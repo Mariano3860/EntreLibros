@@ -9,6 +9,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  checks: write
 
 jobs:
   auto-merge:
@@ -22,10 +23,8 @@ jobs:
         run: |
           AUTHOR=$(jq -r ".pull_request.user.login" "$GITHUB_EVENT_PATH")
           if [ "$AUTHOR" = "dependabot[bot]" ]; then
-            echo "Dependabot PR detected"
             echo "approve=true" >> $GITHUB_ENV
           else
-            echo "Not a Dependabot PR, skipping..."
             echo "approve=false" >> $GITHUB_ENV
           fi
 
@@ -39,10 +38,10 @@ jobs:
         if: env.approve == 'true'
         run: gh pr review --approve "$PR_NUMBER"
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
 
       - name: "Enable auto-merge"
         if: env.approve == 'true'
         run: gh pr merge --auto --squash "$PR_NUMBER"
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
