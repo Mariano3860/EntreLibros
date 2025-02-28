@@ -1,39 +1,52 @@
-name: "Dependabot Auto Merge"
-
-on:
-  pull_request:
-    types:
-      - opened
-      - synchronize
+name: Dependabot auto-merge
+on: pull_request_target
 
 permissions:
   contents: write
   pull-requests: write
+  checks: write
 
 jobs:
-  auto-merge:
+  dependabot:
     runs-on: ubuntu-latest
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
     steps:
-      - name: "Check PR author"
-        id: dependabot
-        run: |
-          AUTHOR=$(jq -r ".pull_request.user.login" "$GITHUB_EVENT_PATH")
-          if [ "$AUTHOR" = "dependabot[bot]" ]; then
-            echo "Dependabot PR detected"
-            echo "approve=true" >> $GITHUB_ENV
-          else
-            echo "Not a Dependabot PR, skipping..."
-            echo "approve=false" >> $GITHUB_ENV
-          fi
+      - name: Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v1
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
 
-      - name: "Approve PR"
-        if: env.approve == 'true'
-        run: gh pr review --approve "$GITHUB_REF"
+      # ✅ Auto-Merge para dependencias seguras
+      - name: Auto-Merge Safe Dependencies
+        if: contains(steps.metadata.outputs.dependency-names, 'eslint') ||
+          contains(steps.metadata.outputs.dependency-names, 'prettier') ||
+          contains(steps.metadata.outputs.dependency-names, 'typescript') ||
+          contains(steps.metadata.outputs.dependency-names, '@types/react') ||
+          contains(steps.metadata.outputs.dependency-names, '@types/react-dom') ||
+          contains(steps.metadata.outputs.dependency-names, '@testing-library/jest-dom') ||
+          contains(steps.metadata.outputs.dependency-names, '@testing-library/react') ||
+          contains(steps.metadata.outputs.dependency-names, '@vitest/coverage-v8') ||
+          contains(steps.metadata.outputs.dependency-names, '@vitest/ui') ||
+          contains(steps.metadata.outputs.dependency-names, 'vitest') ||
+          contains(steps.metadata.outputs.dependency-names, 'stylelint')
+        run: gh pr merge --auto --merge "$PR_URL"
         env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: "Enable auto-merge"
-        if: env.approve == 'true'
-        run: gh pr merge --auto --squash "$GITHUB_REF"
+      # ⚠️ Dejar comentario en PR si es una dependencia crítica
+      - name: Comment on PR
+        if: contains(steps.metadata.outputs.dependency-names, 'react') ||
+          contains(steps.metadata.outputs.dependency-names, 'react-dom') ||
+          contains(steps.metadata.outputs.dependency-names, 'react-router-dom') ||
+          contains(steps.metadata.outputs.dependency-names, '@tanstack/react-query') ||
+          contains(steps.metadata.outputs.dependency-names, 'axios') ||
+          contains(steps.metadata.outputs.dependency-names, '@rsbuild/core') ||
+          contains(steps.metadata.outputs.dependency-names, '@rsbuild/plugin-react') ||
+          contains(steps.metadata.outputs.dependency-names, 'sass') ||
+          contains(steps.metadata.outputs.dependency-names, 'dotenv')
+        run: gh pr comment "$PR_URL" --body "⚠️ This PR updates a critical dependency. Please test before merging."
         env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

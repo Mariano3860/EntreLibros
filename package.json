@@ -19,7 +19,7 @@
   "dependencies": {
     "@rsbuild/core": "^1.2.13",
     "@rsbuild/plugin-react": "^1.1.1",
-    "@tanstack/react-query": "^5.66.10",
+    "@tanstack/react-query": "^5.66.11",
     "axios": "^1.8.1",
     "dotenv": "^16.4.7",
     "react": "^18.3.1",
@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^14.3.1",
+    "@testing-library/react": "^16.2.0",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitest/coverage-v8": "^3.0.7",
@@ -44,7 +44,7 @@
     "style-loader": "^4.0.0",
     "stylelint": "^15.11.0",
     "ts-loader": "^9.5.2",
-    "typescript": "^5.7.3",
+    "typescript": "^5.8.2",
     "vitest": "^3.0.7"
   }
 }
