@@ -1,47 +1,36 @@
-name: "Dependabot Auto Merge"
-
-on:
-  pull_request:
-    types:
-      - opened
-      - synchronize
+name: Dependabot auto-merge
+on: pull_request
 
 permissions:
   contents: write
   pull-requests: write
-  checks: write
+  checks: write  # Permiso adicional requerido
 
 jobs:
-  auto-merge:
+  dependabot:
     runs-on: ubuntu-latest
+    if: |
+      github.event.pull_request.user.login == 'dependabot[bot]' &&
+      github.repository == 'owner/my_repo'
+
     steps:
-      - name: "Checkout Repository"
-        uses: actions/checkout@v4
+      - name: Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@d7267f607e9d3fb96fc2fbe83e0af444713e90b7
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
 
-      - name: "Check PR author"
-        id: check_dependabot
+      - name: Approve PR
+        if: contains(steps.metadata.outputs.dependency-names, 'my-dependency')
         run: |
-          if [ "$(jq -r '.pull_request.user.login' "$GITHUB_EVENT_PATH")" = "dependabot[bot]" ]; then
-            echo "IS_DEPENDABOT=true" >> $GITHUB_ENV
-          else
-            echo "IS_DEPENDABOT=false" >> $GITHUB_ENV
-          fi
-
-      - name: "Get PR Number"
-        if: env.IS_DEPENDABOT == 'true'
-        run: |
-          echo "PR_NUMBER=$(jq -r '.number' "$GITHUB_EVENT_PATH")" >> $GITHUB_ENV
-
-      - name: "Approve PR"
-        if: env.IS_DEPENDABOT == 'true'
-        run: |
-          gh pr review $PR_NUMBER --approve
+          gh pr review ${{ github.event.pull_request.number }} --approve
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}  # Token personal requerido
 
-      - name: "Enable Auto-Merge"
-        if: env.IS_DEPENDABOT == 'true'
+      - name: Enable auto-merge
+        if: contains(steps.metadata.outputs.dependency-names, 'my-dependency')
         run: |
-          gh pr merge $PR_NUMBER --auto --squash
+          gh pr merge --auto --merge "$PR_URL"
         env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
