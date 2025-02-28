@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  frontend:
+    build: .
+    ports:
+      - '3000:80'
+    depends_on:
+      - backend
+  backend:
+    image: buggies-backend:latest
+    ports:
+      - '4000:4000'
+    environment:
+      - NODE_ENV=production
