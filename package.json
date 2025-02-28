@@ -24,7 +24,7 @@
     "dotenv": "^16.4.7",
     "react": "^19.0.0",
     "react-compiler-runtime": "^19.0.0-beta-e1e972c-20250221",
-    "react-dom": "^18.3.1",
+    "react-dom": "^19.0.0",
     "react-router-dom": "^7.2.0",
     "sass": "^1.85.1"
   },
