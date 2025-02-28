@@ -9,7 +9,7 @@ permissions:
 jobs:
   dependabot:
     runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]' && github.repository == 'owner/my_repo'
+    if: github.actor == 'dependabot[bot]'
 
     steps:
       - name: Dependabot metadata
