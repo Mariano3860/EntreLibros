@@ -1,10 +1,5 @@
-name: "Dependabot Auto Merge"
-
-on:
-  pull_request:
-    types:
-      - opened
-      - synchronize
+name: Dependabot auto-merge
+on: pull_request_target
 
 permissions:
   contents: write
@@ -12,36 +7,28 @@ permissions:
   checks: write
 
 jobs:
-  auto-merge:
+  dependabot:
     runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]' && github.repository == 'owner/my_repo'
+
     steps:
-      - name: "Checkout Repository"
-        uses: actions/checkout@v4
+      - name: Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@d7267f607e9d3fb96fc2fbe83e0af444713e90b7
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
 
-      - name: "Check PR author"
-        id: dependabot
+      - name: Approve PR
+        if: contains(steps.metadata.outputs.dependency-names, 'my-dependency')
         run: |
-          AUTHOR=$(jq -r ".pull_request.user.login" "$GITHUB_EVENT_PATH")
-          if [ "$AUTHOR" = "dependabot[bot]" ]; then
-            echo "approve=true" >> $GITHUB_ENV
-          else
-            echo "approve=false" >> $GITHUB_ENV
-          fi
-
-      - name: "Get PR Number"
-        if: env.approve == 'true'
-        run: |
-          PR_NUMBER=$(jq -r ".pull_request.number" "$GITHUB_EVENT_PATH")
-          echo "PR_NUMBER=$PR_NUMBER" >> $GITHUB_ENV
-
-      - name: "Approve PR"
-        if: env.approve == 'true'
-        run: gh pr review --approve "$PR_NUMBER"
+          gh pr review ${{ github.event.pull_request.number }} --approve
         env:
           GH_TOKEN: ${{ secrets.PAT_TOKEN }}
 
-      - name: "Enable auto-merge"
-        if: env.approve == 'true'
-        run: gh pr merge --auto --squash "$PR_NUMBER"
+      - name: Enable auto-merge
+        if: contains(steps.metadata.outputs.dependency-names, 'my-dependency')
+        run: |
+          gh pr merge --auto --merge "$PR_URL"
         env:
-          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
