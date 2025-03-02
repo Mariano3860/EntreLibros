@@ -6,9 +6,8 @@ body {
   font-size: $body-font-size;
   line-height: $line-height-base;
   color: var(--text-primary);
-  background-color: var(--background-color);
-  transition: background-color $transition-duration-normal
-    $transition-timing-function;
+  background-color: var(--background-primary);
+  transition: background-color $transition-duration-normal $transition-timing-function;
 }
 
 // Headings
