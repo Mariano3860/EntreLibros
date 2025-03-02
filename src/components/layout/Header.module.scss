@@ -1,0 +1,25 @@
+@import '../../styles/variables';
+
+// Header styles
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0.5rem;
+  background: var(--background-secondary);
+  box-shadow: var(--shadow-sm);
+
+  .logo {
+    height: 100px;
+    width: auto;
+    margin-left: 0.5rem;
+  }
+
+  .controls {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    margin-top: 1rem;
+    margin-right: 1rem;
+  }
+}

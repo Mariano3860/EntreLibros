@@ -1,0 +1,153 @@
+@use 'sass:math';
+
+// ======================
+// Color System
+// ======================
+
+// Base Colors
+:root {
+  // Primary Colors
+  --color-primary-100: #e0f2f1;
+  --color-primary-200: #b2dfdb;
+  --color-primary-300: #80cbc4;
+  --color-primary-400: #4db6ac;
+  --color-primary-500: #26a69a; // Base primary
+  --color-primary-600: #009688;
+  --color-primary-700: #00897b;
+  --color-primary-800: #00796b;
+  --color-primary-900: #00695c;
+
+  // Neutral Colors
+  --color-neutral-100: #f8f9fa;
+  --color-neutral-200: #e9ecef;
+  --color-neutral-300: #dee2e6;
+  --color-neutral-400: #ced4da;
+  --color-neutral-500: #adb5bd;
+  --color-neutral-600: #6c757d;
+  --color-neutral-700: #495057;
+  --color-neutral-800: #343a40;
+  --color-neutral-900: #212529;
+
+  // Status Colors
+  --color-success: #28a745;
+  --color-warning: #ffc107;
+  --color-error: #dc3545;
+  --color-info: #17a2b8;
+
+  // Light theme
+  --background-primary: #ffffff;
+  --background-card: #f8f9fa;
+  --text-primary: #212529;
+  --text-secondary: #6c757d;
+  --border-color: #dee2e6;
+  --primary-color: #26a69a;
+  --primary-dark: #00796b;
+  --primary-rgb: 38, 166, 154;
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+// Dark Theme Overrides
+[data-theme='dark'] {
+  --background-primary: #212529;
+  --background-card: #343a40;
+  --text-primary: #f8f9fa;
+  --text-secondary: #adb5bd;
+  --border-color: #495057;
+  --primary-color: #4db6ac;
+  --primary-dark: #009688;
+}
+
+// ======================
+// Spacing & Sizing
+// ======================
+
+$base-unit: 4px;
+$spacing-scale: 0.25;
+
+@function space($multiplier) {
+  @return $base-unit * math.div($multiplier, $spacing-scale); // Usar math.div
+}
+
+// Spacing Variables
+$spacing-1: space(1); // 4px
+$spacing-2: space(2); // 8px
+$spacing-3: space(3); // 12px
+$spacing-4: space(4); // 16px
+$spacing-5: space(5); // 20px
+$spacing-6: space(6); // 24px
+
+// Container Sizes
+$container-max-width: 1200px;
+$container-padding: $spacing-4;
+
+// ======================
+// Breakpoints
+// ======================
+
+$breakpoint-mobile: 480px;
+$breakpoint-tablet: 768px;
+$breakpoint-desktop: 1024px;
+
+// ======================
+// Typography
+// ======================
+
+$font-family-base:
+  'Inter',
+  system-ui,
+  -apple-system,
+  sans-serif;
+$font-family-mono: 'Roboto Mono', monospace;
+
+$font-size-root: 16px;
+$line-height-base: 1.5;
+
+// Font Weights
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-bold: 700;
+
+// Heading Sizes
+$h1-font-size: 2.5rem; // 40px
+$h2-font-size: 2rem; // 32px
+$h3-font-size: 1.75rem; // 28px
+$h4-font-size: 1.5rem; // 24px
+$h5-font-size: 1.25rem; // 20px
+$h6-font-size: 1rem; // 16px
+
+// Body Text
+$body-font-size: 1rem;
+$small-font-size: 0.875rem;
+
+// ======================
+// Shadows & Elevation
+// ======================
+
+$box-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$box-shadow-md:
+  0 4px 6px -1px rgba(0, 0, 0, 0.1),
+  0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$box-shadow-lg:
+  0 10px 15px -3px rgba(0, 0, 0, 0.1),
+  0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+// ======================
+// Transitions & Animations
+// ======================
+
+$transition-duration-fast: 0.15s;
+$transition-duration-normal: 0.3s;
+$transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+
+// ======================
+// Z-Index Layers
+// ======================
+
+$z-index-base: 0;
+$z-index-dropdown: 10;
+$z-index-sticky: 20;
+$z-index-fixed: 30;
+$z-index-modal-backdrop: 40;
+$z-index-modal: 50;
+$z-index-toast: 60;
+$z-index-tooltip: 70;

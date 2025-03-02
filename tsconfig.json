@@ -1,5 +1,23 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "@components/*": [
+        "./src/components/*"
+      ],
+      "@contexts/*": [
+        "./src/contexts/*"
+      ],
+      "@hooks/*": [
+        "./src/hooks/*"
+      ],
+      "@styles/*": [
+        "./src/styles/*"
+      ]
+    },
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "moduleResolution": "node",
@@ -10,6 +28,7 @@
     "strict": true,
     "types": [
       "vitest/globals"
-    ]
+    ],
+    "resolveJsonModule": true
   }
 }

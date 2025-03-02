@@ -1,0 +1,59 @@
+@import '@styles/variables';
+
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 24px;
+  border: none;
+  border-radius: 12px;
+  background-color: var(--toggle-bg);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2);
+  }
+
+  &:hover:not(:disabled) {
+    background-color: var(--toggle-hover);
+  }
+
+  &[aria-checked='true'] {
+    background-color: var(--primary-color);
+
+    .thumb {
+      transform: translateX(24px);
+    }
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background-color: white;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// Variables específicas del toggle (agregar en _variables.scss)
+:root {
+  --toggle-bg: #e0e0e0;
+  --toggle-hover: #d0d0d0;
+}
+
+[data-theme='dark'] {
+  --toggle-bg: #424242;
+  --toggle-hover: #555555;
+}

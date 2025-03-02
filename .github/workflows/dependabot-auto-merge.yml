@@ -15,7 +15,7 @@ jobs:
         id: metadata
         uses: dependabot/fetch-metadata@v1
         with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
 
       # ✅ Auto-Merge para dependencias seguras
       - name: Auto-Merge Safe Dependencies

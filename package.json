@@ -19,14 +19,21 @@
   "dependencies": {
     "@rsbuild/core": "^1.2.13",
     "@rsbuild/plugin-react": "^1.1.1",
+    "@rsbuild/plugin-sass": "^1.2.2",
+    "@rsbuild/plugin-svgr": "^1.0.7",
     "@tanstack/react-query": "^5.66.11",
+    "@types/react-i18next": "^8.1.0",
     "axios": "^1.8.1",
     "dotenv": "^16.4.7",
+    "i18next": "^24.2.2",
     "react": "^19.0.0",
     "react-compiler-runtime": "^19.0.0-beta-e1e972c-20250221",
     "react-dom": "^19.0.0",
+    "react-hook-form": "^7.54.2",
+    "react-i18next": "^15.4.1",
     "react-router-dom": "^7.2.0",
-    "sass": "^1.85.1"
+    "vite-tsconfig-paths": "^5.1.4",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.3",
@@ -40,6 +47,7 @@
     "jsdom": "^26.0.0",
     "msw": "^2.7.3",
     "prettier": "^3.5.2",
+    "sass": "^1.85.1",
     "sass-loader": "^16.0.5",
     "style-loader": "^4.0.0",
     "stylelint": "^15.11.0",

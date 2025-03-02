@@ -22,7 +22,7 @@ API.
 ## Technologies Used
 
 | Technology                         | Purpose                                             |
-|------------------------------------|-----------------------------------------------------|
+| ---------------------------------- | --------------------------------------------------- |
 | **React 18 + TypeScript**          | Frontend framework with strong typing & scalability |
 | **RSBuild**                        | Ultra-fast bundler for optimized builds             |
 | **TanStack Query + Axios**         | Efficient state & API data management               |
@@ -105,15 +105,13 @@ buggies-frontend/
 #### **Core Features**
 
 - [x] Set up project structure & dependencies
-- [ ] Implement authentication (JWT-based)
 - [ ] Create Drag & Drop firmware flashing UI
+- [ ] Implement API mocking with MSW for local development
+- [ ] Implement authentication (JWT-based)
+- [ ] CI/CD pipeline for testing & deployment
 - [ ] Implement automatic firmware download from backend
 - [ ] Add WebSocket support for live device status updates
-- [ ] Implement API mocking with MSW for local development
-- [ ] CI/CD pipeline for testing & deployment
-- [ ] Finalize UI/UX improvements for better accessibility
 - [ ] Implement multi-language support
-- [ ] Optimize frontend build for faster performance
 
 ### **Future Enhancements**
 

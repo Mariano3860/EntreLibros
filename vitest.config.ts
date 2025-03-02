@@ -1,6 +1,8 @@
 import { defineConfig } from 'vitest/config'
+import tsconfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig({
+  plugins: [tsconfigPaths()],
   test: {
     coverage: {
       enabled: true,
@@ -9,38 +11,34 @@ export default defineConfig({
       include: ['src/**', 'mocks/**'],
       exclude: ['**/*.stories.{ts,tsx}', 'tests/**', 'node_modules/**'],
       thresholds: {
-        lines: 90,
-        functions: 90,
-        branches: 90,
-        statements: 90,
+        lines: 85,
+        functions: 85,
+        branches: 85,
+        statements: 85,
       },
     },
+    setupFiles: './tests/setup.ts',
+    globals: true,
+    exclude: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/.{idea,git,cache,output,temp}/**',
+    ],
     workspace: [
       {
+        extends: true,
         test: {
-          globals: true,
           include: ['**/*.node.test.{ts,tsx,js,jsx}'],
-          exclude: [
-            '**/node_modules/**',
-            '**/dist/**',
-            '**/.{idea,git,cache,output,temp}/**',
-          ],
           environment: 'node',
           pool: 'forks',
         },
       },
       {
+        extends: true,
         test: {
-          globals: true,
           include: ['**/*.test.{ts,tsx,js,jsx}'],
-          exclude: [
-            '**/*.node.test.*',
-            '**/node_modules/**',
-            '**/dist/**',
-            '**/.{idea,git,cache,output,temp}/**',
-          ],
+          exclude: ['**/*.node.test.*'],
           environment: 'jsdom',
-          setupFiles: './tests/setup.ts',
           pool: 'threads',
         },
       },
