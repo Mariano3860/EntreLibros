@@ -50,14 +50,3 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
-// Variables específicas del toggle (agregar en _variables.scss)
-:root {
-  --toggle-bg: #e0e0e0;
-  --toggle-hover: #d0d0d0;
-}
-
-[data-theme='dark'] {
-  --toggle-bg: #424242;
-  --toggle-hover: #555555;
-}
