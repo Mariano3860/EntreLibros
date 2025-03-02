@@ -4,5 +4,13 @@
   "email": "Email",
   "password": "Password",
   "login": "Login",
-  "authenticating": "Authenticating..."
+  "authenticating": "Authenticating...",
+  "auth": {
+    "errors": {
+      "invalid_credentials": "Invalid email or password."
+    },
+    "success": {
+      "login": "Login successful!"
+    }
+  }
 }

@@ -1,19 +1,33 @@
-import { JSX, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styles from './LoginForm.module.scss'
 import { LoginFormProps } from './LoginForm.types'
+import { showToast } from '@/components/ui/toaster/Toaster'
+import { useLogin } from '@hooks/api/useLogin'
 
-export const LoginForm = ({
-  onSubmit,
-  isLoading = false,
-}: LoginFormProps): JSX.Element => {
+export const LoginForm = ({ onSubmit }: LoginFormProps) => {
   const { t } = useTranslation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const { mutate: login, isPending } = useLogin()
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onSubmit({ email, password })
+    login(
+      { email, password },
+      {
+        onSuccess: (data) => {
+          showToast(t('auth.success.login'), 'success') // Notificación de éxito
+          onSubmit?.(data)
+        },
+        onError: (error: any) => {
+          showToast(
+            t(error.response?.data?.message || 'auth.errors.unknown'),
+            'error'
+          ) // Notificación de error
+        },
+      }
+    )
   }
 
   return (
@@ -43,9 +57,9 @@ export const LoginForm = ({
       <button
         type="submit"
         className={styles.submitButton}
-        disabled={isLoading}
+        disabled={isPending}
       >
-        {isLoading ? t('authenticating') : t('login')}
+        {isPending ? t('authenticating') : t('login')}
       </button>
     </form>
   )

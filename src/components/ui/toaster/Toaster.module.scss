@@ -1,0 +1,19 @@
+@import '@styles/variables';
+
+.toastDark, .toastLight {
+  top: 4.5rem !important;
+  right: 1rem;
+  position: fixed;
+  z-index: 9999;
+  max-width: 320px;
+  width: auto;
+}
+
+@media (max-width: 480px) {
+  .toastDark, .toastLight {
+    top: 5rem !important;
+    right: 0.5rem;
+    left: 0.5rem;
+    max-width: none;
+  }
+}

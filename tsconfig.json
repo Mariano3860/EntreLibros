@@ -16,6 +16,9 @@
       ],
       "@styles/*": [
         "./src/styles/*"
+      ],
+      "@mocks/*": [
+        "./src/mocks/*"
       ]
     },
     "jsx": "react-jsx",

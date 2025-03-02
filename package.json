@@ -32,6 +32,7 @@
     "react-hook-form": "^7.54.2",
     "react-i18next": "^15.4.1",
     "react-router-dom": "^7.2.0",
+    "react-toastify": "^11.0.5",
     "vite-tsconfig-paths": "^5.1.4",
     "zod": "^3.24.2"
   },
@@ -54,5 +55,10 @@
     "ts-loader": "^9.5.2",
     "typescript": "^5.8.2",
     "vitest": "^3.0.7"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }

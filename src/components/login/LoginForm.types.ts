@@ -1,10 +1,7 @@
-export type LoginCredentials = {
-  email: string
-  password: string
-}
+import { LoginResponse } from '@/api/auth/login.types'
 
 export type LoginFormProps = {
-  onSubmit: (credentials: LoginCredentials) => void
+  onSubmit: (credentials: LoginResponse) => void
   isLoading?: boolean
   errorMessage?: string
 }

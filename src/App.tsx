@@ -2,14 +2,21 @@ import AppRoutes from './routes'
 import React from 'react'
 import { ThemeProvider } from '@contexts/ThemeContext'
 import '@styles/main.scss'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { Toaster } from '@components/ui/toaster/Toaster'
+
+const queryClient = new QueryClient()
 
 const App = () => {
   return (
-    <ThemeProvider>
-      <div>
-        <AppRoutes />
-      </div>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <div>
+          <AppRoutes />
+          <Toaster />
+        </div>
+      </ThemeProvider>
+    </QueryClientProvider>
   )
 }
 
