@@ -9,7 +9,3 @@ export const login = async (data: LoginRequest): Promise<LoginResponse> => {
   )
   return response.data
 }
-
-export const logout = async () => {
-  await apiClient.post(API_ROUTES.AUTH.LOGOUT)
-}

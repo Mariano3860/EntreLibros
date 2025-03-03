@@ -1,7 +1,6 @@
-// src/hooks/auth/useLogout.ts
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { logout } from '@/api/auth/logout.service' // Asegúrate de crear este servicio
+import { logout } from '@/api/auth/logout.service'
 import { AuthQueryKeys } from '@/constants/queryKeys'
 
 export const useLogout = () => {

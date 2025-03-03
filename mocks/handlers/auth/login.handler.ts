@@ -2,9 +2,10 @@ import { http, HttpResponse } from 'msw'
 import successResponse from './fixtures/login.success.json'
 import errorResponse from './fixtures/login.error.json'
 import { LoginRequest } from '@/api/auth/login.types'
+import { API_ROUTES } from '@/api/routes'
 
 export const loginHandler = http.post<LoginRequest, '/api/auth/login'>(
-  '/api/auth/login',
+  API_ROUTES.AUTH.LOGIN,
   async ({ request }) => {
     const { email, password } =
       (await request.json()) as unknown as LoginRequest
