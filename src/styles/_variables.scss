@@ -86,6 +86,12 @@ $spacing-6: space(6); // 24px
 $container-max-width: 1200px;
 $container-padding: $spacing-4;
 
+//sidebar
+$collapsed-width: 56px;
+$expanded-width: 200px;
+$transition-speed: 0.3s;
+$icon-size: 1.5rem;
+
 // ======================
 // Breakpoints
 // ======================

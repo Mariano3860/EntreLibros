@@ -1,10 +1,10 @@
 import { Flip, toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import styles from './Toaster.module.scss'
-import { useThemeDetector } from '@hooks/theme/useThemeDetector'
+import { useTheme } from '@hooks/theme/useTheme'
 
 export const Toaster = () => {
-  const currentTheme = useThemeDetector()
+  const { theme } = useTheme()
 
   return (
     <ToastContainer
@@ -16,9 +16,9 @@ export const Toaster = () => {
       rtl={false}
       pauseOnFocusLoss
       pauseOnHover
-      theme={currentTheme}
+      theme={theme}
       transition={Flip}
-      className={currentTheme === 'dark' ? styles.toastDark : styles.toastLight}
+      className={theme === 'dark' ? styles.toastDark : styles.toastLight}
     />
   )
 }

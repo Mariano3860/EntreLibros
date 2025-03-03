@@ -1,0 +1,152 @@
+@import '../../styles/variables';
+
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: $collapsed-width;
+  background: var(--background-card);
+  border-right: 1px solid var(--border-color);
+  transition: width $transition-speed ease;
+  overflow: hidden;
+  z-index: 1000;
+
+  &:hover {
+    width: $expanded-width;
+
+    .label {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @media (max-width: $breakpoint-tablet) {
+    width: $collapsed-width;
+    bottom: 0;
+    height: auto;
+    top: auto;
+
+    &:hover {
+      width: $collapsed-width;
+    }
+  }
+}
+
+.navItems {
+  padding: 1rem 0;
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.3s $transition-timing-function;
+
+  &:hover {
+    color: var(--text-primary);
+  }
+
+  &.active {
+    color: var(--primary-color);
+    font-weight: 500;
+
+    .icon {
+      fill: currentColor;
+    }
+  }
+}
+
+[data-theme='light'] {
+  .navLink {
+    color: var(--text-primary);
+
+    &:hover {
+      color: var(--primary-dark);
+    }
+  }
+}
+
+.icon {
+  font-size: 1.5rem;
+  margin-right: 1rem;
+  min-width: 24px;
+  color: var(--text-primary);
+}
+
+.label {
+  opacity: 0;
+  transition: opacity $transition-speed ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: max-content;
+
+  .sidebar:hover & {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  border-top: 1px solid var(--border-color);
+  //padding-top: 1rem;
+  margin-top: auto;
+}
+
+.themeButton,
+.logoutButton {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 1rem;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.3s $transition-timing-function;
+
+  &:hover {
+    .label {
+      opacity: 1;
+    }
+  }
+
+  .icon {
+    //flex-shrink: 0;
+    margin-right: 1rem;
+  }
+
+  .label {
+    flex-grow: 0;
+    //flex-shrink: 0;
+  }
+}
+
+.logoutButton {
+  padding: 1rem 0.8rem 1rem 1.2rem;
+
+  &:hover {
+    color: var(--color-error);
+  }
+}
+
+.themeButton {
+  &:hover {
+    color: var(--primary-color);
+
+    .icon {
+      transform: rotate(-15deg);
+    }
+
+    .label {
+      transform: translateX(0);
+    }
+  }
+}

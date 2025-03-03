@@ -4,9 +4,11 @@ import styles from './LoginForm.module.scss'
 import { LoginFormProps } from './LoginForm.types'
 import { showToast } from '@/components/ui/toaster/Toaster'
 import { useLogin } from '@hooks/api/useLogin'
+import { useNavigate } from 'react-router-dom'
 
 export const LoginForm = ({ onSubmit }: LoginFormProps) => {
   const { t } = useTranslation()
+  const navigate = useNavigate() // Obtener la función de navegación
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const { mutate: login, isPending } = useLogin()
@@ -17,14 +19,15 @@ export const LoginForm = ({ onSubmit }: LoginFormProps) => {
       { email, password },
       {
         onSuccess: (data) => {
-          showToast(t('auth.success.login'), 'success') // Notificación de éxito
+          showToast(t('auth.success.login'), 'success')
           onSubmit?.(data)
+          navigate('/dashboard')
         },
         onError: (error: any) => {
           showToast(
             t(error.response?.data?.message || 'auth.errors.unknown'),
             'error'
-          ) // Notificación de error
+          )
         },
       }
     )

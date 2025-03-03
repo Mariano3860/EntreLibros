@@ -12,5 +12,11 @@
     "success": {
       "login": "Login successful!"
     }
+  },
+  "theme": {
+    "mode": {
+      "dark": "Dark mode",
+      "light": "Light mode"
+    }
   }
 }

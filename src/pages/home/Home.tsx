@@ -1,6 +1,6 @@
 import styles from './Home.module.scss'
 import { LoginForm } from '@components/login/LoginForm'
-import { Header } from '@components/layout/Header'
+import { Header } from '@components/layout/header/Header'
 
 const Home = () => {
   return (

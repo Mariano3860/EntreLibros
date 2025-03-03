@@ -1,0 +1,62 @@
+// ThemeIconButton.module.scss
+@import '@styles/variables';
+
+.themeButton {
+  background: none;
+  border: none;
+  padding: 1rem;
+  cursor: pointer;
+  width: 100%;
+  color: var(--text-secondary);
+  transition: color 0.3s $transition-timing-function;
+
+  &:hover {
+    color: var(--primary-color);
+
+    .icon {
+      transform: rotate(-15deg);
+    }
+
+    .label {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+}
+
+.buttonContent {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: fit-content;
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  transition: transform 0.3s $transition-timing-function,
+  color 0.3s $transition-timing-function;
+
+  [data-theme='dark'] & {
+    color: var(--primary-color);
+  }
+
+  [data-theme='light'] & {
+    color: var(--text-primary);
+  }
+}
+
+.label {
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity 0.3s $transition-timing-function,
+  transform 0.3s $transition-timing-function;
+  position: absolute;
+  left: calc(100% + 0.5rem);
+  white-space: nowrap;
+
+  .sidebar:hover & {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

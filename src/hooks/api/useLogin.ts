@@ -1,17 +1,19 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { LoginRequest, LoginResponse } from '@/api/auth/login.types'
+import { AuthQueryKeys } from '@/constants/queryKeys'
 import { login } from '@/api/auth/login.service'
 
 export const useLogin = () => {
   const queryClient = useQueryClient()
 
-  return useMutation<LoginResponse, Error, LoginRequest>({
+  return useMutation({
     mutationFn: login,
     onSuccess: (data) => {
-      queryClient.setQueryData(['auth'], data)
+      localStorage.setItem('authToken', data.token)
+      queryClient.setQueryData([AuthQueryKeys.AUTH], data)
     },
     onError: (error) => {
       console.error('Login failed:', error)
+      queryClient.removeQueries({ queryKey: [AuthQueryKeys.AUTH] })
     },
   })
 }

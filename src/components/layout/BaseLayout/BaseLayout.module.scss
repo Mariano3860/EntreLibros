@@ -1,0 +1,19 @@
+// src/components/layout/BaseLayout.module.scss
+@import '../../../styles/variables';
+
+.baseLayout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--background-primary);
+}
+
+.mainContent {
+  flex: 1;
+  padding: 2rem;
+  margin-left: $collapsed-width; // Sidebar collapse width
+
+  @media (max-width: $breakpoint-tablet) {
+    margin-left: 0;
+    padding: 1rem;
+  }
+}
