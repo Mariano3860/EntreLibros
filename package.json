@@ -25,7 +25,7 @@
     "@types/react-i18next": "^8.1.0",
     "axios": "^1.11.0",
     "dotenv": "^16.4.7",
-    "i18next": "^24.2.2",
+    "i18next": "^25.3.2",
     "react": "^19.1.1",
     "react-compiler-runtime": "^19.0.0-beta-e1e972c-20250221",
     "react-dom": "^19.1.1",
