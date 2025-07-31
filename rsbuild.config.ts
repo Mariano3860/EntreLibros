@@ -81,7 +81,7 @@ export default defineConfig({
 
   tools: {
     htmlPlugin: {
-      title: 'Buggies Frontend', // ✅ Sets HTML title
+      title: 'EntreLibros Frontend', // ✅ Sets HTML title
     },
   },
 })

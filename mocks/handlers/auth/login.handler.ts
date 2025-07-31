@@ -10,7 +10,7 @@ export const loginHandler = http.post<LoginRequest, '/api/auth/login'>(
     const { email, password } =
       (await request.json()) as unknown as LoginRequest
 
-    const isValidCredentials = email === 'user@buggies.com' && password === '' // Contraseña corregida
+    const isValidCredentials = email === 'user@entrelibros.com' && password === '' // Contraseña corregida
 
     if (!isValidCredentials) {
       return HttpResponse.json(errorResponse, {

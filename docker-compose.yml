@@ -7,7 +7,7 @@ services:
     depends_on:
       - backend
   backend:
-    image: buggies-backend:latest
+    image: entrelibros-backend:latest
     ports:
       - '4000:4000'
     environment:

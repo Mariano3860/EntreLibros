@@ -1,150 +1,98 @@
-# Buggies Frontend 🖥️
+# 📚 EntreLibros Frontend
 
-## Overview
+**EntreLibros** es una plataforma web colaborativa para el intercambio de libros físicos entre personas reales, potenciando la lectura libre mediante geolocalización, reseñas, catálogos personales y conexión social.
 
-Buggies Frontend is the web-based interface for managing and flashing firmware onto ESP32 devices. It provides an
-intuitive UI for authentication, firmware selection, and device interaction. The frontend is built with **modern web
-technologies**, ensuring performance, scalability, and maintainability while integrating seamlessly with the backend
-API.
-
-## Features
-
-✅ User authentication with JWT & secure session handling  
-✅ Two firmware flashing methods: Drag & Drop or automatic update from backend  
-✅ Device status monitoring via WebSockets  
-✅ Progressive Web App (PWA) for offline support  
-✅ Multi-language support (English & Spanish)  
-✅ Dark mode & accessibility features  
-✅ CI/CD automation for testing & deployments  
-✅ Mock API support for local development using MSW  
-✅ Responsive UI designed with modern UX principles
-
-## Technologies Used
-
-| Technology                         | Purpose                                             |
-| ---------------------------------- | --------------------------------------------------- |
-| **React 18 + TypeScript**          | Frontend framework with strong typing & scalability |
-| **RSBuild**                        | Ultra-fast bundler for optimized builds             |
-| **TanStack Query + Axios**         | Efficient state & API data management               |
-| **ESLint, Prettier, Stylelint**    | Code formatting & linting for quality assurance     |
-| **SASS (SCSS)**                    | Scalable styling with theme support                 |
-| **Vitest + React Testing Library** | Unit & integration testing                          |
-| **Mock Service Worker (MSW)**      | API mocking for seamless local development          |
-| **Nginx + Docker**                 | Production-ready static file serving                |
-| **GitHub Actions**                 | CI/CD automation for builds & deployments           |
-
-## Project Structure 🏗
-
-```
-buggies-frontend/
-│── public/                     # Static assets (icons, manifest, images, etc.)
-│   ├── index.html               # Root HTML file
-│   ├── favicon.ico              # Favicon for the app
-│   ├── manifest.json            # PWA support
-│   ├── robots.txt               # SEO rules
-│── src/                         # Source code
-│   ├── api/                     # API services (Auth, Firmware, Device)
-│   ├── assets/                  # Static assets (SVGs, fonts, etc.)
-│   ├── components/              # Reusable UI components
-│   │   ├── common/              # Buttons, modals, loaders, etc.
-│   │   ├── forms/               # Form components
-│   │   ├── layout/              # Layout components (Navbar, Sidebar)
-│   ├── context/                 # Global state management (React Context)
-│   ├── hooks/                   # Custom React hooks
-│   ├── lib/                     # Utility libraries (fetch, storage, helpers)
-│   ├── pages/                   # Main application pages
-│   │   ├── Home.tsx             # Landing page
-│   │   ├── Dashboard.tsx        # Main dashboard
-│   │   ├── Auth.tsx             # Login & Signup pages
-│   │   ├── Firmware.tsx         # Firmware flashing UI
-│   │   ├── NotFound.tsx         # 404 Page
-│   ├── routes/                  # React Router configuration
-│   ├── services/                # API service integrations
-│   ├── state/                   # State management (if using Redux/Zustand)
-│   ├── styles/                  # Global styles (SCSS)
-│   ├── translations/            # Multi-language support (i18n JSON)
-│   ├── types/                   # TypeScript interfaces & types
-│   ├── utils/                   # Helper functions
-│   ├── App.tsx                  # Main app component
-│   ├── index.tsx                 # App entry point
-│── tests/                       # Unit & integration tests
-│   ├── components/              # Tests for components
-│   ├── pages/                   # Tests for pages
-│   ├── api/                     # Tests for API requests
-│── mocks/                       # Mock API with MSW
-│── .github/                     # GitHub Configurations
-│   ├── workflows/               # CI/CD pipeline config
-│   │   ├── ci.yml               # Runs tests & linting on PRs
-│   │   ├── build.yml            # Build process for deployments
-│   │   ├── dependabot-auto-merge.yml  # Auto-merge Dependabot updates
-│   ├── dependabot.yml           # Dependabot config for dependencies
-│── .vscode/                     # VSCode settings (optional)S
-│   ├── settings.json            # Workspace settings
-│   ├── extensions.json          # Recommended extensions
-│── config/                      # Configuration files
-│   ├── env/                     # Environment variables
-│   │   ├── .env.development     # Dev environment variables
-│   │   ├── .env.production      # Production environment variables
-│── .eslintrc.js                 # ESLint configuration
-│── .prettierrc                  # Prettier configuration
-│── .stylelintrc.js              # Stylelint configuration
-│── .gitignore                   # Git ignore rules
-│── Dockerfile                   # Containerization for deployment
-│── docker-compose.yml           # Multi-service orchestration
-│── rsbuild.config.ts            # RSBuild configuration
-│── vitest.config.ts             # Vitest configuration
-│── tsconfig.json                # TypeScript configuration
-│── package.json                 # Project dependencies
-│── README.md                    # Documentation
-```
-
-## Roadmap 📌
-
-### **Minimum Viable Product (MVP)**
-
-#### **Core Features**
-
-- [x] Set up project structure & dependencies
-- [ ] Create Drag & Drop firmware flashing UI
-- [ ] Implement API mocking with MSW for local development
-- [ ] Implement authentication (JWT-based)
-- [ ] CI/CD pipeline for testing & deployment
-- [ ] Implement automatic firmware download from backend
-- [ ] Add WebSocket support for live device status updates
-- [ ] Implement multi-language support
-
-### **Future Enhancements**
-
-#### **Security & Authentication**
-
-- [ ] OAuth2 & social login support
-- [ ] Two-factor authentication (2FA)
-- [ ] Session management improvements
-
-#### **Performance & Optimization**
-
-- [ ] Implement service worker caching for PWA support
-- [ ] Add GraphQL support for flexible API queries
-- [ ] Optimize WebSocket connection handling
-- [ ] Implement lazy loading for large assets
-
-#### **Additional Features**
-
-- [ ] Dark mode toggle & theme customization
-- [ ] Admin dashboard for firmware & user management
-- [ ] Device analytics & logs visualization
-- [ ] Enhanced accessibility features (keyboard navigation, high contrast mode)
-
-## Contribution Guidelines 🤝
-
-1. Fork the repository & create a feature branch.
-2. Follow the coding style & commit guidelines.
-3. Submit a PR & wait for review.
-
-## License 📜
-
-Not yet.
+Este repositorio contiene el código del frontend desarrollado con **React + Vite + TypeScript**, enfocado en una interfaz limpia, moderna, y con fuerte énfasis en la experiencia de usuario.
 
 ---
 
-🚀 **Ready to get started? Follow the setup guide and start contributing!**
+## 🧭 Visión
+
+EntreLibros busca ser el puente entre el mundo físico de los libros y las herramientas digitales modernas. A través de un mapa interactivo y una comunidad conectada por intereses literarios, la app permite descubrir casitas de intercambio, gestionar tu biblioteca, dejar reseñas y coordinar intercambios directos.
+
+---
+
+## ✨ Funcionalidades principales
+
+✅ Registro y login de usuarios
+✅ Geolocalización de casitas de intercambio
+✅ Catálogo personal de libros para compartir o buscar
+✅ Sistema de reseñas y puntuación
+✅ Perfil de usuario con afinidades lectoras
+✅ Recomendaciones de usuarios cercanos con gustos similares
+✅ Chat entre usuarios que se siguen (premium: iniciar sin aceptación)
+✅ Modo claro/oscuro y diseño responsive
+✅ Internacionalización (i18n) y accesibilidad básica
+
+---
+
+## 🛠️ Tecnologías utilizadas
+
+| Tecnología                    | Uso principal                                 |
+| ----------------------------- | --------------------------------------------- |
+| **React + Vite**              | Frontend rápido y modular                     |
+| **TypeScript**                | Tipado estricto y mantenibilidad              |
+| **TanStack Query**            | Manejo eficiente de datos remotos             |
+| **Zustand o Context API**     | Estado global ligero (dependiendo de versión) |
+| **React Router**              | Navegación declarativa                        |
+| **Vitest + Testing Library**  | Testing unitario e integración                |
+| **Mock Service Worker (MSW)** | Mock de API local                             |
+| **SCSS**                      | Estilos escalables con soporte de theming     |
+| **i18next**                   | Internacionalización                          |
+| **GitHub Actions**            | CI/CD y automatización de builds/tests        |
+
+---
+
+## 🏗 Estructura del proyecto
+
+```
+entreLibros_frontend/
+│── public/                 # Archivos estáticos (index.html, manifest, íconos)
+│── src/
+│   ├── api/                # Integración con servicios REST
+│   ├── assets/             # Imágenes, íconos, fuentes
+│   ├── components/         # Componentes reutilizables
+│   ├── features/           # Módulos funcionales (auth, books, map, etc.)
+│   ├── hooks/              # Hooks personalizados
+│   ├── pages/              # Rutas principales (Home, Perfil, Casita, etc.)
+│   ├── routes/             # Configuración de rutas
+│   ├── styles/             # Estilos globales y variables SCSS
+│   ├── translations/       # Archivos de idiomas (JSON)
+│   ├── types/              # Tipos globales de TypeScript
+│   ├── App.tsx             # Componente raíz
+│   └── main.tsx            # Entry point de la app
+│── tests/                  # Pruebas automatizadas
+│── .github/                # Configuración de workflows CI/CD
+│── .env.*                  # Variables de entorno por ambiente
+│── Dockerfile              # Configuración para despliegue
+│── vitest.config.ts        # Configuración de testing
+│── tsconfig.json           # Configuración de TypeScript
+│── package.json            # Dependencias y scripts
+```
+
+---
+
+## 🚧 Roadmap (MVP)
+
+* [x] Setup de proyecto y dependencias básicas
+* [ ] Mapa interactivo de casitas
+* [ ] Registro/Login + gestión de perfil
+* [ ] Catálogo personal (libros ofrecidos y deseados)
+* [ ] Sistema de reseñas
+* [ ] Matching de usuarios por afinidad lectora
+* [ ] Chat básico entre usuarios que se siguen
+* [ ] Internacionalización (ES/EN)
+* [ ] Mock API con MSW
+* [ ] Deploy automático con GitHub Actions
+
+---
+
+## 📜 Licencia
+
+Este proyecto está en desarrollo académico. La licencia se definirá en la versión final.
+
+---
+
+## 🤝 Contribución
+
+Este repositorio está gestionado como parte de un proyecto de grado. Pull requests están deshabilitados de momento.
