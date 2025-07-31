@@ -1,7 +1,7 @@
 {
   "name": "entrelibros-frontend",
   "version": "1.0.0",
-  "description": "Web-based flasher for ESP32-S3 devices in the EntreLibros ecosystem.",
+  "description": "Aplicación web del proyecto EntreLibros: una plataforma colaborativa para compartir, reseñar e intercambiar libros físicos mediante geolocalización.",
   "type": "module",
   "scripts": {
     "dev": "rsbuild dev --open",
