@@ -27,7 +27,7 @@
     "dotenv": "^16.4.7",
     "i18next": "^24.2.2",
     "react": "^19.1.1",
-    "react-compiler-runtime": "^19.0.0-beta-e1e972c-20250221",
+    "react-compiler-runtime": "^19.0.0-beta-714736e-20250131",
     "react-dom": "^19.1.1",
     "react-hook-form": "^7.61.1",
     "react-i18next": "^15.6.1",
