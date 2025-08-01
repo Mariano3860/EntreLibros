@@ -54,7 +54,7 @@ entreLibros_frontend/
 │   ├── components/         # Componentes reutilizables
 │   ├── features/           # Módulos funcionales (auth, books, map, etc.)
 │   ├── hooks/              # Hooks personalizados
-│   ├── pages/              # Rutas principales (Home, Perfil, Casita, etc.)
+│   ├── pages/              # Rutas principales (Login, Perfil, Casita, etc.)
 │   ├── routes/             # Configuración de rutas
 │   ├── styles/             # Estilos globales y variables SCSS
 │   ├── translations/       # Archivos de idiomas (JSON)
