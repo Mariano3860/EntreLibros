@@ -1,25 +1,14 @@
 {
   "compilerOptions": {
+    "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@components/*": [
-        "./src/components/*"
-      ],
-      "@contexts/*": [
-        "./src/contexts/*"
-      ],
-      "@hooks/*": [
-        "./src/hooks/*"
-      ],
-      "@styles/*": [
-        "./src/styles/*"
-      ],
-      "@mocks/*": [
-        "./src/mocks/*"
-      ]
+      "@/*": ["./src/*"],
+      "@components/*": ["./src/components/*"],
+      "@contexts/*": ["./src/contexts/*"],
+      "@hooks/*": ["./src/hooks/*"],
+      "@styles/*": ["./src/styles/*"],
+      "@mocks/*": ["./src/mocks/*"]
     },
     "jsx": "react-jsx",
     "jsxImportSource": "react",
@@ -29,9 +18,14 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "strict": true,
-    "types": [
-      "vitest/globals"
-    ],
+    "types": ["vitest/globals"],
     "resolveJsonModule": true
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    "coverage"
+  ],
+  "include": ["src"]
 }

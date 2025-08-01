@@ -11,7 +11,8 @@
     "format": "prettier --write .",
     "test": "vitest --run",
     "test:watch": "vitest",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [],
   "author": "",

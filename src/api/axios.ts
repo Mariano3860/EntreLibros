@@ -1,8 +1,6 @@
 import axios from 'axios'
 
-const baseURL =
-  process.env.API_BASE_URL ||
-  (process.env.NODE_ENV === 'production' ? 'https://api.entrelibros.com' : '/api')
+const baseURL = process.env.API_BASE_URL ?? ''
 
 export const apiClient = axios.create({
   baseURL,

@@ -1,7 +1,7 @@
-export const API_ROUTES = {
+export const RELATIVE_API_ROUTES = {
   AUTH: {
-    LOGIN: '/api/auth/login',
-    LOGOUT: '/api/auth/logout',
-    PROFILE: '/api/auth/profile',
+    LOGIN: `/auth/login`,
+    LOGOUT: `/auth/logout`,
+    PROFILE: `/auth/profile`,
   },
 }

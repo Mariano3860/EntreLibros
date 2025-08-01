@@ -1,6 +1,6 @@
 import { apiClient } from '@/api/axios'
-import { API_ROUTES } from '@/api/routes'
+import { RELATIVE_API_ROUTES } from '@/api/routes'
 
 export const logout = async (): Promise<void> => {
-  await apiClient.post(API_ROUTES.AUTH.LOGOUT)
+  await apiClient.post(RELATIVE_API_ROUTES.AUTH.LOGOUT)
 }

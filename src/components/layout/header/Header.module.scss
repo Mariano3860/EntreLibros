@@ -1,4 +1,4 @@
-@import '../../../styles/variables';
+@import '../../../shared/styles/variables';
 
 // Header styles
 .header {
@@ -8,12 +8,6 @@
   padding: 0.5rem;
   background: var(--background-secondary);
   box-shadow: var(--shadow-sm);
-
-  .logo {
-    height: 100px;
-    width: auto;
-    margin-left: 0.5rem;
-  }
 
   .controls {
     display: flex;

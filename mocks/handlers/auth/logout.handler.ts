@@ -1,8 +1,8 @@
 import { http, HttpResponse } from 'msw'
 import successResponse from './fixtures/logout.success.json'
-import { API_ROUTES } from '@/api/routes'
+import { RELATIVE_API_ROUTES } from '@/api/routes'
 
-export const logoutHandler = http.post(API_ROUTES.AUTH.LOGOUT, () => {
+export const logoutHandler = http.post(RELATIVE_API_ROUTES.AUTH.LOGOUT, () => {
   return HttpResponse.json(successResponse, {
     status: 200,
     headers: {

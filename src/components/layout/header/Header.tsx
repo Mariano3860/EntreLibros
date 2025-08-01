@@ -3,13 +3,12 @@ import { Logo } from '@/assets'
 import { ThemeToggle } from '@components/theme/ThemeToggle'
 import { LanguageSelector } from '@components/language-selector/LanguageSelector'
 import styles from './Header.module.scss'
+import { LogoEntreLibros } from '@components/logo/LogoEntreLibros'
 
 export const Header = () => {
   return (
     <header className={styles.header}>
-      <Link to="/" className={styles.logoLink}>
-        <Logo className={styles.logo} />
-      </Link>
+        <LogoEntreLibros withText />
       <div className={styles.controls}>
         <ThemeToggle />
         <LanguageSelector />

@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { logout } from '@/api/auth/logout.service'
-import { AuthQueryKeys } from '@/constants/queryKeys'
+import { AuthQueryKeys } from '@/constants/constants'
 
 export const useLogout = () => {
   const queryClient = useQueryClient()

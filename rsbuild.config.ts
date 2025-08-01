@@ -26,21 +26,20 @@ export default defineConfig({
 
   source: {
     define: {
-      // ✅ Injects environment variables safely
       'process.env': JSON.stringify(process.env),
     },
   },
 
   output: {
     distPath: {
-      root: 'dist', // ✅ Ensures correct output folder
+      root: 'dist',
       js: 'assets/js',
       css: 'assets/css',
       media: 'assets/media',
       html: '',
     },
-    cleanDistPath: true, // ✅ Ensures old builds are removed before new build
-    assetPrefix: '/', // ✅ Sets base URL for assets
+    cleanDistPath: true,
+    assetPrefix: '/',
     cssModules: {
       localIdentName: '[name]__[local]--[hash:base64:5]',
     },
@@ -54,34 +53,34 @@ export default defineConfig({
       '@hooks': './src/hooks',
       '@pages': './src/pages',
       '@api': './src/api',
-      '@styles': './src/styles',
+      '@styles': './src/shared/styles',
       '@utils': './src/utils',
       '@mocks': './src/mocks',
     },
-    extensions: ['.tsx', '.ts', '.js', '.jsx'], // ✅ Supported file extensions
+    extensions: ['.tsx', '.ts', '.js', '.jsx'], // Supported file extensions
   },
 
   dev: {
-    hmr: true, // ✅ Enables Hot Module Replacement (HMR)
+    hmr: true, // Enables Hot Module Replacement (HMR)
     client: {
-      overlay: true, // ✅ Displays errors in the browser
+      overlay: true, // Displays errors in the browser
     },
   },
 
   server: {
-    port: 3000, // ✅ Runs dev server on port 3000
-    open: true, // ✅ Auto-opens browser
+    port: 3000, // Runs dev server on port 3000
+    open: true, // Auto-opens browser
     base: '/', // Base path
     historyApiFallback: true, // Enable Single Page Applications (SPA)
   },
 
   performance: {
-    removeConsole: true, // ✅ Removes console logs in production
+    removeConsole: true, // Removes console logs in production
   },
 
   tools: {
     htmlPlugin: {
-      title: 'EntreLibros Frontend', // ✅ Sets HTML title
+      title: 'EntreLibros Frontend',
     },
   },
 })
