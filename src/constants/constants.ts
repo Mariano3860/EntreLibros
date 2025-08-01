@@ -3,8 +3,8 @@ export const AuthQueryKeys = {
 } as const
 
 export const HOME_URLS = {
-  INICIO: 'inicio',
-  LIBROS: 'mis_libros',
-  COMUNIDAD: 'comunidad',
-  CONTACTO: 'contacto',
+  HOME: 'home',
+  BOOKS: 'books',
+  COMMUNITY: 'community',
+  CONTACT: 'contact',
 } as const

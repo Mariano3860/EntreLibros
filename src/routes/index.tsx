@@ -13,16 +13,16 @@ const AppRoutes = () => {
         <Route path="/" element={<Home />} />
         <Route path="*" element={<NotFound />} />
         <Route element={<BaseLayout />}>
-          <Route path={`/${HOME_URLS.INICIO}`} element={<Inicio />} />
+          <Route path={`/${HOME_URLS.HOME}`} element={<Inicio />} />
         </Route>
         <Route element={<BaseLayout />}>
-          <Route path={`/${HOME_URLS.LIBROS}`} element={<Inicio />} />
+          <Route path={`/${HOME_URLS.BOOKS}`} element={<Inicio />} />
         </Route>
         <Route element={<BaseLayout />}>
-          <Route path={`/${HOME_URLS.COMUNIDAD}`} element={<Inicio />} />
+          <Route path={`/${HOME_URLS.COMMUNITY}`} element={<Inicio />} />
         </Route>
         <Route element={<BaseLayout />}>
-          <Route path={`/${HOME_URLS.CONTACTO}`} element={<Inicio />} />
+          <Route path={`/${HOME_URLS.CONTACT}`} element={<Inicio />} />
         </Route>
       </Routes>
     </BrowserRouter>

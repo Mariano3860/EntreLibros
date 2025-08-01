@@ -19,22 +19,22 @@ export const Sidebar = () => {
 
   const navItems: NavItem[] = [
     {
-      path: `/${HOME_URLS.INICIO}`,
+      path: `/${HOME_URLS.HOME}`,
       icon: Home,
       label: t('pages.home'),
     },
     {
-      path: `/${HOME_URLS.LIBROS}`,
+      path: `/${HOME_URLS.BOOKS}`,
       icon: Books,
       label: t('pages.books'),
     },
     {
-      path: `/${HOME_URLS.COMUNIDAD}`,
+      path: `/${HOME_URLS.COMMUNITY}`,
       icon: Community,
       label: t('pages.community'),
     },
     {
-      path: `/${HOME_URLS.CONTACTO}`,
+      path: `/${HOME_URLS.CONTACT}`,
       icon: Contact,
       label: t('pages.contact'),
     },

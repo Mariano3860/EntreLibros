@@ -22,7 +22,7 @@ export const LoginForm = ({ onSubmit }: LoginFormProps) => {
         onSuccess: (data) => {
           showToast(t('auth.success.login'), 'success')
           onSubmit?.(data)
-          navigate(`/${HOME_URLS.INICIO}`)
+          navigate(`/${HOME_URLS.HOME}`)
         },
         onError: (error: any) => {
           showToast(
