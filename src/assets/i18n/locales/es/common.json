@@ -18,5 +18,11 @@
       "dark": "Modo oscuro",
       "light": "Modo claro"
     }
+  },
+  "pages": {
+    "home": "Inicio",
+    "books": "Mis Libros",
+    "community": "Comunidad",
+    "contact": "Contacto"
   }
 }

@@ -18,5 +18,11 @@
       "dark": "Dark mode",
       "light": "Light mode"
     }
+  },
+  "pages": {
+    "home": "Home",
+    "books": "My Books",
+    "community": "Community",
+    "contact": "Contact"
   }
 }

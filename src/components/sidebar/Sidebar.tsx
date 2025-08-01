@@ -1,12 +1,16 @@
 import { NavLink } from 'react-router-dom'
 import styles from './Sidebar.module.scss'
 import { useLogout } from '@hooks/api/useLogout'
-import { ReactComponent as DashboardIcon } from '@/assets/icons/dashboard.svg'
+import { ReactComponent as Home } from '@/assets/icons/home.svg'
+import { ReactComponent as Books } from '@/assets/icons/books.svg'
+import { ReactComponent as Community } from '@/assets/icons/community.svg'
+import { ReactComponent as Contact } from '@/assets/icons/contact.svg'
 import { ReactComponent as LogoutIcon } from '@/assets/icons/logout.svg'
 import { ReactComponent as MoonIcon } from '@/assets/icons/moon.svg'
 import { NavItem } from '@components/sidebar/Sidebar.types'
 import { useTheme } from '@hooks/theme/useTheme'
 import { useTranslation } from 'react-i18next'
+import { HOME_URLS } from '@/constants/constants'
 
 export const Sidebar = () => {
   const { mutate: logout } = useLogout()
@@ -15,9 +19,24 @@ export const Sidebar = () => {
 
   const navItems: NavItem[] = [
     {
-      path: '/dashboard',
-      icon: DashboardIcon,
-      label: 'Dashboard',
+      path: `/${HOME_URLS.INICIO}`,
+      icon: Home,
+      label: t('pages.home'),
+    },
+    {
+      path: `/${HOME_URLS.LIBROS}`,
+      icon: Books,
+      label: t('pages.books'),
+    },
+    {
+      path: `/${HOME_URLS.COMUNIDAD}`,
+      icon: Community,
+      label: t('pages.community'),
+    },
+    {
+      path: `/${HOME_URLS.CONTACTO}`,
+      icon: Contact,
+      label: t('pages.contact'),
     },
   ]
 

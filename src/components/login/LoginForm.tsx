@@ -5,6 +5,7 @@ import { LoginFormProps } from './LoginForm.types'
 import { showToast } from '@/components/ui/toaster/Toaster'
 import { useLogin } from '@hooks/api/useLogin'
 import { useNavigate } from 'react-router-dom'
+import { HOME_URLS } from '@/constants/constants'
 
 export const LoginForm = ({ onSubmit }: LoginFormProps) => {
   const { t } = useTranslation()
@@ -21,7 +22,7 @@ export const LoginForm = ({ onSubmit }: LoginFormProps) => {
         onSuccess: (data) => {
           showToast(t('auth.success.login'), 'success')
           onSubmit?.(data)
-          navigate('/dashboard')
+          navigate(`/${HOME_URLS.INICIO}`)
         },
         onError: (error: any) => {
           showToast(

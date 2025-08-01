@@ -1,6 +1,6 @@
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 
-export const Dashboard = () => {
+export const Inicio = () => {
   return (
     <BaseLayout>
       <div className="dashboard-content"></div>

@@ -2,4 +2,9 @@ export const AuthQueryKeys = {
   AUTH: 'auth',
 } as const
 
-export const BASE_URL = 'http://localhost:3000/api'
+export const HOME_URLS = {
+  INICIO: 'inicio',
+  LIBROS: 'mis_libros',
+  COMUNIDAD: 'comunidad',
+  CONTACTO: 'contacto',
+} as const
