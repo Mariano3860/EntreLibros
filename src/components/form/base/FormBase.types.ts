@@ -15,3 +15,7 @@ export interface FormBaseProps {
   submitLabel?: string
   isSubmitting?: boolean
 }
+
+export interface FormBaseRef {
+  resetForm: () => void
+}
