@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router-dom'
-import { ReactNode } from 'react' // Importar desde React
+import { ReactNode } from 'react'
 import { Sidebar } from '../../sidebar/Sidebar'
 import styles from './BaseLayout.module.scss'
 

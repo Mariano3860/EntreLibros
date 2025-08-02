@@ -3,7 +3,7 @@ import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 export const Books = () => {
   return (
     <BaseLayout>
-      <div className="dashboard-content"></div>
+      <div className=""></div>
     </BaseLayout>
   )
 }
