@@ -54,7 +54,7 @@ entreLibros_frontend/
 │   ├── components/         # Componentes reutilizables
 │   ├── features/           # Módulos funcionales (auth, books, map, etc.)
 │   ├── hooks/              # Hooks personalizados
-│   ├── pages/              # Rutas principales (Login, Perfil, Casita, etc.)
+│   ├── pages/              # Rutas principales (LoginPage, Perfil, Casita, etc.)
 │   ├── routes/             # Configuración de rutas
 │   ├── styles/             # Estilos globales y variables SCSS
 │   ├── translations/       # Archivos de idiomas (JSON)
@@ -76,7 +76,7 @@ entreLibros_frontend/
 
 * [x] Setup de proyecto y dependencias básicas
 * [ ] Mapa interactivo de casitas
-* [ ] Registro/Login + gestión de perfil
+* [ ] Registro/LoginPage + gestión de perfil
 * [ ] Catálogo personal (libros ofrecidos y deseados)
 * [ ] Sistema de reseñas
 * [ ] Matching de usuarios por afinidad lectora

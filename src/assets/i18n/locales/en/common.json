@@ -26,6 +26,7 @@
     "contact": "Contact"
   },
   "contact": {
+    "title": "Contact Us",
     "name_label": "Name",
     "name_placeholder": "Your full name",
     "email_label": "Email",
@@ -41,6 +42,7 @@
       "min_length": "Must be at least {{count}} characters"
     },
     "submit": "Submit",
-    "success_message": "Message sent successfully"
+    "success_message": "Message sent successfully",
+    "submitting": "Sending..."
   }
 }

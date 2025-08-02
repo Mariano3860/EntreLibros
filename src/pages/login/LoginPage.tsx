@@ -1,9 +1,9 @@
 import { Header } from '@components/layout/header/Header'
 import { LoginForm } from '@components/login/LoginForm'
 
-import styles from './Login.module.scss'
+import styles from './LoginPage.module.scss'
 
-const Login = () => {
+const LoginPage = () => {
   return (
     <div className={styles.homeContainer}>
       <Header></Header>
@@ -16,4 +16,4 @@ const Login = () => {
   )
 }
 
-export default Login
+export default LoginPage

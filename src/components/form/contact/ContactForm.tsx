@@ -1,5 +1,6 @@
 import { FormBase } from '@components/form/base/FormBase'
 import type { FormField } from '@components/form/base/FormBase.types'
+import { useContactForm } from '@hooks/api/useContactForm'
 import { useTranslation } from 'react-i18next'
 
 import styles from './ContactForm.module.scss'
@@ -7,6 +8,7 @@ import { ContactFormData } from './ContactForm.types'
 
 export const ContactForm: React.FC = () => {
   const { t } = useTranslation()
+  const { mutate, isPending } = useContactForm()
 
   const handleContactSubmit = (formData: Record<string, string>) => {
     const parsed: ContactFormData = {
@@ -14,9 +16,7 @@ export const ContactForm: React.FC = () => {
       email: formData.email,
       message: formData.message,
     }
-    // TODO return parsed in a toaster
-    /* eslint-disable no-console */
-    console.log('Mensaje de contacto enviado:', parsed)
+    mutate(parsed)
   }
 
   const fields: FormField[] = [
@@ -52,6 +52,7 @@ export const ContactForm: React.FC = () => {
         fields={fields}
         onSubmit={handleContactSubmit}
         submitLabel="contact.submit_button"
+        isSubmitting={isPending}
       />
     </div>
   )

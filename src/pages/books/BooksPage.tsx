@@ -1,6 +1,6 @@
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 
-export const Community = () => {
+export const BooksPage = () => {
   return (
     <BaseLayout>
       <div className=""></div>

@@ -9,8 +9,9 @@ export type FormField = {
   placeholder?: string
 }
 
-export type FormBaseProps = {
+export interface FormBaseProps {
   fields: FormField[]
   onSubmit: (formData: Record<string, string>) => void
   submitLabel?: string
+  isSubmitting?: boolean
 }

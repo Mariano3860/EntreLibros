@@ -74,17 +74,23 @@ $spacing-scale: 0.25;
   @return $base-unit * math.div($multiplier, $spacing-scale); // Usar math.div
 }
 
+@function rem($px) {
+  @return math.div($px, $font-size-root) * 1rem;
+}
+
 // Spacing Variables
-$spacing-1: space(1); // 4px
-$spacing-2: space(2); // 8px
-$spacing-3: space(3); // 12px
-$spacing-4: space(4); // 16px
-$spacing-5: space(5); // 20px
-$spacing-6: space(6); // 24px
+$spacing-1:  space(1);    // 4px
+$spacing-1x5: space(1.5); // 6px
+$spacing-2:  space(2);    // 8px
+$spacing-2x5: space(2.5); // 10px
+$spacing-3:  space(3);    // 12px
+$spacing-4:  space(4);    // 16px
+$spacing-5:  space(5);    // 20px
+$spacing-6:  space(6);    // 24px
 
 // Container Sizes
-$container-max-width: 1200px;
-$container-padding: $spacing-4;
+$container-max-width: 1400px;
+$container-padding: $spacing-3;
 
 //sidebar
 $collapsed-width: 56px;

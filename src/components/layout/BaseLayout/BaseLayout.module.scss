@@ -1,5 +1,5 @@
 // src/components/layout/BaseLayout.module.scss
-@import '../../../shared/styles/variables';
+@import '@styles/variables';
 
 .baseLayout {
   display: flex;
@@ -9,11 +9,11 @@
 
 .mainContent {
   flex: 1;
-  padding: 2rem;
+  padding: 1rem;
   margin-left: $collapsed-width; // Sidebar collapse width
 
   @media (max-width: $breakpoint-tablet) {
     margin-left: 0;
-    padding: 1rem;
+    padding: 0.5rem;
   }
 }

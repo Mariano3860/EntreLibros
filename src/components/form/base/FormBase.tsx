@@ -8,6 +8,7 @@ export const FormBase: React.FC<FormBaseProps> = ({
   fields,
   onSubmit,
   submitLabel,
+  isSubmitting = false,
 }) => {
   const { t } = useTranslation()
   const [formData, setFormData] = useState<Record<string, string>>(
@@ -58,6 +59,7 @@ export const FormBase: React.FC<FormBaseProps> = ({
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    if (isSubmitting) return // Evitar múltiples envíos
     if (!validate()) return
     onSubmit(formData)
   }
@@ -78,6 +80,7 @@ export const FormBase: React.FC<FormBaseProps> = ({
               value={formData[field.name]}
               onChange={handleChange}
               placeholder={field.placeholder ? t(field.placeholder) : ''}
+              disabled={isSubmitting} // Deshabilitar durante envío
             />
           ) : (
             <input
@@ -88,6 +91,7 @@ export const FormBase: React.FC<FormBaseProps> = ({
               value={formData[field.name]}
               onChange={handleChange}
               placeholder={field.placeholder ? t(field.placeholder) : ''}
+              disabled={isSubmitting} // Deshabilitar durante envío
             />
           )}
 
@@ -97,8 +101,12 @@ export const FormBase: React.FC<FormBaseProps> = ({
         </div>
       ))}
 
-      <button type="submit" className={styles.submitButton}>
-        {t(submitLabel || 'form.submit')}
+      <button
+        type="submit"
+        className={styles.submitButton}
+        disabled={isSubmitting} // Deshabilitar durante envío
+      >
+        {isSubmitting ? t('form.submitting') : t(submitLabel || 'form.submit')}
       </button>
     </form>
   )
