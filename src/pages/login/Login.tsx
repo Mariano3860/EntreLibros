@@ -1,6 +1,7 @@
-import styles from './Login.module.scss'
-import { LoginForm } from '@components/login/LoginForm'
 import { Header } from '@components/layout/header/Header'
+import { LoginForm } from '@components/login/LoginForm'
+
+import styles from './Login.module.scss'
 
 const Login = () => {
   return (
@@ -8,7 +9,7 @@ const Login = () => {
       <Header></Header>
       <main className={styles.mainContent}>
         <div className={styles.authSection}>
-          <LoginForm onSubmit={(credentials) => console.log(credentials)} />
+          <LoginForm onSubmit={() => {}} />
         </div>
       </main>
     </div>

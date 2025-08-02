@@ -24,5 +24,23 @@
     "books": "My Books",
     "community": "Community",
     "contact": "Contact"
+  },
+  "contact": {
+    "name_label": "Name",
+    "name_placeholder": "Your full name",
+    "email_label": "Email",
+    "email_placeholder": "example@email.com",
+    "message_label": "Message",
+    "message_placeholder": "Write your message...",
+    "submit_button": "Send message"
+  },
+  "form": {
+    "errors": {
+      "required": "This field is required",
+      "invalid_email": "Invalid email address",
+      "min_length": "Must be at least {{count}} characters"
+    },
+    "submit": "Submit",
+    "success_message": "Message sent successfully"
   }
 }

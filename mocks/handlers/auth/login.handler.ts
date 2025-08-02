@@ -1,9 +1,14 @@
 import { http, HttpResponse } from 'msw'
-import successResponse from './fixtures/login.success.json'
-import errorResponse from './fixtures/login.error.json'
-import { RELATIVE_API_ROUTES } from '@/api/routes'
-import { DEFAULT_EMAIL, DEFAULT_PASS } from '../../constants/constants'
+
 import { LoginRequest } from '@/api/auth/login.types'
+import { RELATIVE_API_ROUTES } from '@/api/routes'
+
+import { DEFAULT_EMAIL, DEFAULT_PASS } from '../../constants/constants'
+
+import errorResponse from './fixtures/login.error.json'
+import successResponse from './fixtures/login.success.json'
+
+
 
 export const loginHandler = http.post(
   RELATIVE_API_ROUTES.AUTH.LOGIN,

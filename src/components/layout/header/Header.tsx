@@ -1,7 +1,9 @@
-import { ThemeToggle } from '@components/theme/ThemeToggle'
 import { LanguageSelector } from '@components/language-selector/LanguageSelector'
-import styles from './Header.module.scss'
 import { LogoEntreLibros } from '@components/logo/LogoEntreLibros'
+import { ThemeToggle } from '@components/theme/ThemeToggle'
+
+import styles from './Header.module.scss'
+
 
 export const Header = () => {
   return (

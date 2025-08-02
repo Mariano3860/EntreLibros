@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+
 import styles from './LanguageSelector.module.scss'
 
 export const LanguageSelector = () => {

@@ -1,16 +1,18 @@
-import { NavLink } from 'react-router-dom'
-import styles from './Sidebar.module.scss'
+import { NavItem } from '@components/sidebar/Sidebar.types'
 import { useLogout } from '@hooks/api/useLogout'
-import { ReactComponent as Home } from '@/assets/icons/home.svg'
+import { useTheme } from '@hooks/theme/useTheme'
+import { useTranslation } from 'react-i18next'
+import { NavLink } from 'react-router-dom'
+
 import { ReactComponent as Books } from '@/assets/icons/books.svg'
 import { ReactComponent as Community } from '@/assets/icons/community.svg'
 import { ReactComponent as Contact } from '@/assets/icons/contact.svg'
+import { ReactComponent as Home } from '@/assets/icons/home.svg'
 import { ReactComponent as LogoutIcon } from '@/assets/icons/logout.svg'
 import { ReactComponent as MoonIcon } from '@/assets/icons/moon.svg'
-import { NavItem } from '@components/sidebar/Sidebar.types'
-import { useTheme } from '@hooks/theme/useTheme'
-import { useTranslation } from 'react-i18next'
 import { HOME_URLS } from '@/constants/constants'
+
+import styles from './Sidebar.module.scss'
 
 export const Sidebar = () => {
   const { mutate: logout } = useLogout()

@@ -24,5 +24,23 @@
     "books": "Mis Libros",
     "community": "Comunidad",
     "contact": "Contacto"
+  },
+  "contact": {
+    "name_label": "Nombre",
+    "name_placeholder": "Tu nombre completo",
+    "email_label": "Correo electrónico",
+    "email_placeholder": "ejemplo@correo.com",
+    "message_label": "Mensaje",
+    "message_placeholder": "Escribí tu mensaje...",
+    "submit_button": "Enviar mensaje"
+  },
+  "form": {
+    "errors": {
+      "required": "Este campo es obligatorio",
+      "invalid_email": "Email inválido",
+      "min_length": "Debe tener al menos {{count}} caracteres"
+    },
+    "submit": "Enviar",
+    "success_message": "Mensaje enviado con éxito"
   }
 }

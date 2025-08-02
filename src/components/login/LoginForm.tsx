@@ -1,15 +1,17 @@
+import { useLogin } from '@hooks/api/useLogin'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
+
+import { showToast } from '@/components/ui/toaster/Toaster'
+import { HOME_URLS } from '@/constants/constants'
+
 import styles from './LoginForm.module.scss'
 import { LoginFormProps } from './LoginForm.types'
-import { showToast } from '@/components/ui/toaster/Toaster'
-import { useLogin } from '@hooks/api/useLogin'
-import { useNavigate } from 'react-router-dom'
-import { HOME_URLS } from '@/constants/constants'
 
 export const LoginForm = ({ onSubmit }: LoginFormProps) => {
   const { t } = useTranslation()
-  const navigate = useNavigate() // Obtener la función de navegación
+  const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const { mutate: login, isPending } = useLogin()
@@ -24,11 +26,8 @@ export const LoginForm = ({ onSubmit }: LoginFormProps) => {
           onSubmit?.(data)
           navigate(`/${HOME_URLS.HOME}`)
         },
-        onError: (error: any) => {
-          showToast(
-            t(error.response?.data?.message || 'auth.errors.unknown'),
-            'error'
-          )
+        onError: (error: Error) => {
+          showToast(t(error?.message || 'auth.errors.unknown'), 'error')
         },
       }
     )

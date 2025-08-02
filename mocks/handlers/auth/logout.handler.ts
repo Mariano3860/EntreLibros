@@ -1,6 +1,8 @@
 import { http, HttpResponse } from 'msw'
-import successResponse from './fixtures/logout.success.json'
+
 import { RELATIVE_API_ROUTES } from '@/api/routes'
+
+import successResponse from './fixtures/logout.success.json'
 
 export const logoutHandler = http.post(RELATIVE_API_ROUTES.AUTH.LOGOUT, () => {
   return HttpResponse.json(successResponse, {

@@ -1,7 +1,8 @@
+import { useTheme } from '@hooks/theme/useTheme'
 import { Flip, toast, ToastContainer } from 'react-toastify'
+
 import 'react-toastify/dist/ReactToastify.css'
 import styles from './Toaster.module.scss'
-import { useTheme } from '@hooks/theme/useTheme'
 
 export const Toaster = () => {
   const { theme } = useTheme()

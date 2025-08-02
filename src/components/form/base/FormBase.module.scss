@@ -1,0 +1,57 @@
+@import '@styles/variables';
+
+.formContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+}
+
+.formField {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: $body-font-size;
+  font-weight: $font-weight-medium;
+  margin-bottom: $spacing-2;
+  color: var(--text-secondary);
+}
+
+.input,
+.textarea {
+  padding: $spacing-3 $spacing-4;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: $body-font-size;
+  background-color: var(--background-card);
+  color: var(--text-primary);
+  transition: border-color $transition-duration-normal $transition-timing-function;
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary-color);
+  }
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.submitButton {
+  padding: $spacing-3 $spacing-5;
+  background-color: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: $body-font-size;
+  font-weight: $font-weight-bold;
+  cursor: pointer;
+  transition: background-color $transition-duration-normal $transition-timing-function;
+
+  &:hover {
+    background-color: var(--primary-dark);
+  }
+}

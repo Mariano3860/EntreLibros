@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
+
 import { logout } from '@/api/auth/logout.service'
 import { AuthQueryKeys } from '@/constants/constants'
 
@@ -16,9 +17,9 @@ export const useLogout = () => {
       navigate('/', { replace: true })
     },
     onError: (error: Error) => {
-      console.error('Logout failed:', error)
       queryClient.removeQueries({ queryKey: [AuthQueryKeys.AUTH] })
       localStorage.removeItem('authToken')
+      return error
     },
     retry: false,
   })

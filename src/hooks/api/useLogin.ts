@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { AuthQueryKeys } from '@/constants/constants'
+
 import { login } from '@/api/auth/login.service'
+import { AuthQueryKeys } from '@/constants/constants'
 
 export const useLogin = () => {
   const queryClient = useQueryClient()
@@ -12,8 +13,8 @@ export const useLogin = () => {
       queryClient.setQueryData([AuthQueryKeys.AUTH], data)
     },
     onError: (error) => {
-      console.error('Login failed:', error)
       queryClient.removeQueries({ queryKey: [AuthQueryKeys.AUTH] })
+      return error
     },
   })
 }
