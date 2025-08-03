@@ -8,8 +8,6 @@ import { DEFAULT_EMAIL, DEFAULT_PASS } from '../../constants/constants'
 import errorResponse from './fixtures/login.error.json'
 import successResponse from './fixtures/login.success.json'
 
-
-
 export const loginHandler = http.post(
   RELATIVE_API_ROUTES.AUTH.LOGIN,
   async ({ request }) => {

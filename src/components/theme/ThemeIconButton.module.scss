@@ -34,8 +34,9 @@
 .icon {
   width: 24px;
   height: 24px;
-  transition: transform 0.3s $transition-timing-function,
-  color 0.3s $transition-timing-function;
+  transition:
+    transform 0.3s $transition-timing-function,
+    color 0.3s $transition-timing-function;
 
   [data-theme='dark'] & {
     color: var(--primary-color);
@@ -49,8 +50,9 @@
 .label {
   opacity: 0;
   transform: translateX(-10px);
-  transition: opacity 0.3s $transition-timing-function,
-  transform 0.3s $transition-timing-function;
+  transition:
+    opacity 0.3s $transition-timing-function,
+    transform 0.3s $transition-timing-function;
   position: absolute;
   left: calc(100% + 0.5rem);
   white-space: nowrap;

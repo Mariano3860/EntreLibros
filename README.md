@@ -74,16 +74,16 @@ entreLibros_frontend/
 
 ## 🚧 Roadmap (MVP)
 
-* [x] Setup de proyecto y dependencias básicas
-* [ ] Mapa interactivo de casitas
-* [ ] Registro/LoginPage + gestión de perfil
-* [ ] Catálogo personal (libros ofrecidos y deseados)
-* [ ] Sistema de reseñas
-* [ ] Matching de usuarios por afinidad lectora
-* [ ] Chat básico entre usuarios que se siguen
-* [ ] Internacionalización (ES/EN)
-* [ ] Mock API con MSW
-* [ ] Deploy automático con GitHub Actions
+- [x] Setup de proyecto y dependencias básicas
+- [ ] Mapa interactivo de casitas
+- [ ] Registro/LoginPage + gestión de perfil
+- [ ] Catálogo personal (libros ofrecidos y deseados)
+- [ ] Sistema de reseñas
+- [ ] Matching de usuarios por afinidad lectora
+- [ ] Chat básico entre usuarios que se siguen
+- [ ] Internacionalización (ES/EN)
+- [ ] Mock API con MSW
+- [ ] Deploy automático con GitHub Actions
 
 ---
 
