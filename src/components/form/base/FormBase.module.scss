@@ -19,16 +19,14 @@
   color: var(--text-secondary);
 }
 
-.input,
-.textarea {
+.input {
   padding: $spacing-1x5 $spacing-2;
   border: rem(1px) solid var(--border-color);
   border-radius: rem(6px);
   font-size: $h5-font-size;
   background-color: var(--background-card);
   color: var(--text-primary);
-  transition: border-color $transition-duration-normal
-    $transition-timing-function;
+  transition: border-color $transition-duration-normal $transition-timing-function;
 
   &:focus {
     outline: none;
@@ -37,8 +35,20 @@
 }
 
 .textarea {
+  padding: $spacing-1x5 $spacing-2;
+  border: rem(1px) solid var(--border-color);
+  border-radius: rem(6px);
+  font-size: $h5-font-size;
+  background-color: var(--background-card);
+  color: var(--text-primary);
+  transition: border-color $transition-duration-normal $transition-timing-function;
   resize: vertical;
   min-height: rem(120px);
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary-color);
+  }
 }
 
 .submitButton {
@@ -50,8 +60,7 @@
   font-size: $h4-font-size;
   font-weight: $font-weight-bold;
   cursor: pointer;
-  transition: background-color $transition-duration-normal
-    $transition-timing-function;
+  transition: background-color $transition-duration-normal $transition-timing-function;
 
   &:hover {
     background-color: var(--primary-dark);

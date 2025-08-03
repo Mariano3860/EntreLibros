@@ -3,10 +3,7 @@
 .loginForm {
   max-width: 440px;
   padding: 2rem;
-  transition: background-color $transition-duration-normal
-    $transition-timing-function;
-  //border-radius: 12px;
-  //box-shadow: $box-shadow-md;
+  transition: background-color $transition-duration-normal $transition-timing-function;
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -68,7 +65,6 @@
   border-radius: 8px;
   background: var(--background-primary);
   color: var(--text-primary);
-  transition: all 0.2s ease;
 
   &:focus {
     outline: none;
