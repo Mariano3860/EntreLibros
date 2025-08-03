@@ -56,6 +56,7 @@ export default defineConfig({
       '@styles': './src/shared/styles',
       '@utils': './src/utils',
       '@mocks': './src/mocks',
+      '@assets': './src/assets',
     },
     extensions: ['.tsx', '.ts', '.js', '.jsx'], // Supported file extensions
   },

@@ -1,9 +1,23 @@
+import svgr from 'vite-plugin-svgr'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
-  plugins: [tsconfigPaths()],
+  plugins: [
+    tsconfigPaths(),
+    svgr({
+      svgrOptions: {
+        exportType: 'named',
+        ref: true,
+        svgo: false,
+        titleProp: true,
+      },
+      include: '**/*.svg',
+    }),
+  ],
   test: {
+    include: ['**/*.test.{ts,tsx,js,jsx}'],
+    environment: 'jsdom',
     coverage: {
       enabled: true,
       provider: 'v8',
@@ -23,25 +37,6 @@ export default defineConfig({
       '**/node_modules/**',
       '**/dist/**',
       '**/.{idea,git,cache,output,temp}/**',
-    ],
-    workspace: [
-      {
-        extends: true,
-        test: {
-          include: ['**/*.node.test.{ts,tsx,js,jsx}'],
-          environment: 'node',
-          pool: 'forks',
-        },
-      },
-      {
-        extends: true,
-        test: {
-          include: ['**/*.test.{ts,tsx,js,jsx}'],
-          exclude: ['**/*.node.test.*'],
-          environment: 'jsdom',
-          pool: 'threads',
-        },
-      },
     ],
   },
 })

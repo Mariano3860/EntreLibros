@@ -26,7 +26,8 @@
   font-size: $h5-font-size;
   background-color: var(--background-card);
   color: var(--text-primary);
-  transition: border-color $transition-duration-normal $transition-timing-function;
+  transition: border-color $transition-duration-normal
+    $transition-timing-function;
 
   &:focus {
     outline: none;
@@ -41,7 +42,8 @@
   font-size: $h5-font-size;
   background-color: var(--background-card);
   color: var(--text-primary);
-  transition: border-color $transition-duration-normal $transition-timing-function;
+  transition: border-color $transition-duration-normal
+    $transition-timing-function;
   resize: vertical;
   min-height: rem(120px);
 
@@ -60,7 +62,8 @@
   font-size: $h4-font-size;
   font-weight: $font-weight-bold;
   cursor: pointer;
-  transition: background-color $transition-duration-normal $transition-timing-function;
+  transition: background-color $transition-duration-normal
+    $transition-timing-function;
 
   &:hover {
     background-color: var(--primary-dark);

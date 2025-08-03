@@ -86,7 +86,8 @@
 .bookList {
   display: flex;
   gap: $spacing-3;
-  overflow-x: auto;
+  overflow: hidden;
+  padding: $spacing-1;
 }
 
 .activityFeed {
