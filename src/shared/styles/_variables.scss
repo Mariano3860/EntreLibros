@@ -35,7 +35,7 @@
   --color-info: #17a2b8;
 
   // Light theme
-  --background-primary: #ffffff;
+  --background-primary: #fff;
   --background-card: #f8f9fa;
   --text-primary: #212529;
   --text-secondary: #6c757d;
@@ -44,7 +44,7 @@
   --primary-color: #26a69a;
   --primary-dark: #00796b;
   --primary-rgb: 38, 166, 154;
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 10%);
   --placeholder-color: #6c757d;
   --toggle-bg: #e0e0e0;
   --toggle-hover: #d0d0d0;
@@ -62,7 +62,7 @@
   --primary-dark: #009688;
   --placeholder-color: #adb5bd;
   --toggle-bg: #424242;
-  --toggle-hover: #555555;
+  --toggle-hover: #555;
 }
 
 // ======================
@@ -149,13 +149,13 @@ input::placeholder {
 // Shadows & Elevation
 // ======================
 
-$box-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$box-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 5%);
 $box-shadow-md:
-  0 4px 6px -1px rgba(0, 0, 0, 0.1),
-  0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  0 4px 6px -1px rgb(0 0 0 / 10%),
+  0 2px 4px -1px rgb(0 0 0 / 6%);
 $box-shadow-lg:
-  0 10px 15px -3px rgba(0, 0, 0, 0.1),
-  0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  0 10px 15px -3px rgb(0 0 0 / 10%),
+  0 4px 6px -2px rgb(0 0 0 / 5%);
 
 // ======================
 // Transitions & Animations

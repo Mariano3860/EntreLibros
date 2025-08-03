@@ -7,6 +7,7 @@ module.exports = {
     'function-url-no-scheme-relative': null,
     'import-notation': null,
     'property-no-vendor-prefix': null,
+    'selector-class-pattern': null,
   },
   ignoreFiles: ['**/node_modules/**', '**/dist/**'],
 }

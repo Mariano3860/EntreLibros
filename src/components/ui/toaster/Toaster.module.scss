@@ -10,7 +10,7 @@
   width: auto;
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .toastDark,
   .toastLight {
     top: 5rem !important;
