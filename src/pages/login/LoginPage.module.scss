@@ -1,4 +1,3 @@
-// home.module.scss
 @import '@styles/variables';
 
 .homeContainer {
@@ -45,7 +44,7 @@
 
 .authSection {
   width: 100%;
-  max-width: 440px;
+  max-width: rem(440px);
   margin: 0 auto;
   padding: 0 1rem;
   transform: translateY(-30%);

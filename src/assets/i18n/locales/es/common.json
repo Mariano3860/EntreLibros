@@ -44,5 +44,18 @@
     "submit": "Enviar",
     "success_message": "Mensaje enviado con éxito",
     "submitting": "Enviando..."
+  },
+  "home": {
+    "hero_title": "Intercambia tus libros favoritos",
+    "hero_subtitle": "Registrate ahora y descubre una nueva forma de compartir libros.",
+    "hero_cta": "Empezá a intercambiar libros",
+    "books_today": "{{count}} libros intercambiados hoy",
+    "houses_active": "{{count}} casitas activas",
+    "explore_books": "Explorar libros",
+    "see_all": "Ver todos",
+    "my_books": "Mis libros",
+    "community_title": "Únete a la comunidad",
+    "community_subtitle": "Crea tu casita y empieza a intercambiar libros hoy mismo",
+    "explore_community": "Explorar comunidad"
   }
 }

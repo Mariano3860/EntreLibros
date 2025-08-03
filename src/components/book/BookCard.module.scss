@@ -1,0 +1,42 @@
+@import '@styles/variables';
+
+.card {
+  display: flex;
+  flex-direction: column;
+  width: rem(140px);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  border-radius: rem(8px);
+  overflow: hidden;
+  background-color: var(--background-card);
+
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+.cover {
+  width: 100%;
+  height: rem(200px);
+  object-fit: cover;
+  border-bottom: rem(1px) solid var(--border-color);
+}
+
+.info {
+  padding: rem(8px);
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.author {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-top: rem(4px);
+}

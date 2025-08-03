@@ -7,7 +7,7 @@ body {
   line-height: $line-height-base;
   color: var(--text-primary);
   background-color: var(--background-primary);
-  transition: background-color $transition-duration-normal $transition-timing-function;
+  transition: color $transition-duration-normal $transition-timing-function;
 }
 
 // Headings

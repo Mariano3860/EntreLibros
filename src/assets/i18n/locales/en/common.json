@@ -44,5 +44,18 @@
     "submit": "Submit",
     "success_message": "Message sent successfully",
     "submitting": "Sending..."
+  },
+  "home": {
+    "hero_title": "Exchange your favorite books",
+    "hero_subtitle": "Sign up now and discover a new way to share books.",
+    "hero_cta": "Start exchanging books",
+    "books_today": "{{count}} books exchanged today",
+    "houses_active": "{{count}} active book houses",
+    "explore_books": "Explore books",
+    "see_all": "See all",
+    "my_books": "My books",
+    "community_title": "Join the community",
+    "community_subtitle": "Create your book house and start sharing books today",
+    "explore_community": "Explore community"
   }
 }
