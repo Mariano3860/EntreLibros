@@ -1,79 +1,5 @@
 @import '@styles/variables';
 
-.icon {
-  font-size: 1.5rem;
-  margin-right: 1rem;
-  min-width: 24px;
-  color: var(--text-primary);
-  width: 24px;
-  height: 24px;
-}
-
-.label {
-  opacity: 0;
-  transition: opacity $transition-speed ease;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  min-width: max-content;
-  flex-grow: 0;
-
-  .sidebar:hover & {
-    opacity: 1;
-    transform: translateX(0);
-  }
-
-  .themeButton:hover &,
-  .logoutButton:hover & {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-.logoutButton {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  padding: 1rem 0.8rem 1rem 1.2rem;
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: color 0.3s $transition-timing-function;
-
-  .icon {
-    margin-right: 1rem;
-  }
-
-  &:hover {
-    color: var(--color-error);
-  }
-}
-
-.themeButton {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  padding: 1rem;
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: color 0.3s $transition-timing-function;
-
-  .icon {
-    margin-right: 1rem;
-  }
-
-  &:hover {
-    color: var(--primary-color);
-
-    .icon {
-      transform: rotate(-15deg);
-    }
-  }
-}
-
 .sidebar {
   position: fixed;
   left: 0;
@@ -129,6 +55,105 @@
   }
 }
 
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  border-top: rem(1px) solid var(--border-color);
+  margin-top: auto;
+}
+
+/* === Icons and shared Label === */
+.icon {
+  font-size: 1.5rem;
+  margin-right: 1rem;
+  min-width: rem(24px);
+  width: rem(24px);
+  height: rem(24px);
+  color: var(--text-primary);
+}
+
+.label {
+  opacity: 0;
+  transition: opacity $transition-speed ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: max-content;
+  flex-grow: 0;
+}
+
+.sidebar:hover .label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* === Buttons === */
+.logoutButton,
+.themeButton,
+.languageButton {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 1rem;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.3s $transition-timing-function;
+
+  .icon {
+    margin-right: 1rem;
+  }
+}
+
+.logoutButton:hover {
+  color: var(--color-error);
+}
+
+.themeButton:hover {
+  color: var(--primary-color);
+
+  .icon {
+    transform: rotate(-15deg);
+  }
+}
+
+.languageButtonWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.dropdown {
+  position: absolute;
+  bottom: 100%;
+  left: 1rem;
+  background-color: var(--background-card);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  box-shadow: $box-shadow-sm;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  z-index: $z-index-dropdown;
+
+  button {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    text-align: left;
+    padding: 0.3rem 0.5rem;
+    font-size: $small-font-size;
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--toggle-hover);
+    }
+  }
+}
+
+/* === Light Theme === */
 [data-theme='light'] {
   .navLink {
     color: var(--text-primary);
@@ -137,12 +162,4 @@
       color: var(--primary-dark);
     }
   }
-}
-
-.footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  border-top: 1px solid var(--border-color);
-  margin-top: auto;
 }

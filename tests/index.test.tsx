@@ -9,7 +9,7 @@ describe('index.tsx', () => {
     await import('../src/index')
 
     await new Promise((resolve) => setTimeout(resolve, 20))
-    expect(rootElement.innerHTML).toContain('EntreLibros')
+    expect(rootElement.innerHTML).toContain('home.hero_title')
 
     document.body.removeChild(rootElement)
   })

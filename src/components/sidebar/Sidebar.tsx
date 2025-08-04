@@ -1,6 +1,8 @@
+import { SidebarLanguageSwitcher } from '@components/sidebar/buttons/SidebarLanguageSwitcher'
 import { SidebarLogginButton } from '@components/sidebar/buttons/SidebarLogginButton'
 import { SidebarThemeButton } from '@components/sidebar/buttons/SidebarThemeButton'
 import { NavItem } from '@components/sidebar/Sidebar.types'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 
@@ -13,6 +15,7 @@ import { HOME_URLS } from '@/constants/constants'
 import styles from './Sidebar.module.scss'
 
 export const Sidebar = () => {
+  const [isHovered, setIsHovered] = useState(false)
   const { t } = useTranslation()
 
   const navItems: NavItem[] = [
@@ -39,7 +42,11 @@ export const Sidebar = () => {
   ]
 
   return (
-    <nav className={styles.sidebar}>
+    <nav
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className={`${styles.sidebar} ${isHovered ? styles.expanded : ''}`}
+    >
       <div className={styles.navItems}>
         {navItems.map((item) => {
           const IconComponent = item.icon
@@ -59,6 +66,7 @@ export const Sidebar = () => {
       </div>
       {/* Footer section of Sidebar */}
       <div className={styles.footer}>
+        <SidebarLanguageSwitcher />
         <SidebarThemeButton />
         <SidebarLogginButton />
       </div>
