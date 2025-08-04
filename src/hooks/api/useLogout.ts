@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
 import { logout } from '@/api/auth/logout.service'
-import { AuthQueryKeys } from '@/constants/constants'
+import { AuthQueryKeys, HOME_URLS } from '@/constants/constants'
 
 export const useLogout = () => {
   const queryClient = useQueryClient()
@@ -13,13 +13,10 @@ export const useLogout = () => {
     mutationFn: logout,
     onSuccess: () => {
       queryClient.removeQueries({ queryKey: [AuthQueryKeys.AUTH] })
-      localStorage.removeItem('authToken')
-
-      navigate('/', { replace: true })
+      navigate(`/${HOME_URLS.LOGIN}`, { replace: true })
     },
     onError: (error: Error) => {
       queryClient.removeQueries({ queryKey: [AuthQueryKeys.AUTH] })
-      localStorage.removeItem('authToken')
       toast.error(`Error: ${error.message}`)
     },
     retry: false,

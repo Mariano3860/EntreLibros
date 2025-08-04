@@ -10,7 +10,6 @@ export const useLogin = () => {
   return useMutation({
     mutationFn: login,
     onSuccess: (data) => {
-      localStorage.setItem('authToken', data.token)
       queryClient.setQueryData([AuthQueryKeys.AUTH], data)
     },
     onError: (error: Error) => {

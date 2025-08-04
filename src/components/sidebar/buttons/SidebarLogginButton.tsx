@@ -1,0 +1,37 @@
+import { useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
+
+import { ReactComponent as LogoutIcon } from '@/assets/icons/logout.svg'
+import { AuthQueryKeys, HOME_URLS } from '@/constants/constants'
+import { useLogout } from '@/hooks/api/useLogout'
+
+import styles from '../Sidebar.module.scss'
+
+export const SidebarLogginButton = () => {
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
+  const { mutate: logout } = useLogout()
+
+  const authData = queryClient.getQueryData([AuthQueryKeys.AUTH])
+  const isLoggedIn = Boolean(authData)
+
+  return isLoggedIn ? (
+    <button
+      onClick={() => logout()}
+      className={styles.logoutButton}
+      aria-label="Logout"
+    >
+      <LogoutIcon className={styles.icon} />
+      <span className={styles.label}>Logout</span>
+    </button>
+  ) : (
+    <button
+      onClick={() => navigate(`/${HOME_URLS.LOGIN}`)}
+      className={styles.logoutButton}
+      aria-label="Login"
+    >
+      <LogoutIcon className={styles.icon} />
+      <span className={styles.label}>Login</span>
+    </button>
+  )
+}

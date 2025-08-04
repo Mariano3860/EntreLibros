@@ -15,9 +15,10 @@ const AppRoutes = () => {
   return (
     <BrowserRouter basename="/">
       <Routes>
-        <Route path="/" element={<LoginPage />} />
+        <Route path={`/${HOME_URLS.LOGIN}`} element={<LoginPage />} />
         <Route path="*" element={<NotFound />} />
         <Route element={<BaseLayout />}>
+          <Route path="/" element={<HomePage />} />
           <Route path={`/${HOME_URLS.HOME}`} element={<HomePage />} />
         </Route>
         <Route element={<BaseLayout />}>

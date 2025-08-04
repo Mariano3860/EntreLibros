@@ -7,4 +7,5 @@ export const HOME_URLS = {
   BOOKS: 'books',
   COMMUNITY: 'community',
   CONTACT: 'contact',
+  LOGIN: 'login',
 } as const
