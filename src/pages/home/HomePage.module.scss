@@ -77,6 +77,7 @@
   color: var(--primary-color);
   font-weight: $font-weight-medium;
   cursor: pointer;
+  font-size: $h5-font-size;
 
   &:hover {
     text-decoration: underline;

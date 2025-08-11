@@ -26,5 +26,5 @@
     "resolveJsonModule": true
   },
   "exclude": ["node_modules", "dist", "build", "coverage"],
-  "include": ["src"]
+  "include": ["src", "mocks"]
 }

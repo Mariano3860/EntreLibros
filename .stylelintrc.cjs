@@ -8,6 +8,7 @@ module.exports = {
     'import-notation': null,
     'property-no-vendor-prefix': null,
     'selector-class-pattern': null,
+    'no-descending-specificity': null,
   },
   ignoreFiles: ['**/node_modules/**', '**/dist/**'],
 }

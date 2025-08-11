@@ -16,3 +16,12 @@ declare module '*.svg' {
   const src: string
   export default src
 }
+
+// Public envs exposed by Rsbuild (client-side)
+declare interface ImportMetaEnv {
+  readonly PUBLIC_MSW_FORCE_AUTH?: 'auto' | 'logged-in' | 'logged-out'
+  readonly PUBLIC_API_BASE_URL?: string
+}
+declare interface ImportMeta {
+  readonly env: ImportMetaEnv
+}

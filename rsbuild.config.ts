@@ -2,10 +2,6 @@ import { defineConfig } from '@rsbuild/core'
 import { pluginReact } from '@rsbuild/plugin-react'
 import { pluginSass } from '@rsbuild/plugin-sass'
 import { pluginSvgr } from '@rsbuild/plugin-svgr'
-import * as dotenv from 'dotenv'
-
-// Load environment variables
-dotenv.config()
 
 export default defineConfig({
   plugins: [
@@ -22,12 +18,6 @@ export default defineConfig({
     template: './public/index.html',
     mountId: 'root',
     outputStructure: 'flat',
-  },
-
-  source: {
-    define: {
-      'process.env': JSON.stringify(process.env),
-    },
   },
 
   output: {

@@ -1,5 +1,13 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["src", "tests", "*.ts", "*.tsx", ".stylelintrc.*", "*.config.js"],
-  "exclude": ["node_modules"]
+  "include": [
+    "src",
+    "tests",
+    "mocks",
+    "*.ts",
+    "*.tsx",
+    ".stylelintrc.*",
+    "*.config.js"
+  ],
+  "exclude": ["node_modules", "dist", "build", "coverage"]
 }
