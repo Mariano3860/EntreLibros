@@ -57,5 +57,10 @@
     "community_title": "Join the community",
     "community_subtitle": "Create your book house and start sharing books today",
     "explore_community": "Explore community"
+  },
+  "activity": {
+    "added": "Ofreciste",
+    "exchanged": "Intercambiaste",
+    "cover_alt": "Portada de {{title}}"
   }
 }

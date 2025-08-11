@@ -1,0 +1,33 @@
+.activityItem {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--background-secondary);
+  box-shadow: var(--box-shadow-sm);
+}
+
+.activityItem img {
+  width: 48px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.action {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.time {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}

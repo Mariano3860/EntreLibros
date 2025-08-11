@@ -93,7 +93,7 @@
 .activityFeed {
   display: flex;
   flex-direction: column;
-  gap: $spacing-2;
+  gap: $spacing-1;
 }
 
 .communitySection {
@@ -101,7 +101,7 @@
   background: var(--background-card);
   padding: $spacing-4;
   border-radius: 12px;
-  margin-top: -$spacing-2;
+  margin-top: $spacing-1;
 
   h2 {
     margin-bottom: $spacing-2;

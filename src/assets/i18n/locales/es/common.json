@@ -57,5 +57,10 @@
     "community_title": "Únete a la comunidad",
     "community_subtitle": "Crea tu casita y empieza a intercambiar libros hoy mismo",
     "explore_community": "Explorar comunidad"
+  },
+  "activity": {
+    "added": "You added",
+    "exchanged": "You exchanged",
+    "cover_alt": "Cover of {{title}}"
   }
 }
