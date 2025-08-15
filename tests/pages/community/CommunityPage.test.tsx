@@ -1,7 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
 import { CommunityPage } from '../../../src/pages/community/CommunityPage'
-
 import { renderWithProviders } from '../../test-utils'
 
 describe('CommunityPage', () => {

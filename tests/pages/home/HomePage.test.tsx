@@ -7,7 +7,6 @@ vi.mock('../../../src/hooks/api/useIsLoggedIn', () => ({
 
 import { useIsLoggedIn } from '../../../src/hooks/api/useIsLoggedIn'
 import { HomePage } from '../../../src/pages/home/HomePage'
-
 import { renderWithProviders } from '../../test-utils'
 
 describe('HomePage', () => {

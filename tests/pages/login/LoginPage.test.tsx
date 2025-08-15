@@ -9,7 +9,6 @@ vi.mock('../../../src/components/login/LoginForm', () => ({
 }))
 
 import LoginPage from '../../../src/pages/login/LoginPage'
-
 import { renderWithProviders } from '../../test-utils'
 
 describe('LoginPage', () => {
