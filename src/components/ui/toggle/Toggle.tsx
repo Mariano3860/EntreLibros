@@ -10,6 +10,7 @@ export const Toggle = ({
   return (
     <button
       role="switch"
+      type="button"
       aria-checked={isActive}
       aria-label={ariaLabel}
       className={`${styles.toggle} ${className} ${isActive ? styles.active : ''}`}

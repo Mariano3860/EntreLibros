@@ -7,7 +7,7 @@ import { useLogout } from '@/hooks/api/useLogout'
 
 import styles from '../Sidebar.module.scss'
 
-export const SidebarLogginButton = () => {
+export const SidebarLoginButton = () => {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const { mutate: logout } = useLogout()

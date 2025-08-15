@@ -7,7 +7,8 @@
   "authenticating": "Autenticando...",
   "auth": {
     "errors": {
-      "invalid_credentials": "Correo electrónico o contraseña incorrectos."
+      "invalid_credentials": "Correo electrónico o contraseña incorrectos.",
+      "unknown": "Ocurrió un error inesperado."
     },
     "success": {
       "login": "¡Inicio de sesión exitoso!"
