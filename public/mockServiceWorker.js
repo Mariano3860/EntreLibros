@@ -7,7 +7,7 @@
  * - Please do NOT modify this file.
  */
 
-const PACKAGE_VERSION = '2.10.4'
+const PACKAGE_VERSION = '2.10.5'
 const INTEGRITY_CHECKSUM = 'f5825c521429caf22a4dd13b66e243af'
 const IS_MOCKED_RESPONSE = Symbol('isMockedResponse')
 const activeClientIds = new Set()
@@ -156,7 +156,7 @@ async function handleRequest(event, requestId) {
           },
         },
       },
-      responseClone.body ? [serializedRequest.body, responseClone.body] : []
+      responseClone.body ? [serializedRequest.body, responseClone.body] : [],
     )
   }
 
@@ -221,7 +221,7 @@ async function getResponse(event, client, requestId) {
     if (acceptHeader) {
       const values = acceptHeader.split(',').map((value) => value.trim())
       const filteredValues = values.filter(
-        (value) => value !== 'msw/passthrough'
+        (value) => value !== 'msw/passthrough',
       )
 
       if (filteredValues.length > 0) {
@@ -258,7 +258,7 @@ async function getResponse(event, client, requestId) {
         ...serializedRequest,
       },
     },
-    [serializedRequest.body]
+    [serializedRequest.body],
   )
 
   switch (clientMessage.type) {
