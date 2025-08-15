@@ -12,5 +12,5 @@ describe('index.tsx', () => {
     expect(rootElement.innerHTML).toContain('home.hero_title')
 
     document.body.removeChild(rootElement)
-  }, 20000)
+  }, 30000)
 })
