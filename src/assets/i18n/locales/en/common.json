@@ -7,7 +7,8 @@
   "authenticating": "Authenticating...",
   "auth": {
     "errors": {
-      "invalid_credentials": "Invalid email or password."
+      "invalid_credentials": "Invalid email or password.",
+      "unknown": "An unexpected error occurred."
     },
     "success": {
       "login": "Login successful!"

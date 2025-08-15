@@ -16,6 +16,24 @@ export const LoginForm = ({ onSubmit }: LoginFormProps) => {
   const [password, setPassword] = useState('')
   const { mutate: login, isPending } = useLogin()
 
+  const getErrorMessage = (error: Error) => {
+    const errorKeyMap: Record<string, string> = {
+      invalid_credentials: 'auth.errors.invalid_credentials',
+      'auth.errors.invalid_credentials': 'auth.errors.invalid_credentials',
+    }
+
+    const translationKey = errorKeyMap[error.message]
+
+    if (translationKey) {
+      const translated = t(translationKey)
+      return translated === translationKey
+        ? t('auth.errors.unknown')
+        : translated
+    }
+
+    return error.message || t('auth.errors.unknown')
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     login(
@@ -27,7 +45,7 @@ export const LoginForm = ({ onSubmit }: LoginFormProps) => {
           navigate(`/${HOME_URLS.HOME}`)
         },
         onError: (error: Error) => {
-          showToast(t(error?.message || 'auth.errors.unknown'), 'error')
+          showToast(getErrorMessage(error), 'error')
         },
       }
     )

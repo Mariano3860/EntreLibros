@@ -1,5 +1,5 @@
 import { SidebarLanguageSwitcher } from '@components/sidebar/buttons/SidebarLanguageSwitcher'
-import { SidebarLogginButton } from '@components/sidebar/buttons/SidebarLogginButton'
+import { SidebarLoginButton } from '@components/sidebar/buttons/SidebarLoginButton'
 import { SidebarThemeButton } from '@components/sidebar/buttons/SidebarThemeButton'
 import { NavItem } from '@components/sidebar/Sidebar.types'
 import { useState } from 'react'
@@ -68,7 +68,7 @@ export const Sidebar = () => {
       <div className={styles.footer}>
         <SidebarLanguageSwitcher />
         <SidebarThemeButton />
-        <SidebarLogginButton />
+        <SidebarLoginButton />
       </div>
     </nav>
   )
