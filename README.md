@@ -1,98 +1,125 @@
 # 📚 EntreLibros Frontend
 
-**EntreLibros** es una plataforma web colaborativa para el intercambio de libros físicos entre personas reales, potenciando la lectura libre mediante geolocalización, reseñas, catálogos personales y conexión social.
-
-Este repositorio contiene el código del frontend desarrollado con **React + Vite + TypeScript**, enfocado en una interfaz limpia, moderna, y con fuerte énfasis en la experiencia de usuario.
+Aplicación web en **React 19 + TypeScript** para la plataforma colaborativa de intercambio de libros *EntreLibros*. El proyecto utiliza **Rsbuild** como bundler, **React Router** para las rutas, **TanStack Query** para el manejo de datos remotos e **i18next** para internacionalización.
 
 ---
 
-## 🧭 Visión
+## 🚀 Requisitos
 
-EntreLibros busca ser el puente entre el mundo físico de los libros y las herramientas digitales modernas. A través de un mapa interactivo y una comunidad conectada por intereses literarios, la app permite descubrir casitas de intercambio, gestionar tu biblioteca, dejar reseñas y coordinar intercambios directos.
-
----
-
-## ✨ Funcionalidades principales
-
-✅ Registro y login de usuarios
-✅ Geolocalización de casitas de intercambio
-✅ Catálogo personal de libros para compartir o buscar
-✅ Sistema de reseñas y puntuación
-✅ Perfil de usuario con afinidades lectoras
-✅ Recomendaciones de usuarios cercanos con gustos similares
-✅ Chat entre usuarios que se siguen (premium: iniciar sin aceptación)
-✅ Modo claro/oscuro y diseño responsive
-✅ Internacionalización (i18n) y accesibilidad básica
+- [Node.js](https://nodejs.org/) 20 o superior
+- [npm](https://www.npmjs.com/) (incluido con Node)
 
 ---
 
-## 🛠️ Tecnologías utilizadas
+## 🛠️ Instalación y puesta en marcha
 
-| Tecnología                    | Uso principal                                 |
-| ----------------------------- | --------------------------------------------- |
-| **React + Vite**              | Frontend rápido y modular                     |
-| **TypeScript**                | Tipado estricto y mantenibilidad              |
-| **TanStack Query**            | Manejo eficiente de datos remotos             |
-| **Zustand o Context API**     | Estado global ligero (dependiendo de versión) |
-| **React Router**              | Navegación declarativa                        |
-| **Vitest + Testing Library**  | Testing unitario e integración                |
-| **Mock Service Worker (MSW)** | Mock de API local                             |
-| **SCSS**                      | Estilos escalables con soporte de theming     |
-| **i18next**                   | Internacionalización                          |
-| **GitHub Actions**            | CI/CD y automatización de builds/tests        |
+```bash
+git clone https://github.com/tu-usuario/entreLibros_frontend.git
+cd entreLibros_frontend
+npm install
 
----
+# variables de entorno (opcional)
+cp .env.development.local .env.local
 
-## 🏗 Estructura del proyecto
-
+# levantar el servidor de desarrollo
+npm run dev
 ```
+
+El servidor se iniciará en `http://localhost:3000` y utilizará **MSW** para simular la API mientras se desarrolla.
+
+---
+
+## 📦 Scripts disponibles
+
+| Comando                  | Descripción                                            |
+|-------------------------|--------------------------------------------------------|
+| `npm run dev`           | Inicia el entorno de desarrollo con recarga en vivo.   |
+| `npm run start`         | Sirve la aplicación ya construida.                     |
+| `npm run build`         | Genera la build de producción en `dist/`.              |
+| `npm test`              | Ejecuta las pruebas con Vitest una sola vez.           |
+| `npm run test:watch`    | Ejecuta las pruebas en modo watch.                     |
+| `npm run lint`          | Analiza el código con ESLint.                          |
+| `npm run stylelint`     | Revisa estilos SCSS/CSS.                               |
+| `npm run format`        | Verifica el formateo con Prettier.                     |
+| `npm run typecheck`     | Comprueba tipos con TypeScript.                        |
+| `npm run complete-check`| Ejecuta todos los chequeos anteriores en secuencia.    |
+
+---
+
+## 📂 Estructura del proyecto
+
+```text
 entreLibros_frontend/
-│── public/                 # Archivos estáticos (index.html, manifest, íconos)
-│── src/
-│   ├── api/                # Integración con servicios REST
-│   ├── assets/             # Imágenes, íconos, fuentes
-│   ├── components/         # Componentes reutilizables
-│   ├── features/           # Módulos funcionales (auth, books, map, etc.)
-│   ├── hooks/              # Hooks personalizados
-│   ├── pages/              # Rutas principales (LoginPage, Perfil, Casita, etc.)
-│   ├── routes/             # Configuración de rutas
-│   ├── styles/             # Estilos globales y variables SCSS
-│   ├── translations/       # Archivos de idiomas (JSON)
-│   ├── types/              # Tipos globales de TypeScript
-│   ├── App.tsx             # Componente raíz
-│   └── main.tsx            # Entry point de la app
-│── tests/                  # Pruebas automatizadas
-│── .github/                # Configuración de workflows CI/CD
-│── .env.*                  # Variables de entorno por ambiente
-│── Dockerfile              # Configuración para despliegue
-│── vitest.config.ts        # Configuración de testing
-│── tsconfig.json           # Configuración de TypeScript
-│── package.json            # Dependencias y scripts
+├── public/            # Archivos estáticos
+├── src/
+│   ├── api/           # Cliente HTTP y servicios
+│   ├── assets/        # Recursos (iconos, traducciones, etc.)
+│   ├── components/    # Componentes reutilizables
+│   ├── constants/     # Constantes compartidas
+│   ├── contexts/      # Contextos de React (tema, etc.)
+│   ├── hooks/         # Hooks personalizados
+│   ├── pages/         # Páginas asociadas a rutas
+│   ├── routes/        # Configuración de rutas
+│   └── shared/        # Estilos globales y tipos
+├── mocks/             # Handlers de MSW para APIs simuladas
+├── tests/             # Pruebas con Vitest y Testing Library
+├── rsbuild.config.ts  # Configuración de Rsbuild
+└── vitest.config.ts   # Configuración de pruebas
 ```
 
 ---
 
-## 🚧 Roadmap (MVP)
+## 🔧 Variables de entorno
 
-- [x] Setup de proyecto y dependencias básicas
-- [ ] Mapa interactivo de casitas
-- [ ] Registro/LoginPage + gestión de perfil
-- [ ] Catálogo personal (libros ofrecidos y deseados)
-- [ ] Sistema de reseñas
-- [ ] Matching de usuarios por afinidad lectora
-- [ ] Chat básico entre usuarios que se siguen
-- [ ] Internacionalización (ES/EN)
-- [ ] Mock API con MSW
-- [ ] Deploy automático con GitHub Actions
+Las variables se pueden definir en archivos `.env.*`:
+
+- `PUBLIC_API_BASE_URL`: URL base del backend.
+- `PUBLIC_MSW_FORCE_AUTH`: controla si MSW fuerza autenticación (`auto`, `on`, `off`).
+- `API_BASE_URL`: URL de la API para builds de producción.
 
 ---
 
-## 📜 Licencia
+## 🧪 Pruebas
 
-Este proyecto está en desarrollo académico. La licencia se definirá en la versión final.
+Las pruebas se ejecutan con [Vitest](https://vitest.dev/) y [Testing Library](https://testing-library.com/).
+
+```bash
+npm test          # ejecutar todas las pruebas una vez
+npm run test:ui   # interfaz interactiva de Vitest
+```
 
 ---
 
-## 🤝 Contribución
+## 🧩 Tecnologías clave
 
-Este repositorio está gestionado como parte de un proyecto de grado. Pull requests están deshabilitados de momento.
+- **React 19** + **TypeScript**
+- **Rsbuild** (bundler)
+- **TanStack Query**
+- **React Router**
+- **SCSS modules** con theming claro/oscuro
+- **i18next** para traducciones
+- **MSW** para mock de API
+- **Vitest** + **Testing Library**
+
+---
+
+## 🐳 Docker (opcional)
+
+Este repositorio incluye un `Dockerfile` y un `docker-compose.yml` de ejemplo para levantar el frontend junto a un backend compatible.
+
+```bash
+docker-compose up --build
+```
+
+---
+
+## 🤝 Contribuir
+
+Las contribuciones son bienvenidas. Abre un *issue* o envía un *pull request* con tus mejoras o correcciones.
+
+---
+
+## 📄 Licencia
+
+La licencia definitiva del proyecto se definirá en etapas posteriores.
+
