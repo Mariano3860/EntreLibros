@@ -57,7 +57,13 @@
     "my_books": "My books",
     "community_title": "Join the community",
     "community_subtitle": "Create your book house and start sharing books today",
-    "explore_community": "Explore community"
+    "explore_community": "Explore community",
+    "hero_logged_in_title": "Welcome back",
+    "hero_logged_in_subtitle": "Discover new books from the community.",
+    "hero_logged_in_cta": "Browse books",
+    "community_logged_in_title": "Your community",
+    "community_logged_in_subtitle": "See what's happening with other readers.",
+    "community_logged_in_cta": "Go to community"
   },
   "activity": {
     "added": "Ofreciste",

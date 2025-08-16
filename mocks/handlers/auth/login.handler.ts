@@ -7,6 +7,7 @@ import { DEFAULT_EMAIL, DEFAULT_PASS } from '../../constants/constants'
 
 import errorResponse from './fixtures/login.error.json'
 import successResponse from './fixtures/login.success.json'
+import { setLoggedInState } from './me.handler'
 
 export const loginHandler = http.post(
   RELATIVE_API_ROUTES.AUTH.LOGIN,
@@ -24,6 +25,7 @@ export const loginHandler = http.post(
       })
     }
 
+    setLoggedInState(true)
     return HttpResponse.json(successResponse, {
       status: 200,
       headers: {

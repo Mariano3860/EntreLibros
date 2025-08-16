@@ -57,7 +57,13 @@
     "my_books": "Mis libros",
     "community_title": "Únete a la comunidad",
     "community_subtitle": "Crea tu casita y empieza a intercambiar libros hoy mismo",
-    "explore_community": "Explorar comunidad"
+    "explore_community": "Explorar comunidad",
+    "hero_logged_in_title": "Bienvenido de nuevo",
+    "hero_logged_in_subtitle": "Descubre nuevos libros de la comunidad.",
+    "hero_logged_in_cta": "Explorar libros",
+    "community_logged_in_title": "Tu comunidad",
+    "community_logged_in_subtitle": "Mira qué sucede con otros lectores.",
+    "community_logged_in_cta": "Ir a la comunidad"
   },
   "activity": {
     "added": "You added",
