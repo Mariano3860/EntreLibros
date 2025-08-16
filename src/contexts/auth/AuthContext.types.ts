@@ -1,12 +1,8 @@
 import type { ReactNode } from 'react'
 
-export type AuthUser = unknown | null
-
-export type AuthContextType = {
 export interface AuthUser {
   id: string
   email: string
-  // Add other properties as needed, e.g. name, roles, etc.
 }
 
 export type MaybeAuthUser = AuthUser | null

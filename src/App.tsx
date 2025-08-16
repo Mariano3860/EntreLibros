@@ -12,15 +12,6 @@ const queryClient = new QueryClient()
 
 const App = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <ThemeProvider>
-          <div>
-            <AppRoutes />
-            <Toaster />
-          </div>
-        </ThemeProvider>
-      </AuthProvider>
     <AuthProvider>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider>
