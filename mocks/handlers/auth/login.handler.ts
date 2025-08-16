@@ -29,7 +29,7 @@ export const loginHandler = http.post(
     return HttpResponse.json(successResponse, {
       status: 200,
       headers: {
-        'Set-Cookie': `authToken=${successResponse.token}; HttpOnly; Secure`,
+        'Set-Cookie': `authToken=${successResponse.token}; Path=/; HttpOnly; Secure; SameSite=Strict`,
         'Content-Type': 'application/json',
       },
     })
