@@ -1,7 +1,13 @@
 import { BookCard } from '@components/book/BookCard'
+import { CommunitySectionLoggedIn } from '@components/home/CommunitySectionLoggedIn'
+import { HeroLoggedIn } from '@components/home/HeroLoggedIn'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { UserActivityItem } from '@components/user/UserActivityItem'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
+
+import { HOME_URLS } from '@/constants/constants'
+import { useIsLoggedIn } from '@/hooks/api/useIsLoggedIn'
 
 import styles from './HomePage.module.scss'
 
@@ -42,16 +48,29 @@ const mockActivities = [
 
 export const HomePage = () => {
   const { t } = useTranslation()
+  const { isLoggedIn, isLoading } = useIsLoggedIn()
+  const navigate = useNavigate()
+
+  if (isLoading) return null
 
   return (
     <BaseLayout>
       <div className={styles.homeWrapper}>
         {/* HERO */}
-        <section className={styles.hero}>
-          <h1>{t('home.hero_title')}</h1>
-          <p>{t('home.hero_subtitle')}</p>
-          <button className={styles.ctaButton}>{t('home.hero_cta')}</button>
-        </section>
+        {isLoggedIn ? (
+          <HeroLoggedIn />
+        ) : (
+          <section className={styles.hero}>
+            <h1>{t('home.hero_title')}</h1>
+            <p>{t('home.hero_subtitle')}</p>
+            <button
+              className={styles.ctaButton}
+              onClick={() => navigate(`/${HOME_URLS.LOGIN}`)}
+            >
+              {t('home.hero_cta')}
+            </button>
+          </section>
+        )}
 
         {/* STATS */}
         <section className={styles.stats}>
@@ -89,13 +108,20 @@ export const HomePage = () => {
         </section>
 
         {/* CTA COMUNIDAD */}
-        <section className={styles.communitySection}>
-          <h2>{t('home.community_title')}</h2>
-          <p>{t('home.community_subtitle')}</p>
-          <button className={styles.ctaButton}>
-            {t('home.explore_community')}
-          </button>
-        </section>
+        {isLoggedIn ? (
+          <CommunitySectionLoggedIn />
+        ) : (
+          <section className={styles.communitySection}>
+            <h2>{t('home.community_title')}</h2>
+            <p>{t('home.community_subtitle')}</p>
+            <button
+              className={styles.ctaButton}
+              onClick={() => navigate(`/${HOME_URLS.LOGIN}`)}
+            >
+              {t('home.explore_community')}
+            </button>
+          </section>
+        )}
       </div>
     </BaseLayout>
   )
