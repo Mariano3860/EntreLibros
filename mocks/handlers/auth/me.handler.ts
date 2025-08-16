@@ -9,6 +9,11 @@ type Override = 'auto' | 'logged-in' | 'logged-out'
 // Build-time override via .env (optional). Example: VITE_MSW_FORCE_AUTH=logged-in
 let AUTH_OVERRIDE: Override =
   (import.meta.env.PUBLIC_MSW_FORCE_AUTH as Override) ?? 'auto'
+let IS_LOGGED_IN = false
+
+export const setLoggedInState = (next: boolean) => {
+  IS_LOGGED_IN = next
+}
 
 function getCookie(name: string, cookieHeader: string | null): string | null {
   if (!cookieHeader) return null
@@ -52,7 +57,12 @@ export const meHandler = http.get(
       })
     }
 
-    // 2) Cookie-based default
+    // 2) Session-based flag
+    if (IS_LOGGED_IN) {
+      return HttpResponse.json(successUser, { status: 200 })
+    }
+
+    // 3) Cookie-based default
     const cookieHeader = request.headers.get('cookie')
     const token = getCookie('authToken', cookieHeader)
     if (token) {
