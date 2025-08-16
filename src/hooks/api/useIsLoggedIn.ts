@@ -1,9 +1,11 @@
 import { fetchMe } from '@api/auth/me.service'
 import { useQuery } from '@tanstack/react-query'
 
+import { AuthQueryKeys } from '@/constants/constants'
+
 export const useIsLoggedIn = () => {
   const { data, isError, isLoading } = useQuery({
-    queryKey: ['me'],
+    queryKey: [AuthQueryKeys.AUTH],
     queryFn: fetchMe,
     retry: false,
   })

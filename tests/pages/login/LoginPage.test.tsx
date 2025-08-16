@@ -1,6 +1,10 @@
 import { screen } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
+vi.mock('../../../src/api/auth/me.service', () => ({
+  fetchMe: vi.fn().mockRejectedValue(new Error('unauthenticated')),
+}))
+
 vi.mock('../../../src/components/login/LoginForm', () => ({
   LoginForm: ({ onSubmit }: { onSubmit?: (data: unknown) => void }) => {
     onSubmit?.({})
