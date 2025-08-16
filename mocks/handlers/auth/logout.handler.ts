@@ -11,7 +11,7 @@ export const logoutHandler = http.post(RELATIVE_API_ROUTES.AUTH.LOGOUT, () => {
     status: 200,
     headers: {
       'Set-Cookie':
-        'authToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; Secure; SameSite=Strict',
+        'sessionToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; SameSite=Strict',
       'Content-Type': 'application/json',
     },
   })

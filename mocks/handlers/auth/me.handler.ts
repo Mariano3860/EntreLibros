@@ -41,7 +41,7 @@ export const authStateHandler = http.get('/_msw/auth/state', ({ request }) => {
 /**
  * /auth/me — returns 200 with user or 401 based on:
  *  1) AUTH_OVERRIDE if not "auto"
- *  2) Otherwise, presence of "authToken" cookie (set by /auth/login handler)
+ *  2) Otherwise, presence of "sessionToken" cookie (set by /auth/login handler)
  */
 export const meHandler = http.get(
   RELATIVE_API_ROUTES.AUTH.ME,
@@ -64,7 +64,7 @@ export const meHandler = http.get(
 
     // 3) Cookie-based default
     const cookieHeader = request.headers.get('cookie')
-    const token = getCookie('authToken', cookieHeader)
+    const token = getCookie('sessionToken', cookieHeader)
     if (token) {
       return HttpResponse.json(successUser, { status: 200 })
     }
