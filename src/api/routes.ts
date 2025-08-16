@@ -8,4 +8,7 @@ export const RELATIVE_API_ROUTES = {
   CONTACT_FORM: {
     SUBMIT: `/contact/submit`,
   },
+  BOOKS: {
+    LIST: `/books`,
+  },
 }
