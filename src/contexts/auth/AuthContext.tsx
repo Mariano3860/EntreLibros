@@ -1,11 +1,9 @@
+import { fetchMe } from '@api/auth/me.service'
 import { createContext, useContext, useEffect, useState } from 'react'
 
-import { fetchMe } from '@api/auth/me.service'
 import type { AuthContextType, AuthProviderProps } from './AuthContext.types'
 
-export const AuthContext = createContext<AuthContextType | undefined>(
-  undefined
-)
+export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<AuthContextType['user']>(null)
@@ -39,4 +37,3 @@ export const useAuth = () => {
   }
   return context
 }
-

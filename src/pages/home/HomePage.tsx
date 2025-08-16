@@ -3,12 +3,12 @@ import { CommunitySectionLoggedIn } from '@components/home/CommunitySectionLogge
 import { HeroLoggedIn } from '@components/home/HeroLoggedIn'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { UserActivityItem } from '@components/user/UserActivityItem'
+import { useAuth } from '@contexts/auth/AuthContext'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
 import { HOME_URLS } from '@/constants/constants'
 import { useBooks } from '@/hooks/api/useBooks'
-import { useAuth } from '@contexts/auth/AuthContext'
 
 import styles from './HomePage.module.scss'
 

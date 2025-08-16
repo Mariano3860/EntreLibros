@@ -1,5 +1,5 @@
-import { describe, expect, test, vi } from 'vitest'
 import { screen, act } from '@testing-library/react'
+import { describe, expect, test, vi } from 'vitest'
 
 vi.mock('../src/api/auth/me.service', () => ({
   fetchMe: vi.fn(),
@@ -26,7 +26,9 @@ describe('index.tsx', () => {
       await import('../src/index')
     })
 
-    expect(await screen.findByText('home.hero_title', { timeout: 3000 })).toBeTruthy()
+    expect(
+      await screen.findByText('home.hero_title', { timeout: 3000 })
+    ).toBeTruthy()
 
     document.body.removeChild(rootElement)
   }, 30000)
@@ -65,7 +67,9 @@ describe('index.tsx', () => {
     await act(async () => {
       await import('../src/index')
     })
-    expect(await screen.findByText('home.hero_title', { timeout: 3000 })).toBeTruthy()
+    expect(
+      await screen.findByText('home.hero_title', { timeout: 3000 })
+    ).toBeTruthy()
     expect(worker.start).toHaveBeenCalled()
 
     document.body.removeChild(rootElement)

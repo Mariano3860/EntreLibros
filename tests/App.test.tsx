@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
-import App from '../src/App'
 import { fetchMe } from '../src/api/auth/me.service'
+import App from '../src/App'
 vi.mock('../src/hooks/api/useBooks', () => ({
   useBooks: () => ({ data: [] }),
 }))
