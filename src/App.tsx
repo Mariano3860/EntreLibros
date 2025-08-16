@@ -21,7 +21,16 @@ const App = () => {
           </div>
         </ThemeProvider>
       </AuthProvider>
-    </QueryClientProvider>
+    <AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <div>
+            <AppRoutes />
+            <Toaster />
+          </div>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </AuthProvider>
   )
 }
 
