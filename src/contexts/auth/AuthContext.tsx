@@ -14,7 +14,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       try {
         const me = await fetchMe()
         setUser(me)
-      } catch {
+      } catch (error) {
+        console.error('Failed to fetch user:', error)
         setUser(null)
       } finally {
         setIsLoading(false)
