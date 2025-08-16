@@ -1,6 +1,6 @@
 # 📚 EntreLibros Frontend
 
-Aplicación web en **React 19 + TypeScript** para la plataforma colaborativa de intercambio de libros *EntreLibros*. El proyecto utiliza **Rsbuild** como bundler, **React Router** para las rutas, **TanStack Query** para el manejo de datos remotos e **i18next** para internacionalización.
+Aplicación web en **React 19 + TypeScript** para la plataforma colaborativa de intercambio de libros _EntreLibros_. El proyecto utiliza **Rsbuild** como bundler, **React Router** para las rutas, **TanStack Query** para el manejo de datos remotos e **i18next** para internacionalización.
 
 ---
 
@@ -31,18 +31,18 @@ El servidor se iniciará en `http://localhost:3000` y utilizará **MSW** para si
 
 ## 📦 Scripts disponibles
 
-| Comando                  | Descripción                                            |
-|-------------------------|--------------------------------------------------------|
-| `npm run dev`           | Inicia el entorno de desarrollo con recarga en vivo.   |
-| `npm run start`         | Sirve la aplicación ya construida.                     |
-| `npm run build`         | Genera la build de producción en `dist/`.              |
-| `npm test`              | Ejecuta las pruebas con Vitest una sola vez.           |
-| `npm run test:watch`    | Ejecuta las pruebas en modo watch.                     |
-| `npm run lint`          | Analiza el código con ESLint.                          |
-| `npm run stylelint`     | Revisa estilos SCSS/CSS.                               |
-| `npm run format`        | Verifica el formateo con Prettier.                     |
-| `npm run typecheck`     | Comprueba tipos con TypeScript.                        |
-| `npm run complete-check`| Ejecuta todos los chequeos anteriores en secuencia.    |
+| Comando                  | Descripción                                          |
+| ------------------------ | ---------------------------------------------------- |
+| `npm run dev`            | Inicia el entorno de desarrollo con recarga en vivo. |
+| `npm run start`          | Sirve la aplicación ya construida.                   |
+| `npm run build`          | Genera la build de producción en `dist/`.            |
+| `npm test`               | Ejecuta las pruebas con Vitest una sola vez.         |
+| `npm run test:watch`     | Ejecuta las pruebas en modo watch.                   |
+| `npm run lint`           | Analiza el código con ESLint.                        |
+| `npm run stylelint`      | Revisa estilos SCSS/CSS.                             |
+| `npm run format`         | Verifica el formateo con Prettier.                   |
+| `npm run typecheck`      | Comprueba tipos con TypeScript.                      |
+| `npm run complete-check` | Ejecuta todos los chequeos anteriores en secuencia.  |
 
 ---
 
@@ -115,11 +115,10 @@ docker-compose up --build
 
 ## 🤝 Contribuir
 
-Las contribuciones son bienvenidas. Abre un *issue* o envía un *pull request* con tus mejoras o correcciones.
+Las contribuciones son bienvenidas. Abre un _issue_ o envía un _pull request_ con tus mejoras o correcciones.
 
 ---
 
 ## 📄 Licencia
 
 La licencia definitiva del proyecto se definirá en etapas posteriores.
-

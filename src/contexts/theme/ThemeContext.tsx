@@ -2,8 +2,8 @@ import { createContext, useContext, useEffect, useState } from 'react'
 
 import { ThemeContextType, ThemeProviderProps } from './ThemeContext.types'
 
-export const ThemeContext = createContext<ThemeContextType>(
-  {} as ThemeContextType
+export const ThemeContext = createContext<ThemeContextType | undefined>(
+  undefined
 )
 
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
