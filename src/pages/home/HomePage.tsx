@@ -7,28 +7,10 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
 import { HOME_URLS } from '@/constants/constants'
+import { useBooks } from '@/hooks/api/useBooks'
 import { useIsLoggedIn } from '@/hooks/api/useIsLoggedIn'
 
 import styles from './HomePage.module.scss'
-
-// Mock books
-const mockBooks = [
-  {
-    title: '1984',
-    author: 'George Orwell',
-    coverUrl: 'https://covers.openlibrary.org/b/id/7222246-L.jpg',
-  },
-  {
-    title: 'Brave New World',
-    author: 'Aldous Huxley',
-    coverUrl: 'https://covers.openlibrary.org/b/id/8775116-L.jpg',
-  },
-  {
-    title: 'Fahrenheit 451',
-    author: 'Ray Bradbury',
-    coverUrl: 'https://covers.openlibrary.org/b/id/11172235-L.jpg',
-  },
-]
 
 // Mock activity
 const mockActivities = [
@@ -49,6 +31,7 @@ const mockActivities = [
 export const HomePage = () => {
   const { t } = useTranslation()
   const { isLoggedIn, isLoading } = useIsLoggedIn()
+  const { data: books } = useBooks()
   const navigate = useNavigate()
 
   if (isLoading) return null
@@ -89,7 +72,7 @@ export const HomePage = () => {
             <button className={styles.linkButton}>{t('home.see_all')}</button>
           </div>
           <div className={styles.bookList}>
-            {mockBooks.map((book, idx) => (
+            {books?.map((book, idx) => (
               <BookCard key={idx} {...book} />
             ))}
           </div>
