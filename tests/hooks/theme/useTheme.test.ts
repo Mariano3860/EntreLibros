@@ -4,8 +4,8 @@ import { describe, expect, test } from 'vitest'
 import {
   ThemeProvider,
   useTheme as useThemeFromContext,
-} from '../src/contexts/theme/ThemeContext'
-import { useTheme } from '../src/hooks/theme/useTheme'
+} from '../../../src/contexts/theme/ThemeContext'
+import { useTheme } from '../../../src/hooks/theme/useTheme'
 
 describe('useTheme', () => {
   test('returns context when used within ThemeProvider', () => {
@@ -15,6 +15,8 @@ describe('useTheme', () => {
     expect(result.current.theme).toBe('light')
     act(() => result.current.toggleTheme())
     expect(result.current.theme).toBe('dark')
+    act(() => result.current.toggleTheme())
+    expect(result.current.theme).toBe('light')
   })
 
   test('throws error when used outside ThemeProvider', () => {
