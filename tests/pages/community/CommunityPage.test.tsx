@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'vitest'
 
-import { CommunityPage } from '../src/pages/community/CommunityPage'
+import { CommunityPage } from '../../../src/pages/community/CommunityPage'
 
-import { renderWithProviders } from './test-utils'
+import { renderWithProviders } from '../../test-utils'
 
 describe('CommunityPage', () => {
   test('renders sidebar navigation', () => {
