@@ -1,13 +1,17 @@
+import { screen, act } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
-vi.mock('../src/hooks/api/useIsLoggedIn', () => ({
-  useIsLoggedIn: vi.fn(),
+vi.mock('../src/api/auth/me.service', () => ({
+  fetchMe: vi.fn(),
+}))
+vi.mock('../src/hooks/api/useBooks', () => ({
+  useBooks: () => ({ data: [] }),
 }))
 vi.mock('../mocks/browser', () => ({
   worker: { start: vi.fn() },
 }))
 
-import { useIsLoggedIn } from '../src/hooks/api/useIsLoggedIn'
+import { fetchMe } from '../src/api/auth/me.service'
 
 describe('index.tsx', () => {
   test('should render App in root element for guest users', async () => {
@@ -15,17 +19,16 @@ describe('index.tsx', () => {
     rootElement.id = 'root'
     document.body.appendChild(rootElement)
 
-    vi.mocked(useIsLoggedIn).mockReturnValue({
-      isLoggedIn: false,
-      isLoading: false,
-      isError: false,
-    })
+    vi.mocked(fetchMe).mockRejectedValue(new Error('unauthenticated'))
 
     vi.resetModules()
-    await import('../src/index')
+    await act(async () => {
+      await import('../src/index')
+    })
 
-    await new Promise((resolve) => setTimeout(resolve, 20))
-    expect(rootElement.innerHTML).toContain('home.hero_title')
+    expect(
+      await screen.findByText('home.hero_title', { timeout: 3000 })
+    ).toBeTruthy()
 
     document.body.removeChild(rootElement)
   }, 30000)
@@ -35,17 +38,16 @@ describe('index.tsx', () => {
     rootElement.id = 'root'
     document.body.appendChild(rootElement)
 
-    vi.mocked(useIsLoggedIn).mockReturnValue({
-      isLoggedIn: true,
-      isLoading: false,
-      isError: false,
-    })
+    vi.mocked(fetchMe).mockResolvedValue({ id: 1 })
 
     vi.resetModules()
-    await import('../src/index')
+    await act(async () => {
+      await import('../src/index')
+    })
 
-    await new Promise((resolve) => setTimeout(resolve, 20))
-    expect(rootElement.innerHTML).toContain('home.hero_logged_in_title')
+    expect(
+      await screen.findByText('home.hero_logged_in_title', { timeout: 3000 })
+    ).toBeTruthy()
 
     document.body.removeChild(rootElement)
   }, 30000)
@@ -60,15 +62,14 @@ describe('index.tsx', () => {
 
     vi.resetModules()
     const { worker } = await import('../mocks/browser')
-    vi.mocked(useIsLoggedIn).mockReturnValue({
-      isLoggedIn: false,
-      isLoading: false,
-      isError: false,
+    vi.mocked(fetchMe).mockRejectedValue(new Error('unauthenticated'))
+
+    await act(async () => {
+      await import('../src/index')
     })
-
-    await import('../src/index')
-
-    await new Promise((resolve) => setTimeout(resolve, 20))
+    expect(
+      await screen.findByText('home.hero_title', { timeout: 3000 })
+    ).toBeTruthy()
     expect(worker.start).toHaveBeenCalled()
 
     document.body.removeChild(rootElement)

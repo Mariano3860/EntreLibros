@@ -9,7 +9,7 @@ export const useLogin = () => {
   return useMutation({
     mutationFn: login,
     onSuccess: (data) => {
-      queryClient.setQueryData([AuthQueryKeys.AUTH], data)
+      queryClient.setQueryData([AuthQueryKeys.AUTH], data.user)
     },
     onError: () => {
       queryClient.removeQueries({ queryKey: [AuthQueryKeys.AUTH] })

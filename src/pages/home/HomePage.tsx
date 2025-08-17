@@ -3,12 +3,12 @@ import { CommunitySectionLoggedIn } from '@components/home/CommunitySectionLogge
 import { HeroLoggedIn } from '@components/home/HeroLoggedIn'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { UserActivityItem } from '@components/user/UserActivityItem'
+import { useAuth } from '@contexts/auth/AuthContext'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
 import { HOME_URLS } from '@/constants/constants'
 import { useBooks } from '@/hooks/api/useBooks'
-import { useIsLoggedIn } from '@/hooks/api/useIsLoggedIn'
 
 import styles from './HomePage.module.scss'
 
@@ -30,7 +30,7 @@ const mockActivities = [
 
 export const HomePage = () => {
   const { t } = useTranslation()
-  const { isLoggedIn, isLoading } = useIsLoggedIn()
+  const { isAuthenticated, isLoading } = useAuth()
   const { data: books } = useBooks()
   const navigate = useNavigate()
 
@@ -40,7 +40,7 @@ export const HomePage = () => {
     <BaseLayout>
       <div className={styles.homeWrapper}>
         {/* HERO */}
-        {isLoggedIn ? (
+        {isAuthenticated ? (
           <HeroLoggedIn />
         ) : (
           <section className={styles.hero}>
@@ -91,7 +91,7 @@ export const HomePage = () => {
         </section>
 
         {/* CTA COMUNIDAD */}
-        {isLoggedIn ? (
+        {isAuthenticated ? (
           <CommunitySectionLoggedIn />
         ) : (
           <section className={styles.communitySection}>

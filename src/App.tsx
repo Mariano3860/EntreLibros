@@ -1,4 +1,5 @@
 import { Toaster } from '@components/ui/toaster/Toaster'
+import { AuthProvider } from '@contexts/auth/AuthContext'
 import { ThemeProvider } from '@contexts/theme/ThemeContext'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import React from 'react'
@@ -12,12 +13,14 @@ const queryClient = new QueryClient()
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <div>
-          <AppRoutes />
-          <Toaster />
-        </div>
-      </ThemeProvider>
+      <AuthProvider>
+        <ThemeProvider>
+          <div>
+            <AppRoutes />
+            <Toaster />
+          </div>
+        </ThemeProvider>
+      </AuthProvider>
     </QueryClientProvider>
   )
 }

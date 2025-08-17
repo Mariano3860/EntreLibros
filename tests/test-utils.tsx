@@ -3,6 +3,7 @@ import { render } from '@testing-library/react'
 import { ReactElement } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 
+import { AuthProvider } from '../src/contexts/auth/AuthContext'
 import { ThemeProvider } from '../src/contexts/theme/ThemeContext'
 
 export const renderWithProviders = (ui: ReactElement) => {
@@ -10,7 +11,9 @@ export const renderWithProviders = (ui: ReactElement) => {
   return render(
     <MemoryRouter>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider>{ui}</ThemeProvider>
+        <AuthProvider>
+          <ThemeProvider>{ui}</ThemeProvider>
+        </AuthProvider>
       </QueryClientProvider>
     </MemoryRouter>
   )
