@@ -15,13 +15,6 @@ export const setLoggedInState = (next: boolean) => {
   IS_LOGGED_IN = next
 }
 
-function getCookie(name: string, cookieHeader: string | null): string | null {
-  if (!cookieHeader) return null
-  const parts = cookieHeader.split(';').map((c) => c.trim())
-  const found = parts.find((c) => c.startsWith(`${name}=`))
-  return found ? decodeURIComponent(found.split('=').slice(1).join('=')) : null
-}
-
 /**
  * Runtime toggle (no app code changes needed).
  * Usage from browser console:
@@ -41,11 +34,11 @@ export const authStateHandler = http.get('/_msw/auth/state', ({ request }) => {
 /**
  * /auth/me — returns 200 with user or 401 based on:
  *  1) AUTH_OVERRIDE if not "auto"
- *  2) Otherwise, presence of "authToken" cookie (set by /auth/login handler)
+ *  2) Otherwise, presence of "sessionToken" cookie (set by /auth/login handler)
  */
 export const meHandler = http.get(
   RELATIVE_API_ROUTES.AUTH.ME,
-  ({ request }) => {
+  ({ request, cookies }) => {
     // 1) Override wins
     if (AUTH_OVERRIDE === 'logged-in') {
       return HttpResponse.json(successUser, { status: 200 })
@@ -63,8 +56,7 @@ export const meHandler = http.get(
     }
 
     // 3) Cookie-based default
-    const cookieHeader = request.headers.get('cookie')
-    const token = getCookie('authToken', cookieHeader)
+    const token = cookies.sessionToken
     if (token) {
       return HttpResponse.json(successUser, { status: 200 })
     }
