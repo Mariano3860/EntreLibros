@@ -28,9 +28,10 @@ export const loginHandler = http.post(
     setLoggedInState(true)
     return HttpResponse.json(successResponse, {
       status: 200,
-      // HttpOnly should be set in the server, but won't be use in development
+      // HttpOnly should be set in the server, but won't be used in development
       headers: {
-        'Set-Cookie': `sessionToken=${successResponse.token}; Path=/; Secure; SameSite=Strict`,
+        // Secure flag omitted so that the cookie is sent over HTTP in development
+        'Set-Cookie': `sessionToken=${successResponse.token}; Path=/; SameSite=Strict`,
         'Content-Type': 'application/json',
       },
     })
