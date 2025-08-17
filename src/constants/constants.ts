@@ -9,3 +9,5 @@ export const HOME_URLS = {
   CONTACT: 'contact',
   LOGIN: 'login',
 } as const
+
+export const AUTH_COOKIE_NAME = 'sessionToken' as const
