@@ -4,14 +4,21 @@
   "email": "Email",
   "password": "Password",
   "login": "Login",
+  "register": "Sign up",
+  "name": "Name",
+  "confirm_password": "Confirm password",
+  "no_account": "Don't have an account?",
+  "have_account": "Already have an account?",
   "authenticating": "Authenticating...",
   "auth": {
     "errors": {
       "invalid_credentials": "Invalid email or password.",
+      "email_exists": "Email is already registered.",
       "unknown": "An unexpected error occurred."
     },
     "success": {
-      "login": "Login successful!"
+      "login": "Login successful!",
+      "register": "Registration successful!"
     }
   },
   "theme": {
@@ -40,7 +47,8 @@
     "errors": {
       "required": "This field is required",
       "invalid_email": "Invalid email address",
-      "min_length": "Must be at least {{count}} characters"
+      "min_length": "Must be at least {{count}} characters",
+      "password_mismatch": "Passwords do not match"
     },
     "submit": "Submit",
     "success_message": "Message sent successfully",
