@@ -1,9 +1,13 @@
-export interface LoginRequest {
+/**
+ * Tipos para el proceso de inicio de sesión.
+ * TODO: considerar soporte para autenticación multifactor.
+ */
+export type LoginRequest = {
   email: string
   password: string
 }
 
-export interface LoginResponse {
+export type LoginResponse = {
   token: string
   user: {
     id: string
@@ -16,7 +20,7 @@ export interface LoginResponse {
   message: string
 }
 
-export interface LoginError {
+export type LoginError = {
   error: 'InvalidCredentials' | 'AccountLocked' | 'MissingFields'
   message: string
   remainingAttempts?: number

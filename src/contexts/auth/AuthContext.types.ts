@@ -1,6 +1,10 @@
 import type { ReactNode } from 'react'
 
-export interface AuthUser {
+/**
+ * Datos básicos del usuario autenticado.
+ * TODO: incluir más información del perfil cuando esté disponible.
+ */
+export type AuthUser = {
   id: string
   email: string
 }

@@ -4,21 +4,9 @@ import React, { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import styles from './BooksPage.module.scss'
+import type { Book } from './BooksPage.types'
 
-interface Book {
-  id: string
-  title: string
-  author: string
-  coverUrl: string
-  condition?: string
-  status?: 'available' | 'reserved' | 'sold' | 'exchanged'
-  isForSale?: boolean
-  price?: number | null
-  isForTrade?: boolean
-  tradePreferences?: string[]
-  isSeeking?: boolean
-}
-
+// TODO: reemplazar este arreglo por datos provenientes del backend
 const mockBooks: Book[] = [
   {
     id: '1',
@@ -88,6 +76,7 @@ export const BooksPage = () => {
     [t]
   )
 
+  // TODO: mover este filtro a un hook reutilizable si se complica
   const filterByTab = (book: Book) => {
     switch (activeTab) {
       case 'trade':

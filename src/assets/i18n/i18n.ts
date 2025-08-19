@@ -8,11 +8,13 @@ const storedLanguage =
   typeof window !== 'undefined' ? localStorage.getItem('language') : null
 
 declare module 'react-i18next' {
-  interface Resources {
+  // TODO: verificar si es necesario declarar recursos adicionales
+  type Resources = {
     translation: typeof esTranslations
   }
 }
 
+// Configuración de internacionalización
 i18n.use(initReactI18next).init({
   resources: {
     en: { translation: enTranslations },
