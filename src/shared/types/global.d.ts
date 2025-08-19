@@ -19,10 +19,11 @@ declare module '*.svg' {
 
 // Variables de entorno públicas expuestas por Rsbuild (lado del cliente)
 // TODO: revisar otras variables públicas necesarias y evaluar si se pueden usar types
-declare interface ImportMetaEnv {
+type ImportMetaEnv = {
   readonly PUBLIC_MSW_FORCE_AUTH?: 'auto' | 'logged-in' | 'logged-out'
   readonly PUBLIC_API_BASE_URL?: string
+  readonly PROD: boolean
 }
-declare interface ImportMeta {
+interface ImportMeta {
   readonly env: ImportMetaEnv
 }

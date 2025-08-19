@@ -8,8 +8,8 @@
       "@contexts/*": ["./src/contexts/*"],
       "@hooks/*": ["./src/hooks/*"],
       "@styles/*": ["./src/shared/styles/*"],
-      "@mocks/*": ["./src/mocks/*"],
       "@api/*": ["./src/api/*"],
+      "mocks/*": ["./mocks/*"],
       "@pages/*": ["./src/pages/*"],
       "@utils/*": ["./src/utils/*"],
       "@assets/*": ["./src/assets/*"]
