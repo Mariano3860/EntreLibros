@@ -9,7 +9,7 @@
       "@hooks/*": ["./src/hooks/*"],
       "@styles/*": ["./src/shared/styles/*"],
       "@api/*": ["./src/api/*"],
-      "mocks/*": ["./mocks/*"],
+      "@mocks/*": ["./mocks/*"],
       "@pages/*": ["./src/pages/*"],
       "@utils/*": ["./src/utils/*"],
       "@assets/*": ["./src/assets/*"]

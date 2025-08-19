@@ -1,8 +1,8 @@
+import { DEFAULT_EMAIL } from '@mocks/constants/constants'
+import { registerHandler } from '@mocks/handlers/auth/register.handler'
 import { setupServer } from 'msw/node'
 import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest'
 
-import { DEFAULT_EMAIL } from '../../../mocks/constants/constants'
-import { registerHandler } from '../../../mocks/handlers/auth/register.handler'
 import { register } from '../../../src/api/auth/register.service'
 
 const server = setupServer(registerHandler)

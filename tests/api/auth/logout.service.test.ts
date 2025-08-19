@@ -1,4 +1,4 @@
-import { logoutHandler } from 'mocks/handlers/auth/logout.handler'
+import { logoutHandler } from '@mocks/handlers/auth/logout.handler'
 import { setupServer } from 'msw/node'
 import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest'
 

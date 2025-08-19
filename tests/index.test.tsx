@@ -7,7 +7,7 @@ vi.mock('../src/api/auth/me.service', () => ({
 vi.mock('../src/hooks/api/useBooks', () => ({
   useBooks: () => ({ data: [] }),
 }))
-vi.mock('../mocks/browser', () => ({
+vi.mock('@mocks/browser', () => ({
   worker: { start: vi.fn() },
 }))
 
@@ -61,7 +61,7 @@ describe('index.tsx', () => {
     process.env.NODE_ENV = 'development'
 
     vi.resetModules()
-    const { worker } = await import('../mocks/browser')
+    const { worker } = await import('@mocks/browser')
     vi.mocked(fetchMe).mockRejectedValue(new Error('unauthenticated'))
 
     await act(async () => {
