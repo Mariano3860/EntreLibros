@@ -28,8 +28,12 @@ export const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
 
   const getErrorMessage = (error: unknown) => {
     const err = error as { response?: { data?: { message?: string } } }
-    const message = err.response?.data?.message || 'auth.errors.unknown'
-    return t(message)
+    const message = err.response?.data?.message
+    if (!message) {
+      return t('auth.errors.unknown')
+    }
+    const translated = t(message)
+    return translated === message ? t('auth.errors.unknown') : translated
   }
 
   const onSubmitForm = (data: FormValues) => {
@@ -98,14 +102,15 @@ export const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
           className={styles.input}
           {...register('confirmPassword', {
             required: true,
-            validate: (value) => value === password || 'password_mismatch',
+            validate: (value) =>
+              value === password || t('form.errors.password_mismatch'),
           })}
         />
         {errors.confirmPassword && (
           <span className={styles.errorMessage}>
             {errors.confirmPassword.type === 'required'
               ? t('form.errors.required')
-              : t('form.errors.password_mismatch')}
+              : (errors.confirmPassword.message as string)}
           </span>
         )}
       </div>
