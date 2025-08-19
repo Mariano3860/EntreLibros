@@ -1,7 +1,7 @@
 import { http, HttpResponse } from 'msw'
 
-import { LoginRequest } from '@/api/auth/login.types'
-import { RELATIVE_API_ROUTES } from '@/api/routes'
+import { LoginRequest } from '@src/api/auth/login.types'
+import { RELATIVE_API_ROUTES } from '@src/api/routes'
 
 import { DEFAULT_EMAIL, DEFAULT_PASS } from '../../constants/constants'
 

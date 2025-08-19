@@ -2,7 +2,7 @@ import { fetchMe } from '@api/auth/me.service'
 import { useQuery } from '@tanstack/react-query'
 import { createContext, useContext } from 'react'
 
-import { AuthQueryKeys } from '@/constants/constants'
+import { AuthQueryKeys } from '@src/constants/constants'
 
 import type { AuthContextType, AuthProviderProps } from './AuthContext.types'
 

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { ReactComponent as Globe } from '@/assets/icons/globe.svg'
+import { ReactComponent as Globe } from '@src/assets/icons/globe.svg'
 
 import styles from '../Sidebar.module.scss'
 

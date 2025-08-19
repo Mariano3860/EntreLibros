@@ -1,6 +1,6 @@
 import { useTheme } from '@hooks/theme/useTheme'
 
-import { ReactComponent as MoonIcon } from '@/assets/icons/moon.svg'
+import { ReactComponent as MoonIcon } from '@src/assets/icons/moon.svg'
 
 import styles from './ThemeIconButton.module.scss'
 

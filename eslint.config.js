@@ -68,7 +68,10 @@ export default [
             'sibling',
             'index',
           ],
-          pathGroups: [{ pattern: '@/**', group: 'internal' }],
+          pathGroups: [
+            { pattern: '@src/**', group: 'internal' },
+            { pattern: '@mocks/**', group: 'internal' },
+          ],
           pathGroupsExcludedImportTypes: ['builtin'],
           alphabetize: { order: 'asc', caseInsensitive: true },
           'newlines-between': 'always',

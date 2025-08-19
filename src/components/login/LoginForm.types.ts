@@ -1,4 +1,4 @@
-import { LoginResponse } from '@/api/auth/login.types'
+import { LoginResponse } from '@src/api/auth/login.types'
 
 export type LoginFormProps = {
   onSubmit: (credentials: LoginResponse) => void

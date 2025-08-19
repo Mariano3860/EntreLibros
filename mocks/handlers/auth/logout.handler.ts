@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw'
 
-import { RELATIVE_API_ROUTES } from '@/api/routes'
+import { RELATIVE_API_ROUTES } from '@src/api/routes'
 
 import successResponse from './fixtures/logout.success.json'
 import { setLoggedInState } from './me.handler'

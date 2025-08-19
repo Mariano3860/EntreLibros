@@ -37,7 +37,7 @@ export default defineConfig({
 
   resolve: {
     alias: {
-      '@': './src',
+      '@src': './src',
       '@components': './src/components',
       '@contexts': './src/contexts',
       '@hooks': './src/hooks',

@@ -6,7 +6,7 @@ import React from 'react'
 
 import AppRoutes from './routes'
 
-import '@/shared/styles/main.scss'
+import '@src/shared/styles/main.scss'
 
 const queryClient = new QueryClient()
 

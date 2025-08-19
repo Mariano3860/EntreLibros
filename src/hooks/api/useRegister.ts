@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-import { register } from '@/api/auth/register.service'
-import { AuthQueryKeys } from '@/constants/constants'
+import { register } from '@src/api/auth/register.service'
+import { AuthQueryKeys } from '@src/constants/constants'
 
 export const useRegister = () => {
   const queryClient = useQueryClient()
