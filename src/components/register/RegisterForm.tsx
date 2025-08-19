@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { useNavigate, Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import { showToast } from '@/components/ui/toaster/Toaster'
 import { HOME_URLS } from '@/constants/constants'
@@ -29,9 +29,8 @@ export const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
 
   const getErrorMessage = (error: unknown) => {
     const err = error as { response?: { data?: { message?: string } } }
-    const message = err.response?.data?.message
-    const translated = t(message)
-    return translated === message ? t('auth.errors.unknown') : translated
+    const message = err.response?.data?.message || 'auth.errors.unknown'
+    return t(message)
   }
 
   const onSubmitForm = (data: FormValues) => {
@@ -67,7 +66,9 @@ export const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
           {...register('name', { required: true })}
         />
         {errors.name && (
-          <span className={styles.errorMessage}>{t('form.errors.required')}</span>
+          <span className={styles.errorMessage}>
+            {t('form.errors.required')}
+          </span>
         )}
         <input
           type="email"
@@ -76,7 +77,9 @@ export const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
           {...register('email', { required: true })}
         />
         {errors.email && (
-          <span className={styles.errorMessage}>{t('form.errors.required')}</span>
+          <span className={styles.errorMessage}>
+            {t('form.errors.required')}
+          </span>
         )}
         <input
           type="password"
@@ -85,7 +88,9 @@ export const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
           {...register('password', { required: true, minLength: 6 })}
         />
         {errors.password && (
-          <span className={styles.errorMessage}>{t('form.errors.min_length', { count: 6 })}</span>
+          <span className={styles.errorMessage}>
+            {t('form.errors.min_length', { count: 6 })}
+          </span>
         )}
         <input
           type="password"
@@ -96,7 +101,9 @@ export const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
           })}
         />
         {errors.confirmPassword && (
-          <span className={styles.errorMessage}>{t('form.errors.required')}</span>
+          <span className={styles.errorMessage}>
+            {t('form.errors.required')}
+          </span>
         )}
       </div>
 
@@ -109,8 +116,7 @@ export const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
       </button>
 
       <p className={styles.loginLink}>
-        {t('have_account')}{' '}
-        <Link to={`/${HOME_URLS.LOGIN}`}>{t('login')}</Link>
+        {t('have_account')} <Link to={`/${HOME_URLS.LOGIN}`}>{t('login')}</Link>
       </p>
     </form>
   )

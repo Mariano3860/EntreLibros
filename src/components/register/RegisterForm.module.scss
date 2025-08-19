@@ -3,7 +3,8 @@
 .registerForm {
   max-width: 440px;
   padding: 2rem;
-  transition: background-color $transition-duration-normal $transition-timing-function;
+  transition: background-color $transition-duration-normal
+    $transition-timing-function;
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
