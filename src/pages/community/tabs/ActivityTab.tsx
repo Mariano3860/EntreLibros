@@ -4,20 +4,24 @@ import styles from '../CommunityPage.module.scss'
 
 export const ActivityTab = () => {
   const { t } = useTranslation()
-  const items = [
-    t('community.activity.feed.new_book'),
-    t('community.activity.feed.exchange'),
-    t('community.activity.feed.new_house'),
-    t('community.activity.feed.comment'),
-    t('community.activity.feed.event'),
+  const itemKeys = [
+    'community.activity.feed.new_book',
+    'community.activity.feed.exchange',
+    'community.activity.feed.new_house',
+    'community.activity.feed.comment',
+    'community.activity.feed.event',
   ]
+  const items = itemKeys.map((key) => ({
+    key,
+    text: t(key),
+  }))
 
   return (
     <section className={styles.tabContent}>
       <h2>{t('community.activity.title')}</h2>
       <ul className={styles.feedList}>
-        {items.map((text, idx) => (
-          <li key={idx}>{text}</li>
+        {items.map((item) => (
+          <li key={item.key}>{item.text}</li>
         ))}
       </ul>
     </section>

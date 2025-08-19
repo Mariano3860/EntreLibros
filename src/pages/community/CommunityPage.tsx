@@ -9,6 +9,8 @@ import { ForumsTab } from './tabs/ForumsTab'
 import { MessagesTab } from './tabs/MessagesTab'
 import { StatsTab } from './tabs/StatsTab'
 
+const ACTIVITY_TAB_KEY = 'activity'
+
 export const CommunityPage = () => {
   const { t } = useTranslation()
   const location = useLocation()
@@ -35,7 +37,7 @@ export const CommunityPage = () => {
             const isActive = location.pathname === fullPath
             return (
               <Link
-                key={tab.path || 'activity'}
+                key={tab.path || ACTIVITY_TAB_KEY}
                 to={fullPath}
                 className={`${styles.tab} ${isActive ? styles.active : ''}`}
                 role="tab"
