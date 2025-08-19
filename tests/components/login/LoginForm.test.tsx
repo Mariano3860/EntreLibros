@@ -20,6 +20,7 @@ vi.mock('@src/components/ui/toaster/Toaster', () => ({
 
 import { LoginForm } from '@src/components/login/LoginForm'
 import { showToast } from '@src/components/ui/toaster/Toaster'
+
 import { renderWithProviders } from '../../test-utils'
 
 const showToastMock = vi.mocked(showToast)

@@ -5,6 +5,7 @@ vi.mock('@src/api/auth/me.service', () => ({
 }))
 
 import { CommunityPage } from '@src/pages/community/CommunityPage'
+
 import { renderWithProviders } from '../../test-utils'
 
 describe('CommunityPage', () => {

@@ -19,6 +19,7 @@ vi.mock('react-router-dom', async () => {
 })
 
 import RegisterPage from '@src/pages/register/RegisterPage'
+
 import { renderWithProviders } from '../../test-utils'
 
 describe('RegisterPage', () => {

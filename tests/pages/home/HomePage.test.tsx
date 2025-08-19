@@ -16,6 +16,7 @@ beforeEach(() => {
 
 import { fetchMe } from '@src/api/auth/me.service'
 import { HomePage } from '@src/pages/home/HomePage'
+
 import { renderWithProviders } from '../../test-utils'
 
 describe('HomePage', () => {

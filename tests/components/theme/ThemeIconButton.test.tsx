@@ -3,6 +3,7 @@ import { describe, expect, test, vi } from 'vitest'
 
 import { ThemeIconButton } from '@src/components/theme/ThemeIconButton'
 import * as useThemeModule from '@src/hooks/theme/useTheme'
+
 import { renderWithProviders } from '../../test-utils'
 
 describe('ThemeIconButton', () => {

@@ -4,6 +4,7 @@ import type { Mock } from 'vitest'
 import { describe, expect, test, vi } from 'vitest'
 
 import { Toaster, showToast } from '@src/components/ui/toaster/Toaster'
+
 import { renderWithProviders } from '../../../test-utils'
 
 type ToastMock = Mock & {

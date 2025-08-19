@@ -11,6 +11,7 @@ vi.mock('react-i18next', () => ({
 }))
 
 import { SidebarLanguageSwitcher } from '@src/components/sidebar/buttons/SidebarLanguageSwitcher'
+
 import { renderWithProviders } from '../../test-utils'
 
 describe('SidebarLanguageSwitcher', () => {

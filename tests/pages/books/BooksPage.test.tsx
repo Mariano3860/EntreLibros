@@ -6,6 +6,7 @@ vi.mock('@src/api/auth/me.service', () => ({
 }))
 
 import { BooksPage } from '@src/pages/books/BooksPage'
+
 import { renderWithProviders } from '../../test-utils'
 
 describe('BooksPage', () => {

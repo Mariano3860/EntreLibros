@@ -13,6 +13,7 @@ vi.mock('@src/components/ui/toaster/Toaster', () => ({
 
 import { RegisterForm } from '@src/components/register/RegisterForm'
 import { showToast } from '@src/components/ui/toaster/Toaster'
+
 import { renderWithProviders } from '../../test-utils'
 
 describe('RegisterForm', () => {
