@@ -1,12 +1,18 @@
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, expect, test, vi } from 'vitest'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 vi.mock('../../../src/api/auth/me.service', () => ({
   fetchMe: vi.fn(),
 }))
+
+const useBooksMock = vi.fn()
 vi.mock('../../../src/hooks/api/useBooks', () => ({
-  useBooks: () => ({ data: [] }),
+  useBooks: () => useBooksMock(),
 }))
+
+beforeEach(() => {
+  useBooksMock.mockReturnValue({ data: [] })
+})
 
 import { fetchMe } from '../../../src/api/auth/me.service'
 import { HomePage } from '../../../src/pages/home/HomePage'
@@ -31,5 +37,12 @@ describe('HomePage', () => {
     vi.mocked(fetchMe).mockResolvedValueOnce({ id: 1 })
     renderWithProviders(<HomePage />)
     expect(await screen.findByText('home.hero_logged_in_title')).toBeVisible()
+  })
+
+  test('handles malformed book data without crashing', async () => {
+    vi.mocked(fetchMe).mockRejectedValueOnce(new Error('unauthenticated'))
+    useBooksMock.mockReturnValue({ data: {} })
+    renderWithProviders(<HomePage />)
+    expect(await screen.findByText('home.hero_title')).toBeVisible()
   })
 })

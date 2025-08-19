@@ -31,7 +31,8 @@ const mockActivities = [
 export const HomePage = () => {
   const { t } = useTranslation()
   const { isAuthenticated, isLoading } = useAuth()
-  const { data: books } = useBooks()
+  const { data: booksData } = useBooks()
+  const books = Array.isArray(booksData) ? booksData : []
   const navigate = useNavigate()
 
   if (isLoading) return null
