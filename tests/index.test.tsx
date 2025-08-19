@@ -1,17 +1,17 @@
 import { screen, act } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
-vi.mock('../src/api/auth/me.service', () => ({
+vi.mock('@src/api/auth/me.service', () => ({
   fetchMe: vi.fn(),
 }))
-vi.mock('../src/hooks/api/useBooks', () => ({
+vi.mock('@src/hooks/api/useBooks', () => ({
   useBooks: () => ({ data: [] }),
 }))
-vi.mock('../mocks/browser', () => ({
+vi.mock('@mocks/browser', () => ({
   worker: { start: vi.fn() },
 }))
 
-import { fetchMe } from '../src/api/auth/me.service'
+import { fetchMe } from '@src/api/auth/me.service'
 
 describe('index.tsx', () => {
   test('should render App in root element for guest users', async () => {
@@ -23,12 +23,10 @@ describe('index.tsx', () => {
 
     vi.resetModules()
     await act(async () => {
-      await import('../src/index')
+      await import('@src/index')
     })
 
-    expect(
-      await screen.findByText('home.hero_title', { timeout: 3000 })
-    ).toBeTruthy()
+    expect(await screen.findByText('home.hero_title')).toBeTruthy()
 
     document.body.removeChild(rootElement)
   }, 30000)
@@ -42,12 +40,10 @@ describe('index.tsx', () => {
 
     vi.resetModules()
     await act(async () => {
-      await import('../src/index')
+      await import('@src/index')
     })
 
-    expect(
-      await screen.findByText('home.hero_logged_in_title', { timeout: 3000 })
-    ).toBeTruthy()
+    expect(await screen.findByText('home.hero_logged_in_title')).toBeTruthy()
 
     document.body.removeChild(rootElement)
   }, 30000)
@@ -61,15 +57,13 @@ describe('index.tsx', () => {
     process.env.NODE_ENV = 'development'
 
     vi.resetModules()
-    const { worker } = await import('../mocks/browser')
+    const { worker } = await import('@mocks/browser')
     vi.mocked(fetchMe).mockRejectedValue(new Error('unauthenticated'))
 
     await act(async () => {
-      await import('../src/index')
+      await import('@src/index')
     })
-    expect(
-      await screen.findByText('home.hero_title', { timeout: 3000 })
-    ).toBeTruthy()
+    expect(await screen.findByText('home.hero_title')).toBeTruthy()
     expect(worker.start).toHaveBeenCalled()
 
     document.body.removeChild(rootElement)

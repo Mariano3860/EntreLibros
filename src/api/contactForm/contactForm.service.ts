@@ -1,5 +1,5 @@
-import { apiClient } from '@/api/axios'
-import { RELATIVE_API_ROUTES } from '@/api/routes'
+import { apiClient } from '@src/api/axios'
+import { RELATIVE_API_ROUTES } from '@src/api/routes'
 
 import { ContactFormData } from './contactForm.types'
 

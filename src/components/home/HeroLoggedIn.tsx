@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
-import { HOME_URLS } from '@/constants/constants'
-import styles from '@/pages/home/HomePage.module.scss'
+import { HOME_URLS } from '@src/constants/constants'
+import styles from '@src/pages/home/HomePage.module.scss'
 
 export const HeroLoggedIn = () => {
   const { t } = useTranslation()

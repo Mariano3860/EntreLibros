@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw'
 
-import { RELATIVE_API_ROUTES } from '@/api/routes'
+import { RELATIVE_API_ROUTES } from '@src/api/routes'
 
 import errorResponse from './fixtures/contactForm.error.json'
 import successResponse from './fixtures/contactForm.success.json'

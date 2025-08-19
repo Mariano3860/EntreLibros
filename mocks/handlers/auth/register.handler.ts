@@ -1,7 +1,7 @@
 import { http, HttpResponse } from 'msw'
 
-import { RegisterRequest } from '@/api/auth/register.types'
-import { RELATIVE_API_ROUTES } from '@/api/routes'
+import { RegisterRequest } from '@src/api/auth/register.types'
+import { RELATIVE_API_ROUTES } from '@src/api/routes'
 
 import { DEFAULT_EMAIL } from '../../constants/constants'
 

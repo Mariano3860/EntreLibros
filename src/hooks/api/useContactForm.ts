@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
 
-import { submitContactForm } from '@/api/contactForm/contactForm.service'
+import { submitContactForm } from '@src/api/contactForm/contactForm.service'
 
 export const useContactForm = (onSuccessCallback?: () => void) => {
   return useMutation({

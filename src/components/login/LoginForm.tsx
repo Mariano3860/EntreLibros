@@ -3,8 +3,8 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
-import { showToast } from '@/components/ui/toaster/Toaster'
-import { HOME_URLS } from '@/constants/constants'
+import { showToast } from '@src/components/ui/toaster/Toaster'
+import { HOME_URLS } from '@src/constants/constants'
 
 import styles from './LoginForm.module.scss'
 import { LoginFormProps } from './LoginForm.types'

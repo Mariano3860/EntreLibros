@@ -7,8 +7,8 @@ import { useAuth } from '@contexts/auth/AuthContext'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
-import { HOME_URLS } from '@/constants/constants'
-import { useBooks } from '@/hooks/api/useBooks'
+import { HOME_URLS } from '@src/constants/constants'
+import { useBooks } from '@src/hooks/api/useBooks'
 
 import styles from './HomePage.module.scss'
 

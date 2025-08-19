@@ -37,7 +37,7 @@ export default defineConfig({
 
   resolve: {
     alias: {
-      '@': './src',
+      '@src': './src',
       '@components': './src/components',
       '@contexts': './src/contexts',
       '@hooks': './src/hooks',
@@ -45,8 +45,8 @@ export default defineConfig({
       '@api': './src/api',
       '@styles': './src/shared/styles',
       '@utils': './src/utils',
-      '@mocks': './src/mocks',
       '@assets': './src/assets',
+      '@mocks': './mocks',
     },
     extensions: ['.tsx', '.ts', '.js', '.jsx'], // Supported file extensions
   },

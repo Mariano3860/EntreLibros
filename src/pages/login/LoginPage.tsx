@@ -3,7 +3,7 @@ import { LoginForm } from '@components/login/LoginForm'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
-import { HOME_URLS } from '@/constants/constants'
+import { HOME_URLS } from '@src/constants/constants'
 
 import styles from './LoginPage.module.scss'
 

@@ -2,9 +2,9 @@ import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
-import { showToast } from '@/components/ui/toaster/Toaster'
-import { HOME_URLS } from '@/constants/constants'
-import { useRegister } from '@/hooks/api/useRegister'
+import { showToast } from '@src/components/ui/toaster/Toaster'
+import { HOME_URLS } from '@src/constants/constants'
+import { useRegister } from '@src/hooks/api/useRegister'
 
 import styles from './RegisterForm.module.scss'
 import { RegisterFormProps } from './RegisterForm.types'

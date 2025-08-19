@@ -6,11 +6,11 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 
-import { ReactComponent as Books } from '@/assets/icons/books.svg'
-import { ReactComponent as Community } from '@/assets/icons/community.svg'
-import { ReactComponent as Contact } from '@/assets/icons/contact.svg'
-import { ReactComponent as Home } from '@/assets/icons/home.svg'
-import { HOME_URLS } from '@/constants/constants'
+import { ReactComponent as Books } from '@src/assets/icons/books.svg'
+import { ReactComponent as Community } from '@src/assets/icons/community.svg'
+import { ReactComponent as Contact } from '@src/assets/icons/contact.svg'
+import { ReactComponent as Home } from '@src/assets/icons/home.svg'
+import { HOME_URLS } from '@src/constants/constants'
 
 import styles from './Sidebar.module.scss'
 

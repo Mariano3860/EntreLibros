@@ -1,3 +1,5 @@
+import { fileURLToPath, URL } from 'node:url'
+
 import svgr from 'vite-plugin-svgr'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { defineConfig } from 'vitest/config'
@@ -15,9 +17,16 @@ export default defineConfig({
       include: '**/*.svg',
     }),
   ],
+  resolve: {
+    alias: {
+      '@src': fileURLToPath(new URL('./src', import.meta.url)),
+      '@mocks': fileURLToPath(new URL('./mocks', import.meta.url)),
+    },
+  },
   test: {
     include: ['**/*.test.{ts,tsx,js,jsx}'],
     environment: 'jsdom',
+    testTimeout: 10000,
     coverage: {
       enabled: true,
       provider: 'v8',
@@ -28,17 +37,14 @@ export default defineConfig({
         'tests/**',
         'node_modules/**',
         'mocks/**',
-        'src/api/**',
-        'src/hooks/api/**',
-        'src/components/**',
         '**/*.d.ts',
         '**/*.types.ts',
       ],
       thresholds: {
-        lines: 70,
-        functions: 70,
-        branches: 70,
-        statements: 70,
+        lines: 85,
+        functions: 85,
+        branches: 85,
+        statements: 85,
       },
     },
     setupFiles: './tests/setup.ts',

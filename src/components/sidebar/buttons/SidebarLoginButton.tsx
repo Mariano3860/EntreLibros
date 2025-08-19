@@ -1,9 +1,9 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 
-import { ReactComponent as LogoutIcon } from '@/assets/icons/logout.svg'
-import { AuthQueryKeys, HOME_URLS } from '@/constants/constants'
-import { useLogout } from '@/hooks/api/useLogout'
+import { ReactComponent as LogoutIcon } from '@src/assets/icons/logout.svg'
+import { AuthQueryKeys, HOME_URLS } from '@src/constants/constants'
+import { useLogout } from '@src/hooks/api/useLogout'
 
 import styles from '../Sidebar.module.scss'
 

@@ -1,7 +1,7 @@
 import { useTheme } from '@hooks/theme/useTheme'
 import { useTranslation } from 'react-i18next'
 
-import { ReactComponent as MoonIcon } from '@/assets/icons/moon.svg'
+import { ReactComponent as MoonIcon } from '@src/assets/icons/moon.svg'
 
 import styles from '../Sidebar.module.scss'
 
