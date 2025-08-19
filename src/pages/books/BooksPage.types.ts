@@ -1,8 +1,9 @@
 /**
- * Propiedades para el componente BookCard.
- * TODO: unificar los estados en un enum reutilizable.
+ * Representa un libro dentro de la aplicación.
+ * TODO: mover los estados y condiciones a tipos compartidos.
  */
-export type BookCardProps = {
+export type Book = {
+  id: string
   title: string
   author: string
   coverUrl: string

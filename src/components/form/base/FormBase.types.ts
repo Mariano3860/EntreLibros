@@ -1,3 +1,7 @@
+/**
+ * Tipos base para formularios reutilizables.
+ * TODO: admitir más tipos de campos y validaciones.
+ */
 export type InputType = 'text' | 'email' | 'textarea'
 
 export type FormField = {
@@ -9,13 +13,13 @@ export type FormField = {
   placeholder?: string
 }
 
-export interface FormBaseProps {
+export type FormBaseProps = {
   fields: FormField[]
   onSubmit: (formData: Record<string, string>) => void
   submitLabel?: string
   isSubmitting?: boolean
 }
 
-export interface FormBaseRef {
+export type FormBaseRef = {
   resetForm: () => void
 }

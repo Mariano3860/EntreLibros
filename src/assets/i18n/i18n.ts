@@ -5,11 +5,13 @@ import enTranslations from './locales/en/common.json'
 import esTranslations from './locales/es/common.json'
 
 declare module 'react-i18next' {
-  interface Resources {
+  // TODO: verificar si es necesario declarar recursos adicionales
+  type Resources = {
     translation: typeof esTranslations
   }
 }
 
+// Configuración de internacionalización
 i18n.use(initReactI18next).init({
   resources: {
     en: { translation: enTranslations },
