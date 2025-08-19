@@ -1,0 +1,95 @@
+@import '@styles/variables';
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+  padding: $spacing-2;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+.searchRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-2;
+  align-items: center;
+}
+
+.search {
+  flex: 1;
+  padding: $spacing-1x5 $spacing-2;
+  border: 1px solid var(--border-color);
+  border-radius: rem(8px);
+}
+
+.chips {
+  display: flex;
+  gap: $spacing-1;
+}
+
+.chip {
+  background: var(--background-card);
+  border: 1px solid var(--border-color);
+  border-radius: rem(16px);
+  padding: 0 $spacing-2;
+  height: rem(32px);
+  display: flex;
+  align-items: center;
+  color: var(--text-secondary);
+}
+
+.publishButton {
+  margin-left: auto;
+  background-color: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: rem(8px);
+  padding: $spacing-1x5 $spacing-3;
+  cursor: pointer;
+}
+
+.tabs {
+  display: flex;
+  gap: $spacing-1;
+  border-bottom: 1px solid var(--border-color);
+  overflow-x: auto;
+}
+
+.tab {
+  background: none;
+  border: none;
+  padding: $spacing-1 $spacing-2;
+  cursor: pointer;
+  font-weight: $font-weight-medium;
+  color: var(--text-secondary);
+}
+
+.tab.active {
+  color: var(--primary-color);
+  border-bottom: rem(2px) solid var(--primary-color);
+}
+
+.seeAll {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  cursor: pointer;
+}
+
+.grid {
+  display: grid;
+  gap: $spacing-2;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+}
+
+.empty {
+  text-align: center;
+  color: var(--text-secondary);
+  padding: $spacing-4 0;
+}

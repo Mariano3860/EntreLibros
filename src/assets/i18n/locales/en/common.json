@@ -69,5 +69,39 @@
     "added": "Ofreciste",
     "exchanged": "Intercambiaste",
     "cover_alt": "Portada de {{title}}"
+  },
+  "booksPage": {
+    "title": "Explore books",
+    "search_placeholder": "Search by title, author, ISBN",
+    "filter": {
+      "near": "Near",
+      "available": "Available"
+    },
+    "publish_button": "Publish a book",
+    "tabs": {
+      "mine": "My books",
+      "for_trade": "Available for trade",
+      "seeking": "Seeking",
+      "for_sale": "For sale",
+      "see_all": "See all"
+    },
+    "empty": {
+      "mine": "You haven't added books yet.",
+      "trade": "You haven't listed books for trade yet.",
+      "seeking": "No books in your wish list.",
+      "sale": "You don't have books for sale yet."
+    },
+    "status": {
+      "available": "Available",
+      "reserved": "Reserved",
+      "sold": "Sold",
+      "exchanged": "Exchanged"
+    },
+    "badge": {
+      "for_sale": "For sale · ${{price}}",
+      "for_trade": "Trade",
+      "seeking": "Seeking"
+    },
+    "cover_alt": "Cover of {{title}}"
   }
 }
