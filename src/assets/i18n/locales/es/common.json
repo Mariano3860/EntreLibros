@@ -75,7 +75,7 @@
     "search_placeholder": "Buscar por título, autor, ISBN",
     "filter": {
       "near": "Cerca",
-      "available": "Available"
+      "available": "Disponible"
     },
     "publish_button": "Publicar un libro",
     "tabs": {
