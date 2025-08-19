@@ -16,10 +16,12 @@ import { showToast } from '@src/components/ui/toaster/Toaster'
 
 import { renderWithProviders } from '../../test-utils'
 
+const showToastMock = vi.mocked(showToast)
+
 describe('RegisterForm', () => {
   beforeEach(() => {
     mockMutate.mockReset()
-    showToast.mockReset()
+    showToastMock.mockReset()
   })
 
   test('shows validation errors for required fields', async () => {
@@ -73,7 +75,10 @@ describe('RegisterForm', () => {
     await screen.findByRole('button', { name: 'register' })
     expect(mockMutate).toHaveBeenCalled()
     expect(onSubmit).toHaveBeenCalled()
-    expect(showToast).toHaveBeenCalledWith('auth.success.register', 'success')
+    expect(showToastMock).toHaveBeenCalledWith(
+      'auth.success.register',
+      'success'
+    )
   })
 
   test('shows server error message on failure', async () => {
@@ -98,6 +103,6 @@ describe('RegisterForm', () => {
     fireEvent.click(screen.getByRole('button', { name: 'register' }))
 
     await screen.findByRole('button', { name: 'register' })
-    expect(showToast).toHaveBeenCalledWith('auth.errors.unknown', 'error')
+    expect(showToastMock).toHaveBeenCalledWith('auth.errors.unknown', 'error')
   })
 })

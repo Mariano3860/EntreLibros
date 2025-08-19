@@ -22,9 +22,9 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "strict": true,
-    "types": ["vitest/globals"],
+    "types": ["vitest/globals", "vitest"],
     "resolveJsonModule": true
   },
   "exclude": ["node_modules", "dist", "build", "coverage"],
-  "include": ["src", "mocks"]
+  "include": ["src", "tests", "mocks"]
 }

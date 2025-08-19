@@ -17,7 +17,6 @@ describe('clearAllCookies', () => {
 
   test('handles missing document gracefully', () => {
     const original = global.document
-    // @ts-expect-error - simulate environment without document
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     delete (global as any).document
     expect(() => clearAllCookies()).not.toThrow()
