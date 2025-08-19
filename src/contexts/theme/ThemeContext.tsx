@@ -9,7 +9,10 @@ export const ThemeContext = createContext<ThemeContextType | undefined>(
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     if (typeof window !== 'undefined') {
-      const storedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null
+      const storedTheme = localStorage.getItem('theme') as
+        | 'light'
+        | 'dark'
+        | null
       if (storedTheme) return storedTheme
     }
     return 'light'

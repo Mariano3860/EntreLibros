@@ -10,4 +10,3 @@ describe('i18n language persistence', () => {
     expect(window.localStorage.getItem('language')).toBe('en')
   })
 })
-
