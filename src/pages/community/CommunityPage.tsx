@@ -36,7 +36,7 @@ export const CommunityPage = () => {
             return (
               <Link
                 key={tab.path || 'activity'}
-                to={tab.path}
+                to={fullPath}
                 className={`${styles.tab} ${isActive ? styles.active : ''}`}
                 role="tab"
                 aria-selected={isActive}
