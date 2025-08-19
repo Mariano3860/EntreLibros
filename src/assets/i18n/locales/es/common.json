@@ -4,14 +4,21 @@
   "email": "Correo electrónico",
   "password": "Contraseña",
   "login": "Iniciar sesión",
+  "register": "Registrarse",
+  "name": "Nombre",
+  "confirm_password": "Confirmar contraseña",
+  "no_account": "¿No tenés cuenta?",
+  "have_account": "¿Ya tenés cuenta?",
   "authenticating": "Autenticando...",
   "auth": {
     "errors": {
       "invalid_credentials": "Correo electrónico o contraseña incorrectos.",
+      "email_exists": "El correo ya está registrado.",
       "unknown": "Ocurrió un error inesperado."
     },
     "success": {
-      "login": "¡Inicio de sesión exitoso!"
+      "login": "¡Inicio de sesión exitoso!",
+      "register": "¡Registro exitoso!"
     }
   },
   "theme": {

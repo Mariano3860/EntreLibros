@@ -8,4 +8,5 @@ export const HOME_URLS = {
   COMMUNITY: 'community',
   CONTACT: 'contact',
   LOGIN: 'login',
+  REGISTER: 'register',
 } as const
