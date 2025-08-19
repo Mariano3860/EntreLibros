@@ -74,7 +74,7 @@
     "title": "Explorar libros",
     "search_placeholder": "Buscar por título, autor, ISBN",
     "filter": {
-      "near": "Near",
+      "near": "Cerca",
       "available": "Available"
     },
     "publish_button": "Publicar un libro",
