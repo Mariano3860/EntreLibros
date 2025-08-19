@@ -7,14 +7,7 @@ import { HOME_URLS } from '@/constants/constants'
 import { useRegister } from '@/hooks/api/useRegister'
 
 import styles from './RegisterForm.module.scss'
-import { RegisterFormProps } from './RegisterForm.types'
-
-type FormValues = {
-  name: string
-  email: string
-  password: string
-  confirmPassword: string
-}
+import { FormValues, RegisterFormProps } from './RegisterForm.types'
 
 export const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
   const { t } = useTranslation()
