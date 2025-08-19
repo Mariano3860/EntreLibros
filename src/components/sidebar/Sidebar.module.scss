@@ -81,26 +81,38 @@
   background: var(--background-card);
   border: rem(1px) solid var(--border-color);
   border-radius: 50%;
-  padding: $spacing-1;
   cursor: pointer;
   box-shadow: var(--shadow-md);
   z-index: $z-index-fixed;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  width: rem(15px);
-  height: rem(15px);
+  width: rem(24px);
+  height: rem(24px);
+  padding: $spacing-1;
 
   span {
-    display: block;
-    width: 100%;
-    height: rem(1px);
+    position: absolute;
+    left: 50%;
+    width: 65%;
+    height: rem(2px);
     background: var(--text-primary);
     border-radius: rem(1px);
+    transform: translateX(-50%);
+
+    &:nth-child(1) {
+      top: rem(6px);
+    }
+
+    &:nth-child(2) {
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    &:nth-child(3) {
+      bottom: rem(6px);
+    }
   }
 
   @media (max-width: $breakpoint-tablet) {
-    display: flex;
+    display: block;
   }
 }
 
