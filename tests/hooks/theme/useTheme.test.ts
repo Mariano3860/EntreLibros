@@ -8,6 +8,10 @@ import {
 import { useTheme } from '../../../src/hooks/theme/useTheme'
 
 describe('useTheme', () => {
+  beforeEach(() => {
+    window.localStorage.clear()
+  })
+
   test('returns context when used within ThemeProvider', () => {
     const { result } = renderHook(() => useTheme(), {
       wrapper: ThemeProvider,
@@ -36,5 +40,21 @@ describe('useTheme', () => {
     expect(() => renderHook(() => useThemeFromContext())).toThrow(
       'useTheme must be used within a ThemeProvider'
     )
+  })
+
+  test('persists theme to localStorage', () => {
+    const { result } = renderHook(() => useTheme(), {
+      wrapper: ThemeProvider,
+    })
+    act(() => result.current.toggleTheme())
+    expect(window.localStorage.getItem('theme')).toBe('dark')
+  })
+
+  test('initializes theme from localStorage', () => {
+    window.localStorage.setItem('theme', 'dark')
+    const { result } = renderHook(() => useTheme(), {
+      wrapper: ThemeProvider,
+    })
+    expect(result.current.theme).toBe('dark')
   })
 })
