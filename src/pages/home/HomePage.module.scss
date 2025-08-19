@@ -14,12 +14,20 @@
     font-size: $h1-font-size;
     font-weight: $font-weight-bold;
     margin-bottom: $spacing-2;
+
+    @media (max-width: $breakpoint-mobile) {
+      font-size: $h3-font-size;
+    }
   }
 
   p {
     color: var(--text-secondary);
     margin-bottom: $spacing-3;
     font-size: $h6-font-size;
+
+    @media (max-width: $breakpoint-mobile) {
+      font-size: $body-font-size;
+    }
   }
 }
 
@@ -51,6 +59,12 @@
     font-weight: $font-weight-medium;
     font-size: $h6-font-size;
     border: solid 1px var(--border-color-secondary);
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-2;
   }
 }
 
@@ -89,6 +103,12 @@
   gap: $spacing-3;
   overflow: hidden;
   padding: $spacing-1;
+
+  @media (max-width: $breakpoint-mobile) {
+    flex-direction: column;
+    gap: $spacing-2;
+    overflow-x: auto;
+  }
 }
 
 .activityFeed {
@@ -111,5 +131,9 @@
   p {
     color: var(--text-secondary);
     margin-bottom: $spacing-3;
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    padding: $spacing-3;
   }
 }

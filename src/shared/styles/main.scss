@@ -41,4 +41,8 @@ h6 {
   max-width: $container-max-width;
   margin: 0 auto;
   padding: 0 $container-padding;
+
+  @media (max-width: $breakpoint-mobile) {
+    padding: 0 $spacing-2;
+  }
 }
