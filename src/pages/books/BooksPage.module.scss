@@ -67,7 +67,11 @@
   display: flex;
   gap: $spacing-1;
   border-bottom: 1px solid var(--border-color);
-  overflow-x: auto;
+  overflow: hidden;
+
+  @media (max-width: $breakpoint-mobile) {
+    overflow-x: auto;
+  }
 }
 
 .tab {

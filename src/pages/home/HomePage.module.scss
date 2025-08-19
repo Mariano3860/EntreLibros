@@ -101,12 +101,13 @@
 .bookList {
   display: flex;
   gap: $spacing-3;
-  overflow-x: auto;
+  overflow: hidden;
   padding: $spacing-1;
 
   @media (max-width: $breakpoint-mobile) {
     flex-direction: column;
     gap: $spacing-2;
+    overflow-x: auto;
   }
 }
 
