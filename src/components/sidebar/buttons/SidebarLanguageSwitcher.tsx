@@ -6,7 +6,7 @@ import { ReactComponent as Globe } from '@/assets/icons/globe.svg'
 import styles from '../Sidebar.module.scss'
 
 export const SidebarLanguageSwitcher = () => {
-  const { i18n } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [open, setOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -33,13 +33,17 @@ export const SidebarLanguageSwitcher = () => {
     <div className={styles.languageButtonWrapper} ref={dropdownRef}>
       <button onClick={toggleDropdown} className={styles.languageButton}>
         <Globe className={styles.icon} />
-        <span className={styles.label}>Idioma</span>
+        <span className={styles.label}>{t('language.label')}</span>
       </button>
 
       {open && (
         <div className={styles.dropdown}>
-          <button onClick={() => changeLanguage('es')}>Español</button>
-          <button onClick={() => changeLanguage('en')}>English</button>
+          <button onClick={() => changeLanguage('es')}>
+            {t('language.es')}
+          </button>
+          <button onClick={() => changeLanguage('en')}>
+            {t('language.en')}
+          </button>
         </div>
       )}
     </div>

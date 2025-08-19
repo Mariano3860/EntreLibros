@@ -66,9 +66,14 @@
     "community_logged_in_cta": "Go to community"
   },
   "activity": {
-    "added": "Ofreciste",
-    "exchanged": "Intercambiaste",
-    "cover_alt": "Portada de {{title}}"
+    "added": "You added",
+    "exchanged": "You exchanged",
+    "cover_alt": "Cover of {{title}}"
+  },
+  "language": {
+    "label": "Language",
+    "en": "English",
+    "es": "Spanish"
   },
   "booksPage": {
     "title": "Explore books",
