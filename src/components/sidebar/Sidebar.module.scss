@@ -76,14 +76,18 @@
 .mobileToggle {
   display: none;
   position: fixed;
-  top: $spacing-4;
-  left: $spacing-4;
-  background: none;
-  border: none;
+  top: $spacing-2;
+  left: $spacing-2;
+  background: var(--background-card);
+  border: rem(1px) solid var(--border-color);
+  border-radius: 50%;
+  padding: $spacing-2;
   cursor: pointer;
+  box-shadow: var(--shadow-md);
   z-index: $z-index-fixed;
   flex-direction: column;
   justify-content: space-between;
+  align-items: center;
   width: rem(24px);
   height: rem(18px);
 
