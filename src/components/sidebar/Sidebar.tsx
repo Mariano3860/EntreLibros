@@ -53,7 +53,9 @@ export const Sidebar = () => {
       >
         <span></span>
         <span></span>
-        <span></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
       </button>
       <nav className={`${styles.sidebar} ${isMenuOpen ? styles.open : ''}`}>
         <div className={styles.navItems}>
