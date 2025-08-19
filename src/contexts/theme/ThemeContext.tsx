@@ -7,10 +7,22 @@ export const ThemeContext = createContext<ThemeContextType | undefined>(
 )
 
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light')
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    if (typeof window !== 'undefined') {
+      const storedTheme = localStorage.getItem('theme') as
+        | 'light'
+        | 'dark'
+        | null
+      if (storedTheme) return storedTheme
+    }
+    return 'light'
+  })
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('theme', theme)
+    }
   }, [theme])
 
   const toggleTheme = () => {
