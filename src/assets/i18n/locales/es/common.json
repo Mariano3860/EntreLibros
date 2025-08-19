@@ -116,5 +116,41 @@
       "seeking": "Buscando"
     },
     "cover_alt": "Portada de {{title}}"
+  },
+  "community": {
+    "title": "Comunidad",
+    "tabs": {
+      "activity": "Actividad",
+      "forums": "Foros",
+      "messages": "Mensajes",
+      "events": "Eventos",
+      "stats": "Estadísticas"
+    },
+    "activity": {
+      "title": "Actividad",
+      "feed": {
+        "new_book": "Nuevo libro publicado",
+        "exchange": "Intercambio realizado",
+        "new_house": "Nueva casita",
+        "comment": "Comentario destacado",
+        "event": "Evento creado"
+      }
+    },
+    "forums": {
+      "title": "Foros",
+      "placeholder": "Listado de foros"
+    },
+    "messages": {
+      "title": "Mensajes",
+      "placeholder": "Lista de mensajes"
+    },
+    "events": {
+      "title": "Eventos",
+      "placeholder": "Próximos eventos"
+    },
+    "stats": {
+      "title": "Estadísticas",
+      "placeholder": "Datos de ejemplo"
+    }
   }
 }
