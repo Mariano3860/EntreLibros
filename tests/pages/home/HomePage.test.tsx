@@ -45,4 +45,13 @@ describe('HomePage', () => {
     renderWithProviders(<HomePage />)
     expect(await screen.findByText('home.hero_title')).toBeVisible()
   })
+
+  test('renders book list when data is available', async () => {
+    vi.mocked(fetchMe).mockRejectedValueOnce(new Error('unauthenticated'))
+    useBooksMock.mockReturnValue({
+      data: [{ title: 'Book title', author: 'Author', coverUrl: '' }],
+    })
+    renderWithProviders(<HomePage />)
+    expect(await screen.findByText('Book title')).toBeVisible()
+  })
 })

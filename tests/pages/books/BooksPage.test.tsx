@@ -1,3 +1,4 @@
+import { fireEvent, screen } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
 vi.mock('../../../src/api/auth/me.service', () => ({
@@ -11,5 +12,35 @@ describe('BooksPage', () => {
   test('renders sidebar navigation', () => {
     const { getByRole } = renderWithProviders(<BooksPage />)
     expect(getByRole('navigation')).toBeInTheDocument()
+  })
+
+  test('filters books by tab selection', () => {
+    renderWithProviders(<BooksPage />)
+    fireEvent.click(
+      screen.getByRole('tab', { name: 'booksPage.tabs.for_trade' })
+    )
+    expect(screen.getByText('1984')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('tab', { name: 'booksPage.tabs.seeking' }))
+    expect(screen.getByText('El pulpo invisible')).toBeInTheDocument()
+
+    fireEvent.click(
+      screen.getByRole('tab', { name: 'booksPage.tabs.for_sale' })
+    )
+    expect(screen.getByText('Matisse en Bélgica')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('tab', { name: 'booksPage.tabs.mine' }))
+    expect(screen.getByText('Matisse en Bélgica')).toBeInTheDocument()
+  })
+
+  test('shows empty state when search yields no results', () => {
+    renderWithProviders(<BooksPage />)
+    fireEvent.change(
+      screen.getByPlaceholderText('booksPage.search_placeholder'),
+      {
+        target: { value: 'zzzzz' },
+      }
+    )
+    expect(screen.getByText('booksPage.empty.mine')).toBeInTheDocument()
   })
 })

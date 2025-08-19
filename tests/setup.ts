@@ -1,6 +1,8 @@
 import 'tsconfig-paths/register'
 import '@testing-library/jest-dom'
-import { afterEach, vi } from 'vitest'
+import { afterAll, afterEach, beforeAll, vi } from 'vitest'
+
+import { server } from '../mocks/server'
 
 // Mock SVGs
 vi.mock('.*\\.svg$', () => ({
@@ -25,11 +27,16 @@ vi.mock('react-i18next', async () => {
   }
 })
 
-// Clear cookies after each test to avoid cross-test contamination
+beforeAll(() => server.listen())
+
+// Clear cookies and reset handlers after each test to avoid cross-test contamination
 afterEach(() => {
+  server.resetHandlers()
   document.cookie.split(';').forEach((cookie) => {
     const eqPos = cookie.indexOf('=')
     const name = eqPos > -1 ? cookie.slice(0, eqPos).trim() : cookie.trim()
     document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`
   })
 })
+
+afterAll(() => server.close())
