@@ -80,7 +80,7 @@
   left: $spacing-1;
   background: var(--background-card);
   border: rem(1px) solid var(--border-color);
-  border-radius: 50%;
+  border-radius: 22%;
   cursor: pointer;
   box-shadow: var(--shadow-md);
   z-index: $z-index-fixed;
@@ -91,14 +91,14 @@
   span {
     position: absolute;
     left: 50%;
-    width: 65%;
-    height: rem(2px);
+    width: 64%;
+    height: rem(1.5px);
     background: var(--text-primary);
     border-radius: rem(1px);
     transform: translateX(-50%);
 
     &:nth-child(1) {
-      top: rem(6px);
+      top: rem(6.4px);
     }
 
     &:nth-child(2) {
@@ -107,7 +107,7 @@
     }
 
     &:nth-child(3) {
-      bottom: rem(6px);
+      bottom: rem(6.4px);
     }
   }
 
