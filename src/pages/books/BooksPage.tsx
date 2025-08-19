@@ -23,7 +23,7 @@ const mockBooks: Book[] = [
   {
     id: '1',
     title: 'Matisse en Bélgica',
-    author: 'Caros Argan',
+    author: 'Carlos Argan',
     coverUrl: 'https://covers.openlibrary.org/b/id/9875161-L.jpg',
     condition: 'bueno',
     status: 'available',
