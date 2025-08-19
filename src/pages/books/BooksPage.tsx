@@ -73,7 +73,9 @@ const mockBooks: Book[] = [
 
 export const BooksPage = () => {
   const { t } = useTranslation()
-  const [activeTab, setActiveTab] = useState<'mine' | 'trade' | 'seeking' | 'sale'>('mine')
+  const [activeTab, setActiveTab] = useState<
+    'mine' | 'trade' | 'seeking' | 'sale'
+  >('mine')
   const [search, setSearch] = useState('')
 
   const tabs = useMemo(
@@ -83,7 +85,7 @@ export const BooksPage = () => {
       { key: 'seeking', label: t('booksPage.tabs.seeking') },
       { key: 'sale', label: t('booksPage.tabs.for_sale') },
     ],
-    [t],
+    [t]
   )
 
   const filterByTab = (book: Book) => {
@@ -99,7 +101,7 @@ export const BooksPage = () => {
     }
   }
 
-  const filteredBooks = mockBooks.filter(book => {
+  const filteredBooks = mockBooks.filter((book) => {
     const matchesSearch = `${book.title} ${book.author}`
       .toLowerCase()
       .includes(search.toLowerCase())
@@ -112,45 +114,53 @@ export const BooksPage = () => {
         <header className={styles.header}>
           <h1>{t('booksPage.title')}</h1>
           <div className={styles.searchRow}>
-          <input
-            type="text"
-            className={styles.search}
-            placeholder={t('booksPage.search_placeholder') ?? ''}
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
-          <div className={styles.chips}>
-            <span className={styles.chip}>{t('booksPage.filter.near')}</span>
-            <span className={styles.chip}>{t('booksPage.filter.available')}</span>
+            <input
+              type="text"
+              className={styles.search}
+              placeholder={t('booksPage.search_placeholder') ?? ''}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <div className={styles.chips}>
+              <span className={styles.chip}>{t('booksPage.filter.near')}</span>
+              <span className={styles.chip}>
+                {t('booksPage.filter.available')}
+              </span>
+            </div>
+            <button className={styles.publishButton}>
+              {t('booksPage.publish_button')}
+            </button>
           </div>
-          <button className={styles.publishButton}>{t('booksPage.publish_button')}</button>
-        </div>
-      </header>
+        </header>
 
-      <div className={styles.tabs} role="tablist">
-        {tabs.map(tab => (
-          <button
-            key={tab.key}
-            role="tab"
-            aria-selected={activeTab === tab.key}
-            className={`${styles.tab} ${activeTab === tab.key ? styles.active : ''}`}
-            onClick={() => setActiveTab(tab.key as typeof activeTab)}
-          >
-            {tab.label}
-          </button>
-        ))}
-        <button className={styles.seeAll}>{t('booksPage.tabs.see_all')}</button>
-      </div>
-
-      {filteredBooks.length === 0 ? (
-        <div className={styles.empty}>{t(`booksPage.empty.${activeTab}`)}</div>
-      ) : (
-        <div className={styles.grid}>
-          {filteredBooks.map(book => (
-            <BookCard key={book.id} {...book} />
+        <div className={styles.tabs} role="tablist">
+          {tabs.map((tab) => (
+            <button
+              key={tab.key}
+              role="tab"
+              aria-selected={activeTab === tab.key}
+              className={`${styles.tab} ${activeTab === tab.key ? styles.active : ''}`}
+              onClick={() => setActiveTab(tab.key as typeof activeTab)}
+            >
+              {tab.label}
+            </button>
           ))}
+          <button className={styles.seeAll}>
+            {t('booksPage.tabs.see_all')}
+          </button>
         </div>
-      )}
+
+        {filteredBooks.length === 0 ? (
+          <div className={styles.empty}>
+            {t(`booksPage.empty.${activeTab}`)}
+          </div>
+        ) : (
+          <div className={styles.grid}>
+            {filteredBooks.map((book) => (
+              <BookCard key={book.id} {...book} />
+            ))}
+          </div>
+        )}
       </div>
     </BaseLayout>
   )

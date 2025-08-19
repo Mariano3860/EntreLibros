@@ -48,14 +48,17 @@
   padding: 0 $spacing-1;
   border-radius: rem(4px);
   width: fit-content;
+
   &.available {
     background-color: var(--color-success);
     color: #fff;
   }
+
   &.reserved {
     background-color: var(--color-warning);
     color: #000;
   }
+
   &.sold,
   &.exchanged {
     background-color: var(--color-neutral-500);

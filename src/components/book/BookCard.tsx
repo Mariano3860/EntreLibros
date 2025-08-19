@@ -21,7 +21,8 @@ export const BookCard: React.FC<BookCardProps> = ({
   const renderTradePreferences = () => {
     if (!tradePreferences || tradePreferences.length === 0) return null
     const shown = tradePreferences.slice(0, 3).join(', ')
-    const extra = tradePreferences.length > 3 ? ` +${tradePreferences.length - 3}` : ''
+    const extra =
+      tradePreferences.length > 3 ? ` +${tradePreferences.length - 3}` : ''
     return `${shown}${extra}`
   }
 
@@ -58,7 +59,11 @@ export const BookCard: React.FC<BookCardProps> = ({
               )}
             </span>
           )}
-          {isSeeking && <span className={styles.seeking}>{t('booksPage.badge.seeking')}</span>}
+          {isSeeking && (
+            <span className={styles.seeking}>
+              {t('booksPage.badge.seeking')}
+            </span>
+          )}
         </div>
       </div>
     </div>
