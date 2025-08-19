@@ -18,6 +18,11 @@
   flex-wrap: wrap;
   gap: $spacing-2;
   align-items: center;
+
+  @media (max-width: $breakpoint-mobile) {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 
 .search {
@@ -30,6 +35,7 @@
 .chips {
   display: flex;
   gap: $spacing-1;
+  flex-wrap: wrap;
 }
 
 .chip {
@@ -51,6 +57,10 @@
   border-radius: rem(8px);
   padding: $spacing-1x5 $spacing-3;
   cursor: pointer;
+
+  @media (max-width: $breakpoint-mobile) {
+    width: 100%;
+  }
 }
 
 .tabs {
@@ -86,6 +96,10 @@
   display: grid;
   gap: $spacing-2;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+
+  @media (max-width: $breakpoint-mobile) {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 .empty {
