@@ -1,5 +1,6 @@
-import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { renderHook } from '@testing-library/react'
+import { toast } from 'react-toastify'
 import { describe, expect, test, vi } from 'vitest'
 
 import { useContactForm } from '@src/hooks/api/useContactForm'
@@ -10,8 +11,6 @@ vi.mock('react-toastify', () => ({
     error: vi.fn(),
   },
 }))
-
-import { toast } from 'react-toastify'
 
 describe('useContactForm', () => {
   test('shows success toast', async () => {
