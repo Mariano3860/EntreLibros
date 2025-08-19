@@ -1,4 +1,4 @@
-import i18n from '../../src/assets/i18n/i18n'
+import i18n from '@src/assets/i18n/i18n'
 
 describe('i18n language persistence', () => {
   beforeEach(() => {

@@ -4,7 +4,7 @@ import { describe, expect, test, vi, beforeEach } from 'vitest'
 const mockMutate = vi.fn()
 const navigate = vi.fn()
 
-vi.mock('../../../src/hooks/api/useLogin', () => ({
+vi.mock('@src/hooks/api/useLogin', () => ({
   useLogin: () => ({ mutate: mockMutate, isPending: false }),
 }))
 
@@ -14,12 +14,12 @@ vi.mock('react-router-dom', async () => {
   return { ...actual, useNavigate: () => navigate }
 })
 
-vi.mock('../../../src/components/ui/toaster/Toaster', () => ({
+vi.mock('@src/components/ui/toaster/Toaster', () => ({
   showToast: vi.fn(),
 }))
 
-import { LoginForm } from '../../../src/components/login/LoginForm'
-import { showToast } from '../../../src/components/ui/toaster/Toaster'
+import { LoginForm } from '@src/components/login/LoginForm'
+import { showToast } from '@src/components/ui/toaster/Toaster'
 import { renderWithProviders } from '../../test-utils'
 
 const showToastMock = vi.mocked(showToast)

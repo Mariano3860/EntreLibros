@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react'
 import { describe, expect, test } from 'vitest'
 
-import { Logo } from '../../src/assets'
+import { Logo } from '@src/assets'
 
 describe('assets index', () => {
   test('exports Logo component', () => {

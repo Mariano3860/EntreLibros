@@ -1,7 +1,7 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, expect, test } from 'vitest'
 
-import { Sidebar } from '../../../src/components/sidebar/Sidebar'
+import { Sidebar } from '@src/components/sidebar/Sidebar'
 import { renderWithProviders } from '../../test-utils'
 
 describe('Sidebar', () => {

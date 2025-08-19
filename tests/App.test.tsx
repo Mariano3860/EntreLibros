@@ -1,13 +1,12 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
-import { fetchMe } from '../src/api/auth/me.service'
-import App from '../src/App'
-vi.mock('../src/hooks/api/useBooks', () => ({
+import { fetchMe } from '@src/api/auth/me.service'
+import App from '@src/App'
+vi.mock('@src/hooks/api/useBooks', () => ({
   useBooks: () => ({ data: [] }),
 }))
-
-vi.mock('../src/api/auth/me.service', () => ({ fetchMe: vi.fn() }))
+vi.mock('@src/api/auth/me.service', () => ({ fetchMe: vi.fn() }))
 
 describe('App Component', () => {
   test('renders correctly for guest users', async () => {

@@ -1,8 +1,8 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
-import { ThemeIconButton } from '../../../src/components/theme/ThemeIconButton'
-import * as useThemeModule from '../../../src/hooks/theme/useTheme'
+import { ThemeIconButton } from '@src/components/theme/ThemeIconButton'
+import * as useThemeModule from '@src/hooks/theme/useTheme'
 import { renderWithProviders } from '../../test-utils'
 
 describe('ThemeIconButton', () => {

@@ -1,12 +1,12 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
-vi.mock('../../../src/api/auth/me.service', () => ({
+vi.mock('@src/api/auth/me.service', () => ({
   fetchMe: vi.fn(),
 }))
 
 const useBooksMock = vi.fn()
-vi.mock('../../../src/hooks/api/useBooks', () => ({
+vi.mock('@src/hooks/api/useBooks', () => ({
   useBooks: () => useBooksMock(),
 }))
 
@@ -14,8 +14,8 @@ beforeEach(() => {
   useBooksMock.mockReturnValue({ data: [] })
 })
 
-import { fetchMe } from '../../../src/api/auth/me.service'
-import { HomePage } from '../../../src/pages/home/HomePage'
+import { fetchMe } from '@src/api/auth/me.service'
+import { HomePage } from '@src/pages/home/HomePage'
 import { renderWithProviders } from '../../test-utils'
 
 describe('HomePage', () => {
