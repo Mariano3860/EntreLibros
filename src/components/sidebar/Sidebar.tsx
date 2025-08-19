@@ -15,7 +15,7 @@ import { HOME_URLS } from '@/constants/constants'
 import styles from './Sidebar.module.scss'
 
 export const Sidebar = () => {
-  const [isHovered, setIsHovered] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { t } = useTranslation()
 
   const navItems: NavItem[] = [
@@ -41,35 +41,47 @@ export const Sidebar = () => {
     },
   ]
 
+  const toggleMenu = () => setIsMenuOpen((prev) => !prev)
+  const closeMenu = () => setIsMenuOpen(false)
+
   return (
-    <nav
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className={`${styles.sidebar} ${isHovered ? styles.expanded : ''}`}
-    >
-      <div className={styles.navItems}>
-        {navItems.map((item) => {
-          const IconComponent = item.icon
-          return (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={({ isActive }) =>
-                `${styles.navLink} ${isActive ? styles.active : ''}`
-              }
-            >
-              <IconComponent className={styles.icon} />
-              <span className={styles.label}>{item.label}</span>
-            </NavLink>
-          )
-        })}
-      </div>
-      {/* Footer section of Sidebar */}
-      <div className={styles.footer}>
-        <SidebarLanguageSwitcher />
-        <SidebarThemeButton />
-        <SidebarLoginButton />
-      </div>
-    </nav>
+    <>
+      <button
+        className={styles.mobileToggle}
+        onClick={toggleMenu}
+        aria-label="Toggle navigation"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav className={`${styles.sidebar} ${isMenuOpen ? styles.open : ''}`}>
+        <div className={styles.navItems}>
+          {navItems.map((item) => {
+            const IconComponent = item.icon
+            return (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                onClick={closeMenu}
+                className={({ isActive }) =>
+                  `${styles.navLink} ${isActive ? styles.active : ''}`
+                }
+              >
+                <IconComponent className={styles.icon} />
+                <span className={styles.label}>{item.label}</span>
+              </NavLink>
+            )
+          })}
+        </div>
+        {/* Footer section of Sidebar */}
+        <div className={styles.footer}>
+          <SidebarLanguageSwitcher />
+          <SidebarThemeButton />
+          <SidebarLoginButton />
+        </div>
+      </nav>
+      {isMenuOpen && <div className={styles.overlay} onClick={closeMenu} />}
+    </>
   )
 }
