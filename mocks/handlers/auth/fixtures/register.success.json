@@ -1,0 +1,9 @@
+{
+  "token": "fake-register-token",
+  "user": {
+    "id": "2",
+    "email": "new@entrelibros.com",
+    "role": "user"
+  },
+  "message": "auth.success.register"
+}

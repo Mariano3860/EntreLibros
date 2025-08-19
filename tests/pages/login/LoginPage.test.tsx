@@ -19,5 +19,6 @@ describe('LoginPage', () => {
   test('renders login form', () => {
     renderWithProviders(<LoginPage />)
     expect(screen.getByText('Mocked LoginForm')).toBeVisible()
+    expect(screen.getByText('register')).toBeVisible()
   })
 })

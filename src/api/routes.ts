@@ -4,6 +4,7 @@ export const RELATIVE_API_ROUTES = {
     LOGOUT: `/auth/logout`,
     PROFILE: `/auth/profile`,
     ME: `/auth/me`,
+    REGISTER: `/auth/register`,
   },
   CONTACT_FORM: {
     SUBMIT: `/contact/submit`,

@@ -8,6 +8,7 @@ import { CommunityPage } from '@/pages/community/CommunityPage'
 import { ContactPage } from '@/pages/contact/ContactPage'
 import { HomePage } from '@/pages/home/HomePage'
 import LoginPage from '@/pages/login/LoginPage'
+import RegisterPage from '@/pages/register/RegisterPage'
 
 import NotFound from '../pages/not_found/NotFound'
 
@@ -16,6 +17,7 @@ const AppRoutes = () => {
     <BrowserRouter basename="/">
       <Routes>
         <Route path={`/${HOME_URLS.LOGIN}`} element={<LoginPage />} />
+        <Route path={`/${HOME_URLS.REGISTER}`} element={<RegisterPage />} />
         <Route path="*" element={<NotFound />} />
         <Route element={<BaseLayout />}>
           <Route path="/" element={<HomePage />} />
