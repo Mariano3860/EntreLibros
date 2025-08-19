@@ -51,8 +51,6 @@ export const Sidebar = () => {
         onClick={toggleMenu}
         aria-label="Toggle navigation"
       >
-        <span></span>
-        <span></span>
         <span aria-hidden="true"></span>
         <span aria-hidden="true"></span>
         <span aria-hidden="true"></span>
