@@ -38,7 +38,7 @@ export const authStateHandler = http.get('/_msw/auth/state', ({ request }) => {
  */
 export const meHandler = http.get(
   RELATIVE_API_ROUTES.AUTH.ME,
-  ({ request, cookies }) => {
+  ({ cookies }) => {
     // 1) Override wins
     if (AUTH_OVERRIDE === 'logged-in') {
       return HttpResponse.json(successUser, { status: 200 })
