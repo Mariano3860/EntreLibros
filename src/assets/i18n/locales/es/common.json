@@ -69,5 +69,39 @@
     "added": "You added",
     "exchanged": "You exchanged",
     "cover_alt": "Cover of {{title}}"
+  },
+  "booksPage": {
+    "title": "Explorar libros",
+    "search_placeholder": "Buscar por título, autor, ISBN",
+    "filter": {
+      "near": "Near",
+      "available": "Available"
+    },
+    "publish_button": "Publicar un libro",
+    "tabs": {
+      "mine": "Mis libros",
+      "for_trade": "Disponibles para intercambio",
+      "seeking": "Buscando",
+      "for_sale": "A la venta",
+      "see_all": "Ver todos"
+    },
+    "empty": {
+      "mine": "Aún no cargaste libros.",
+      "trade": "Aún no publicaste libros para intercambio. Cargá el primero.",
+      "seeking": "No hay libros en tu lista de deseos.",
+      "sale": "Aún no tenés libros a la venta."
+    },
+    "status": {
+      "available": "Disponible",
+      "reserved": "Reservado",
+      "sold": "Vendido",
+      "exchanged": "Intercambiado"
+    },
+    "badge": {
+      "for_sale": "A la venta · ${{price}}",
+      "for_trade": "Intercambio",
+      "seeking": "Buscando"
+    },
+    "cover_alt": "Portada de {{title}}"
   }
 }
