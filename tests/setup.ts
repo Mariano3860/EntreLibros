@@ -2,7 +2,7 @@ import 'tsconfig-paths/register'
 import '@testing-library/jest-dom'
 import { afterAll, afterEach, beforeAll, vi } from 'vitest'
 
-import { server } from '../mocks/server'
+import { server } from '@mocks/server'
 
 // Mock SVGs
 vi.mock('.*\\.svg$', () => ({

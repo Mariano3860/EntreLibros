@@ -3,16 +3,17 @@ import { describe, expect, test, vi, beforeEach } from 'vitest'
 
 const mockMutate = vi.fn()
 
-vi.mock('../../../src/hooks/api/useRegister', () => ({
+vi.mock('@src/hooks/api/useRegister', () => ({
   useRegister: () => ({ mutate: mockMutate, isPending: false }),
 }))
 
-vi.mock('../../../src/components/ui/toaster/Toaster', () => ({
+vi.mock('@src/components/ui/toaster/Toaster', () => ({
   showToast: vi.fn(),
 }))
 
-import { RegisterForm } from '../../../src/components/register/RegisterForm'
-import { showToast } from '../../../src/components/ui/toaster/Toaster'
+import { RegisterForm } from '@src/components/register/RegisterForm'
+import { showToast } from '@src/components/ui/toaster/Toaster'
+
 import { renderWithProviders } from '../../test-utils'
 
 describe('RegisterForm', () => {

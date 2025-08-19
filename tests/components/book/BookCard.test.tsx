@@ -1,7 +1,8 @@
 import { screen } from '@testing-library/react'
 import { describe, expect, test } from 'vitest'
 
-import { BookCard } from '../../../src/components/book/BookCard'
+import { BookCard } from '@src/components/book/BookCard'
+
 import { renderWithProviders } from '../../test-utils'
 
 describe('BookCard', () => {

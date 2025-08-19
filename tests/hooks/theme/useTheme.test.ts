@@ -4,8 +4,8 @@ import { describe, expect, test } from 'vitest'
 import {
   ThemeProvider,
   useTheme as useThemeFromContext,
-} from '../../../src/contexts/theme/ThemeContext'
-import { useTheme } from '../../../src/hooks/theme/useTheme'
+} from '@src/contexts/theme/ThemeContext'
+import { useTheme } from '@src/hooks/theme/useTheme'
 
 describe('useTheme', () => {
   beforeEach(() => {

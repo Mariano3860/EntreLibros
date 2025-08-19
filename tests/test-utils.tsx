@@ -3,8 +3,8 @@ import { render } from '@testing-library/react'
 import { ReactElement, ReactNode } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 
-import { AuthProvider } from '../src/contexts/auth/AuthContext'
-import { ThemeProvider } from '../src/contexts/theme/ThemeContext'
+import { AuthProvider } from '@src/contexts/auth/AuthContext'
+import { ThemeProvider } from '@src/contexts/theme/ThemeContext'
 
 export const createWrapper = () => {
   const queryClient = new QueryClient({
