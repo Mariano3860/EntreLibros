@@ -76,26 +76,26 @@
 .mobileToggle {
   display: none;
   position: fixed;
-  top: $spacing-2;
-  left: $spacing-2;
-  background: var(--background-card);
-  border: rem(1px) solid var(--border-color);
+  top: $spacing-1x5;
+  left: $spacing-1x5;
+  width: rem(24px);
+  height: rem(24px);
+  background: rgb(var(--primary-rgb) / 10%);
+  border: rem(1px) solid rgb(var(--primary-rgb) / 20%);
   border-radius: 50%;
-  padding: $spacing-2;
   cursor: pointer;
-  box-shadow: var(--shadow-md);
   z-index: $z-index-fixed;
   flex-direction: column;
-  justify-content: space-between;
   align-items: center;
-  width: rem(24px);
-  height: rem(18px);
+  justify-content: center;
+  gap: rem(3px);
 
   span {
     display: block;
-    width: 100%;
+    width: rem(16px);
     height: rem(2px);
     background: var(--text-primary);
+    border-radius: rem(1px);
   }
 
   @media (max-width: $breakpoint-tablet) {
