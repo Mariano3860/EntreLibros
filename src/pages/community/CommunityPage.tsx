@@ -1,12 +1,12 @@
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
-import { Link, Route, Routes, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { Link, Route, Routes, useLocation } from 'react-router-dom'
 
 import styles from './CommunityPage.module.scss'
 import { ActivityTab } from './tabs/ActivityTab'
+import { EventsTab } from './tabs/EventsTab'
 import { ForumsTab } from './tabs/ForumsTab'
 import { MessagesTab } from './tabs/MessagesTab'
-import { EventsTab } from './tabs/EventsTab'
 import { StatsTab } from './tabs/StatsTab'
 
 export const CommunityPage = () => {

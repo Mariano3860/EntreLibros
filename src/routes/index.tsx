@@ -27,7 +27,10 @@ const AppRoutes = () => {
           <Route path={`/${HOME_URLS.BOOKS}`} element={<BooksPage />} />
         </Route>
         <Route element={<BaseLayout />}>
-          <Route path={`/${HOME_URLS.COMMUNITY}/*`} element={<CommunityPage />} />
+          <Route
+            path={`/${HOME_URLS.COMMUNITY}/*`}
+            element={<CommunityPage />}
+          />
         </Route>
         <Route element={<BaseLayout />}>
           <Route path={`/${HOME_URLS.CONTACT}`} element={<ContactPage />} />

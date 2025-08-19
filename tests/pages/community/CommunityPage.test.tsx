@@ -1,21 +1,21 @@
-import { describe, expect, test, vi } from 'vitest'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render } from '@testing-library/react'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { describe, expect, test, vi } from 'vitest'
 
 vi.mock('@src/api/auth/me.service', () => ({
   fetchMe: vi.fn().mockRejectedValue(new Error('unauthenticated')),
 }))
 
-import { CommunityPage } from '@src/pages/community/CommunityPage'
-
-import { renderWithProviders } from '../../test-utils'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider } from '@src/contexts/auth/AuthContext'
 import { ThemeProvider } from '@src/contexts/theme/ThemeContext'
-import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { CommunityPage } from '@src/pages/community/CommunityPage'
+import { EventsTab } from '@src/pages/community/tabs/EventsTab'
 import { ForumsTab } from '@src/pages/community/tabs/ForumsTab'
 import { MessagesTab } from '@src/pages/community/tabs/MessagesTab'
-import { EventsTab } from '@src/pages/community/tabs/EventsTab'
 import { StatsTab } from '@src/pages/community/tabs/StatsTab'
+
+import { renderWithProviders } from '../../test-utils'
 
 describe('CommunityPage', () => {
   test('renders sidebar navigation', () => {
@@ -33,7 +33,9 @@ describe('CommunityPage', () => {
     const forums = renderWithProviders(<ForumsTab />)
     expect(forums.getByText('community.forums.placeholder')).toBeInTheDocument()
     const messages = renderWithProviders(<MessagesTab />)
-    expect(messages.getByText('community.messages.placeholder')).toBeInTheDocument()
+    expect(
+      messages.getByText('community.messages.placeholder')
+    ).toBeInTheDocument()
     const events = renderWithProviders(<EventsTab />)
     expect(events.getByText('community.events.placeholder')).toBeInTheDocument()
     const stats = renderWithProviders(<StatsTab />)
@@ -42,7 +44,10 @@ describe('CommunityPage', () => {
 
   test('tab links use absolute paths', () => {
     const queryClient = new QueryClient({
-      defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
     })
 
     const { getByText } = render(
@@ -59,7 +64,9 @@ describe('CommunityPage', () => {
       </MemoryRouter>
     )
 
-    const messagesTab = getByText('community.tabs.messages') as HTMLAnchorElement
+    const messagesTab = getByText(
+      'community.tabs.messages'
+    ) as HTMLAnchorElement
     expect(messagesTab.getAttribute('href')).toBe('/community/messages')
   })
 })
