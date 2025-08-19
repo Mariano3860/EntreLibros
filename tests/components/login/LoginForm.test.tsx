@@ -22,11 +22,13 @@ import { LoginForm } from '../../../src/components/login/LoginForm'
 import { showToast } from '../../../src/components/ui/toaster/Toaster'
 import { renderWithProviders } from '../../test-utils'
 
+const showToastMock = vi.mocked(showToast)
+
 describe('LoginForm', () => {
   beforeEach(() => {
     mockMutate.mockReset()
     navigate.mockReset()
-    showToast.mockReset()
+    showToastMock.mockReset()
   })
 
   test('submits login form successfully', () => {
@@ -51,7 +53,7 @@ describe('LoginForm', () => {
     )
     expect(onSubmit).toHaveBeenCalled()
     expect(navigate).toHaveBeenCalledWith('/home')
-    expect(showToast).toHaveBeenCalledWith('auth.success.login', 'success')
+    expect(showToastMock).toHaveBeenCalledWith('auth.success.login', 'success')
   })
 
   test('shows error toast on failure', () => {
@@ -59,7 +61,13 @@ describe('LoginForm', () => {
       onError?.(new Error('invalid_credentials'))
     })
 
-    renderWithProviders(<LoginForm />)
+    renderWithProviders(
+      <LoginForm
+        onSubmit={function (): void {
+          throw new Error('Function not implemented.')
+        }}
+      />
+    )
 
     fireEvent.change(screen.getByPlaceholderText('email'), {
       target: { value: 'test@example.com' },
@@ -69,7 +77,7 @@ describe('LoginForm', () => {
     })
     fireEvent.click(screen.getByRole('button', { name: 'login' }))
 
-    expect(showToast).toHaveBeenCalledWith('auth.errors.unknown', 'error')
+    expect(showToastMock).toHaveBeenCalledWith('auth.errors.unknown', 'error')
     expect(navigate).not.toHaveBeenCalled()
   })
 })
