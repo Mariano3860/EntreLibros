@@ -1,7 +1,7 @@
 @import '@styles/variables';
 
 .registerForm {
-  max-width: 440px;
+  max-width: rem(440px);
   padding: 2rem;
   transition: background-color $transition-duration-normal
     $transition-timing-function;
@@ -38,7 +38,7 @@
 .input {
   padding: 1rem;
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: rem(8px);
   background: var(--background-primary);
   color: var(--text-primary);
 
