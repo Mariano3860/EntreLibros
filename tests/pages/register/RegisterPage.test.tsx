@@ -1,4 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react'
+import { useNavigate } from 'react-router-dom'
 import { describe, expect, test, vi } from 'vitest'
 
 vi.mock('../../../src/api/auth/me.service', () => ({
@@ -16,8 +17,6 @@ vi.mock('react-router-dom', async () => {
     await vi.importActual<typeof import('react-router-dom')>('react-router-dom')
   return { ...actual, useNavigate: vi.fn() }
 })
-
-import { useNavigate } from 'react-router-dom'
 
 import RegisterPage from '../../../src/pages/register/RegisterPage'
 import { renderWithProviders } from '../../test-utils'

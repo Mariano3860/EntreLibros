@@ -5,15 +5,18 @@ const mockMutate = vi.fn()
 const navigate = vi.fn()
 
 vi.mock('../../../src/hooks/api/useLogin', () => ({
-  useLogin: () => ({ mutate: mockMutate, isPending: false })
+  useLogin: () => ({ mutate: mockMutate, isPending: false }),
 }))
 
 vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom')
+  const actual =
+    await vi.importActual<typeof import('react-router-dom')>('react-router-dom')
   return { ...actual, useNavigate: () => navigate }
 })
 
-vi.mock('../../../src/components/ui/toaster/Toaster', () => ({ showToast: vi.fn() }))
+vi.mock('../../../src/components/ui/toaster/Toaster', () => ({
+  showToast: vi.fn(),
+}))
 
 import { LoginForm } from '../../../src/components/login/LoginForm'
 import { showToast } from '../../../src/components/ui/toaster/Toaster'
@@ -28,7 +31,7 @@ describe('LoginForm', () => {
 
   test('submits login form successfully', () => {
     mockMutate.mockImplementation((_data, { onSuccess }) => {
-      onSuccess && onSuccess({})
+      onSuccess?.({})
     })
     const onSubmit = vi.fn()
 
@@ -53,7 +56,7 @@ describe('LoginForm', () => {
 
   test('shows error toast on failure', () => {
     mockMutate.mockImplementation((_data, { onError }) => {
-      onError && onError(new Error('invalid_credentials'))
+      onError?.(new Error('invalid_credentials'))
     })
 
     renderWithProviders(<LoginForm />)
@@ -66,10 +69,7 @@ describe('LoginForm', () => {
     })
     fireEvent.click(screen.getByRole('button', { name: 'login' }))
 
-    expect(showToast).toHaveBeenCalledWith(
-      'auth.errors.unknown',
-      'error'
-    )
+    expect(showToast).toHaveBeenCalledWith('auth.errors.unknown', 'error')
     expect(navigate).not.toHaveBeenCalled()
   })
 })

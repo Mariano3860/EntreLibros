@@ -4,10 +4,12 @@ import { describe, expect, test, vi, beforeEach } from 'vitest'
 const mockMutate = vi.fn()
 
 vi.mock('../../../src/hooks/api/useRegister', () => ({
-  useRegister: () => ({ mutate: mockMutate, isPending: false })
+  useRegister: () => ({ mutate: mockMutate, isPending: false }),
 }))
 
-vi.mock('../../../src/components/ui/toaster/Toaster', () => ({ showToast: vi.fn() }))
+vi.mock('../../../src/components/ui/toaster/Toaster', () => ({
+  showToast: vi.fn(),
+}))
 
 import { RegisterForm } from '../../../src/components/register/RegisterForm'
 import { showToast } from '../../../src/components/ui/toaster/Toaster'
@@ -47,7 +49,7 @@ describe('RegisterForm', () => {
 
   test('submits form and calls onSubmit on success', async () => {
     mockMutate.mockImplementation((_data, { onSuccess }) => {
-      onSuccess && onSuccess({})
+      onSuccess?.({})
     })
     const onSubmit = vi.fn()
 
@@ -75,7 +77,7 @@ describe('RegisterForm', () => {
 
   test('shows server error message on failure', async () => {
     mockMutate.mockImplementation((_data, { onError }) => {
-      onError && onError({})
+      onError?.({})
     })
 
     renderWithProviders(<RegisterForm />)
