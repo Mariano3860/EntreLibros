@@ -76,24 +76,25 @@
 .mobileToggle {
   display: none;
   position: fixed;
-  top: $spacing-1x5;
-  left: $spacing-1x5;
-  width: rem(24px);
-  height: rem(24px);
-  background: rgb(var(--primary-rgb) / 10%);
-  border: rem(1px) solid rgb(var(--primary-rgb) / 20%);
+  top: $spacing-1;
+  left: $spacing-1;
+  background: var(--background-card);
+  border: rem(1px) solid var(--border-color);
   border-radius: 50%;
+  padding: $spacing-1;
   cursor: pointer;
+  box-shadow: var(--shadow-md);
   z-index: $z-index-fixed;
   flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  gap: rem(3px);
+  width: rem(15px);
+  height: rem(15px);
 
   span {
     display: block;
-    width: rem(16px);
-    height: rem(2px);
+    width: 100%;
+    height: rem(1px);
     background: var(--text-primary);
     border-radius: rem(1px);
   }
