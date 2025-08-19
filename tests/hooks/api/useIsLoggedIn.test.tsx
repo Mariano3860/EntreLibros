@@ -1,5 +1,5 @@
-import { renderHook, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { renderHook, waitFor } from '@testing-library/react'
 import { describe, expect, test } from 'vitest'
 
 import { setLoggedInState } from '@mocks/handlers/auth/me.handler'

@@ -1,8 +1,10 @@
-import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { renderHook } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
-import { describe, expect, test, vi } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import { describe, expect, test, vi } from 'vitest'
 
 import { server } from '@mocks/server'
 import { RELATIVE_API_ROUTES } from '@src/api/routes'
@@ -10,7 +12,8 @@ import { AuthQueryKeys } from '@src/constants/constants'
 import { useLogout } from '@src/hooks/api/useLogout'
 
 vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom')
+  const actual =
+    await vi.importActual<typeof import('react-router-dom')>('react-router-dom')
   return { ...actual, useNavigate: vi.fn() }
 })
 
@@ -18,16 +21,15 @@ vi.mock('react-toastify', () => ({
   toast: { error: vi.fn() },
 }))
 
-import { useNavigate } from 'react-router-dom'
-import { toast } from 'react-toastify'
-
 describe('useLogout', () => {
   test('removes auth data and navigates on success', async () => {
     const queryClient = new QueryClient()
     queryClient.setQueryData([AuthQueryKeys.AUTH], { id: '1' })
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <MemoryRouter>
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
       </MemoryRouter>
     )
     const navigate = vi.fn()
@@ -43,7 +45,9 @@ describe('useLogout', () => {
     const queryClient = new QueryClient()
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <MemoryRouter>
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
       </MemoryRouter>
     )
     server.use(

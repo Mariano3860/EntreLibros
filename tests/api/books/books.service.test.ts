@@ -1,9 +1,9 @@
 import { http, HttpResponse } from 'msw'
 import { describe, expect, test } from 'vitest'
 
-import { RELATIVE_API_ROUTES } from '@src/api/routes'
-import { fetchBooks } from '@src/api/books/books.service'
 import { server } from '@mocks/server'
+import { fetchBooks } from '@src/api/books/books.service'
+import { RELATIVE_API_ROUTES } from '@src/api/routes'
 
 describe('fetchBooks service', () => {
   test('returns list of books', async () => {

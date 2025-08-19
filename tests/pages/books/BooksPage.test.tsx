@@ -21,9 +21,7 @@ describe('BooksPage', () => {
     )
     expect(screen.getByText('1984')).toBeInTheDocument()
 
-    fireEvent.click(
-      screen.getByRole('tab', { name: 'booksPage.tabs.seeking' })
-    )
+    fireEvent.click(screen.getByRole('tab', { name: 'booksPage.tabs.seeking' }))
     expect(screen.getByText('El pulpo invisible')).toBeInTheDocument()
 
     fireEvent.click(
@@ -31,17 +29,18 @@ describe('BooksPage', () => {
     )
     expect(screen.getByText('Matisse en Bélgica')).toBeInTheDocument()
 
-    fireEvent.click(
-      screen.getByRole('tab', { name: 'booksPage.tabs.mine' })
-    )
+    fireEvent.click(screen.getByRole('tab', { name: 'booksPage.tabs.mine' }))
     expect(screen.getByText('Matisse en Bélgica')).toBeInTheDocument()
   })
 
   test('shows empty state when search yields no results', () => {
     renderWithProviders(<BooksPage />)
-    fireEvent.change(screen.getByPlaceholderText('booksPage.search_placeholder'), {
-      target: { value: 'zzzzz' },
-    })
+    fireEvent.change(
+      screen.getByPlaceholderText('booksPage.search_placeholder'),
+      {
+        target: { value: 'zzzzz' },
+      }
+    )
     expect(screen.getByText('booksPage.empty.mine')).toBeInTheDocument()
   })
 })

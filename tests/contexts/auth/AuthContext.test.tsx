@@ -1,5 +1,5 @@
-import { renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { renderHook } from '@testing-library/react'
 import { describe, expect, test } from 'vitest'
 
 import { AuthProvider, useAuth } from '@src/contexts/auth/AuthContext'

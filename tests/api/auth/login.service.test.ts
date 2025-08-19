@@ -13,7 +13,10 @@ describe('login service', () => {
   })
 
   test('logs in with correct credentials', async () => {
-    const response = await login({ email: DEFAULT_EMAIL, password: DEFAULT_PASS })
+    const response = await login({
+      email: DEFAULT_EMAIL,
+      password: DEFAULT_PASS,
+    })
     expect(response).toHaveProperty('token')
     expect(document.cookie).toContain('sessionToken')
   })
