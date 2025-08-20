@@ -19,7 +19,7 @@ export const TabsMenu = ({
         const isActive = location.pathname === fullPath
         return (
           <Link
-            key={fullPath}
+            key={`${basePath}:${item.path}`}
             to={fullPath}
             className={`${styles.tab} ${isActive ? styles.active : ''}`}
             role="tab"
