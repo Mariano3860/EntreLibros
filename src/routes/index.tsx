@@ -24,7 +24,7 @@ const AppRoutes = () => {
           <Route path={`/${HOME_URLS.HOME}`} element={<HomePage />} />
         </Route>
         <Route element={<BaseLayout />}>
-          <Route path={`/${HOME_URLS.BOOKS}`} element={<BooksPage />} />
+          <Route path={`/${HOME_URLS.BOOKS}/*`} element={<BooksPage />} />
         </Route>
         <Route element={<BaseLayout />}>
           <Route
