@@ -83,7 +83,7 @@ export const StatsTab = () => {
           <h3>{t('community.stats.trends.newBooks')}</h3>
           <div className={styles.trendPlaceholder}>
             {trendNewBooks.map((h, idx) => (
-              <div key={idx} style={{ height: `${h}%` }} />
+              <div key={`${h}-${idx}`} style={{ height: `${h}%` }} />
             ))}
           </div>
         </div>
