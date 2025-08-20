@@ -14,12 +14,12 @@ export const TabsMenu = ({
 
   return (
     <nav className={`${styles.tabs} ${className ?? ''}`} role="tablist">
-      {items.map((item, index) => {
+      {items.map((item) => {
         const fullPath = buildFullPath(basePath, item.path)
         const isActive = location.pathname === fullPath
         return (
           <Link
-            key={index}
+            key={fullPath}
             to={fullPath}
             className={`${styles.tab} ${isActive ? styles.active : ''}`}
             role="tab"
