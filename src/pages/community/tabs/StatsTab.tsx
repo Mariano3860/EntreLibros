@@ -99,10 +99,9 @@ export const StatsTab = () => {
                 </span>
                 <span className={styles.name}>{user.username}</span>
                 <span className={styles.metric}>
-                  {t(
-                    `community.stats.topContributors.metric.${user.metric}`,
-                    { count: user.value }
-                  )}
+                  {t(`community.stats.topContributors.metric.${user.metric}`, {
+                    count: user.value,
+                  })}
                 </span>
               </li>
             ))}
