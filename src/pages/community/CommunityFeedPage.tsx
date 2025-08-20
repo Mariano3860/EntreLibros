@@ -4,6 +4,7 @@ import { FeedList } from '@components/feed/FeedList'
 import { filterItems } from '@components/feed/filterItems'
 import { RightPanel } from '@components/feed/RightPanel'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
+import { LogoEntreLibros } from '@components/logo/LogoEntreLibros'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -45,7 +46,7 @@ export const CommunityFeedPage = () => {
       <div className={styles.wrapper}>
         <main className={styles.main}>
           <header className={styles.header}>
-            <h1>{t('community.title')}</h1>
+            <LogoEntreLibros />
             <button
               className={styles.publishButton}
               aria-label={t('community.feed.cta.publish')}

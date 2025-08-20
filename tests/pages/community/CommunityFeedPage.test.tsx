@@ -9,7 +9,7 @@ describe('CommunityFeedPage', () => {
     const { getByText, getByLabelText } = renderWithProviders(
       <CommunityFeedPage />
     )
-    expect(getByText('community.title')).toBeInTheDocument()
+    expect(getByText('EntreLibros')).toBeInTheDocument()
     expect(getByLabelText('community.feed.search')).toBeInTheDocument()
     expect(getByText('community.feed.tabs.all')).toBeInTheDocument()
   })
