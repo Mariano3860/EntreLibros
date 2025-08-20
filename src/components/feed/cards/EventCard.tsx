@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { track } from '@src/utils/analytics'
 
+import { FeedActions } from '../FeedActions'
 import type { EventItem } from '../FeedItem.types'
 
 import styles from './FeedCard.module.scss'
@@ -13,18 +14,23 @@ interface Props {
 export const EventCard = ({ item }: Props) => {
   const { t } = useTranslation()
 
-  const image = `https://picsum.photos/seed/${item.id}/600/300`
-
   const handleGo = () => {
-    track('feed.cta', { type: 'event', action: 'going' })
+    track('feed.cta', { type: 'event', action: 'go' })
   }
+
+  const image = `https://picsum.photos/seed/${item.title}/600/400`
 
   return (
     <article className={styles.card}>
+      <header className={styles.header}>
+        <img src={item.avatar} alt={item.user} />
+        <span>{item.user}</span>
+      </header>
       <img src={image} alt={item.title} className={styles.image} />
-      <h3 className={styles.title}>{item.title}</h3>
-      <p>{item.location}</p>
-      <div className={styles.actions}>
+      <FeedActions initialLikes={item.likes} />
+      <div className={styles.content}>
+        <h3 className={styles.title}>{item.title}</h3>
+        <p>{item.date} · {item.location}</p>
         <button
           className={styles.primaryButton}
           onClick={handleGo}

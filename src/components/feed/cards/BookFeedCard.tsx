@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { track } from '@src/utils/analytics'
 
+import { FeedActions } from '../FeedActions'
 import type { BookItem } from '../FeedItem.types'
 
 import styles from './FeedCard.module.scss'
@@ -19,10 +20,15 @@ export const BookFeedCard = ({ item }: Props) => {
 
   return (
     <article className={styles.card}>
+      <header className={styles.header}>
+        <img src={item.avatar} alt={item.user} />
+        <span>{item.user}</span>
+      </header>
       <img src={item.cover} alt={item.title} className={styles.image} />
-      <h3 className={styles.title}>{item.title}</h3>
-      <p>{item.author}</p>
-      <div className={styles.actions}>
+      <FeedActions initialLikes={item.likes} />
+      <div className={styles.content}>
+        <h3 className={styles.title}>{item.title}</h3>
+        <p>{item.author}</p>
         <button
           className={styles.primaryButton}
           onClick={handlePrimary}

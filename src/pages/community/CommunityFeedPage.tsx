@@ -1,6 +1,8 @@
+import { ActivityBar } from '@components/feed/ActivityBar'
 import { FeedFilters } from '@components/feed/FeedFilters'
 import { FeedList } from '@components/feed/FeedList'
 import { filterItems } from '@components/feed/filterItems'
+import { RightPanel } from '@components/feed/RightPanel'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -41,18 +43,22 @@ export const CommunityFeedPage = () => {
   return (
     <BaseLayout>
       <div className={styles.wrapper}>
-        <header className={styles.header}>
-          <h1>{t('community.title')}</h1>
-          <button
-            className={styles.publishButton}
-            aria-label={t('community.feed.cta.publish')}
-          >
-            {t('community.feed.cta.publish')}
-          </button>
-        </header>
-        <FeedFilters filter={filter} onFilterChange={setFilter} />
-        <FeedList items={filtered} />
-        <div ref={loaderRef} className={styles.loader} />
+        <main className={styles.main}>
+          <header className={styles.header}>
+            <h1>{t('community.title')}</h1>
+            <button
+              className={styles.publishButton}
+              aria-label={t('community.feed.cta.publish')}
+            >
+              {t('community.feed.cta.publish')}
+            </button>
+          </header>
+          <ActivityBar />
+          <FeedFilters filter={filter} onFilterChange={setFilter} />
+          <FeedList items={filtered} />
+          <div ref={loaderRef} className={styles.loader} />
+        </main>
+        <RightPanel />
       </div>
     </BaseLayout>
   )

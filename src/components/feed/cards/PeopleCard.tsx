@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { track } from '@src/utils/analytics'
 
+import { FeedActions } from '../FeedActions'
 import type { PersonItem } from '../FeedItem.types'
 
 import styles from './FeedCard.module.scss'
@@ -13,18 +14,21 @@ interface Props {
 export const PeopleCard = ({ item }: Props) => {
   const { t } = useTranslation()
 
-  const avatar = `https://i.pravatar.cc/300?u=${item.id}`
-
   const handleMessage = () => {
     track('feed.cta', { type: 'person', action: 'message' })
   }
 
   return (
     <article className={styles.card}>
-      <img src={avatar} alt={item.name} className={styles.avatar} />
-      <h3 className={styles.title}>{item.name}</h3>
-      <p>{t('community.feed.person.match', { match: item.match })}</p>
-      <div className={styles.actions}>
+      <header className={styles.header}>
+        <img src={item.avatar} alt={item.user} />
+        <span>{item.user}</span>
+      </header>
+      <img src={item.avatar} alt={item.name} className={styles.image} />
+      <FeedActions initialLikes={item.likes} />
+      <div className={styles.content}>
+        <h3 className={styles.title}>{item.name}</h3>
+        <p>{t('community.feed.person.match', { match: item.match })}</p>
         <button
           className={styles.primaryButton}
           onClick={handleMessage}

@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { track } from '@src/utils/analytics'
 
+import { FeedActions } from '../FeedActions'
 import type { SaleItem } from '../FeedItem.types'
 
 import styles from './FeedCard.module.scss'
@@ -13,18 +14,21 @@ interface Props {
 export const ForSaleCard = ({ item }: Props) => {
   const { t } = useTranslation()
 
-  const image = `https://picsum.photos/seed/${item.id}/600/300`
-
   const handleBuy = () => {
     track('feed.cta', { type: 'sale', action: 'buy' })
   }
 
   return (
     <article className={styles.card}>
-      <img src={image} alt={item.title} className={styles.image} />
-      <h3 className={styles.title}>{item.title}</h3>
-      <p>{t('community.feed.sale.price', { price: item.price })}</p>
-      <div className={styles.actions}>
+      <header className={styles.header}>
+        <img src={item.avatar} alt={item.user} />
+        <span>{item.user}</span>
+      </header>
+      <img src={item.cover} alt={item.title} className={styles.image} />
+      <FeedActions initialLikes={item.likes} />
+      <div className={styles.content}>
+        <h3 className={styles.title}>{item.title}</h3>
+        <p>{t('community.feed.sale.price', { price: item.price })}</p>
         <button
           className={styles.primaryButton}
           onClick={handleBuy}

@@ -8,65 +8,64 @@ export type FeedItem =
   | HouseItem
   | PersonItem
 
-export type BookItem = {
-  type: 'book'
+export type FeedBase = {
   id: string
+  user: string
+  avatar: string
+  time: string
+  likes: number
+}
+
+export type BookItem = FeedBase & {
+  type: 'book'
   title: string
   author: string
   cover: string
 }
 
-export type SwapProposalItem = {
+export type SwapProposalItem = FeedBase & {
   type: 'swap'
-  id: string
   requester: string
   offered: string
   requested: string
 }
 
-export type SaleItem = {
+export type SaleItem = FeedBase & {
   type: 'sale'
-  id: string
   title: string
   price: number
   condition: string
+  cover: string
 }
 
-export type SeekingItem = {
+export type SeekingItem = FeedBase & {
   type: 'seeking'
-  id: string
-  user: string
   title: string
 }
 
-export type ReviewItem = {
+export type ReviewItem = FeedBase & {
   type: 'review'
-  id: string
-  user: string
   book: string
   quote: string
   rating?: number
 }
 
-export type EventItem = {
+export type EventItem = FeedBase & {
   type: 'event'
-  id: string
   title: string
   date: string
   location: string
   going?: boolean
 }
 
-export type HouseItem = {
+export type HouseItem = FeedBase & {
   type: 'house'
-  id: string
   name: string
   distance: number
 }
 
-export type PersonItem = {
+export type PersonItem = FeedBase & {
   type: 'person'
-  id: string
   name: string
   match: number
   lastActivity: string

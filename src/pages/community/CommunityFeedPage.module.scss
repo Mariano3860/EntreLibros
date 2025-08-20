@@ -6,6 +6,14 @@
   padding: $spacing-4;
   box-sizing: border-box;
   overflow-x: hidden;
+  display: flex;
+  justify-content: center;
+  gap: $spacing-6;
+}
+
+.main {
+  width: 100%;
+  max-width: 600px;
 }
 
 .header {

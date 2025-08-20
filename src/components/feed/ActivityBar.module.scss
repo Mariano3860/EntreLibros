@@ -1,0 +1,22 @@
+@import '@styles/variables';
+
+.bar {
+  display: flex;
+  overflow-x: auto;
+  gap: $spacing-3;
+  padding: $spacing-2 0;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: rem(12px);
+}
+
+.item img {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  margin-bottom: $spacing-1;
+}

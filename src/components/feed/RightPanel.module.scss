@@ -1,0 +1,41 @@
+@import '@styles/variables';
+
+.panel {
+  width: 300px;
+  display: none;
+  flex-direction: column;
+  gap: $spacing-3;
+  padding: $spacing-2;
+}
+
+.panel h2 {
+  font-size: $h6-font-size;
+  margin: 0;
+}
+
+.panel ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+.panel li {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+}
+
+.panel img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+@media (min-width: 1024px) {
+  .panel {
+    display: flex;
+  }
+}

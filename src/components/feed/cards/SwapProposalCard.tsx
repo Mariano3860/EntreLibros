@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { track } from '@src/utils/analytics'
 
+import { FeedActions } from '../FeedActions'
 import type { SwapProposalItem } from '../FeedItem.types'
 
 import styles from './FeedCard.module.scss'
@@ -13,8 +14,8 @@ interface Props {
 export const SwapProposalCard = ({ item }: Props) => {
   const { t } = useTranslation()
 
-  const offeredImage = `https://picsum.photos/seed/${item.offered}/300/200`
-  const requestedImage = `https://picsum.photos/seed/${item.requested}/300/200`
+  const offeredImage = `https://picsum.photos/seed/${item.offered}/600/400`
+  const requestedImage = `https://picsum.photos/seed/${item.requested}/600/400`
 
   const handleAccept = () => {
     track('feed.cta', { type: 'swap', action: 'accept' })
@@ -22,15 +23,20 @@ export const SwapProposalCard = ({ item }: Props) => {
 
   return (
     <article className={styles.card}>
+      <header className={styles.header}>
+        <img src={item.avatar} alt={item.user} />
+        <span>{item.user}</span>
+      </header>
       <div className={styles.swapImages}>
         <img src={offeredImage} alt={item.offered} />
         <img src={requestedImage} alt={item.requested} />
       </div>
-      <h3 className={styles.title}>{item.requester}</h3>
-      <p>
-        {item.requester} {t('community.feed.swap.wants', { offered: item.offered, requested: item.requested })}
-      </p>
-      <div className={styles.actions}>
+      <FeedActions initialLikes={item.likes} />
+      <div className={styles.content}>
+        <p>
+          {item.user}{' '}
+          {t('community.feed.swap.wants', { offered: item.offered, requested: item.requested })}
+        </p>
         <button
           className={styles.primaryButton}
           onClick={handleAccept}

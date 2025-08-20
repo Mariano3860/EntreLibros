@@ -210,11 +210,17 @@
           "open_map": "Abrir en el mapa",
           "message": "Mensaje"
         },
+        "actions": {
+          "like": "Me gusta",
+          "comment": "Comentar",
+          "share": "Compartir"
+        },
         "swap": {"wants": "quiere intercambiar tu {{offered}} por {{requested}}"},
         "sale": {"price": "Precio: ${{price}}"},
         "seeking": {"description": "busca {{title}}"},
         "house": {"distance": "A {{distance}} km"},
-        "person": {"match": "Coincidencia {{match}}%"}
+        "person": {"match": "Coincidencia {{match}}%"},
+        "suggestions": "Sugerencias"
       }
     }
   }

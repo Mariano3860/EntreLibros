@@ -22,15 +22,24 @@ import type {
 
 import { renderWithProviders } from '../../../test-utils'
 
+const base = {
+  user: 'User',
+  avatar: 'https://i.pravatar.cc/100?img=1',
+  time: 'now',
+  likes: 0,
+}
+
 const book: BookItem = {
+  ...base,
   type: 'book',
   id: 'b',
   title: 'Dune',
   author: 'Frank Herbert',
-  cover: 'https://picsum.photos/seed/dune/600/300',
+  cover: 'https://picsum.photos/seed/dune/600/400',
 }
 
 const swap: SwapProposalItem = {
+  ...base,
   type: 'swap',
   id: 's',
   requester: 'Ana',
@@ -39,29 +48,32 @@ const swap: SwapProposalItem = {
 }
 
 const sale: SaleItem = {
+  ...base,
   type: 'sale',
   id: 'sa',
   title: 'Foundation',
   price: 10,
   condition: 'used',
+  cover: 'https://picsum.photos/seed/foundation/600/400',
 }
 
 const seeking: SeekingItem = {
+  ...base,
   type: 'seeking',
   id: 'se',
-  user: 'Luis',
   title: 'Sapiens',
 }
 
 const review: ReviewItem = {
+  ...base,
   type: 'review',
   id: 'r',
-  user: 'Maria',
   book: 'Dune',
   quote: 'Great book',
 }
 
 const event: EventItem = {
+  ...base,
   type: 'event',
   id: 'e',
   title: 'Book Fair',
@@ -70,6 +82,7 @@ const event: EventItem = {
 }
 
 const house: HouseItem = {
+  ...base,
   type: 'house',
   id: 'h',
   name: 'Casita Norte',
@@ -77,6 +90,7 @@ const house: HouseItem = {
 }
 
 const person: PersonItem = {
+  ...base,
   type: 'person',
   id: 'p',
   name: 'Carlos',
