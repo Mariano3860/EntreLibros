@@ -1,0 +1,25 @@
+@import '@styles/variables';
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-1;
+}
+
+.chip {
+  background: var(--background-card);
+  border: 1px solid var(--border-color);
+  border-radius: rem(16px);
+  padding: 0 $spacing-2;
+  height: rem(32px);
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: var(--text-secondary);
+}
+
+.active {
+  background-color: var(--primary-color);
+  color: #fff;
+  border-color: var(--primary-color);
+}

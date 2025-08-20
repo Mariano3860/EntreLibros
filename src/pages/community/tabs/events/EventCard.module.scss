@@ -1,0 +1,68 @@
+@import '@styles/variables';
+
+.card {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--background-card);
+  border-radius: rem(12px);
+  overflow: hidden;
+  box-shadow: $box-shadow-sm;
+}
+
+.image {
+  width: 100%;
+  height: rem(140px);
+  object-fit: cover;
+}
+
+.content {
+  padding: $spacing-2;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1;
+  flex: 1;
+}
+
+.title {
+  font-size: $h5-font-size;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.info {
+  font-size: $small-font-size;
+  color: var(--text-secondary);
+}
+
+.status {
+  width: fit-content;
+  font-size: $small-font-size;
+  padding: 0 $spacing-1;
+  border-radius: rem(4px);
+  font-weight: $font-weight-medium;
+
+  &.upcoming {
+    background-color: var(--color-success);
+    color: #fff;
+  }
+
+  &.past {
+    background-color: var(--color-error);
+    color: #fff;
+  }
+
+  &.ongoing {
+    background-color: var(--color-info);
+    color: #fff;
+  }
+}
+
+.detailsButton {
+  margin-top: auto;
+  background-color: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: rem(8px);
+  padding: $spacing-1x5 $spacing-2;
+  cursor: pointer;
+}

@@ -1,0 +1,57 @@
+@import '@styles/variables';
+
+.eventsTab {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1;
+
+  @media (min-width: $breakpoint-tablet) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.subtitle {
+  font-size: $h6-font-size;
+  color: var(--text-secondary);
+}
+
+.createButton {
+  background-color: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: rem(8px);
+  padding: $spacing-1x5 $spacing-3;
+  cursor: pointer;
+}
+
+.main {
+  display: grid;
+  gap: $spacing-3;
+  grid-template-columns: 1fr;
+
+  @media (min-width: $breakpoint-desktop) {
+    grid-template-columns: 3fr 1fr;
+  }
+}
+
+.grid {
+  display: grid;
+  gap: $spacing-2;
+  grid-template-columns: 1fr;
+
+  @media (min-width: $breakpoint-tablet) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: $breakpoint-desktop) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

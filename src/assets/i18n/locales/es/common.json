@@ -146,11 +146,70 @@
     },
     "events": {
       "title": "Eventos",
-      "placeholder": "Próximos eventos"
+      "subtitle": "Encuentros y actividades de tu comunidad lectora",
+      "create": "Crear evento",
+      "filters": {
+        "status": {
+          "upcoming": "Próximos",
+          "past": "Pasados",
+          "all": "Todos"
+        },
+        "nearby": "Cerca de mí"
+      },
+      "details": "Ver detalles",
+      "status": {
+        "upcoming": "Próximo",
+        "past": "Finalizado",
+        "ongoing": "En curso"
+      },
+      "empty": {
+        "upcoming": "No hay eventos próximos",
+        "past": "No hay eventos pasados",
+        "all": "No hay eventos disponibles"
+      },
+      "explore": "Explorar comunidad",
+      "metrics": {
+        "events_this_month": "Eventos este mes",
+        "host_houses": "Casitas anfitrionas",
+        "confirmed_users": "Usuarios confirmados"
+      },
+      "image_alt": "Banner del evento {{title}}"
     },
     "stats": {
       "title": "Estadísticas",
-      "placeholder": "Datos de ejemplo"
+      "subtitle": "Visión general de la comunidad",
+      "filters": {
+        "aria": "Seleccionar rango temporal",
+        "7d": "7d",
+        "30d": "30d",
+        "90d": "90d",
+        "lastDays": "Últimos {{count}} días"
+      },
+      "kpis": {
+        "exchanges": "Intercambios",
+        "activeHouses": "Casitas activas",
+        "activeUsers": "Usuarios activos",
+        "booksPublished": "Libros publicados"
+      },
+      "trends": {
+        "exchanges": "Intercambios por día (7d)",
+        "newBooks": "Nuevos libros por día (7d)"
+      },
+      "topContributors": {
+        "title": "Top contribuidores",
+        "metric": {
+          "exchanges": "{{count}} intercambios",
+          "books": "{{count}} libros publicados"
+        },
+        "viewCommunity": "Ver comunidad"
+      },
+      "map": {
+        "title": "Mapa de casitas activas",
+        "description": "Vista referencial. En breve se habilitará el mapa interactivo."
+      },
+      "hotSearches": {
+        "title": "Lo más buscado"
+      }
     }
   }
 }

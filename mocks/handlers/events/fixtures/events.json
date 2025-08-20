@@ -1,0 +1,65 @@
+[
+  {
+    "id": "1",
+    "title": "Club de lectura Borges",
+    "date": "2024-08-24T18:00:00",
+    "location": "Casita Av. Sevilla 123",
+    "description": "Lectura y debate sobre relatos de Borges.",
+    "status": "upcoming",
+    "imageUrl": "https://picsum.photos/seed/event1/400/200"
+  },
+  {
+    "id": "2",
+    "title": "Feria de intercambio de libros",
+    "date": "2024-09-10T10:00:00",
+    "location": "Plaza Central",
+    "description": "Traé tus libros y encontrá nuevas lecturas.",
+    "status": "upcoming",
+    "imageUrl": "https://picsum.photos/seed/event2/400/200"
+  },
+  {
+    "id": "3",
+    "title": "Taller de escritura creativa",
+    "date": "2024-07-15T15:00:00",
+    "location": "Casita Rivadavia 456",
+    "description": "Ejercicios para estimular la imaginación.",
+    "status": "ongoing",
+    "imageUrl": "https://picsum.photos/seed/event3/400/200"
+  },
+  {
+    "id": "4",
+    "title": "Presentación de autores locales",
+    "date": "2024-05-20T17:00:00",
+    "location": "Biblioteca Municipal",
+    "description": "Conoce a escritores emergentes de la zona.",
+    "status": "past",
+    "imageUrl": "https://picsum.photos/seed/event4/400/200"
+  },
+  {
+    "id": "5",
+    "title": "Encuentro de poesía",
+    "date": "2024-05-30T19:00:00",
+    "location": "Casita del Parque",
+    "description": "Micrófono abierto para poetas.",
+    "status": "past",
+    "imageUrl": "https://picsum.photos/seed/event5/400/200"
+  },
+  {
+    "id": "6",
+    "title": "Maratón de lectura solidaria",
+    "date": "2024-07-01T09:00:00",
+    "location": "Centro Cultural",
+    "description": "Leemos para recaudar fondos para bibliotecas.",
+    "status": "upcoming",
+    "imageUrl": "https://picsum.photos/seed/event6/400/200"
+  },
+  {
+    "id": "7",
+    "title": "Noche de relatos de terror",
+    "date": "2024-06-15T22:00:00",
+    "location": "Casita Corrientes 789",
+    "description": "Lectura colectiva de cuentos de terror.",
+    "status": "ongoing",
+    "imageUrl": "https://picsum.photos/seed/event7/400/200"
+  }
+]
