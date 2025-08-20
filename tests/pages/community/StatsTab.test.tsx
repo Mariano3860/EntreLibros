@@ -6,28 +6,28 @@ import { StatsTab } from '@src/pages/community/tabs/StatsTab'
 import { renderWithProviders } from '../../test-utils'
 
 describe('StatsTab', () => {
-  test('renders all sections', () => {
-    const { getByText, getByLabelText } = renderWithProviders(<StatsTab />)
+  test('renders all sections', async () => {
+    const { getByText, findByText, findByLabelText } = renderWithProviders(
+      <StatsTab />
+    )
     expect(getByText('community.stats.title')).toBeInTheDocument()
     expect(getByText('community.stats.subtitle')).toBeInTheDocument()
-    expect(getByText('community.stats.kpis.exchanges')).toBeInTheDocument()
-    expect(getByText('community.stats.kpis.activeHouses')).toBeInTheDocument()
-    expect(getByText('community.stats.kpis.activeUsers')).toBeInTheDocument()
-    expect(getByText('community.stats.kpis.booksPublished')).toBeInTheDocument()
-    expect(getByText('community.stats.trends.exchanges')).toBeInTheDocument()
-    expect(getByText('community.stats.trends.newBooks')).toBeInTheDocument()
-    expect(
-      getByText('community.stats.topContributors.title')
-    ).toBeInTheDocument()
-    const list = getByLabelText('top-contributors')
+    await findByText('community.stats.kpis.exchanges')
+    await findByText('community.stats.kpis.activeHouses')
+    await findByText('community.stats.kpis.activeUsers')
+    await findByText('community.stats.kpis.booksPublished')
+    await findByText('community.stats.trends.exchanges')
+    await findByText('community.stats.trends.newBooks')
+    await findByText('community.stats.topContributors.title')
+    const list = await findByLabelText('top-contributors')
     expect(within(list).getAllByRole('listitem')).toHaveLength(5)
-    expect(getByText('community.stats.map.title')).toBeInTheDocument()
-    expect(getByText('community.stats.hotSearches.title')).toBeInTheDocument()
+    await findByText('community.stats.map.title')
+    await findByText('community.stats.hotSearches.title')
   })
 
-  test('changes active range', () => {
-    const { getByText } = renderWithProviders(<StatsTab />)
-    const button = getByText('community.stats.filters.30d')
+  test('changes active range', async () => {
+    const { findByText } = renderWithProviders(<StatsTab />)
+    const button = await findByText('community.stats.filters.30d')
     fireEvent.click(button)
     expect(button).toHaveAttribute('aria-pressed', 'true')
   })
