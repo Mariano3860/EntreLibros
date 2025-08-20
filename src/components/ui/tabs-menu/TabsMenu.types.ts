@@ -1,11 +1,11 @@
 import type { ReactNode } from 'react'
 
-export interface TabItem {
+export type TabItem = {
   path: string
   label: string
 }
 
-export interface TabsMenuProps {
+export type TabsMenuProps = {
   items: TabItem[]
   basePath?: string
   className?: string
