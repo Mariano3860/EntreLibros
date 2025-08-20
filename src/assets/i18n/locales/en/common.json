@@ -150,7 +150,39 @@
     },
     "stats": {
       "title": "Stats",
-      "placeholder": "Sample data"
+      "subtitle": "Community overview",
+      "filters": {
+        "aria": "Select time range",
+        "7d": "7d",
+        "30d": "30d",
+        "90d": "90d",
+        "lastDays": "Last {{count}} days"
+      },
+      "kpis": {
+        "exchanges": "Exchanges",
+        "activeHouses": "Active houses",
+        "activeUsers": "Active users",
+        "booksPublished": "Books posted"
+      },
+      "trends": {
+        "exchanges": "Exchanges per day (7d)",
+        "newBooks": "New books per day (7d)"
+      },
+      "topContributors": {
+        "title": "Top contributors",
+        "metric": {
+          "exchanges": "{{count}} exchanges",
+          "books": "{{count}} books posted"
+        },
+        "viewCommunity": "View community"
+      },
+      "map": {
+        "title": "Active houses map",
+        "description": "Reference view. Interactive map coming soon."
+      },
+      "hotSearches": {
+        "title": "Trending searches"
+      }
     }
   }
 }
