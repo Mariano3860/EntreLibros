@@ -183,6 +183,37 @@
       "hotSearches": {
         "title": "Trending searches"
       }
+      },
+      "feed": {
+        "tabs": {
+          "all": "All",
+          "book": "Books",
+          "swap": "Swaps",
+          "sale": "For sale",
+          "seeking": "Seeking",
+          "review": "Reviews",
+          "event": "Events",
+          "house": "Casitas",
+          "person": "People"
+        },
+        "search": "Search feed",
+        "cta": {
+          "publish": "Publish",
+          "propose_swap": "Propose swap",
+          "accept": "Accept",
+          "buy": "Buy",
+          "offer_copy": "Offer my copy",
+          "helpful": "Helpful",
+          "go": "I'll go",
+          "open_map": "Open in map",
+          "message": "Message"
+        },
+        "swap": {"wants": "wants to swap your {{offered}} for {{requested}}"},
+        "sale": {"price": "Price: ${{price}}"},
+        "seeking": {"description": "is looking for {{title}}"},
+        "house": {"distance": "{{distance}} km away"},
+        "person": {"match": "{{match}}% match"},
+        "load_more": "Load more"
+      }
     }
   }
-}

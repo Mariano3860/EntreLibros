@@ -1,0 +1,13 @@
+.wrapper {
+  margin-bottom: 1rem;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.active {
+  font-weight: bold;
+}

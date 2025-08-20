@@ -1,0 +1,417 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Feed cards snapshots > book card matches snapshots 1`] = `
+<DocumentFragment>
+  <article
+    class="_card_9f5b00"
+  >
+    <h3
+      class="_title_9f5b00"
+    >
+      Dune
+    </h3>
+    <p>
+      Frank Herbert
+    </p>
+    <div
+      class="_actions_9f5b00"
+    >
+      <button
+        aria-label="community.feed.cta.propose_swap"
+      >
+        community.feed.cta.propose_swap
+      </button>
+    </div>
+  </article>
+</DocumentFragment>
+`;
+
+exports[`Feed cards snapshots > book card matches snapshots 2`] = `
+<DocumentFragment>
+  <article
+    class="_card_9f5b00"
+  >
+    <h3
+      class="_title_9f5b00"
+    >
+      Dune
+    </h3>
+    <p>
+      Frank Herbert
+    </p>
+    <div
+      class="_actions_9f5b00"
+    >
+      <button
+        aria-label="community.feed.cta.propose_swap"
+      >
+        community.feed.cta.propose_swap
+      </button>
+    </div>
+  </article>
+</DocumentFragment>
+`;
+
+exports[`Feed cards snapshots > event card matches snapshots 1`] = `
+<DocumentFragment>
+  <article
+    class="_card_9f5b00"
+  >
+    <h3
+      class="_title_9f5b00"
+    >
+      Book Fair
+    </h3>
+    <p>
+      Casita Centro
+    </p>
+    <div
+      class="_actions_9f5b00"
+    >
+      <button
+        aria-label="community.feed.cta.go"
+      >
+        community.feed.cta.go
+      </button>
+    </div>
+  </article>
+</DocumentFragment>
+`;
+
+exports[`Feed cards snapshots > event card matches snapshots 2`] = `
+<DocumentFragment>
+  <article
+    class="_card_9f5b00"
+  >
+    <h3
+      class="_title_9f5b00"
+    >
+      Book Fair
+    </h3>
+    <p>
+      Casita Centro
+    </p>
+    <div
+      class="_actions_9f5b00"
+    >
+      <button
+        aria-label="community.feed.cta.go"
+      >
+        community.feed.cta.go
+      </button>
+    </div>
+  </article>
+</DocumentFragment>
+`;
+
+exports[`Feed cards snapshots > house card matches snapshots 1`] = `
+<DocumentFragment>
+  <article
+    class="_card_9f5b00"
+  >
+    <h3
+      class="_title_9f5b00"
+    >
+      Casita Norte
+    </h3>
+    <p>
+      community.feed.house.distance
+    </p>
+    <div
+      class="_actions_9f5b00"
+    >
+      <button
+        aria-label="community.feed.cta.open_map"
+      >
+        community.feed.cta.open_map
+      </button>
+    </div>
+  </article>
+</DocumentFragment>
+`;
+
+exports[`Feed cards snapshots > house card matches snapshots 2`] = `
+<DocumentFragment>
+  <article
+    class="_card_9f5b00"
+  >
+    <h3
+      class="_title_9f5b00"
+    >
+      Casita Norte
+    </h3>
+    <p>
+      community.feed.house.distance
+    </p>
+    <div
+      class="_actions_9f5b00"
+    >
+      <button
+        aria-label="community.feed.cta.open_map"
+      >
+        community.feed.cta.open_map
+      </button>
+    </div>
+  </article>
+</DocumentFragment>
+`;
+
+exports[`Feed cards snapshots > person card matches snapshots 1`] = `
+<DocumentFragment>
+  <article
+    class="_card_9f5b00"
+  >
+    <h3
+      class="_title_9f5b00"
+    >
+      Carlos
+    </h3>
+    <p>
+      community.feed.person.match
+    </p>
+    <div
+      class="_actions_9f5b00"
+    >
+      <button
+        aria-label="community.feed.cta.message"
+      >
+        community.feed.cta.message
+      </button>
+    </div>
+  </article>
+</DocumentFragment>
+`;
+
+exports[`Feed cards snapshots > person card matches snapshots 2`] = `
+<DocumentFragment>
+  <article
+    class="_card_9f5b00"
+  >
+    <h3
+      class="_title_9f5b00"
+    >
+      Carlos
+    </h3>
+    <p>
+      community.feed.person.match
+    </p>
+    <div
+      class="_actions_9f5b00"
+    >
+      <button
+        aria-label="community.feed.cta.message"
+      >
+        community.feed.cta.message
+      </button>
+    </div>
+  </article>
+</DocumentFragment>
+`;
+
+exports[`Feed cards snapshots > review card matches snapshots 1`] = `
+<DocumentFragment>
+  <article
+    class="_card_9f5b00"
+  >
+    <h3
+      class="_title_9f5b00"
+    >
+      Maria
+    </h3>
+    <p>
+      Great book
+    </p>
+    <div
+      class="_actions_9f5b00"
+    >
+      <button
+        aria-label="community.feed.cta.helpful"
+      >
+        community.feed.cta.helpful
+      </button>
+    </div>
+  </article>
+</DocumentFragment>
+`;
+
+exports[`Feed cards snapshots > review card matches snapshots 2`] = `
+<DocumentFragment>
+  <article
+    class="_card_9f5b00"
+  >
+    <h3
+      class="_title_9f5b00"
+    >
+      Maria
+    </h3>
+    <p>
+      Great book
+    </p>
+    <div
+      class="_actions_9f5b00"
+    >
+      <button
+        aria-label="community.feed.cta.helpful"
+      >
+        community.feed.cta.helpful
+      </button>
+    </div>
+  </article>
+</DocumentFragment>
+`;
+
+exports[`Feed cards snapshots > sale card matches snapshots 1`] = `
+<DocumentFragment>
+  <article
+    class="_card_9f5b00"
+  >
+    <h3
+      class="_title_9f5b00"
+    >
+      Foundation
+    </h3>
+    <p>
+      community.feed.sale.price
+    </p>
+    <div
+      class="_actions_9f5b00"
+    >
+      <button
+        aria-label="community.feed.cta.buy"
+      >
+        community.feed.cta.buy
+      </button>
+    </div>
+  </article>
+</DocumentFragment>
+`;
+
+exports[`Feed cards snapshots > sale card matches snapshots 2`] = `
+<DocumentFragment>
+  <article
+    class="_card_9f5b00"
+  >
+    <h3
+      class="_title_9f5b00"
+    >
+      Foundation
+    </h3>
+    <p>
+      community.feed.sale.price
+    </p>
+    <div
+      class="_actions_9f5b00"
+    >
+      <button
+        aria-label="community.feed.cta.buy"
+      >
+        community.feed.cta.buy
+      </button>
+    </div>
+  </article>
+</DocumentFragment>
+`;
+
+exports[`Feed cards snapshots > seeking card matches snapshots 1`] = `
+<DocumentFragment>
+  <article
+    class="_card_9f5b00"
+  >
+    <h3
+      class="_title_9f5b00"
+    >
+      Luis
+    </h3>
+    <p>
+      community.feed.seeking.description
+    </p>
+    <div
+      class="_actions_9f5b00"
+    >
+      <button
+        aria-label="community.feed.cta.offer_copy"
+      >
+        community.feed.cta.offer_copy
+      </button>
+    </div>
+  </article>
+</DocumentFragment>
+`;
+
+exports[`Feed cards snapshots > seeking card matches snapshots 2`] = `
+<DocumentFragment>
+  <article
+    class="_card_9f5b00"
+  >
+    <h3
+      class="_title_9f5b00"
+    >
+      Luis
+    </h3>
+    <p>
+      community.feed.seeking.description
+    </p>
+    <div
+      class="_actions_9f5b00"
+    >
+      <button
+        aria-label="community.feed.cta.offer_copy"
+      >
+        community.feed.cta.offer_copy
+      </button>
+    </div>
+  </article>
+</DocumentFragment>
+`;
+
+exports[`Feed cards snapshots > swap card matches snapshots 1`] = `
+<DocumentFragment>
+  <article
+    class="_card_9f5b00"
+  >
+    <h3
+      class="_title_9f5b00"
+    >
+      Ana
+    </h3>
+    <p>
+      Ana community.feed.swap.wants
+    </p>
+    <div
+      class="_actions_9f5b00"
+    >
+      <button
+        aria-label="community.feed.cta.accept"
+      >
+        community.feed.cta.accept
+      </button>
+    </div>
+  </article>
+</DocumentFragment>
+`;
+
+exports[`Feed cards snapshots > swap card matches snapshots 2`] = `
+<DocumentFragment>
+  <article
+    class="_card_9f5b00"
+  >
+    <h3
+      class="_title_9f5b00"
+    >
+      Ana
+    </h3>
+    <p>
+      Ana community.feed.swap.wants
+    </p>
+    <div
+      class="_actions_9f5b00"
+    >
+      <button
+        aria-label="community.feed.cta.accept"
+      >
+        community.feed.cta.accept
+      </button>
+    </div>
+  </article>
+</DocumentFragment>
+`;
