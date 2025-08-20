@@ -75,7 +75,7 @@ export const StatsTab = () => {
           <h3>{t('community.stats.trends.exchanges')}</h3>
           <div className={styles.trendPlaceholder}>
             {trendExchanges.map((h, idx) => (
-              <div key={idx} style={{ height: `${h}%` }} />
+              <div key={`${h}-${idx}`} style={{ height: `${h}%` }} />
             ))}
           </div>
         </div>
@@ -115,11 +115,9 @@ export const StatsTab = () => {
         <div className={styles.mapCard}>
           <h3>{t('community.stats.map.title')}</h3>
           <div className={styles.mapPlaceholder}>
-            {activeHousesMapMock.map((pin, idx) => (
-              <span
             {activeHousesMapMock.map((pin) => (
               <span
-                key={pin.id}
+                key={`${pin.top}-${pin.left}`}
                 className={styles.pin}
                 style={{ top: pin.top, left: pin.left }}
               />
