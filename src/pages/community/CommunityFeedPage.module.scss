@@ -2,7 +2,10 @@
 
 .wrapper {
   width: 100%;
+  max-width: 100vw;
   padding: $spacing-4;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .header {

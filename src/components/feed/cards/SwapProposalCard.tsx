@@ -13,12 +13,19 @@ interface Props {
 export const SwapProposalCard = ({ item }: Props) => {
   const { t } = useTranslation()
 
+  const offeredImage = `https://picsum.photos/seed/${item.offered}/300/200`
+  const requestedImage = `https://picsum.photos/seed/${item.requested}/300/200`
+
   const handleAccept = () => {
     track('feed.cta', { type: 'swap', action: 'accept' })
   }
 
   return (
     <article className={styles.card}>
+      <div className={styles.swapImages}>
+        <img src={offeredImage} alt={item.offered} />
+        <img src={requestedImage} alt={item.requested} />
+      </div>
       <h3 className={styles.title}>{item.requester}</h3>
       <p>
         {item.requester} {t('community.feed.swap.wants', { offered: item.offered, requested: item.requested })}

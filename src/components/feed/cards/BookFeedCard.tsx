@@ -19,6 +19,7 @@ export const BookFeedCard = ({ item }: Props) => {
 
   return (
     <article className={styles.card}>
+      <img src={item.cover} alt={item.title} className={styles.image} />
       <h3 className={styles.title}>{item.title}</h3>
       <p>{item.author}</p>
       <div className={styles.actions}>

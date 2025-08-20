@@ -13,12 +13,15 @@ interface Props {
 export const HouseCard = ({ item }: Props) => {
   const { t } = useTranslation()
 
+  const image = `https://picsum.photos/seed/${item.id}/600/300`
+
   const handleOpen = () => {
     track('feed.cta', { type: 'house', action: 'open' })
   }
 
   return (
     <article className={styles.card}>
+      <img src={image} alt={item.name} className={styles.image} />
       <h3 className={styles.title}>{item.name}</h3>
       <p>{t('community.feed.house.distance', { distance: item.distance })}</p>
       <div className={styles.actions}>

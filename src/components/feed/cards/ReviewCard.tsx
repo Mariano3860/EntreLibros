@@ -13,12 +13,15 @@ interface Props {
 export const ReviewCard = ({ item }: Props) => {
   const { t } = useTranslation()
 
+  const image = `https://picsum.photos/seed/${item.id}/600/300`
+
   const handleHelpful = () => {
     track('feed.cta', { type: 'review', action: 'helpful' })
   }
 
   return (
     <article className={styles.card}>
+      <img src={image} alt={item.book} className={styles.image} />
       <h3 className={styles.title}>{item.user}</h3>
       <p>{item.quote}</p>
       <div className={styles.actions}>

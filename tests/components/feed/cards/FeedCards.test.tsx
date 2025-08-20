@@ -27,7 +27,7 @@ const book: BookItem = {
   id: 'b',
   title: 'Dune',
   author: 'Frank Herbert',
-  cover: '',
+  cover: 'https://picsum.photos/seed/dune/600/300',
 }
 
 const swap: SwapProposalItem = {

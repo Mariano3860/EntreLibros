@@ -4,10 +4,16 @@
   padding: $spacing-4;
   border-radius: rem(12px);
   box-shadow: var(--shadow-md);
-  background-color: var(--background-card);
+  background: linear-gradient(
+    135deg,
+    var(--background-card),
+    rgba(var(--primary-rgb), 0.05)
+  );
   color: var(--text-primary);
   margin-bottom: $spacing-4;
   width: 100%;
+  overflow: hidden;
+  animation: fadeIn 0.4s $transition-timing-function;
   transition: box-shadow $transition-duration-fast $transition-timing-function,
     transform $transition-duration-fast $transition-timing-function;
 }
@@ -15,6 +21,47 @@
 .card:hover {
   box-shadow: $box-shadow-md;
   transform: translateY(-2px);
+}
+
+.image {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: rem(12px) rem(12px) 0 0;
+  margin: -$spacing-4 -$spacing-4 $spacing-2 -$spacing-4;
+  max-height: 200px;
+  object-fit: cover;
+}
+
+.swapImages {
+  display: flex;
+  margin: -$spacing-4 -$spacing-4 $spacing-2 -$spacing-4;
+}
+
+.swapImages img {
+  width: 50%;
+  height: 120px;
+  object-fit: cover;
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin: -$spacing-4 auto $spacing-2;
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .title {

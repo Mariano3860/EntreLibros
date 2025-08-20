@@ -13,12 +13,15 @@ interface Props {
 export const ForSaleCard = ({ item }: Props) => {
   const { t } = useTranslation()
 
+  const image = `https://picsum.photos/seed/${item.id}/600/300`
+
   const handleBuy = () => {
     track('feed.cta', { type: 'sale', action: 'buy' })
   }
 
   return (
     <article className={styles.card}>
+      <img src={image} alt={item.title} className={styles.image} />
       <h3 className={styles.title}>{item.title}</h3>
       <p>{t('community.feed.sale.price', { price: item.price })}</p>
       <div className={styles.actions}>

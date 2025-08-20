@@ -1,7 +1,13 @@
 import type { FeedItem } from '@components/feed/FeedItem.types'
 
 const base: FeedItem[] = [
-  { type: 'book', id: 'b1', title: 'Dune', author: 'Frank Herbert', cover: '' },
+  {
+    type: 'book',
+    id: 'b1',
+    title: 'Dune',
+    author: 'Frank Herbert',
+    cover: 'https://picsum.photos/seed/dune/600/300',
+  },
   {
     type: 'swap',
     id: 's1',

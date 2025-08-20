@@ -5,6 +5,11 @@ exports[`Feed cards snapshots > book card matches snapshots 1`] = `
   <article
     class="_card_9f5b00"
   >
+    <img
+      alt="Dune"
+      class="_image_9f5b00"
+      src="https://picsum.photos/seed/dune/600/300"
+    />
     <h3
       class="_title_9f5b00"
     >
@@ -32,6 +37,11 @@ exports[`Feed cards snapshots > book card matches snapshots 2`] = `
   <article
     class="_card_9f5b00"
   >
+    <img
+      alt="Dune"
+      class="_image_9f5b00"
+      src="https://picsum.photos/seed/dune/600/300"
+    />
     <h3
       class="_title_9f5b00"
     >
@@ -59,6 +69,11 @@ exports[`Feed cards snapshots > event card matches snapshots 1`] = `
   <article
     class="_card_9f5b00"
   >
+    <img
+      alt="Book Fair"
+      class="_image_9f5b00"
+      src="https://picsum.photos/seed/e/600/300"
+    />
     <h3
       class="_title_9f5b00"
     >
@@ -86,6 +101,11 @@ exports[`Feed cards snapshots > event card matches snapshots 2`] = `
   <article
     class="_card_9f5b00"
   >
+    <img
+      alt="Book Fair"
+      class="_image_9f5b00"
+      src="https://picsum.photos/seed/e/600/300"
+    />
     <h3
       class="_title_9f5b00"
     >
@@ -113,6 +133,11 @@ exports[`Feed cards snapshots > house card matches snapshots 1`] = `
   <article
     class="_card_9f5b00"
   >
+    <img
+      alt="Casita Norte"
+      class="_image_9f5b00"
+      src="https://picsum.photos/seed/h/600/300"
+    />
     <h3
       class="_title_9f5b00"
     >
@@ -140,6 +165,11 @@ exports[`Feed cards snapshots > house card matches snapshots 2`] = `
   <article
     class="_card_9f5b00"
   >
+    <img
+      alt="Casita Norte"
+      class="_image_9f5b00"
+      src="https://picsum.photos/seed/h/600/300"
+    />
     <h3
       class="_title_9f5b00"
     >
@@ -167,6 +197,11 @@ exports[`Feed cards snapshots > person card matches snapshots 1`] = `
   <article
     class="_card_9f5b00"
   >
+    <img
+      alt="Carlos"
+      class="_avatar_9f5b00"
+      src="https://i.pravatar.cc/300?u=p"
+    />
     <h3
       class="_title_9f5b00"
     >
@@ -194,6 +229,11 @@ exports[`Feed cards snapshots > person card matches snapshots 2`] = `
   <article
     class="_card_9f5b00"
   >
+    <img
+      alt="Carlos"
+      class="_avatar_9f5b00"
+      src="https://i.pravatar.cc/300?u=p"
+    />
     <h3
       class="_title_9f5b00"
     >
@@ -221,6 +261,11 @@ exports[`Feed cards snapshots > review card matches snapshots 1`] = `
   <article
     class="_card_9f5b00"
   >
+    <img
+      alt="Dune"
+      class="_image_9f5b00"
+      src="https://picsum.photos/seed/r/600/300"
+    />
     <h3
       class="_title_9f5b00"
     >
@@ -248,6 +293,11 @@ exports[`Feed cards snapshots > review card matches snapshots 2`] = `
   <article
     class="_card_9f5b00"
   >
+    <img
+      alt="Dune"
+      class="_image_9f5b00"
+      src="https://picsum.photos/seed/r/600/300"
+    />
     <h3
       class="_title_9f5b00"
     >
@@ -275,6 +325,11 @@ exports[`Feed cards snapshots > sale card matches snapshots 1`] = `
   <article
     class="_card_9f5b00"
   >
+    <img
+      alt="Foundation"
+      class="_image_9f5b00"
+      src="https://picsum.photos/seed/sa/600/300"
+    />
     <h3
       class="_title_9f5b00"
     >
@@ -302,6 +357,11 @@ exports[`Feed cards snapshots > sale card matches snapshots 2`] = `
   <article
     class="_card_9f5b00"
   >
+    <img
+      alt="Foundation"
+      class="_image_9f5b00"
+      src="https://picsum.photos/seed/sa/600/300"
+    />
     <h3
       class="_title_9f5b00"
     >
@@ -329,6 +389,11 @@ exports[`Feed cards snapshots > seeking card matches snapshots 1`] = `
   <article
     class="_card_9f5b00"
   >
+    <img
+      alt="Sapiens"
+      class="_image_9f5b00"
+      src="https://picsum.photos/seed/se/600/300"
+    />
     <h3
       class="_title_9f5b00"
     >
@@ -356,6 +421,11 @@ exports[`Feed cards snapshots > seeking card matches snapshots 2`] = `
   <article
     class="_card_9f5b00"
   >
+    <img
+      alt="Sapiens"
+      class="_image_9f5b00"
+      src="https://picsum.photos/seed/se/600/300"
+    />
     <h3
       class="_title_9f5b00"
     >
@@ -383,6 +453,18 @@ exports[`Feed cards snapshots > swap card matches snapshots 1`] = `
   <article
     class="_card_9f5b00"
   >
+    <div
+      class="_swapImages_9f5b00"
+    >
+      <img
+        alt="1984"
+        src="https://picsum.photos/seed/1984/300/200"
+      />
+      <img
+        alt="The Hobbit"
+        src="https://picsum.photos/seed/The Hobbit/300/200"
+      />
+    </div>
     <h3
       class="_title_9f5b00"
     >
@@ -410,6 +492,18 @@ exports[`Feed cards snapshots > swap card matches snapshots 2`] = `
   <article
     class="_card_9f5b00"
   >
+    <div
+      class="_swapImages_9f5b00"
+    >
+      <img
+        alt="1984"
+        src="https://picsum.photos/seed/1984/300/200"
+      />
+      <img
+        alt="The Hobbit"
+        src="https://picsum.photos/seed/The Hobbit/300/200"
+      />
+    </div>
     <h3
       class="_title_9f5b00"
     >

@@ -13,12 +13,15 @@ interface Props {
 export const PeopleCard = ({ item }: Props) => {
   const { t } = useTranslation()
 
+  const avatar = `https://i.pravatar.cc/300?u=${item.id}`
+
   const handleMessage = () => {
     track('feed.cta', { type: 'person', action: 'message' })
   }
 
   return (
     <article className={styles.card}>
+      <img src={avatar} alt={item.name} className={styles.avatar} />
       <h3 className={styles.title}>{item.name}</h3>
       <p>{t('community.feed.person.match', { match: item.match })}</p>
       <div className={styles.actions}>

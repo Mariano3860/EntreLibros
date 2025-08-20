@@ -13,12 +13,15 @@ interface Props {
 export const EventCard = ({ item }: Props) => {
   const { t } = useTranslation()
 
+  const image = `https://picsum.photos/seed/${item.id}/600/300`
+
   const handleGo = () => {
     track('feed.cta', { type: 'event', action: 'going' })
   }
 
   return (
     <article className={styles.card}>
+      <img src={image} alt={item.title} className={styles.image} />
       <h3 className={styles.title}>{item.title}</h3>
       <p>{item.location}</p>
       <div className={styles.actions}>
