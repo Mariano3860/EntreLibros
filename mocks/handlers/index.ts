@@ -4,6 +4,7 @@ import { authStateHandler, meHandler } from './auth/me.handler'
 import { registerHandler } from './auth/register.handler'
 import { booksHandler } from './books/books.handler'
 import { contactFormHandler } from './contactForm/contactForm.handler'
+import { communityStatsHandler } from './community/communityStats.handler'
 
 export const handlers = [
   loginHandler,
@@ -13,4 +14,5 @@ export const handlers = [
   meHandler,
   booksHandler,
   contactFormHandler,
+  communityStatsHandler,
 ]

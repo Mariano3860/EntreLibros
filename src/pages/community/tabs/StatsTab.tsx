@@ -1,20 +1,15 @@
-import { getInitials } from '@utils/getInitials'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
 
-import { COMMUNITY_STATS_RANGES, HOME_URLS } from '@src/constants/constants'
+import { COMMUNITY_STATS_RANGES } from '@src/constants/constants'
 
+import { useCommunityStats } from '@src/hooks/api/useCommunityStats'
 import commonStyles from '../CommunityPage.module.scss'
-import {
-  kpis,
-  trendExchanges,
-  trendNewBooks,
-  topContributors,
-  hotSearches,
-  activeHousesMapMock,
-} from '../mocks/communityStats.mock'
-
+import { HotSearchesCard } from './components/HotSearchesCard'
+import { KpiCard } from './components/KpiCard'
+import { MapCard } from './components/MapCard'
+import { TopContributorsCard } from './components/TopContributorsCard'
+import { TrendCard } from './components/TrendCard'
 import styles from './StatsTab.module.scss'
 
 type Range = (typeof COMMUNITY_STATS_RANGES)[number]
@@ -22,15 +17,17 @@ type Range = (typeof COMMUNITY_STATS_RANGES)[number]
 export const StatsTab = () => {
   const { t } = useTranslation()
   const [range, setRange] = useState<Range>(COMMUNITY_STATS_RANGES[0])
+  const { data } = useCommunityStats()
 
   const rangeText = t('community.stats.filters.lastDays', { count: range })
-
-  const kpiItems = [
-    { key: 'exchanges', value: kpis.exchanges, icon: '🔄' },
-    { key: 'activeHouses', value: kpis.activeHouses, icon: '🏠' },
-    { key: 'activeUsers', value: kpis.activeUsers, icon: '👥' },
-    { key: 'booksPublished', value: kpis.booksPublished, icon: '📚' },
-  ] as const
+  const kpiItems = data
+    ? ([
+        { key: 'exchanges', value: data.kpis.exchanges, icon: '🔄' },
+        { key: 'activeHouses', value: data.kpis.activeHouses, icon: '🏠' },
+        { key: 'activeUsers', value: data.kpis.activeUsers, icon: '👥' },
+        { key: 'booksPublished', value: data.kpis.booksPublished, icon: '📚' },
+      ] as const)
+    : []
 
   return (
     <section className={`${commonStyles.tabContent} ${styles.stats}`}>
@@ -54,88 +51,35 @@ export const StatsTab = () => {
           ))}
         </div>
       </header>
-
-      <div className={styles.kpiGrid}>
-        {kpiItems.map((item) => (
-          <div key={item.key} className={styles.kpiCard}>
-            <span aria-hidden="true" className={styles.icon}>
-              {item.icon}
-            </span>
-            <div className={styles.value}>{item.value.toLocaleString()}</div>
-            <div className={styles.label}>
-              {t(`community.stats.kpis.${item.key}`)}
-            </div>
-            <span className={styles.badge}>{rangeText}</span>
-          </div>
-        ))}
-      </div>
-
-      <div className={styles.detailsGrid}>
-        <div className={styles.trendCard}>
-          <h3>{t('community.stats.trends.exchanges')}</h3>
-          <div className={styles.trendPlaceholder}>
-            {trendExchanges.map((h, idx) => (
-              <div key={`${h}-${idx}`} style={{ height: `${h}%` }} />
-            ))}
-          </div>
-        </div>
-        <div className={styles.trendCard}>
-          <h3>{t('community.stats.trends.newBooks')}</h3>
-          <div className={styles.trendPlaceholder}>
-            {trendNewBooks.map((h, idx) => (
-              <div key={`${h}-${idx}`} style={{ height: `${h}%` }} />
-            ))}
-          </div>
-        </div>
-        <div className={styles.topContributorsCard}>
-          <h3>{t('community.stats.topContributors.title')}</h3>
-          <ul aria-label="top-contributors">
-            {topContributors.map((user) => (
-              <li key={user.username}>
-                <span
-                  className={styles.avatar}
-                  role="img"
-                  aria-label={user.username}
-                >
-                  {getInitials(user.username)}
-                </span>
-                <span className={styles.name}>{user.username}</span>
-                <span className={styles.metric}>
-                  {t(`community.stats.topContributors.metric.${user.metric}`, {
-                    count: user.value,
-                  })}
-                </span>
-              </li>
-            ))}
-          </ul>
-          <Link to={`/${HOME_URLS.COMMUNITY}`} className={styles.viewCommunity}>
-            {t('community.stats.topContributors.viewCommunity')}
-          </Link>
-        </div>
-        <div className={styles.mapCard}>
-          <h3>{t('community.stats.map.title')}</h3>
-          <div className={styles.mapPlaceholder}>
-            {activeHousesMapMock.map((pin) => (
-              <span
-                key={`${pin.top}-${pin.left}`}
-                className={styles.pin}
-                style={{ top: pin.top, left: pin.left }}
+      {data && (
+        <>
+          <div className={styles.kpiGrid}>
+            {kpiItems.map((item) => (
+              <KpiCard
+                key={item.key}
+                icon={item.icon}
+                value={item.value}
+                label={t(`community.stats.kpis.${item.key}`)}
+                badge={rangeText}
               />
             ))}
           </div>
-          <p>{t('community.stats.map.description')}</p>
-        </div>
-        <div className={styles.hotSearchesCard}>
-          <h3>{t('community.stats.hotSearches.title')}</h3>
-          <div className={styles.chips}>
-            {hotSearches.map((item) => (
-              <span key={item.term} className={styles.chip}>
-                {item.term} ({item.count})
-              </span>
-            ))}
+
+          <div className={styles.detailsGrid}>
+            <TrendCard
+              title={t('community.stats.trends.exchanges')}
+              data={data.trendExchanges}
+            />
+            <TrendCard
+              title={t('community.stats.trends.newBooks')}
+              data={data.trendNewBooks}
+            />
+            <TopContributorsCard contributors={data.topContributors} />
+            <MapCard pins={data.activeHousesMap} />
+            <HotSearchesCard searches={data.hotSearches} />
           </div>
-        </div>
-      </div>
+        </>
+      )}
     </section>
   )
 }

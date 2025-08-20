@@ -12,4 +12,7 @@ export const RELATIVE_API_ROUTES = {
   BOOKS: {
     LIST: `/books`,
   },
+  COMMUNITY: {
+    STATS: `/community/stats`,
+  },
 }
