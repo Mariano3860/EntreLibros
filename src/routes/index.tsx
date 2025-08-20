@@ -4,11 +4,14 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
 import { HOME_URLS } from '@src/constants/constants'
 import { BooksPage } from '@src/pages/books/BooksPage'
-import { CommunityPage } from '@src/pages/community/CommunityPage'
+import { CommunityFeedPage } from '@src/pages/community/CommunityFeedPage'
 import { ContactPage } from '@src/pages/contact/ContactPage'
 import { HomePage } from '@src/pages/home/HomePage'
 import LoginPage from '@src/pages/login/LoginPage'
+import { MessagesPage } from '@src/pages/messages/MessagesPage'
 import RegisterPage from '@src/pages/register/RegisterPage'
+import { StatsPage } from '@src/pages/stats/StatsPage'
+
 
 import NotFound from '../pages/not_found/NotFound'
 
@@ -28,9 +31,15 @@ const AppRoutes = () => {
         </Route>
         <Route element={<BaseLayout />}>
           <Route
-            path={`/${HOME_URLS.COMMUNITY}/*`}
-            element={<CommunityPage />}
+            path={`/${HOME_URLS.COMMUNITY}`}
+            element={<CommunityFeedPage />}
           />
+        </Route>
+        <Route element={<BaseLayout />}>
+          <Route path={`/${HOME_URLS.MESSAGES}`} element={<MessagesPage />} />
+        </Route>
+        <Route element={<BaseLayout />}>
+          <Route path={`/${HOME_URLS.STATS}`} element={<StatsPage />} />
         </Route>
         <Route element={<BaseLayout />}>
           <Route path={`/${HOME_URLS.CONTACT}`} element={<ContactPage />} />

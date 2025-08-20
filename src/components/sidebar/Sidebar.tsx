@@ -9,6 +9,7 @@ import { NavLink } from 'react-router-dom'
 import { ReactComponent as Books } from '@src/assets/icons/books.svg'
 import { ReactComponent as Community } from '@src/assets/icons/community.svg'
 import { ReactComponent as Contact } from '@src/assets/icons/contact.svg'
+import { ReactComponent as Stats } from '@src/assets/icons/globe.svg'
 import { ReactComponent as Home } from '@src/assets/icons/home.svg'
 import { HOME_URLS } from '@src/constants/constants'
 
@@ -33,6 +34,16 @@ export const Sidebar = () => {
       path: `/${HOME_URLS.COMMUNITY}`,
       icon: Community,
       label: t('pages.community'),
+    },
+    {
+      path: `/${HOME_URLS.MESSAGES}`,
+      icon: Contact,
+      label: t('pages.messages'),
+    },
+    {
+      path: `/${HOME_URLS.STATS}`,
+      icon: Stats,
+      label: t('pages.stats'),
     },
     {
       path: `/${HOME_URLS.CONTACT}`,

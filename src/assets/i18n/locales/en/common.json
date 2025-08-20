@@ -31,6 +31,8 @@
     "home": "Home",
     "books": "My Books",
     "community": "Community",
+    "messages": "Messages",
+    "stats": "Stats",
     "contact": "Contact"
   },
   "contact": {

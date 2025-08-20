@@ -1,14 +1,14 @@
 import { fireEvent, within } from '@testing-library/react'
 import { describe, expect, test } from 'vitest'
 
-import { StatsTab } from '@src/pages/community/tabs/StatsTab'
+import { StatsPage } from '@src/pages/stats/StatsPage'
 
 import { renderWithProviders } from '../../test-utils'
 
-describe('StatsTab', () => {
+describe('StatsPage', () => {
   test('renders all sections', async () => {
     const { getByText, findByText, findByLabelText } = renderWithProviders(
-      <StatsTab />
+      <StatsPage />
     )
     expect(getByText('community.stats.title')).toBeInTheDocument()
     expect(getByText('community.stats.subtitle')).toBeInTheDocument()
@@ -26,7 +26,7 @@ describe('StatsTab', () => {
   })
 
   test('changes active range', async () => {
-    const { findByText } = renderWithProviders(<StatsTab />)
+    const { findByText } = renderWithProviders(<StatsPage />)
     const button = await findByText('community.stats.filters.30d')
     fireEvent.click(button)
     expect(button).toHaveAttribute('aria-pressed', 'true')

@@ -11,6 +11,8 @@ describe('Sidebar', () => {
     const toggle = screen.getByRole('button', { name: 'Toggle navigation' })
     fireEvent.click(toggle)
     expect(screen.getByRole('navigation').className).toMatch(/open/)
+    expect(screen.getByRole('link', { name: 'pages.messages' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'pages.stats' })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('link', { name: 'pages.home' }))
     expect(screen.getByRole('navigation').className).not.toMatch(/open/)
   })

@@ -6,6 +6,8 @@ export const HOME_URLS = {
   HOME: 'home',
   BOOKS: 'books',
   COMMUNITY: 'community',
+  MESSAGES: 'messages',
+  STATS: 'stats',
   CONTACT: 'contact',
   LOGIN: 'login',
   REGISTER: 'register',
