@@ -10,3 +10,5 @@ export const HOME_URLS = {
   LOGIN: 'login',
   REGISTER: 'register',
 } as const
+
+export const COMMUNITY_STATS_RANGES = [7, 30, 90] as const

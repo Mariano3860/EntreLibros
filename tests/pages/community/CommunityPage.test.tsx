@@ -39,7 +39,7 @@ describe('CommunityPage', () => {
     const events = renderWithProviders(<EventsTab />)
     expect(events.getByText('community.events.placeholder')).toBeInTheDocument()
     const stats = renderWithProviders(<StatsTab />)
-    expect(stats.getByText('community.stats.placeholder')).toBeInTheDocument()
+    expect(stats.getByText('community.stats.subtitle')).toBeInTheDocument()
   })
 
   test('tab links use absolute paths', () => {
