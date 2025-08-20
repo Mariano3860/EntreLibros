@@ -214,8 +214,7 @@
         "sale": {"price": "Precio: ${{price}}"},
         "seeking": {"description": "busca {{title}}"},
         "house": {"distance": "A {{distance}} km"},
-        "person": {"match": "Coincidencia {{match}}%"},
-        "load_more": "Cargar más"
+        "person": {"match": "Coincidencia {{match}}%"}
       }
     }
   }

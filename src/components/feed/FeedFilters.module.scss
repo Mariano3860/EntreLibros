@@ -1,13 +1,41 @@
+@import '@styles/variables';
+
 .wrapper {
-  margin-bottom: 1rem;
+  margin-bottom: $spacing-4;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+input {
+  padding: $spacing-1x5 $spacing-2;
+  border: 1px solid var(--border-color);
+  border-radius: rem(8px);
+  background: var(--background-card);
+  color: var(--text-primary);
 }
 
 .tabs {
   display: flex;
-  gap: 0.5rem;
+  gap: $spacing-2;
   flex-wrap: wrap;
 }
 
+.tabs button {
+  background: none;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: $spacing-1 $spacing-2;
+  border-radius: rem(16px);
+  cursor: pointer;
+}
+
+.tabs button:hover {
+  background: var(--background-card);
+}
+
 .active {
-  font-weight: bold;
+  background: var(--primary-color);
+  color: #fff;
+  border-color: var(--primary-color);
 }

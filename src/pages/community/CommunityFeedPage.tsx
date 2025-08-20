@@ -2,7 +2,7 @@ import { FeedFilters } from '@components/feed/FeedFilters'
 import { FeedList } from '@components/feed/FeedList'
 import { filterItems } from '@components/feed/filterItems'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import feedData from '../../../mocks/data/feed.mock'
@@ -15,25 +15,44 @@ export const CommunityFeedPage = () => {
   const [items, setItems] = useState(feedData)
 
   const filtered = filterItems(items, filter)
+  const loaderRef = useRef<HTMLDivElement | null>(null)
 
-  const loadMore = () => {
-    setItems((prev) => [...prev, ...feedData])
-  }
+  useEffect(() => {
+    if (!('IntersectionObserver' in window)) {
+      return
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        setItems((prev) => [...prev, ...feedData])
+      }
+    })
+
+    const node = loaderRef.current
+    if (node) {
+      observer.observe(node)
+    }
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [])
 
   return (
     <BaseLayout>
       <div className={styles.wrapper}>
         <header className={styles.header}>
           <h1>{t('community.title')}</h1>
-          <button aria-label={t('community.feed.cta.publish')}>
+          <button
+            className={styles.publishButton}
+            aria-label={t('community.feed.cta.publish')}
+          >
             {t('community.feed.cta.publish')}
           </button>
         </header>
         <FeedFilters filter={filter} onFilterChange={setFilter} />
         <FeedList items={filtered} />
-        <button onClick={loadMore} aria-label={t('community.feed.load_more')}>
-          {t('community.feed.load_more')}
-        </button>
+        <div ref={loaderRef} className={styles.loader} />
       </div>
     </BaseLayout>
   )

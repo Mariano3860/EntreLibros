@@ -22,7 +22,11 @@ export const EventCard = ({ item }: Props) => {
       <h3 className={styles.title}>{item.title}</h3>
       <p>{item.location}</p>
       <div className={styles.actions}>
-        <button onClick={handleGo} aria-label={t('community.feed.cta.go')}>
+        <button
+          className={styles.primaryButton}
+          onClick={handleGo}
+          aria-label={t('community.feed.cta.go')}
+        >
           {t('community.feed.cta.go')}
         </button>
       </div>

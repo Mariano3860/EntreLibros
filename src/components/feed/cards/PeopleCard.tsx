@@ -22,7 +22,11 @@ export const PeopleCard = ({ item }: Props) => {
       <h3 className={styles.title}>{item.name}</h3>
       <p>{t('community.feed.person.match', { match: item.match })}</p>
       <div className={styles.actions}>
-        <button onClick={handleMessage} aria-label={t('community.feed.cta.message')}>
+        <button
+          className={styles.primaryButton}
+          onClick={handleMessage}
+          aria-label={t('community.feed.cta.message')}
+        >
           {t('community.feed.cta.message')}
         </button>
       </div>

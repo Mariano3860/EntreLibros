@@ -22,7 +22,11 @@ export const ReviewCard = ({ item }: Props) => {
       <h3 className={styles.title}>{item.user}</h3>
       <p>{item.quote}</p>
       <div className={styles.actions}>
-        <button onClick={handleHelpful} aria-label={t('community.feed.cta.helpful')}>
+        <button
+          className={styles.primaryButton}
+          onClick={handleHelpful}
+          aria-label={t('community.feed.cta.helpful')}
+        >
           {t('community.feed.cta.helpful')}
         </button>
       </div>

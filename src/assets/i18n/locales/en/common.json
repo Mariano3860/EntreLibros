@@ -214,8 +214,7 @@
         "sale": {"price": "Price: ${{price}}"},
         "seeking": {"description": "is looking for {{title}}"},
         "house": {"distance": "{{distance}} km away"},
-        "person": {"match": "{{match}}% match"},
-        "load_more": "Load more"
+        "person": {"match": "{{match}}% match"}
       }
     }
   }

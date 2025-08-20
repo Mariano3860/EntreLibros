@@ -22,7 +22,11 @@ export const HouseCard = ({ item }: Props) => {
       <h3 className={styles.title}>{item.name}</h3>
       <p>{t('community.feed.house.distance', { distance: item.distance })}</p>
       <div className={styles.actions}>
-        <button onClick={handleOpen} aria-label={t('community.feed.cta.open_map')}>
+        <button
+          className={styles.primaryButton}
+          onClick={handleOpen}
+          aria-label={t('community.feed.cta.open_map')}
+        >
           {t('community.feed.cta.open_map')}
         </button>
       </div>

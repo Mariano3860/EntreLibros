@@ -22,7 +22,11 @@ export const BookFeedCard = ({ item }: Props) => {
       <h3 className={styles.title}>{item.title}</h3>
       <p>{item.author}</p>
       <div className={styles.actions}>
-        <button onClick={handlePrimary} aria-label={t('community.feed.cta.propose_swap')}>
+        <button
+          className={styles.primaryButton}
+          onClick={handlePrimary}
+          aria-label={t('community.feed.cta.propose_swap')}
+        >
           {t('community.feed.cta.propose_swap')}
         </button>
       </div>

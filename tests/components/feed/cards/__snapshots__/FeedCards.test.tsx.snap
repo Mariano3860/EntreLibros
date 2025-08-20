@@ -18,6 +18,7 @@ exports[`Feed cards snapshots > book card matches snapshots 1`] = `
     >
       <button
         aria-label="community.feed.cta.propose_swap"
+        class="_primaryButton_9f5b00"
       >
         community.feed.cta.propose_swap
       </button>
@@ -44,6 +45,7 @@ exports[`Feed cards snapshots > book card matches snapshots 2`] = `
     >
       <button
         aria-label="community.feed.cta.propose_swap"
+        class="_primaryButton_9f5b00"
       >
         community.feed.cta.propose_swap
       </button>
@@ -70,6 +72,7 @@ exports[`Feed cards snapshots > event card matches snapshots 1`] = `
     >
       <button
         aria-label="community.feed.cta.go"
+        class="_primaryButton_9f5b00"
       >
         community.feed.cta.go
       </button>
@@ -96,6 +99,7 @@ exports[`Feed cards snapshots > event card matches snapshots 2`] = `
     >
       <button
         aria-label="community.feed.cta.go"
+        class="_primaryButton_9f5b00"
       >
         community.feed.cta.go
       </button>
@@ -122,6 +126,7 @@ exports[`Feed cards snapshots > house card matches snapshots 1`] = `
     >
       <button
         aria-label="community.feed.cta.open_map"
+        class="_primaryButton_9f5b00"
       >
         community.feed.cta.open_map
       </button>
@@ -148,6 +153,7 @@ exports[`Feed cards snapshots > house card matches snapshots 2`] = `
     >
       <button
         aria-label="community.feed.cta.open_map"
+        class="_primaryButton_9f5b00"
       >
         community.feed.cta.open_map
       </button>
@@ -174,6 +180,7 @@ exports[`Feed cards snapshots > person card matches snapshots 1`] = `
     >
       <button
         aria-label="community.feed.cta.message"
+        class="_primaryButton_9f5b00"
       >
         community.feed.cta.message
       </button>
@@ -200,6 +207,7 @@ exports[`Feed cards snapshots > person card matches snapshots 2`] = `
     >
       <button
         aria-label="community.feed.cta.message"
+        class="_primaryButton_9f5b00"
       >
         community.feed.cta.message
       </button>
@@ -226,6 +234,7 @@ exports[`Feed cards snapshots > review card matches snapshots 1`] = `
     >
       <button
         aria-label="community.feed.cta.helpful"
+        class="_primaryButton_9f5b00"
       >
         community.feed.cta.helpful
       </button>
@@ -252,6 +261,7 @@ exports[`Feed cards snapshots > review card matches snapshots 2`] = `
     >
       <button
         aria-label="community.feed.cta.helpful"
+        class="_primaryButton_9f5b00"
       >
         community.feed.cta.helpful
       </button>
@@ -278,6 +288,7 @@ exports[`Feed cards snapshots > sale card matches snapshots 1`] = `
     >
       <button
         aria-label="community.feed.cta.buy"
+        class="_primaryButton_9f5b00"
       >
         community.feed.cta.buy
       </button>
@@ -304,6 +315,7 @@ exports[`Feed cards snapshots > sale card matches snapshots 2`] = `
     >
       <button
         aria-label="community.feed.cta.buy"
+        class="_primaryButton_9f5b00"
       >
         community.feed.cta.buy
       </button>
@@ -330,6 +342,7 @@ exports[`Feed cards snapshots > seeking card matches snapshots 1`] = `
     >
       <button
         aria-label="community.feed.cta.offer_copy"
+        class="_primaryButton_9f5b00"
       >
         community.feed.cta.offer_copy
       </button>
@@ -356,6 +369,7 @@ exports[`Feed cards snapshots > seeking card matches snapshots 2`] = `
     >
       <button
         aria-label="community.feed.cta.offer_copy"
+        class="_primaryButton_9f5b00"
       >
         community.feed.cta.offer_copy
       </button>
@@ -382,6 +396,7 @@ exports[`Feed cards snapshots > swap card matches snapshots 1`] = `
     >
       <button
         aria-label="community.feed.cta.accept"
+        class="_primaryButton_9f5b00"
       >
         community.feed.cta.accept
       </button>
@@ -408,6 +423,7 @@ exports[`Feed cards snapshots > swap card matches snapshots 2`] = `
     >
       <button
         aria-label="community.feed.cta.accept"
+        class="_primaryButton_9f5b00"
       >
         community.feed.cta.accept
       </button>

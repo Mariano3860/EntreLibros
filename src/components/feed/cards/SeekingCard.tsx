@@ -22,7 +22,11 @@ export const SeekingCard = ({ item }: Props) => {
       <h3 className={styles.title}>{item.user}</h3>
       <p>{t('community.feed.seeking.description', { title: item.title })}</p>
       <div className={styles.actions}>
-        <button onClick={handleOffer} aria-label={t('community.feed.cta.offer_copy')}>
+        <button
+          className={styles.primaryButton}
+          onClick={handleOffer}
+          aria-label={t('community.feed.cta.offer_copy')}
+        >
           {t('community.feed.cta.offer_copy')}
         </button>
       </div>

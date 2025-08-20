@@ -24,7 +24,11 @@ export const SwapProposalCard = ({ item }: Props) => {
         {item.requester} {t('community.feed.swap.wants', { offered: item.offered, requested: item.requested })}
       </p>
       <div className={styles.actions}>
-        <button onClick={handleAccept} aria-label={t('community.feed.cta.accept')}>
+        <button
+          className={styles.primaryButton}
+          onClick={handleAccept}
+          aria-label={t('community.feed.cta.accept')}
+        >
           {t('community.feed.cta.accept')}
         </button>
       </div>

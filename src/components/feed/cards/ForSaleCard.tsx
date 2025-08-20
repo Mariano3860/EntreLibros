@@ -22,7 +22,11 @@ export const ForSaleCard = ({ item }: Props) => {
       <h3 className={styles.title}>{item.title}</h3>
       <p>{t('community.feed.sale.price', { price: item.price })}</p>
       <div className={styles.actions}>
-        <button onClick={handleBuy} aria-label={t('community.feed.cta.buy')}>
+        <button
+          className={styles.primaryButton}
+          onClick={handleBuy}
+          aria-label={t('community.feed.cta.buy')}
+        >
           {t('community.feed.cta.buy')}
         </button>
       </div>

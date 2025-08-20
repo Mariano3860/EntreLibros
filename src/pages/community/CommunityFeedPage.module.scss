@@ -1,12 +1,27 @@
+@import '@styles/variables';
+
 .wrapper {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 1rem;
+  width: 100%;
+  padding: $spacing-4;
 }
 
 .header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  gap: $spacing-2;
+  margin-bottom: $spacing-4;
+}
+
+.publishButton {
+  margin-left: auto;
+  background-color: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: rem(8px);
+  padding: $spacing-1x5 $spacing-3;
+  cursor: pointer;
+}
+
+.loader {
+  height: 1px;
 }
