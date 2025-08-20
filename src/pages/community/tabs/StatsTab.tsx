@@ -1,6 +1,9 @@
+import { getInitials } from '@utils/getInitials'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
+
+import { COMMUNITY_STATS_RANGES, HOME_URLS } from '@src/constants/constants'
 
 import commonStyles from '../CommunityPage.module.scss'
 import {
@@ -13,13 +16,12 @@ import {
 } from '../mocks/communityStats.mock'
 
 import styles from './StatsTab.module.scss'
-const ranges = [7, 30, 90] as const
 
-type Range = (typeof ranges)[number]
+type Range = (typeof COMMUNITY_STATS_RANGES)[number]
 
 export const StatsTab = () => {
   const { t } = useTranslation()
-  const [range, setRange] = useState<Range>(7)
+  const [range, setRange] = useState<Range>(COMMUNITY_STATS_RANGES[0])
 
   const rangeText = t('community.stats.filters.lastDays', { count: range })
 
@@ -40,7 +42,7 @@ export const StatsTab = () => {
           role="group"
           aria-label={t('community.stats.filters.aria')}
         >
-          {ranges.map((r) => (
+          {COMMUNITY_STATS_RANGES.map((r) => (
             <button
               key={r}
               type="button"
@@ -95,7 +97,7 @@ export const StatsTab = () => {
                   role="img"
                   aria-label={user.username}
                 >
-                  {user.username.replace('@', '').charAt(0).toUpperCase()}
+                  {getInitials(user.username)}
                 </span>
                 <span className={styles.name}>{user.username}</span>
                 <span className={styles.metric}>
@@ -106,7 +108,7 @@ export const StatsTab = () => {
               </li>
             ))}
           </ul>
-          <Link to="/community" className={styles.viewCommunity}>
+          <Link to={`/${HOME_URLS.COMMUNITY}`} className={styles.viewCommunity}>
             {t('community.stats.topContributors.viewCommunity')}
           </Link>
         </div>
