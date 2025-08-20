@@ -71,7 +71,7 @@ export const BooksPage = () => {
 
   const tabs = useMemo(
     () => [
-      { key: 'mine', path: '', label: t('booksPage.tabs.mine') },
+      { key: 'mine', path: 'mine', label: t('booksPage.tabs.mine') },
       { key: 'trade', path: 'trade', label: t('booksPage.tabs.for_trade') },
       { key: 'seeking', path: 'seeking', label: t('booksPage.tabs.seeking') },
       { key: 'sale', path: 'sale', label: t('booksPage.tabs.for_sale') },
