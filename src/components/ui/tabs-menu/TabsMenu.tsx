@@ -3,7 +3,12 @@ import { Link, useLocation } from 'react-router-dom'
 import styles from './TabsMenu.module.scss'
 import type { TabsMenuProps } from './TabsMenu.types'
 
-export const TabsMenu = ({ items, basePath = '', className, children }: TabsMenuProps) => {
+export const TabsMenu = ({
+  items,
+  basePath = '',
+  className,
+  children,
+}: TabsMenuProps) => {
   const location = useLocation()
 
   return (

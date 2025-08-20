@@ -78,12 +78,9 @@ export const BooksPage = () => {
     [t]
   )
 
-  const pathSegment = location.pathname
-    .replace(basePath, '')
-    .replace(/^\//, '')
-  const activeTab = (
-    tabs.find((tab) => tab.path === pathSegment)?.key ?? 'mine'
-  ) as 'mine' | 'trade' | 'seeking' | 'sale'
+  const pathSegment = location.pathname.replace(basePath, '').replace(/^\//, '')
+  const activeTab = (tabs.find((tab) => tab.path === pathSegment)?.key ??
+    'mine') as 'mine' | 'trade' | 'seeking' | 'sale'
 
   // TODO: mover este filtro a un hook reutilizable si se complica
   const filterByTab = (book: Book) => {
