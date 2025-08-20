@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { COMMUNITY_STATS_RANGES } from '@src/constants/constants'
-
 import { useCommunityStats } from '@src/hooks/api/useCommunityStats'
+
 import commonStyles from '../CommunityPage.module.scss'
+
 import { HotSearchesCard } from './components/HotSearchesCard'
 import { KpiCard } from './components/KpiCard'
 import { MapCard } from './components/MapCard'

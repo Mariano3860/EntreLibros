@@ -2,8 +2,8 @@ import { getInitials } from '@utils/getInitials'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
-import { HOME_URLS } from '@src/constants/constants'
 import type { CommunityStats } from '@src/api/community/communityStats.types'
+import { HOME_URLS } from '@src/constants/constants'
 
 import styles from '../StatsTab.module.scss'
 
@@ -19,7 +19,11 @@ export const TopContributorsCard = ({ contributors }: Props) => {
       <ul aria-label="top-contributors">
         {contributors.map((user) => (
           <li key={user.username}>
-            <span className={styles.avatar} role="img" aria-label={user.username}>
+            <span
+              className={styles.avatar}
+              role="img"
+              aria-label={user.username}
+            >
               {getInitials(user.username)}
             </span>
             <span className={styles.name}>{user.username}</span>
