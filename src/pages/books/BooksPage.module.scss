@@ -62,32 +62,6 @@
   }
 }
 
-.tabs {
-  display: flex;
-  gap: $spacing-1;
-  border-bottom: 1px solid var(--border-color);
-  overflow: hidden;
-
-  @media (max-width: $breakpoint-mobile) {
-    overflow-x: auto;
-  }
-}
-
-.tab {
-  background: none;
-  border: none;
-  padding: $spacing-1 $spacing-2;
-  cursor: pointer;
-  font-weight: $font-weight-medium;
-  font-size: $h6-font-size;
-  color: var(--text-secondary);
-}
-
-.tab.active {
-  color: var(--primary-color);
-  border-bottom: rem(2px) solid var(--primary-color);
-}
-
 .seeAll {
   margin-left: auto;
   background: none;

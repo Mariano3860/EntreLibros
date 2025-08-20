@@ -1,7 +1,9 @@
 import { BookCard } from '@components/book/BookCard'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
+import { TabsMenu } from '@components/ui/tabs-menu/TabsMenu'
 import React, { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useLocation } from 'react-router-dom'
 
 import styles from './BooksPage.module.scss'
 import type { Book } from './BooksPage.types'
@@ -61,20 +63,27 @@ const mockBooks: Book[] = [
 
 export const BooksPage = () => {
   const { t } = useTranslation()
-  const [activeTab, setActiveTab] = useState<
-    'mine' | 'trade' | 'seeking' | 'sale'
-  >('mine')
+  const location = useLocation()
   const [search, setSearch] = useState('')
+
+  const basePath = '/books'
 
   const tabs = useMemo(
     () => [
-      { key: 'mine', label: t('booksPage.tabs.mine') },
-      { key: 'trade', label: t('booksPage.tabs.for_trade') },
-      { key: 'seeking', label: t('booksPage.tabs.seeking') },
-      { key: 'sale', label: t('booksPage.tabs.for_sale') },
+      { key: 'mine', path: '', label: t('booksPage.tabs.mine') },
+      { key: 'trade', path: 'trade', label: t('booksPage.tabs.for_trade') },
+      { key: 'seeking', path: 'seeking', label: t('booksPage.tabs.seeking') },
+      { key: 'sale', path: 'sale', label: t('booksPage.tabs.for_sale') },
     ],
     [t]
   )
+
+  const pathSegment = location.pathname
+    .replace(basePath, '')
+    .replace(/^\//, '')
+  const activeTab = (
+    tabs.find((tab) => tab.path === pathSegment)?.key ?? 'mine'
+  ) as 'mine' | 'trade' | 'seeking' | 'sale'
 
   // TODO: mover este filtro a un hook reutilizable si se complica
   const filterByTab = (book: Book) => {
@@ -122,22 +131,11 @@ export const BooksPage = () => {
           </div>
         </header>
 
-        <div className={styles.tabs} role="tablist">
-          {tabs.map((tab) => (
-            <button
-              key={tab.key}
-              role="tab"
-              aria-selected={activeTab === tab.key}
-              className={`${styles.tab} ${activeTab === tab.key ? styles.active : ''}`}
-              onClick={() => setActiveTab(tab.key as typeof activeTab)}
-            >
-              {tab.label}
-            </button>
-          ))}
+        <TabsMenu items={tabs} basePath={basePath}>
           <button className={styles.seeAll}>
             {t('booksPage.tabs.see_all')}
           </button>
-        </div>
+        </TabsMenu>
 
         {filteredBooks.length === 0 ? (
           <div className={styles.empty}>
