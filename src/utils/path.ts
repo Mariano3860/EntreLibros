@@ -8,7 +8,7 @@ export const buildFullPath = (basePath: string, subPath?: string) => {
 }
 
 export const getPathSegment = (pathname: string, basePath: string) => {
-  const normalizedBase = basePath.endsWith('/') ? basePath : `${basePath}`
+  const normalizedBase = basePath.endsWith('/') ? basePath : `${basePath}/`
   const withoutBase = pathname.startsWith(normalizedBase)
     ? pathname.slice(normalizedBase.length)
     : pathname
