@@ -34,8 +34,11 @@ export const SwapProposalCard = ({ item }: Props) => {
       <FeedActions initialLikes={item.likes} />
       <div className={styles.content}>
         <p>
-          {item.user}{' '}
-          {t('community.feed.swap.wants', { offered: item.offered, requested: item.requested })}
+          {t('community.feed.swap.wants', {
+            user: item.user,
+            offered: item.offered,
+            requested: item.requested,
+          })}
         </p>
         <button
           className={styles.primaryButton}

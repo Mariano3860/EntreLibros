@@ -16,8 +16,16 @@ export const CommunityFeedPage = () => {
   const { t } = useTranslation()
   const [filter, setFilter] = useState('all')
   const [items, setItems] = useState(feedData)
+  const [search, setSearch] = useState('')
 
-  const filtered = filterItems(items, filter)
+  const filtered = filterItems(items, filter).filter((item) => {
+    const q = search.toLowerCase()
+    if (!q) return true
+    if ('title' in item && item.title.toLowerCase().includes(q)) return true
+    if ('name' in item && item.name.toLowerCase().includes(q)) return true
+    if ('user' in item && item.user.toLowerCase().includes(q)) return true
+    return false
+  })
   const loaderRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -55,7 +63,11 @@ export const CommunityFeedPage = () => {
             </button>
           </header>
           <ActivityBar />
-          <FeedFilters filter={filter} onFilterChange={setFilter} />
+          <FeedFilters
+            filter={filter}
+            onFilterChange={setFilter}
+            onSearchChange={setSearch}
+          />
           <FeedList items={filtered} />
           <div ref={loaderRef} className={styles.loader} />
         </main>

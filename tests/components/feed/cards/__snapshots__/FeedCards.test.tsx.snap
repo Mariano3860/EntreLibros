@@ -1321,7 +1321,7 @@ exports[`Feed cards snapshots > seeking card matches snapshots 1`] = `
       class="_content_9f5b00"
     >
       <p>
-        User community.feed.seeking.description
+        community.feed.seeking.description
       </p>
       <button
         aria-label="community.feed.cta.offer_copy"
@@ -1419,7 +1419,7 @@ exports[`Feed cards snapshots > seeking card matches snapshots 2`] = `
       class="_content_9f5b00"
     >
       <p>
-        User community.feed.seeking.description
+        community.feed.seeking.description
       </p>
       <button
         aria-label="community.feed.cta.offer_copy"
@@ -1524,7 +1524,7 @@ exports[`Feed cards snapshots > swap card matches snapshots 1`] = `
       class="_content_9f5b00"
     >
       <p>
-        User community.feed.swap.wants
+        community.feed.swap.wants
       </p>
       <button
         aria-label="community.feed.cta.accept"
@@ -1629,7 +1629,7 @@ exports[`Feed cards snapshots > swap card matches snapshots 2`] = `
       class="_content_9f5b00"
     >
       <p>
-        User community.feed.swap.wants
+        community.feed.swap.wants
       </p>
       <button
         aria-label="community.feed.cta.accept"

@@ -30,7 +30,10 @@ export const SeekingCard = ({ item }: Props) => {
       <FeedActions initialLikes={item.likes} />
       <div className={styles.content}>
         <p>
-          {item.user} {t('community.feed.seeking.description', { title: item.title })}
+          {t('community.feed.seeking.description', {
+            user: item.user,
+            title: item.title,
+          })}
         </p>
         <button
           className={styles.primaryButton}

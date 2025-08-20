@@ -5,7 +5,7 @@ import styles from './FeedFilters.module.scss'
 interface Props {
   filter: string
   onFilterChange: (filter: string) => void
-  onSearchChange?: (q: string) => void
+  onSearchChange: (q: string) => void
 }
 
 export const FeedFilters = ({
@@ -32,7 +32,7 @@ export const FeedFilters = ({
       <input
         aria-label={t('community.feed.search')}
         placeholder={t('community.feed.search') ?? ''}
-        onChange={(e) => onSearchChange?.(e.target.value)}
+        onChange={(e) => onSearchChange(e.target.value)}
       />
       <div className={styles.tabs}>
         {tabs.map((tName) => (
