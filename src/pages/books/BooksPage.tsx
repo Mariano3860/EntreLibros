@@ -1,6 +1,7 @@
 import { BookCard } from '@components/book/BookCard'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { TabsMenu } from '@components/ui/tabs-menu/TabsMenu'
+import { getPathSegment } from '@utils/path'
 import React, { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
@@ -78,7 +79,7 @@ export const BooksPage = () => {
     [t]
   )
 
-  const pathSegment = location.pathname.replace(basePath, '').replace(/^\//, '')
+  const pathSegment = getPathSegment(location.pathname, basePath)
   const activeTab = (tabs.find((tab) => tab.path === pathSegment)?.key ??
     'mine') as 'mine' | 'trade' | 'seeking' | 'sale'
 

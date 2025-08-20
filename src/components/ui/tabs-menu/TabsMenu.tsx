@@ -1,3 +1,4 @@
+import { buildFullPath } from '@utils/path'
 import { Link, useLocation } from 'react-router-dom'
 
 import styles from './TabsMenu.module.scss'
@@ -13,12 +14,12 @@ export const TabsMenu = ({
 
   return (
     <nav className={`${styles.tabs} ${className ?? ''}`} role="tablist">
-      {items.map((item) => {
-        const fullPath = `${basePath}${item.path ? `/${item.path}` : ''}`
+      {items.map((item, index) => {
+        const fullPath = buildFullPath(basePath, item.path)
         const isActive = location.pathname === fullPath
         return (
           <Link
-            key={item.path || item.label}
+            key={index}
             to={fullPath}
             className={`${styles.tab} ${isActive ? styles.active : ''}`}
             role="tab"
