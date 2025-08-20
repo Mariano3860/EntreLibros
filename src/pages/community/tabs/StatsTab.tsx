@@ -117,7 +117,9 @@ export const StatsTab = () => {
           <div className={styles.mapPlaceholder}>
             {activeHousesMapMock.map((pin, idx) => (
               <span
-                key={idx}
+            {activeHousesMapMock.map((pin) => (
+              <span
+                key={pin.id}
                 className={styles.pin}
                 style={{ top: pin.top, left: pin.left }}
               />
