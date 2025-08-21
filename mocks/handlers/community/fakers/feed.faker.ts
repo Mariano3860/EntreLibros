@@ -64,7 +64,6 @@ export const generateFeedItems = (
   size = 8,
   seed?: number
 ): FeedItem[] => {
-  faker.locale = faker.helpers.arrayElement(['es', 'en', 'fr'])
   faker.seed(seed ?? page)
   return Array.from({ length: size }).map(generateItem)
 }

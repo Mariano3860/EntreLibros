@@ -84,5 +84,5 @@ export const generateUserBooks = (seed?: number): ApiUserBook[] => {
     price: b.isForSale
       ? faker.number.int({ min: 8000, max: 20000 })
       : undefined,
-  }))
+  })) as ApiUserBook[]
 }

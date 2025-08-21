@@ -13,15 +13,11 @@ export type LoginResponse = {
     id: string
     email: string
     role: 'user' | 'admin'
-    name?: string
-    lastLogin?: string
   }
-  expiresIn: number
   message: string
 }
 
 export type LoginError = {
   error: 'InvalidCredentials' | 'AccountLocked' | 'MissingFields'
   message: string
-  remainingAttempts?: number
 }
