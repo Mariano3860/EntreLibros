@@ -30,6 +30,7 @@
     "@rsbuild/plugin-svgr": "^1.2.1",
     "@tanstack/react-query": "^5.83.1",
     "@types/react-i18next": "^8.1.0",
+    "@faker-js/faker": "^9.9.0",
     "axios": "^1.11.0",
     "date-fns": "^4.1.0",
     "dotenv": "^17.2.1",

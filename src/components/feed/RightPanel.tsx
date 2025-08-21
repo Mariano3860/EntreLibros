@@ -1,11 +1,13 @@
 import { useTranslation } from 'react-i18next'
 
-import suggestions from '@mocks/data/suggestions.mock'
+import { useSuggestions } from '@src/hooks/api/useSuggestions'
 
 import styles from './RightPanel.module.scss'
 
 export const RightPanel = () => {
   const { t } = useTranslation()
+  const { data } = useSuggestions()
+  const suggestions = data ?? []
 
   return (
     <aside className={styles.panel}>

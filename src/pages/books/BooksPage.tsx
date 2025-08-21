@@ -6,66 +6,17 @@ import React, { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 
-import styles from './BooksPage.module.scss'
-import type { Book } from './BooksPage.types'
+import type { ApiUserBook } from '@src/api/books/userBooks.types'
+import { useUserBooks } from '@src/hooks/api/useUserBooks'
 
-// TODO: reemplazar este arreglo por datos provenientes del backend
-const mockBooks: Book[] = [
-  {
-    id: '1',
-    title: 'Matisse en Bélgica',
-    author: 'Carlos Argan',
-    coverUrl: 'https://covers.openlibrary.org/b/id/9875161-L.jpg',
-    condition: 'bueno',
-    status: 'available',
-    isForSale: true,
-    price: 15000,
-  },
-  {
-    id: '2',
-    title: '1984',
-    author: 'George Orwell',
-    coverUrl: 'https://covers.openlibrary.org/b/id/7222246-L.jpg',
-    condition: 'muy bueno',
-    status: 'reserved',
-    isForTrade: true,
-    tradePreferences: ['Dune', 'Fahrenheit 451'],
-  },
-  {
-    id: '3',
-    title: 'El cuervo',
-    author: 'Edgar Allan Poe',
-    coverUrl: 'https://covers.openlibrary.org/b/id/8231996-L.jpg',
-    condition: 'aceptable',
-    status: 'sold',
-    isForSale: true,
-    price: 12000,
-    isForTrade: true,
-    tradePreferences: ['Lovecraft', 'Drácula', 'Sherlock Holmes'],
-  },
-  {
-    id: '4',
-    title: 'El pulpo invisible',
-    author: 'A. G. Rivadera',
-    coverUrl: 'https://covers.openlibrary.org/b/id/10521241-L.jpg',
-    isSeeking: true,
-  },
-  {
-    id: '5',
-    title: 'Sapiens',
-    author: 'Yuval Noah Harari',
-    coverUrl: 'https://covers.openlibrary.org/b/id/11172236-L.jpg',
-    condition: 'nuevo',
-    status: 'exchanged',
-    isForTrade: true,
-    tradePreferences: ['Homo Deus'],
-  },
-]
+import styles from './BooksPage.module.scss'
 
 export const BooksPage = () => {
   const { t } = useTranslation()
   const location = useLocation()
   const [search, setSearch] = useState('')
+  const { data: booksData } = useUserBooks()
+  const books = Array.isArray(booksData) ? booksData : []
 
   const basePath = '/books'
 
@@ -84,7 +35,7 @@ export const BooksPage = () => {
     'mine') as 'mine' | 'trade' | 'seeking' | 'sale'
 
   // TODO: mover este filtro a un hook reutilizable si se complica
-  const filterByTab = (book: Book) => {
+  const filterByTab = (book: ApiUserBook) => {
     switch (activeTab) {
       case 'trade':
         return !!book.isForTrade
@@ -97,7 +48,7 @@ export const BooksPage = () => {
     }
   }
 
-  const filteredBooks = mockBooks.filter((book) => {
+  const filteredBooks = books.filter((book) => {
     const matchesSearch = `${book.title} ${book.author}`
       .toLowerCase()
       .includes(search.toLowerCase())
