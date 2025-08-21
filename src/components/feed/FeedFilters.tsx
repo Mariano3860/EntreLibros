@@ -29,7 +29,7 @@ export const FeedFilters = ({
 
   return (
     <div className={styles.wrapper}>
-      <label htmlFor="feed-search-input" className={styles.searchLabel}>
+      <label htmlFor="feed-search-input">
         {t('community.feed.search')}
       </label>
       <input
