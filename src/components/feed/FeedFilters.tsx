@@ -29,10 +29,12 @@ export const FeedFilters = ({
 
   return (
     <div className={styles.wrapper}>
-      <label htmlFor="feed-search-input">{t('community.feed.search')}</label>
+      <label htmlFor="feed-search-input" className={styles.searchLabel}>
+        {t('community.feed.search')}
+      </label>
       <input
         id="feed-search-input"
-        placeholder={t('community.feed.search')}
+        placeholder={t('community.feed.search') ?? ''}
         onChange={(e) => onSearchChange(e.target.value)}
       />
       <div className={styles.tabs}>

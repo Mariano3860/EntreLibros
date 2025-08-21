@@ -36,7 +36,6 @@ export const SwapProposalCard = ({ item }: Props) => {
         <section
           aria-label={t('community.feed.swap.proposalAria', {
             user: item.user,
-            defaultValue: `Swap proposal by ${item.user}`,
           })}
         >
           <p>
