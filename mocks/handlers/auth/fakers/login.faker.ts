@@ -2,8 +2,9 @@ import { faker } from '@faker-js/faker'
 
 import { LoginError, LoginResponse } from '@src/api/auth/login.types'
 
-export const generateLoginSuccess = (): LoginResponse => {
-  faker.seed(101)
+export const generateLoginSuccess = (seed = 101): LoginResponse => {
+  faker.locale = faker.helpers.arrayElement(['es', 'en', 'fr'])
+  faker.seed(seed)
   return {
     token: faker.internet.jwt(),
     expiresIn: faker.number.int({ min: 3600, max: 7200 }),
@@ -18,8 +19,8 @@ export const generateLoginSuccess = (): LoginResponse => {
   }
 }
 
-export const generateLoginError = (): LoginError => {
-  faker.seed(102)
+export const generateLoginError = (seed = 102): LoginError => {
+  faker.seed(seed)
   return {
     error: 'InvalidCredentials',
     message: 'auth.errors.invalid_credentials',

@@ -2,8 +2,9 @@ import { faker } from '@faker-js/faker'
 
 import { CommunityStats } from '@src/api/community/communityStats.types'
 
-export const generateCommunityStats = (): CommunityStats => {
-  faker.seed(301)
+export const generateCommunityStats = (seed = 301): CommunityStats => {
+  faker.locale = faker.helpers.arrayElement(['es', 'en', 'fr'])
+  faker.seed(seed)
 
   const kpis = {
     exchanges: 134,

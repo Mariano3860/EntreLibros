@@ -2,8 +2,9 @@ import { faker } from '@faker-js/faker'
 
 import { RegisterError, RegisterResponse } from '@src/api/auth/register.types'
 
-export const generateRegisterSuccess = (): RegisterResponse => {
-  faker.seed(105)
+export const generateRegisterSuccess = (seed = 105): RegisterResponse => {
+  faker.locale = faker.helpers.arrayElement(['es', 'en', 'fr'])
+  faker.seed(seed)
   return {
     token: faker.internet.jwt(),
     user: {
@@ -16,7 +17,7 @@ export const generateRegisterSuccess = (): RegisterResponse => {
   }
 }
 
-export const generateRegisterError = (): RegisterError => ({
+export const generateRegisterError = (seed = 106): RegisterError => ({
   error: 'EmailExists',
   message: 'auth.errors.email_exists',
 })
