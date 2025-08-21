@@ -31,6 +31,8 @@
     "home": "Inicio",
     "books": "Mis Libros",
     "community": "Comunidad",
+    "messages": "Mensajes",
+    "stats": "Estadísticas",
     "contact": "Contacto"
   },
   "contact": {
@@ -183,6 +185,48 @@
       "hotSearches": {
         "title": "Lo más buscado"
       }
+    },
+    "feed": {
+      "tabs": {
+        "all": "Todos",
+        "book": "Libros",
+        "swap": "Intercambios",
+        "sale": "En venta",
+        "seeking": "Buscando",
+        "review": "Reseñas",
+        "event": "Eventos",
+        "house": "Casitas",
+        "person": "Personas"
+      },
+      "search": "Buscar en el feed",
+      "cta": {
+        "publish": "Publicar",
+        "propose_swap": "Proponer intercambio",
+        "accept": "Aceptar",
+        "buy": "Comprar",
+        "offer_copy": "Ofrecer mi copia",
+        "helpful": "Útil",
+        "go": "Voy",
+        "open_map": "Abrir en el mapa",
+        "message": "Mensaje"
+      },
+      "actions": {
+        "like": "Me gusta",
+        "comment": "Comentar",
+        "share": "Compartir"
+      },
+      "swap": {
+        "wants": "{{user}} quiere intercambiar tu {{offered}} por {{requested}}",
+        "proposalAria": "Propuesta de intercambio de {{user}}",
+        "user": "Usuario",
+        "offered": "Ofrece",
+        "requested": "Solicita"
+      },
+      "sale": { "price": "Precio: ${{price}}" },
+      "seeking": { "description": "{{user}} busca {{title}}" },
+      "house": { "distance": "A {{distance}} km" },
+      "person": { "match": "Coincidencia {{match}}%" },
+      "suggestions": "Sugerencias"
     }
   }
 }

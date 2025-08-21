@@ -1,0 +1,44 @@
+@import '@styles/variables';
+
+.bar {
+  display: flex;
+  overflow-x: auto;
+  gap: $spacing-3;
+  padding: $spacing-2 0;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  position: relative;
+}
+
+.bar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: rem(32px);
+  height: 100%;
+  pointer-events: none;
+  background: linear-gradient(
+    to right,
+    rgb(0 0 0 / 0%),
+    var(--background-primary)
+  );
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: rem(12px);
+}
+
+.item img {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  margin-bottom: $spacing-1;
+}

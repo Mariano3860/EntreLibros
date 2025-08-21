@@ -1,0 +1,52 @@
+@import '@styles/variables';
+
+.wrapper {
+  margin-bottom: $spacing-4;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+.searchLabel {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  white-space: nowrap;
+  border: 0;
+}
+
+input {
+  padding: $spacing-1x5 $spacing-2;
+  border: 1px solid var(--border-color);
+  border-radius: rem(8px);
+  background: var(--background-card);
+  color: var(--text-primary);
+}
+
+.tabs {
+  display: flex;
+  gap: $spacing-2;
+  flex-wrap: wrap;
+}
+
+.tabs button {
+  background: none;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: $spacing-1 $spacing-2;
+  border-radius: rem(16px);
+  cursor: pointer;
+}
+
+.tabs button:hover {
+  background: var(--background-card);
+}
+
+.active {
+  background: var(--primary-color);
+  color: #fff;
+  border-color: var(--primary-color);
+}

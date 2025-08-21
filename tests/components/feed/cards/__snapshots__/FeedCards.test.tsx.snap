@@ -1,0 +1,1695 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Feed cards snapshots > book card matches snapshot (dark/es) 1`] = `
+<DocumentFragment>
+  <article
+    class="_card_9f5b00"
+  >
+    <header
+      class="_header_9f5b00"
+    >
+      <img
+        alt="User"
+        src="https://i.pravatar.cc/100?img=1"
+      />
+      <span>
+        User
+      </span>
+    </header>
+    <img
+      alt="Dune"
+      class="_image_9f5b00"
+      src="https://picsum.photos/seed/dune/600/400"
+    />
+    <div
+      class="_actions_4a79c8"
+    >
+      <button
+        aria-label="community.feed.actions.like"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="community.feed.actions.comment"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="community.feed.actions.share"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M4 12l16-8-4 16-4-6-8-2z"
+          />
+        </svg>
+      </button>
+      <span
+        class="_likes_4a79c8"
+      >
+        0
+      </span>
+    </div>
+    <div
+      class="_content_9f5b00"
+    >
+      <h3
+        class="_title_9f5b00"
+      >
+        Dune
+      </h3>
+      <p>
+        Frank Herbert
+      </p>
+      <button
+        aria-label="community.feed.cta.propose_swap"
+        class="_primaryButton_9f5b00"
+      >
+        community.feed.cta.propose_swap
+      </button>
+    </div>
+  </article>
+</DocumentFragment>
+`;
+
+exports[`Feed cards snapshots > book card matches snapshot (light/en) 1`] = `
+<DocumentFragment>
+  <article
+    class="_card_9f5b00"
+  >
+    <header
+      class="_header_9f5b00"
+    >
+      <img
+        alt="User"
+        src="https://i.pravatar.cc/100?img=1"
+      />
+      <span>
+        User
+      </span>
+    </header>
+    <img
+      alt="Dune"
+      class="_image_9f5b00"
+      src="https://picsum.photos/seed/dune/600/400"
+    />
+    <div
+      class="_actions_4a79c8"
+    >
+      <button
+        aria-label="community.feed.actions.like"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="community.feed.actions.comment"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="community.feed.actions.share"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M4 12l16-8-4 16-4-6-8-2z"
+          />
+        </svg>
+      </button>
+      <span
+        class="_likes_4a79c8"
+      >
+        0
+      </span>
+    </div>
+    <div
+      class="_content_9f5b00"
+    >
+      <h3
+        class="_title_9f5b00"
+      >
+        Dune
+      </h3>
+      <p>
+        Frank Herbert
+      </p>
+      <button
+        aria-label="community.feed.cta.propose_swap"
+        class="_primaryButton_9f5b00"
+      >
+        community.feed.cta.propose_swap
+      </button>
+    </div>
+  </article>
+</DocumentFragment>
+`;
+
+exports[`Feed cards snapshots > event card matches snapshot (dark/es) 1`] = `
+<DocumentFragment>
+  <article
+    class="_card_9f5b00"
+  >
+    <header
+      class="_header_9f5b00"
+    >
+      <img
+        alt="User"
+        src="https://i.pravatar.cc/100?img=1"
+      />
+      <span>
+        User
+      </span>
+    </header>
+    <img
+      alt="Book Fair"
+      class="_image_9f5b00"
+      src="https://picsum.photos/seed/Book Fair/600/400"
+    />
+    <div
+      class="_actions_4a79c8"
+    >
+      <button
+        aria-label="community.feed.actions.like"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="community.feed.actions.comment"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="community.feed.actions.share"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M4 12l16-8-4 16-4-6-8-2z"
+          />
+        </svg>
+      </button>
+      <span
+        class="_likes_4a79c8"
+      >
+        0
+      </span>
+    </div>
+    <div
+      class="_content_9f5b00"
+    >
+      <h3
+        class="_title_9f5b00"
+      >
+        Book Fair
+      </h3>
+      <p>
+        2025-01-01 · Casita Centro
+      </p>
+      <button
+        aria-label="community.feed.cta.go"
+        class="_primaryButton_9f5b00"
+      >
+        community.feed.cta.go
+      </button>
+    </div>
+  </article>
+</DocumentFragment>
+`;
+
+exports[`Feed cards snapshots > event card matches snapshot (light/en) 1`] = `
+<DocumentFragment>
+  <article
+    class="_card_9f5b00"
+  >
+    <header
+      class="_header_9f5b00"
+    >
+      <img
+        alt="User"
+        src="https://i.pravatar.cc/100?img=1"
+      />
+      <span>
+        User
+      </span>
+    </header>
+    <img
+      alt="Book Fair"
+      class="_image_9f5b00"
+      src="https://picsum.photos/seed/Book Fair/600/400"
+    />
+    <div
+      class="_actions_4a79c8"
+    >
+      <button
+        aria-label="community.feed.actions.like"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="community.feed.actions.comment"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="community.feed.actions.share"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M4 12l16-8-4 16-4-6-8-2z"
+          />
+        </svg>
+      </button>
+      <span
+        class="_likes_4a79c8"
+      >
+        0
+      </span>
+    </div>
+    <div
+      class="_content_9f5b00"
+    >
+      <h3
+        class="_title_9f5b00"
+      >
+        Book Fair
+      </h3>
+      <p>
+        2025-01-01 · Casita Centro
+      </p>
+      <button
+        aria-label="community.feed.cta.go"
+        class="_primaryButton_9f5b00"
+      >
+        community.feed.cta.go
+      </button>
+    </div>
+  </article>
+</DocumentFragment>
+`;
+
+exports[`Feed cards snapshots > house card matches snapshot (dark/es) 1`] = `
+<DocumentFragment>
+  <article
+    class="_card_9f5b00"
+  >
+    <header
+      class="_header_9f5b00"
+    >
+      <img
+        alt="User"
+        src="https://i.pravatar.cc/100?img=1"
+      />
+      <span>
+        User
+      </span>
+    </header>
+    <img
+      alt="Casita Norte"
+      class="_image_9f5b00"
+      src="https://picsum.photos/seed/Casita Norte/600/400"
+    />
+    <div
+      class="_actions_4a79c8"
+    >
+      <button
+        aria-label="community.feed.actions.like"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="community.feed.actions.comment"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="community.feed.actions.share"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M4 12l16-8-4 16-4-6-8-2z"
+          />
+        </svg>
+      </button>
+      <span
+        class="_likes_4a79c8"
+      >
+        0
+      </span>
+    </div>
+    <div
+      class="_content_9f5b00"
+    >
+      <h3
+        class="_title_9f5b00"
+      >
+        Casita Norte
+      </h3>
+      <p>
+        community.feed.house.distance
+      </p>
+      <button
+        aria-label="community.feed.cta.open_map"
+        class="_secondaryButton_9f5b00"
+      >
+        community.feed.cta.open_map
+      </button>
+    </div>
+  </article>
+</DocumentFragment>
+`;
+
+exports[`Feed cards snapshots > house card matches snapshot (light/en) 1`] = `
+<DocumentFragment>
+  <article
+    class="_card_9f5b00"
+  >
+    <header
+      class="_header_9f5b00"
+    >
+      <img
+        alt="User"
+        src="https://i.pravatar.cc/100?img=1"
+      />
+      <span>
+        User
+      </span>
+    </header>
+    <img
+      alt="Casita Norte"
+      class="_image_9f5b00"
+      src="https://picsum.photos/seed/Casita Norte/600/400"
+    />
+    <div
+      class="_actions_4a79c8"
+    >
+      <button
+        aria-label="community.feed.actions.like"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="community.feed.actions.comment"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="community.feed.actions.share"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M4 12l16-8-4 16-4-6-8-2z"
+          />
+        </svg>
+      </button>
+      <span
+        class="_likes_4a79c8"
+      >
+        0
+      </span>
+    </div>
+    <div
+      class="_content_9f5b00"
+    >
+      <h3
+        class="_title_9f5b00"
+      >
+        Casita Norte
+      </h3>
+      <p>
+        community.feed.house.distance
+      </p>
+      <button
+        aria-label="community.feed.cta.open_map"
+        class="_secondaryButton_9f5b00"
+      >
+        community.feed.cta.open_map
+      </button>
+    </div>
+  </article>
+</DocumentFragment>
+`;
+
+exports[`Feed cards snapshots > person card matches snapshot (dark/es) 1`] = `
+<DocumentFragment>
+  <article
+    class="_card_9f5b00"
+  >
+    <header
+      class="_header_9f5b00"
+    >
+      <img
+        alt="User"
+        src="https://i.pravatar.cc/100?img=1"
+      />
+      <span>
+        User
+      </span>
+    </header>
+    <img
+      alt="Carlos"
+      class="_image_9f5b00"
+      src="https://i.pravatar.cc/100?img=1"
+    />
+    <div
+      class="_actions_4a79c8"
+    >
+      <button
+        aria-label="community.feed.actions.like"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="community.feed.actions.comment"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="community.feed.actions.share"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M4 12l16-8-4 16-4-6-8-2z"
+          />
+        </svg>
+      </button>
+      <span
+        class="_likes_4a79c8"
+      >
+        0
+      </span>
+    </div>
+    <div
+      class="_content_9f5b00"
+    >
+      <h3
+        class="_title_9f5b00"
+      >
+        Carlos
+      </h3>
+      <p>
+        community.feed.person.match
+      </p>
+      <button
+        aria-label="community.feed.cta.message"
+        class="_primaryButton_9f5b00"
+      >
+        community.feed.cta.message
+      </button>
+    </div>
+  </article>
+</DocumentFragment>
+`;
+
+exports[`Feed cards snapshots > person card matches snapshot (light/en) 1`] = `
+<DocumentFragment>
+  <article
+    class="_card_9f5b00"
+  >
+    <header
+      class="_header_9f5b00"
+    >
+      <img
+        alt="User"
+        src="https://i.pravatar.cc/100?img=1"
+      />
+      <span>
+        User
+      </span>
+    </header>
+    <img
+      alt="Carlos"
+      class="_image_9f5b00"
+      src="https://i.pravatar.cc/100?img=1"
+    />
+    <div
+      class="_actions_4a79c8"
+    >
+      <button
+        aria-label="community.feed.actions.like"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="community.feed.actions.comment"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="community.feed.actions.share"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M4 12l16-8-4 16-4-6-8-2z"
+          />
+        </svg>
+      </button>
+      <span
+        class="_likes_4a79c8"
+      >
+        0
+      </span>
+    </div>
+    <div
+      class="_content_9f5b00"
+    >
+      <h3
+        class="_title_9f5b00"
+      >
+        Carlos
+      </h3>
+      <p>
+        community.feed.person.match
+      </p>
+      <button
+        aria-label="community.feed.cta.message"
+        class="_primaryButton_9f5b00"
+      >
+        community.feed.cta.message
+      </button>
+    </div>
+  </article>
+</DocumentFragment>
+`;
+
+exports[`Feed cards snapshots > review card matches snapshot (dark/es) 1`] = `
+<DocumentFragment>
+  <article
+    class="_card_9f5b00"
+  >
+    <header
+      class="_header_9f5b00"
+    >
+      <img
+        alt="User"
+        src="https://i.pravatar.cc/100?img=1"
+      />
+      <span>
+        User
+      </span>
+    </header>
+    <img
+      alt="Dune"
+      class="_image_9f5b00"
+      src="https://picsum.photos/seed/Dune/600/400"
+    />
+    <div
+      class="_actions_4a79c8"
+    >
+      <button
+        aria-label="community.feed.actions.like"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="community.feed.actions.comment"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="community.feed.actions.share"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M4 12l16-8-4 16-4-6-8-2z"
+          />
+        </svg>
+      </button>
+      <span
+        class="_likes_4a79c8"
+      >
+        0
+      </span>
+    </div>
+    <div
+      class="_content_9f5b00"
+    >
+      <h3
+        class="_title_9f5b00"
+      >
+        Dune
+      </h3>
+      <p>
+        Great book
+      </p>
+      <button
+        aria-label="community.feed.cta.helpful"
+        class="_secondaryButton_9f5b00"
+      >
+        community.feed.cta.helpful
+      </button>
+    </div>
+  </article>
+</DocumentFragment>
+`;
+
+exports[`Feed cards snapshots > review card matches snapshot (light/en) 1`] = `
+<DocumentFragment>
+  <article
+    class="_card_9f5b00"
+  >
+    <header
+      class="_header_9f5b00"
+    >
+      <img
+        alt="User"
+        src="https://i.pravatar.cc/100?img=1"
+      />
+      <span>
+        User
+      </span>
+    </header>
+    <img
+      alt="Dune"
+      class="_image_9f5b00"
+      src="https://picsum.photos/seed/Dune/600/400"
+    />
+    <div
+      class="_actions_4a79c8"
+    >
+      <button
+        aria-label="community.feed.actions.like"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="community.feed.actions.comment"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="community.feed.actions.share"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M4 12l16-8-4 16-4-6-8-2z"
+          />
+        </svg>
+      </button>
+      <span
+        class="_likes_4a79c8"
+      >
+        0
+      </span>
+    </div>
+    <div
+      class="_content_9f5b00"
+    >
+      <h3
+        class="_title_9f5b00"
+      >
+        Dune
+      </h3>
+      <p>
+        Great book
+      </p>
+      <button
+        aria-label="community.feed.cta.helpful"
+        class="_secondaryButton_9f5b00"
+      >
+        community.feed.cta.helpful
+      </button>
+    </div>
+  </article>
+</DocumentFragment>
+`;
+
+exports[`Feed cards snapshots > sale card matches snapshot (dark/es) 1`] = `
+<DocumentFragment>
+  <article
+    class="_card_9f5b00"
+  >
+    <header
+      class="_header_9f5b00"
+    >
+      <img
+        alt="User"
+        src="https://i.pravatar.cc/100?img=1"
+      />
+      <span>
+        User
+      </span>
+    </header>
+    <img
+      alt="Foundation"
+      class="_image_9f5b00"
+      src="https://picsum.photos/seed/foundation/600/400"
+    />
+    <div
+      class="_actions_4a79c8"
+    >
+      <button
+        aria-label="community.feed.actions.like"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="community.feed.actions.comment"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="community.feed.actions.share"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M4 12l16-8-4 16-4-6-8-2z"
+          />
+        </svg>
+      </button>
+      <span
+        class="_likes_4a79c8"
+      >
+        0
+      </span>
+    </div>
+    <div
+      class="_content_9f5b00"
+    >
+      <h3
+        class="_title_9f5b00"
+      >
+        Foundation
+      </h3>
+      <p>
+        community.feed.sale.price
+      </p>
+      <button
+        aria-label="community.feed.cta.buy"
+        class="_primaryButton_9f5b00"
+      >
+        community.feed.cta.buy
+      </button>
+    </div>
+  </article>
+</DocumentFragment>
+`;
+
+exports[`Feed cards snapshots > sale card matches snapshot (light/en) 1`] = `
+<DocumentFragment>
+  <article
+    class="_card_9f5b00"
+  >
+    <header
+      class="_header_9f5b00"
+    >
+      <img
+        alt="User"
+        src="https://i.pravatar.cc/100?img=1"
+      />
+      <span>
+        User
+      </span>
+    </header>
+    <img
+      alt="Foundation"
+      class="_image_9f5b00"
+      src="https://picsum.photos/seed/foundation/600/400"
+    />
+    <div
+      class="_actions_4a79c8"
+    >
+      <button
+        aria-label="community.feed.actions.like"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="community.feed.actions.comment"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="community.feed.actions.share"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M4 12l16-8-4 16-4-6-8-2z"
+          />
+        </svg>
+      </button>
+      <span
+        class="_likes_4a79c8"
+      >
+        0
+      </span>
+    </div>
+    <div
+      class="_content_9f5b00"
+    >
+      <h3
+        class="_title_9f5b00"
+      >
+        Foundation
+      </h3>
+      <p>
+        community.feed.sale.price
+      </p>
+      <button
+        aria-label="community.feed.cta.buy"
+        class="_primaryButton_9f5b00"
+      >
+        community.feed.cta.buy
+      </button>
+    </div>
+  </article>
+</DocumentFragment>
+`;
+
+exports[`Feed cards snapshots > seeking card matches snapshot (dark/es) 1`] = `
+<DocumentFragment>
+  <article
+    class="_card_9f5b00"
+  >
+    <header
+      class="_header_9f5b00"
+    >
+      <img
+        alt="User"
+        src="https://i.pravatar.cc/100?img=1"
+      />
+      <span>
+        User
+      </span>
+    </header>
+    <img
+      alt="Sapiens"
+      class="_image_9f5b00"
+      src="https://picsum.photos/seed/Sapiens/600/400"
+    />
+    <div
+      class="_actions_4a79c8"
+    >
+      <button
+        aria-label="community.feed.actions.like"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="community.feed.actions.comment"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="community.feed.actions.share"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M4 12l16-8-4 16-4-6-8-2z"
+          />
+        </svg>
+      </button>
+      <span
+        class="_likes_4a79c8"
+      >
+        0
+      </span>
+    </div>
+    <div
+      class="_content_9f5b00"
+    >
+      <p>
+        community.feed.seeking.description
+      </p>
+      <button
+        aria-label="community.feed.cta.offer_copy"
+        class="_primaryButton_9f5b00"
+      >
+        community.feed.cta.offer_copy
+      </button>
+    </div>
+  </article>
+</DocumentFragment>
+`;
+
+exports[`Feed cards snapshots > seeking card matches snapshot (light/en) 1`] = `
+<DocumentFragment>
+  <article
+    class="_card_9f5b00"
+  >
+    <header
+      class="_header_9f5b00"
+    >
+      <img
+        alt="User"
+        src="https://i.pravatar.cc/100?img=1"
+      />
+      <span>
+        User
+      </span>
+    </header>
+    <img
+      alt="Sapiens"
+      class="_image_9f5b00"
+      src="https://picsum.photos/seed/Sapiens/600/400"
+    />
+    <div
+      class="_actions_4a79c8"
+    >
+      <button
+        aria-label="community.feed.actions.like"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="community.feed.actions.comment"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="community.feed.actions.share"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M4 12l16-8-4 16-4-6-8-2z"
+          />
+        </svg>
+      </button>
+      <span
+        class="_likes_4a79c8"
+      >
+        0
+      </span>
+    </div>
+    <div
+      class="_content_9f5b00"
+    >
+      <p>
+        community.feed.seeking.description
+      </p>
+      <button
+        aria-label="community.feed.cta.offer_copy"
+        class="_primaryButton_9f5b00"
+      >
+        community.feed.cta.offer_copy
+      </button>
+    </div>
+  </article>
+</DocumentFragment>
+`;
+
+exports[`Feed cards snapshots > swap card matches snapshot (dark/es) 1`] = `
+<DocumentFragment>
+  <article
+    class="_card_9f5b00"
+  >
+    <header
+      class="_header_9f5b00"
+    >
+      <img
+        alt="User"
+        src="https://i.pravatar.cc/100?img=1"
+      />
+      <span>
+        User
+      </span>
+    </header>
+    <div
+      class="_swapImages_9f5b00"
+    >
+      <img
+        alt="1984"
+        src="https://picsum.photos/seed/1984/600/400"
+      />
+      <img
+        alt="The Hobbit"
+        src="https://picsum.photos/seed/The Hobbit/600/400"
+      />
+    </div>
+    <div
+      class="_actions_4a79c8"
+    >
+      <button
+        aria-label="community.feed.actions.like"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="community.feed.actions.comment"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="community.feed.actions.share"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M4 12l16-8-4 16-4-6-8-2z"
+          />
+        </svg>
+      </button>
+      <span
+        class="_likes_4a79c8"
+      >
+        0
+      </span>
+    </div>
+    <div
+      class="_content_9f5b00"
+    >
+      <section
+        aria-label="community.feed.swap.proposalAria"
+      >
+        <p>
+          community.feed.swap.wants
+        </p>
+        <dl
+          class="_srOnly_9f5b00"
+        >
+          <dt>
+            community.feed.swap.user
+          </dt>
+          <dd>
+            User
+          </dd>
+          <dt>
+            community.feed.swap.offered
+          </dt>
+          <dd>
+            1984
+          </dd>
+          <dt>
+            community.feed.swap.requested
+          </dt>
+          <dd>
+            The Hobbit
+          </dd>
+        </dl>
+      </section>
+      <button
+        aria-label="community.feed.cta.accept"
+        class="_primaryButton_9f5b00"
+      >
+        community.feed.cta.accept
+      </button>
+    </div>
+  </article>
+</DocumentFragment>
+`;
+
+exports[`Feed cards snapshots > swap card matches snapshot (light/en) 1`] = `
+<DocumentFragment>
+  <article
+    class="_card_9f5b00"
+  >
+    <header
+      class="_header_9f5b00"
+    >
+      <img
+        alt="User"
+        src="https://i.pravatar.cc/100?img=1"
+      />
+      <span>
+        User
+      </span>
+    </header>
+    <div
+      class="_swapImages_9f5b00"
+    >
+      <img
+        alt="1984"
+        src="https://picsum.photos/seed/1984/600/400"
+      />
+      <img
+        alt="The Hobbit"
+        src="https://picsum.photos/seed/The Hobbit/600/400"
+      />
+    </div>
+    <div
+      class="_actions_4a79c8"
+    >
+      <button
+        aria-label="community.feed.actions.like"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="community.feed.actions.comment"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+          />
+        </svg>
+      </button>
+      <button
+        aria-label="community.feed.actions.share"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M4 12l16-8-4 16-4-6-8-2z"
+          />
+        </svg>
+      </button>
+      <span
+        class="_likes_4a79c8"
+      >
+        0
+      </span>
+    </div>
+    <div
+      class="_content_9f5b00"
+    >
+      <section
+        aria-label="community.feed.swap.proposalAria"
+      >
+        <p>
+          community.feed.swap.wants
+        </p>
+        <dl
+          class="_srOnly_9f5b00"
+        >
+          <dt>
+            community.feed.swap.user
+          </dt>
+          <dd>
+            User
+          </dd>
+          <dt>
+            community.feed.swap.offered
+          </dt>
+          <dd>
+            1984
+          </dd>
+          <dt>
+            community.feed.swap.requested
+          </dt>
+          <dd>
+            The Hobbit
+          </dd>
+        </dl>
+      </section>
+      <button
+        aria-label="community.feed.cta.accept"
+        class="_primaryButton_9f5b00"
+      >
+        community.feed.cta.accept
+      </button>
+    </div>
+  </article>
+</DocumentFragment>
+`;
