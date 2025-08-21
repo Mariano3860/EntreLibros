@@ -213,7 +213,8 @@
       "actions": {
         "like": "Me gusta",
         "comment": "Comentar",
-        "share": "Compartir"
+        "share": "Compartir",
+        "likes": "Me gusta"
       },
       "swap": {
         "wants": "{{user}} quiere intercambiar tu {{offered}} por {{requested}}",
