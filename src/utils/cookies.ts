@@ -25,7 +25,12 @@ export const getCookie = (name: string): string | undefined => {
   return document.cookie
     .split('; ')
     .find((row) => row.startsWith(`${name}=`))
-    ?.split('=')[1]
+    ?.split('=')[1] && decodeURIComponent(
+      (document.cookie
+        .split('; ')
+        .find((row) => row.startsWith(`${name}=`))
+        ?.split('=')[1]) as string
+    )
 }
 
 export default clearAllCookies
