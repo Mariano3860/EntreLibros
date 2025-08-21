@@ -5,9 +5,11 @@ Este documento describe los endpoints que el backend de EntreLibros deberá expo
 ## Autenticación
 
 ### `POST /auth/login`
+
 Inicia sesión de un usuario válido.
 
 **Request**
+
 ```json
 {
   "email": "user@entrelibros.com",
@@ -16,6 +18,7 @@ Inicia sesión de un usuario válido.
 ```
 
 **Respuesta 200**
+
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -27,9 +30,11 @@ Inicia sesión de un usuario válido.
   "message": "auth.success.login"
 }
 ```
+
 La cookie `sessionToken` se envía en la cabecera `Set-Cookie` para mantener la sesión.
 
 **Errores comunes**
+
 - `401 Unauthorized` cuando las credenciales no son válidas:
   ```json
   {
@@ -39,25 +44,30 @@ La cookie `sessionToken` se envía en la cabecera `Set-Cookie` para mantener la 
   ```
 
 ### `POST /auth/logout`
+
 Cierra la sesión activa.
 
 **Request**: requiere la cookie `sessionToken` válida.
 
 **Respuesta 200**
+
 ```json
 {
   "message": "Successfully logged out",
   "timestamp": "2024-02-20T15:00:00Z"
 }
 ```
+
 El backend debe invalidar la cookie de sesión.
 
 ### `GET /auth/me`
+
 Devuelve la información del usuario autenticado.
 
 **Request**: requiere la cookie `sessionToken`.
 
 **Respuesta 200**
+
 ```json
 {
   "id": "u_1",
@@ -67,14 +77,17 @@ Devuelve la información del usuario autenticado.
 ```
 
 **Respuesta 401**
+
 ```json
 { "error": "Unauthorized" }
 ```
 
 ### `POST /auth/register`
+
 Registra un nuevo usuario.
 
 **Request**
+
 ```json
 {
   "name": "Jane Doe",
@@ -84,6 +97,7 @@ Registra un nuevo usuario.
 ```
 
 **Respuesta 201**
+
 ```json
 {
   "token": "fake-register-token",
@@ -97,6 +111,7 @@ Registra un nuevo usuario.
 ```
 
 **Errores comunes**
+
 - `409 Conflict` si el email ya existe:
   ```json
   {
@@ -108,9 +123,11 @@ Registra un nuevo usuario.
 ## Formularios y contacto
 
 ### `POST /contact/submit`
+
 Envía el formulario de contacto.
 
 **Request**
+
 ```json
 {
   "name": "María Pérez",
@@ -120,6 +137,7 @@ Envía el formulario de contacto.
 ```
 
 **Respuesta 200**
+
 ```json
 {
   "message": "¡Gracias por tu mensaje! Te responderemos lo antes posible."
@@ -127,14 +145,17 @@ Envía el formulario de contacto.
 ```
 
 **Errores**
+
 - `400 Bad Request` o `500 Internal Server Error` con el campo `message` describiendo el problema.
 
 ## Libros
 
 ### `GET /books`
+
 Obtiene el listado público de libros disponibles.
 
 **Respuesta 200**
+
 ```json
 [
   {
@@ -146,9 +167,11 @@ Obtiene el listado público de libros disponibles.
 ```
 
 ### `GET /books/mine`
+
 Devuelve los libros publicados por el usuario autenticado.
 
 **Respuesta 200**
+
 ```json
 [
   {
@@ -167,9 +190,11 @@ Devuelve los libros publicados por el usuario autenticado.
 ## Comunidad
 
 ### `GET /community/stats`
+
 Estadísticas agregadas de la comunidad.
 
 **Respuesta 200**
+
 ```json
 {
   "kpis": {
@@ -184,14 +209,17 @@ Estadísticas agregadas de la comunidad.
 ```
 
 ### `GET /community/feed`
+
 Listado paginado de actividad de la comunidad.
 
 **Query params**
+
 - `page` (opcional, por defecto `0`)
 - `size` (opcional, por defecto `8`)
 
 **Respuesta 200**
 Arreglo de elementos que varían según el campo `type` (`book`, `swap`, `sale`, `seeking`, etc.):
+
 ```json
 [
   {
@@ -209,21 +237,21 @@ Arreglo de elementos que varían según el campo `type` (`book`, `swap`, `sale`,
 ```
 
 ### `GET /community/activity`
+
 Última actividad breve de usuarios.
 
 **Respuesta 200**
+
 ```json
-[
-  { "id": "uuid", "user": "Lucía", "avatar": "https://example.com/avatar.png" }
-]
+[{ "id": "uuid", "user": "Lucía", "avatar": "https://example.com/avatar.png" }]
 ```
 
 ### `GET /community/suggestions`
+
 Usuarios sugeridos para seguir.
 
 **Respuesta 200**
+
 ```json
-[
-  { "id": "uuid", "user": "Pedro", "avatar": "https://example.com/avatar.png" }
-]
+[{ "id": "uuid", "user": "Pedro", "avatar": "https://example.com/avatar.png" }]
 ```
