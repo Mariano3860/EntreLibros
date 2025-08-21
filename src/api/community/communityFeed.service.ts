@@ -1,6 +1,7 @@
+import { FeedItem } from '@components/feed/FeedItem.types'
+
 import { apiClient } from '@src/api/axios'
 import { RELATIVE_API_ROUTES } from '@src/api/routes'
-import { FeedItem } from '@components/feed/FeedItem.types'
 
 export const fetchCommunityFeed = async (
   page = 0,

@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw'
 
 import { RELATIVE_API_ROUTES } from '@src/api/routes'
+
 import { generateActivityItems } from './fakers/activity.faker'
 
 export const activityHandler = http.get(

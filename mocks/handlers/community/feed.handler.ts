@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw'
 
 import { RELATIVE_API_ROUTES } from '@src/api/routes'
+
 import { generateFeedItems } from './fakers/feed.faker'
 
 export const communityFeedHandler = http.get(

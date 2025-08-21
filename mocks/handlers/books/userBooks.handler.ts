@@ -1,7 +1,7 @@
 import { http, HttpResponse } from 'msw'
 
-import { RELATIVE_API_ROUTES } from '@src/api/routes'
 import { ApiUserBook } from '@src/api/books/userBooks.types'
+import { RELATIVE_API_ROUTES } from '@src/api/routes'
 
 import books from './fixtures/userBooks.json'
 

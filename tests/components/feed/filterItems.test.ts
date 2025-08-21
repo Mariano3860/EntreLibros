@@ -1,8 +1,9 @@
+import { FeedItem } from '@components/feed/FeedItem.types'
 import { describe, expect, test } from 'vitest'
 
 import { filterItems } from '@src/components/feed/filterItems'
 
-const feedMock = [
+const feedMock: FeedItem[] = [
   {
     type: 'book',
     id: 'b1',

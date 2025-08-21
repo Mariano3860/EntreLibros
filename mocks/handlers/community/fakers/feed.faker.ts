@@ -1,6 +1,5 @@
-import { faker } from '@faker-js/faker'
-
 import { FeedItem } from '@components/feed/FeedItem.types'
+import { faker } from '@faker-js/faker'
 
 const generateItem = (): FeedItem => {
   const base = {

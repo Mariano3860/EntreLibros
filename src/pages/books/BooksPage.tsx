@@ -6,9 +6,10 @@ import React, { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 
-import styles from './BooksPage.module.scss'
-import { useUserBooks } from '@src/hooks/api/useUserBooks'
 import type { ApiUserBook } from '@src/api/books/userBooks.types'
+import { useUserBooks } from '@src/hooks/api/useUserBooks'
+
+import styles from './BooksPage.module.scss'
 
 export const BooksPage = () => {
   const { t } = useTranslation()
