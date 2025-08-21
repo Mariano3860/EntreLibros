@@ -34,7 +34,7 @@ export const SwapProposalCard = ({ item }: Props) => {
       <FeedActions initialLikes={item.likes} />
       <div className={styles.content}>
         <section
-          aria-label={t('community.feed.swap.proposalAria', { user: item.user })}
+          aria-label={t('community.feed.swap.proposalAria', { user: item.user, defaultValue: `Swap proposal by ${item.user}` })}
         >
           <p>
             {t('community.feed.swap.wants', {
