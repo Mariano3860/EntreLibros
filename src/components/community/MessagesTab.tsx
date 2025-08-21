@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import styles from '../CommunityPage.module.scss'
+import styles from './CommunityTabs.module.scss'
 
 export const MessagesTab = () => {
   const { t } = useTranslation()
