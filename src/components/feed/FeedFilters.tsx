@@ -34,7 +34,7 @@ export const FeedFilters = ({
       </label>
       <input
         id="feed-search-input"
-        placeholder={t('community.feed.search') ?? ''}
+        placeholder={t('community.feed.search')}
         onChange={(e) => onSearchChange(e.target.value)}
       />
       <div className={styles.tabs}>
