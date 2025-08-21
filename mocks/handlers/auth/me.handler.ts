@@ -1,10 +1,7 @@
 import { RELATIVE_API_ROUTES } from '@api/routes'
 import { http, HttpResponse } from 'msw'
 
-import {
-  generateMeUser,
-  generateUnauthorized,
-} from './fakers/me.faker'
+import { generateMeUser, generateUnauthorized } from './fakers/me.faker'
 
 const successUser = generateMeUser()
 const unauthorizedBody = generateUnauthorized()

@@ -5,10 +5,7 @@ import { RELATIVE_API_ROUTES } from '@src/api/routes'
 
 import { DEFAULT_EMAIL, DEFAULT_PASS } from '../../constants/constants'
 
-import {
-  generateLoginError,
-  generateLoginSuccess,
-} from './fakers/login.faker'
+import { generateLoginError, generateLoginSuccess } from './fakers/login.faker'
 import { setLoggedInState } from './me.handler'
 
 export const loginHandler = http.post(

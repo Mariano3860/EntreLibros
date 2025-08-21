@@ -22,7 +22,9 @@ export const generateCommunityStats = (seed = 301): CommunityStats => {
 
   const topContributors = Array.from({ length: 5 }).map(() => ({
     username: `@${faker.internet.username().toLowerCase()}`,
-    metric: faker.helpers.arrayElement(['exchanges', 'books']) as 'exchanges' | 'books',
+    metric: faker.helpers.arrayElement(['exchanges', 'books']) as
+      | 'exchanges'
+      | 'books',
     value: faker.number.int({ min: 1, max: 20 }),
   }))
 
