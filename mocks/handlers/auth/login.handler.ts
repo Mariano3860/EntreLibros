@@ -5,8 +5,10 @@ import { RELATIVE_API_ROUTES } from '@src/api/routes'
 
 import { DEFAULT_EMAIL, DEFAULT_PASS } from '../../constants/constants'
 
-import errorResponse from './fixtures/login.error.json'
-import successResponse from './fixtures/login.success.json'
+import {
+  generateLoginError,
+  generateLoginSuccess,
+} from './fakers/login.faker'
 import { setLoggedInState } from './me.handler'
 
 export const loginHandler = http.post(
@@ -19,6 +21,7 @@ export const loginHandler = http.post(
       email === DEFAULT_EMAIL && password === DEFAULT_PASS
 
     if (!isValidCredentials) {
+      const errorResponse = generateLoginError()
       return HttpResponse.json(errorResponse, {
         status: 401,
         statusText: 'Unauthorized',
@@ -26,6 +29,7 @@ export const loginHandler = http.post(
     }
 
     setLoggedInState(true)
+    const successResponse = generateLoginSuccess()
     return HttpResponse.json(successResponse, {
       status: 200,
       // HttpOnly should be set in the server, but won't be used in development
