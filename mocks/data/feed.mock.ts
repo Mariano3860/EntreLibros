@@ -89,8 +89,8 @@ const base: FeedItem[] = [
   },
 ]
 
-export const feedMock: FeedItem[] = Array.from({ length: 20 }).flatMap((_, idx) =>
-  base.map((item) => ({ ...item, id: item.id + '-' + idx }))
+export const feedMock: FeedItem[] = Array.from({ length: 20 }).flatMap(
+  (_, idx) => base.map((item) => ({ ...item, id: item.id + '-' + idx }))
 )
 
 export const PAGE_SIZE = 8

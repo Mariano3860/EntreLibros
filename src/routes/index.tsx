@@ -12,7 +12,6 @@ import { MessagesPage } from '@src/pages/messages/MessagesPage'
 import RegisterPage from '@src/pages/register/RegisterPage'
 import { StatsPage } from '@src/pages/stats/StatsPage'
 
-
 import NotFound from '../pages/not_found/NotFound'
 
 const AppRoutes = () => {

@@ -2,8 +2,8 @@
  * Development stub for analytics tracking.
  *
  * Logs the event name and optional payload to the console when not running
- * under test. Replace this helper with a real analytics integration once the
- * backend is available.
+ * under test.
+ * TODO Replace this helper with a real analytics integration once the backend is available.
  *
  * @param event - Identifier for the event being tracked.
  * @param data - Additional event properties.

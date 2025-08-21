@@ -110,19 +110,25 @@ const cases = [
 ] as const
 
 describe('Feed cards snapshots', () => {
-  test.each(cases)('%s card matches snapshot (light/en)', async (_name, element) => {
-    localStorage.setItem('theme', 'light')
-    await i18n.changeLanguage('en')
-    const { asFragment } = renderWithProviders(element)
-    expect(asFragment()).toMatchSnapshot()
-    localStorage.clear()
-  })
+  test.each(cases)(
+    '%s card matches snapshot (light/en)',
+    async (_name, element) => {
+      localStorage.setItem('theme', 'light')
+      await i18n.changeLanguage('en')
+      const { asFragment } = renderWithProviders(element)
+      expect(asFragment()).toMatchSnapshot()
+      localStorage.clear()
+    }
+  )
 
-  test.each(cases)('%s card matches snapshot (dark/es)', async (_name, element) => {
-    localStorage.setItem('theme', 'dark')
-    await i18n.changeLanguage('es')
-    const { asFragment } = renderWithProviders(element)
-    expect(asFragment()).toMatchSnapshot()
-    localStorage.clear()
-  })
+  test.each(cases)(
+    '%s card matches snapshot (dark/es)',
+    async (_name, element) => {
+      localStorage.setItem('theme', 'dark')
+      await i18n.changeLanguage('es')
+      const { asFragment } = renderWithProviders(element)
+      expect(asFragment()).toMatchSnapshot()
+      localStorage.clear()
+    }
+  )
 })
