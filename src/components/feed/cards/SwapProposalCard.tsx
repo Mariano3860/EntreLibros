@@ -33,13 +33,25 @@ export const SwapProposalCard = ({ item }: Props) => {
       </div>
       <FeedActions initialLikes={item.likes} />
       <div className={styles.content}>
-        <p>
-          {t('community.feed.swap.wants', {
-            user: item.user,
-            offered: item.offered,
-            requested: item.requested,
-          })}
-        </p>
+        <section
+          aria-label={t('community.feed.swap.proposalAria', { user: item.user })}
+        >
+          <p>
+            {t('community.feed.swap.wants', {
+              user: item.user,
+              offered: item.offered,
+              requested: item.requested,
+            })}
+          </p>
+          <dl className={styles.srOnly}>
+            <dt>{t('community.feed.swap.user')}</dt>
+            <dd>{item.user}</dd>
+            <dt>{t('community.feed.swap.offered')}</dt>
+            <dd>{item.offered}</dd>
+            <dt>{t('community.feed.swap.requested')}</dt>
+            <dd>{item.requested}</dd>
+          </dl>
+        </section>
         <button
           className={styles.primaryButton}
           onClick={handleAccept}

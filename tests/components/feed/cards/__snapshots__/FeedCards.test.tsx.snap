@@ -1523,9 +1523,35 @@ exports[`Feed cards snapshots > swap card matches snapshots 1`] = `
     <div
       class="_content_9f5b00"
     >
-      <p>
-        community.feed.swap.wants
-      </p>
+      <section
+        aria-label="community.feed.swap.proposalAria"
+      >
+        <p>
+          community.feed.swap.wants
+        </p>
+        <dl
+          class="_srOnly_9f5b00"
+        >
+          <dt>
+            community.feed.swap.user
+          </dt>
+          <dd>
+            User
+          </dd>
+          <dt>
+            community.feed.swap.offered
+          </dt>
+          <dd>
+            1984
+          </dd>
+          <dt>
+            community.feed.swap.requested
+          </dt>
+          <dd>
+            The Hobbit
+          </dd>
+        </dl>
+      </section>
       <button
         aria-label="community.feed.cta.accept"
         class="_primaryButton_9f5b00"
@@ -1628,9 +1654,35 @@ exports[`Feed cards snapshots > swap card matches snapshots 2`] = `
     <div
       class="_content_9f5b00"
     >
-      <p>
-        community.feed.swap.wants
-      </p>
+      <section
+        aria-label="community.feed.swap.proposalAria"
+      >
+        <p>
+          community.feed.swap.wants
+        </p>
+        <dl
+          class="_srOnly_9f5b00"
+        >
+          <dt>
+            community.feed.swap.user
+          </dt>
+          <dd>
+            User
+          </dd>
+          <dt>
+            community.feed.swap.offered
+          </dt>
+          <dd>
+            1984
+          </dd>
+          <dt>
+            community.feed.swap.requested
+          </dt>
+          <dd>
+            The Hobbit
+          </dd>
+        </dl>
+      </section>
       <button
         aria-label="community.feed.cta.accept"
         class="_primaryButton_9f5b00"

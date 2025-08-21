@@ -27,6 +27,7 @@ export const CommunityFeedPage = () => {
     return false
   })
   const loaderRef = useRef<HTMLDivElement | null>(null)
+  const batchRef = useRef(0)
 
   useEffect(() => {
     if (!('IntersectionObserver' in window)) {
@@ -35,7 +36,14 @@ export const CommunityFeedPage = () => {
 
     const observer = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting) {
-        setItems((prev) => [...prev, ...feedData])
+        batchRef.current += 1
+        setItems((prev) => [
+          ...prev,
+          ...feedData.map((item) => ({
+            ...item,
+            id: `${item.id}-${batchRef.current}`,
+          })),
+        ])
       }
     })
 

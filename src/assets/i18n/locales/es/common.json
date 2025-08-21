@@ -215,7 +215,13 @@
           "comment": "Comentar",
           "share": "Compartir"
         },
-        "swap": {"wants": "{{user}} quiere intercambiar tu {{offered}} por {{requested}}"},
+        "swap": {
+          "wants": "{{user}} quiere intercambiar tu {{offered}} por {{requested}}",
+          "proposalAria": "Propuesta de intercambio de {{user}}",
+          "user": "Usuario",
+          "offered": "Ofrece",
+          "requested": "Solicita"
+        },
         "sale": {"price": "Precio: ${{price}}"},
         "seeking": {"description": "{{user}} busca {{title}}"},
         "house": {"distance": "A {{distance}} km"},
