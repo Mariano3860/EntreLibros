@@ -3,7 +3,6 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 vi.mock('@src/utils/analytics', () => ({ track: vi.fn() }))
 
-import feedMock from '@mocks/data/feed.mock'
 import i18n from '@src/assets/i18n/i18n'
 import { BookFeedCard } from '@src/components/feed/cards/BookFeedCard'
 import { EventCard } from '@src/components/feed/cards/EventCard'
@@ -22,6 +21,95 @@ describe('Feed card CTAs', () => {
     vi.clearAllMocks()
     await i18n.changeLanguage('en')
   })
+
+  const feedMock = [
+    {
+      type: 'book',
+      id: 'b1',
+      user: 'Ana',
+      avatar: '',
+      time: '1h',
+      likes: 0,
+      title: 'Dune',
+      author: 'Frank Herbert',
+      cover: '',
+    },
+    {
+      type: 'swap',
+      id: 's1',
+      user: 'Luis',
+      avatar: '',
+      time: '2h',
+      likes: 0,
+      requester: 'Ana',
+      offered: '1984',
+      requested: 'The Hobbit',
+    },
+    {
+      type: 'sale',
+      id: 'sa1',
+      user: 'Maria',
+      avatar: '',
+      time: '3h',
+      likes: 0,
+      title: 'Foundation',
+      price: 10,
+      condition: 'used',
+      cover: '',
+    },
+    {
+      type: 'seeking',
+      id: 'se1',
+      user: 'Luis',
+      avatar: '',
+      time: '4h',
+      likes: 0,
+      title: 'Sapiens',
+    },
+    {
+      type: 'review',
+      id: 'r1',
+      user: 'Maria',
+      avatar: '',
+      time: '5h',
+      likes: 0,
+      book: 'Dune',
+      quote: 'Great book!',
+      rating: 5,
+    },
+    {
+      type: 'event',
+      id: 'e1',
+      user: 'Carlos',
+      avatar: '',
+      time: '6h',
+      likes: 0,
+      title: 'Book Fair',
+      date: '2025-01-01',
+      location: 'Casita Centro',
+    },
+    {
+      type: 'house',
+      id: 'h1',
+      user: 'Sofia',
+      avatar: '',
+      time: '7h',
+      likes: 0,
+      name: 'Casita Norte',
+      distance: 0.8,
+    },
+    {
+      type: 'person',
+      id: 'p1',
+      user: 'Admin',
+      avatar: '',
+      time: '8h',
+      likes: 0,
+      name: 'Carlos',
+      match: 85,
+      lastActivity: 'yesterday',
+    },
+  ]
 
   const [book, swap, sale, seeking, review, event, house, person] = feedMock
 

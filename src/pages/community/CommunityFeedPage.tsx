@@ -8,16 +8,16 @@ import { LogoEntreLibros } from '@components/logo/LogoEntreLibros'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { fetchFeedPage } from '@mocks/data/feed.mock'
+import { useCommunityFeed } from '@src/hooks/api/useCommunityFeed'
 
 import styles from './CommunityFeedPage.module.scss'
 
 export const CommunityFeedPage = () => {
   const { t } = useTranslation()
   const [filter, setFilter] = useState('all')
-  const [items, setItems] = useState(() => fetchFeedPage(0))
-  const [, setPage] = useState(1)
   const [search, setSearch] = useState('')
+  const { data, fetchNextPage, hasNextPage } = useCommunityFeed()
+  const items = data?.pages.flat() ?? []
 
   const filtered = filterItems(items, filter).filter((item) => {
     const q = search.toLowerCase()
@@ -35,15 +35,8 @@ export const CommunityFeedPage = () => {
     }
 
     const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
-        setPage((prevPage) => {
-          const nextItems = fetchFeedPage(prevPage)
-          if (nextItems.length > 0) {
-            setItems((prev) => [...prev, ...nextItems])
-            return prevPage + 1
-          }
-          return prevPage
-        })
+      if (entries[0].isIntersecting && hasNextPage) {
+        fetchNextPage()
       }
     })
 
@@ -55,7 +48,7 @@ export const CommunityFeedPage = () => {
     return () => {
       observer.disconnect()
     }
-  }, [])
+  }, [fetchNextPage, hasNextPage])
 
   return (
     <BaseLayout>

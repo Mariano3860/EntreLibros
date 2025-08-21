@@ -88,6 +88,10 @@ npm test          # ejecutar todas las pruebas una vez
 npm run test:ui   # interfaz interactiva de Vitest
 ```
 
+## 📡 API
+
+Las llamadas al backend disponibles se encuentran documentadas en [docs/backend-calls.md](docs/backend-calls.md).
+
 ---
 
 ## 🧩 Tecnologías clave

@@ -15,23 +15,29 @@ describe('BooksPage', () => {
     expect(getByRole('navigation')).toBeInTheDocument()
   })
 
-  test('filters books by tab selection', () => {
+  test('filters books by tab selection', async () => {
     renderWithProviders(<BooksPage />)
     fireEvent.click(
       screen.getByRole('tab', { name: 'booksPage.tabs.for_trade' })
     )
-    expect(screen.getByText('1984')).toBeInTheDocument()
+    expect(await screen.findByText('1984')).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('tab', { name: 'booksPage.tabs.seeking' }))
-    expect(screen.getByText('El pulpo invisible')).toBeInTheDocument()
+    expect(
+      await screen.findByText('El pulpo invisible')
+    ).toBeInTheDocument()
 
     fireEvent.click(
       screen.getByRole('tab', { name: 'booksPage.tabs.for_sale' })
     )
-    expect(screen.getByText('Matisse en Bélgica')).toBeInTheDocument()
+    expect(
+      await screen.findByText('Matisse en Bélgica')
+    ).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('tab', { name: 'booksPage.tabs.mine' }))
-    expect(screen.getByText('Matisse en Bélgica')).toBeInTheDocument()
+    expect(
+      await screen.findByText('Matisse en Bélgica')
+    ).toBeInTheDocument()
   })
 
   test('shows empty state when search yields no results', () => {
