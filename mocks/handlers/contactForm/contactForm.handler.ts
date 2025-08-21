@@ -2,8 +2,14 @@ import { http, HttpResponse } from 'msw'
 
 import { RELATIVE_API_ROUTES } from '@src/api/routes'
 
-import errorResponse from './fixtures/contactForm.error.json'
-import successResponse from './fixtures/contactForm.success.json'
+const successResponse = {
+  message: '¡Gracias por tu mensaje! Te responderemos lo antes posible.',
+}
+
+const errorResponse = {
+  message:
+    'Ocurrió un error al enviar tu mensaje. Por favor intenta nuevamente más tarde.',
+}
 
 export const contactFormHandler = http.post(
   RELATIVE_API_ROUTES.CONTACT_FORM.SUBMIT,

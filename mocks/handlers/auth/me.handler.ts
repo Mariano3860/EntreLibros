@@ -1,8 +1,10 @@
 import { RELATIVE_API_ROUTES } from '@api/routes'
 import { http, HttpResponse } from 'msw'
 
-import successUser from './fixtures/me.success.json'
-import unauthorizedBody from './fixtures/me.unauthorized.json'
+import { generateMeUser, generateUnauthorized } from './fakers/me.faker'
+
+const successUser = generateMeUser()
+const unauthorizedBody = generateUnauthorized()
 
 type Override = 'auto' | 'logged-in' | 'logged-out'
 

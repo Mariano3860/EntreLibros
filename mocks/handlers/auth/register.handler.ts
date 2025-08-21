@@ -5,8 +5,10 @@ import { RELATIVE_API_ROUTES } from '@src/api/routes'
 
 import { DEFAULT_EMAIL } from '../../constants/constants'
 
-import errorResponse from './fixtures/register.error.json'
-import successResponse from './fixtures/register.success.json'
+import {
+  generateRegisterError,
+  generateRegisterSuccess,
+} from './fakers/register.faker'
 import { setLoggedInState } from './me.handler'
 
 export const registerHandler = http.post(
@@ -16,10 +18,12 @@ export const registerHandler = http.post(
     const { email } = body
 
     if (email === DEFAULT_EMAIL) {
+      const errorResponse = generateRegisterError()
       return HttpResponse.json(errorResponse, { status: 409 })
     }
 
     setLoggedInState(true)
+    const successResponse = generateRegisterSuccess()
     return HttpResponse.json(successResponse, { status: 201 })
   }
 )

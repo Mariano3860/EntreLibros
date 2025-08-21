@@ -2,8 +2,8 @@ import { faker } from '@faker-js/faker'
 
 import { ActivityItem } from '@src/api/community/activity.types'
 
-export const generateActivityItems = (): ActivityItem[] => {
-  faker.seed(123)
+export const generateActivityItems = (seed = 123): ActivityItem[] => {
+  faker.seed(seed)
   return Array.from({ length: 10 }).map(() => ({
     id: faker.string.uuid(),
     user: faker.person.firstName(),
