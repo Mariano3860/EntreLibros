@@ -76,10 +76,12 @@ describe('Feed card CTAs', () => {
     },
   ] as const
 
-  test.each(cases)('%s triggers analytics', ({ Component, item, label, expected }) => {
-    renderWithProviders(<Component item={item as never} />)
-    fireEvent.click(screen.getByLabelText(label))
-    expect(track).toHaveBeenCalledWith('feed.cta', expected)
-  })
+  test.each(cases)(
+    '%s triggers analytics',
+    ({ Component, item, label, expected }) => {
+      renderWithProviders(<Component item={item as never} />)
+      fireEvent.click(screen.getByLabelText(label))
+      expect(track).toHaveBeenCalledWith('feed.cta', expected)
+    }
+  )
 })
-

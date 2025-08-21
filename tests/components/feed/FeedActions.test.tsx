@@ -18,4 +18,3 @@ describe('FeedActions', () => {
     expect(screen.getByText('1')).toBeInTheDocument()
   })
 })
-
