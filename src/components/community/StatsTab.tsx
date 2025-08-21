@@ -4,13 +4,12 @@ import { useTranslation } from 'react-i18next'
 import { COMMUNITY_STATS_RANGES } from '@src/constants/constants'
 import { useCommunityStats } from '@src/hooks/api/useCommunityStats'
 
-import commonStyles from '../CommunityPage.module.scss'
-
-import { HotSearchesCard } from './components/HotSearchesCard'
-import { KpiCard } from './components/KpiCard'
-import { MapCard } from './components/MapCard'
-import { TopContributorsCard } from './components/TopContributorsCard'
-import { TrendCard } from './components/TrendCard'
+import { HotSearchesCard } from './cards/HotSearchesCard'
+import { KpiCard } from './cards/KpiCard'
+import { MapCard } from './cards/MapCard'
+import { TopContributorsCard } from './cards/TopContributorsCard'
+import { TrendCard } from './cards/TrendCard'
+import commonStyles from './CommunityTabs.module.scss'
 import styles from './StatsTab.module.scss'
 
 type Range = (typeof COMMUNITY_STATS_RANGES)[number]
