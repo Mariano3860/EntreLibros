@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Feed cards snapshots > book card matches snapshots 1`] = `
+exports[`Feed cards snapshots > book card matches snapshot (dark/es) 1`] = `
 <DocumentFragment>
   <article
     class="_card_9f5b00"
@@ -103,7 +103,7 @@ exports[`Feed cards snapshots > book card matches snapshots 1`] = `
 </DocumentFragment>
 `;
 
-exports[`Feed cards snapshots > book card matches snapshots 2`] = `
+exports[`Feed cards snapshots > book card matches snapshot (light/en) 1`] = `
 <DocumentFragment>
   <article
     class="_card_9f5b00"
@@ -206,7 +206,7 @@ exports[`Feed cards snapshots > book card matches snapshots 2`] = `
 </DocumentFragment>
 `;
 
-exports[`Feed cards snapshots > event card matches snapshots 1`] = `
+exports[`Feed cards snapshots > event card matches snapshot (dark/es) 1`] = `
 <DocumentFragment>
   <article
     class="_card_9f5b00"
@@ -309,7 +309,7 @@ exports[`Feed cards snapshots > event card matches snapshots 1`] = `
 </DocumentFragment>
 `;
 
-exports[`Feed cards snapshots > event card matches snapshots 2`] = `
+exports[`Feed cards snapshots > event card matches snapshot (light/en) 1`] = `
 <DocumentFragment>
   <article
     class="_card_9f5b00"
@@ -412,7 +412,7 @@ exports[`Feed cards snapshots > event card matches snapshots 2`] = `
 </DocumentFragment>
 `;
 
-exports[`Feed cards snapshots > house card matches snapshots 1`] = `
+exports[`Feed cards snapshots > house card matches snapshot (dark/es) 1`] = `
 <DocumentFragment>
   <article
     class="_card_9f5b00"
@@ -515,7 +515,7 @@ exports[`Feed cards snapshots > house card matches snapshots 1`] = `
 </DocumentFragment>
 `;
 
-exports[`Feed cards snapshots > house card matches snapshots 2`] = `
+exports[`Feed cards snapshots > house card matches snapshot (light/en) 1`] = `
 <DocumentFragment>
   <article
     class="_card_9f5b00"
@@ -618,7 +618,7 @@ exports[`Feed cards snapshots > house card matches snapshots 2`] = `
 </DocumentFragment>
 `;
 
-exports[`Feed cards snapshots > person card matches snapshots 1`] = `
+exports[`Feed cards snapshots > person card matches snapshot (dark/es) 1`] = `
 <DocumentFragment>
   <article
     class="_card_9f5b00"
@@ -721,7 +721,7 @@ exports[`Feed cards snapshots > person card matches snapshots 1`] = `
 </DocumentFragment>
 `;
 
-exports[`Feed cards snapshots > person card matches snapshots 2`] = `
+exports[`Feed cards snapshots > person card matches snapshot (light/en) 1`] = `
 <DocumentFragment>
   <article
     class="_card_9f5b00"
@@ -824,7 +824,7 @@ exports[`Feed cards snapshots > person card matches snapshots 2`] = `
 </DocumentFragment>
 `;
 
-exports[`Feed cards snapshots > review card matches snapshots 1`] = `
+exports[`Feed cards snapshots > review card matches snapshot (dark/es) 1`] = `
 <DocumentFragment>
   <article
     class="_card_9f5b00"
@@ -927,7 +927,7 @@ exports[`Feed cards snapshots > review card matches snapshots 1`] = `
 </DocumentFragment>
 `;
 
-exports[`Feed cards snapshots > review card matches snapshots 2`] = `
+exports[`Feed cards snapshots > review card matches snapshot (light/en) 1`] = `
 <DocumentFragment>
   <article
     class="_card_9f5b00"
@@ -1030,7 +1030,7 @@ exports[`Feed cards snapshots > review card matches snapshots 2`] = `
 </DocumentFragment>
 `;
 
-exports[`Feed cards snapshots > sale card matches snapshots 1`] = `
+exports[`Feed cards snapshots > sale card matches snapshot (dark/es) 1`] = `
 <DocumentFragment>
   <article
     class="_card_9f5b00"
@@ -1133,7 +1133,7 @@ exports[`Feed cards snapshots > sale card matches snapshots 1`] = `
 </DocumentFragment>
 `;
 
-exports[`Feed cards snapshots > sale card matches snapshots 2`] = `
+exports[`Feed cards snapshots > sale card matches snapshot (light/en) 1`] = `
 <DocumentFragment>
   <article
     class="_card_9f5b00"
@@ -1236,7 +1236,7 @@ exports[`Feed cards snapshots > sale card matches snapshots 2`] = `
 </DocumentFragment>
 `;
 
-exports[`Feed cards snapshots > seeking card matches snapshots 1`] = `
+exports[`Feed cards snapshots > seeking card matches snapshot (dark/es) 1`] = `
 <DocumentFragment>
   <article
     class="_card_9f5b00"
@@ -1334,7 +1334,7 @@ exports[`Feed cards snapshots > seeking card matches snapshots 1`] = `
 </DocumentFragment>
 `;
 
-exports[`Feed cards snapshots > seeking card matches snapshots 2`] = `
+exports[`Feed cards snapshots > seeking card matches snapshot (light/en) 1`] = `
 <DocumentFragment>
   <article
     class="_card_9f5b00"
@@ -1432,7 +1432,7 @@ exports[`Feed cards snapshots > seeking card matches snapshots 2`] = `
 </DocumentFragment>
 `;
 
-exports[`Feed cards snapshots > swap card matches snapshots 1`] = `
+exports[`Feed cards snapshots > swap card matches snapshot (dark/es) 1`] = `
 <DocumentFragment>
   <article
     class="_card_9f5b00"
@@ -1563,7 +1563,7 @@ exports[`Feed cards snapshots > swap card matches snapshots 1`] = `
 </DocumentFragment>
 `;
 
-exports[`Feed cards snapshots > swap card matches snapshots 2`] = `
+exports[`Feed cards snapshots > swap card matches snapshot (light/en) 1`] = `
 <DocumentFragment>
   <article
     class="_card_9f5b00"
