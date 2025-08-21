@@ -24,61 +24,65 @@ exports[`Feed cards snapshots > book card matches snapshot (dark/es) 1`] = `
     <div
       class="_actions_4a79c8"
     >
-      <button
-        aria-label="community.feed.actions.like"
+      <div
+        class="_buttons_4a79c8"
       >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+        <button
+          aria-label="community.feed.actions.like"
         >
-          <path
-            d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
-          />
-        </svg>
-      </button>
-      <button
-        aria-label="community.feed.actions.comment"
-      >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="community.feed.actions.comment"
         >
-          <path
-            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-          />
-        </svg>
-      </button>
-      <button
-        aria-label="community.feed.actions.share"
-      >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="community.feed.actions.share"
         >
-          <path
-            d="M4 12l16-8-4 16-4-6-8-2z"
-          />
-        </svg>
-      </button>
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4 12l16-8-4 16-4-6-8-2z"
+            />
+          </svg>
+        </button>
+      </div>
       <span
         class="_likes_4a79c8"
       >
-        0
+        0 community.feed.actions.likes
       </span>
     </div>
     <div
@@ -127,61 +131,65 @@ exports[`Feed cards snapshots > book card matches snapshot (light/en) 1`] = `
     <div
       class="_actions_4a79c8"
     >
-      <button
-        aria-label="community.feed.actions.like"
+      <div
+        class="_buttons_4a79c8"
       >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+        <button
+          aria-label="community.feed.actions.like"
         >
-          <path
-            d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
-          />
-        </svg>
-      </button>
-      <button
-        aria-label="community.feed.actions.comment"
-      >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="community.feed.actions.comment"
         >
-          <path
-            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-          />
-        </svg>
-      </button>
-      <button
-        aria-label="community.feed.actions.share"
-      >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="community.feed.actions.share"
         >
-          <path
-            d="M4 12l16-8-4 16-4-6-8-2z"
-          />
-        </svg>
-      </button>
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4 12l16-8-4 16-4-6-8-2z"
+            />
+          </svg>
+        </button>
+      </div>
       <span
         class="_likes_4a79c8"
       >
-        0
+        0 community.feed.actions.likes
       </span>
     </div>
     <div
@@ -230,61 +238,65 @@ exports[`Feed cards snapshots > event card matches snapshot (dark/es) 1`] = `
     <div
       class="_actions_4a79c8"
     >
-      <button
-        aria-label="community.feed.actions.like"
+      <div
+        class="_buttons_4a79c8"
       >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+        <button
+          aria-label="community.feed.actions.like"
         >
-          <path
-            d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
-          />
-        </svg>
-      </button>
-      <button
-        aria-label="community.feed.actions.comment"
-      >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="community.feed.actions.comment"
         >
-          <path
-            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-          />
-        </svg>
-      </button>
-      <button
-        aria-label="community.feed.actions.share"
-      >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="community.feed.actions.share"
         >
-          <path
-            d="M4 12l16-8-4 16-4-6-8-2z"
-          />
-        </svg>
-      </button>
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4 12l16-8-4 16-4-6-8-2z"
+            />
+          </svg>
+        </button>
+      </div>
       <span
         class="_likes_4a79c8"
       >
-        0
+        0 community.feed.actions.likes
       </span>
     </div>
     <div
@@ -333,61 +345,65 @@ exports[`Feed cards snapshots > event card matches snapshot (light/en) 1`] = `
     <div
       class="_actions_4a79c8"
     >
-      <button
-        aria-label="community.feed.actions.like"
+      <div
+        class="_buttons_4a79c8"
       >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+        <button
+          aria-label="community.feed.actions.like"
         >
-          <path
-            d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
-          />
-        </svg>
-      </button>
-      <button
-        aria-label="community.feed.actions.comment"
-      >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="community.feed.actions.comment"
         >
-          <path
-            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-          />
-        </svg>
-      </button>
-      <button
-        aria-label="community.feed.actions.share"
-      >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="community.feed.actions.share"
         >
-          <path
-            d="M4 12l16-8-4 16-4-6-8-2z"
-          />
-        </svg>
-      </button>
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4 12l16-8-4 16-4-6-8-2z"
+            />
+          </svg>
+        </button>
+      </div>
       <span
         class="_likes_4a79c8"
       >
-        0
+        0 community.feed.actions.likes
       </span>
     </div>
     <div
@@ -436,61 +452,65 @@ exports[`Feed cards snapshots > house card matches snapshot (dark/es) 1`] = `
     <div
       class="_actions_4a79c8"
     >
-      <button
-        aria-label="community.feed.actions.like"
+      <div
+        class="_buttons_4a79c8"
       >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+        <button
+          aria-label="community.feed.actions.like"
         >
-          <path
-            d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
-          />
-        </svg>
-      </button>
-      <button
-        aria-label="community.feed.actions.comment"
-      >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="community.feed.actions.comment"
         >
-          <path
-            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-          />
-        </svg>
-      </button>
-      <button
-        aria-label="community.feed.actions.share"
-      >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="community.feed.actions.share"
         >
-          <path
-            d="M4 12l16-8-4 16-4-6-8-2z"
-          />
-        </svg>
-      </button>
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4 12l16-8-4 16-4-6-8-2z"
+            />
+          </svg>
+        </button>
+      </div>
       <span
         class="_likes_4a79c8"
       >
-        0
+        0 community.feed.actions.likes
       </span>
     </div>
     <div
@@ -539,61 +559,65 @@ exports[`Feed cards snapshots > house card matches snapshot (light/en) 1`] = `
     <div
       class="_actions_4a79c8"
     >
-      <button
-        aria-label="community.feed.actions.like"
+      <div
+        class="_buttons_4a79c8"
       >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+        <button
+          aria-label="community.feed.actions.like"
         >
-          <path
-            d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
-          />
-        </svg>
-      </button>
-      <button
-        aria-label="community.feed.actions.comment"
-      >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="community.feed.actions.comment"
         >
-          <path
-            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-          />
-        </svg>
-      </button>
-      <button
-        aria-label="community.feed.actions.share"
-      >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="community.feed.actions.share"
         >
-          <path
-            d="M4 12l16-8-4 16-4-6-8-2z"
-          />
-        </svg>
-      </button>
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4 12l16-8-4 16-4-6-8-2z"
+            />
+          </svg>
+        </button>
+      </div>
       <span
         class="_likes_4a79c8"
       >
-        0
+        0 community.feed.actions.likes
       </span>
     </div>
     <div
@@ -642,61 +666,65 @@ exports[`Feed cards snapshots > person card matches snapshot (dark/es) 1`] = `
     <div
       class="_actions_4a79c8"
     >
-      <button
-        aria-label="community.feed.actions.like"
+      <div
+        class="_buttons_4a79c8"
       >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+        <button
+          aria-label="community.feed.actions.like"
         >
-          <path
-            d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
-          />
-        </svg>
-      </button>
-      <button
-        aria-label="community.feed.actions.comment"
-      >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="community.feed.actions.comment"
         >
-          <path
-            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-          />
-        </svg>
-      </button>
-      <button
-        aria-label="community.feed.actions.share"
-      >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="community.feed.actions.share"
         >
-          <path
-            d="M4 12l16-8-4 16-4-6-8-2z"
-          />
-        </svg>
-      </button>
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4 12l16-8-4 16-4-6-8-2z"
+            />
+          </svg>
+        </button>
+      </div>
       <span
         class="_likes_4a79c8"
       >
-        0
+        0 community.feed.actions.likes
       </span>
     </div>
     <div
@@ -745,61 +773,65 @@ exports[`Feed cards snapshots > person card matches snapshot (light/en) 1`] = `
     <div
       class="_actions_4a79c8"
     >
-      <button
-        aria-label="community.feed.actions.like"
+      <div
+        class="_buttons_4a79c8"
       >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+        <button
+          aria-label="community.feed.actions.like"
         >
-          <path
-            d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
-          />
-        </svg>
-      </button>
-      <button
-        aria-label="community.feed.actions.comment"
-      >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="community.feed.actions.comment"
         >
-          <path
-            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-          />
-        </svg>
-      </button>
-      <button
-        aria-label="community.feed.actions.share"
-      >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="community.feed.actions.share"
         >
-          <path
-            d="M4 12l16-8-4 16-4-6-8-2z"
-          />
-        </svg>
-      </button>
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4 12l16-8-4 16-4-6-8-2z"
+            />
+          </svg>
+        </button>
+      </div>
       <span
         class="_likes_4a79c8"
       >
-        0
+        0 community.feed.actions.likes
       </span>
     </div>
     <div
@@ -848,61 +880,65 @@ exports[`Feed cards snapshots > review card matches snapshot (dark/es) 1`] = `
     <div
       class="_actions_4a79c8"
     >
-      <button
-        aria-label="community.feed.actions.like"
+      <div
+        class="_buttons_4a79c8"
       >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+        <button
+          aria-label="community.feed.actions.like"
         >
-          <path
-            d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
-          />
-        </svg>
-      </button>
-      <button
-        aria-label="community.feed.actions.comment"
-      >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="community.feed.actions.comment"
         >
-          <path
-            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-          />
-        </svg>
-      </button>
-      <button
-        aria-label="community.feed.actions.share"
-      >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="community.feed.actions.share"
         >
-          <path
-            d="M4 12l16-8-4 16-4-6-8-2z"
-          />
-        </svg>
-      </button>
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4 12l16-8-4 16-4-6-8-2z"
+            />
+          </svg>
+        </button>
+      </div>
       <span
         class="_likes_4a79c8"
       >
-        0
+        0 community.feed.actions.likes
       </span>
     </div>
     <div
@@ -951,61 +987,65 @@ exports[`Feed cards snapshots > review card matches snapshot (light/en) 1`] = `
     <div
       class="_actions_4a79c8"
     >
-      <button
-        aria-label="community.feed.actions.like"
+      <div
+        class="_buttons_4a79c8"
       >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+        <button
+          aria-label="community.feed.actions.like"
         >
-          <path
-            d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
-          />
-        </svg>
-      </button>
-      <button
-        aria-label="community.feed.actions.comment"
-      >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="community.feed.actions.comment"
         >
-          <path
-            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-          />
-        </svg>
-      </button>
-      <button
-        aria-label="community.feed.actions.share"
-      >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="community.feed.actions.share"
         >
-          <path
-            d="M4 12l16-8-4 16-4-6-8-2z"
-          />
-        </svg>
-      </button>
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4 12l16-8-4 16-4-6-8-2z"
+            />
+          </svg>
+        </button>
+      </div>
       <span
         class="_likes_4a79c8"
       >
-        0
+        0 community.feed.actions.likes
       </span>
     </div>
     <div
@@ -1054,61 +1094,65 @@ exports[`Feed cards snapshots > sale card matches snapshot (dark/es) 1`] = `
     <div
       class="_actions_4a79c8"
     >
-      <button
-        aria-label="community.feed.actions.like"
+      <div
+        class="_buttons_4a79c8"
       >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+        <button
+          aria-label="community.feed.actions.like"
         >
-          <path
-            d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
-          />
-        </svg>
-      </button>
-      <button
-        aria-label="community.feed.actions.comment"
-      >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="community.feed.actions.comment"
         >
-          <path
-            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-          />
-        </svg>
-      </button>
-      <button
-        aria-label="community.feed.actions.share"
-      >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="community.feed.actions.share"
         >
-          <path
-            d="M4 12l16-8-4 16-4-6-8-2z"
-          />
-        </svg>
-      </button>
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4 12l16-8-4 16-4-6-8-2z"
+            />
+          </svg>
+        </button>
+      </div>
       <span
         class="_likes_4a79c8"
       >
-        0
+        0 community.feed.actions.likes
       </span>
     </div>
     <div
@@ -1157,61 +1201,65 @@ exports[`Feed cards snapshots > sale card matches snapshot (light/en) 1`] = `
     <div
       class="_actions_4a79c8"
     >
-      <button
-        aria-label="community.feed.actions.like"
+      <div
+        class="_buttons_4a79c8"
       >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+        <button
+          aria-label="community.feed.actions.like"
         >
-          <path
-            d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
-          />
-        </svg>
-      </button>
-      <button
-        aria-label="community.feed.actions.comment"
-      >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="community.feed.actions.comment"
         >
-          <path
-            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-          />
-        </svg>
-      </button>
-      <button
-        aria-label="community.feed.actions.share"
-      >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="community.feed.actions.share"
         >
-          <path
-            d="M4 12l16-8-4 16-4-6-8-2z"
-          />
-        </svg>
-      </button>
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4 12l16-8-4 16-4-6-8-2z"
+            />
+          </svg>
+        </button>
+      </div>
       <span
         class="_likes_4a79c8"
       >
-        0
+        0 community.feed.actions.likes
       </span>
     </div>
     <div
@@ -1260,61 +1308,65 @@ exports[`Feed cards snapshots > seeking card matches snapshot (dark/es) 1`] = `
     <div
       class="_actions_4a79c8"
     >
-      <button
-        aria-label="community.feed.actions.like"
+      <div
+        class="_buttons_4a79c8"
       >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+        <button
+          aria-label="community.feed.actions.like"
         >
-          <path
-            d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
-          />
-        </svg>
-      </button>
-      <button
-        aria-label="community.feed.actions.comment"
-      >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="community.feed.actions.comment"
         >
-          <path
-            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-          />
-        </svg>
-      </button>
-      <button
-        aria-label="community.feed.actions.share"
-      >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="community.feed.actions.share"
         >
-          <path
-            d="M4 12l16-8-4 16-4-6-8-2z"
-          />
-        </svg>
-      </button>
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4 12l16-8-4 16-4-6-8-2z"
+            />
+          </svg>
+        </button>
+      </div>
       <span
         class="_likes_4a79c8"
       >
-        0
+        0 community.feed.actions.likes
       </span>
     </div>
     <div
@@ -1358,61 +1410,65 @@ exports[`Feed cards snapshots > seeking card matches snapshot (light/en) 1`] = `
     <div
       class="_actions_4a79c8"
     >
-      <button
-        aria-label="community.feed.actions.like"
+      <div
+        class="_buttons_4a79c8"
       >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+        <button
+          aria-label="community.feed.actions.like"
         >
-          <path
-            d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
-          />
-        </svg>
-      </button>
-      <button
-        aria-label="community.feed.actions.comment"
-      >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="community.feed.actions.comment"
         >
-          <path
-            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-          />
-        </svg>
-      </button>
-      <button
-        aria-label="community.feed.actions.share"
-      >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="community.feed.actions.share"
         >
-          <path
-            d="M4 12l16-8-4 16-4-6-8-2z"
-          />
-        </svg>
-      </button>
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4 12l16-8-4 16-4-6-8-2z"
+            />
+          </svg>
+        </button>
+      </div>
       <span
         class="_likes_4a79c8"
       >
-        0
+        0 community.feed.actions.likes
       </span>
     </div>
     <div
@@ -1463,61 +1519,65 @@ exports[`Feed cards snapshots > swap card matches snapshot (dark/es) 1`] = `
     <div
       class="_actions_4a79c8"
     >
-      <button
-        aria-label="community.feed.actions.like"
+      <div
+        class="_buttons_4a79c8"
       >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+        <button
+          aria-label="community.feed.actions.like"
         >
-          <path
-            d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
-          />
-        </svg>
-      </button>
-      <button
-        aria-label="community.feed.actions.comment"
-      >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="community.feed.actions.comment"
         >
-          <path
-            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-          />
-        </svg>
-      </button>
-      <button
-        aria-label="community.feed.actions.share"
-      >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="community.feed.actions.share"
         >
-          <path
-            d="M4 12l16-8-4 16-4-6-8-2z"
-          />
-        </svg>
-      </button>
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4 12l16-8-4 16-4-6-8-2z"
+            />
+          </svg>
+        </button>
+      </div>
       <span
         class="_likes_4a79c8"
       >
-        0
+        0 community.feed.actions.likes
       </span>
     </div>
     <div
@@ -1594,61 +1654,65 @@ exports[`Feed cards snapshots > swap card matches snapshot (light/en) 1`] = `
     <div
       class="_actions_4a79c8"
     >
-      <button
-        aria-label="community.feed.actions.like"
+      <div
+        class="_buttons_4a79c8"
       >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+        <button
+          aria-label="community.feed.actions.like"
         >
-          <path
-            d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
-          />
-        </svg>
-      </button>
-      <button
-        aria-label="community.feed.actions.comment"
-      >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M20.8 4.6c-1.5-1.4-3.9-1.4-5.4 0L12 7.9 8.6 4.6c-1.5-1.4-3.9-1.4-5.4 0-1.6 1.5-1.6 3.9 0 5.4l8.2 8.2 8.2-8.2c1.5-1.5 1.5-3.9 0-5.4z"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="community.feed.actions.comment"
         >
-          <path
-            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-          />
-        </svg>
-      </button>
-      <button
-        aria-label="community.feed.actions.share"
-      >
-        <svg
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="community.feed.actions.share"
         >
-          <path
-            d="M4 12l16-8-4 16-4-6-8-2z"
-          />
-        </svg>
-      </button>
+          <svg
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4 12l16-8-4 16-4-6-8-2z"
+            />
+          </svg>
+        </button>
+      </div>
       <span
         class="_likes_4a79c8"
       >
-        0
+        0 community.feed.actions.likes
       </span>
     </div>
     <div

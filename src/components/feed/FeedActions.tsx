@@ -27,20 +27,24 @@ export const FeedActions = ({ initialLikes = 0 }: Props) => {
 
   return (
     <div className={styles.actions}>
-      <button
-        aria-label={t('community.feed.actions.like')}
-        onClick={handleLikeClick}
-        className={liked ? styles.liked : undefined}
-      >
-        <HeartIcon />
-      </button>
-      <button aria-label={t('community.feed.actions.comment')}>
-        <CommentIcon />
-      </button>
-      <button aria-label={t('community.feed.actions.share')}>
-        <ShareIcon />
-      </button>
-      <span className={styles.likes}>{likes}</span>
+      <div className={styles.buttons}>
+        <button
+          aria-label={t('community.feed.actions.like')}
+          onClick={handleLikeClick}
+          className={liked ? styles.liked : undefined}
+        >
+          <HeartIcon />
+        </button>
+        <button aria-label={t('community.feed.actions.comment')}>
+          <CommentIcon />
+        </button>
+        <button aria-label={t('community.feed.actions.share')}>
+          <ShareIcon />
+        </button>
+      </div>
+      <span className={styles.likes}>
+        {likes} {t('community.feed.actions.likes')}
+      </span>
     </div>
   )
 }
