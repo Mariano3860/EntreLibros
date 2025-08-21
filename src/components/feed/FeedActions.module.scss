@@ -17,6 +17,10 @@
   align-items: center;
 }
 
+.liked {
+  color: var(--color-error);
+}
+
 .likes {
   margin-left: $spacing-2;
   font-weight: 600;

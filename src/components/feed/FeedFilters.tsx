@@ -29,8 +29,11 @@ export const FeedFilters = ({
 
   return (
     <div className={styles.wrapper}>
+      <label htmlFor="feed-search-input" className={styles.searchLabel}>
+        {t('community.feed.search')}
+      </label>
       <input
-        aria-label={t('community.feed.search')}
+        id="feed-search-input"
         placeholder={t('community.feed.search') ?? ''}
         onChange={(e) => onSearchChange(e.target.value)}
       />

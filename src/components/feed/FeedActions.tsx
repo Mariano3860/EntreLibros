@@ -13,12 +13,24 @@ interface Props {
 export const FeedActions = ({ initialLikes = 0 }: Props) => {
   const { t } = useTranslation()
   const [likes, setLikes] = useState(initialLikes)
+  const [liked, setLiked] = useState(false)
+
+  const handleLikeClick = () => {
+    if (liked) {
+      setLikes((l) => l - 1)
+      setLiked(false)
+    } else {
+      setLikes((l) => l + 1)
+      setLiked(true)
+    }
+  }
 
   return (
     <div className={styles.actions}>
       <button
         aria-label={t('community.feed.actions.like')}
-        onClick={() => setLikes((l) => l + 1)}
+        onClick={handleLikeClick}
+        className={liked ? styles.liked : undefined}
       >
         <HeartIcon />
       </button>

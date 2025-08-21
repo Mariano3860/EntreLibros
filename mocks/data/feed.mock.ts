@@ -93,4 +93,11 @@ export const feedMock: FeedItem[] = Array.from({ length: 20 }).flatMap((_, idx) 
   base.map((item) => ({ ...item, id: item.id + '-' + idx }))
 )
 
+export const PAGE_SIZE = 8
+
+export const fetchFeedPage = (page: number, size = PAGE_SIZE): FeedItem[] => {
+  const start = page * size
+  return feedMock.slice(start, start + size)
+}
+
 export default feedMock

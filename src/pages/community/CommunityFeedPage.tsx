@@ -8,14 +8,15 @@ import { LogoEntreLibros } from '@components/logo/LogoEntreLibros'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import feedData from '../../../mocks/data/feed.mock'
+import { fetchFeedPage } from '@mocks/data/feed.mock'
 
 import styles from './CommunityFeedPage.module.scss'
 
 export const CommunityFeedPage = () => {
   const { t } = useTranslation()
   const [filter, setFilter] = useState('all')
-  const [items, setItems] = useState(feedData)
+  const [items, setItems] = useState(() => fetchFeedPage(0))
+  const [, setPage] = useState(1)
   const [search, setSearch] = useState('')
 
   const filtered = filterItems(items, filter).filter((item) => {
@@ -27,7 +28,6 @@ export const CommunityFeedPage = () => {
     return false
   })
   const loaderRef = useRef<HTMLDivElement | null>(null)
-  const batchRef = useRef(0)
 
   useEffect(() => {
     if (!('IntersectionObserver' in window)) {
@@ -36,14 +36,14 @@ export const CommunityFeedPage = () => {
 
     const observer = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting) {
-        batchRef.current += 1
-        setItems((prev) => [
-          ...prev,
-          ...feedData.map((item) => ({
-            ...item,
-            id: `${item.id}-${batchRef.current}`,
-          })),
-        ])
+        setPage((prevPage) => {
+          const nextItems = fetchFeedPage(prevPage)
+          if (nextItems.length > 0) {
+            setItems((prev) => [...prev, ...nextItems])
+            return prevPage + 1
+          }
+          return prevPage
+        })
       }
     })
 
