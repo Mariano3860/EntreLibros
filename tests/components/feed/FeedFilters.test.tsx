@@ -11,11 +11,7 @@ describe('FeedFilters', () => {
     await i18n.changeLanguage('en')
     const handleSearch = vi.fn()
     renderWithProviders(
-      <FeedFilters
-        filter="all"
-        onFilterChange={() => {}}
-        onSearchChange={handleSearch}
-      />
+      <FeedFilters filter="all" onFilterChange={() => {}} onSearchChange={handleSearch} />,
     )
     const input = screen.getByLabelText(/search/i)
     fireEvent.change(input, { target: { value: 'dune' } })
@@ -26,13 +22,10 @@ describe('FeedFilters', () => {
     await i18n.changeLanguage('en')
     const handleFilter = vi.fn()
     renderWithProviders(
-      <FeedFilters
-        filter="all"
-        onFilterChange={handleFilter}
-        onSearchChange={() => {}}
-      />
+      <FeedFilters filter="all" onFilterChange={handleFilter} onSearchChange={() => {}} />,
     )
     fireEvent.click(screen.getByLabelText('community.feed.tabs.swap'))
     expect(handleFilter).toHaveBeenCalledWith('swap')
   })
 })
+

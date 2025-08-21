@@ -185,48 +185,48 @@
       "hotSearches": {
         "title": "Trending searches"
       }
-    },
-    "feed": {
-      "tabs": {
-        "all": "All",
-        "book": "Books",
-        "swap": "Swaps",
-        "sale": "For sale",
-        "seeking": "Seeking",
-        "review": "Reviews",
-        "event": "Events",
-        "house": "Casitas",
-        "person": "People"
       },
-      "search": "Search feed",
-      "cta": {
-        "publish": "Publish",
-        "propose_swap": "Propose swap",
-        "accept": "Accept",
-        "buy": "Buy",
-        "offer_copy": "Offer my copy",
-        "helpful": "Helpful",
-        "go": "I'll go",
-        "open_map": "Open in map",
-        "message": "Message"
-      },
-      "actions": {
-        "like": "Like",
-        "comment": "Comment",
-        "share": "Share"
-      },
-      "swap": {
-        "wants": "{{user}} wants to swap your {{offered}} for {{requested}}",
-        "proposalAria": "Swap proposal by {{user}}",
-        "user": "User",
-        "offered": "Offered",
-        "requested": "Requested"
-      },
-      "sale": { "price": "Price: ${{price}}" },
-      "seeking": { "description": "{{user}} is looking for {{title}}" },
-      "house": { "distance": "{{distance}} km away" },
-      "person": { "match": "{{match}}% match" },
-      "suggestions": "Suggestions"
+      "feed": {
+        "tabs": {
+          "all": "All",
+          "book": "Books",
+          "swap": "Swaps",
+          "sale": "For sale",
+          "seeking": "Seeking",
+          "review": "Reviews",
+          "event": "Events",
+          "house": "Casitas",
+          "person": "People"
+        },
+        "search": "Search feed",
+        "cta": {
+          "publish": "Publish",
+          "propose_swap": "Propose swap",
+          "accept": "Accept",
+          "buy": "Buy",
+          "offer_copy": "Offer my copy",
+          "helpful": "Helpful",
+          "go": "I'll go",
+          "open_map": "Open in map",
+          "message": "Message"
+        },
+        "actions": {
+          "like": "Like",
+          "comment": "Comment",
+          "share": "Share"
+        },
+        "swap": {
+          "wants": "{{user}} wants to swap your {{offered}} for {{requested}}",
+          "proposalAria": "Swap proposal by {{user}}",
+          "user": "User",
+          "offered": "Offered",
+          "requested": "Requested"
+        },
+        "sale": {"price": "Price: ${{price}}"},
+        "seeking": {"description": "{{user}} is looking for {{title}}"},
+        "house": {"distance": "{{distance}} km away"},
+        "person": {"match": "{{match}}% match"},
+        "suggestions": "Suggestions"
+      }
     }
   }
-}

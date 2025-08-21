@@ -30,9 +30,7 @@ export const EventCard = ({ item }: Props) => {
       <FeedActions initialLikes={item.likes} />
       <div className={styles.content}>
         <h3 className={styles.title}>{item.title}</h3>
-        <p>
-          {item.date} · {item.location}
-        </p>
+        <p>{item.date} · {item.location}</p>
         <button
           className={styles.primaryButton}
           onClick={handleGo}
