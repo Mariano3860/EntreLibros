@@ -5,8 +5,8 @@ import { MessagesPage } from '@src/pages/messages/MessagesPage'
 import { renderWithProviders } from '../../test-utils'
 
 describe('MessagesPage', () => {
-  test('shows messages placeholder', () => {
+  test('renders conversations list', () => {
     const { getByText } = renderWithProviders(<MessagesPage />)
-    expect(getByText('community.messages.placeholder')).toBeInTheDocument()
+    expect(getByText('Laura')).toBeInTheDocument()
   })
 })
