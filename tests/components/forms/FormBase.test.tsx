@@ -97,4 +97,55 @@ describe('FormBase', () => {
     expect(screen.getByPlaceholderText('email_placeholder')).toHaveValue('')
     expect(screen.getByPlaceholderText('message_placeholder')).toHaveValue('')
   })
+
+  test('sets appropriate autoComplete attributes', () => {
+    const onSubmit = vi.fn()
+
+    renderWithProviders(<FormBase fields={fields} onSubmit={onSubmit} />)
+
+    expect(screen.getByPlaceholderText('name_placeholder')).toHaveAttribute(
+      'autocomplete',
+      'name'
+    )
+    expect(screen.getByPlaceholderText('email_placeholder')).toHaveAttribute(
+      'autocomplete',
+      'email'
+    )
+    expect(screen.getByPlaceholderText('message_placeholder')).toHaveAttribute(
+      'autocomplete',
+      'off'
+    )
+  })
+
+  test('preserves data when fields prop reference changes', () => {
+    const onSubmit = vi.fn()
+    const { rerender } = renderWithProviders(
+      <FormBase fields={fields} onSubmit={onSubmit} />
+    )
+
+    fireEvent.change(screen.getByPlaceholderText('name_placeholder'), {
+      target: { value: 'John' },
+    })
+
+    rerender(<FormBase fields={[...fields]} onSubmit={onSubmit} />)
+
+    expect(screen.getByPlaceholderText('name_placeholder')).toHaveValue('John')
+  })
+
+  test('resets data when field names change', () => {
+    const onSubmit = vi.fn()
+    const { rerender } = renderWithProviders(
+      <FormBase fields={fields} onSubmit={onSubmit} />
+    )
+
+    fireEvent.change(screen.getByPlaceholderText('name_placeholder'), {
+      target: { value: 'John' },
+    })
+
+    const newFields = fields.slice(0, 2) // remove message field
+
+    rerender(<FormBase fields={newFields} onSubmit={onSubmit} />)
+
+    expect(screen.getByPlaceholderText('name_placeholder')).toHaveValue('')
+  })
 })
