@@ -135,13 +135,13 @@ const mockConversations: Conversation[] = [
 export const Messages = () => {
   const { t } = useTranslation()
   const [conversations, setConversations] = useState<Conversation[]>(mockConversations)
-  const [selectedId, setSelectedId] = useState<number>(mockConversations[0].id)
+  const [selectedId, setSelectedId] = useState<number | null>(null)
   const [text, setText] = useState('')
 
-  const selected = conversations.find((c) => c.id === selectedId)!
+  const selected = conversations.find((c) => c.id === selectedId)
 
   const handleSend = () => {
-    if (!text.trim()) return
+    if (!text.trim() || selectedId === null) return
     const newMsg: Message = {
       id: Date.now(),
       sender: 'me',
@@ -188,56 +188,63 @@ export const Messages = () => {
           ))}
         </ul>
       </aside>
-      <div className={styles.chat}>
-        <header className={styles.chatHeader}>
-          <img src={selected.user.avatar} alt={selected.user.name} className={styles.avatar} />
-          <div className={styles.chatHeaderInfo}>
-            <span className={styles.name}>{selected.user.name}</span>
-            <span className={styles.status}>
-              {selected.user.online ? 'Online' : `Last seen ${selected.user.lastSeen}`}
-            </span>
-          </div>
-          <div className={styles.actions}>
-            <button aria-label="Profile info">ℹ️</button>
-          </div>
-        </header>
-        <div className={styles.messages}>
-          {selected.messages.map((msg) => (
-            <div
-              key={msg.id}
-              className={`${styles.message} ${msg.sender === 'me' ? styles.me : ''}`}
-            >
-              {msg.text && <p>{msg.text}</p>}
-              {msg.book && (
-                <div className={styles.bookCard}>
-                  <img src={msg.book.cover} alt={`Cover of ${msg.book.title}`} />
-                  <div>
-                    <div className={styles.bookTitle}>{msg.book.title}</div>
-                    <div className={styles.bookAuthor}>{msg.book.author}</div>
+      {selected ? (
+        <div className={styles.chat}>
+          <header className={styles.chatHeader}>
+            <img src={selected.user.avatar} alt={selected.user.name} className={styles.avatar} />
+            <div className={styles.chatHeaderInfo}>
+              <span className={styles.name}>{selected.user.name}</span>
+              <span className={styles.status}>
+                {selected.user.online ? 'Online' : `Last seen ${selected.user.lastSeen}`}
+              </span>
+            </div>
+            <div className={styles.actions}>
+              <button aria-label="Call">📞</button>
+              <button aria-label="Video call">📹</button>
+              <button aria-label="Profile info">ℹ️</button>
+            </div>
+          </header>
+          <div className={styles.messages}>
+            {selected.messages.map((msg) => (
+              <div
+                key={msg.id}
+                className={`${styles.message} ${msg.sender === 'me' ? styles.me : ''}`}
+              >
+                {msg.text && <p>{msg.text}</p>}
+                {msg.book && (
+                  <div className={styles.bookCard}>
+                    <img src={msg.book.cover} alt={`Cover of ${msg.book.title}`} />
+                    <div>
+                      <div className={styles.bookTitle}>{msg.book.title}</div>
+                      <div className={styles.bookAuthor}>{msg.book.author}</div>
+                    </div>
                   </div>
-                </div>
-              )}
-              <span className={styles.time}>{msg.time}</span>
-            </div>
-          ))}
-        </div>
-        <div className={styles.inputArea}>
-          <div className={styles.inputWrapper}>
-            <input
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              placeholder="Message..."
-            />
-            <div className={styles.inputIcons}>
-              <button aria-label="Attach book">📎</button>
-              <button aria-label="Emoji">😊</button>
-            </div>
+                )}
+                <span className={styles.time}>{msg.time}</span>
+              </div>
+            ))}
           </div>
-          <button aria-label="Send" onClick={handleSend}>
-            ➤
-          </button>
+          <div className={styles.inputArea}>
+            <div className={styles.inputWrapper}>
+              <input
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                placeholder="Message..."
+              />
+              <div className={styles.inputIcons}>
+                <button aria-label="Attach book">📎</button>
+                <button aria-label="Emoji">😊</button>
+                <button aria-label="Attach image">🖼️</button>
+              </div>
+            </div>
+            <button aria-label="Send" onClick={handleSend} className={styles.sendButton}>
+              ➤
+            </button>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className={styles.placeholder}>Select a conversation to start</div>
+      )}
     </div>
   )
 }
