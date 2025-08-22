@@ -104,15 +104,15 @@ describe('FormBase', () => {
     renderWithProviders(<FormBase fields={fields} onSubmit={onSubmit} />)
 
     expect(screen.getByPlaceholderText('name_placeholder')).toHaveAttribute(
-      'autocomplete',
+      'autoComplete',
       'name'
     )
     expect(screen.getByPlaceholderText('email_placeholder')).toHaveAttribute(
-      'autocomplete',
+      'autoComplete',
       'email'
     )
     expect(screen.getByPlaceholderText('message_placeholder')).toHaveAttribute(
-      'autocomplete',
+      'autoComplete',
       'off'
     )
   })
