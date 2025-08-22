@@ -102,7 +102,7 @@ export const FormBase = forwardRef<FormBaseRef, FormBaseProps>(
       return 'off'
     }
 
-    // Exponemos resetForm a través de la ref
+    // Expose resetForm through the ref
     useImperativeHandle(ref, () => ({
       resetForm,
     }))
