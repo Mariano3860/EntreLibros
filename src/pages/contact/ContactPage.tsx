@@ -1,4 +1,4 @@
-import { ContactForm } from '@components/form/contact/ContactForm'
+import { ContactForm } from '@components/forms/contact/ContactForm'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 
 import styles from './ContactPage.module.scss'

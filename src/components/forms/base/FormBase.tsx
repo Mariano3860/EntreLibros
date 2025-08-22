@@ -2,14 +2,18 @@ import React, {
   ChangeEvent,
   FormEvent,
   forwardRef,
+  useEffect,
   useImperativeHandle,
   useMemo,
   useState,
+  useRef,
 } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import styles from './FormBase.module.scss'
-import { FormBaseProps, FormBaseRef } from './FormBase.types'
+import { FormBaseProps, FormBaseRef, FormField } from './FormBase.types'
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export const FormBase = forwardRef<FormBaseRef, FormBaseProps>(
   ({ fields, onSubmit, submitLabel, isSubmitting = false }, ref) => {
@@ -30,6 +34,21 @@ export const FormBase = forwardRef<FormBaseRef, FormBaseProps>(
       useState<Record<string, string>>(initialFormState)
     const [errors, setErrors] = useState<Record<string, string>>({})
 
+    const prevFieldNamesRef = useRef<string[]>(fields.map((f) => f.name))
+    useEffect(() => {
+      const currentFieldNames = fields.map((f) => f.name)
+      const prevFieldNames = prevFieldNamesRef.current
+      const fieldNamesChanged =
+        prevFieldNames.length !== currentFieldNames.length ||
+        prevFieldNames.some((name, idx) => name !== currentFieldNames[idx])
+
+      if (fieldNamesChanged) {
+        setFormData(initialFormState)
+        setErrors({})
+        prevFieldNamesRef.current = currentFieldNames
+      }
+    }, [fields, initialFormState])
+
     const handleChange = (
       e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ) => {
@@ -48,7 +67,7 @@ export const FormBase = forwardRef<FormBaseRef, FormBaseProps>(
           return
         }
 
-        if (field.type === 'email' && value && !/\S+@\S+\.\S+/.test(value)) {
+        if (field.type === 'email' && value && !EMAIL_REGEX.test(value)) {
           newErrors[field.name] = t('form.errors.invalid_email')
           return
         }
@@ -77,7 +96,13 @@ export const FormBase = forwardRef<FormBaseRef, FormBaseProps>(
       setErrors({})
     }
 
-    // Exponemos resetForm a través de la ref
+    const getAutoComplete = (field: FormField): string => {
+      if (field.type === 'email') return 'email'
+      if (field.name.toLowerCase().includes('name')) return 'name'
+      return 'off'
+    }
+
+    // Expose resetForm through the ref
     useImperativeHandle(ref, () => ({
       resetForm,
     }))
@@ -98,7 +123,8 @@ export const FormBase = forwardRef<FormBaseRef, FormBaseProps>(
                 value={formData[field.name]}
                 onChange={handleChange}
                 placeholder={field.placeholder ? t(field.placeholder) : ''}
-                disabled={isSubmitting} // Deshabilitar durante envío
+                autoComplete={getAutoComplete(field)}
+                disabled={isSubmitting} // Disable during submission
               />
             ) : (
               <input
@@ -109,7 +135,8 @@ export const FormBase = forwardRef<FormBaseRef, FormBaseProps>(
                 value={formData[field.name]}
                 onChange={handleChange}
                 placeholder={field.placeholder ? t(field.placeholder) : ''}
-                disabled={isSubmitting} // Deshabilitar durante envío
+                autoComplete={getAutoComplete(field)}
+                disabled={isSubmitting} // Disable during submission
               />
             )}
 
