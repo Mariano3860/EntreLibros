@@ -21,28 +21,16 @@ const AppRoutes = () => {
         <Route path={`/${HOME_URLS.LOGIN}`} element={<LoginPage />} />
         <Route path={`/${HOME_URLS.REGISTER}`} element={<RegisterPage />} />
         <Route path="*" element={<NotFound />} />
-        <Route element={<BaseLayout />}>
-          <Route path="/" element={<HomePage />} />
-          <Route path={`/${HOME_URLS.HOME}`} element={<HomePage />} />
-        </Route>
-        <Route element={<BaseLayout />}>
-          <Route path={`/${HOME_URLS.BOOKS}/*`} element={<BooksPage />} />
-        </Route>
-        <Route element={<BaseLayout />}>
-          <Route
-            path={`/${HOME_URLS.COMMUNITY}`}
-            element={<CommunityFeedPage />}
-          />
-        </Route>
-        <Route element={<BaseLayout />}>
-          <Route path={`/${HOME_URLS.MESSAGES}`} element={<MessagesPage />} />
-        </Route>
-        <Route element={<BaseLayout />}>
-          <Route path={`/${HOME_URLS.STATS}`} element={<StatsPage />} />
-        </Route>
-        <Route element={<BaseLayout />}>
-          <Route path={`/${HOME_URLS.CONTACT}`} element={<ContactPage />} />
-        </Route>
+        <Route path="/" element={<HomePage />} />
+        <Route path={`/${HOME_URLS.HOME}`} element={<HomePage />} />
+        <Route path={`/${HOME_URLS.BOOKS}/*`} element={<BooksPage />} />
+        <Route
+          path={`/${HOME_URLS.COMMUNITY}`}
+          element={<CommunityFeedPage />}
+        />
+        <Route path={`/${HOME_URLS.MESSAGES}`} element={<MessagesPage />} />
+        <Route path={`/${HOME_URLS.STATS}`} element={<StatsPage />} />
+        <Route path={`/${HOME_URLS.CONTACT}`} element={<ContactPage />} />
       </Routes>
     </BrowserRouter>
   )

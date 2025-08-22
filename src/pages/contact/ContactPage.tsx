@@ -5,7 +5,7 @@ import styles from './ContactPage.module.scss'
 
 export const ContactPage = () => {
   return (
-    <BaseLayout>
+    <BaseLayout id={'contact-page'}>
       <div className={styles.contactPageWrapper}>
         <div className={styles.formContainer}>
           <ContactForm />
