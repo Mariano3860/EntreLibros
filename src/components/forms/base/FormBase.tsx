@@ -136,7 +136,7 @@ export const FormBase = forwardRef<FormBaseRef, FormBaseProps>(
                 onChange={handleChange}
                 placeholder={field.placeholder ? t(field.placeholder) : ''}
                 autoComplete={getAutoComplete(field)}
-                disabled={isSubmitting} // Deshabilitar durante envío
+                disabled={isSubmitting} // Disable during submission
               />
             )}
 
