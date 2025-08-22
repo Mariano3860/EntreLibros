@@ -1,5 +1,5 @@
-import { FormBase } from '@components/form/base/FormBase'
-import type { FormField } from '@components/form/base/FormBase.types'
+import { FormBase } from '@components/forms/base/FormBase'
+import type { FormField } from '@components/forms/base/FormBase.types'
 import { useContactForm } from '@hooks/api/useContactForm'
 import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'

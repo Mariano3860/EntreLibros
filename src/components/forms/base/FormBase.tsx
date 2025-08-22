@@ -2,6 +2,7 @@ import React, {
   ChangeEvent,
   FormEvent,
   forwardRef,
+  useEffect,
   useImperativeHandle,
   useMemo,
   useState,
@@ -10,6 +11,8 @@ import { useTranslation } from 'react-i18next'
 
 import styles from './FormBase.module.scss'
 import { FormBaseProps, FormBaseRef } from './FormBase.types'
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export const FormBase = forwardRef<FormBaseRef, FormBaseProps>(
   ({ fields, onSubmit, submitLabel, isSubmitting = false }, ref) => {
@@ -30,6 +33,10 @@ export const FormBase = forwardRef<FormBaseRef, FormBaseProps>(
       useState<Record<string, string>>(initialFormState)
     const [errors, setErrors] = useState<Record<string, string>>({})
 
+    useEffect(() => {
+      setFormData(initialFormState)
+    }, [initialFormState])
+
     const handleChange = (
       e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ) => {
@@ -48,7 +55,7 @@ export const FormBase = forwardRef<FormBaseRef, FormBaseProps>(
           return
         }
 
-        if (field.type === 'email' && value && !/\S+@\S+\.\S+/.test(value)) {
+        if (field.type === 'email' && value && !EMAIL_REGEX.test(value)) {
           newErrors[field.name] = t('form.errors.invalid_email')
           return
         }
@@ -98,6 +105,7 @@ export const FormBase = forwardRef<FormBaseRef, FormBaseProps>(
                 value={formData[field.name]}
                 onChange={handleChange}
                 placeholder={field.placeholder ? t(field.placeholder) : ''}
+                autoComplete="off"
                 disabled={isSubmitting} // Deshabilitar durante envío
               />
             ) : (
@@ -109,6 +117,7 @@ export const FormBase = forwardRef<FormBaseRef, FormBaseProps>(
                 value={formData[field.name]}
                 onChange={handleChange}
                 placeholder={field.placeholder ? t(field.placeholder) : ''}
+                autoComplete="off"
                 disabled={isSubmitting} // Deshabilitar durante envío
               />
             )}
