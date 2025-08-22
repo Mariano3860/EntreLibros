@@ -198,8 +198,6 @@ export const Messages = () => {
             </span>
           </div>
           <div className={styles.actions}>
-            <button aria-label="Call">📞</button>
-            <button aria-label="Video call">🎥</button>
             <button aria-label="Profile info">ℹ️</button>
           </div>
         </header>
@@ -224,14 +222,17 @@ export const Messages = () => {
           ))}
         </div>
         <div className={styles.inputArea}>
-          <button aria-label="Attach book">📎</button>
-          <input
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Message..."
-          />
-          <button aria-label="Emoji">😊</button>
-          <button aria-label="Image">🖼️</button>
+          <div className={styles.inputWrapper}>
+            <input
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder="Message..."
+            />
+            <div className={styles.inputIcons}>
+              <button aria-label="Attach book">📎</button>
+              <button aria-label="Emoji">😊</button>
+            </div>
+          </div>
           <button aria-label="Send" onClick={handleSend}>
             ➤
           </button>
