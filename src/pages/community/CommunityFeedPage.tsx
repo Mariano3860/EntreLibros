@@ -51,7 +51,7 @@ export const CommunityFeedPage = () => {
   }, [fetchNextPage, hasNextPage])
 
   return (
-    <BaseLayout>
+    <BaseLayout id={'community-page'}>
       <div className={styles.wrapper}>
         <main className={styles.main}>
           <header className={styles.header}>

@@ -38,7 +38,7 @@ export const HomePage = () => {
   if (isLoading) return null
 
   return (
-    <BaseLayout>
+    <BaseLayout id={'home-page'}>
       <div className={styles.homeWrapper}>
         {/* HERO */}
         {isAuthenticated ? (

@@ -56,7 +56,7 @@ export const BooksPage = () => {
   })
 
   return (
-    <BaseLayout>
+    <BaseLayout id={'books-page'}>
       <div className={styles.wrapper}>
         <header className={styles.header}>
           <h1>{t('booksPage.title')}</h1>

@@ -6,4 +6,7 @@ import type { ReactNode } from 'react'
  */
 export type BaseLayoutProps = {
   children?: ReactNode
+  className?: string
+  mainClassName?: string
+  id?: string
 }

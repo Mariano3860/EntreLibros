@@ -7,6 +7,7 @@ import React from 'react'
 
 import AppRoutes from './routes'
 
+import '@src/shared/styles/_reset.scss'
 import '@src/shared/styles/main.scss'
 
 const queryClient = new QueryClient()
