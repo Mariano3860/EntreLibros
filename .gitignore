@@ -7,3 +7,4 @@ build/
 coverage/
 *.log
 npm-debug.log*
+backend/target/
