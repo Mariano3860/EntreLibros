@@ -1,13 +1,13 @@
 import { BookCard } from '@components/book/BookCard'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { TabsMenu } from '@components/ui/tabs-menu/TabsMenu'
+import { useUserBooks } from '@hooks/api/useUserBooks'
 import { getPathSegment } from '@utils/path'
 import React, { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 
 import type { ApiUserBook } from '@src/api/books/userBooks.types'
-import { useUserBooks } from '@src/hooks/api/useUserBooks'
 
 import styles from './BooksPage.module.scss'
 

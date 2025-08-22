@@ -21,16 +21,11 @@ export const setCookie = (name: string, value: string, days = 365) => {
 }
 
 export const getCookie = (name: string): string | undefined => {
-  if (typeof document === 'undefined') return
-  return document.cookie
+  const value = document.cookie
     .split('; ')
     .find((row) => row.startsWith(`${name}=`))
-    ?.split('=')[1] && decodeURIComponent(
-      (document.cookie
-        .split('; ')
-        .find((row) => row.startsWith(`${name}=`))
-        ?.split('=')[1]) as string
-    )
+    ?.split('=')[1]
+  return value === undefined ? undefined : decodeURIComponent(value)
 }
 
 export default clearAllCookies
