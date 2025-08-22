@@ -1,4 +1,3 @@
-import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import React from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 

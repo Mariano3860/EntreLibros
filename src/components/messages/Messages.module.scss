@@ -262,7 +262,7 @@
 }
 
 .inputWrapper input {
-  width: calc(100% - $spacing-4*2);
+  width: calc(100% - $spacing-4 * 2);
   height: 44px;
   padding: 0 ($spacing-3 * 2) 0 $spacing-2;
   border: 1px solid var(--border-color);
