@@ -102,7 +102,7 @@ export const FormBase = forwardRef<FormBaseRef, FormBaseProps>(
       return 'off'
     }
 
-    // Exponemos resetForm a través de la ref
+    // Expose resetForm through the ref
     useImperativeHandle(ref, () => ({
       resetForm,
     }))
@@ -124,7 +124,7 @@ export const FormBase = forwardRef<FormBaseRef, FormBaseProps>(
                 onChange={handleChange}
                 placeholder={field.placeholder ? t(field.placeholder) : ''}
                 autoComplete={getAutoComplete(field)}
-                disabled={isSubmitting} // Deshabilitar durante envío
+                disabled={isSubmitting} // Disable during submission
               />
             ) : (
               <input
@@ -136,7 +136,7 @@ export const FormBase = forwardRef<FormBaseRef, FormBaseProps>(
                 onChange={handleChange}
                 placeholder={field.placeholder ? t(field.placeholder) : ''}
                 autoComplete={getAutoComplete(field)}
-                disabled={isSubmitting} // Deshabilitar durante envío
+                disabled={isSubmitting} // Disable during submission
               />
             )}
 
