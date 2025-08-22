@@ -64,7 +64,7 @@ describe('index.tsx', () => {
       await import('@src/index')
     })
     expect(await screen.findByText('home.hero_title')).toBeTruthy()
-    expect(worker.start).toHaveBeenCalled()
+    expect(worker.start).toHaveBeenCalledWith({ onUnhandledRequest: 'bypass' })
 
     document.body.removeChild(rootElement)
     process.env.NODE_ENV = originalEnv
