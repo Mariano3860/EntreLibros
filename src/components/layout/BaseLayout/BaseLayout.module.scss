@@ -9,7 +9,8 @@
 .mainContent {
   flex: 1;
   padding: 1rem;
-  margin-left: $collapsed-width; // Sidebar collapse width
+  margin-left: $collapsed-width * 1.5; // Sidebar collapse width
+  margin-right: $collapsed-width * 0.5;
 
   @media (max-width: $breakpoint-tablet) {
     margin-left: 0;
