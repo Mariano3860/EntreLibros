@@ -27,7 +27,7 @@ vi.mock('react-i18next', async () => {
   }
 })
 
-beforeAll(() => server.listen())
+beforeAll(() => server.listen({ onUnhandledRequest: 'bypass' }))
 
 // Clear cookies and reset handlers after each test to avoid cross-test contamination
 afterEach(() => {
