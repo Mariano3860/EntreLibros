@@ -1,0 +1,46 @@
+.messagesSection {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.messagesList {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.message {
+  max-width: 70%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+}
+
+.user {
+  align-self: flex-end;
+  background-color: #d1e7dd;
+}
+
+.other {
+  align-self: flex-start;
+  background-color: #f8d7da;
+}
+
+.inputForm {
+  display: flex;
+  border-top: 1px solid #ccc;
+  padding: 0.5rem;
+}
+
+.inputForm input {
+  flex: 1;
+  padding: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.inputForm button {
+  padding: 0.5rem 1rem;
+}

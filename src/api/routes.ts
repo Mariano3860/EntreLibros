@@ -19,6 +19,9 @@ export const RELATIVE_API_ROUTES = {
     ACTIVITY: `/community/activity`,
     SUGGESTIONS: `/community/suggestions`,
   },
+  MESSAGES: {
+    LIST: `/messages`,
+  },
   LANGUAGE: {
     UPDATE: `/user/language`,
   },

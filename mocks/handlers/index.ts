@@ -10,6 +10,10 @@ import { communityFeedHandler } from './community/feed.handler'
 import { suggestionsHandler } from './community/suggestions.handler'
 import { contactFormHandler } from './contactForm/contactForm.handler'
 import { userLanguageHandler } from './language/language.handler'
+import {
+  messagesListHandler,
+  messagesSendHandler,
+} from './messages/messages.handler'
 
 export const handlers = [
   loginHandler,
@@ -25,4 +29,6 @@ export const handlers = [
   communityFeedHandler,
   activityHandler,
   suggestionsHandler,
+  messagesListHandler,
+  messagesSendHandler,
 ]
