@@ -7,7 +7,7 @@ import styles from './Header.module.scss'
 export const Header = () => {
   return (
     <header className={styles.header}>
-      <LogoEntreLibros withText />
+      <LogoEntreLibros redirectTo={'/'} withText />
       <div className={styles.controls}>
         <ThemeToggle />
         <LanguageSelector />

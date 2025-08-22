@@ -15,14 +15,14 @@
 
 .main {
   width: 100%;
-  max-width: 600px;
+  max-width: 70vw;
 }
 
 .header {
   display: flex;
   align-items: center;
-  gap: $spacing-2;
-  margin-bottom: $spacing-4;
+  gap: $spacing-1;
+  margin-bottom: $spacing-2;
 }
 
 .publishButton {
@@ -31,8 +31,9 @@
   color: #fff;
   border: none;
   border-radius: rem(8px);
-  padding: $spacing-1x5 $spacing-3;
+  padding: $spacing-1 $spacing-2;
   cursor: pointer;
+  margin-top: $spacing-1;
 }
 
 .loader {

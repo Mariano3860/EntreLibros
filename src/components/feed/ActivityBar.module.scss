@@ -3,8 +3,8 @@
 .bar {
   display: flex;
   overflow-x: auto;
-  gap: $spacing-3;
-  padding: $spacing-2 0;
+  gap: $spacing-2;
+  padding: $spacing-1 0;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE and Edge */
   position: relative;
@@ -37,8 +37,8 @@
 }
 
 .item img {
-  width: 56px;
-  height: 56px;
+  width: rem(56px);
+  height: rem(56px);
   border-radius: 50%;
   margin-bottom: $spacing-1;
 }
