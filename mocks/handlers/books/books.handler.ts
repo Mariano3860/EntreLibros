@@ -6,12 +6,13 @@ import { generateBooks } from './fakers/books.faker'
 
 export const booksHandler = http.get(
   RELATIVE_API_ROUTES.BOOKS.LIST,
-  async ({ request }) => {
+  async ({ request, cookies }) => {
     const url = new URL(request.url)
     const seedParam = url.searchParams.get('seed')
     const seed = seedParam ? Number(seedParam) : undefined
+    const language = cookies.language || 'es'
     await new Promise((r) => setTimeout(r, 200))
-    const books = generateBooks(seed)
+    const books = generateBooks(seed, language)
     return HttpResponse.json(books, { status: 200 })
   }
 )
