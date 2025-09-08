@@ -15,9 +15,17 @@
     "migrate": "npm run migrate -w backend",
     "test": "npm run test:backend && npm run test:frontend",
     "test:backend": "npm test -w backend",
-    "test:frontend": "npm test -w frontend"
+    "test:frontend": "npm test -w frontend",
+    "lint": "npm run lint -w backend && npm run lint -w frontend",
+    "lint:fix": "npm run lint:fix -w backend && npm run lint:fix -w frontend",
+    "format": "npm run format -w backend && npm run format -w frontend",
+    "format:fix": "npm run format:fix -w backend && npm run format:fix -w frontend",
+    "typecheck": "npm run typecheck -w backend && npm run typecheck -w frontend",
+    "check": "npm run format && npm run lint && npm run typecheck && npm test",
+    "prepare": "husky"
   },
   "devDependencies": {
-    "npm-run-all": "^4.1.5"
+    "npm-run-all": "^4.1.5",
+    "husky": "^9.1.7"
   }
 }

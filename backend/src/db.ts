@@ -1,24 +1,26 @@
-import { Pool, PoolClient } from 'pg';
+import { Pool, PoolClient, type QueryResult, type QueryResultRow } from 'pg'
 
-const connectionString = process.env.DATABASE_URL;
+const connectionString = process.env.DATABASE_URL
 if (!connectionString) {
-  throw new Error('DATABASE_URL is not set');
+  throw new Error('DATABASE_URL is not set')
 }
 
-export const pool = new Pool({ connectionString });
+export const pool = new Pool({ connectionString })
 
-let testClient: PoolClient | null = null;
+let testClient: PoolClient | null = null
 
 export function setTestClient(client: PoolClient | null) {
-  testClient = client;
+  testClient = client
 }
 
 export function getClient(): Pool | PoolClient {
-  return testClient ?? pool;
+  return testClient ?? pool
 }
 
-export async function query<T = any>(sql: string, params?: any[]): Promise<{ rows: T[] }> {
-  const client = getClient();
-  // Both Pool and PoolClient expose a compatible query method
-  return client.query(sql, params);
+export async function query<T extends QueryResultRow = QueryResultRow>(
+  sql: string,
+  params?: any[]
+): Promise<QueryResult<T>> {
+  const client = getClient()
+  return client.query<T>(sql, params)
 }

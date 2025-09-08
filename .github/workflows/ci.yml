@@ -22,8 +22,8 @@ jobs:
           sudo -u postgres createdb entrelibros_test
       - name: Install dependencies
         run: npm ci
-      - name: Run tests
+      - name: Run checks
         env:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/entrelibros_test
           FRONTEND_URL: http://localhost:3000
-        run: npm test
+        run: npm run check
