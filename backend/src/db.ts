@@ -19,6 +19,6 @@ export function getClient(): Pool | PoolClient {
 
 export async function query<T = any>(sql: string, params?: any[]): Promise<{ rows: T[] }> {
   const client = getClient();
-  // @ts-ignore - both Pool and PoolClient have query
-  return client.query(sql, params);
+  // Both Pool and PoolClient expose a compatible query method
+  return (client as PoolClient).query(sql, params);
 }
