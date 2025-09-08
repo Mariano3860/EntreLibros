@@ -10,7 +10,11 @@ if (!connectionString) {
 }
 
 const url = new URL(connectionString);
-const migrationsDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'migrations');
+const migrationsDir = path.join(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '..',
+  'migrations'
+);
 
 migrate(
   {

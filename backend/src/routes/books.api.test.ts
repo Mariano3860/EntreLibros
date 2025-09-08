@@ -20,7 +20,10 @@ afterEach(async () => {
 
 describe('books API', () => {
   it('creates and lists books via HTTP', async () => {
-    await request(app).post('/api/books').send({ title: 'API Book' }).expect(201);
+    await request(app)
+      .post('/api/books')
+      .send({ title: 'API Book' })
+      .expect(201);
     const res = await request(app).get('/api/books').expect(200);
     expect(res.body).toHaveLength(1);
     expect(res.body[0].title).toBe('API Book');
