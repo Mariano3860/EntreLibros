@@ -8,17 +8,23 @@ Este repositorio contiene el frontend y backend del proyecto EntreLibros.
    ```bash
    npm install
    ```
-2. **Preparar base de datos y migraciones**
+2. **Configurar variables de entorno**
+   - Copiar `backend/.env.example` a `backend/.env` y ajustar `DATABASE_URL`.
+   - Copiar `backend/.env.test.example` a `backend/.env.test` para las pruebas.
+   - Revisar `frontend/.env.example` para configurar el frontend.
+3. **Preparar base de datos y migraciones**
    ```bash
-   npm run migrate -w backend
+   npm run migrate
    ```
    Crea la base definida en `backend/.env` y aplica las migraciones.
-3. **Levantar servidores**
+4. **Levantar servidores**
    ```bash
-   npm run dev -w backend
-   npm run dev -w frontend
+   npm run dev:backend   # backend
+   npm run dev:frontend  # frontend
+   # o para levantar ambos en paralelo:
+   npm run dev
    ```
-   El frontend obtiene la URL del backend desde `PUBLIC_API_BASE_URL` (ver `frontend/.env.example`).
+   El frontend obtiene la URL del backend desde `PUBLIC_API_BASE_URL`.
 
 ## Tests
 
@@ -34,7 +40,7 @@ Las pruebas del backend ejecutan las migraciones antes de correr y cada test usa
 
 Para ejecutar manualmente las migraciones del backend:
 ```bash
-npm run migrate -w backend
+npm run migrate
 ```
 
 ## CI
