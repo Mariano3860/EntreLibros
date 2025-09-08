@@ -4,7 +4,7 @@
   "description": "Aplicación web del proyecto EntreLibros: una plataforma colaborativa para compartir, reseñar e intercambiar libros físicos mediante geolocalización.",
   "type": "module",
   "engines": {
-    "node": ">=20"
+    "node": ">=24"
   },
   "scripts": {
     "dev": "rsbuild dev --open",

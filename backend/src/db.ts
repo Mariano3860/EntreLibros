@@ -1,4 +1,4 @@
-import { Pool, PoolClient } from 'pg';
+import { Pool, PoolClient, type QueryResultRow } from 'pg';
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
@@ -17,11 +17,11 @@ export function getClient(): Pool | PoolClient {
   return testClient ?? pool;
 }
 
-export async function query<T = any>(
+export async function query<T extends QueryResultRow = QueryResultRow>(
   sql: string,
   params?: any[]
-): Promise<any> {
+): Promise<{ rows: T[] }> {
   const client = getClient();
   // Both Pool and PoolClient expose a compatible query method
-  return client.query(sql, params);
+  return client.query<T>(sql, params);
 }
