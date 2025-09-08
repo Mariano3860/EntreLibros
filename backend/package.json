@@ -1,0 +1,35 @@
+{
+  "name": "entrelibros-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "migrate": "node -r dotenv/config scripts/migrate.js",
+    "test": "DOTENV_CONFIG_PATH=.env.test node -r dotenv/config scripts/migrate.js && DOTENV_CONFIG_PATH=.env.test node -r dotenv/config ../node_modules/vitest/vitest.mjs --run"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "helmet": "^7.0.0",
+    "morgan": "^1.10.0",
+    "pg": "^8.13.1",
+    "postgres-migrations": "^5.3.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.11.30",
+    "@types/supertest": "^2.0.12",
+    "supertest": "^6.3.4",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.0.7"
+  }
+}

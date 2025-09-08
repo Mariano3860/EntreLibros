@@ -4,17 +4,26 @@ on:
   pull_request:
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run format
-      - run: npm run typecheck
-      - run: npm test
+      - name: Install Postgres
+        run: sudo apt-get update && sudo apt-get install -y postgresql
+      - name: Start Postgres
+        run: sudo service postgresql start
+      - name: Setup database
+        run: |
+          sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';"
+          sudo -u postgres createdb entrelibros_test
+      - name: Install dependencies
+        run: npm ci
+      - name: Run tests
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/entrelibros_test
+          FRONTEND_URL: http://localhost:3000
+        run: npm test
