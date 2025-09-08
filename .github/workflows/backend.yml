@@ -1,0 +1,23 @@
+name: Backend
+
+on:
+  push:
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run format -w backend
+      - run: npm run lint -w backend
+      - run: npm run typecheck -w backend
+      - run: npm run test:backend
+      - name: Build Docker image
+        run: docker build -t backend -f backend/Dockerfile .

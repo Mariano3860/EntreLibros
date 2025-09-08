@@ -1,6 +1,7 @@
 name: CI
 
 on:
+  push:
   pull_request:
 
 jobs:
@@ -12,6 +13,20 @@ jobs:
         with:
           node-version: 20
           cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Check formatting (backend)
+        run: npm run format -w backend
+      - name: Lint backend
+        run: npm run lint -w backend
+      - name: Typecheck backend
+        run: npm run typecheck -w backend
+      - name: Check formatting (frontend)
+        run: npm run format -w frontend
+      - name: Lint frontend
+        run: npm run lint -w frontend
+      - name: Typecheck frontend
+        run: npm run typecheck -w frontend
       - name: Install Postgres
         run: sudo apt-get update && sudo apt-get install -y postgresql
       - name: Start Postgres
@@ -20,8 +35,6 @@ jobs:
         run: |
           sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';"
           sudo -u postgres createdb entrelibros_test
-      - name: Install dependencies
-        run: npm ci
       - name: Run tests
         env:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/entrelibros_test
