@@ -3,6 +3,7 @@ import { fileURLToPath, URL } from 'node:url'
 import svgr from 'vite-plugin-svgr'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { defineConfig } from 'vitest/config'
+import sass from 'sass'
 
 export default defineConfig({
   plugins: [
@@ -24,7 +25,7 @@ export default defineConfig({
     },
   },
   css: {
-    preprocessorOptions: { scss: { implementation: 'sass' } },
+    preprocessorOptions: { scss: { implementation: sass } },
   },
   test: {
     include: ['**/*.test.{ts,tsx,js,jsx}'],

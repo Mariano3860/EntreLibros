@@ -1,12 +1,13 @@
 import { defineConfig } from '@rsbuild/core'
 import { pluginReact } from '@rsbuild/plugin-react'
 import { pluginSass } from '@rsbuild/plugin-sass'
+import sass from 'sass'
 import { pluginSvgr } from '@rsbuild/plugin-svgr'
 
 export default defineConfig({
   plugins: [
     pluginReact(),
-    pluginSass({ implementation: 'sass' }),
+    pluginSass({ implementation: sass }),
     pluginSvgr({
       svgrOptions: {
         exportType: 'named',

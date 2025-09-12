@@ -4,6 +4,16 @@ import { afterAll, afterEach, beforeAll, vi } from 'vitest'
 
 import { server } from '@mocks/server'
 
+if (typeof globalThis.ProgressEvent === 'undefined') {
+  class ProgressEvent extends Event {
+    constructor(type: string, eventInitDict?: EventInit) {
+      super(type, eventInitDict)
+    }
+  }
+  // @ts-ignore - add ProgressEvent to the global scope for MSW interceptors
+  globalThis.ProgressEvent = ProgressEvent
+}
+
 // Mock SVGs
 vi.mock('.*\\.svg$', () => ({
   default: () => '<svg />',
