@@ -87,4 +87,38 @@ describe('auth API', () => {
     expect(res.body.message).toBe('auth.errors.jwt_not_configured');
     process.env.JWT_SECRET = original;
   });
+
+  it('logs in an existing user', async () => {
+    await request(app)
+      .post('/api/auth/register')
+      .send({
+        name: 'Alice',
+        email: 'alice@example.com',
+        password: 'Str0ng!Pass1',
+      })
+      .expect(201);
+    const res = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'alice@example.com', password: 'Str0ng!Pass1' })
+      .expect(200);
+    expect(res.body.message).toBe('auth.success.login');
+    expect(res.body.user.email).toBe('alice@example.com');
+    expect(res.headers['set-cookie'][0]).toMatch(/sessionToken=/);
+  });
+
+  it('rejects invalid credentials', async () => {
+    const res = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'wrong@example.com', password: 'bad' })
+      .expect(401);
+    expect(res.body.error).toBe('InvalidCredentials');
+  });
+
+  it('requires email and password', async () => {
+    const res = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'nope@example.com' })
+      .expect(400);
+    expect(res.body.error).toBe('MissingFields');
+  });
 });
