@@ -11,6 +11,14 @@ import validator from 'validator';
 const router = Router();
 
 router.post('/register', async (req, res) => {
+  const jwtSecret = process.env.JWT_SECRET;
+  if (!jwtSecret) {
+    return res.status(500).json({
+      error: 'ServerError',
+      message: 'auth.errors.jwt_not_configured',
+    });
+  }
+
   const { name, email, password } = req.body as {
     name?: string;
     email?: string;
@@ -39,13 +47,6 @@ router.post('/register', async (req, res) => {
       .json({ error: 'EmailExists', message: 'auth.errors.email_exists' });
   }
   const user = await createUser(name, email, password, DEFAULT_USER_ROLE);
-  const jwtSecret = process.env.JWT_SECRET;
-  if (!jwtSecret) {
-    return res.status(500).json({
-      error: 'ServerError',
-      message: 'auth.errors.jwt_not_configured',
-    });
-  }
   const publicUser = toPublicUser(user);
   const token = jwt.sign(
     { id: publicUser.id, email: publicUser.email, role: publicUser.role },

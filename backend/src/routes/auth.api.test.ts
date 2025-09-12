@@ -72,4 +72,19 @@ describe('auth API', () => {
       .expect(400);
     expect(res.body.error).toBe('WeakPassword');
   });
+
+  it('fails when JWT secret is missing', async () => {
+    const original = process.env.JWT_SECRET;
+    delete process.env.JWT_SECRET;
+    const res = await request(app)
+      .post('/api/auth/register')
+      .send({
+        name: 'Zed',
+        email: 'zed@example.com',
+        password: 'Str0ng!Pass1',
+      })
+      .expect(500);
+    expect(res.body.message).toBe('auth.errors.jwt_not_configured');
+    process.env.JWT_SECRET = original;
+  });
 });
