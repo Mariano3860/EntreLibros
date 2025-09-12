@@ -9,6 +9,13 @@ export interface User {
   role: string;
 }
 
+export type PublicUser = Omit<User, 'password'>;
+
+export function toPublicUser(user: User): PublicUser {
+  const { password, ...publicUser } = user;
+  return publicUser;
+}
+
 export async function findUserByEmail(email: string): Promise<User | null> {
   const { rows } = await query<User>('SELECT * FROM users WHERE email = $1', [
     email,

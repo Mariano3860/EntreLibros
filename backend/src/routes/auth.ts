@@ -1,5 +1,9 @@
 import { Router } from 'express';
-import { createUser, findUserByEmail } from '../repositories/userRepository.js';
+import {
+  createUser,
+  findUserByEmail,
+  toPublicUser,
+} from '../repositories/userRepository.js';
 import jwt from 'jsonwebtoken';
 
 const router = Router();
@@ -26,16 +30,17 @@ router.post('/register', async (req, res) => {
   if (!jwtSecret) {
     return res.status(500).json({
       error: 'ServerError',
-      message: 'JWT secret is not configured.',
+      message: 'auth.errors.jwt_not_configured',
     });
   }
+  const publicUser = toPublicUser(user);
   const token = jwt.sign(
-    { id: user.id, email: user.email, role: user.role },
+    { id: publicUser.id, email: publicUser.email, role: publicUser.role },
     jwtSecret
   );
   res.status(201).json({
     token,
-    user: { id: String(user.id), email: user.email, role: user.role },
+    user: publicUser,
     message: 'auth.success.register',
   });
 });
