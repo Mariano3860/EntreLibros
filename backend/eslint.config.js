@@ -3,7 +3,7 @@ import tseslint from 'typescript-eslint';
 
 export default [
   {
-    ignores: ['scripts/migrate.js'],
+    ignores: ['scripts/migrate.js', 'scripts/generate-openapi.ts'],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,

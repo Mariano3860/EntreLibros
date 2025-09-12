@@ -16,7 +16,8 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "openapi": "tsx scripts/generate-openapi.ts"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
