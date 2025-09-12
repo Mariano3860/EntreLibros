@@ -108,11 +108,11 @@ router.post('/login', async (req, res) => {
   res
     .cookie('sessionToken', token, {
       httpOnly: true,
-      sameSite: 'strict',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       secure: process.env.NODE_ENV === 'production',
       maxAge: 24 * 60 * 60 * 1000,
     })
-    .json({ token, user: publicUser, message: 'auth.success.login' });
+    .json({ user: publicUser, message: 'auth.success.login' });
 });
 
 export default router;

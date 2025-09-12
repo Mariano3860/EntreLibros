@@ -1,12 +1,12 @@
-import { beforeEach, afterEach, describe, expect, it } from 'vitest';
-import { pool, setTestClient } from '../db.js';
+import { beforeEach, afterEach, describe, expect, test } from 'vitest';
+import { pool, setTestClient } from '../../src/db.js';
 import type { PoolClient } from 'pg';
 import bcrypt from 'bcryptjs';
 import {
   createUser,
   findUserByEmail,
   DEFAULT_USER_ROLE,
-} from './userRepository.js';
+} from '../../src/repositories/userRepository.js';
 
 let client: PoolClient;
 
@@ -23,7 +23,7 @@ afterEach(async () => {
 });
 
 describe('userRepository', () => {
-  it('creates and finds users', async () => {
+  test('creates and finds users', async () => {
     const user = await createUser(
       'Alice',
       'alice@example.com',

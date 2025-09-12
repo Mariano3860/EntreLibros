@@ -1,7 +1,7 @@
 import request from 'supertest';
-import { beforeEach, afterEach, describe, expect, it } from 'vitest';
-import app from '../app.js';
-import { pool, setTestClient } from '../db.js';
+import { beforeEach, afterEach, describe, expect, test } from 'vitest';
+import app from '../../src/app.js';
+import { pool, setTestClient } from '../../src/db.js';
 import type { PoolClient } from 'pg';
 
 let client: PoolClient;
@@ -19,7 +19,7 @@ afterEach(async () => {
 });
 
 describe('books API', () => {
-  it('creates and lists books via HTTP', async () => {
+  test('creates and lists books via HTTP', async () => {
     await request(app)
       .post('/api/books')
       .send({ title: 'API Book' })

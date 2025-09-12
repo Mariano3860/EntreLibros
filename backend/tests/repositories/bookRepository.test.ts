@@ -1,6 +1,9 @@
-import { beforeEach, afterEach, describe, expect, it } from 'vitest';
-import { pool, setTestClient } from '../db.js';
-import { createBook, listBooks } from './bookRepository.js';
+import { beforeEach, afterEach, describe, expect, test } from 'vitest';
+import { pool, setTestClient } from '../../src/db.js';
+import {
+  createBook,
+  listBooks,
+} from '../../src/repositories/bookRepository.js';
 import type { PoolClient } from 'pg';
 
 let client: PoolClient;
@@ -18,7 +21,7 @@ afterEach(async () => {
 });
 
 describe('bookRepository', () => {
-  it('inserts and lists books', async () => {
+  test('inserts and lists books', async () => {
     await createBook('Test Book');
     const books = await listBooks();
     expect(books).toHaveLength(1);
