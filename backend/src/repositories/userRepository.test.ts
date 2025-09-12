@@ -1,6 +1,7 @@
 import { beforeEach, afterEach, describe, expect, it } from 'vitest';
 import { pool, setTestClient } from '../db.js';
 import type { PoolClient } from 'pg';
+import bcrypt from 'bcryptjs';
 import { createUser, findUserByEmail } from './userRepository.js';
 
 let client: PoolClient;
@@ -19,7 +20,8 @@ afterEach(async () => {
 
 describe('userRepository', () => {
   it('creates and finds users', async () => {
-    await createUser('Alice', 'alice@example.com', 'secret');
+    const user = await createUser('Alice', 'alice@example.com', 'secret');
+    expect(await bcrypt.compare('secret', user.password)).toBe(true);
     const found = await findUserByEmail('alice@example.com');
     expect(found?.email).toBe('alice@example.com');
   });

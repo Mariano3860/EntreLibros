@@ -26,6 +26,7 @@ describe('auth API', () => {
       .expect(201);
     expect(res.body.message).toBe('auth.success.register');
     expect(res.body.user.email).toBe('alice@example.com');
+    expect(typeof res.body.token).toBe('string');
   });
 
   it('rejects duplicate email', async () => {

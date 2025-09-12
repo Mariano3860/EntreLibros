@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { createUser, findUserByEmail } from '../repositories/userRepository.js';
+import jwt from 'jsonwebtoken';
 
 const router = Router();
 
@@ -21,8 +22,12 @@ router.post('/register', async (req, res) => {
       .json({ error: 'EmailExists', message: 'auth.errors.email_exists' });
   }
   const user = await createUser(name, email, password);
+  const token = jwt.sign(
+    { id: user.id, email: user.email, role: user.role },
+    process.env.JWT_SECRET || ''
+  );
   res.status(201).json({
-    token: 'fake-register-token',
+    token,
     user: { id: String(user.id), email: user.email, role: user.role },
     message: 'auth.success.register',
   });

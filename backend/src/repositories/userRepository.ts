@@ -1,4 +1,5 @@
 import { query } from '../db.js';
+import bcrypt from 'bcryptjs';
 
 export interface User {
   id: number;
@@ -20,9 +21,10 @@ export async function createUser(
   email: string,
   password: string
 ): Promise<User> {
+  const hashed = await bcrypt.hash(password, 10);
   const { rows } = await query<User>(
     'INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *',
-    [name, email, password]
+    [name, email, hashed]
   );
   return rows[0];
 }
