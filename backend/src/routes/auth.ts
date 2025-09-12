@@ -164,9 +164,12 @@ router.post('/register', async (req, res) => {
  *             schema:
  *               type: object
  *               required:
+ *                 - token
  *                 - user
  *                 - message
  *               properties:
+ *                 token:
+ *                   type: string
  *                 user:
  *                   type: object
  *                   properties:
@@ -247,7 +250,7 @@ router.post('/login', async (req, res) => {
       secure: process.env.NODE_ENV === 'production',
       maxAge: 24 * 60 * 60 * 1000,
     })
-    .json({ user: publicUser, message: 'auth.success.login' });
+    .json({ token, user: publicUser, message: 'auth.success.login' });
 });
 
 export default router;
