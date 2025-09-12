@@ -177,7 +177,7 @@ router.post('/register', async (req, res) => {
  *                   type: object
  *                   properties:
  *                     id:
- *                       type: string
+ *                       type: integer
  *                     email:
  *                       type: string
  *                     role:
@@ -206,6 +206,24 @@ router.post('/register', async (req, res) => {
  *                   message: auth.errors.invalid_email
  *       401:
  *         description: Invalid credentials
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               required:
+ *                 - error
+ *                 - message
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                 message:
+ *                   type: string
+ *             examples:
+ *               invalidCredentials:
+ *                 summary: Invalid credentials
+ *                 value:
+ *                   error: InvalidCredentials
+ *                   message: auth.errors.invalid_credentials
  */
 router.post('/login', async (req, res) => {
   const jwtSecret = process.env.JWT_SECRET;
