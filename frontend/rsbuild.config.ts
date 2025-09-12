@@ -6,7 +6,7 @@ import { pluginSvgr } from '@rsbuild/plugin-svgr'
 export default defineConfig({
   plugins: [
     pluginReact(),
-    pluginSass(),
+    pluginSass({ implementation: 'sass' }),
     pluginSvgr({
       svgrOptions: {
         exportType: 'named',

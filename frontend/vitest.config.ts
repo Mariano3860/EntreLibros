@@ -23,6 +23,9 @@ export default defineConfig({
       '@mocks': fileURLToPath(new URL('./mocks', import.meta.url)),
     },
   },
+  css: {
+    preprocessorOptions: { scss: { implementation: 'sass' } },
+  },
   test: {
     include: ['**/*.test.{ts,tsx,js,jsx}'],
     environment: 'jsdom',
