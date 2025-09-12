@@ -9,10 +9,9 @@ export interface User {
 }
 
 export async function findUserByEmail(email: string): Promise<User | null> {
-  const { rows } = await query<User>(
-    'SELECT * FROM users WHERE email = $1',
-    [email]
-  );
+  const { rows } = await query<User>('SELECT * FROM users WHERE email = $1', [
+    email,
+  ]);
   return rows[0] ?? null;
 }
 
