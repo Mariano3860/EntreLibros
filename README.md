@@ -26,6 +26,8 @@ Este repositorio contiene el frontend y backend del proyecto EntreLibros.
    ```
 El frontend obtiene la URL del backend desde `PUBLIC_API_BASE_URL`.
 
+Luego de iniciar el backend, puedes visitar `http://localhost:4000/api-docs` para ver la documentación interactiva de la API generada con Swagger.
+
 ## Desarrollo con Docker Compose
 
 El proyecto puede ejecutarse con [Docker Compose](https://docs.docker.com/compose/) para levantar base de datos, backend y frontend con un solo comando.
