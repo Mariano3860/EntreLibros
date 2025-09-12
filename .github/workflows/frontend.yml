@@ -15,10 +15,11 @@ jobs:
         with:
           node-version: 24
           cache: npm
-      - run: npm ci
+      - run: npm ci --workspace frontend
       - run: npm run format -w frontend
       - run: npm run lint -w frontend
       - run: npm run typecheck -w frontend
       - run: npm run test -w frontend
       - name: Build Docker image
+        if: github.ref == 'refs/heads/main'
         run: docker build -t frontend -f frontend/Dockerfile .
