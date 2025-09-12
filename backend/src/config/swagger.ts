@@ -1,5 +1,8 @@
 import swaggerJSDoc from 'swagger-jsdoc';
 
+const serverUrl =
+  process.env.API_BASE_URL || `http://localhost:${process.env.PORT || 4000}`;
+
 const options = {
   definition: {
     openapi: '3.0.0',
@@ -7,13 +10,7 @@ const options = {
       title: 'EntreLibros API',
       version: '1.0.0',
     },
-    servers: [
-      {
-        url:
-          process.env.API_BASE_URL ||
-          `http://localhost:${process.env.PORT || 4000}`,
-      },
-    ],
+    servers: [{ url: serverUrl }],
   },
   apis: ['src/routes/*.ts'],
 };

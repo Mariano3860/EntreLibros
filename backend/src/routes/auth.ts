@@ -39,7 +39,38 @@ const router = Router();
  *       201:
  *         description: User registered
  *       400:
- *         description: Missing or invalid fields
+ *         description: Bad Request - One of the following errors occurred
+ *         content:
+ *           application/json:
+ *             schema:
+ *               oneOf:
+ *                 - type: object
+ *                   properties:
+ *                     error:
+ *                       type: string
+ *                       example: MissingFields
+ *                     message:
+ *                       type: string
+ *                       example: auth.errors.missing_fields
+ *                   description: Required fields are missing from the request body.
+ *                 - type: object
+ *                   properties:
+ *                     error:
+ *                       type: string
+ *                       example: InvalidEmail
+ *                     message:
+ *                       type: string
+ *                       example: auth.errors.invalid_email
+ *                   description: The email provided is not valid.
+ *                 - type: object
+ *                   properties:
+ *                     error:
+ *                       type: string
+ *                       example: WeakPassword
+ *                     message:
+ *                       type: string
+ *                       example: auth.errors.weak_password
+ *                   description: The password does not meet complexity requirements.
  *       409:
  *         description: Email already exists
  */
@@ -118,7 +149,20 @@ router.post('/register', async (req, res) => {
  *       200:
  *         description: Successful login
  *       400:
- *         description: Missing or invalid fields
+ *         description: The request is invalid due to missing required fields or invalid email format.
+ *         content:
+ *           application/json:
+ *             examples:
+ *               missingFields:
+ *                 summary: Missing required fields
+ *                 value:
+ *                   error: MissingFields
+ *                   message: auth.errors.missing_fields
+ *               invalidEmail:
+ *                 summary: Invalid email format
+ *                 value:
+ *                   error: InvalidEmail
+ *                   message: auth.errors.invalid_email
  *       401:
  *         description: Invalid credentials
  */
