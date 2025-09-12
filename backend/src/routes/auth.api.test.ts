@@ -25,7 +25,7 @@ describe('auth API', () => {
       .send({
         name: 'Alice',
         email: 'alice@example.com',
-        password: 'Secret123',
+        password: 'Str0ng!Pass1',
       })
       .expect(201);
     expect(res.body.message).toBe('auth.success.register');
@@ -39,7 +39,7 @@ describe('auth API', () => {
       .send({
         name: 'Bob',
         email: 'bob@example.com',
-        password: 'Secret123',
+        password: 'Str0ng!Pass1',
       })
       .expect(201);
     const res = await request(app)
@@ -47,7 +47,7 @@ describe('auth API', () => {
       .send({
         name: 'Bob',
         email: 'bob@example.com',
-        password: 'Secret123',
+        password: 'Str0ng!Pass1',
       })
       .expect(409);
     expect(res.body.error).toBe('EmailExists');
@@ -56,7 +56,7 @@ describe('auth API', () => {
   it('rejects invalid email format', async () => {
     const res = await request(app)
       .post('/api/auth/register')
-      .send({ name: 'Eve', email: 'not-an-email', password: 'Secret123' })
+      .send({ name: 'Eve', email: 'not-an-email', password: 'Str0ng!Pass1' })
       .expect(400);
     expect(res.body.error).toBe('InvalidEmail');
   });
@@ -67,7 +67,7 @@ describe('auth API', () => {
       .send({
         name: 'Mallory',
         email: 'mallory@example.com',
-        password: 'short',
+        password: 'Weakpass1',
       })
       .expect(400);
     expect(res.body.error).toBe('WeakPassword');

@@ -5,6 +5,7 @@ import {
   toPublicUser,
 } from '../repositories/userRepository.js';
 import jwt from 'jsonwebtoken';
+import validator from 'validator';
 
 const router = Router();
 
@@ -19,13 +20,12 @@ router.post('/register', async (req, res) => {
       .status(400)
       .json({ error: 'MissingFields', message: 'auth.errors.missing_fields' });
   }
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
+  if (!validator.isEmail(email)) {
     return res
       .status(400)
       .json({ error: 'InvalidEmail', message: 'auth.errors.invalid_email' });
   }
-  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
   if (!passwordRegex.test(password)) {
     return res
       .status(400)
