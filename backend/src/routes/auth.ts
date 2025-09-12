@@ -160,19 +160,16 @@ router.post('/register', async (req, res) => {
  *       200:
  *         description: |
  *           Successful login.
- *           Returns a JWT token in the response body and sets it as an `httpOnly` `sessionToken` cookie used for authentication.
- *           Clients should rely on the cookie for subsequent requests; the token field is provided for reference.
+ *           Sets an `httpOnly` `sessionToken` cookie used for authentication.
+ *           Clients should rely on this cookie for subsequent requests.
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               required:
- *                 - token
  *                 - user
  *                 - message
  *               properties:
- *                 token:
- *                   type: string
  *                 user:
  *                   type: object
  *                   properties:
@@ -276,7 +273,7 @@ router.post('/login', async (req, res) => {
       secure: process.env.NODE_ENV === 'production',
       maxAge: 24 * 60 * 60 * 1000,
     })
-    .json({ token, user: publicUser, message: 'auth.success.login' });
+    .json({ user: publicUser, message: 'auth.success.login' });
 });
 
 export default router;
