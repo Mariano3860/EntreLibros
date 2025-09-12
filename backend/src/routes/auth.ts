@@ -158,7 +158,10 @@ router.post('/register', async (req, res) => {
  *                 type: string
  *     responses:
  *       200:
-*         description: Successful login. Returns a JWT token in the response body and sets it as an `httpOnly` `sessionToken` cookie used for authentication. Clients should rely on the cookie for subsequent requests; the token field is provided for reference.
+ *         description: |
+ *           Successful login.
+ *           Returns a JWT token in the response body and sets it as an `httpOnly` `sessionToken` cookie used for authentication.
+ *           Clients should rely on the cookie for subsequent requests; the token field is provided for reference.
  *         content:
  *           application/json:
  *             schema:
@@ -167,11 +170,11 @@ router.post('/register', async (req, res) => {
  *                 - token
  *                 - user
  *                 - message
-*               properties:
-*                 token:
-*                   type: string
-*                 user:
-*                   type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                 user:
+ *                   type: object
  *                   properties:
  *                     id:
  *                       type: string
@@ -179,14 +182,14 @@ router.post('/register', async (req, res) => {
  *                       type: string
  *                     role:
  *                       type: string
-*                 message:
-*                   type: string
+ *                 message:
+ *                   type: string
  *         headers:
  *           Set-Cookie:
  *             schema:
  *               type: string
  *             description: sessionToken cookie containing the JWT
-*       400:
+ *       400:
  *         description: The request is invalid due to missing required fields or invalid email format.
  *         content:
  *           application/json:
