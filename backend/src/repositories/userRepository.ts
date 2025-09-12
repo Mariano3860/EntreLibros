@@ -16,6 +16,8 @@ export function toPublicUser(user: User): PublicUser {
   return publicUser;
 }
 
+export const DEFAULT_USER_ROLE = 'user';
+
 export async function findUserByEmail(email: string): Promise<User | null> {
   const { rows } = await query<User>('SELECT * FROM users WHERE email = $1', [
     email,
@@ -27,7 +29,7 @@ export async function createUser(
   name: string,
   email: string,
   password: string,
-  role = 'user'
+  role = DEFAULT_USER_ROLE
 ): Promise<User> {
   const hashed = await bcrypt.hash(password, 10);
   const { rows } = await query<User>(

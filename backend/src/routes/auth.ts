@@ -3,6 +3,7 @@ import {
   createUser,
   findUserByEmail,
   toPublicUser,
+  DEFAULT_USER_ROLE,
 } from '../repositories/userRepository.js';
 import jwt from 'jsonwebtoken';
 import validator from 'validator';
@@ -37,7 +38,7 @@ router.post('/register', async (req, res) => {
       .status(409)
       .json({ error: 'EmailExists', message: 'auth.errors.email_exists' });
   }
-  const user = await createUser(name, email, password, 'user');
+  const user = await createUser(name, email, password, DEFAULT_USER_ROLE);
   const jwtSecret = process.env.JWT_SECRET;
   if (!jwtSecret) {
     return res.status(500).json({
