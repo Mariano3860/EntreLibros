@@ -1,5 +1,6 @@
 import { fileURLToPath, URL } from 'node:url'
 
+import sass from 'sass'
 import svgr from 'vite-plugin-svgr'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { defineConfig } from 'vitest/config'
@@ -22,6 +23,9 @@ export default defineConfig({
       '@src': fileURLToPath(new URL('./src', import.meta.url)),
       '@mocks': fileURLToPath(new URL('./mocks', import.meta.url)),
     },
+  },
+  css: {
+    preprocessorOptions: { scss: { implementation: sass } },
   },
   test: {
     include: ['**/*.test.{ts,tsx,js,jsx}'],
