@@ -21,10 +21,17 @@ router.post('/register', async (req, res) => {
       .status(409)
       .json({ error: 'EmailExists', message: 'auth.errors.email_exists' });
   }
-  const user = await createUser(name, email, password);
+  const user = await createUser(name, email, password, 'user');
+  const jwtSecret = process.env.JWT_SECRET;
+  if (!jwtSecret) {
+    return res.status(500).json({
+      error: 'ServerError',
+      message: 'JWT secret is not configured.',
+    });
+  }
   const token = jwt.sign(
     { id: user.id, email: user.email, role: user.role },
-    process.env.JWT_SECRET || ''
+    jwtSecret
   );
   res.status(201).json({
     token,
