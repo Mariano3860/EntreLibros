@@ -3,11 +3,66 @@ import { createBook, listBooks } from '../repositories/bookRepository.js';
 
 const router = Router();
 
+/**
+ * @openapi
+ * /api/books:
+ *   get:
+ *     summary: List all books
+ *     tags:
+ *       - Books
+ *     responses:
+ *       200:
+ *         description: Array of books
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   title:
+ *                     type: string
+ */
 router.get('/', async (_req, res) => {
   const books = await listBooks();
   res.json(books);
 });
 
+/**
+ * @openapi
+ * /api/books:
+ *   post:
+ *     summary: Create a book
+ *     tags:
+ *       - Books
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - title
+ *             properties:
+ *               title:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Book created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 title:
+ *                   type: string
+ *       400:
+ *         description: title is required
+ */
 router.post('/', async (req, res) => {
   const { title } = req.body as { title?: string };
   if (!title) {

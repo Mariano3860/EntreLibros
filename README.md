@@ -26,6 +26,8 @@ Este repositorio contiene el frontend y backend del proyecto EntreLibros.
    ```
 El frontend obtiene la URL del backend desde `PUBLIC_API_BASE_URL`.
 
+Luego de iniciar el backend, puedes visitar `http://localhost:4000/api-docs` para ver la documentación interactiva de la API generada con Swagger.
+
 ## Desarrollo con Docker Compose
 
 El proyecto puede ejecutarse con [Docker Compose](https://docs.docker.com/compose/) para levantar base de datos, backend y frontend con un solo comando.
@@ -109,4 +111,5 @@ Principales variables:
 - `DATABASE_URL`: Cadena de conexión de PostgreSQL utilizada por el backend. Ejemplo: `postgres://postgres:postgres@localhost:5432/entrelibros`.
 - `FRONTEND_URL`: URL del frontend que el backend permite para CORS. Ejemplo: `http://localhost:3000`.
 - `PUBLIC_API_BASE_URL`: URL del backend que el frontend consulta. Ejemplo: `http://localhost:4000`.
+- `API_BASE_URL`: URL base de la API utilizada en la documentación de Swagger (opcional, por defecto `http://localhost:4000` o `http://localhost:<PORT>`).
 - `PORT`: Puerto en el que se expone el backend (opcional, por defecto `4000`). Ejemplo: `4000`.
