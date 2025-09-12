@@ -115,6 +115,14 @@ describe('auth API', () => {
     expect(res.body.error).toBe('InvalidCredentials');
   });
 
+  test('rejects invalid email format on login', async () => {
+    const res = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'not-an-email', password: 'whatever' })
+      .expect(400);
+    expect(res.body.error).toBe('InvalidEmail');
+  });
+
   test('requires email and password', async () => {
     const res = await request(app)
       .post('/api/auth/login')

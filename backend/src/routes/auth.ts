@@ -80,9 +80,9 @@ router.post('/login', async (req, res) => {
       .json({ error: 'MissingFields', message: 'auth.errors.missing_fields' });
   }
   if (!validator.isEmail(email)) {
-    return res.status(401).json({
-      error: 'InvalidCredentials',
-      message: 'auth.errors.invalid_credentials',
+    return res.status(400).json({
+      error: 'InvalidEmail',
+      message: 'auth.errors.invalid_email',
     });
   }
   const user = await findUserByEmail(email);
@@ -108,7 +108,7 @@ router.post('/login', async (req, res) => {
   res
     .cookie('sessionToken', token, {
       httpOnly: true,
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
       secure: process.env.NODE_ENV === 'production',
       maxAge: 24 * 60 * 60 * 1000,
     })
