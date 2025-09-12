@@ -31,10 +31,11 @@ jobs:
         with:
           node-version: 24
           cache: npm
-      - run: npm ci
+      - run: npm ci --workspace backend
       - run: npm run format -w backend
       - run: npm run lint -w backend
       - run: npm run typecheck -w backend
       - run: npm run test -w backend
       - name: Build Docker image
+        if: github.ref == 'refs/heads/main'
         run: docker build -t backend -f backend/Dockerfile .
