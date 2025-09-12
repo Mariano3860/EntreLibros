@@ -24,7 +24,54 @@ Este repositorio contiene el frontend y backend del proyecto EntreLibros.
    # o para levantar ambos en paralelo:
    npm run dev
    ```
-   El frontend obtiene la URL del backend desde `PUBLIC_API_BASE_URL`.
+El frontend obtiene la URL del backend desde `PUBLIC_API_BASE_URL`.
+
+## Desarrollo con Docker Compose
+
+El proyecto puede ejecutarse con [Docker Compose](https://docs.docker.com/compose/) para levantar base de datos, backend y frontend con un solo comando.
+
+1. Copiar los archivos de entorno como se describe en la sección anterior.
+2. Crear un archivo `docker-compose.yml` como el siguiente:
+
+```yaml
+version: '3.8'
+services:
+  db:
+    image: postgres:14
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: entrelibros
+
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/entrelibros
+      FRONTEND_URL: http://localhost:3000
+    ports:
+      - "4000:4000"
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    environment:
+      PUBLIC_API_BASE_URL: http://localhost:4000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+```
+
+3. Ejecutar los servicios:
+
+```bash
+docker-compose up --build
+```
+
+Esto expondrá el backend en `http://localhost:4000`, el frontend en `http://localhost:3000` y PostgreSQL en `localhost:5432`.
 
 ## Tests
 
@@ -56,3 +103,10 @@ El flujo falla si falta una migración o si las pruebas dejan datos sin limpiar.
 ## Variables de entorno
 
 No se deben commitear credenciales reales. Usa `backend/.env.example` y `frontend/.env.example` como guía y provee valores reales mediante variables de entorno del entorno de ejecución o del runner de CI.
+
+Principales variables:
+
+- `DATABASE_URL`: Cadena de conexión de PostgreSQL utilizada por el backend. Ejemplo: `postgres://postgres:postgres@localhost:5432/entrelibros`.
+- `FRONTEND_URL`: URL del frontend que el backend permite para CORS. Ejemplo: `http://localhost:3000`.
+- `PUBLIC_API_BASE_URL`: URL del backend que el frontend consulta. Ejemplo: `http://localhost:4000`.
+- `PORT`: Puerto en el que se expone el backend (opcional, por defecto `4000`). Ejemplo: `4000`.
