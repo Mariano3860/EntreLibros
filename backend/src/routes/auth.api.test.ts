@@ -22,7 +22,11 @@ describe('auth API', () => {
   it('registers a new user', async () => {
     const res = await request(app)
       .post('/api/auth/register')
-      .send({ name: 'Alice', email: 'alice@example.com', password: 'secret' })
+      .send({
+        name: 'Alice',
+        email: 'alice@example.com',
+        password: 'Secret123',
+      })
       .expect(201);
     expect(res.body.message).toBe('auth.success.register');
     expect(res.body.user.email).toBe('alice@example.com');
@@ -32,12 +36,40 @@ describe('auth API', () => {
   it('rejects duplicate email', async () => {
     await request(app)
       .post('/api/auth/register')
-      .send({ name: 'Bob', email: 'bob@example.com', password: 'pw' })
+      .send({
+        name: 'Bob',
+        email: 'bob@example.com',
+        password: 'Secret123',
+      })
       .expect(201);
     const res = await request(app)
       .post('/api/auth/register')
-      .send({ name: 'Bob', email: 'bob@example.com', password: 'pw' })
+      .send({
+        name: 'Bob',
+        email: 'bob@example.com',
+        password: 'Secret123',
+      })
       .expect(409);
     expect(res.body.error).toBe('EmailExists');
+  });
+
+  it('rejects invalid email format', async () => {
+    const res = await request(app)
+      .post('/api/auth/register')
+      .send({ name: 'Eve', email: 'not-an-email', password: 'Secret123' })
+      .expect(400);
+    expect(res.body.error).toBe('InvalidEmail');
+  });
+
+  it('rejects weak passwords', async () => {
+    const res = await request(app)
+      .post('/api/auth/register')
+      .send({
+        name: 'Mallory',
+        email: 'mallory@example.com',
+        password: 'short',
+      })
+      .expect(400);
+    expect(res.body.error).toBe('WeakPassword');
   });
 });

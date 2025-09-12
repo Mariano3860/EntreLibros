@@ -19,6 +19,18 @@ router.post('/register', async (req, res) => {
       .status(400)
       .json({ error: 'MissingFields', message: 'auth.errors.missing_fields' });
   }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res
+      .status(400)
+      .json({ error: 'InvalidEmail', message: 'auth.errors.invalid_email' });
+  }
+  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+  if (!passwordRegex.test(password)) {
+    return res
+      .status(400)
+      .json({ error: 'WeakPassword', message: 'auth.errors.weak_password' });
+  }
   const existing = await findUserByEmail(email);
   if (existing) {
     return res
