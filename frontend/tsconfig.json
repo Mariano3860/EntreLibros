@@ -26,5 +26,5 @@
     "resolveJsonModule": true
   },
   "exclude": ["node_modules", "dist", "build", "coverage"],
-  "include": ["src", "tests", "mocks"]
+  "include": ["src", "tests", "mocks", "vitest.config.ts"]
 }
