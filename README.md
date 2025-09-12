@@ -111,4 +111,5 @@ Principales variables:
 - `DATABASE_URL`: Cadena de conexión de PostgreSQL utilizada por el backend. Ejemplo: `postgres://postgres:postgres@localhost:5432/entrelibros`.
 - `FRONTEND_URL`: URL del frontend que el backend permite para CORS. Ejemplo: `http://localhost:3000`.
 - `PUBLIC_API_BASE_URL`: URL del backend que el frontend consulta. Ejemplo: `http://localhost:4000`.
+- `API_BASE_URL`: URL base de la API utilizada en la documentación de Swagger (opcional, por defecto `http://localhost:4000` o `http://localhost:<PORT>`).
 - `PORT`: Puerto en el que se expone el backend (opcional, por defecto `4000`). Ejemplo: `4000`.

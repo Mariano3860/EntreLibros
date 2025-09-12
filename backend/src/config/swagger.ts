@@ -7,7 +7,13 @@ const options = {
       title: 'EntreLibros API',
       version: '1.0.0',
     },
-    servers: [{ url: 'http://localhost:4000' }],
+    servers: [
+      {
+        url:
+          process.env.API_BASE_URL ||
+          `http://localhost:${process.env.PORT || 4000}`,
+      },
+    ],
   },
   apis: ['src/routes/*.ts'],
 };
