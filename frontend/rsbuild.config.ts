@@ -1,8 +1,8 @@
 import { defineConfig } from '@rsbuild/core'
 import { pluginReact } from '@rsbuild/plugin-react'
 import { pluginSass } from '@rsbuild/plugin-sass'
-import sass from 'sass'
 import { pluginSvgr } from '@rsbuild/plugin-svgr'
+import sass from 'sass'
 
 export default defineConfig({
   plugins: [

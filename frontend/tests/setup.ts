@@ -10,7 +10,7 @@ if (typeof globalThis.ProgressEvent === 'undefined') {
       super(type, eventInitDict)
     }
   }
-  // @ts-ignore - add ProgressEvent to the global scope for MSW interceptors
+  // @ts-expect-error - add ProgressEvent to the global scope for MSW interceptors
   globalThis.ProgressEvent = ProgressEvent
 }
 

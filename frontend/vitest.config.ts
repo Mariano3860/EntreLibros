@@ -1,9 +1,9 @@
 import { fileURLToPath, URL } from 'node:url'
 
+import sass from 'sass'
 import svgr from 'vite-plugin-svgr'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { defineConfig } from 'vitest/config'
-import sass from 'sass'
 
 export default defineConfig({
   plugins: [
