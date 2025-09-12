@@ -13,6 +13,17 @@ const router = Router();
  *     responses:
  *       200:
  *         description: Array of books
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   title:
+ *                     type: string
  */
 router.get('/', async (_req, res) => {
   const books = await listBooks();
@@ -40,6 +51,15 @@ router.get('/', async (_req, res) => {
  *     responses:
  *       201:
  *         description: Book created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 title:
+ *                   type: string
  *       400:
  *         description: title is required
  */

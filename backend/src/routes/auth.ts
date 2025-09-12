@@ -73,6 +73,17 @@ const router = Router();
  *                   description: The password does not meet complexity requirements.
  *       409:
  *         description: Email already exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: EmailExists
+ *                 message:
+ *                   type: string
+ *                   example: auth.errors.email_exists
  */
 router.post('/register', async (req, res) => {
   const jwtSecret = process.env.JWT_SECRET;
@@ -148,6 +159,25 @@ router.post('/register', async (req, res) => {
  *     responses:
  *       200:
  *         description: Successful login
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               required:
+ *                 - user
+ *                 - message
+ *               properties:
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     role:
+ *                       type: string
+ *                 message:
+ *                   type: string
  *       400:
  *         description: The request is invalid due to missing required fields or invalid email format.
  *         content:
