@@ -1,0 +1,29 @@
+import { query } from '../db.js';
+
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  password: string;
+  role: string;
+}
+
+export async function findUserByEmail(email: string): Promise<User | null> {
+  const { rows } = await query<User>(
+    'SELECT * FROM users WHERE email = $1',
+    [email]
+  );
+  return rows[0] ?? null;
+}
+
+export async function createUser(
+  name: string,
+  email: string,
+  password: string
+): Promise<User> {
+  const { rows } = await query<User>(
+    'INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *',
+    [name, email, password]
+  );
+  return rows[0];
+}
