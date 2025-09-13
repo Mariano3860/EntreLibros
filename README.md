@@ -10,7 +10,7 @@ Este repositorio contiene el frontend y backend del proyecto EntreLibros.
    ```
 2. **Configurar variables de entorno**
    - Copiar `backend/.env.example` a `backend/.env` y ajustar `DATABASE_URL`.
-   - Copiar `backend/.env.test.example` a `backend/.env.test` para las pruebas.
+   - (Opcional) Copiar `backend/.env.test.example` a `backend/.env.test` para las pruebas. Este archivo se genera automáticamente si no existe.
    - Revisar `frontend/.env.example` para configurar el frontend.
 3. **Preparar base de datos y migraciones**
    ```bash
