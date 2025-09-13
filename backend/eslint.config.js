@@ -12,6 +12,7 @@ export default [
       'scripts/generate-openapi.ts',
       '**/*.config.js',
       '!**/eslint.config.js',
+      'scripts/run-tests.js',
     ],
   },
   {

@@ -11,7 +11,7 @@
     "build": "tsc",
     "start": "node dist/src/index.js",
     "migrate": "node -r dotenv/config scripts/migrate.js",
-    "test": "node scripts/setup-test-env.js && cross-env DOTENV_CONFIG_PATH=.env.test node -r dotenv/config scripts/migrate.js && cross-env DOTENV_CONFIG_PATH=.env.test node -r dotenv/config ../node_modules/vitest/vitest.mjs --run",
+    "test": "node scripts/run-tests.js",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --check .",
