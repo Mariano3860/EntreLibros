@@ -3,46 +3,57 @@ import tseslint from 'typescript-eslint'
 import react from 'eslint-plugin-react'
 import reactHooks from 'eslint-plugin-react-hooks'
 import importPlugin from 'eslint-plugin-import'
+import globals from 'globals'
 
 export default [
   {
+    // Ignore all build artifacts everywhere
+    ignores: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/build/**',
+      '**/coverage/**',
+      '**/.next/**',
+      '**/out/**',
+      '**/*.min.js',
+      '**/*.bundle.js',
+    ],
+  },
+  // 1) Node-only config and scripts/config files
+  {
     files: [
       '.stylelintrc.*',
-      '**/*.config.js',
+      '**/*.config.*',
       '**/*.config.*js',
-      'eslint.config.js',
+      'scripts/**/*.{js,cjs,mjs}',
     ],
     languageOptions: {
       sourceType: 'commonjs',
-      globals: {
-        module: true,
-        process: true,
-        require: true,
-        __dirname: true,
-      },
+      globals: globals.node,
     },
     rules: {
       'no-console': 'off',
-      'no-undef': 'off', // Desactiva verificación de variables no definidas
     },
   },
+  // 2) Base JS rules
   js.configs.recommended,
+  // 3) TypeScript + React for app source ONLY (avoid dist/)
   ...tseslint.configs.recommended,
   {
-    files: ['**/*.ts', '**/*.tsx'],
-    ignores: ['.stylelintrc.*', '**/*.config.js', '!**/eslint.config.js'],
+    files: ['src/**/*.{ts,tsx}'],
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {
-        project: './tsconfig.eslint.json',
+        project: ['./tsconfig.eslint.json'],
         tsconfigRootDir: process.cwd(),
-        sourceType: 'module',
       },
+      // Browser + Node globals available in app code (e.g., SSR tooling, Vite)
       globals: {
-        process: true,
-        module: true,
-        require: true,
-        __dirname: true,
+        ...globals.browser,
+        ...globals.node,
+        // Extra globals sometimes used by tooling
+        __REACT_DEVTOOLS_GLOBAL_HOOK__: 'readonly',
+        IntersectionObserver: 'readonly',
       },
     },
     plugins: {
@@ -50,9 +61,28 @@ export default [
       'react-hooks': reactHooks,
       import: importPlugin,
     },
+    settings: {
+      react: { version: 'detect' },
+    },
     rules: {
       'no-console': 'warn',
-      '@typescript-eslint/no-unused-vars': 'warn',
+      // TS already checks undefined symbols; keep no-undef off in TS
+      'no-undef': 'off',
+      // Tame unused variables but allow intentional "_" discards
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
+      // Allow common expression patterns used in modern TS/React code
+      '@typescript-eslint/no-unused-expressions': [
+        'warn',
+        {
+          allowShortCircuit: true,
+          allowTernary: true,
+          allowTaggedTemplates: true,
+        },
+      ],
+
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
       'react-hooks/rules-of-hooks': 'error',
@@ -78,10 +108,11 @@ export default [
         },
       ],
     },
-    settings: {
-      react: {
-        version: 'detect',
-      },
+  },
+  {
+    files: ['**/*.{test,spec}.{ts,tsx,js}'],
+    languageOptions: {
+      globals: { ...globals.vitest },
     },
   },
 ]
