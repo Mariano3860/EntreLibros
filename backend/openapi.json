@@ -241,7 +241,9 @@
             "description": "User logged out. Clears the session cookie.",
             "headers": {
               "Set-Cookie": {
-                "schema": { "type": "string" },
+                "schema": {
+                  "type": "string"
+                },
                 "description": "Clears the sessionToken cookie"
               }
             }
