@@ -13,14 +13,20 @@
     "/api/auth/register": {
       "post": {
         "summary": "Register a new user",
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["name", "email", "password"],
+                "required": [
+                  "name",
+                  "email",
+                  "password"
+                ],
                 "properties": {
                   "name": {
                     "type": "string"
@@ -119,14 +125,19 @@
     "/api/auth/login": {
       "post": {
         "summary": "Log in a user",
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["email", "password"],
+                "required": [
+                  "email",
+                  "password"
+                ],
                 "properties": {
                   "email": {
                     "type": "string"
@@ -146,7 +157,10 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["user", "message"],
+                  "required": [
+                    "user",
+                    "message"
+                  ],
                   "properties": {
                     "user": {
                       "type": "object",
@@ -207,7 +221,10 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["error", "message"],
+                  "required": [
+                    "error",
+                    "message"
+                  ],
                   "properties": {
                     "error": {
                       "type": "string"
@@ -235,7 +252,9 @@
     "/api/auth/logout": {
       "post": {
         "summary": "Log out the current user",
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "responses": {
           "200": {
             "description": "User logged out. Clears the session cookie.",
@@ -257,7 +276,9 @@
     "/api/books": {
       "get": {
         "summary": "List all books",
-        "tags": ["Books"],
+        "tags": [
+          "Books"
+        ],
         "responses": {
           "200": {
             "description": "Array of books",
@@ -284,14 +305,18 @@
       },
       "post": {
         "summary": "Create a book",
-        "tags": ["Books"],
+        "tags": [
+          "Books"
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["title"],
+                "required": [
+                  "title"
+                ],
                 "properties": {
                   "title": {
                     "type": "string"
