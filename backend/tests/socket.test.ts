@@ -1,5 +1,11 @@
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+import type {
+  ClientToServerEvents,
+  ServerToClientEvents,
+  InterServerEvents,
+  SocketData,
+} from '../src/socket.js';
 import Client from 'socket.io-client';
 import { beforeAll, afterAll, describe, expect, test, vi } from 'vitest';
 import app from '../src/app.js';
@@ -7,7 +13,12 @@ import { setupWebsocket } from '../src/socket.js';
 import jwt from 'jsonwebtoken';
 import * as userRepo from '../src/repositories/userRepository.js';
 
-let io: Server;
+let io: Server<
+  ClientToServerEvents,
+  ServerToClientEvents,
+  InterServerEvents,
+  SocketData
+>;
 let httpServer: ReturnType<typeof createServer>;
 let clientSocket: ReturnType<typeof Client>;
 
@@ -15,7 +26,12 @@ describe('websocket messaging', () => {
   beforeAll(async () => {
     process.env.JWT_SECRET = 'testsecret';
     httpServer = createServer(app);
-    io = new Server(httpServer);
+    io = new Server<
+      ClientToServerEvents,
+      ServerToClientEvents,
+      InterServerEvents,
+      SocketData
+    >(httpServer);
     setupWebsocket(io);
     await new Promise<void>((resolve) => httpServer.listen(() => resolve()));
     const port = (httpServer.address() as any).port;
@@ -29,8 +45,8 @@ describe('websocket messaging', () => {
     });
     const token = jwt.sign({ id: 1 }, process.env.JWT_SECRET!);
     clientSocket = Client(`http://localhost:${port}`, {
-      extraHeaders: { cookie: `sessionToken=${token}` },
-    });
+      extraHeaders: { cookie: `sessionToken=${token}` } as any,
+    } as any);
     await new Promise<void>((resolve) =>
       clientSocket.on('connect', () => resolve())
     );
@@ -42,11 +58,13 @@ describe('websocket messaging', () => {
     httpServer.close();
   });
 
-  test('broadcasts messages', () => {
+  test('broadcasts messages without exposing sensitive data', () => {
     return new Promise<void>((resolve) => {
-      clientSocket.on('message', (msg) => {
+      clientSocket.on('message', (msg: any) => {
         expect(msg.text).toBe('hello');
-        expect(msg.user.id).toBe(1);
+        expect(msg.user).toEqual({ id: 1, name: 'Test' });
+        expect(msg.timestamp).toBeTruthy();
+        expect((msg.user as any).email).toBeUndefined();
         resolve();
       });
       clientSocket.emit('message', 'hello');

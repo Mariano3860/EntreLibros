@@ -1,5 +1,5 @@
 import { mockConversations } from '@components/messages/Messages.mock'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { ReactComponent as AttachIcon } from '@src/assets/icons/attachments.svg'
@@ -8,32 +8,34 @@ import { ReactComponent as InfoIcon } from '@src/assets/icons/info.svg'
 
 import styles from './Messages.module.scss'
 import { Conversation, Message } from './Messages.types'
+import { useChatSocket } from '@hooks/socket/useChatSocket'
 
 export const Messages = () => {
   const { t } = useTranslation()
-  const [conversations, setConversations] =
-    useState<Conversation[]>(mockConversations)
+  const [conversations] = useState<Conversation[]>(mockConversations)
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const [text, setText] = useState('')
+  const { messages, sendMessage, currentUser } = useChatSocket()
 
   const selected = conversations.find((c) => c.id === selectedId)
 
+  const mappedMessages: Message[] = useMemo(
+    () =>
+      messages.map((m, idx) => ({
+        id: idx,
+        sender: m.user.id === currentUser?.id ? 'me' : 'them',
+        text: m.text,
+        time: new Date(m.timestamp).toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
+      })),
+    [messages, currentUser]
+  )
+
   const handleSend = () => {
     if (!text.trim() || selectedId === null) return
-    const newMsg: Message = {
-      id: Date.now(),
-      sender: 'me',
-      text: text.trim(),
-      time: new Date().toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-      }),
-    }
-    setConversations((prev) =>
-      prev.map((c) =>
-        c.id === selectedId ? { ...c, messages: [...c.messages, newMsg] } : c
-      )
-    )
+    sendMessage(text.trim())
     setText('')
   }
 
@@ -115,7 +117,7 @@ export const Messages = () => {
             </div>
           </header>
           <div className={styles.messages}>
-            {selected.messages.map((msg) => (
+            {mappedMessages.map((msg) => (
               <div
                 key={msg.id}
                 className={`${styles.message} ${msg.sender === 'me' ? styles.me : ''}`}

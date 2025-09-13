@@ -1,5 +1,5 @@
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
-import { SocketMessages } from '@components/messages/SocketMessages'
+import { Messages } from '@components/messages/Messages'
 import styles from '@pages/messages/MessagesPage.module.scss'
 
 export const MessagesPage = () => (
@@ -8,6 +8,6 @@ export const MessagesPage = () => (
     mainClassName={styles.messagesContent}
     id={'messages-page'}
   >
-    <SocketMessages />
+    <Messages />
   </BaseLayout>
 )

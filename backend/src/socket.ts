@@ -1,10 +1,6 @@
 import type { Server } from 'socket.io';
 import jwt from 'jsonwebtoken';
-import {
-  findUserById,
-  toPublicUser,
-  type PublicUser,
-} from './repositories/userRepository.js';
+import { findUserById } from './repositories/userRepository.js';
 import { logger } from './utils/logger.js';
 
 function parseCookies(header?: string): Record<string, string> {
@@ -16,12 +12,40 @@ function parseCookies(header?: string): Record<string, string> {
   }, {});
 }
 
-export interface ChatMessage {
-  text: string;
-  user: PublicUser;
+interface ChatUser {
+  id: number;
+  name: string;
 }
 
-export function setupWebsocket(io: Server) {
+export interface ChatMessage {
+  text: string;
+  user: ChatUser;
+  timestamp: string;
+}
+
+export interface ClientToServerEvents {
+  message: (text: string) => void;
+}
+
+export interface ServerToClientEvents {
+  message: (msg: ChatMessage) => void;
+  user: (user: ChatUser) => void;
+}
+
+export type InterServerEvents = Record<string, never>;
+
+export interface SocketData {
+  user: ChatUser;
+}
+
+export function setupWebsocket(
+  io: Server<
+    ClientToServerEvents,
+    ServerToClientEvents,
+    InterServerEvents,
+    SocketData
+  >
+) {
   io.use(async (socket, next) => {
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) return next(new Error('Unauthorized'));
@@ -31,7 +55,7 @@ export function setupWebsocket(io: Server) {
       const payload = jwt.verify(token, jwtSecret) as { id: number };
       const user = await findUserById(payload.id);
       if (!user) return next(new Error('Unauthorized'));
-      (socket as any).user = toPublicUser(user);
+      socket.data.user = { id: user.id, name: user.name };
       next();
     } catch (error) {
       logger.error('Socket authentication error', {
@@ -42,9 +66,13 @@ export function setupWebsocket(io: Server) {
   });
 
   io.on('connection', (socket) => {
+    socket.emit('user', socket.data.user);
     socket.on('message', (text: string) => {
-      const user: PublicUser = (socket as any).user;
-      const msg: ChatMessage = { text, user };
+      const msg: ChatMessage = {
+        text,
+        user: socket.data.user,
+        timestamp: new Date().toISOString(),
+      };
       io.emit('message', msg);
     });
   });
