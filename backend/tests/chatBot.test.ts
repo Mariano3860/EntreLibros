@@ -22,7 +22,7 @@ let io: Server<
 let httpServer: ReturnType<typeof createServer>;
 let clientSocket: ReturnType<typeof Client>;
 
-describe('websocket messaging', () => {
+describe('chat bot replies', () => {
   beforeAll(async () => {
     process.env.JWT_SECRET = 'testsecret';
     httpServer = createServer(app);
@@ -58,17 +58,17 @@ describe('websocket messaging', () => {
     httpServer.close();
   });
 
-  test('broadcasts messages without exposing sensitive data', () => {
+  test('responds when message is directed to bot', () => {
     return new Promise<void>((resolve) => {
       clientSocket.on('message', (msg: any) => {
-        expect(msg.text).toBe('hello');
-        expect(msg.user).toEqual({ id: 1, name: 'Test' });
-        expect(msg.timestamp).toBeTruthy();
-        expect(msg.channel).toBe('general');
-        expect((msg.user as any).email).toBeUndefined();
-        resolve();
+        if (msg.user.id === 0) {
+          expect(msg.user).toEqual({ id: 0, name: 'Bot' });
+          expect(msg.channel).toBe('Bot');
+          expect(typeof msg.text).toBe('string');
+          resolve();
+        }
       });
-      clientSocket.emit('message', { text: 'hello', channel: 'general' });
+      clientSocket.emit('message', { text: 'hola', channel: 'Bot' });
     });
   });
 });

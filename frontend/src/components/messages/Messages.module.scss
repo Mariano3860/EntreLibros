@@ -6,6 +6,12 @@
   height: 100vh;
   overflow: hidden;
   background: var(--background-primary);
+  flex-direction: column;
+}
+
+.content {
+  flex: 1;
+  display: flex;
 }
 
 .sidebar {
@@ -318,4 +324,11 @@
   align-items: center;
   justify-content: center;
   color: var(--text-secondary);
+}
+
+.offlineBanner {
+  background: var(--color-error);
+  color: #fff;
+  text-align: center;
+  padding: $spacing-1;
 }

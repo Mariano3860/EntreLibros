@@ -2,6 +2,21 @@
 
 Este repositorio contiene el frontend y backend del proyecto EntreLibros.
 
+## Chat Bot
+
+El sistema incluye un bot de chat básico. Para hablarle:
+
+- Abre el chat **Bot** en la vista de mensajes (es la primera opción y se selecciona por defecto).
+- También puedes mencionar al bot escribiendo `@bot` al inicio de un mensaje.
+
+El backend enviará una respuesta automática en el mismo canal usando el usuario `{ id: 0, name: 'Bot' }`.
+
+### Guía rápida para testers
+
+1. Inicia el backend y el frontend con `npm run dev`.
+2. Abre la página de mensajes y verifica que el chat **Bot** esté seleccionado.
+3. Envía un mensaje y confirma que el bot responde de inmediato.
+
 ## Desarrollo sin Docker
 
 1. **Instalar dependencias**
