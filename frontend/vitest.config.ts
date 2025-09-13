@@ -1,6 +1,7 @@
 import { fileURLToPath, URL } from 'node:url'
 
 import sass from 'sass-embedded'
+import type { SassPreprocessorOptions } from 'vite'
 import svgr from 'vite-plugin-svgr'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { defineConfig } from 'vitest/config'
@@ -28,7 +29,7 @@ export default defineConfig({
     preprocessorOptions: {
       scss: {
         implementation: sass,
-      } as any,
+      } as unknown as SassPreprocessorOptions,
     },
   },
   test: {
