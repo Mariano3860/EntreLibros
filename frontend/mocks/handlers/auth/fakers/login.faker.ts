@@ -7,9 +7,11 @@ export const generateLoginSuccess = (seed = 101): LoginResponse => {
   return {
     token: faker.internet.jwt(),
     user: {
-      id: '1',
+      id: 1,
       email: 'user@entrelibros.com',
       role: 'user',
+      name: 'User',
+      language: 'es',
     },
     message: 'auth.success.login',
   }

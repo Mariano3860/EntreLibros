@@ -35,7 +35,10 @@ describe('HomePage', () => {
   })
 
   test('renders logged in hero', async () => {
-    vi.mocked(fetchMe).mockResolvedValueOnce({ id: 1 })
+    vi.mocked(fetchMe).mockResolvedValueOnce({
+      id: 1,
+      email: 'test@example.com',
+    })
     renderWithProviders(<HomePage />)
     expect(await screen.findByText('home.hero_logged_in_title')).toBeVisible()
   })

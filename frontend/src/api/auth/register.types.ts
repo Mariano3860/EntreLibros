@@ -10,10 +10,11 @@ export type RegisterRequest = {
 export type RegisterResponse = {
   token: string
   user: {
-    id: string
+    id: number
     email: string
     role: 'user' | 'admin'
     name?: string
+    language: string
   }
   message: string
 }

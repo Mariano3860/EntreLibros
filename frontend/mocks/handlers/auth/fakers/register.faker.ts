@@ -7,9 +7,11 @@ export const generateRegisterSuccess = (seed = 105): RegisterResponse => {
   return {
     token: faker.internet.jwt(),
     user: {
-      id: '2',
+      id: 2,
       email: 'new@entrelibros.com',
       role: 'user',
+      name: 'New User',
+      language: 'es',
     },
     message: 'auth.success.register',
   }

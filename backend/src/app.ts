@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import booksRouter from './routes/books.js';
 import authRouter from './routes/auth.js';
+import userRouter from './routes/user.js';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './config/swagger.js';
 
@@ -23,5 +24,6 @@ app.get('/api/health', (_req, res) => {
 
 app.use('/api/books', booksRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/user', userRouter);
 
 export default app;

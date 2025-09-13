@@ -36,7 +36,7 @@ describe('index.tsx', () => {
     rootElement.id = 'root'
     document.body.appendChild(rootElement)
 
-    vi.mocked(fetchMe).mockResolvedValue({ id: 1 })
+    vi.mocked(fetchMe).mockResolvedValue({ id: 1, email: 'test@example.com' })
 
     vi.resetModules()
     await act(async () => {

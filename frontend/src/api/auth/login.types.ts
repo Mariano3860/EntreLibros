@@ -10,9 +10,11 @@ export type LoginRequest = {
 export type LoginResponse = {
   token: string
   user: {
-    id: string
+    id: number
     email: string
     role: 'user' | 'admin'
+    name?: string
+    language: string
   }
   message: string
 }
