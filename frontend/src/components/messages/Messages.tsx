@@ -1,4 +1,5 @@
 import { mockConversations } from '@components/messages/Messages.mock'
+import { useChatSocket } from '@hooks/socket/useChatSocket'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -8,7 +9,6 @@ import { ReactComponent as InfoIcon } from '@src/assets/icons/info.svg'
 
 import styles from './Messages.module.scss'
 import { Conversation, Message } from './Messages.types'
-import { useChatSocket } from '@hooks/socket/useChatSocket'
 
 export const Messages = () => {
   const { t } = useTranslation()

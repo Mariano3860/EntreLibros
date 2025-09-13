@@ -19,8 +19,12 @@ export const useChatSocket = () => {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const url = import.meta.env.PUBLIC_API_BASE_URL || 'http://localhost:4000'
-    const s = io(url, { withCredentials: true })
+    const apiUrl =
+      import.meta.env.PUBLIC_API_BASE_URL || 'http://localhost:4000'
+    // Ensure we connect to the server origin without any API prefix to avoid
+    // Socket.IO "Invalid namespace" errors in production environments.
+    const { origin } = new URL(apiUrl, window.location.origin)
+    const s = io(origin, { withCredentials: true })
     setSocket(s)
     s.on('user', (u: { id: number; name: string }) => setCurrentUser(u))
     s.on('message', (msg: ChatMessage) => {

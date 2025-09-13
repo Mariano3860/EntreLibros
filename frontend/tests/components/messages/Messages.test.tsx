@@ -1,6 +1,7 @@
 import { Messages } from '@components/messages/Messages'
-import { renderWithProviders } from '../../test-utils'
 import { describe, expect, test, vi } from 'vitest'
+
+import { renderWithProviders } from '../../test-utils'
 
 vi.mock('@hooks/socket/useChatSocket', () => ({
   useChatSocket: () => ({
