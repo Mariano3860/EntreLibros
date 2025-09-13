@@ -3,88 +3,15 @@ import {
   createUser,
   findUserByEmail,
   toPublicUser,
-  DEFAULT_USER_ROLE,
 } from '../repositories/userRepository.js';
+import { DEFAULT_USER_ROLE } from '../constants.js';
 import jwt from 'jsonwebtoken';
 import validator from 'validator';
 import bcrypt from 'bcryptjs';
+import { authenticate, type AuthenticatedRequest } from '../middleware/auth.js';
 
 const router = Router();
 
-/**
- * @openapi
- * /api/auth/register:
- *   post:
- *     summary: Register a new user
- *     tags:
- *       - Auth
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - name
- *               - email
- *               - password
- *             properties:
- *               name:
- *                 type: string
- *               email:
- *                 type: string
- *               password:
- *                 type: string
- *     responses:
- *       201:
- *         description: User registered
- *       400:
- *         description: Bad Request - One of the following errors occurred
- *         content:
- *           application/json:
- *             schema:
- *               oneOf:
- *                 - type: object
- *                   properties:
- *                     error:
- *                       type: string
- *                       example: MissingFields
- *                     message:
- *                       type: string
- *                       example: auth.errors.missing_fields
- *                   description: Required fields are missing from the request body.
- *                 - type: object
- *                   properties:
- *                     error:
- *                       type: string
- *                       example: InvalidEmail
- *                     message:
- *                       type: string
- *                       example: auth.errors.invalid_email
- *                   description: The email provided is not valid.
- *                 - type: object
- *                   properties:
- *                     error:
- *                       type: string
- *                       example: WeakPassword
- *                     message:
- *                       type: string
- *                       example: auth.errors.weak_password
- *                   description: The password does not meet complexity requirements.
- *       409:
- *         description: Email already exists
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: EmailExists
- *                 message:
- *                   type: string
- *                   example: auth.errors.email_exists
- */
 router.post('/register', async (req, res) => {
   const jwtSecret = process.env.JWT_SECRET;
   if (!jwtSecret) {
@@ -128,100 +55,17 @@ router.post('/register', async (req, res) => {
     jwtSecret,
     { expiresIn: '24h' }
   );
-  res.status(201).json({
-    token,
-    user: publicUser,
-    message: 'auth.success.register',
-  });
+  res
+    .cookie('sessionToken', token, {
+      httpOnly: true,
+      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 24 * 60 * 60 * 1000,
+    })
+    .status(201)
+    .json({ user: publicUser, message: 'auth.success.register' });
 });
 
-/**
- * @openapi
- * /api/auth/login:
- *   post:
- *     summary: Log in a user
- *     tags:
- *       - Auth
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *               - password
- *             properties:
- *               email:
- *                 type: string
- *               password:
- *                 type: string
- *     responses:
- *       200:
- *         description: |
- *           Successful login.
- *           Sets an `httpOnly` `sessionToken` cookie used for authentication.
- *           Clients should rely on this cookie for subsequent requests.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               required:
- *                 - user
- *                 - message
- *               properties:
- *                 user:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: integer
- *                     email:
- *                       type: string
- *                     role:
- *                       type: string
- *                 message:
- *                   type: string
- *         headers:
- *           Set-Cookie:
- *             schema:
- *               type: string
- *             description: sessionToken cookie containing the JWT
- *       400:
- *         description: The request is invalid due to missing required fields or invalid email format.
- *         content:
- *           application/json:
- *             examples:
- *               missingFields:
- *                 summary: Missing required fields
- *                 value:
- *                   error: MissingFields
- *                   message: auth.errors.missing_fields
- *               invalidEmail:
- *                 summary: Invalid email format
- *                 value:
- *                   error: InvalidEmail
- *                   message: auth.errors.invalid_email
- *       401:
- *         description: Invalid credentials
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               required:
- *                 - error
- *                 - message
- *               properties:
- *                 error:
- *                   type: string
- *                 message:
- *                   type: string
- *             examples:
- *               invalidCredentials:
- *                 summary: Invalid credentials
- *                 value:
- *                   error: InvalidCredentials
- *                   message: auth.errors.invalid_credentials
- */
 router.post('/login', async (req, res) => {
   const jwtSecret = process.env.JWT_SECRET;
   if (!jwtSecret) {
@@ -274,6 +118,10 @@ router.post('/login', async (req, res) => {
       maxAge: 24 * 60 * 60 * 1000,
     })
     .json({ user: publicUser, message: 'auth.success.login' });
+});
+
+router.get('/me', authenticate, (req: AuthenticatedRequest, res) => {
+  res.json(req.user);
 });
 
 export default router;

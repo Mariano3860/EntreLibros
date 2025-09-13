@@ -3,6 +3,7 @@ import { beforeEach, afterEach, describe, expect, test } from 'vitest';
 import app from '../../src/app.js';
 import { pool, setTestClient } from '../../src/db.js';
 import type { PoolClient } from 'pg';
+import { DEFAULT_USER_LANGUAGE } from '../../src/constants.js';
 
 let client: PoolClient;
 
@@ -30,7 +31,9 @@ describe('auth API', () => {
       .expect(201);
     expect(res.body.message).toBe('auth.success.register');
     expect(res.body.user.email).toBe('alice@example.com');
-    expect(typeof res.body.token).toBe('string');
+    expect(res.body.user.language).toBe(DEFAULT_USER_LANGUAGE);
+    expect(res.headers['set-cookie'][0]).toMatch(/sessionToken=/);
+    expect(res.body.token).toBeUndefined();
   });
 
   test('rejects duplicate email', async () => {
@@ -103,8 +106,35 @@ describe('auth API', () => {
       .expect(200);
     expect(res.body.message).toBe('auth.success.login');
     expect(res.body.user.email).toBe('alice@example.com');
+    expect(res.body.user.language).toBe(DEFAULT_USER_LANGUAGE);
     expect(res.headers['set-cookie'][0]).toMatch(/sessionToken=/);
     expect(res.body.token).toBeUndefined();
+  });
+
+  test('returns current user with valid session', async () => {
+    await request(app)
+      .post('/api/auth/register')
+      .send({
+        name: 'Alice',
+        email: 'alice@example.com',
+        password: 'Str0ng!Pass1',
+      })
+      .expect(201);
+    const loginRes = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'alice@example.com', password: 'Str0ng!Pass1' })
+      .expect(200);
+    const cookie = loginRes.headers['set-cookie'][0];
+    const meRes = await request(app)
+      .get('/api/auth/me')
+      .set('Cookie', cookie)
+      .expect(200);
+    expect(meRes.body.email).toBe('alice@example.com');
+    expect(meRes.body.language).toBe(DEFAULT_USER_LANGUAGE);
+  });
+
+  test('rejects unauthenticated me request', async () => {
+    await request(app).get('/api/auth/me').expect(401);
   });
 
   test('rejects invalid credentials', async () => {

@@ -5,8 +5,13 @@ import bcrypt from 'bcryptjs';
 import {
   createUser,
   findUserByEmail,
-  DEFAULT_USER_ROLE,
+  findUserById,
+  updateUserLanguage,
 } from '../../src/repositories/userRepository.js';
+import {
+  DEFAULT_USER_ROLE,
+  DEFAULT_USER_LANGUAGE,
+} from '../../src/constants.js';
 
 let client: PoolClient;
 
@@ -33,5 +38,18 @@ describe('userRepository', () => {
     expect(await bcrypt.compare('secret', user.password)).toBe(true);
     const found = await findUserByEmail('alice@example.com');
     expect(found?.email).toBe('alice@example.com');
+    expect(found?.language).toBe(DEFAULT_USER_LANGUAGE);
+  });
+
+  test('updates user language', async () => {
+    const user = await createUser(
+      'Bob',
+      'bob@example.com',
+      'secret',
+      DEFAULT_USER_ROLE
+    );
+    await updateUserLanguage(user.id, 'en');
+    const updated = await findUserById(user.id);
+    expect(updated?.language).toBe('en');
   });
 });

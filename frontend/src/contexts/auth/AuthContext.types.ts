@@ -5,8 +5,11 @@ import type { ReactNode } from 'react'
  * TODO: incluir más información del perfil cuando esté disponible.
  */
 export type AuthUser = {
-  id: string
+  id: number
   email: string
+  role?: 'user' | 'admin'
+  name?: string
+  language?: string
 }
 
 export type MaybeAuthUser = AuthUser | null

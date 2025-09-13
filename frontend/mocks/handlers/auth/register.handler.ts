@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker'
 import { http, HttpResponse } from 'msw'
 
 import { RegisterRequest } from '@src/api/auth/register.types'
@@ -24,6 +25,12 @@ export const registerHandler = http.post(
 
     setLoggedInState(true)
     const successResponse = generateRegisterSuccess()
-    return HttpResponse.json(successResponse, { status: 201 })
+    const token = faker.internet.jwt()
+    return HttpResponse.json(successResponse, {
+      status: 201,
+      headers: {
+        'Set-Cookie': `sessionToken=${token}; Path=/; SameSite=Strict`,
+      },
+    })
   }
 )

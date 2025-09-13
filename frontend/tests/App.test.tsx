@@ -18,7 +18,10 @@ describe('App Component', () => {
   })
 
   test('renders correctly for logged in users', async () => {
-    vi.mocked(fetchMe).mockResolvedValueOnce({ id: 1 })
+    vi.mocked(fetchMe).mockResolvedValueOnce({
+      id: 1,
+      email: 'test@example.com',
+    })
 
     render(<App />)
 

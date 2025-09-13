@@ -19,14 +19,14 @@ describe('useLogin', () => {
     })
     await waitFor(() =>
       expect(queryClient.getQueryData([AuthQueryKeys.AUTH])).toMatchObject({
-        id: '1',
+        id: 1,
       })
     )
   })
 
   test('clears auth data on error', async () => {
     const queryClient = new QueryClient()
-    queryClient.setQueryData([AuthQueryKeys.AUTH], { id: '1' })
+    queryClient.setQueryData([AuthQueryKeys.AUTH], { id: 1 })
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
