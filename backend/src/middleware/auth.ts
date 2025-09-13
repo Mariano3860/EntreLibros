@@ -5,6 +5,7 @@ import {
   toPublicUser,
   type PublicUser,
 } from '../repositories/userRepository.js';
+import { logger } from '../utils/logger.js';
 
 export interface AuthenticatedRequest extends Request {
   user?: PublicUser;
@@ -52,7 +53,9 @@ export async function authenticate(
     req.user = toPublicUser(user);
     next();
   } catch (error) {
-    console.error('Authentication error:', error);
+    logger.error('Authentication error', {
+      message: error instanceof Error ? error.message : String(error),
+    });
     return res.status(401).json({
       error: 'Unauthorized',
       message: 'auth.errors.unauthorized',

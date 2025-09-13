@@ -15,7 +15,13 @@ router.post(
         message: 'user.errors.missing_language',
       });
     }
-    await updateUserLanguage(req.user!.id, language);
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'Unauthorized',
+        message: 'user.errors.unauthenticated',
+      });
+    }
+    await updateUserLanguage(req.user.id, language);
     res.json({ language });
   }
 );
