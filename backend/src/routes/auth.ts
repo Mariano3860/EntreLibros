@@ -55,11 +55,15 @@ router.post('/register', async (req, res) => {
     jwtSecret,
     { expiresIn: '24h' }
   );
-  res.status(201).json({
-    token,
-    user: publicUser,
-    message: 'auth.success.register',
-  });
+  res
+    .cookie('sessionToken', token, {
+      httpOnly: true,
+      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 24 * 60 * 60 * 1000,
+    })
+    .status(201)
+    .json({ user: publicUser, message: 'auth.success.register' });
 });
 
 router.post('/login', async (req, res) => {

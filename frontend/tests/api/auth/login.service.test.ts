@@ -17,7 +17,7 @@ describe('login service', () => {
       email: DEFAULT_EMAIL,
       password: DEFAULT_PASS,
     })
-    expect(response).toHaveProperty('token')
+    expect(response.user.email).toBe(DEFAULT_EMAIL)
     expect(document.cookie).toContain('sessionToken')
   })
 })

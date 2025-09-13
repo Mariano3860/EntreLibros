@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker'
 import { http, HttpResponse } from 'msw'
 
 import { LoginRequest } from '@src/api/auth/login.types'
@@ -27,12 +28,13 @@ export const loginHandler = http.post(
 
     setLoggedInState(true)
     const successResponse = generateLoginSuccess()
+    const token = faker.internet.jwt()
     return HttpResponse.json(successResponse, {
       status: 200,
       // HttpOnly should be set in the server, but won't be used in development
       headers: {
         // Secure flag omitted so that the cookie is sent over HTTP in development
-        'Set-Cookie': `sessionToken=${successResponse.token}; Path=/; SameSite=Strict`,
+        'Set-Cookie': `sessionToken=${token}; Path=/; SameSite=Strict`,
         'Content-Type': 'application/json',
       },
     })

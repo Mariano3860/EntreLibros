@@ -2,13 +2,14 @@ import { faker } from '@faker-js/faker'
 
 import { LoginError, LoginResponse } from '@src/api/auth/login.types'
 
+import { DEFAULT_EMAIL } from '../../../constants/constants'
+
 export const generateLoginSuccess = (seed = 101): LoginResponse => {
   faker.seed(seed)
   return {
-    token: faker.internet.jwt(),
     user: {
       id: 1,
-      email: 'user@entrelibros.com',
+      email: DEFAULT_EMAIL,
       role: 'user',
       name: 'User',
       language: 'es',

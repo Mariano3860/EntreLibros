@@ -21,7 +21,6 @@ Inicia sesión de un usuario válido.
 
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "user": {
     "id": "1",
     "email": "user@entrelibros.com",
@@ -100,7 +99,6 @@ Registra un nuevo usuario.
 
 ```json
 {
-  "token": "fake-register-token",
   "user": {
     "id": "2",
     "email": "new@entrelibros.com",

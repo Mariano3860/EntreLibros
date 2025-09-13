@@ -8,7 +8,6 @@ export type RegisterRequest = {
 }
 
 export type RegisterResponse = {
-  token: string
   user: {
     id: number
     email: string

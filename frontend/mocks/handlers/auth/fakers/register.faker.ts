@@ -5,7 +5,6 @@ import { RegisterError, RegisterResponse } from '@src/api/auth/register.types'
 export const generateRegisterSuccess = (seed = 105): RegisterResponse => {
   faker.seed(seed)
   return {
-    token: faker.internet.jwt(),
     user: {
       id: 2,
       email: 'new@entrelibros.com',

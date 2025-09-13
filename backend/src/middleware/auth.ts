@@ -51,7 +51,8 @@ export async function authenticate(
     }
     req.user = toPublicUser(user);
     next();
-  } catch {
+  } catch (error) {
+    console.error('Authentication error:', error);
     return res.status(401).json({
       error: 'Unauthorized',
       message: 'auth.errors.unauthorized',

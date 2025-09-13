@@ -32,7 +32,8 @@ describe('auth API', () => {
     expect(res.body.message).toBe('auth.success.register');
     expect(res.body.user.email).toBe('alice@example.com');
     expect(res.body.user.language).toBe(DEFAULT_USER_LANGUAGE);
-    expect(typeof res.body.token).toBe('string');
+    expect(res.headers['set-cookie'][0]).toMatch(/sessionToken=/);
+    expect(res.body.token).toBeUndefined();
   });
 
   test('rejects duplicate email', async () => {
