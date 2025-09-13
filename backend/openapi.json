@@ -232,6 +232,26 @@
         }
       }
     },
+    "/api/auth/logout": {
+      "post": {
+        "summary": "Log out the current user",
+        "tags": ["Auth"],
+        "responses": {
+          "200": {
+            "description": "User logged out. Clears the session cookie.",
+            "headers": {
+              "Set-Cookie": {
+                "schema": { "type": "string" },
+                "description": "Clears the sessionToken cookie"
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated"
+          }
+        }
+      }
+    },
     "/api/books": {
       "get": {
         "summary": "List all books",
