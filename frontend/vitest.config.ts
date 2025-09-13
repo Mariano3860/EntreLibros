@@ -25,7 +25,11 @@ export default defineConfig({
     },
   },
   css: {
-    preprocessorOptions: { scss: { implementation: sass } },
+    preprocessorOptions: {
+      scss: {
+        implementation: sass,
+      } as any,
+    },
   },
   test: {
     include: ['**/*.test.{ts,tsx,js,jsx}'],
