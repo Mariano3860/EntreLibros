@@ -2,6 +2,16 @@ import { Conversation } from '@components/messages/Messages.types'
 
 export const mockConversations: Conversation[] = [
   {
+    id: 0,
+    user: {
+      name: 'Bot',
+      avatar: 'https://i.pravatar.cc/40?u=bot',
+      online: true,
+    },
+    badges: [],
+    messages: [],
+  },
+  {
     id: 1,
     user: {
       name: 'Samuel',

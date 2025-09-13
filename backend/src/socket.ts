@@ -2,6 +2,7 @@ import type { Server } from 'socket.io';
 import jwt from 'jsonwebtoken';
 import { findUserById } from './repositories/userRepository.js';
 import { logger } from './utils/logger.js';
+import { generateReply } from './services/chatBot.js';
 
 function parseCookies(header?: string): Record<string, string> {
   if (!header) return {};
@@ -21,10 +22,11 @@ export interface ChatMessage {
   text: string;
   user: ChatUser;
   timestamp: string;
+  channel: string;
 }
 
 export interface ClientToServerEvents {
-  message: (text: string) => void;
+  message: (payload: { text: string; channel?: string }) => void;
 }
 
 export interface ServerToClientEvents {
@@ -67,13 +69,24 @@ export function setupWebsocket(
 
   io.on('connection', (socket) => {
     socket.emit('user', socket.data.user);
-    socket.on('message', (text: string) => {
+    socket.on('message', async ({ text, channel = 'general' }) => {
       const msg: ChatMessage = {
         text,
         user: socket.data.user,
         timestamp: new Date().toISOString(),
+        channel,
       };
       io.emit('message', msg);
+      if (channel === 'Bot' || /^@bot\b/i.test(text)) {
+        const reply = await generateReply(text.replace(/^@bot\s*/i, ''));
+        const botMsg: ChatMessage = {
+          text: reply,
+          user: { id: 0, name: 'Bot' },
+          timestamp: new Date().toISOString(),
+          channel,
+        };
+        io.emit('message', botMsg);
+      }
     });
   });
 }

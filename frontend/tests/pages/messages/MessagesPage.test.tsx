@@ -6,7 +6,7 @@ import { renderWithProviders } from '../../test-utils'
 
 describe('MessagesPage', () => {
   test('renders message input', () => {
-    const { getByRole } = renderWithProviders(<MessagesPage />)
-    expect(getByRole('textbox')).toBeInTheDocument()
+    const { getByPlaceholderText } = renderWithProviders(<MessagesPage />)
+    expect(getByPlaceholderText('Message...')).toBeInTheDocument()
   })
 })
