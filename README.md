@@ -24,9 +24,19 @@ Este repositorio contiene el frontend y backend del proyecto EntreLibros.
    # o para levantar ambos en paralelo:
    npm run dev
    ```
-El frontend obtiene la URL del backend desde `PUBLIC_API_BASE_URL`.
+   El frontend obtiene la URL del backend desde `PUBLIC_API_BASE_URL`.
 
 Luego de iniciar el backend, puedes visitar `http://localhost:4000/api-docs` para ver la documentación interactiva de la API generada con Swagger.
+
+## Modo producción local
+
+Para probar el sistema completo en modo producción:
+
+```bash
+npm run prod
+```
+
+Esto compila el frontend y backend y levanta ambos servidores usando los builds resultantes.
 
 ## Desarrollo con Docker Compose
 
@@ -36,7 +46,7 @@ El proyecto puede ejecutarse con [Docker Compose](https://docs.docker.com/compos
 2. Crear un archivo `docker-compose.yml` como el siguiente:
 
 ```yaml
-version: '3.8'
+version: "3.8"
 services:
   db:
     image: postgres:14
@@ -88,6 +98,7 @@ Las pruebas del backend ejecutan las migraciones antes de correr y cada test usa
 ## Migraciones
 
 Para ejecutar manualmente las migraciones del backend:
+
 ```bash
 npm run migrate
 ```
@@ -95,6 +106,7 @@ npm run migrate
 ## CI
 
 Los pull requests ejecutan un flujo de CI que:
+
 1. Instala dependencias.
 2. Instala y levanta Postgres.
 3. Crea una base de datos de pruebas y corre las migraciones.
