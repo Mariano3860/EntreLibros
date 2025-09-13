@@ -1,0 +1,79 @@
+import type { Server } from 'socket.io';
+import jwt from 'jsonwebtoken';
+import { findUserById } from './repositories/userRepository.js';
+import { logger } from './utils/logger.js';
+
+function parseCookies(header?: string): Record<string, string> {
+  if (!header) return {};
+  return header.split(';').reduce<Record<string, string>>((acc, pair) => {
+    const [key, ...rest] = pair.trim().split('=');
+    acc[key] = decodeURIComponent(rest.join('='));
+    return acc;
+  }, {});
+}
+
+interface ChatUser {
+  id: number;
+  name: string;
+}
+
+export interface ChatMessage {
+  text: string;
+  user: ChatUser;
+  timestamp: string;
+}
+
+export interface ClientToServerEvents {
+  message: (text: string) => void;
+}
+
+export interface ServerToClientEvents {
+  message: (msg: ChatMessage) => void;
+  user: (user: ChatUser) => void;
+}
+
+export type InterServerEvents = Record<string, never>;
+
+export interface SocketData {
+  user: ChatUser;
+}
+
+export function setupWebsocket(
+  io: Server<
+    ClientToServerEvents,
+    ServerToClientEvents,
+    InterServerEvents,
+    SocketData
+  >
+) {
+  io.use(async (socket, next) => {
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) return next(new Error('Unauthorized'));
+    const token = parseCookies(socket.handshake.headers.cookie).sessionToken;
+    if (!token) return next(new Error('Unauthorized'));
+    try {
+      const payload = jwt.verify(token, jwtSecret) as { id: number };
+      const user = await findUserById(payload.id);
+      if (!user) return next(new Error('Unauthorized'));
+      socket.data.user = { id: user.id, name: user.name };
+      next();
+    } catch (error) {
+      logger.error('Socket authentication error', {
+        message: error instanceof Error ? error.message : String(error),
+      });
+      next(new Error('Unauthorized'));
+    }
+  });
+
+  io.on('connection', (socket) => {
+    socket.emit('user', socket.data.user);
+    socket.on('message', (text: string) => {
+      const msg: ChatMessage = {
+        text,
+        user: socket.data.user,
+        timestamp: new Date().toISOString(),
+      };
+      io.emit('message', msg);
+    });
+  });
+}
