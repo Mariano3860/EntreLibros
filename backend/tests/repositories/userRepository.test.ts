@@ -61,7 +61,7 @@ describe('userRepository', () => {
       'secret',
       DEFAULT_USER_ROLE
     );
-    await updateUserLocation(user.id, 40.4168, -3.7038, 1000);
+    await updateUserLocation(user.id, -3.7038, 40.4168, 1000);
     const updated = await findUserById(user.id);
     expect(updated?.location).toEqual({
       latitude: 40.4168,

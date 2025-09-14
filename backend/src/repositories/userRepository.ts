@@ -87,8 +87,8 @@ export async function updateUserLanguage(
 
 export async function updateUserLocation(
   id: number,
-  latitude: number,
   longitude: number,
+  latitude: number,
   searchRadius: number
 ): Promise<User> {
   const { rows } = await query<UserRow>(
