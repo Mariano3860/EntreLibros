@@ -26,6 +26,7 @@ Estas instrucciones aplican a todo el repositorio.
 - Usa `rg` para buscar en el código en lugar de `grep` o `ls -R`.
 - Los archivos se formatean automáticamente con Prettier; evita editar el formato manualmente.
 - Los mensajes de commit deben ser claros, en tiempo presente y concisos.
+- Evita usar el tipo `any`; utiliza tipos explícitos o `unknown` cuando sea necesario.
 
 ## AGENTS anidados
 Si modificas archivos dentro de un directorio que contenga su propio `AGENTS.md`, respeta las instrucciones adicionales de ese archivo.

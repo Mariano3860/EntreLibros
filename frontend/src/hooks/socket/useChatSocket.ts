@@ -21,7 +21,7 @@ export const useChatSocket = () => {
   useEffect(() => {
     const apiUrl =
       import.meta.env.PUBLIC_API_BASE_URL || 'http://localhost:4000'
-    // Ensure we connect to the server origin without any API prefix to avoid
+    // Ensure we connect to the server origin without an API prefix to avoid
     // Socket.IO "Invalid namespace" errors in production environments.
     const { origin } = new URL(apiUrl, window.location.origin)
     const s = io(origin, { withCredentials: true })

@@ -16,11 +16,9 @@ describe('clearAllCookies', () => {
   })
 
   test('handles missing document gracefully', () => {
-    const original = global.document
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    delete (global as any).document
+    const original = globalThis.document
+    delete (globalThis as { document?: Document }).document
     expect(() => clearAllCookies()).not.toThrow()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ;(global as any).document = original
+    ;(globalThis as { document?: Document }).document = original
   })
 })
