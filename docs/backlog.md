@@ -34,7 +34,7 @@ Resumen de Hechos (hasta la fecha)
 - Mensajería base y UI de conversaciones inicial. [~]
 - Normalización/verificación de libros asistida por metadata/ISBN. [~]
 - Bases de trabajo: scripts de desarrollo y CI, documentación de entorno. [x]
-- Flujo de despliegue a Docker Hub para `main` y `dev`. [x]
+- Flujo de despliegue a Docker Hub para `main` y `dev`; plantillas `.env` con `JWT_SECRET`. [x]
 
 EP-1 Identidad y Perfil
 Feature 1.1 Cuenta y acceso

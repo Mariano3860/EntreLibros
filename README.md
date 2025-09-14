@@ -77,6 +77,7 @@ services:
     environment:
       DATABASE_URL: postgres://postgres:postgres@db:5432/entrelibros
       FRONTEND_URL: http://localhost:3000
+      JWT_SECRET: devsecret
     ports:
       - "4000:4000"
     depends_on:
@@ -107,7 +108,7 @@ Para cada entorno crea un archivo de variables en la raíz del proyecto:
 - `.env.production` para producción
 - `.env.development` para desarrollo
 
-Estos archivos no se versionan (revisa `.env.production.example` y `.env.development.example` como guía) e incluyen valores como `DOCKERHUB_USER`, `POSTGRES_PASSWORD`, `DATABASE_URL`, `FRONTEND_URL` y `PUBLIC_API_BASE_URL`.
+Estos archivos no se versionan (revisa `.env.production.example` y `.env.development.example` como guía) e incluyen valores como `DOCKERHUB_USER`, `JWT_SECRET`, `POSTGRES_PASSWORD`, `DATABASE_URL`, `FRONTEND_URL` y `PUBLIC_API_BASE_URL`.
 
 Ejemplos de Docker Compose:
 
@@ -184,6 +185,7 @@ No se deben commitear credenciales reales. Usa `backend/.env.example` y `fronten
 Principales variables:
 
 - `DATABASE_URL`: Cadena de conexión de PostGIS utilizada por el backend. Ejemplo: `postgres://postgres:postgres@localhost:5432/entrelibros`.
+- `JWT_SECRET`: clave secreta para firmar y verificar tokens JWT.
 - `FRONTEND_URL`: URL del frontend que el backend permite para CORS. Ejemplo: `http://localhost:3000`.
 - `PUBLIC_API_BASE_URL`: URL del backend que el frontend consulta. Ejemplo: `http://localhost:4000`.
 - `API_BASE_URL`: URL base de la API utilizada en la documentación de Swagger (opcional, por defecto `http://localhost:4000` o `http://localhost:<PORT>`).
