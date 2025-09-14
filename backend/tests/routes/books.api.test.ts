@@ -1,8 +1,9 @@
 import request from 'supertest';
-import { beforeEach, afterEach, describe, expect, test } from 'vitest';
+import { beforeEach, afterEach, describe, expect, test, vi } from 'vitest';
 import app from '../../src/app.js';
 import { pool, setTestClient } from '../../src/db.js';
 import type { PoolClient } from 'pg';
+import * as openLibrary from '../../src/services/openLibrary.js';
 
 let client: PoolClient;
 
@@ -10,12 +11,14 @@ beforeEach(async () => {
   client = await pool.connect();
   await client.query('BEGIN');
   setTestClient(client);
+  vi.spyOn(openLibrary, 'checkBookExists').mockResolvedValue(false);
 });
 
 afterEach(async () => {
   await client.query('ROLLBACK');
   client.release();
   setTestClient(null);
+  vi.restoreAllMocks();
 });
 
 describe('books API', () => {

@@ -5,8 +5,13 @@ import type {
   ServerToClientEvents,
   InterServerEvents,
   SocketData,
+  ChatMessage,
 } from '../src/socket.js';
-import Client from 'socket.io-client';
+import Client, {
+  type ManagerOptions,
+  type SocketOptions,
+} from 'socket.io-client';
+import type { AddressInfo } from 'net';
 import { beforeAll, afterAll, describe, expect, test, vi } from 'vitest';
 import app from '../src/app.js';
 import { setupWebsocket } from '../src/socket.js';
@@ -34,7 +39,8 @@ describe('chat bot replies', () => {
     >(httpServer);
     setupWebsocket(io);
     await new Promise<void>((resolve) => httpServer.listen(() => resolve()));
-    const port = (httpServer.address() as any).port;
+    const address = httpServer.address() as AddressInfo;
+    const port = address.port;
     vi.spyOn(userRepo, 'findUserById').mockResolvedValue({
       id: 1,
       name: 'Test',
@@ -47,9 +53,10 @@ describe('chat bot replies', () => {
     const token = jwt.sign({ id: 1 }, process.env.JWT_SECRET!, {
       algorithm: jwtAlgorithm,
     });
-    clientSocket = Client(`http://localhost:${port}`, {
-      extraHeaders: { cookie: `sessionToken=${token}` } as any,
-    } as any);
+    const options: Partial<ManagerOptions & SocketOptions> = {
+      extraHeaders: { cookie: `sessionToken=${token}` },
+    };
+    clientSocket = Client(`http://localhost:${port}`, options);
     await new Promise<void>((resolve) =>
       clientSocket.on('connect', () => resolve())
     );
@@ -63,7 +70,7 @@ describe('chat bot replies', () => {
 
   test('responds when message is directed to bot', () => {
     return new Promise<void>((resolve) => {
-      clientSocket.on('message', (msg: any) => {
+      clientSocket.on('message', (msg: ChatMessage) => {
         if (msg.user.id === 0) {
           expect(msg.user).toEqual({ id: 0, name: 'Bot' });
           expect(msg.channel).toBe('Bot');

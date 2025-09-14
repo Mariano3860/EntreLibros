@@ -19,7 +19,7 @@ export function getClient(): Pool | PoolClient {
 
 export async function query<T extends QueryResultRow = QueryResultRow>(
   sql: string,
-  params?: any[]
+  params?: unknown[]
 ): Promise<{ rows: T[] }> {
   const client = getClient();
   // Both Pool and PoolClient expose a compatible query method
