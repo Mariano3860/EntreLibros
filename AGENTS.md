@@ -4,13 +4,23 @@ Estas instrucciones aplican a todo el repositorio.
 
 ## Flujo de trabajo
 1. Realiza tus cambios en la rama actual (no crees nuevas ramas).
-2. Ejecuta el chequeo completo antes de commitear:
+2. Si trabajas solo en **backend**, ejecuta los tests correspondientes:
    ```bash
-   npm run complete-check
+   npm run test:backend
    ```
-   Este comando ejecuta ESLint, Prettier, TypeScript y los tests tanto en **backend** como en **frontend**.
-3. Verifica que el árbol de trabajo esté limpio con `git status --short`.
-4. Si el chequeo falla, corrige los errores y vuelve a ejecutar.
+   Si trabajas solo en **frontend**, ejecuta:
+   ```bash
+   npm run test:frontend
+   ```
+3. Antes de commitear y crear la PR, corre las verificaciones generales:
+   ```bash
+   npm run test:backend
+   npm run test:frontend
+   npm run format:backend
+   npm run format:frontend
+   ```
+4. Verifica que el árbol de trabajo esté limpio con `git status --short`.
+5. Si algún comando falla, corrige los errores y vuelve a ejecutar.
 
 ## Estilo y herramientas
 - Usa `rg` para buscar en el código en lugar de `grep` o `ls -R`.
@@ -23,4 +33,4 @@ Si modificas archivos dentro de un directorio que contenga su propio `AGENTS.md`
 ## En caso de duda
 - Prefiere código simple y legible.
 - Si añades TODOs, explícalos claramente.
-- Ejecuta siempre `npm run complete-check` antes de solicitar un PR.
+- Ejecuta siempre los comandos de verificación indicados antes de solicitar un PR.
