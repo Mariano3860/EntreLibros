@@ -3,10 +3,12 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 import { logger } from './utils/logger.js';
 
-const envFile = process.env.DOTENV_CONFIG_PATH
-  ? path.resolve(process.cwd(), process.env.DOTENV_CONFIG_PATH)
-  : path.join(path.dirname(fileURLToPath(import.meta.url)), '../.env');
-dotenv.config({ path: envFile });
+if (process.env.NODE_ENV !== 'production') {
+  const envFile = process.env.DOTENV_CONFIG_PATH
+    ? path.resolve(process.cwd(), process.env.DOTENV_CONFIG_PATH)
+    : path.join(path.dirname(fileURLToPath(import.meta.url)), '../.env');
+  dotenv.config({ path: envFile });
+}
 
 import { createServer } from 'http';
 import { Server } from 'socket.io';

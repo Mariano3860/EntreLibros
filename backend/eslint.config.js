@@ -30,7 +30,7 @@ export default [
     files: ['**/*.ts', '**/*.tsx'],
     languageOptions: {
       parser: tseslint.parser,
-      parserOptions: { project: './tsconfig.json' },
+      parserOptions: { project: './tsconfig.eslint.json' },
     },
     rules: {
       'no-console': 'off',
