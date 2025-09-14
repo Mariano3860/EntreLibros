@@ -50,23 +50,23 @@ export function setupWebsocket(
 ) {
   io.use(async (socket, next) => {
     const jwtSecret = process.env.JWT_SECRET;
-    if (!jwtSecret) return next(new Error('Unauthorized'));
+    if (!jwtSecret) return next(new Error('auth.errors.unauthorized'));
     const jwtAlgorithm = (process.env.JWT_ALGORITHM || 'HS256') as Algorithm;
     const token = parseCookies(socket.handshake.headers.cookie).sessionToken;
-    if (!token) return next(new Error('Unauthorized'));
+    if (!token) return next(new Error('auth.errors.unauthorized'));
     try {
       const payload = jwt.verify(token, jwtSecret, {
         algorithms: [jwtAlgorithm],
       }) as { id: number };
       const user = await findUserById(payload.id);
-      if (!user) return next(new Error('Unauthorized'));
+      if (!user) return next(new Error('auth.errors.unauthorized'));
       socket.data.user = { id: user.id, name: user.name };
       next();
     } catch (error) {
       logger.error('Socket authentication error', {
         message: error instanceof Error ? error.message : String(error),
       });
-      next(new Error('Unauthorized'));
+      next(new Error('auth.errors.unauthorized'));
     }
   });
 

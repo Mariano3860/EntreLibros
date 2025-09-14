@@ -3,6 +3,7 @@ import { pool, setTestClient } from '../../src/db.js';
 import {
   createBook,
   listBooks,
+  verifyBook,
 } from '../../src/repositories/bookRepository.js';
 import type { PoolClient } from 'pg';
 
@@ -21,10 +22,17 @@ afterEach(async () => {
 });
 
 describe('bookRepository', () => {
-  test('inserts and lists books', async () => {
-    await createBook('Test Book');
+  test('inserts and lists books with pending verification', async () => {
+    await createBook({ title: 'Test Book', author: 'Author' });
     const books = await listBooks();
     expect(books).toHaveLength(1);
     expect(books[0].title).toBe('Test Book');
+    expect(books[0].verified).toBe(false);
+  });
+
+  test('marks book as verified', async () => {
+    const book = await createBook({ title: 'Another Book' });
+    const verified = await verifyBook(book.id);
+    expect(verified?.verified).toBe(true);
   });
 });
