@@ -7,7 +7,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '..');
 
-rmSync(path.join(projectRoot, 'dist'), { recursive: true, force: true });
+try {
+  rmSync(path.join(projectRoot, 'dist'), { recursive: true, force: true });
+} catch (err) {
+  console.error('Failed to remove dist directory:', err.message);
+}
 
 execSync('tsc', { cwd: projectRoot, stdio: 'inherit' });
 
