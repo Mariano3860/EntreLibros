@@ -92,8 +92,8 @@ export async function updateUserLocation(
   searchRadius: number
 ): Promise<User> {
   const { rows } = await query<UserRow>(
-    'UPDATE users SET location = ST_SetSRID(ST_MakePoint($2, $1), 4326), search_radius = $3 WHERE id = $4 RETURNING *, ST_X(location::geometry) AS longitude, ST_Y(location::geometry) AS latitude',
-    [latitude, longitude, searchRadius, id]
+    'UPDATE users SET location = ST_SetSRID(ST_MakePoint($1, $2), 4326), search_radius = $3 WHERE id = $4 RETURNING *, ST_X(location::geometry) AS longitude, ST_Y(location::geometry) AS latitude',
+    [longitude, latitude, searchRadius, id]
   );
   return rowToUser(rows[0]);
 }
