@@ -256,8 +256,19 @@
     },
     "/api/books": {
       "get": {
-        "summary": "List all books",
+        "summary": "List or search books",
         "tags": ["Books"],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "description": "Search query"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Array of books",
@@ -266,15 +277,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "integer"
-                      },
-                      "title": {
-                        "type": "string"
-                      }
-                    }
+                    "$ref": "#/components/schemas/Book"
                   }
                 }
               }
@@ -291,9 +294,21 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["title"],
+                "required": ["title", "author"],
                 "properties": {
                   "title": {
+                    "type": "string"
+                  },
+                  "author": {
+                    "type": "string"
+                  },
+                  "isbn": {
+                    "type": "string"
+                  },
+                  "publishedYear": {
+                    "type": "integer"
+                  },
+                  "publisher": {
                     "type": "string"
                   }
                 }
@@ -307,26 +322,115 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "integer"
-                    },
-                    "title": {
-                      "type": "string"
-                    }
-                  }
+                  "$ref": "#/components/schemas/Book"
                 }
               }
             }
           },
           "400": {
-            "description": "title is required"
+            "description": "Missing required fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "MissingFields"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "books.errors.missing_title_author"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/books/{id}/verify": {
+      "post": {
+        "summary": "Verify a book",
+        "tags": ["Books"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Book verified",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Book"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Book not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "BookNotFound"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "books.errors.not_found"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
     }
   },
-  "components": {},
+  "components": {
+    "schemas": {
+      "Book": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string"
+          },
+          "isbn": {
+            "type": "string",
+            "nullable": true
+          },
+          "published_year": {
+            "type": "integer",
+            "nullable": true
+          },
+          "publisher": {
+            "type": "string",
+            "nullable": true
+          },
+          "verified": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  },
   "tags": []
 }
