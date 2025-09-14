@@ -7,6 +7,7 @@ import {
   findUserByEmail,
   findUserById,
   updateUserLanguage,
+  updateUserLocation,
 } from '../../src/repositories/userRepository.js';
 import {
   DEFAULT_USER_ROLE,
@@ -51,5 +52,21 @@ describe('userRepository', () => {
     await updateUserLanguage(user.id, 'en');
     const updated = await findUserById(user.id);
     expect(updated?.language).toBe('en');
+  });
+
+  test('updates user location and search radius', async () => {
+    const user = await createUser(
+      'Carol',
+      'carol@example.com',
+      'secret',
+      DEFAULT_USER_ROLE
+    );
+    await updateUserLocation(user.id, -3.7038, 40.4168, 1000);
+    const updated = await findUserById(user.id);
+    expect(updated?.location).toEqual({
+      latitude: 40.4168,
+      longitude: -3.7038,
+    });
+    expect(updated?.searchRadius).toBe(1000);
   });
 });
