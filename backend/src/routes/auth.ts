@@ -120,6 +120,15 @@ router.post('/login', async (req, res) => {
     .json({ user: publicUser, message: 'auth.success.login' });
 });
 
+router.post('/logout', authenticate, (req: AuthenticatedRequest, res) => {
+  res.clearCookie('sessionToken', {
+    httpOnly: true,
+    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+    secure: process.env.NODE_ENV === 'production',
+  });
+  res.status(200).json({ message: 'auth.success.logout' });
+});
+
 router.get('/me', authenticate, (req: AuthenticatedRequest, res) => {
   res.json(req.user);
 });

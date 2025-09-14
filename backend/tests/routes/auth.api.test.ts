@@ -133,6 +133,33 @@ describe('auth API', () => {
     expect(meRes.body.language).toBe(DEFAULT_USER_LANGUAGE);
   });
 
+  test('logs out the current user', async () => {
+    await request(app)
+      .post('/api/auth/register')
+      .send({
+        name: 'Alice',
+        email: 'alice@example.com',
+        password: 'Str0ng!Pass1',
+      })
+      .expect(201);
+    const loginRes = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'alice@example.com', password: 'Str0ng!Pass1' })
+      .expect(200);
+    const cookie = loginRes.headers['set-cookie'][0];
+    const logoutRes = await request(app)
+      .post('/api/auth/logout')
+      .set('Cookie', cookie)
+      .expect(200);
+    expect(logoutRes.body.message).toBe('auth.success.logout');
+    const clearedCookie = logoutRes.headers['set-cookie'][0];
+    expect(clearedCookie).toMatch(/sessionToken=;/);
+    await request(app)
+      .get('/api/auth/me')
+      .set('Cookie', clearedCookie.split(';')[0])
+      .expect(401);
+  });
+
   test('rejects unauthenticated me request', async () => {
     await request(app).get('/api/auth/me').expect(401);
   });
