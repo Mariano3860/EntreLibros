@@ -25,8 +25,15 @@ router.get('/search', async (req, res) => {
       message: 'books.errors.q_required',
     });
   }
-  const books = await searchExternalBooks(q);
-  res.json(books);
+  try {
+    const books = await searchExternalBooks(q);
+    res.json(books);
+  } catch {
+    res.status(502).json({
+      error: 'SearchFailed',
+      message: 'books.errors.search_failed',
+    });
+  }
 });
 
 router.post('/', async (req, res) => {

@@ -47,6 +47,18 @@ describe('books API', () => {
     });
   });
 
+  test('returns search error when OpenLibrary fails', async () => {
+    vi.spyOn(openLibrary, 'searchBooks').mockRejectedValue(new Error('fail'));
+    const res = await request(app)
+      .get('/api/books/search')
+      .query({ q: 'foo' })
+      .expect(502);
+    expect(res.body).toEqual({
+      error: 'SearchFailed',
+      message: 'books.errors.search_failed',
+    });
+  });
+
   test('requires title when creating book', async () => {
     const res = await request(app).post('/api/books').send({}).expect(400);
     expect(res.body).toEqual({

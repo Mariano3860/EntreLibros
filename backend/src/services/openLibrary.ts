@@ -41,14 +41,11 @@ export async function checkBookExists(
   options?: { fetchFn?: typeof fetch }
 ): Promise<boolean> {
   const fetchFn = options?.fetchFn ?? fetch;
-  let query = '';
+  let query: string;
   if (params.isbn) {
     query = `isbn:${params.isbn}`;
   } else if (params.title) {
-    query = params.title;
-    if (params.author) {
-      query += ` ${params.author}`;
-    }
+    query = params.author ? `${params.title} ${params.author}` : params.title;
   } else {
     return false;
   }

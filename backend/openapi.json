@@ -415,6 +415,9 @@
           },
           "400": {
             "description": "books.errors.q_required"
+          },
+          "502": {
+            "description": "books.errors.search_failed"
           }
         }
       }
