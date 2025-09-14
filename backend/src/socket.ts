@@ -1,5 +1,5 @@
 import type { Server } from 'socket.io';
-import jwt from 'jsonwebtoken';
+import jwt, { type Algorithm } from 'jsonwebtoken';
 import { findUserById } from './repositories/userRepository.js';
 import { logger } from './utils/logger.js';
 import { generateReply } from './services/chatBot.js';
@@ -51,10 +51,13 @@ export function setupWebsocket(
   io.use(async (socket, next) => {
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) return next(new Error('Unauthorized'));
+    const jwtAlgorithm = (process.env.JWT_ALGORITHM || 'HS256') as Algorithm;
     const token = parseCookies(socket.handshake.headers.cookie).sessionToken;
     if (!token) return next(new Error('Unauthorized'));
     try {
-      const payload = jwt.verify(token, jwtSecret) as { id: number };
+      const payload = jwt.verify(token, jwtSecret, {
+        algorithms: [jwtAlgorithm],
+      }) as { id: number };
       const user = await findUserById(payload.id);
       if (!user) return next(new Error('Unauthorized'));
       socket.data.user = { id: user.id, name: user.name };

@@ -5,7 +5,7 @@ import {
   toPublicUser,
 } from '../repositories/userRepository.js';
 import { DEFAULT_USER_ROLE } from '../constants.js';
-import jwt from 'jsonwebtoken';
+import jwt, { type Algorithm } from 'jsonwebtoken';
 import validator from 'validator';
 import bcrypt from 'bcryptjs';
 import { authenticate, type AuthenticatedRequest } from '../middleware/auth.js';
@@ -14,6 +14,7 @@ const router = Router();
 
 router.post('/register', async (req, res) => {
   const jwtSecret = process.env.JWT_SECRET;
+  const jwtAlgorithm = (process.env.JWT_ALGORITHM || 'HS256') as Algorithm;
   if (!jwtSecret) {
     return res.status(500).json({
       error: 'ServerError',
@@ -53,7 +54,7 @@ router.post('/register', async (req, res) => {
   const token = jwt.sign(
     { id: publicUser.id, email: publicUser.email, role: publicUser.role },
     jwtSecret,
-    { expiresIn: '24h' }
+    { expiresIn: '24h', algorithm: jwtAlgorithm }
   );
   res
     .cookie('sessionToken', token, {
@@ -68,6 +69,7 @@ router.post('/register', async (req, res) => {
 
 router.post('/login', async (req, res) => {
   const jwtSecret = process.env.JWT_SECRET;
+  const jwtAlgorithm = (process.env.JWT_ALGORITHM || 'HS256') as Algorithm;
   if (!jwtSecret) {
     return res.status(500).json({
       error: 'ServerError',
@@ -108,7 +110,7 @@ router.post('/login', async (req, res) => {
   const token = jwt.sign(
     { id: publicUser.id, email: publicUser.email, role: publicUser.role },
     jwtSecret,
-    { expiresIn: '24h' }
+    { expiresIn: '24h', algorithm: jwtAlgorithm }
   );
   res
     .cookie('sessionToken', token, {

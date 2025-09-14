@@ -1,9 +1,7 @@
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const openapiPath = path.resolve(__dirname, '../../openapi.json');
+const openapiPath = path.resolve(process.cwd(), 'openapi.json');
 const openapiSpec = JSON.parse(fs.readFileSync(openapiPath, 'utf-8'));
 
 const serverUrl =
