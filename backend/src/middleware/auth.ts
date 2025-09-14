@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
+import jwt, { type Algorithm } from 'jsonwebtoken';
 import {
   findUserById,
   toPublicUser,
@@ -26,6 +26,7 @@ export async function authenticate(
   next: NextFunction
 ) {
   const jwtSecret = process.env.JWT_SECRET;
+  const jwtAlgorithm = (process.env.JWT_ALGORITHM || 'HS256') as Algorithm;
   if (!jwtSecret) {
     return res.status(500).json({
       error: 'ServerError',
@@ -42,7 +43,9 @@ export async function authenticate(
   }
 
   try {
-    const payload = jwt.verify(token, jwtSecret) as { id: number };
+    const payload = jwt.verify(token, jwtSecret, {
+      algorithms: [jwtAlgorithm],
+    }) as { id: number };
     const user = await findUserById(payload.id);
     if (!user) {
       return res.status(401).json({

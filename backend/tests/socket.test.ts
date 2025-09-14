@@ -10,7 +10,7 @@ import Client from 'socket.io-client';
 import { beforeAll, afterAll, describe, expect, test, vi } from 'vitest';
 import app from '../src/app.js';
 import { setupWebsocket } from '../src/socket.js';
-import jwt from 'jsonwebtoken';
+import jwt, { type Algorithm } from 'jsonwebtoken';
 import * as userRepo from '../src/repositories/userRepository.js';
 
 let io: Server<
@@ -43,7 +43,10 @@ describe('websocket messaging', () => {
       role: 'user',
       language: 'en',
     });
-    const token = jwt.sign({ id: 1 }, process.env.JWT_SECRET!);
+    const jwtAlgorithm = (process.env.JWT_ALGORITHM || 'HS256') as Algorithm;
+    const token = jwt.sign({ id: 1 }, process.env.JWT_SECRET!, {
+      algorithm: jwtAlgorithm,
+    });
     clientSocket = Client(`http://localhost:${port}`, {
       extraHeaders: { cookie: `sessionToken=${token}` } as any,
     } as any);
