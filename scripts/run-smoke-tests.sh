@@ -9,9 +9,11 @@ if [[ -z "${BACKEND_REFERENCE}" || -z "${FRONTEND_REFERENCE}" ]]; then
   exit 1
 fi
 
-echo "Running E2E tests against the following images:"
+echo "Running smoke tests against the following images:"
 echo "  Backend: ${BACKEND_REFERENCE}"
 echo "  Frontend: ${FRONTEND_REFERENCE}"
 
+# Placeholder smoke tests: exercise backend and frontend unit suites until a
+# true integrated E2E harness is implemented.
 npm run test:backend
 npm run test:frontend

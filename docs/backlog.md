@@ -35,7 +35,7 @@ Resumen de Hechos (hasta la fecha)
 - Normalización/verificación de libros asistida por metadata/ISBN. [~]
 - Bases de trabajo: scripts de desarrollo y CI, documentación de entorno. [x]
 - Flujo de despliegue a Docker Hub para `main` y `dev`; plantillas `.env` con `JWT_SECRET`. [x]
-- Despliegue automatizado a staging con imágenes versionadas por digest y promoción canary a producción. [x]
+- Despliegue automatizado a staging vía Docker Hub (imágenes por digest, smoke tests) y promoción canary a producción; falta completar los scripts de rollout. [~]
 - PostGIS local con Docker Compose para desarrollo. [x]
 
 EP-1 Identidad y Perfil

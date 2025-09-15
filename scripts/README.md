@@ -50,22 +50,34 @@ Este script puede ser integrado en un workflow de CI/CD para mantener la documen
 - Generación de métricas de desarrollo (PRs por tipo, velocidad, etc.)
 - Orquestación de despliegues canary y smoke tests end-to-end
 
-## run-e2e.sh
+## run-smoke-tests.sh
 
-Script de apoyo para ejecutar un smoke test end-to-end tras desplegar imágenes del backend y frontend.
+Script de apoyo para ejecutar pruebas de humo tras desplegar imágenes del backend y frontend.
 
 ### Uso
 
 ```bash
-./scripts/run-e2e.sh "ghcr.io/org/proyecto-backend@sha256:..." "ghcr.io/org/proyecto-frontend@sha256:..."
+./scripts/run-smoke-tests.sh "docker.io/org/proyecto-backend@sha256:..." "docker.io/org/proyecto-frontend@sha256:..."
 ```
 
 ### Funcionalidades
 
 - Muestra las referencias (imagen@digest) probadas.
-- Ejecuta `npm run test:backend` y `npm run test:frontend` reutilizando el entorno actual.
+- Ejecuta `npm run test:backend` y `npm run test:frontend` reutilizando el entorno actual hasta contar con E2E reales.
 
 ### Notas
 
 - Requiere que las dependencias estén instaladas (`npm ci`).
 - Para los tests de backend se necesita una base de datos PostgreSQL accesible via `DATABASE_URL`.
+
+## deploy-staging.sh
+
+Guion que debe implementar la lógica real de despliegue a staging usando referencias `imagen@digest` generadas por los workflows.
+
+Actualmente finaliza con error a modo de recordatorio: edítalo para invocar la herramienta de despliegue que corresponda (por ejemplo, `kubectl`, `helm`, `flyctl`, etc.).
+
+## deploy-production.sh
+
+Responsable de las operaciones de producción: inicio del canary, promoción a 100% y rollback.
+
+Recibe el modo (`canary`, `promote` o `rollback`), las referencias `imagen@digest` y, para el canary, el porcentaje deseado. Al igual que `deploy-staging.sh`, hoy actúa como placeholder y termina con error hasta que se complete la automatización real.

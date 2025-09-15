@@ -79,22 +79,24 @@ jobs:
           FRONTEND_REFERENCE: ${{ steps.staging-digests.outputs.frontend_image }}@${{ steps.staging-digests.outputs.frontend_digest }}
           CANARY_PERCENTAGE: ${{ inputs.canary-percentage }}
         run: |
-          echo "Starting canary deployment with ${CANARY_PERCENTAGE}% traffic"
-          echo "kubectl set image deployment/backend backend=${BACKEND_REFERENCE} --record"
-          echo "kubectl set image deployment/frontend frontend=${FRONTEND_REFERENCE} --record"
-          echo "kubectl rollout status deployment/backend --watch"
-          echo "kubectl rollout status deployment/frontend --watch"
+          if [[ -x "./scripts/deploy-production.sh" ]]; then
+            ./scripts/deploy-production.sh canary "$BACKEND_REFERENCE" "$FRONTEND_REFERENCE" "$CANARY_PERCENTAGE"
+          else
+            echo "ERROR: Production canary deployment is not configured. Provide scripts/deploy-production.sh to perform the rollout." >&2
+            exit 1
+          fi
 
       - name: Promote canary to full traffic
         env:
           BACKEND_REFERENCE: ${{ steps.staging-digests.outputs.backend_image }}@${{ steps.staging-digests.outputs.backend_digest }}
           FRONTEND_REFERENCE: ${{ steps.staging-digests.outputs.frontend_image }}@${{ steps.staging-digests.outputs.frontend_digest }}
         run: |
-          echo "Promoting canary to 100% traffic"
-          echo "kubectl annotate deployment/backend canary=false --overwrite"
-          echo "kubectl annotate deployment/frontend canary=false --overwrite"
-          echo "kubectl set image deployment/backend backend=${BACKEND_REFERENCE}"
-          echo "kubectl set image deployment/frontend frontend=${FRONTEND_REFERENCE}"
+          if [[ -x "./scripts/deploy-production.sh" ]]; then
+            ./scripts/deploy-production.sh promote "$BACKEND_REFERENCE" "$FRONTEND_REFERENCE"
+          else
+            echo "ERROR: Production promotion is not configured. Provide scripts/deploy-production.sh to perform the rollout." >&2
+            exit 1
+          fi
 
       - name: Persist production digests
         if: success()
@@ -132,7 +134,9 @@ jobs:
         run: |
           PREV_BACKEND_REFERENCE=$(jq -r '.backend.image + "@" + .backend.digest' "$PREVIOUS_FILE")
           PREV_FRONTEND_REFERENCE=$(jq -r '.frontend.image + "@" + .frontend.digest' "$PREVIOUS_FILE")
-          echo "Rolling back to ${PREV_BACKEND_REFERENCE}"
-          echo "Rolling back to ${PREV_FRONTEND_REFERENCE}"
-          echo "kubectl set image deployment/backend backend=${PREV_BACKEND_REFERENCE}"
-          echo "kubectl set image deployment/frontend frontend=${PREV_FRONTEND_REFERENCE}"
+          if [[ -x "./scripts/deploy-production.sh" ]]; then
+            ./scripts/deploy-production.sh rollback "$PREV_BACKEND_REFERENCE" "$PREV_FRONTEND_REFERENCE"
+          else
+            echo "ERROR: Rollback commands are not configured. Provide scripts/deploy-production.sh to restore the previous release." >&2
+            exit 1
+          fi
