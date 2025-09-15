@@ -4,7 +4,7 @@
   "type": "module",
   "main": "dist/index.js",
   "engines": {
-    "node": ">=20 <24"
+    "node": ">=24 <25"
   },
   "scripts": {
     "dev": "tsx watch src/index.ts",

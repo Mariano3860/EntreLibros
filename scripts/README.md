@@ -48,3 +48,24 @@ Este script puede ser integrado en un workflow de CI/CD para mantener la documen
 - Análisis de cobertura de tests y actualización de métricas
 - Validación automática de documentación vs código real
 - Generación de métricas de desarrollo (PRs por tipo, velocidad, etc.)
+- Orquestación de despliegues canary y smoke tests end-to-end
+
+## run-e2e.sh
+
+Script de apoyo para ejecutar un smoke test end-to-end tras desplegar imágenes del backend y frontend.
+
+### Uso
+
+```bash
+./scripts/run-e2e.sh "ghcr.io/org/proyecto-backend@sha256:..." "ghcr.io/org/proyecto-frontend@sha256:..."
+```
+
+### Funcionalidades
+
+- Muestra las referencias (imagen@digest) probadas.
+- Ejecuta `npm run test:backend` y `npm run test:frontend` reutilizando el entorno actual.
+
+### Notas
+
+- Requiere que las dependencias estén instaladas (`npm ci`).
+- Para los tests de backend se necesita una base de datos PostgreSQL accesible via `DATABASE_URL`.

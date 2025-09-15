@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:16-3.5
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: entrelibros_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/entrelibros_test
+      CI: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Backend formatting
+        run: npm run format -w backend
+
+      - name: Backend lint
+        run: npm run lint -w backend
+
+      - name: Backend typecheck
+        run: npm run typecheck -w backend
+
+      - name: Backend tests
+        run: npm run test -w backend
+
+      - name: Backend build
+        run: npm run build -w backend
+
+      - name: Frontend formatting
+        run: npm run format -w frontend
+
+      - name: Frontend lint
+        run: npm run lint -w frontend
+
+      - name: Frontend typecheck
+        run: npm run typecheck -w frontend
+
+      - name: Frontend tests
+        run: npm run test -w frontend
+
+      - name: Frontend build
+        run: npm run build -w frontend

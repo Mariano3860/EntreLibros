@@ -1,0 +1,120 @@
+name: Deploy to staging
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  staging:
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+    services:
+      postgres:
+        image: postgis/postgis:16-3.5
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: entrelibros_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      CI: true
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/entrelibros_test
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prepare image names
+        id: image-info
+        run: |
+          REPO=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "BACKEND_IMAGE=ghcr.io/${REPO}-backend" >> "$GITHUB_ENV"
+          echo "FRONTEND_IMAGE=ghcr.io/${REPO}-frontend" >> "$GITHUB_ENV"
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push backend image
+        id: build-backend
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: backend/Dockerfile
+          push: true
+          tags: ${{ env.BACKEND_IMAGE }}:${{ github.sha }}
+          provenance: false
+
+      - name: Build and push frontend image
+        id: build-frontend
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: frontend/Dockerfile
+          push: true
+          tags: ${{ env.FRONTEND_IMAGE }}:${{ github.sha }}
+          provenance: false
+
+      - name: Record image digests
+        id: record-digests
+        run: |
+          cat <<JSON > staging-digests.json
+          {
+            "backend": {
+              "image": "${{ env.BACKEND_IMAGE }}",
+              "tag": "${{ github.sha }}",
+              "digest": "${{ steps.build-backend.outputs.digest }}"
+            },
+            "frontend": {
+              "image": "${{ env.FRONTEND_IMAGE }}",
+              "tag": "${{ github.sha }}",
+              "digest": "${{ steps.build-frontend.outputs.digest }}"
+            }
+          }
+          JSON
+          cat staging-digests.json
+
+      - name: Upload staging digests
+        uses: actions/upload-artifact@v4
+        with:
+          name: staging-digests
+          path: staging-digests.json
+
+      - name: Deploy to staging
+        env:
+          BACKEND_IMAGE: ${{ env.BACKEND_IMAGE }}
+          BACKEND_DIGEST: ${{ steps.build-backend.outputs.digest }}
+          FRONTEND_IMAGE: ${{ env.FRONTEND_IMAGE }}
+          FRONTEND_DIGEST: ${{ steps.build-frontend.outputs.digest }}
+        run: |
+          echo "Deploying ${BACKEND_IMAGE}@${BACKEND_DIGEST} to staging"
+          echo "Deploying ${FRONTEND_IMAGE}@${FRONTEND_DIGEST} to staging"
+          # Replace the following commands with the platform-specific deployment tooling.
+          echo "kubectl set image deployment/backend backend=${BACKEND_IMAGE}@${BACKEND_DIGEST}"
+          echo "kubectl set image deployment/frontend frontend=${FRONTEND_IMAGE}@${FRONTEND_DIGEST}"
+
+      - name: Run E2E tests
+        env:
+          BACKEND_REFERENCE: ${{ env.BACKEND_IMAGE }}@${{ steps.build-backend.outputs.digest }}
+          FRONTEND_REFERENCE: ${{ env.FRONTEND_IMAGE }}@${{ steps.build-frontend.outputs.digest }}
+        run: |
+          ./scripts/run-e2e.sh "$BACKEND_REFERENCE" "$FRONTEND_REFERENCE"

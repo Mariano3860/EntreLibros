@@ -1,0 +1,138 @@
+name: Promote to production
+
+on:
+  workflow_dispatch:
+    inputs:
+      canary-percentage:
+        description: 'Percentage of traffic to send to the canary deployment'
+        required: true
+        default: '10'
+
+permissions:
+  contents: read
+  packages: read
+  actions: write
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+    env:
+      CI: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Download latest staging digests
+        id: staging-digests
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          RUN_ID=$(gh api repos/${{ github.repository }}/actions/workflows/staging.yml/runs \
+            --field branch=main \
+            --field status=success \
+            --field per_page=1 \
+            --jq '.workflow_runs[0].id // empty')
+          if [ -z "$RUN_ID" ]; then
+            echo "No successful staging deployment found" >&2
+            exit 1
+          fi
+          gh run download "$RUN_ID" --name staging-digests --dir staging
+          cat staging/staging-digests.json
+          echo "file=staging/staging-digests.json" >> "$GITHUB_OUTPUT"
+          echo "backend_image=$(jq -r '.backend.image' staging/staging-digests.json)" >> "$GITHUB_OUTPUT"
+          echo "backend_digest=$(jq -r '.backend.digest' staging/staging-digests.json)" >> "$GITHUB_OUTPUT"
+          echo "frontend_image=$(jq -r '.frontend.image' staging/staging-digests.json)" >> "$GITHUB_OUTPUT"
+          echo "frontend_digest=$(jq -r '.frontend.digest' staging/staging-digests.json)" >> "$GITHUB_OUTPUT"
+
+      - name: Fetch previous production digests
+        id: previous-production
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          PREV_RUN_ID=$(gh api repos/${{ github.repository }}/actions/workflows/promote.yml/runs \
+            --field status=success \
+            --field per_page=1 \
+            --jq '.workflow_runs[0].id // empty')
+          if [ -n "$PREV_RUN_ID" ]; then
+            gh run download "$PREV_RUN_ID" --name production-digests --dir previous || true
+          fi
+          if [ -f previous/production-digests.json ]; then
+            cat previous/production-digests.json
+            echo "available=true" >> "$GITHUB_OUTPUT"
+            echo "file=previous/production-digests.json" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Start canary deployment
+        env:
+          BACKEND_REFERENCE: ${{ steps.staging-digests.outputs.backend_image }}@${{ steps.staging-digests.outputs.backend_digest }}
+          FRONTEND_REFERENCE: ${{ steps.staging-digests.outputs.frontend_image }}@${{ steps.staging-digests.outputs.frontend_digest }}
+          CANARY_PERCENTAGE: ${{ inputs.canary-percentage }}
+        run: |
+          echo "Starting canary deployment with ${CANARY_PERCENTAGE}% traffic"
+          echo "kubectl set image deployment/backend backend=${BACKEND_REFERENCE} --record"
+          echo "kubectl set image deployment/frontend frontend=${FRONTEND_REFERENCE} --record"
+          echo "kubectl rollout status deployment/backend --watch"
+          echo "kubectl rollout status deployment/frontend --watch"
+
+      - name: Promote canary to full traffic
+        env:
+          BACKEND_REFERENCE: ${{ steps.staging-digests.outputs.backend_image }}@${{ steps.staging-digests.outputs.backend_digest }}
+          FRONTEND_REFERENCE: ${{ steps.staging-digests.outputs.frontend_image }}@${{ steps.staging-digests.outputs.frontend_digest }}
+        run: |
+          echo "Promoting canary to 100% traffic"
+          echo "kubectl annotate deployment/backend canary=false --overwrite"
+          echo "kubectl annotate deployment/frontend canary=false --overwrite"
+          echo "kubectl set image deployment/backend backend=${BACKEND_REFERENCE}"
+          echo "kubectl set image deployment/frontend frontend=${FRONTEND_REFERENCE}"
+
+      - name: Persist production digests
+        if: success()
+        env:
+          BACKEND_IMAGE: ${{ steps.staging-digests.outputs.backend_image }}
+          BACKEND_DIGEST: ${{ steps.staging-digests.outputs.backend_digest }}
+          FRONTEND_IMAGE: ${{ steps.staging-digests.outputs.frontend_image }}
+          FRONTEND_DIGEST: ${{ steps.staging-digests.outputs.frontend_digest }}
+        run: |
+          cat <<JSON > production-digests.json
+          {
+            "backend": {
+              "image": "${BACKEND_IMAGE}",
+              "digest": "${BACKEND_DIGEST}"
+            },
+            "frontend": {
+              "image": "${FRONTEND_IMAGE}",
+              "digest": "${FRONTEND_DIGEST}"
+            }
+          }
+          JSON
+          cat production-digests.json
+
+      - name: Upload production digests
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-digests
+          path: production-digests.json
+
+      - name: Rollback to previous digests
+        if: failure() && steps.previous-production.outputs.available == 'true'
+        env:
+          PREVIOUS_FILE: ${{ steps.previous-production.outputs.file }}
+        run: |
+          PREV_BACKEND_REFERENCE=$(jq -r '.backend.image + "@" + .backend.digest' "$PREVIOUS_FILE")
+          PREV_FRONTEND_REFERENCE=$(jq -r '.frontend.image + "@" + .frontend.digest' "$PREVIOUS_FILE")
+          echo "Rolling back to ${PREV_BACKEND_REFERENCE}"
+          echo "Rolling back to ${PREV_FRONTEND_REFERENCE}"
+          echo "kubectl set image deployment/backend backend=${PREV_BACKEND_REFERENCE}"
+          echo "kubectl set image deployment/frontend frontend=${PREV_FRONTEND_REFERENCE}"
