@@ -27,12 +27,20 @@ El backend enviará una respuesta automática en el mismo canal usando el usuari
    - Copiar `backend/.env.example` a `backend/.env` y ajustar `DATABASE_URL`.
    - (Opcional) Copiar `backend/.env.test.example` a `backend/.env.test` para las pruebas. Este archivo se genera automáticamente si no existe.
    - Revisar `frontend/.env.example` para configurar el frontend.
-3. **Preparar base de datos y migraciones**
+3. **Levantar PostGIS con Docker**
+   ```bash
+   docker compose -f docker-compose.postgis.yml up -d
+   ```
+   Para detenerlo:
+   ```bash
+   docker compose -f docker-compose.postgis.yml down
+   ```
+4. **Preparar base de datos y migraciones**
    ```bash
    npm run migrate
    ```
    Crea la base definida en `backend/.env` y aplica las migraciones.
-4. **Levantar servidores**
+5. **Levantar servidores**
    ```bash
    npm run dev:backend   # backend
    npm run dev:frontend  # frontend
