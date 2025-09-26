@@ -89,6 +89,8 @@ Feature 3.2 Búsquedas y ciclo de vida
   - Éxito: resultados <2s con filtros básicos.
 - [ ] S-3.5 Vencimiento/renovación de publicaciones (Should, E2; BR-23)
   - Éxito: aviso previo; reducción de obsoletas.
+- [x] S-3.6 Documentar diagrama de clases del modelo de datos (Mermaid) (Should, E1; DOC-01)
+  - Éxito: diagrama actualizado en `docs/base_de_datos.md`, visible en GitHub y alineado con entidades principales.
 
 EP-4 Descubrimiento y Navegación
 Feature 4.1 Mapa y listados
