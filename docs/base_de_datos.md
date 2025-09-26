@@ -1,5 +1,89 @@
 # Esquema de base de datos
 
+## Diagrama de clases (Mermaid)
+
+El siguiente diagrama resume las entidades principales de EntreLibros y cómo se relacionan. Se incluyen usuarios, libros, publicaciones, rincones de libros, mensajes, acuerdos, imágenes, géneros y sugerencias de libros. Al visualizar este archivo en GitHub se renderiza el diagrama en formato Mermaid.
+
+```mermaid
+classDiagram
+    %% Definición de clases con atributos principales
+    class Usuario {
+        +usuarioId: int
+        +nombre: string
+        +email: string
+        +zona: string
+        +fechaRegistro: datetime
+    }
+    class Libro {
+        +libroId: int
+        +titulo: string
+        +autor: string
+        +editorial: string
+        +isbn: string
+        +anioPublicacion: int
+    }
+    class Genero {
+        +generoId: int
+        +nombre: string
+    }
+    class Publicacion {
+        +publicacionId: int
+        +estadoEjemplar: string
+        +modalidad: string
+        +precio: decimal
+        +zonaEncuentro: string
+        +fechaPublicacion: datetime
+        +fechaExpiracion: datetime
+    }
+    class RinconDeLibros {
+        +rinconId: int
+        +nombre: string
+        +ambito: string
+        +ciudad: string
+        +barrio: string
+        +referencia: string
+        +ubicacion: Point
+        +estado: string
+        +fechaAlta: datetime
+    }
+    class Mensaje {
+        +mensajeId: int
+        +contenido: string
+        +fechaHora: datetime
+        +leido: bool
+    }
+    class Acuerdo {
+        +acuerdoId: int
+        +fechaHoraEncuentro: datetime
+        +puntoEncuentro: Point
+        +estado: string
+        +confirmado: bool
+    }
+    class Imagen {
+        +imagenId: int
+        +url: string
+        +tipo: string
+    }
+    class SugerenciaLibro {
+        +sugerenciaId: int
+        +motivo: string
+        +fechaSugerencia: datetime
+    }
+
+    %% Relaciones entre clases con cardinalidades
+    Usuario "1" -- "0..*" Publicacion : **publica/autor** >
+    Usuario "1" -- "0..*" RinconDeLibros : **registra** >
+    Usuario "0..*" -- "0..*" Acuerdo : **participa** >
+    Mensaje "*" -- "1" Usuario : **remitente**
+    Mensaje "*" -- "1" Usuario : **destinatario**
+    Libro "1" -- "0..*" Publicacion : **título de / ejemplar de** >
+    Genero "1" -- "0..*" Libro : **clasifica** >
+    Publicacion "0..1" -- "1" Acuerdo : **cerrada en** >
+    RinconDeLibros "0..*" -- "0..1" Acuerdo : **lugarEncuentro** >
+    Publicacion "1" -- "1" Imagen : **fotoEjemplar**
+    RinconDeLibros "1" -- "1" Imagen : **fotoRDL**
+    Usuario "1" -- "0..*" SugerenciaLibro : **recibe** >
+    Libro "1" -- "0..*" SugerenciaLibro : **esSugerido** >
 ## Tablas principales
 
 ### `users`
