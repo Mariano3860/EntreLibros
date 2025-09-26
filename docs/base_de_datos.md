@@ -78,7 +78,7 @@ classDiagram
     Mensaje "*" -- "1" Usuario : destinatario
     Libro "1" -- "0..*" Publicacion : ejemplar
     Genero "1" -- "0..*" Libro : clasifica
-    Publicacion "0..1" -- "0..1" Acuerdo : cierraAcuerdo
+    Publicacion "0..1" -- "1" Acuerdo : cierraAcuerdo
     RinconDeLibros "0..*" -- "0..1" Acuerdo : puntoEncuentro
     Publicacion "1" -- "1" Imagen : fotoEjemplar
     RinconDeLibros "1" -- "1" Imagen : fotoRincon
