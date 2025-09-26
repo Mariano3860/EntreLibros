@@ -84,6 +84,7 @@ classDiagram
     RinconDeLibros "1" -- "1" Imagen : **fotoRDL**
     Usuario "1" -- "0..*" SugerenciaLibro : **recibe** >
     Libro "1" -- "0..*" SugerenciaLibro : **esSugerido** >
+```
 ## Tablas principales
 
 ### `users`
