@@ -80,8 +80,7 @@ classDiagram
     Mensaje "*" -- "1" Usuario : **destinatario**
     Libro "1" -- "0..*" Publicacion : **título de** >
     Publicacion "*" -- "1" Libro : **ejemplar de**
-    Genero "1" -- "0..*" Libro : **clasifica** >
-    Libro "*" -- "1" Genero : **pertenece a**
+    Genero "1" <--> "0..*" Libro : **clasifica/pertenece a**
     Publicacion "0..1" -- "1" Acuerdo : **cerrada en** >
     Acuerdo "1" -- "0..1" Publicacion : **ejemplar intercambiado**
     RinconDeLibros "0..*" -- "0..1" Acuerdo : **lugarEncuentro** >
