@@ -77,19 +77,13 @@ classDiagram
     Mensaje "*" -- "1" Usuario : **remitente**
     Mensaje "*" -- "1" Usuario : **destinatario**
     Libro "1" -- "0..*" Publicacion : **título de / ejemplar de** >
-    Genero "1" <--> "0..*" Libro : **clasifica/pertenece a**
+    Genero "1" -- "0..*" Libro : **clasifica** >
     Publicacion "0..1" -- "1" Acuerdo : **cerrada en** >
-    Acuerdo "1" -- "0..1" Publicacion : **ejemplar intercambiado**
     RinconDeLibros "0..*" -- "0..1" Acuerdo : **lugarEncuentro** >
-    Acuerdo "0..1" -- "0..1" RinconDeLibros : **usa**
     Publicacion "1" -- "1" Imagen : **fotoEjemplar**
     RinconDeLibros "1" -- "1" Imagen : **fotoRDL**
     Usuario "1" -- "0..*" SugerenciaLibro : **recibe** >
-    SugerenciaLibro "*" -- "1" Usuario : **destinatario**
     Libro "1" -- "0..*" SugerenciaLibro : **esSugerido** >
-    SugerenciaLibro "*" -- "1" Libro : **libroRecomendado**
-```
-
 ## Tablas principales
 
 ### `users`
