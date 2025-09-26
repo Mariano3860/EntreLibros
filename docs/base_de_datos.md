@@ -71,8 +71,7 @@ classDiagram
     }
 
     %% Relaciones entre clases con cardinalidades
-    Usuario "1" -- "0..*" Publicacion : **publica** >
-    Publicacion "1" -- "1" Usuario : **autor**
+    Usuario "1" -- "0..*" Publicacion : **publica/autor** >
     Usuario "1" -- "0..*" RinconDeLibros : **registra** >
     RinconDeLibros "1" -- "1" Usuario : **responsable**
     Usuario "0..*" -- "0..*" Acuerdo : **participa** >
