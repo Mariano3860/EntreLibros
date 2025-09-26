@@ -71,19 +71,21 @@ classDiagram
     }
 
     %% Relaciones entre clases con cardinalidades
-    Usuario "1" -- "0..*" Publicacion : **publica/autor** >
-    Usuario "1" -- "0..*" RinconDeLibros : **registra** >
-    Usuario "0..*" -- "0..*" Acuerdo : **participa** >
-    Mensaje "*" -- "1" Usuario : **remitente**
-    Mensaje "*" -- "1" Usuario : **destinatario**
-    Libro "1" -- "0..*" Publicacion : **título de / ejemplar de** >
-    Genero "1" -- "0..*" Libro : **clasifica** >
-    Publicacion "0..1" -- "1" Acuerdo : **cerrada en** >
-    RinconDeLibros "0..*" -- "0..1" Acuerdo : **lugarEncuentro** >
-    Publicacion "1" -- "1" Imagen : **fotoEjemplar**
-    RinconDeLibros "1" -- "1" Imagen : **fotoRDL**
-    Usuario "1" -- "0..*" SugerenciaLibro : **recibe** >
-    Libro "1" -- "0..*" SugerenciaLibro : **esSugerido** >
+    Usuario "1" -- "0..*" Publicacion : publica
+    Usuario "1" -- "0..*" RinconDeLibros : registra
+    Usuario "0..*" -- "0..*" Acuerdo : participa
+    Mensaje "*" -- "1" Usuario : remitente
+    Mensaje "*" -- "1" Usuario : destinatario
+    Libro "1" -- "0..*" Publicacion : ejemplar
+    Genero "1" -- "0..*" Libro : clasifica
+    Publicacion "0..1" -- "1" Acuerdo : cierraAcuerdo
+    RinconDeLibros "0..*" -- "0..1" Acuerdo : puntoEncuentro
+    Publicacion "1" -- "1" Imagen : fotoEjemplar
+    RinconDeLibros "1" -- "1" Imagen : fotoRincon
+    Usuario "1" -- "0..*" SugerenciaLibro : recibe
+    Libro "1" -- "0..*" SugerenciaLibro : recomendado
+```
+
 ## Tablas principales
 
 ### `users`
