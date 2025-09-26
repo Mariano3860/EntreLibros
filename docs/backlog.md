@@ -91,6 +91,7 @@ Feature 3.2 Búsquedas y ciclo de vida
   - Éxito: aviso previo; reducción de obsoletas.
 - [x] S-3.6 Documentar diagrama de clases del modelo de datos (Mermaid) (Should, E1; DOC-01)
   - Éxito: diagrama actualizado en `docs/base_de_datos.md`, visible en GitHub y alineado con entidades principales.
+  - Actualización: se depuraron redundancias y se corrigió el bloque Mermaid para que vuelva a renderizar en GitHub.
 
 EP-4 Descubrimiento y Navegación
 Feature 4.1 Mapa y listados
