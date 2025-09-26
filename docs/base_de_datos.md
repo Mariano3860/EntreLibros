@@ -76,8 +76,6 @@ classDiagram
     RinconDeLibros "1" -- "1" Usuario : **responsable**
     Usuario "0..*" -- "0..*" Acuerdo : **participa** >
     Acuerdo "1" -- "1" Usuario : **participante**
-    Usuario "1" -- "0..*" Mensaje : **envía** >
-    Usuario "1" -- "0..*" Mensaje : **recibe** >
     Mensaje "*" -- "1" Usuario : **remitente**
     Mensaje "*" -- "1" Usuario : **destinatario**
     Libro "1" -- "0..*" Publicacion : **título de** >
