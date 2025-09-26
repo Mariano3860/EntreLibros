@@ -78,8 +78,7 @@ classDiagram
     Acuerdo "1" -- "1" Usuario : **participante**
     Mensaje "*" -- "1" Usuario : **remitente**
     Mensaje "*" -- "1" Usuario : **destinatario**
-    Libro "1" -- "0..*" Publicacion : **título de** >
-    Publicacion "*" -- "1" Libro : **ejemplar de**
+    Libro "1" -- "0..*" Publicacion : **título de / ejemplar de** >
     Genero "1" <--> "0..*" Libro : **clasifica/pertenece a**
     Publicacion "0..1" -- "1" Acuerdo : **cerrada en** >
     Acuerdo "1" -- "0..1" Publicacion : **ejemplar intercambiado**
