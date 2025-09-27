@@ -253,7 +253,7 @@ book_suggestions ..> book_suggestion_status : uses
 | `status`                      | ENUM('draft','pending','verified','rejected') | Estado de la publicación           |
 | `type`                        | ENUM('offer','request','exchange')            | Tipo de interacción                |
 | `description`                 | TEXT                                          | Detalle del ejemplar               |
-| `condition`                   | TEXT                                          | Estado físico del ejemplar         |
+| `condition`                   | TEXT                                          | Estado físico del ejemplar (por ejemplo: 'nuevo', 'bueno', 'aceptable', 'malo') |
 | `location`                    | GEOGRAPHY(Point,4326)                         | Ubicación opcional del intercambio |
 | `created_at`                  | TIMESTAMPTZ                                   | Fecha de creación                  |
 | `updated_at`                  | TIMESTAMPTZ                                   | Última actualización               |
