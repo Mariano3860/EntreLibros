@@ -1,6 +1,6 @@
 # Backlog de Producto (Business) — EntreLibros
 
-Última actualización: 2025-09-15
+Última actualización: 2025-09-16
 
 Resumen ejecutivo
 EntreLibros conecta lectores mediante Rincones de Libros (RdL), publicaciones de ejemplares y acuerdos entre pares, priorizando privacidad por diseño y operación comunitaria. Este backlog ordena el trabajo en épicas, features y stories, con foco en el valor de negocio y en resultados observables. El estado actual refleja avances ya logrados (auth básica, mensajería, geolocalización, normalización de libros, scripts/CI), y alinea los pendientes críticos (RdL, descubrimiento, moderación, métricas y notificaciones) para alcanzar un MVP robusto.
@@ -91,7 +91,8 @@ Feature 3.2 Búsquedas y ciclo de vida
   - Éxito: aviso previo; reducción de obsoletas.
 - [x] S-3.6 Documentar diagrama de clases del modelo de datos (Mermaid) (Should, E1; DOC-01)
   - Éxito: diagrama actualizado en `docs/base_de_datos.md`, visible en GitHub y alineado con entidades principales.
-  - Actualización: se documentó el modelo físico completo (tablas reales, columnas y enums), se aclararon relaciones clave y se listaron proyecciones futuras para mantener la trazabilidad técnica.
+- Actualización: se documentó el modelo físico completo (tablas reales, columnas y enums), se aclararon relaciones clave y se listaron proyecciones futuras para mantener la trazabilidad técnica.
+- Actualización 2025-09-16: se corrigió la sintaxis Mermaid para que GitHub renderice el diagrama y se mantuvo terminología consistente en la documentación.
 
 EP-4 Descubrimiento y Navegación
 Feature 4.1 Mapa y listados

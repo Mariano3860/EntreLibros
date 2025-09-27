@@ -163,34 +163,38 @@ genres "1" --> "0..*" user_genres : tag
 users "1" --> "0..*" book_suggestions : suggests
 
 %% =========================
-%% ENUMS (dependency «use» for type coupling)
+%% ENUMS (dependency "use" for type coupling)
 %% =========================
-class publication_status <<enumeration>> {
+class publication_status {
+  <<enumeration>>
   draft
   pending
   verified
   rejected
 }
-class publication_type <<enumeration>> {
+class publication_type {
+  <<enumeration>>
   offer
   request
   exchange
 }
-class conversation_status <<enumeration>> {
+class conversation_status {
+  <<enumeration>>
   open
   closed
   archived
 }
-class book_suggestion_status <<enumeration>> {
+class book_suggestion_status {
+  <<enumeration>>
   pending
   approved
   rejected
 }
 
-publications ..> publication_status : «use»
-publications ..> publication_type : «use»
-conversations ..> conversation_status : «use»
-book_suggestions ..> book_suggestion_status : «use»
+publications ..> publication_status : uses
+publications ..> publication_type : uses
+conversations ..> conversation_status : uses
+book_suggestions ..> book_suggestion_status : uses
 classDef table fill:#f8f9fa,stroke:#4a4a4a,stroke-width:1px,color:#1f1f1f;
 classDef enumeration fill:#fff3cd,stroke:#b8860b,stroke-dasharray: 5 3,color:#1f1f1f;
 class users,books,book_images,publications,publication_stats,publication_images,conversations,messages,book_corners,genres,user_genres,book_suggestions table;
@@ -382,7 +386,7 @@ class publication_status,publication_type,conversation_status,book_suggestion_st
 * **Composición** para imágenes y `publication_stats` (dependen del padre).
 * **`conversations.publication_id` nullable** para soportar ambos casos (chat general o sobre una publicación).
 * **PostGIS** se representa físicamente como `geography(Point,4326)`; en el diagrama se deja explícito.
-* **Enums** se muestran como `enum{...}` y se etiquetan con dependencia «use» para dejar claro el acople de tipo.
+* **Enums** se muestran como `enum{...}` y se etiquetan con dependencia "use" para dejar claro el acople de tipo.
 
 ---
 
