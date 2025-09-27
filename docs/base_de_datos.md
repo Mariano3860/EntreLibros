@@ -196,7 +196,8 @@ publications ..> publication_type : uses
 conversations ..> conversation_status : uses
 book_suggestions ..> book_suggestion_status : uses
 classDef table fill:#f8f9fa,stroke:#4a4a4a,stroke-width:1px,color:#1f1f1f
-classDef enumeration fill:#fff3cd,stroke:#b8860b,stroke-dasharray: 5 3,color:#1f1f1f
+classDef enumeration fill:#fff3cd,stroke:#b8860b,stroke-dasharray:5 3,color:#1f1f1f
+
 class users,books,book_images,publications,publication_stats,publication_images,conversations,messages,book_corners,genres,user_genres,book_suggestions table
 class publication_status,publication_type,conversation_status,book_suggestion_status enumeration
 ```

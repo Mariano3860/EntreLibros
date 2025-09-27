@@ -93,7 +93,7 @@ Feature 3.2 Búsquedas y ciclo de vida
   - Éxito: diagrama actualizado en `docs/base_de_datos.md`, visible en GitHub y alineado con entidades principales.
 - Actualización: se documentó el modelo físico completo (tablas reales, columnas y enums), se aclararon relaciones clave y se listaron proyecciones futuras para mantener la trazabilidad técnica.
 - Actualización 2025-09-16: se corrigió la sintaxis Mermaid para que GitHub renderice el diagrama y se mantuvo terminología consistente en la documentación.
-- Actualización 2025-09-27: se ajustaron los estilos del diagrama Mermaid para evitar errores de render en la documentación.
+- Actualización 2025-09-27: se ajustaron los estilos y la sintaxis del diagrama Mermaid para evitar errores de parseo/render en la documentación.
 
 EP-4 Descubrimiento y Navegación
 Feature 4.1 Mapa y listados
