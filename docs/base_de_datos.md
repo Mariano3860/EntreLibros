@@ -287,7 +287,7 @@ book_suggestions ..> book_suggestion_status : uses
 | Campo                                                 | Tipo                             | Descripción                          |
 | ----------------------------------------------------- | -------------------------------- | ------------------------------------ |
 | `id` (PK)                                             | SERIAL                           | Identificador                        |
-| `publication_id` (FK→`publications.id`, **optional**) | INTEGER                          | Publicación sobre la que se conversa |
+| `publication_id` (FK→`publications.id`, (nullable))   | INTEGER                          | Publicación sobre la que se conversa |
 | `created_at`                                          | TIMESTAMPTZ                      | Fecha de inicio                      |
 | `status`                                              | ENUM('open','closed','archived') | Estado de la conversación            |
 | `last_message_at`                                     | TIMESTAMPTZ                      | Fecha/hora del último mensaje        |
