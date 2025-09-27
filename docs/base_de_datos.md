@@ -6,11 +6,13 @@
 
 ```mermaid
 classDiagram
+direction LR
 %% =========================
 %% PHYSICAL MODEL (TABLE = CLASS)
 %% =========================
 
 class users {
+  <<table>>
   +id: serial PK
   +name: text
   +email: text (unique)
@@ -25,6 +27,7 @@ class users {
 }
 
 class books {
+  <<table>>
   +id: serial PK
   +title: text
   +isbn: text
@@ -37,6 +40,7 @@ class books {
 }
 
 class book_images {
+  <<table>>
   +id: serial PK
   +book_id: integer FK -> books.id
   +url: text
@@ -46,11 +50,12 @@ class book_images {
 }
 
 class publications {
+  <<table>>
   +id: serial PK
   +user_id: integer FK -> users.id
   +book_id: integer FK -> books.id
-  +status: enum{draft,pending,verified,rejected}
-  +type: enum{offer,request,exchange}
+  +status: publication_status
+  +type: publication_type
   +description: text
   +condition: text
   +location: geography(Point,4326)
@@ -61,6 +66,7 @@ class publications {
 }
 
 class publication_stats {
+  <<table>>
   +publication_id: integer PK/FK -> publications.id
   +views: integer
   +likes: integer
@@ -70,6 +76,7 @@ class publication_stats {
 }
 
 class publication_images {
+  <<table>>
   +id: serial PK
   +publication_id: integer FK -> publications.id
   +url: text
@@ -79,14 +86,16 @@ class publication_images {
 }
 
 class conversations {
+  <<table>>
   +id: serial PK
   +publication_id: integer FK -> publications.id (nullable)
   +created_at: timestamptz
-  +status: enum{open,closed,archived}
+  +status: conversation_status
   +last_message_at: timestamptz
 }
 
 class messages {
+  <<table>>
   +id: serial PK
   +conversation_id: integer FK -> conversations.id
   +sender_id: integer FK -> users.id
@@ -97,6 +106,7 @@ class messages {
 }
 
 class book_corners {
+  <<table>>
   +id: serial PK
   +name: text
   +owner_user_id: integer FK -> users.id
@@ -106,22 +116,25 @@ class book_corners {
 }
 
 class genres {
+  <<table>>
   +id: serial PK
   +name: text
 }
 
 class user_genres {
+  <<table>>
   +user_id: integer FK -> users.id
   +genre_id: integer FK -> genres.id
 }
 
 class book_suggestions {
+  <<table>>
   +id: serial PK
   +user_id: integer FK -> users.id
   +title: text
   +authors: text
   +isbn: text
-  +status: enum{pending,approved,rejected}
+  +status: book_suggestion_status
   +created_at: timestamptz
 }
 
@@ -178,6 +191,10 @@ publications ..> publication_status : «use»
 publications ..> publication_type : «use»
 conversations ..> conversation_status : «use»
 book_suggestions ..> book_suggestion_status : «use»
+classDef table fill:#f8f9fa,stroke:#4a4a4a,stroke-width:1px,color:#1f1f1f;
+classDef enumeration fill:#fff3cd,stroke:#b8860b,stroke-dasharray: 5 3,color:#1f1f1f;
+class users,books,book_images,publications,publication_stats,publication_images,conversations,messages,book_corners,genres,user_genres,book_suggestions table;
+class publication_status,publication_type,conversation_status,book_suggestion_status enumeration;
 ```
 
 ---
@@ -235,7 +252,7 @@ book_suggestions ..> book_suggestion_status : «use»
 | `status`                      | ENUM('draft','pending','verified','rejected') | Estado de la publicación           |
 | `type`                        | ENUM('offer','request','exchange')            | Tipo de interacción                |
 | `description`                 | TEXT                                          | Detalle del ejemplar               |
-| `condition`                   | TEXT                                          | Estado físico del libro ofrecido   |
+| `condition`                   | TEXT                                          | Estado físico del ejemplar         |
 | `location`                    | GEOGRAPHY(Point,4326)                         | Ubicación opcional del intercambio |
 | `created_at`                  | TIMESTAMPTZ                                   | Fecha de creación                  |
 | `updated_at`                  | TIMESTAMPTZ                                   | Última actualización               |
@@ -269,7 +286,7 @@ book_suggestions ..> book_suggestion_status : «use»
 | Campo                                                 | Tipo                             | Descripción                          |
 | ----------------------------------------------------- | -------------------------------- | ------------------------------------ |
 | `id` (PK)                                             | SERIAL                           | Identificador                        |
-| `publication_id` (FK→`publications.id`, **opcional**) | INTEGER                          | Publicación sobre la que se conversa |
+| `publication_id` (FK→`publications.id`, **optional**) | INTEGER                          | Publicación sobre la que se conversa |
 | `created_at`                                          | TIMESTAMPTZ                      | Fecha de inicio                      |
 | `status`                                              | ENUM('open','closed','archived') | Estado de la conversación            |
 | `last_message_at`                                     | TIMESTAMPTZ                      | Fecha/hora del último mensaje        |
