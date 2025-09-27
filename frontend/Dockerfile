@@ -1,4 +1,4 @@
-FROM node:24-alpine AS builder
+FROM node:24 AS builder
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY backend/package.json backend/
@@ -7,7 +7,10 @@ RUN npm ci -w frontend
 COPY frontend frontend
 RUN npm run build -w frontend
 
-FROM nginx:alpine
-COPY --from=builder /app/frontend/dist /usr/share/nginx/html
-CMD ["nginx", "-g", "daemon off;"]
+FROM node:24 AS runner
+WORKDIR /app
+RUN npm install -g serve@14.2.1
+COPY --from=builder /app/frontend/dist ./dist
+EXPOSE 4173
+CMD ["serve", "-s", "dist", "-l", "4173"]
 
