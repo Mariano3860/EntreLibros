@@ -4,12 +4,23 @@ export type Book = {
   cover: string
 }
 
+export type MessageRole = 'me' | 'them' | 'system'
+
+export type MessageTone =
+  | 'primary'
+  | 'secondary'
+  | 'success'
+  | 'warning'
+  | 'info'
+  | 'neutral'
+
 export type Message = {
   id: number
-  sender: 'me' | 'them'
+  sender: MessageRole
   text?: string
   book?: Book
   time: string
+  tone?: MessageTone
 }
 
 export type Conversation = {
