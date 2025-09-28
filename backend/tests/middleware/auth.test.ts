@@ -1,16 +1,23 @@
-import type { Response, NextFunction } from 'express';
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import jwt from 'jsonwebtoken';
+// prettier-ignore
+import type { Response, NextFunction } from 'express'
+// prettier-ignore
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
+// prettier-ignore
+import jwt from 'jsonwebtoken'
+// prettier-ignore
 import {
   authenticate,
   type AuthenticatedRequest,
-} from '../../src/middleware/auth.js';
-import * as userRepository from '../../src/repositories/userRepository.js';
+} from '../../src/middleware/auth.js'
+// prettier-ignore
+import * as userRepository from '../../src/repositories/userRepository.js'
+// prettier-ignore
 import type {
   PublicUser,
   User,
-} from '../../src/repositories/userRepository.js';
-import { logger } from '../../src/utils/logger.js';
+} from '../../src/repositories/userRepository.js'
+// prettier-ignore
+import { logger } from '../../src/utils/logger.js'
 
 describe('authenticate middleware', () => {
   const originalJwtSecret = process.env.JWT_SECRET;
