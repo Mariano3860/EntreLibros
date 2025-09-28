@@ -29,7 +29,7 @@ export const Messages = () => {
       .filter((m) => m.channel === selected.user.name)
       .map((m, idx) => ({
         id: idx,
-        sender: m.user.id === currentUser?.id ? 'me' : 'them',
+        role: m.user.id === currentUser?.id ? 'me' : 'them',
         tone: m.user.id === currentUser?.id ? 'primary' : 'neutral',
         text: m.text,
         time: new Date(m.timestamp).toLocaleTimeString([], {
@@ -132,7 +132,7 @@ export const Messages = () => {
               {mappedMessages.map((msg) => (
                 <BubbleText
                   key={msg.id}
-                  role={msg.sender}
+                  role={msg.role}
                   tone={msg.tone}
                   text={msg.text}
                   book={msg.book}

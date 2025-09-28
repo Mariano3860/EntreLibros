@@ -16,7 +16,7 @@ export type MessageTone =
 
 export type Message = {
   id: number
-  sender: MessageRole
+  role: MessageRole
   text?: string
   book?: Book
   time: string

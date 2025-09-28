@@ -38,7 +38,7 @@ export const BubbleText = ({
       <div className={styles.bookCard}>
         <img
           src={book.cover}
-          alt={book.title}
+          alt={`Cover of ${book.title}`}
           className={styles.bookCover}
           loading="lazy"
         />

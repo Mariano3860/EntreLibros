@@ -22,25 +22,25 @@ export const mockConversations: Conversation[] = [
     messages: [
       {
         id: 1,
-        sender: 'them',
+        role: 'them',
         text: "I'll trade it for your book",
         time: '4:30 PM',
       },
       {
         id: 2,
-        sender: 'me',
+        role: 'me',
         text: "Hi! I'm interested in To Kill a Mockingbird",
         time: '4:32 PM',
       },
       {
         id: 3,
-        sender: 'them',
+        role: 'them',
         text: 'Sure! Are you offering a book for exchange?',
         time: '4:35 PM',
       },
       {
         id: 4,
-        sender: 'me',
+        role: 'me',
         text: "I'll trade it for your book",
         book: {
           title: 'The Wind-Up Bird Chronicle',
@@ -51,7 +51,7 @@ export const mockConversations: Conversation[] = [
       },
       {
         id: 5,
-        sender: 'them',
+        role: 'them',
         text: 'Sounds good!',
         time: '4:37 PM',
       },
@@ -69,7 +69,7 @@ export const mockConversations: Conversation[] = [
     messages: [
       {
         id: 1,
-        sender: 'them',
+        role: 'them',
         text: 'Great, thanks!',
         time: '1:15 PM',
       },
@@ -87,7 +87,7 @@ export const mockConversations: Conversation[] = [
     messages: [
       {
         id: 1,
-        sender: 'them',
+        role: 'them',
         text: 'Swap request pending',
         time: 'Yesterday',
       },
@@ -105,7 +105,7 @@ export const mockConversations: Conversation[] = [
     messages: [
       {
         id: 1,
-        sender: 'them',
+        role: 'them',
         text: 'Whoa, sounds like a great book!',
         time: 'Yesterday',
       },
