@@ -2,6 +2,8 @@ export type Book = {
   title: string
   author: string
   cover: string
+  ownership?: 'mine' | 'theirs'
+  ownerName?: string
 }
 
 export type MessageRole = 'me' | 'them' | 'system'

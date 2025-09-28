@@ -11,7 +11,15 @@ import { BubbleAgreementConfirmation } from './components/BubbleAgreement/Bubble
 import { BubbleAgreementProposal } from './components/BubbleAgreement/BubbleAgreementProposal'
 import { BubbleText } from './components/BubbleText/BubbleText'
 import styles from './Messages.module.scss'
-import { Conversation, Message, MessageRole } from './Messages.types'
+import {
+  Conversation,
+  Message,
+  MessageRole,
+  TextMessage,
+} from './Messages.types'
+
+const isTextMessage = (message: Message): message is TextMessage =>
+  message.type === undefined || message.type === 'text'
 
 export const Messages = () => {
   const { t } = useTranslation()
@@ -29,6 +37,10 @@ export const Messages = () => {
     if (!selected) return []
 
     const staticMessages: Message[] = selected.messages ?? []
+    const maxStaticId = staticMessages.reduce(
+      (maxId, message) => Math.max(maxId, message.id),
+      0
+    )
     const liveMessages = messages
       .filter((m) => m.channel === selected.user.name)
       .map((m, idx) => {
@@ -36,7 +48,7 @@ export const Messages = () => {
         const tone: Message['tone'] = role === 'me' ? 'primary' : 'neutral'
 
         return {
-          id: staticMessages.length + idx,
+          id: maxStaticId + idx + 1,
           role,
           tone,
           text: m.text,
@@ -61,7 +73,14 @@ export const Messages = () => {
     <div className={styles.wrapper}>
       {!isConnected && (
         <div className={styles.offlineBanner} role="alert">
-          {error ? `Disconnected: ${error}` : 'Disconnected'}
+          {error
+            ? t('community.messages.status.disconnectedError', {
+                defaultValue: `Desconectado: ${error}`,
+                error,
+              })
+            : t('community.messages.status.disconnected', {
+                defaultValue: 'Desconectado',
+              })}
         </div>
       )}
       <div className={styles.content}>
@@ -70,8 +89,12 @@ export const Messages = () => {
             <h2>{t('community.messages.title')}</h2>
             <input
               className={styles.search}
-              placeholder="Search"
-              aria-label="Search conversations"
+              placeholder={t('community.messages.searchPlaceholder', {
+                defaultValue: 'Buscar',
+              })}
+              aria-label={t('community.messages.searchAriaLabel', {
+                defaultValue: 'Buscar conversaciones',
+              })}
             />
           </div>
           <ul className={styles.conversationList}>
@@ -100,9 +123,13 @@ export const Messages = () => {
                           'community.messages.agreement.confirmation.title'
                         )
                       }
-                      if ('text' in lastMsg && lastMsg.text) return lastMsg.text
-                      if ('book' in lastMsg && lastMsg.book)
-                        return t('community.messages.snippets.sharedBook')
+                      if (isTextMessage(lastMsg)) {
+                        if (lastMsg.book)
+                          return t('community.messages.snippets.sharedBook', {
+                            defaultValue: 'Compartió un libro',
+                          })
+                        if (lastMsg.text) return lastMsg.text
+                      }
                       return ''
                     })()}
                   </span>
@@ -110,17 +137,23 @@ export const Messages = () => {
                 <div className={styles.badges}>
                   {conv.badges.includes('unread') && (
                     <span className={`${styles.badge} ${styles.badgeUnread}`}>
-                      Unread
+                      {t('community.messages.badges.unread', {
+                        defaultValue: 'Sin leer',
+                      })}
                     </span>
                   )}
                   {conv.badges.includes('book') && (
                     <span className={`${styles.badge} ${styles.badgeBook}`}>
-                      Book
+                      {t('community.messages.badges.book', {
+                        defaultValue: 'Libro',
+                      })}
                     </span>
                   )}
                   {conv.badges.includes('swap') && (
                     <span className={`${styles.badge} ${styles.badgeSwap}`}>
-                      Swap Offer
+                      {t('community.messages.badges.swap', {
+                        defaultValue: 'Oferta de intercambio',
+                      })}
                     </span>
                   )}
                 </div>
@@ -140,12 +173,25 @@ export const Messages = () => {
                 <span className={styles.name}>{selected.user.name}</span>
                 <span className={styles.status}>
                   {selected.user.online
-                    ? 'Online'
-                    : `Last seen ${selected.user.lastSeen}`}
+                    ? t('community.messages.status.online', {
+                        defaultValue: 'En línea',
+                      })
+                    : t('community.messages.status.lastSeen', {
+                        defaultValue: 'Última vez {{lastSeen}}',
+                        lastSeen:
+                          selected.user.lastSeen ??
+                          t('community.messages.status.lastSeenFallback', {
+                            defaultValue: 'hace un momento',
+                          }),
+                      })}
                 </span>
               </div>
               <div className={styles.actions}>
-                <button aria-label="Profile info">
+                <button
+                  aria-label={t('community.messages.actions.profile', {
+                    defaultValue: 'Ver información del perfil',
+                  })}
+                >
                   <InfoIcon />
                 </button>
               </div>
@@ -192,20 +238,32 @@ export const Messages = () => {
                 <input
                   value={text}
                   onChange={(e) => setText(e.target.value)}
-                  placeholder="Message..."
+                  placeholder={t('community.messages.inputPlaceholder', {
+                    defaultValue: 'Escribe un mensaje...',
+                  })}
                   disabled={!isConnected}
                 />
                 <div className={styles.inputIcons}>
-                  <button aria-label="Attachments">
+                  <button
+                    aria-label={t('community.messages.actions.attachments', {
+                      defaultValue: 'Adjuntar archivos',
+                    })}
+                  >
                     <AttachIcon />
                   </button>
-                  <button aria-label="Emoji">
+                  <button
+                    aria-label={t('community.messages.actions.emoji', {
+                      defaultValue: 'Abrir selector de emojis',
+                    })}
+                  >
                     <EmojiIcon />
                   </button>
                 </div>
               </div>
               <button
-                aria-label="Send"
+                aria-label={t('community.messages.actions.send', {
+                  defaultValue: 'Enviar mensaje',
+                })}
                 onClick={handleSend}
                 className={styles.sendButton}
                 disabled={!isConnected}
@@ -216,7 +274,9 @@ export const Messages = () => {
           </div>
         ) : (
           <div className={styles.placeholder}>
-            Select a conversation to start
+            {t('community.messages.placeholder', {
+              defaultValue: 'Selecciona una conversación para comenzar',
+            })}
           </div>
         )}
       </div>
