@@ -46,6 +46,10 @@ Feature 1.1 Cuenta y acceso
   - Éxito: login/logout confiable; sesión persistente controlada.
 - [~] S-1.3 Idioma base y copy claro (Must, E1; BR-100; Should BR-101 en E2)
   - Éxito: español neutral; glosario/etiquetas centralizadas.
+  - Actualización 2025-09-30: se sumaron pruebas del selector de idioma y la actualización remota de preferencias en frontend, garantizando persistencia en cookies y sincronización con la API.
+- [x] S-1.7 Cobertura automatizada de autenticación y servicios transversales (Should, E1; QA-01)
+  - Éxito: middleware de auth y servicios comunes protegidos por pruebas unitarias que fallan ante regresiones críticas.
+  - Actualización 2025-09-30: se añadieron tests de middleware de autenticación, servicio de Open Library y utilidades de logging para sostener respuestas i18n coherentes ante fallos.
 
 Feature 1.2 Perfil y privacidad
 

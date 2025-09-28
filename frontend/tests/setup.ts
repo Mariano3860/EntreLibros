@@ -4,6 +4,11 @@ import { afterAll, afterEach, beforeAll, vi } from 'vitest'
 
 import { server } from '@mocks/server'
 
+let currentLanguage = 'es'
+const changeLanguageMock = vi.fn(async (lng: string) => {
+  currentLanguage = lng
+})
+
 if (typeof globalThis.ProgressEvent === 'undefined') {
   class ProgressEvent extends Event {
     constructor(type: string, eventInitDict?: EventInit) {
@@ -40,7 +45,12 @@ vi.mock('react-i18next', async () => {
           return value !== undefined ? String(value) : ''
         })
       },
-      i18n: { changeLanguage: () => Promise.resolve() },
+      i18n: {
+        changeLanguage: changeLanguageMock,
+        get language() {
+          return currentLanguage
+        },
+      },
     }),
     Trans: ({ children }: { children: React.ReactNode }) => children,
     initReactI18next: {
@@ -60,6 +70,8 @@ afterEach(() => {
     const name = eqPos > -1 ? cookie.slice(0, eqPos).trim() : cookie.trim()
     document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`
   })
+  currentLanguage = 'es'
+  changeLanguageMock.mockClear()
 })
 
 afterAll(() => server.close())
