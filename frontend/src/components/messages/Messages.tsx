@@ -11,7 +11,15 @@ import { BubbleAgreementConfirmation } from './components/BubbleAgreement/Bubble
 import { BubbleAgreementProposal } from './components/BubbleAgreement/BubbleAgreementProposal'
 import { BubbleText } from './components/BubbleText/BubbleText'
 import styles from './Messages.module.scss'
-import { Conversation, Message, MessageRole } from './Messages.types'
+import {
+  Conversation,
+  Message,
+  MessageRole,
+  TextMessage,
+} from './Messages.types'
+
+const isTextMessage = (message: Message): message is TextMessage =>
+  message.type === undefined || message.type === 'text'
 
 export const Messages = () => {
   const { t } = useTranslation()
@@ -115,11 +123,13 @@ export const Messages = () => {
                           'community.messages.agreement.confirmation.title'
                         )
                       }
-                      if ('book' in lastMsg && lastMsg.book)
-                        return t('community.messages.snippets.sharedBook', {
-                          defaultValue: 'Compartió un libro',
-                        })
-                      if ('text' in lastMsg && lastMsg.text) return lastMsg.text
+                      if (isTextMessage(lastMsg)) {
+                        if (lastMsg.book)
+                          return t('community.messages.snippets.sharedBook', {
+                            defaultValue: 'Compartió un libro',
+                          })
+                        if (lastMsg.text) return lastMsg.text
+                      }
                       return ''
                     })()}
                   </span>

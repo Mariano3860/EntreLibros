@@ -23,40 +23,39 @@ export const mockConversations: Conversation[] = [
       {
         id: 1,
         role: 'them',
-        text: 'Puedo cambiarlo por tu libro',
+        type: 'text',
+        text: '¡Hola! Estoy interesado en tu libro «El nombre del viento». ¿Sigue disponible?',
+        book: {
+          title: 'El nombre del viento',
+          author: 'Patrick Rothfuss',
+          cover: 'https://covers.openlibrary.org/b/id/9259256-S.jpg',
+          ownership: 'mine',
+        },
         time: '4:30 PM',
       },
       {
         id: 2,
         role: 'me',
-        text: '¡Hola! Estoy interesado en Matar a un ruiseñor',
-        time: '4:32 PM',
-      },
-      {
-        id: 3,
-        role: 'them',
-        text: '¡Claro! ¿Ofreces algún libro para el intercambio?',
-        time: '4:35 PM',
-      },
-      {
-        id: 4,
-        role: 'me',
-        text: 'Puedo cambiarlo por tu libro',
+        type: 'text',
+        text: '¡Hola, Samuel! Sí, sigue disponible. Estuve revisando tus estanterías y me gustaría cambiarlo por «Crónica del pájaro que da cuerda al mundo».',
         book: {
           title: 'Crónica del pájaro que da cuerda al mundo',
           author: 'Haruki Murakami',
           cover: 'https://covers.openlibrary.org/b/id/240726-S.jpg',
+          ownership: 'theirs',
+          ownerName: 'Samuel',
         },
-        time: '4:37 PM',
+        time: '4:33 PM',
       },
       {
-        id: 5,
+        id: 3,
         role: 'them',
-        text: '¡Perfecto!',
-        time: '4:37 PM',
+        type: 'text',
+        text: '¡Perfecto! Me encanta la idea, coordinemos el intercambio.',
+        time: '4:35 PM',
       },
       {
-        id: 6,
+        id: 4,
         role: 'me',
         type: 'agreementProposal',
         proposal: {
@@ -69,7 +68,7 @@ export const mockConversations: Conversation[] = [
         time: '4:40 PM',
       },
       {
-        id: 7,
+        id: 5,
         role: 'them',
         type: 'agreementConfirmation',
         agreement: {

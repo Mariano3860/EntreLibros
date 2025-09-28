@@ -26,7 +26,15 @@
 .bookInfo {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
+}
+
+.bookOwnership {
+  font-size: 11px;
+  font-weight: $font-weight-medium;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: color-mix(in srgb, var(--text-secondary) 75%, var(--text-primary) 25%);
 }
 
 .bookTitle {
@@ -36,6 +44,16 @@
 .bookAuthor {
   font-size: $small-font-size;
   opacity: 0.8;
+}
+
+.ownership-mine {
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, rgb(var(--primary-rgb)) 45%, transparent 55%);
+}
+
+.ownership-theirs {
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--color-info) 55%, transparent 45%);
 }
 
 .time {
