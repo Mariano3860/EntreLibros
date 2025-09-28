@@ -26,7 +26,20 @@ vi.mock('react-i18next', async () => {
   return {
     ...actual,
     useTranslation: () => ({
-      t: (key: string) => key, // Devuelve la key directamente
+      t: (key: string, options?: Record<string, unknown>) => {
+        const template =
+          (typeof options?.defaultValue === 'string'
+            ? options.defaultValue
+            : undefined) ?? key
+
+        if (!options) return template
+
+        return template.replace(/{{(.*?)}}/g, (_, varName: string) => {
+          const trimmed = varName.trim()
+          const value = options[trimmed]
+          return value !== undefined ? String(value) : ''
+        })
+      },
       i18n: { changeLanguage: () => Promise.resolve() },
     }),
     Trans: ({ children }: { children: React.ReactNode }) => children,

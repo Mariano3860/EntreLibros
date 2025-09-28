@@ -144,7 +144,30 @@
     },
     "messages": {
       "title": "Mensajes",
-      "placeholder": "Lista de mensajes"
+      "placeholder": "Lista de mensajes",
+      "agreement": {
+        "proposal": {
+          "title": "Propuesta de acuerdo",
+          "ariaLabel": "Propuesta de acuerdo: {{meetingPoint}}, {{date}} a las {{time}} para el libro {{book}}"
+        },
+        "confirmation": {
+          "title": "Confirmación de acuerdo",
+          "status": "Confirmado por {{name}}",
+          "ariaLabel": "Acuerdo confirmado por {{name}}: {{meetingPoint}}, {{date}} a las {{time}} para el libro {{book}}"
+        },
+        "fields": {
+          "place": "Lugar",
+          "schedule": "Día y horario",
+          "book": "Libro"
+        },
+        "actions": {
+          "confirm": "Confirmar",
+          "suggestChange": "Proponer cambio"
+        }
+      },
+      "snippets": {
+        "sharedBook": "Compartió un libro"
+      }
     },
     "events": {
       "title": "Eventos",

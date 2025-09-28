@@ -1,0 +1,83 @@
+@import '@styles/variables';
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1;
+}
+
+.summaryItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.label {
+  font-size: $small-font-size;
+  font-weight: $font-weight-medium;
+  color: color-mix(in srgb, var(--text-secondary) 75%, var(--text-primary) 25%);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.value {
+  font-weight: $font-weight-medium;
+  color: inherit;
+}
+
+.valueStrong {
+  font-weight: $font-weight-bold;
+}
+
+.statusLine {
+  font-weight: $font-weight-bold;
+  margin-bottom: $spacing-1;
+}
+
+.time {
+  display: block;
+  width: 100%;
+  text-align: inherit;
+}
+
+.actionButton {
+  border-radius: 999px;
+  border: 1px solid transparent;
+  padding: rem(6px) rem(14px);
+  font-weight: $font-weight-medium;
+  font-size: 14px;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+  background: transparent;
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-1;
+}
+
+.actionButton:focus-visible {
+  outline: 2px solid rgb(var(--primary-rgb));
+  outline-offset: 2px;
+}
+
+.actionButtonConfirm {
+  background: rgb(var(--primary-rgb));
+  color: #fff;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 12%);
+}
+
+.actionButtonConfirm:hover {
+  background: color-mix(in srgb, rgb(var(--primary-rgb)) 88%, #000 12%);
+}
+
+.actionButtonSuggest {
+  border-color: color-mix(in srgb, var(--text-secondary) 45%, transparent 55%);
+}
+
+.actionButtonSuggest:hover {
+  background: color-mix(in srgb, var(--text-secondary) 16%, transparent 84%);
+}
