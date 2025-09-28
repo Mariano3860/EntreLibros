@@ -1,0 +1,134 @@
+@import '@styles/variables';
+
+.bubble {
+  max-width: 70%;
+  padding: $spacing-1 $spacing-2;
+  border-radius: 20px;
+  background: var(--background-card);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
+  font-size: 15px;
+  line-height: 1.45;
+  display: flex;
+  flex-direction: column;
+  align-self: flex-start;
+  color: var(--text-primary);
+  transition:
+    background $transition-duration-fast $transition-timing-function,
+    color $transition-duration-fast $transition-timing-function;
+}
+
+.role-me {
+  align-self: flex-end;
+}
+
+.role-them {
+  align-self: flex-start;
+}
+
+.role-system {
+  align-self: center;
+  max-width: 80%;
+  text-align: center;
+}
+
+.header {
+  font-weight: $font-weight-medium;
+  font-size: $small-font-size;
+  color: var(--text-secondary);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1;
+  color: inherit;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-1;
+  justify-content: flex-end;
+}
+
+.meta {
+  width: 100%;
+  font-size: 11px;
+  opacity: 0.65;
+  margin-top: $spacing-1;
+  text-align: right;
+}
+
+.role-them .meta {
+  text-align: left;
+}
+
+.role-system .meta {
+  text-align: center;
+}
+
+.tone-neutral {
+  background: var(--background-card);
+  color: var(--text-primary);
+}
+
+.tone-primary {
+  background: rgb(var(--primary-rgb));
+  color: #fff;
+}
+
+.tone-primary .header,
+.tone-primary .meta,
+.tone-primary .actions {
+  color: color-mix(in srgb, #fff 80%, transparent);
+}
+
+.tone-secondary {
+  background: color-mix(
+    in srgb,
+    var(--background-card) 80%,
+    var(--text-secondary) 20%
+  );
+  color: var(--text-primary);
+}
+
+.tone-success {
+  background: color-mix(
+    in srgb,
+    var(--background-card) 70%,
+    var(--color-success) 30%
+  );
+  color: var(--text-primary);
+}
+
+.tone-warning {
+  background: color-mix(
+    in srgb,
+    var(--background-card) 65%,
+    var(--color-warning) 35%
+  );
+  color: var(--text-primary);
+}
+
+.tone-info {
+  background: color-mix(
+    in srgb,
+    var(--background-card) 70%,
+    var(--color-info) 30%
+  );
+  color: var(--text-primary);
+}
+
+.role-me.tone-neutral {
+  background: var(--background-card);
+}
+
+@media (max-width: $breakpoint-tablet) {
+  .bubble {
+    max-width: 85%;
+  }
+
+  .role-system {
+    max-width: 95%;
+  }
+}

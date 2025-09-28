@@ -7,6 +7,7 @@ import { ReactComponent as AttachIcon } from '@src/assets/icons/attachments.svg'
 import { ReactComponent as EmojiIcon } from '@src/assets/icons/emoji.svg'
 import { ReactComponent as InfoIcon } from '@src/assets/icons/info.svg'
 
+import { BubbleText } from './components/BubbleText/BubbleText'
 import styles from './Messages.module.scss'
 import { Conversation, Message } from './Messages.types'
 
@@ -28,7 +29,8 @@ export const Messages = () => {
       .filter((m) => m.channel === selected.user.name)
       .map((m, idx) => ({
         id: idx,
-        sender: m.user.id === currentUser?.id ? 'me' : 'them',
+        role: m.user.id === currentUser?.id ? 'me' : 'them',
+        tone: m.user.id === currentUser?.id ? 'primary' : 'neutral',
         text: m.text,
         time: new Date(m.timestamp).toLocaleTimeString([], {
           hour: '2-digit',
@@ -128,27 +130,14 @@ export const Messages = () => {
             </header>
             <div className={styles.messages}>
               {mappedMessages.map((msg) => (
-                <div
+                <BubbleText
                   key={msg.id}
-                  className={`${styles.message} ${msg.sender === 'me' ? styles.me : ''}`}
-                >
-                  {msg.text && <p>{msg.text}</p>}
-                  {msg.book && (
-                    <div className={styles.bookCard}>
-                      <img
-                        src={msg.book.cover}
-                        alt={`Cover of ${msg.book.title}`}
-                      />
-                      <div>
-                        <div className={styles.bookTitle}>{msg.book.title}</div>
-                        <div className={styles.bookAuthor}>
-                          {msg.book.author}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  <span className={styles.time}>{msg.time}</span>
-                </div>
+                  role={msg.role}
+                  tone={msg.tone}
+                  text={msg.text}
+                  book={msg.book}
+                  time={msg.time}
+                />
               ))}
             </div>
             <div className={styles.inputArea}>

@@ -198,61 +198,6 @@
   }
 }
 
-.message {
-  max-width: 70%;
-  padding: $spacing-1 $spacing-2;
-  border-radius: 20px;
-  background: var(--background-card);
-  box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
-  align-self: flex-start;
-  font-size: 15px;
-  line-height: 1.45;
-}
-
-.me {
-  align-self: flex-end;
-  background: rgb(var(--primary-rgb));
-  color: #fff;
-}
-
-.bookCard {
-  display: flex;
-  gap: $spacing-2;
-  margin-top: $spacing-1;
-  padding: $spacing-1;
-  border-radius: 10px;
-  background: inherit;
-  box-shadow: inset 0 0 0 1px var(--color-primary-200);
-}
-
-.bookCard img {
-  width: 48px;
-  height: 68px;
-  object-fit: cover;
-  border-radius: 6px;
-}
-
-.bookTitle {
-  font-weight: 600;
-}
-
-.bookAuthor {
-  opacity: 0.8;
-  font-size: $small-font-size;
-}
-
-.time {
-  display: block;
-  font-size: 11px;
-  opacity: 0.65;
-  margin-top: $spacing-1;
-  text-align: right;
-}
-
-.message:not(.me) .time {
-  text-align: left;
-}
-
 .inputArea {
   display: flex;
   align-items: center;
