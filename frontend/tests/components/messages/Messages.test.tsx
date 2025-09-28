@@ -18,7 +18,7 @@ describe('Messages component', () => {
     const { getByText, getByPlaceholderText } = renderWithProviders(
       <Messages />
     )
-    expect(getByText(/disconnected/i)).toBeInTheDocument()
-    expect(getByPlaceholderText('Message...')).toBeDisabled()
+    expect(getByText(/desconectado/i)).toBeInTheDocument()
+    expect(getByPlaceholderText('Escribe un mensaje...')).toBeDisabled()
   })
 })

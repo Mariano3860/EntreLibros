@@ -23,27 +23,27 @@ export const mockConversations: Conversation[] = [
       {
         id: 1,
         role: 'them',
-        text: "I'll trade it for your book",
+        text: 'Puedo cambiarlo por tu libro',
         time: '4:30 PM',
       },
       {
         id: 2,
         role: 'me',
-        text: "Hi! I'm interested in To Kill a Mockingbird",
+        text: '¡Hola! Estoy interesado en Matar a un ruiseñor',
         time: '4:32 PM',
       },
       {
         id: 3,
         role: 'them',
-        text: 'Sure! Are you offering a book for exchange?',
+        text: '¡Claro! ¿Ofreces algún libro para el intercambio?',
         time: '4:35 PM',
       },
       {
         id: 4,
         role: 'me',
-        text: "I'll trade it for your book",
+        text: 'Puedo cambiarlo por tu libro',
         book: {
-          title: 'The Wind-Up Bird Chronicle',
+          title: 'Crónica del pájaro que da cuerda al mundo',
           author: 'Haruki Murakami',
           cover: 'https://covers.openlibrary.org/b/id/240726-S.jpg',
         },
@@ -52,7 +52,7 @@ export const mockConversations: Conversation[] = [
       {
         id: 5,
         role: 'them',
-        text: 'Sounds good!',
+        text: '¡Perfecto!',
         time: '4:37 PM',
       },
       {
@@ -97,7 +97,7 @@ export const mockConversations: Conversation[] = [
       {
         id: 1,
         role: 'them',
-        text: 'Great, thanks!',
+        text: '¡Genial, gracias!',
         time: '1:15 PM',
       },
     ],
@@ -115,7 +115,7 @@ export const mockConversations: Conversation[] = [
       {
         id: 1,
         role: 'them',
-        text: 'Swap request pending',
+        text: 'Solicitud de intercambio pendiente',
         time: 'Yesterday',
       },
     ],
@@ -133,7 +133,7 @@ export const mockConversations: Conversation[] = [
       {
         id: 1,
         role: 'them',
-        text: 'Whoa, sounds like a great book!',
+        text: '¡Guau, suena como un gran libro!',
         time: 'Yesterday',
       },
     ],

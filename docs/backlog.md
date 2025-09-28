@@ -117,6 +117,7 @@ Feature 5.1 Mensajería 1:1
 - [~] S-5.1 Chat 1:1 con plantillas de primer contacto (Must, E1; BR-40)
   - Éxito: iniciar conversación desde ficha en ≤2 taps/clicks.
   - Actualización 2025-01-09: se creó el wrapper `BubbleBase` y se adaptaron los mensajes genéricos para reutilizarlo sin alterar el estilo actual, preparando el chat para nuevas variantes de burbuja.
+  - Actualización 2025-09-29: se ajustaron los mocks del chat al español y se corrigió el layout para que la barra de mensajes permanezca visible mientras el historial hace scroll.
 - [ ] S-5.2 Bloqueo/Reporte en conversación y ficha (Must, E1; BR-43)
   - Éxito: acción en ≤2 pasos.
 
