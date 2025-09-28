@@ -76,8 +76,9 @@ Feature 2.2 Visibilidad y actividad
 EP-3 Publicaciones (Ofrezco/Busco)
 Feature 3.1 Publicación y calidad del dato
 
-- [ ] S-3.1 Publicar ejemplares (título, autor, estado; ISBN si existe; foto opcional) (Must, E1; BR-20)
+- [~] S-3.1 Publicar ejemplares (título, autor, estado; ISBN si existe; foto opcional) (Must, E1; BR-20)
   - Éxito: 90% publicaciones con campos mínimos.
+  - Actualización 2025-10-05: se entregó el flujo completo en frontend (modal por ruta, stepper, autosave, preview e i18n) consumiendo mocks MSW; queda pendiente integrar con backend real y telemetría persistente.
 - [~] S-3.2 Normalización asistida por ISBN/metadata (Should, E2; BR-22)
   - Éxito: autocompletado; reducción de duplicados/ambigüedades.
 - [ ] S-3.3 Contenidos permitidos/denegados (política editorial) (Must, E1; BR-24)

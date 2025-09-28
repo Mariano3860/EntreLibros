@@ -56,10 +56,29 @@
   border-radius: rem(8px);
   padding: $spacing-1 $spacing-2;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-1;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
 
   @media (max-width: $breakpoint-mobile) {
     width: 100%;
   }
+}
+
+.highlight {
+  margin: $spacing-3 0;
+  padding: $spacing-3;
+  border-radius: rem(16px);
+  background: var(--background-card);
+  border: 1px solid var(--border-color);
+  display: grid;
+  gap: $spacing-2;
 }
 
 .seeAll {

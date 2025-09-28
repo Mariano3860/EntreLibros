@@ -5,15 +5,17 @@ import { useUserBooks } from '@hooks/api/useUserBooks'
 import { getPathSegment } from '@utils/path'
 import React, { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useMatch, useNavigate } from 'react-router-dom'
 
 import type { ApiUserBook } from '@src/api/books/userBooks.types'
 
 import styles from './BooksPage.module.scss'
+import { PublishBookModal } from '@components/publish/PublishBookModal/PublishBookModal'
 
 export const BooksPage = () => {
   const { t } = useTranslation()
   const location = useLocation()
+  const navigate = useNavigate()
   const [search, setSearch] = useState('')
   const { data: booksData } = useUserBooks()
   const books = Array.isArray(booksData) ? booksData : []
@@ -33,6 +35,12 @@ export const BooksPage = () => {
   const pathSegment = getPathSegment(location.pathname, basePath)
   const activeTab = (tabs.find((tab) => tab.path === pathSegment)?.key ??
     'mine') as 'mine' | 'trade' | 'seeking' | 'sale'
+
+  const publishMatch = useMatch('/books/new')
+  const detailMatch = useMatch('/books/:bookId')
+  const selectedBook = detailMatch
+    ? books.find((book) => book.id === detailMatch.params?.bookId)
+    : null
 
   // TODO: mover este filtro a un hook reutilizable si se complica
   const filterByTab = (book: ApiUserBook) => {
@@ -55,6 +63,18 @@ export const BooksPage = () => {
     return matchesSearch && filterByTab(book)
   })
 
+  const handleOpenModal = () => {
+    navigate('/books/new', { state: { from: location.pathname } })
+  }
+
+  const handleCloseModal = () => {
+    navigate('/books', { replace: true })
+  }
+
+  const handlePublished = (bookId: string) => {
+    navigate(`/books/${bookId}`, { replace: true })
+  }
+
   return (
     <BaseLayout id={'books-page'}>
       <div className={styles.wrapper}>
@@ -74,11 +94,18 @@ export const BooksPage = () => {
                 {t('booksPage.filter.available')}
               </span>
             </div>
-            <button className={styles.publishButton}>
+            <button className={styles.publishButton} onClick={handleOpenModal}>
               {t('booksPage.publish_button')}
             </button>
           </div>
         </header>
+
+        {selectedBook && (
+          <section aria-live="polite" className={styles.highlight}>
+            <h2>{t('booksPage.recently_published')}</h2>
+            <BookCard {...selectedBook} />
+          </section>
+        )}
 
         <TabsMenu items={tabs} basePath={basePath}>
           <button className={styles.seeAll}>
@@ -98,6 +125,13 @@ export const BooksPage = () => {
           </div>
         )}
       </div>
+      {publishMatch && (
+        <PublishBookModal
+          isOpen={true}
+          onClose={handleCloseModal}
+          onPublished={handlePublished}
+        />
+      )}
     </BaseLayout>
   )
 }
