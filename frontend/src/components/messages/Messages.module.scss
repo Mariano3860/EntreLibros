@@ -23,16 +23,20 @@
 }
 
 .sidebarHeader {
-  padding: $spacing-2;
+  padding: $spacing-3;
   border-bottom: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
 }
 
 .search {
-  width: calc(100% - $spacing-4);
+  width: 100%;
   border: 1px solid var(--border-color);
   background: var(--background-card);
   color: var(--text-primary);
-  margin-top: rem(25px);
+  border-radius: rem(12px);
+  padding: $spacing-2 $spacing-3;
 }
 
 .conversationList {
@@ -51,28 +55,34 @@
 
 .conversationItem {
   display: flex;
-  gap: $spacing-1;
-  padding: $spacing-1;
+  gap: $spacing-2;
+  padding: $spacing-2;
   align-items: center;
   cursor: pointer;
   border: 0;
   border-radius: rem(14px);
-  margin: rem(5px) rem(10px);
-  transition: background 0.2s ease;
+  margin: rem(6px);
+  transition: background $transition-duration-fast ease;
 
   &:hover {
-    background: color-mix(in srgb, var(--background-card) 92%, #000 8%);
+    background: color-mix(in srgb, var(--background-card) 90%, transparent);
+  }
+
+  &:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--primary-color) 55%, transparent);
+    outline-offset: 2px;
   }
 }
 
 .conversationItemActive {
-  background: color-mix(in srgb, var(--background-card) 88%, #000 12%);
-  box-shadow: inset 0 0 0 1px var(--border-color);
+  background: color-mix(in srgb, var(--background-card) 85%, transparent);
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--primary-color) 35%, transparent);
 }
 
 .avatar {
-  width: rem(40px);
-  height: rem(40px);
+  width: rem(42px);
+  height: rem(42px);
   border-radius: 50%;
   object-fit: cover;
 }
@@ -81,6 +91,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
 
 .name {
@@ -90,33 +101,77 @@
 .snippet {
   font-size: $small-font-size;
   color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .badges {
   display: flex;
   gap: $spacing-1;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .badge {
-  background: var(--primary-color);
-  color: #fff;
-  padding: 2px 8px;
+  padding: 2px $spacing-2;
   border-radius: 999px;
-  font-size: 12px;
-  line-height: 1.3;
+  font-size: 0.7rem;
+  font-weight: $font-weight-medium;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+  background: color-mix(in srgb, var(--background-card) 85%, transparent);
 }
 
-.badgeUnread {
-  background: var(--color-error);
+.badgePending {
+  background: color-mix(
+    in srgb,
+    var(--color-warning) 32%,
+    var(--background-card) 68%
+  );
+  color: color-mix(in srgb, var(--color-warning) 80%, var(--text-primary) 20%);
+  border-color: color-mix(in srgb, var(--color-warning) 55%, transparent);
 }
 
-.badgeBook {
-  background: var(--primary-dark);
+.badgeConfirmed {
+  background: color-mix(
+    in srgb,
+    var(--color-success) 32%,
+    var(--background-card) 68%
+  );
+  color: color-mix(in srgb, var(--color-success) 80%, var(--text-primary) 20%);
+  border-color: color-mix(in srgb, var(--color-success) 55%, transparent);
 }
 
-.badgeSwap {
-  background: var(--color-warning);
-  color: #000;
+.badgeReminder {
+  background: color-mix(
+    in srgb,
+    var(--color-info) 30%,
+    var(--background-card) 70%
+  );
+  color: color-mix(in srgb, var(--color-info) 80%, var(--text-primary) 20%);
+  border-color: color-mix(in srgb, var(--color-info) 55%, transparent);
+}
+
+.badgeAwaiting {
+  background: color-mix(
+    in srgb,
+    var(--primary-color) 25%,
+    var(--background-card) 75%
+  );
+  color: color-mix(in srgb, var(--primary-color) 82%, var(--text-primary) 18%);
+  border-color: color-mix(in srgb, var(--primary-color) 55%, transparent);
+}
+
+.badgeCancelled {
+  background: color-mix(
+    in srgb,
+    var(--text-secondary) 20%,
+    var(--background-card) 80%
+  );
+  color: color-mix(in srgb, var(--text-secondary) 90%, var(--text-primary) 10%);
+  border-color: color-mix(in srgb, var(--text-secondary) 55%, transparent);
 }
 
 .chat {
@@ -128,8 +183,8 @@
 .chatHeader {
   display: flex;
   align-items: center;
-  gap: $spacing-1;
-  padding: $spacing-1 $spacing-2;
+  gap: $spacing-2;
+  padding: $spacing-2 $spacing-3;
   border-bottom: 1px solid var(--border-color);
   background: var(--background-primary);
 }
@@ -141,13 +196,16 @@
 }
 
 .chatHeaderInfo .name {
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 1.1rem;
+  font-weight: $font-weight-bold;
 }
 
 .status {
   font-size: $small-font-size;
   color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-1;
 }
 
 .status::before {
@@ -156,8 +214,11 @@
   width: 8px;
   height: 8px;
   border-radius: 999px;
-  background: #2ecc71;
-  margin-right: 6px;
+  background: color-mix(in srgb, var(--color-success) 80%, transparent);
+}
+
+.status[data-online='false']::before {
+  background: color-mix(in srgb, var(--text-secondary) 85%, transparent);
 }
 
 .actions {
@@ -175,20 +236,19 @@
   border: none;
   cursor: pointer;
   color: var(--text-secondary);
-  transition: background 0.15s;
+  transition: background $transition-duration-fast ease;
 
   &:hover {
-    background: color-mix(in srgb, var(--background-card) 86%, #000 14%);
+    background: color-mix(in srgb, var(--background-card) 86%, transparent);
   }
 }
 
 .messages {
   flex: 1;
-  padding: $spacing-1;
-  padding-bottom: $spacing-2;
+  padding: $spacing-3;
   display: flex;
   flex-direction: column;
-  gap: $spacing-1;
+  gap: $spacing-3;
   overflow-y: auto;
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -198,68 +258,79 @@
   }
 }
 
-.message {
-  max-width: 70%;
-  padding: $spacing-1 $spacing-2;
-  border-radius: 20px;
-  background: var(--background-card);
-  box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
-  align-self: flex-start;
-  font-size: 15px;
-  line-height: 1.45;
-}
-
-.me {
-  align-self: flex-end;
-  background: rgb(var(--primary-rgb));
-  color: #fff;
-}
-
-.bookCard {
-  display: flex;
-  gap: $spacing-2;
-  margin-top: $spacing-1;
-  padding: $spacing-1;
-  border-radius: 10px;
-  background: inherit;
-  box-shadow: inset 0 0 0 1px var(--color-primary-200);
-}
-
-.bookCard img {
-  width: 48px;
-  height: 68px;
-  object-fit: cover;
-  border-radius: 6px;
-}
-
-.bookTitle {
-  font-weight: 600;
-}
-
-.bookAuthor {
-  opacity: 0.8;
-  font-size: $small-font-size;
-}
-
-.time {
-  display: block;
-  font-size: 11px;
-  opacity: 0.65;
-  margin-top: $spacing-1;
-  text-align: right;
-}
-
-.message:not(.me) .time {
-  text-align: left;
-}
-
 .inputArea {
   display: flex;
-  align-items: center;
-  gap: $spacing-1;
-  padding: $spacing-1 $spacing-2;
+  align-items: flex-end;
+  gap: $spacing-2;
+  padding: $spacing-2 $spacing-3;
   background: var(--background-primary);
   border-top: 1px solid var(--border-color);
+  position: relative;
+}
+
+.templateToggle {
+  position: relative;
+}
+
+.templateToggle > button {
+  border-radius: rem(14px);
+  border: 1px solid color-mix(in srgb, var(--primary-color) 45%, transparent);
+  background: color-mix(in srgb, var(--background-card) 92%, transparent);
+  color: color-mix(in srgb, var(--primary-color) 80%, var(--text-primary) 20%);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: $font-weight-medium;
+  padding: $spacing-2 $spacing-3;
+  transition: background $transition-duration-fast ease;
+
+  &:hover {
+    background: color-mix(in srgb, var(--background-card) 88%, transparent);
+  }
+}
+
+.templateMenu {
+  position: absolute;
+  top: calc(100% + $spacing-2);
+  left: 0;
+  width: rem(280px);
+  max-width: 80vw;
+  background: var(--background-primary);
+  border: 1px solid color-mix(in srgb, var(--border-color) 90%, transparent);
+  border-radius: rem(14px);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 12%);
+  padding: $spacing-2;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+  z-index: $z-index-dropdown;
+}
+
+.templateMenu button {
+  border: none;
+  background: none;
+  padding: $spacing-2;
+  text-align: left;
+  border-radius: rem(10px);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  cursor: pointer;
+  color: var(--text-primary);
+
+  &:hover {
+    background: color-mix(in srgb, var(--background-card) 90%, transparent);
+  }
+}
+
+.templateMenuLabel {
+  font-weight: $font-weight-medium;
+  font-size: 0.85rem;
+  color: color-mix(in srgb, var(--primary-color) 75%, var(--text-primary) 25%);
+}
+
+.templateMenuText {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
 }
 
 .inputWrapper {
@@ -268,9 +339,9 @@
 }
 
 .inputWrapper input {
-  width: calc(100% - $spacing-4 * 2);
-  height: 44px;
-  padding: 0 ($spacing-3 * 2) 0 $spacing-2;
+  width: 100%;
+  height: 46px;
+  padding: 0 ($spacing-4 + $spacing-2) 0 $spacing-3;
   border: 1px solid var(--border-color);
   border-radius: 24px;
   background: var(--background-primary);
@@ -278,15 +349,17 @@
 
   &:focus {
     outline: 2px solid color-mix(in srgb, var(--primary-color) 35%, transparent);
+    outline-offset: 1px;
   }
 }
 
 .inputIcons {
   position: absolute;
   top: 50%;
-  right: $spacing-1;
+  right: $spacing-2;
   transform: translateY(-50%);
   display: flex;
+  gap: $spacing-1;
 }
 
 .inputIcons button {
@@ -294,16 +367,16 @@
   border: none;
   cursor: pointer;
   color: var(--text-secondary);
-  font-size: 1.2rem;
+  font-size: 1.1rem;
 }
 
 .sendButton {
   background: rgb(var(--primary-rgb));
   color: #fff;
   border: none;
-  border-radius: 10px;
-  padding: 10px 16px;
-  font-weight: 600;
+  border-radius: 12px;
+  padding: $spacing-2 $spacing-3;
+  font-weight: $font-weight-bold;
   transition:
     transform 0.04s ease,
     background 0.15s;
@@ -315,6 +388,11 @@
 
   &:hover {
     background: var(--primary-dark);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 }
 
@@ -330,5 +408,26 @@
   background: var(--color-error);
   color: #fff;
   text-align: center;
-  padding: $spacing-1;
+  padding: $spacing-2;
+}
+
+@media (max-width: $breakpoint-desktop) {
+  .sidebar {
+    width: rem(300px);
+  }
+}
+
+@media (max-width: $breakpoint-tablet) {
+  .wrapper {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .chatHeader {
+    align-items: flex-start;
+  }
 }

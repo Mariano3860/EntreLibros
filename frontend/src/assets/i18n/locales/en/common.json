@@ -144,7 +144,101 @@
     },
     "messages": {
       "title": "Messages",
-      "placeholder": "Messages list"
+      "placeholder": "Messages list",
+      "chat": {
+        "searchPlaceholder": "Search conversations",
+        "searchAria": "Search conversations",
+        "offline": "Offline",
+        "offlineWithError": "Offline: {{error}}",
+        "emptyState": "Select a conversation to start",
+        "inputPlaceholder": "Type a message...",
+        "templateButton": "Templates",
+        "status": {
+          "online": "Online",
+          "lastSeen": "Last seen {{value}}"
+        },
+        "actions": {
+          "profile": "View participant info",
+          "attach": "Attach file",
+          "emoji": "Open emojis",
+          "send": "Send message",
+          "confirm": "Confirm",
+          "proposeChange": "Propose change",
+          "accept": "Accept proposal",
+          "suggestAnother": "Suggest another time",
+          "yes": "Yes",
+          "no": "No"
+        },
+        "templates": {
+          "interest": {
+            "label": "Interest in a book",
+            "text": "Hi! I'm interested in this book. Is it still available for exchange?"
+          },
+          "availability": {
+            "label": "Check availability",
+            "text": "When works for you? I can meet this week."
+          },
+          "place": {
+            "label": "Suggest meeting spot",
+            "text": "Could we meet at a Book Nook or another public place in the neighbourhood?"
+          }
+        },
+        "labels": {
+          "template": "Template",
+          "proposal": "Agreement proposal",
+          "confirmation": "Agreement confirmed",
+          "reminder": "Reminder",
+          "reschedule": "Reschedule",
+          "cancellation": "Agreement cancelled",
+          "postMeeting": "Post-meeting check-in",
+          "tip": "Safety tip"
+        },
+        "a11y": {
+          "proposal": "Agreement proposal card",
+          "confirmation": "Agreement confirmation card",
+          "reminder": "Agreement reminder",
+          "reschedule": "Reschedule card",
+          "cancellation": "Cancellation notice",
+          "postMeeting": "Post-meeting follow-up",
+          "tip": "Safety tip"
+        },
+        "badges": {
+          "proposalPending": "Proposal pending",
+          "agreementConfirmed": "Agreement confirmed",
+          "reminderScheduled": "Reminder scheduled",
+          "awaitingFeedback": "Awaiting follow-up",
+          "cancelled": "Cancelled"
+        },
+        "snippets": {
+          "proposal": "Proposal: {{book}}",
+          "confirmation": "Confirmed: {{book}}",
+          "reminder": "Reminder {{time}}",
+          "reschedule": "Reschedule suggested",
+          "cancellation": "Agreement cancelled",
+          "postMeeting": "Post-meeting check-in",
+          "tip": "Safety tip"
+        },
+        "location": {
+          "bookCorner": "Book Nook",
+          "publicSpace": "Public space"
+        },
+        "fields": {
+          "place": "Place",
+          "schedule": "Date & time",
+          "book": "Book"
+        },
+        "confirmedBy": "Confirmed by {{name}}",
+        "reschedule": {
+          "previous": "Original agreement",
+          "proposed": "New proposal"
+        },
+        "cancellation": {
+          "reason": "Reason: {{reason}}"
+        },
+        "postCheck": {
+          "note": "Your answer helps keep our community trustworthy."
+        }
+      }
     },
     "events": {
       "title": "Events",

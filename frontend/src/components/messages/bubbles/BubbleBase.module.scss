@@ -1,0 +1,176 @@
+@import '@styles/variables';
+
+.wrapper {
+  --bubble-bg: color-mix(in srgb, var(--background-card) 92%, transparent);
+  --bubble-border: color-mix(in srgb, var(--border-color) 86%, transparent);
+  --bubble-text: var(--text-primary);
+
+  display: flex;
+  width: 100%;
+  gap: $spacing-1;
+}
+
+.me {
+  justify-content: flex-end;
+}
+
+.them {
+  justify-content: flex-start;
+}
+
+.system {
+  justify-content: center;
+}
+
+.surface {
+  width: min(100%, rem(420px));
+  background: var(--bubble-bg);
+  border: 1px solid var(--bubble-border);
+  border-radius: rem(18px);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 6%);
+  color: var(--bubble-text);
+  padding: $spacing-3;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+.header {
+  font-size: $small-font-size;
+  font-weight: $font-weight-bold;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: color-mix(in srgb, var(--bubble-text) 82%, var(--text-secondary) 18%);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+  color: var(--bubble-text);
+}
+
+.actions {
+  margin-top: $spacing-1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-2;
+}
+
+.meta {
+  font-size: 0.75rem;
+  color: color-mix(in srgb, var(--bubble-text) 72%, var(--text-secondary) 28%);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.meta time {
+  font-variant-numeric: tabular-nums;
+}
+
+.tone-primary {
+  --bubble-bg: color-mix(
+    in srgb,
+    rgb(var(--primary-rgb)) 20%,
+    var(--background-card) 80%
+  );
+  --bubble-border: color-mix(in srgb, var(--primary-color) 60%, transparent);
+}
+
+.tone-success {
+  --bubble-bg: color-mix(
+    in srgb,
+    var(--color-success) 16%,
+    var(--background-card) 84%
+  );
+  --bubble-border: color-mix(in srgb, var(--color-success) 55%, transparent);
+}
+
+.tone-warning {
+  --bubble-bg: color-mix(
+    in srgb,
+    var(--color-warning) 22%,
+    var(--background-card) 78%
+  );
+  --bubble-border: color-mix(in srgb, var(--color-warning) 55%, transparent);
+}
+
+.tone-info {
+  --bubble-bg: color-mix(
+    in srgb,
+    var(--color-info) 18%,
+    var(--background-card) 82%
+  );
+  --bubble-border: color-mix(in srgb, var(--color-info) 55%, transparent);
+}
+
+.tone-secondary {
+  --bubble-bg: color-mix(
+    in srgb,
+    var(--background-card) 86%,
+    var(--text-secondary) 14%
+  );
+  --bubble-border: color-mix(in srgb, var(--border-color) 75%, transparent);
+}
+
+.actionButton {
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid var(--bubble-border);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 0.9rem;
+  font-weight: $font-weight-medium;
+  gap: $spacing-1;
+  padding: $spacing-1 $spacing-3;
+  transition:
+    background $transition-duration-fast ease,
+    border-color $transition-duration-fast ease,
+    color $transition-duration-fast ease;
+  background: color-mix(in srgb, var(--background-primary) 92%, transparent);
+  color: var(--text-primary);
+}
+
+.actionButton:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--primary-color) 55%, transparent);
+  outline-offset: 2px;
+}
+
+.actionButtonPrimary {
+  background: rgb(var(--primary-rgb));
+  border-color: rgb(var(--primary-rgb));
+  color: #fff;
+}
+
+[data-theme='dark'] .actionButtonPrimary {
+  color: #fff;
+}
+
+.actionButtonSecondary {
+  background: transparent;
+  border-color: color-mix(in srgb, var(--border-color) 70%, transparent);
+}
+
+.actionButtonGhost {
+  background: transparent;
+  border-color: transparent;
+  color: color-mix(in srgb, var(--text-secondary) 92%, var(--bubble-text) 8%);
+}
+
+.templateLabel {
+  align-self: flex-start;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--primary-color) 45%, transparent);
+  color: color-mix(in srgb, var(--primary-color) 85%, var(--bubble-text) 15%);
+  font-size: 0.75rem;
+  font-weight: $font-weight-medium;
+  letter-spacing: 0.03em;
+  padding: 2px $spacing-2;
+  text-transform: uppercase;
+}
+
+@media (max-width: $breakpoint-tablet) {
+  .surface {
+    width: min(100%, rem(360px));
+  }
+}

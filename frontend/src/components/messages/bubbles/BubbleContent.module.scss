@@ -1,0 +1,80 @@
+@import '@styles/variables';
+
+.agreementDetails {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+.sectionTitle {
+  font-size: 0.85rem;
+  font-weight: $font-weight-medium;
+  color: color-mix(in srgb, var(--text-primary) 84%, var(--text-secondary) 16%);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1;
+}
+
+.label {
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--text-secondary) 82%, var(--text-primary) 18%);
+}
+
+.value {
+  font-size: 0.95rem;
+  font-weight: $font-weight-medium;
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-1;
+  align-items: center;
+  color: inherit;
+}
+
+.badge {
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--primary-color) 45%, transparent);
+  color: color-mix(in srgb, var(--primary-color) 82%, var(--text-primary) 18%);
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+  padding: 2px $spacing-2;
+  text-transform: uppercase;
+}
+
+.muted {
+  color: color-mix(in srgb, var(--text-secondary) 88%, var(--text-primary) 12%);
+}
+
+.note {
+  color: color-mix(in srgb, var(--text-secondary) 90%, var(--text-primary) 10%);
+  font-size: 0.9rem;
+}
+
+.divider {
+  border: 0;
+  border-top: 1px solid
+    color-mix(
+      in srgb,
+      var(--bubble-border, var(--border-color)) 90%,
+      transparent
+    );
+  margin: $spacing-2 0;
+}
+
+.actionsNote {
+  font-size: 0.75rem;
+  color: color-mix(in srgb, var(--text-secondary) 85%, var(--text-primary) 15%);
+}

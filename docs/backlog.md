@@ -121,10 +121,16 @@ Feature 5.1 Mensajería 1:1
 
 Feature 5.2 Acuerdos
 
-- [ ] S-5.3 Confirmación de acuerdo (lugar RdL/espacio público, horario) (Must, E1; BR-41)
+- [~] S-5.3 Confirmación de acuerdo (lugar RdL/espacio público, horario) (Must, E1; BR-41)
   - Éxito: registra acuerdo y dispara recordatorio.
-- [ ] S-5.4 Registro post-encuentro (“se concretó / no se concretó”) (Should, E2; BR-42)
+  - Actualización: la UI de mensajería muestra burbujas específicas (propuesta, confirmación, recordatorios, reprogramación y cancelación) con dataset mock y accesibilidad/i18n completa; resta conectar con backend y persistencia real.
+- [ ] S-5.3a Automatizar confirmación y recordatorios (backend + notificaciones) (Must, E1; BR-41)
+  - Éxito: persistencia del acuerdo, disparo de recordatorios reales y actualización de estado en socket/notificaciones.
+- [~] S-5.4 Registro post-encuentro (“se concretó / no se concretó”) (Should, E2; BR-42)
   - Éxito: alimenta métricas sin exponer datos personales.
+  - Actualización: se agregó la tarjeta de seguimiento post-encuentro con acciones Sí/No dentro del chat; falta registrar la respuesta en backend y alimentar métricas.
+- [ ] S-5.4a Persistir resultados post-encuentro y métricas (Should, E2; BR-42)
+  - Éxito: almacenar la respuesta de cierre, actualizar indicadores y exponerlos a coordinación.
 
 Feature 5.3 Notificaciones
 

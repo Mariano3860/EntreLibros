@@ -144,7 +144,101 @@
     },
     "messages": {
       "title": "Mensajes",
-      "placeholder": "Lista de mensajes"
+      "placeholder": "Lista de mensajes",
+      "chat": {
+        "searchPlaceholder": "Buscar conversaciones",
+        "searchAria": "Buscar conversaciones",
+        "offline": "Sin conexión",
+        "offlineWithError": "Sin conexión: {{error}}",
+        "emptyState": "Selecciona una conversación para iniciar",
+        "inputPlaceholder": "Escribe un mensaje...",
+        "templateButton": "Plantillas",
+        "status": {
+          "online": "En línea",
+          "lastSeen": "Visto {{value}}"
+        },
+        "actions": {
+          "profile": "Ver detalles de la persona",
+          "attach": "Adjuntar archivo",
+          "emoji": "Abrir emojis",
+          "send": "Enviar mensaje",
+          "confirm": "Confirmar",
+          "proposeChange": "Proponer cambio",
+          "accept": "Aceptar propuesta",
+          "suggestAnother": "Sugerir otro horario",
+          "yes": "Sí",
+          "no": "No"
+        },
+        "templates": {
+          "interest": {
+            "label": "Interés por un libro",
+            "text": "Hola, me interesa este libro. ¿Sigue en intercambio?"
+          },
+          "availability": {
+            "label": "Consultar disponibilidad",
+            "text": "¿Cuándo te viene bien encontrarnos? Tengo disponibilidad esta semana."
+          },
+          "place": {
+            "label": "Proponer punto de encuentro",
+            "text": "¿Te parece si nos vemos en un Rincón de Libros o espacio público cerca del barrio?"
+          }
+        },
+        "labels": {
+          "template": "Plantilla",
+          "proposal": "Propuesta de acuerdo",
+          "confirmation": "Acuerdo confirmado",
+          "reminder": "Recordatorio",
+          "reschedule": "Reprogramación",
+          "cancellation": "Acuerdo cancelado",
+          "postMeeting": "Seguimiento del encuentro",
+          "tip": "Consejo de seguridad"
+        },
+        "a11y": {
+          "proposal": "Tarjeta de propuesta de acuerdo",
+          "confirmation": "Tarjeta de confirmación de acuerdo",
+          "reminder": "Recordatorio del acuerdo",
+          "reschedule": "Tarjeta de reprogramación",
+          "cancellation": "Aviso de cancelación",
+          "postMeeting": "Seguimiento posterior al encuentro",
+          "tip": "Consejo de seguridad"
+        },
+        "badges": {
+          "proposalPending": "Propuesta pendiente",
+          "agreementConfirmed": "Acuerdo confirmado",
+          "reminderScheduled": "Recordatorio activo",
+          "awaitingFeedback": "Esperando cierre",
+          "cancelled": "Cancelado"
+        },
+        "snippets": {
+          "proposal": "Propuesta: {{book}}",
+          "confirmation": "Confirmado: {{book}}",
+          "reminder": "Recordatorio {{time}}",
+          "reschedule": "Reprogramación sugerida",
+          "cancellation": "Acuerdo cancelado",
+          "postMeeting": "Seguimiento post-encuentro",
+          "tip": "Consejo de seguridad"
+        },
+        "location": {
+          "bookCorner": "Rincón de Libros",
+          "publicSpace": "Espacio público"
+        },
+        "fields": {
+          "place": "Lugar",
+          "schedule": "Día y hora",
+          "book": "Libro"
+        },
+        "confirmedBy": "Confirmado por {{name}}",
+        "reschedule": {
+          "previous": "Acuerdo original",
+          "proposed": "Nueva propuesta"
+        },
+        "cancellation": {
+          "reason": "Motivo: {{reason}}"
+        },
+        "postCheck": {
+          "note": "Tu respuesta ayuda a mantener la confianza en la comunidad."
+        }
+      }
     },
     "events": {
       "title": "Eventos",
