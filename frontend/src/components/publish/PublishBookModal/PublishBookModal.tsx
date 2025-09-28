@@ -5,6 +5,7 @@ import { useFocusTrap } from '@hooks/useFocusTrap'
 import { usePublishDraft } from '@hooks/usePublishDraft'
 import { PublishBookPayload } from '@src/api/books/publishBook.types'
 import { ApiBookSearchResult } from '@src/api/books/searchBooks.types'
+import { stripDraftMeta } from '@utils/drafts'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
@@ -71,17 +72,6 @@ const genres = [
   'romance',
   'selfHelp',
 ]
-
-const stripDraftMeta = (
-  draft:
-    | PublishBookDraftState
-    | (PublishBookDraftState & { updatedAt?: number })
-    | null
-): PublishBookDraftState | null => {
-  if (!draft) return null
-  const { updatedAt: _updatedAt, ...rest } = draft
-  return rest
-}
 
 type PublishBookModalProps = {
   isOpen: boolean
@@ -150,15 +140,19 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
   onPublished,
 }) => {
   const { t, i18n } = useTranslation()
+  const {
+    draft: storedDraft,
+    saveNow,
+    scheduleSave,
+    clear,
+  } = usePublishDraft<PublishBookDraftState>({ storageKey: STORAGE_KEY })
+  const draft = useMemo(() => stripDraftMeta(storedDraft), [storedDraft])
   const [state, setState] = useState<PublishBookFormState>(initialState)
   const [showDraftPrompt, setShowDraftPrompt] = useState(false)
+  const [draftResolved, setDraftResolved] = useState<boolean>(() => !draft)
   const modalRef = useRef<HTMLDivElement>(null)
   const initializedRef = useRef(false)
 
-  const { draft: storedDraft, saveNow, scheduleSave, clear } =
-    usePublishDraft<PublishBookDraftState>({ storageKey: STORAGE_KEY })
-  const draft = useMemo(() => stripDraftMeta(storedDraft), [storedDraft])
-  
   const debouncedQuery = useDebouncedValue(state.searchQuery)
   const {
     data: results,
@@ -175,6 +169,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
     if (!isOpen) {
       initializedRef.current = false
       setShowDraftPrompt(false)
+      setDraftResolved(true)
       return
     }
 
@@ -183,8 +178,10 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
     initializedRef.current = true
     if (draft) {
       setShowDraftPrompt(true)
+      setDraftResolved(false)
     } else {
       setState(initialState)
+      setDraftResolved(true)
     }
   }, [draft, isOpen])
 
@@ -199,8 +196,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
   const closeWithConfirmation = () => {
     const draftState = toSerializableDraft(state)
     const baseline = draft ?? initialState
-    const hasChanges =
-      JSON.stringify(draftState) !== JSON.stringify(baseline)
+    const hasChanges = JSON.stringify(draftState) !== JSON.stringify(baseline)
     if (hasChanges) {
       const confirmed = window.confirm(t('publishBook.confirmClose'))
       if (!confirmed) {
@@ -233,9 +229,9 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
   }, [draft, isOpen, state])
 
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen || showDraftPrompt || !draftResolved) return
     scheduleSave(toSerializableDraft(state))
-  }, [isOpen, scheduleSave, state])
+  }, [draftResolved, isOpen, scheduleSave, showDraftPrompt, state])
 
   const updateMetadata = (update: Partial<PublishBookMetadata>) => {
     setState((prev) => {
@@ -252,9 +248,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
     }))
   }
 
-  const updateDelivery = (
-    update: Partial<PublishBookOffer['delivery']>
-  ) => {
+  const updateDelivery = (update: Partial<PublishBookOffer['delivery']>) => {
     setState((prev) => ({
       ...prev,
       offer: { ...prev.offer, delivery: { ...prev.offer.delivery, ...update } },
@@ -277,7 +271,10 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
         coverUrl: result.coverUrl ?? prev.metadata.coverUrl,
       },
       manualMode: false,
-      images: ensureCover(prev.images, result.coverUrl ?? prev.metadata.coverUrl),
+      images: ensureCover(
+        prev.images,
+        result.coverUrl ?? prev.metadata.coverUrl
+      ),
     }))
     toast.info(t('publishBook.prefilled'))
   }
@@ -398,7 +395,8 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
               currency: state.offer.priceCurrency,
             }
           : null,
-        condition: state.offer.condition as PublishBookPayload['offer']['condition'],
+        condition: state.offer
+          .condition as PublishBookPayload['offer']['condition'],
         tradePreferences: state.offer.tradePreferences,
         notes: state.offer.notes || undefined,
         availability: state.offer.availability,
@@ -427,12 +425,14 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
   const resumeDraft = () => {
     setState(baseState)
     setShowDraftPrompt(false)
+    setDraftResolved(true)
   }
 
   const discardDraft = () => {
     clear()
     setState(initialState)
     setShowDraftPrompt(false)
+    setDraftResolved(true)
   }
 
   if (!isOpen) return null
@@ -443,22 +443,22 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
         <div className={styles.resumePrompt} role="dialog" aria-modal="true">
           <h2>{t('publishBook.resume.title')}</h2>
           <p>{t('publishBook.resume.description')}</p>
-            <div className={styles.resumeActions}>
-              <button
-                type="button"
-                className={styles.secondaryButton}
-                onClick={discardDraft}
-              >
-                {t('publishBook.resume.discard')}
-              </button>
-              <button
-                type="button"
-                className={styles.primaryButton}
-                onClick={resumeDraft}
-              >
-                {t('publishBook.resume.continue')}
-              </button>
-            </div>
+          <div className={styles.resumeActions}>
+            <button
+              type="button"
+              className={styles.secondaryButton}
+              onClick={discardDraft}
+            >
+              {t('publishBook.resume.discard')}
+            </button>
+            <button
+              type="button"
+              className={styles.primaryButton}
+              onClick={resumeDraft}
+            >
+              {t('publishBook.resume.continue')}
+            </button>
+          </div>
         </div>
       ) : (
         <div
@@ -487,27 +487,33 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
           </header>
 
           <section className={styles.content}>
-            <div className={styles.stepper} role="tablist" aria-label={t('publishBook.progress')}>
-              {(['identify', 'offer', 'review'] as PublishBookStep[]).map((step) => (
-                <div key={step} className={styles.step}>
-                  <span
-                    className={`${styles.stepIndicator} ${
-                      step === state.step ? styles.stepActive : ''
-                    }`.trim()}
-                    aria-hidden="true"
-                  >
-                    {stepIndex[step] + 1}
-                  </span>
-                  <div>
-                    <div className={styles.stepLabel}>
-                      {t(`publishBook.steps.${step}.title`)}
-                    </div>
-                    <div className={styles.stepDescription}>
-                      {t(`publishBook.steps.${step}.description`)}
+            <div
+              className={styles.stepper}
+              role="tablist"
+              aria-label={t('publishBook.progress')}
+            >
+              {(['identify', 'offer', 'review'] as PublishBookStep[]).map(
+                (step) => (
+                  <div key={step} className={styles.step}>
+                    <span
+                      className={`${styles.stepIndicator} ${
+                        step === state.step ? styles.stepActive : ''
+                      }`.trim()}
+                      aria-hidden="true"
+                    >
+                      {stepIndex[step] + 1}
+                    </span>
+                    <div>
+                      <div className={styles.stepLabel}>
+                        {t(`publishBook.steps.${step}.title`)}
+                      </div>
+                      <div className={styles.stepDescription}>
+                        {t(`publishBook.steps.${step}.description`)}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                )
+              )}
             </div>
 
             <div className={styles.stepContent}>
@@ -569,7 +575,10 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                                 className={styles.searchCover}
                               />
                             ) : (
-                              <div className={styles.searchCover} aria-hidden="true" />
+                              <div
+                                className={styles.searchCover}
+                                aria-hidden="true"
+                              />
                             )}
                             <div className={styles.searchMeta}>
                               <strong>{book.title}</strong>
@@ -602,135 +611,146 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                           }))
                         }
                       />
-                      <label htmlFor="publish-manual" className={styles.switchLabel}>
+                      <label
+                        htmlFor="publish-manual"
+                        className={styles.switchLabel}
+                      >
                         {t('publishBook.manualToggle')}
                       </label>
                     </div>
                   </div>
 
-                  <div className={styles.stepGrid}>
-                      <div className={styles.formGroup}>
-                        <label htmlFor="publish-title">{t('publishBook.fields.title')}</label>
-                        <input
-                          id="publish-title"
-                          className={styles.input}
-                          value={state.metadata.title}
-                          onChange={(event) =>
-                            updateMetadata({ title: event.target.value })
-                          }
-                          onBlur={() => saveNow(toSerializableDraft(state))}
-                          required
-                          aria-invalid={identifyErrors.title ? 'true' : 'false'}
-                        />
-                        {identifyErrors.title && (
-                          <span className={styles.error} role="alert">
-                            {identifyErrors.title}
-                          </span>
-                        )}
-                      </div>
-                      <div className={styles.formGroup}>
-                        <label htmlFor="publish-author">
-                          {t('publishBook.fields.author')}
-                        </label>
-                        <input
-                          id="publish-author"
-                          className={styles.input}
-                          value={state.metadata.author}
-                          onChange={(event) =>
-                            updateMetadata({ author: event.target.value })
-                          }
-                          onBlur={() => saveNow(toSerializableDraft(state))}
-                          required
-                          aria-invalid={identifyErrors.author ? 'true' : 'false'}
-                        />
-                        {identifyErrors.author && (
-                          <span className={styles.error} role="alert">
-                            {identifyErrors.author}
-                          </span>
-                        )}
-                      </div>
-                      <div className={styles.formGroup}>
-                        <label htmlFor="publish-language">
-                          {t('publishBook.fields.language')}
-                        </label>
-                        <input
-                          id="publish-language"
-                          className={styles.input}
-                          value={state.metadata.language}
-                          onChange={(event) =>
-                            updateMetadata({ language: event.target.value })
-                          }
-                          onBlur={() => saveNow(toSerializableDraft(state))}
-                          required
-                          aria-invalid={identifyErrors.language ? 'true' : 'false'}
-                        />
-                        {identifyErrors.language && (
-                          <span className={styles.error} role="alert">
-                            {identifyErrors.language}
-                          </span>
-                        )}
-                      </div>
-                      <div className={styles.formGroup}>
-                        <label htmlFor="publish-format">
-                          {t('publishBook.fields.format')}
-                        </label>
-                        <input
-                          id="publish-format"
-                          className={styles.input}
-                          value={state.metadata.format}
-                          onChange={(event) =>
-                            updateMetadata({ format: event.target.value })
-                          }
-                          onBlur={() => saveNow(toSerializableDraft(state))}
-                          required
-                          aria-invalid={identifyErrors.format ? 'true' : 'false'}
-                        />
-                        {identifyErrors.format && (
-                          <span className={styles.error} role="alert">
-                            {identifyErrors.format}
-                          </span>
-                        )}
-                      </div>
-                      <div className={styles.formGroup}>
-                        <label htmlFor="publish-publisher">
-                          {t('publishBook.fields.publisher')}
-                        </label>
-                        <input
-                          id="publish-publisher"
-                          className={styles.input}
-                          value={state.metadata.publisher}
-                          onChange={(event) =>
-                            updateMetadata({ publisher: event.target.value })
-                          }
-                          onBlur={() => saveNow(toSerializableDraft(state))}
-                        />
-                      </div>
-                      <div className={styles.formGroup}>
-                        <label htmlFor="publish-year">{t('publishBook.fields.year')}</label>
-                        <input
-                          id="publish-year"
-                          className={styles.input}
-                          value={state.metadata.year}
-                          onChange={(event) =>
-                            updateMetadata({ year: event.target.value })
-                          }
-                          onBlur={() => saveNow(toSerializableDraft(state))}
-                          inputMode="numeric"
-                        />
-                      </div>
-                      <div className={styles.formGroup}>
-                        <label htmlFor="publish-isbn">{t('publishBook.fields.isbn')}</label>
-                        <input
-                          id="publish-isbn"
-                          className={styles.input}
-                          value={state.metadata.isbn}
-                          onChange={(event) =>
-                            updateMetadata({ isbn: event.target.value })
-                          }
-                          onBlur={() => saveNow(toSerializableDraft(state))}
-                        />
-                      </div>
+                  <div className={styles.formGrid}>
+                    <div className={styles.formGroup}>
+                      <label htmlFor="publish-title">
+                        {t('publishBook.fields.title')}
+                      </label>
+                      <input
+                        id="publish-title"
+                        className={styles.input}
+                        value={state.metadata.title}
+                        onChange={(event) =>
+                          updateMetadata({ title: event.target.value })
+                        }
+                        onBlur={() => saveNow(toSerializableDraft(state))}
+                        required
+                        aria-invalid={identifyErrors.title ? 'true' : 'false'}
+                      />
+                      {identifyErrors.title && (
+                        <span className={styles.error} role="alert">
+                          {identifyErrors.title}
+                        </span>
+                      )}
                     </div>
+                    <div className={styles.formGroup}>
+                      <label htmlFor="publish-author">
+                        {t('publishBook.fields.author')}
+                      </label>
+                      <input
+                        id="publish-author"
+                        className={styles.input}
+                        value={state.metadata.author}
+                        onChange={(event) =>
+                          updateMetadata({ author: event.target.value })
+                        }
+                        onBlur={() => saveNow(toSerializableDraft(state))}
+                        required
+                        aria-invalid={identifyErrors.author ? 'true' : 'false'}
+                      />
+                      {identifyErrors.author && (
+                        <span className={styles.error} role="alert">
+                          {identifyErrors.author}
+                        </span>
+                      )}
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label htmlFor="publish-language">
+                        {t('publishBook.fields.language')}
+                      </label>
+                      <input
+                        id="publish-language"
+                        className={styles.input}
+                        value={state.metadata.language}
+                        onChange={(event) =>
+                          updateMetadata({ language: event.target.value })
+                        }
+                        onBlur={() => saveNow(toSerializableDraft(state))}
+                        required
+                        aria-invalid={
+                          identifyErrors.language ? 'true' : 'false'
+                        }
+                      />
+                      {identifyErrors.language && (
+                        <span className={styles.error} role="alert">
+                          {identifyErrors.language}
+                        </span>
+                      )}
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label htmlFor="publish-format">
+                        {t('publishBook.fields.format')}
+                      </label>
+                      <input
+                        id="publish-format"
+                        className={styles.input}
+                        value={state.metadata.format}
+                        onChange={(event) =>
+                          updateMetadata({ format: event.target.value })
+                        }
+                        onBlur={() => saveNow(toSerializableDraft(state))}
+                        required
+                        aria-invalid={identifyErrors.format ? 'true' : 'false'}
+                      />
+                      {identifyErrors.format && (
+                        <span className={styles.error} role="alert">
+                          {identifyErrors.format}
+                        </span>
+                      )}
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label htmlFor="publish-publisher">
+                        {t('publishBook.fields.publisher')}
+                      </label>
+                      <input
+                        id="publish-publisher"
+                        className={styles.input}
+                        value={state.metadata.publisher}
+                        onChange={(event) =>
+                          updateMetadata({ publisher: event.target.value })
+                        }
+                        onBlur={() => saveNow(toSerializableDraft(state))}
+                      />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label htmlFor="publish-year">
+                        {t('publishBook.fields.year')}
+                      </label>
+                      <input
+                        id="publish-year"
+                        className={styles.input}
+                        value={state.metadata.year}
+                        onChange={(event) =>
+                          updateMetadata({ year: event.target.value })
+                        }
+                        onBlur={() => saveNow(toSerializableDraft(state))}
+                        inputMode="numeric"
+                      />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label htmlFor="publish-isbn">
+                        {t('publishBook.fields.isbn')}
+                      </label>
+                      <input
+                        id="publish-isbn"
+                        className={styles.input}
+                        value={state.metadata.isbn}
+                        onChange={(event) =>
+                          updateMetadata({ isbn: event.target.value })
+                        }
+                        onBlur={() => saveNow(toSerializableDraft(state))}
+                      />
+                    </div>
+                  </div>
 
                   <div>
                     <div className={styles.formGroup}>
@@ -749,9 +769,14 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                       >
                         <p>{t('publishBook.uploader.title')}</p>
                         <span className={styles.uploadHint}>
-                          {t('publishBook.uploader.hint', { count: MAX_IMAGES })}
+                          {t('publishBook.uploader.hint', {
+                            count: MAX_IMAGES,
+                          })}
                         </span>
-                        <label className={styles.uploadButton} htmlFor="publish-upload">
+                        <label
+                          className={styles.uploadButton}
+                          htmlFor="publish-upload"
+                        >
                           {t('publishBook.uploader.cta')}
                         </label>
                         <input
@@ -772,12 +797,17 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                       <div className={styles.previews}>
                         {state.images.map((image) => (
                           <figure key={image.id} className={styles.previewItem}>
-                            <img src={image.url} alt={t('publishBook.previewAlt')} />
+                            <img
+                              src={image.url}
+                              alt={t('publishBook.previewAlt')}
+                            />
                             <button
                               type="button"
                               className={styles.removePreview}
                               onClick={() => removeImage(image.id)}
-                              aria-label={t('publishBook.uploader.remove') ?? ''}
+                              aria-label={
+                                t('publishBook.uploader.remove') ?? ''
+                              }
                             >
                               ×
                             </button>
@@ -817,22 +847,24 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                   <div className={styles.formGroup}>
                     <label>{t('publishBook.offer.condition.label')}</label>
                     <div className={styles.radioGroup}>
-                      {(['new', 'very_good', 'good', 'acceptable'] as const).map(
-                        (condition) => (
-                          <label key={condition} className={styles.radioRow}>
-                            <input
-                              type="radio"
-                              name="publish-condition"
-                              value={condition}
-                              checked={state.offer.condition === condition}
-                              onChange={() => updateOffer({ condition })}
-                            />
-                            <span>
-                              {t(`publishBook.offer.condition.options.${condition}`)}
-                            </span>
-                          </label>
-                        )
-                      )}
+                      {(
+                        ['new', 'very_good', 'good', 'acceptable'] as const
+                      ).map((condition) => (
+                        <label key={condition} className={styles.radioRow}>
+                          <input
+                            type="radio"
+                            name="publish-condition"
+                            value={condition}
+                            checked={state.offer.condition === condition}
+                            onChange={() => updateOffer({ condition })}
+                          />
+                          <span>
+                            {t(
+                              `publishBook.offer.condition.options.${condition}`
+                            )}
+                          </span>
+                        </label>
+                      ))}
                     </div>
                     {offerErrors.condition && (
                       <span className={styles.error} role="alert">
@@ -842,7 +874,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                   </div>
 
                   {state.offer.sale && (
-                    <div className={styles.stepGrid}>
+                    <div className={styles.priceGrid}>
                       <div className={styles.formGroup}>
                         <label htmlFor="publish-price">
                           {t('publishBook.offer.price.label')}
@@ -889,7 +921,8 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                       <label>{t('publishBook.offer.trade.label')}</label>
                       <div className={styles.badgeRow}>
                         {genres.map((genre) => {
-                          const isActive = state.offer.tradePreferences.includes(genre)
+                          const isActive =
+                            state.offer.tradePreferences.includes(genre)
                           return (
                             <button
                               key={genre}
@@ -953,7 +986,9 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                             onChange={() => updateOffer({ availability: mode })}
                           />
                           <span>
-                            {t(`publishBook.offer.availability.options.${mode}`)}
+                            {t(
+                              `publishBook.offer.availability.options.${mode}`
+                            )}
                           </span>
                         </label>
                       ))}
@@ -968,10 +1003,16 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                           type="checkbox"
                           checked={state.offer.delivery.nearBookCorner}
                           onChange={(event) =>
-                            updateDelivery({ nearBookCorner: event.target.checked })
+                            updateDelivery({
+                              nearBookCorner: event.target.checked,
+                            })
                           }
                         />
-                        <span>{t('publishBook.offer.delivery.options.nearBookCorner')}</span>
+                        <span>
+                          {t(
+                            'publishBook.offer.delivery.options.nearBookCorner'
+                          )}
+                        </span>
                       </label>
                       <label className={styles.checkboxRow}>
                         <input
@@ -981,7 +1022,9 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                             updateDelivery({ inPerson: event.target.checked })
                           }
                         />
-                        <span>{t('publishBook.offer.delivery.options.inPerson')}</span>
+                        <span>
+                          {t('publishBook.offer.delivery.options.inPerson')}
+                        </span>
                       </label>
                       <label className={styles.checkboxRow}>
                         <input
@@ -991,7 +1034,9 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                             updateDelivery({ shipping: event.target.checked })
                           }
                         />
-                        <span>{t('publishBook.offer.delivery.options.shipping')}</span>
+                        <span>
+                          {t('publishBook.offer.delivery.options.shipping')}
+                        </span>
                       </label>
                     </div>
                     {state.offer.delivery.shipping && (
@@ -1005,18 +1050,25 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                           value={state.offer.delivery.shippingPayer}
                           onChange={(event) =>
                             updateDelivery({
-                              shippingPayer: event.target.value as PublishBookOffer['delivery']['shippingPayer'],
+                              shippingPayer: event.target
+                                .value as PublishBookOffer['delivery']['shippingPayer'],
                             })
                           }
                         >
                           <option value="owner">
-                            {t('publishBook.offer.delivery.shippingPayer.owner')}
+                            {t(
+                              'publishBook.offer.delivery.shippingPayer.owner'
+                            )}
                           </option>
                           <option value="requester">
-                            {t('publishBook.offer.delivery.shippingPayer.requester')}
+                            {t(
+                              'publishBook.offer.delivery.shippingPayer.requester'
+                            )}
                           </option>
                           <option value="split">
-                            {t('publishBook.offer.delivery.shippingPayer.split')}
+                            {t(
+                              'publishBook.offer.delivery.shippingPayer.split'
+                            )}
                           </option>
                         </select>
                       </div>
@@ -1037,10 +1089,14 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                       )}
                       status="available"
                       isForSale={state.offer.sale}
-                      price={state.offer.sale ? Number(state.offer.priceAmount) : undefined}
+                      price={
+                        state.offer.sale
+                          ? Number(state.offer.priceAmount)
+                          : undefined
+                      }
                       isForTrade={state.offer.trade}
-                      tradePreferences={state.offer.tradePreferences.map((genre) =>
-                        t(`publishBook.offer.trade.genres.${genre}`)
+                      tradePreferences={state.offer.tradePreferences.map(
+                        (genre) => t(`publishBook.offer.trade.genres.${genre}`)
                       )}
                       isSeeking={false}
                     />
@@ -1060,7 +1116,9 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                       />
                       <span>{t('publishBook.review.terms')}</span>
                     </label>
-                    <p className={styles.toastInline}>{t('publishBook.review.hint')}</p>
+                    <p className={styles.toastInline}>
+                      {t('publishBook.review.hint')}
+                    </p>
                   </div>
                 </div>
               )}
@@ -1115,7 +1173,9 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                   onClick={handlePublish}
                   disabled={publishDisabled}
                 >
-                  {isPending ? t('publishBook.publishing') : t('publishBook.publish')}
+                  {isPending
+                    ? t('publishBook.publishing')
+                    : t('publishBook.publish')}
                 </button>
               )}
             </div>

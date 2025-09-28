@@ -11,10 +11,7 @@ export const publishBookHandler = http.post(
     const body = await request.json()
 
     if (body.metadata?.title?.toLowerCase?.().includes('error')) {
-      return HttpResponse.json(
-        { message: 'publish failed' },
-        { status: 500 }
-      )
+      return HttpResponse.json({ message: 'publish failed' }, { status: 500 })
     }
 
     const id = `book-${++lastGeneratedId}`
@@ -27,7 +24,8 @@ export const publishBookHandler = http.post(
         title: body.metadata?.title,
         author: body.metadata?.author,
         coverUrl:
-          body.metadata?.coverUrl ?? body.images?.[0]?.url ??
+          body.metadata?.coverUrl ??
+          body.images?.[0]?.url ??
           'https://placehold.co/400x600',
         condition: body.offer?.condition,
         status: 'available',

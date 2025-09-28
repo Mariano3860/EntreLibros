@@ -1,8 +1,8 @@
 import { useCallback, useRef, useState } from 'react'
 
-export type PublishDraft<TDraft> = TDraft & {
-  updatedAt: number
-}
+import { DraftWithMeta } from '@utils/drafts'
+
+export type PublishDraft<TDraft> = DraftWithMeta<TDraft>
 
 type UsePublishDraftParams<TDraft> = {
   storageKey: string
@@ -10,7 +10,7 @@ type UsePublishDraftParams<TDraft> = {
   parser?: (raw: string) => PublishDraft<TDraft> | null
 }
 
-export const usePublishDraft = <TDraft,>(
+export const usePublishDraft = <TDraft>(
   params: UsePublishDraftParams<TDraft>
 ) => {
   const { storageKey, serializer, parser } = params
@@ -41,9 +41,7 @@ export const usePublishDraft = <TDraft,>(
   const persist = useCallback(
     (next: PublishDraft<TDraft>) => {
       if (typeof window === 'undefined') return
-      const serialized = serializer
-        ? serializer(next)
-        : JSON.stringify(next)
+      const serialized = serializer ? serializer(next) : JSON.stringify(next)
       window.localStorage.setItem(storageKey, serialized)
       setDraft(next)
       lastSavedRef.current = next

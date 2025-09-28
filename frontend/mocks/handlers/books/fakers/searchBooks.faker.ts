@@ -10,7 +10,8 @@ const SEARCH_DATA: ApiBookSearchResult[] = [
     language: 'Español',
     format: 'Tapa blanda',
     isbn: '9780451524935',
-    coverUrl: 'https://covers.openlibrary.org/b/isbn/9780451524935-L.jpg?default=false',
+    coverUrl:
+      'https://covers.openlibrary.org/b/isbn/9780451524935-L.jpg?default=false',
   },
   {
     id: 'sapiens',
@@ -21,7 +22,8 @@ const SEARCH_DATA: ApiBookSearchResult[] = [
     language: 'Español',
     format: 'Tapa blanda',
     isbn: '9786071131071',
-    coverUrl: 'https://covers.openlibrary.org/b/isbn/9786071131071-L.jpg?default=false',
+    coverUrl:
+      'https://covers.openlibrary.org/b/isbn/9786071131071-L.jpg?default=false',
   },
   {
     id: 'el-principito',
@@ -32,7 +34,8 @@ const SEARCH_DATA: ApiBookSearchResult[] = [
     language: 'Español',
     format: 'Tapa dura',
     isbn: '9789507315586',
-    coverUrl: 'https://covers.openlibrary.org/b/isbn/9789507315586-L.jpg?default=false',
+    coverUrl:
+      'https://covers.openlibrary.org/b/isbn/9789507315586-L.jpg?default=false',
   },
   {
     id: 'fahrenheit-451',
@@ -43,7 +46,8 @@ const SEARCH_DATA: ApiBookSearchResult[] = [
     language: 'Inglés',
     format: 'Paperback',
     isbn: '9780345342966',
-    coverUrl: 'https://covers.openlibrary.org/b/isbn/9780345342966-L.jpg?default=false',
+    coverUrl:
+      'https://covers.openlibrary.org/b/isbn/9780345342966-L.jpg?default=false',
   },
   {
     id: 'cien-anos-soledad',
@@ -54,7 +58,8 @@ const SEARCH_DATA: ApiBookSearchResult[] = [
     language: 'Español',
     format: 'Tapa blanda',
     isbn: '9788439732471',
-    coverUrl: 'https://covers.openlibrary.org/b/isbn/9788439732471-L.jpg?default=false',
+    coverUrl:
+      'https://covers.openlibrary.org/b/isbn/9788439732471-L.jpg?default=false',
   },
 ]
 

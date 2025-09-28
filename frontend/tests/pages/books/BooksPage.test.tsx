@@ -72,9 +72,9 @@ describe('BooksPage', () => {
     )
 
     await waitFor(() => {
-      expect(
-        screen.getByLabelText('publishBook.fields.title')
-      ).toHaveValue('1984')
+      expect(screen.getByLabelText('publishBook.fields.title')).toHaveValue(
+        '1984'
+      )
     })
 
     const nextButton = screen.getByRole('button', { name: 'publishBook.next' })
@@ -109,15 +109,41 @@ describe('BooksPage', () => {
 
     unmount()
 
+    vi.useFakeTimers()
+
     const { getByText, getByRole } = renderWithProviders(<BooksPage />, {
       initialEntries: ['/books/new'],
     })
 
     expect(getByText('publishBook.resume.title')).toBeInTheDocument()
-    fireEvent.click(getByRole('button', { name: 'publishBook.resume.continue' }))
+
+    await vi.advanceTimersByTimeAsync(3000)
+
+    vi.useRealTimers()
+
+    fireEvent.click(
+      getByRole('button', { name: 'publishBook.resume.continue' })
+    )
 
     expect(
       await screen.findByDisplayValue('Mi libro secreto')
     ).toBeInTheDocument()
+  })
+
+  test('keeps focus while typing metadata fields', () => {
+    renderWithProviders(<BooksPage />, { initialEntries: ['/books/new'] })
+
+    const titleInput = screen.getByLabelText('publishBook.fields.title')
+    titleInput.focus()
+
+    expect(document.activeElement).toBe(titleInput)
+
+    fireEvent.change(titleInput, { target: { value: 'L' } })
+    expect(document.activeElement).toBe(titleInput)
+
+    fireEvent.change(titleInput, { target: { value: 'Li' } })
+
+    expect(titleInput).toHaveValue('Li')
+    expect(document.activeElement).toBe(titleInput)
   })
 })

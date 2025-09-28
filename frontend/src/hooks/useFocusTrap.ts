@@ -1,4 +1,4 @@
-import { RefObject, useEffect } from 'react'
+import { RefObject, useEffect, useRef } from 'react'
 
 const focusableSelectors =
   'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
@@ -14,27 +14,42 @@ export const useFocusTrap = ({
   active,
   onEscape,
 }: UseFocusTrapOptions) => {
+  const escapeRef = useRef(onEscape)
+  const lastActiveElementRef = useRef<HTMLElement | null>(null)
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null)
+
+  useEffect(() => {
+    escapeRef.current = onEscape
+  }, [onEscape])
+
   useEffect(() => {
     if (!active) return
     const container = containerRef.current
     if (!container) return
 
-    const previouslyFocused = document.activeElement as HTMLElement | null
+    const getFocusable = () =>
+      Array.from(
+        container.querySelectorAll<HTMLElement>(focusableSelectors)
+      ).filter((element) => !element.hasAttribute('data-focus-guard'))
 
-    const focusable = Array.from(
-      container.querySelectorAll<HTMLElement>(focusableSelectors)
-    ).filter((element) => !element.hasAttribute('data-focus-guard'))
-
-    focusable[0]?.focus()
+    const handleFocusIn = (event: FocusEvent) => {
+      const target = event.target as HTMLElement
+      if (container.contains(target)) {
+        lastActiveElementRef.current = target
+      }
+    }
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.stopPropagation()
-        onEscape?.()
+        escapeRef.current?.()
         return
       }
 
-      if (event.key !== 'Tab' || focusable.length === 0) return
+      if (event.key !== 'Tab') return
+
+      const focusable = getFocusable()
+      if (focusable.length === 0) return
 
       const first = focusable[0]
       const last = focusable[focusable.length - 1]
@@ -50,11 +65,34 @@ export const useFocusTrap = ({
       }
     }
 
+    const currentActive = document.activeElement as HTMLElement | null
+    previouslyFocusedRef.current = currentActive
+
+    if (currentActive && container.contains(currentActive)) {
+      lastActiveElementRef.current = currentActive
+    } else {
+      const focusable = getFocusable()
+      const target =
+        (lastActiveElementRef.current &&
+        container.contains(lastActiveElementRef.current)
+          ? lastActiveElementRef.current
+          : focusable[0]) ?? null
+      target?.focus()
+      lastActiveElementRef.current = target
+    }
+
     container.addEventListener('keydown', handleKeyDown)
+    container.addEventListener('focusin', handleFocusIn)
 
     return () => {
       container.removeEventListener('keydown', handleKeyDown)
-      previouslyFocused?.focus()
+      container.removeEventListener('focusin', handleFocusIn)
+      if (
+        previouslyFocusedRef.current &&
+        previouslyFocusedRef.current !== document.activeElement
+      ) {
+        previouslyFocusedRef.current.focus()
+      }
     }
-  }, [active, containerRef, onEscape])
+  }, [active, containerRef])
 }

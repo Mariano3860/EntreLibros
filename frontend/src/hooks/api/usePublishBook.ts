@@ -1,5 +1,8 @@
 import { publishBook } from '@api/books/books.service'
-import { PublishBookPayload, PublishBookResponse } from '@api/books/publishBook.types'
+import {
+  PublishBookPayload,
+  PublishBookResponse,
+} from '@api/books/publishBook.types'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 export const usePublishBook = () => {

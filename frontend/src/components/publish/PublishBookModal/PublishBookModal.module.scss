@@ -133,7 +133,9 @@
   font-weight: 600;
   cursor: pointer;
   border: none;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -167,6 +169,17 @@
   gap: 24px;
 }
 
+.formGrid {
+  display: grid;
+  gap: 24px;
+}
+
+.priceGrid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
 .formGroup {
   display: flex;
   flex-direction: column;
@@ -186,7 +199,9 @@
   border: 1px solid rgba(8, 15, 32, 0.12);
   padding: 12px 14px;
   font-size: 0.95rem;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .input:focus,
