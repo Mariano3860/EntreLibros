@@ -55,6 +55,33 @@ export const mockConversations: Conversation[] = [
         text: 'Sounds good!',
         time: '4:37 PM',
       },
+      {
+        id: 6,
+        role: 'me',
+        type: 'agreementProposal',
+        proposal: {
+          meetingPoint: 'Rincón Parque Central',
+          area: 'Nervión (Sevilla)',
+          date: 'martes',
+          time: '19:00',
+          bookTitle: 'El nombre del viento',
+        },
+        time: '4:40 PM',
+      },
+      {
+        id: 7,
+        role: 'them',
+        type: 'agreementConfirmation',
+        agreement: {
+          meetingPoint: 'Rincón Parque Central',
+          area: 'Nervión (Sevilla)',
+          date: 'martes',
+          time: '19:00',
+          bookTitle: 'El nombre del viento',
+        },
+        confirmedBy: 'Samuel',
+        time: '4:42 PM',
+      },
     ],
   },
   {

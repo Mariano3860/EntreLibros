@@ -7,9 +7,11 @@ import { ReactComponent as AttachIcon } from '@src/assets/icons/attachments.svg'
 import { ReactComponent as EmojiIcon } from '@src/assets/icons/emoji.svg'
 import { ReactComponent as InfoIcon } from '@src/assets/icons/info.svg'
 
+import { BubbleAgreementConfirmation } from './components/BubbleAgreement/BubbleAgreementConfirmation'
+import { BubbleAgreementProposal } from './components/BubbleAgreement/BubbleAgreementProposal'
 import { BubbleText } from './components/BubbleText/BubbleText'
 import styles from './Messages.module.scss'
-import { Conversation, Message } from './Messages.types'
+import { Conversation, Message, MessageRole } from './Messages.types'
 
 export const Messages = () => {
   const { t } = useTranslation()
@@ -25,18 +27,28 @@ export const Messages = () => {
 
   const mappedMessages: Message[] = useMemo(() => {
     if (!selected) return []
-    return messages
+
+    const staticMessages: Message[] = selected.messages ?? []
+    const liveMessages = messages
       .filter((m) => m.channel === selected.user.name)
-      .map((m, idx) => ({
-        id: idx,
-        role: m.user.id === currentUser?.id ? 'me' : 'them',
-        tone: m.user.id === currentUser?.id ? 'primary' : 'neutral',
-        text: m.text,
-        time: new Date(m.timestamp).toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit',
-        }),
-      }))
+      .map((m, idx) => {
+        const role: MessageRole = m.user.id === currentUser?.id ? 'me' : 'them'
+        const tone: Message['tone'] = role === 'me' ? 'primary' : 'neutral'
+
+        return {
+          id: staticMessages.length + idx,
+          role,
+          tone,
+          text: m.text,
+          time: new Date(m.timestamp).toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+          }),
+          type: 'text' as const,
+        }
+      })
+
+    return [...staticMessages, ...liveMessages]
   }, [messages, currentUser, selected])
 
   const handleSend = () => {
@@ -79,8 +91,18 @@ export const Messages = () => {
                   <span className={styles.snippet}>
                     {(() => {
                       const lastMsg = conv.messages[conv.messages.length - 1]
-                      if (lastMsg?.text) return lastMsg.text
-                      if (lastMsg?.book) return 'Shared a book'
+                      if (!lastMsg) return ''
+                      if (lastMsg.type === 'agreementProposal') {
+                        return t('community.messages.agreement.proposal.title')
+                      }
+                      if (lastMsg.type === 'agreementConfirmation') {
+                        return t(
+                          'community.messages.agreement.confirmation.title'
+                        )
+                      }
+                      if ('text' in lastMsg && lastMsg.text) return lastMsg.text
+                      if ('book' in lastMsg && lastMsg.book)
+                        return t('community.messages.snippets.sharedBook')
                       return ''
                     })()}
                   </span>
@@ -129,16 +151,41 @@ export const Messages = () => {
               </div>
             </header>
             <div className={styles.messages}>
-              {mappedMessages.map((msg) => (
-                <BubbleText
-                  key={msg.id}
-                  role={msg.role}
-                  tone={msg.tone}
-                  text={msg.text}
-                  book={msg.book}
-                  time={msg.time}
-                />
-              ))}
+              {mappedMessages.map((msg) => {
+                if (msg.type === 'agreementProposal') {
+                  return (
+                    <BubbleAgreementProposal
+                      key={msg.id}
+                      role={msg.role}
+                      proposal={msg.proposal}
+                      time={msg.time}
+                    />
+                  )
+                }
+
+                if (msg.type === 'agreementConfirmation') {
+                  return (
+                    <BubbleAgreementConfirmation
+                      key={msg.id}
+                      role={msg.role}
+                      agreement={msg.agreement}
+                      confirmedBy={msg.confirmedBy}
+                      time={msg.time}
+                    />
+                  )
+                }
+
+                return (
+                  <BubbleText
+                    key={msg.id}
+                    role={msg.role}
+                    tone={msg.tone}
+                    text={msg.text}
+                    book={msg.book}
+                    time={msg.time}
+                  />
+                )
+              })}
             </div>
             <div className={styles.inputArea}>
               <div className={styles.inputWrapper}>
