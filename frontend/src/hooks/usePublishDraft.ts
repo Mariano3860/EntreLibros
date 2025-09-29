@@ -63,9 +63,11 @@ export const usePublishDraft = <TDraft>(
       if (scheduleRef.current) {
         window.clearTimeout(scheduleRef.current)
       }
-      scheduleRef.current = window.setTimeout(() => {
+      const timeoutId = window.setTimeout(() => {
         persist({ ...data, updatedAt: Date.now() })
+        scheduleRef.current = null
       }, delay)
+      scheduleRef.current = timeoutId
     },
     [persist]
   )

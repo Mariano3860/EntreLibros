@@ -9,6 +9,7 @@ import { stripDraftMeta } from '@utils/drafts'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
+import isEqual from 'fast-deep-equal'
 
 import styles from './PublishBookModal.module.scss'
 import {
@@ -149,9 +150,18 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
   const draft = useMemo(() => stripDraftMeta(storedDraft), [storedDraft])
   const [state, setState] = useState<PublishBookFormState>(initialState)
   const [showDraftPrompt, setShowDraftPrompt] = useState(false)
-  const [draftResolved, setDraftResolved] = useState<boolean>(() => !draft)
+  const [autosaveEnabled, setAutosaveEnabled] = useState<boolean>(() => !draft)
   const modalRef = useRef<HTMLDivElement>(null)
   const initializedRef = useRef(false)
+
+  const baselineDraft = useMemo<PublishBookDraftState>(
+    () => draft ?? toSerializableDraft(initialState),
+    [draft]
+  )
+  const serializableState = useMemo<PublishBookDraftState>(
+    () => toSerializableDraft(state),
+    [state]
+  )
 
   const debouncedQuery = useDebouncedValue(state.searchQuery)
   const {
@@ -169,7 +179,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
     if (!isOpen) {
       initializedRef.current = false
       setShowDraftPrompt(false)
-      setDraftResolved(true)
+      setAutosaveEnabled(true)
       return
     }
 
@@ -178,10 +188,10 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
     initializedRef.current = true
     if (draft) {
       setShowDraftPrompt(true)
-      setDraftResolved(false)
+      setAutosaveEnabled(false)
     } else {
       setState(initialState)
-      setDraftResolved(true)
+      setAutosaveEnabled(true)
     }
   }, [draft, isOpen])
 
@@ -194,9 +204,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
   }, [isOpen])
 
   const closeWithConfirmation = () => {
-    const draftState = toSerializableDraft(state)
-    const baseline = draft ?? initialState
-    const hasChanges = JSON.stringify(draftState) !== JSON.stringify(baseline)
+    const hasChanges = !isEqual(serializableState, baselineDraft)
     if (hasChanges) {
       const confirmed = window.confirm(t('publishBook.confirmClose'))
       if (!confirmed) {
@@ -215,9 +223,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
   useEffect(() => {
     if (!isOpen) return
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      const draftState = toSerializableDraft(state)
-      const baseline = draft ?? initialState
-      if (JSON.stringify(draftState) !== JSON.stringify(baseline)) {
+      if (!isEqual(serializableState, baselineDraft)) {
         event.preventDefault()
         event.returnValue = ''
       }
@@ -226,14 +232,23 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload)
     }
-  }, [draft, isOpen, state])
+  }, [baselineDraft, isOpen, serializableState])
 
   useEffect(() => {
-    if (!isOpen || showDraftPrompt || !draftResolved) return
-    scheduleSave(toSerializableDraft(state))
-  }, [draftResolved, isOpen, scheduleSave, showDraftPrompt, state])
+    if (!isOpen || showDraftPrompt || !autosaveEnabled) return
+    if (isEqual(serializableState, baselineDraft)) return
+    scheduleSave(serializableState)
+  }, [
+    autosaveEnabled,
+    baselineDraft,
+    isOpen,
+    scheduleSave,
+    serializableState,
+    showDraftPrompt,
+  ])
 
   const updateMetadata = (update: Partial<PublishBookMetadata>) => {
+    setAutosaveEnabled(true)
     setState((prev) => {
       const metadata = { ...prev.metadata, ...update }
       const nextImages = ensureCover(prev.images, metadata.coverUrl)
@@ -242,6 +257,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
   }
 
   const updateOffer = (update: Partial<PublishBookOffer>) => {
+    setAutosaveEnabled(true)
     setState((prev) => ({
       ...prev,
       offer: { ...prev.offer, ...update },
@@ -249,6 +265,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
   }
 
   const updateDelivery = (update: Partial<PublishBookOffer['delivery']>) => {
+    setAutosaveEnabled(true)
     setState((prev) => ({
       ...prev,
       offer: { ...prev.offer, delivery: { ...prev.offer.delivery, ...update } },
@@ -277,32 +294,39 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
       ),
     }))
     toast.info(t('publishBook.prefilled'))
+    setAutosaveEnabled(true)
   }
 
   const handleFiles = async (files: FileList | null) => {
     if (!files) return
-    const uploads: PublishBookImage[] = []
-    for (const file of Array.from(files).slice(0, MAX_IMAGES)) {
-      const reader = new FileReader()
-      const base64 = await new Promise<string>((resolve, reject) => {
-        reader.onload = () => resolve(String(reader.result))
-        reader.onerror = () => reject(reader.error)
-        reader.readAsDataURL(file)
-      })
-      uploads.push({
-        id: `${file.name}-${Date.now()}`,
-        url: base64,
-        source: 'upload',
-        name: file.name,
-      })
-    }
+    const fileArray = Array.from(files).slice(0, MAX_IMAGES)
+    const uploads: PublishBookImage[] = await Promise.all(
+      fileArray.map(
+        (file, index) =>
+          new Promise<PublishBookImage>((resolve, reject) => {
+            const reader = new FileReader()
+            reader.onload = () =>
+              resolve({
+                id: `${file.name}-${Date.now()}-${index}`,
+                url: String(reader.result),
+                source: 'upload',
+                name: file.name,
+              })
+            reader.onerror = () =>
+              reject(reader.error ?? new Error('Failed to read file'))
+            reader.readAsDataURL(file)
+          })
+      )
+    )
     setState((prev) => {
       const nextImages = [...prev.images, ...uploads].slice(0, MAX_IMAGES)
       return { ...prev, images: nextImages }
     })
+    setAutosaveEnabled(true)
   }
 
   const removeImage = (id: string) => {
+    setAutosaveEnabled(true)
     setState((prev) => ({
       ...prev,
       images: prev.images.filter((image) => image.id !== id),
@@ -310,6 +334,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
   }
 
   const nextStep = () => {
+    setAutosaveEnabled(true)
     setState((prev) => ({
       ...prev,
       step: prev.step === 'identify' ? 'offer' : 'review',
@@ -317,6 +342,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
   }
 
   const previousStep = () => {
+    setAutosaveEnabled(true)
     setState((prev) => ({
       ...prev,
       step: prev.step === 'review' ? 'offer' : 'identify',
@@ -364,7 +390,8 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
   const publishDisabled = !state.acceptedTerms || isPending
 
   const saveDraft = () => {
-    saveNow(toSerializableDraft(state))
+    setAutosaveEnabled(true)
+    saveNow(serializableState)
     toast.success(t('publishBook.draftSaved'))
   }
 
@@ -425,14 +452,14 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
   const resumeDraft = () => {
     setState(baseState)
     setShowDraftPrompt(false)
-    setDraftResolved(true)
+    setAutosaveEnabled(true)
   }
 
   const discardDraft = () => {
     clear()
     setState(initialState)
     setShowDraftPrompt(false)
-    setDraftResolved(true)
+    setAutosaveEnabled(true)
   }
 
   if (!isOpen) return null
@@ -518,7 +545,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
 
             <div className={styles.stepContent}>
               {state.step === 'identify' && (
-                <div className={styles.stepGrid}>
+                <div className={styles.stepLayout}>
                   <div>
                     <div className={styles.formGroup}>
                       <label htmlFor="publish-search">
@@ -536,7 +563,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                             searchQuery: event.target.value,
                           }))
                         }
-                        onBlur={() => saveNow(toSerializableDraft(state))}
+                        onBlur={() => saveNow(serializableState)}
                       />
                     </div>
                     {isFetching && (
@@ -632,7 +659,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                         onChange={(event) =>
                           updateMetadata({ title: event.target.value })
                         }
-                        onBlur={() => saveNow(toSerializableDraft(state))}
+                        onBlur={() => saveNow(serializableState)}
                         required
                         aria-invalid={identifyErrors.title ? 'true' : 'false'}
                       />
@@ -653,7 +680,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                         onChange={(event) =>
                           updateMetadata({ author: event.target.value })
                         }
-                        onBlur={() => saveNow(toSerializableDraft(state))}
+                        onBlur={() => saveNow(serializableState)}
                         required
                         aria-invalid={identifyErrors.author ? 'true' : 'false'}
                       />
@@ -674,7 +701,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                         onChange={(event) =>
                           updateMetadata({ language: event.target.value })
                         }
-                        onBlur={() => saveNow(toSerializableDraft(state))}
+                        onBlur={() => saveNow(serializableState)}
                         required
                         aria-invalid={
                           identifyErrors.language ? 'true' : 'false'
@@ -697,7 +724,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                         onChange={(event) =>
                           updateMetadata({ format: event.target.value })
                         }
-                        onBlur={() => saveNow(toSerializableDraft(state))}
+                        onBlur={() => saveNow(serializableState)}
                         required
                         aria-invalid={identifyErrors.format ? 'true' : 'false'}
                       />
@@ -718,7 +745,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                         onChange={(event) =>
                           updateMetadata({ publisher: event.target.value })
                         }
-                        onBlur={() => saveNow(toSerializableDraft(state))}
+                        onBlur={() => saveNow(serializableState)}
                       />
                     </div>
                     <div className={styles.formGroup}>
@@ -732,7 +759,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                         onChange={(event) =>
                           updateMetadata({ year: event.target.value })
                         }
-                        onBlur={() => saveNow(toSerializableDraft(state))}
+                        onBlur={() => saveNow(serializableState)}
                         inputMode="numeric"
                       />
                     </div>
@@ -747,7 +774,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                         onChange={(event) =>
                           updateMetadata({ isbn: event.target.value })
                         }
-                        onBlur={() => saveNow(toSerializableDraft(state))}
+                        onBlur={() => saveNow(serializableState)}
                       />
                     </div>
                   </div>
@@ -820,7 +847,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
               )}
 
               {state.step === 'offer' && (
-                <div className={styles.stepGrid}>
+                <div className={styles.stepLayout}>
                   <div className={styles.formGroup}>
                     <label>{t('publishBook.offer.modes.label')}</label>
                     <div className={styles.checkboxGroup}>
@@ -887,7 +914,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                           onChange={(event) =>
                             updateOffer({ priceAmount: event.target.value })
                           }
-                          onBlur={() => saveNow(toSerializableDraft(state))}
+                          onBlur={() => saveNow(serializableState)}
                           aria-invalid={offerErrors.price ? 'true' : 'false'}
                         />
                         {offerErrors.price && (
@@ -964,7 +991,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                       onChange={(event) =>
                         updateOffer({ notes: event.target.value })
                       }
-                      onBlur={() => saveNow(toSerializableDraft(state))}
+                      onBlur={() => saveNow(serializableState)}
                     />
                     <span className={styles.toastInline}>
                       {t('publishBook.offer.notes.counter', {
@@ -1078,7 +1105,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
               )}
 
               {state.step === 'review' && (
-                <div className={styles.stepGrid}>
+                <div className={styles.stepLayout}>
                   <div className={styles.reviewCardWrapper}>
                     <BookCard
                       title={state.metadata.title}

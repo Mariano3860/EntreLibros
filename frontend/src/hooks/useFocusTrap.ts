@@ -31,16 +31,22 @@ export const useFocusTrap = <TElement extends HTMLElement = HTMLElement>({
     const container = containerRef.current
     if (!container) return
 
-    const getFocusable = () =>
-      Array.from(
+    const focusableRef: { current: HTMLElement[] } = { current: [] }
+
+    const updateFocusable = () => {
+      focusableRef.current = Array.from(
         container.querySelectorAll<HTMLElement>(focusableSelectors)
       ).filter((element) => !element.hasAttribute('data-focus-guard'))
+    }
+
+    updateFocusable()
 
     const handleFocusIn = (event: FocusEvent) => {
       const target = event.target as HTMLElement
       if (container.contains(target)) {
         lastActiveElementRef.current = target
       }
+      updateFocusable()
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -52,7 +58,7 @@ export const useFocusTrap = <TElement extends HTMLElement = HTMLElement>({
 
       if (event.key !== 'Tab') return
 
-      const focusable = getFocusable()
+      const focusable = focusableRef.current
       if (focusable.length === 0) return
 
       const first = focusable[0]
@@ -75,7 +81,7 @@ export const useFocusTrap = <TElement extends HTMLElement = HTMLElement>({
     if (currentActive && container.contains(currentActive)) {
       lastActiveElementRef.current = currentActive
     } else {
-      const focusable = getFocusable()
+      const focusable = focusableRef.current
       const target =
         (lastActiveElementRef.current &&
         container.contains(lastActiveElementRef.current)
@@ -85,12 +91,24 @@ export const useFocusTrap = <TElement extends HTMLElement = HTMLElement>({
       lastActiveElementRef.current = target
     }
 
+    let observer: MutationObserver | null = null
+    if (typeof MutationObserver !== 'undefined') {
+      observer = new MutationObserver(() => updateFocusable())
+      observer.observe(container, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['tabindex', 'disabled', 'data-focus-guard'],
+      })
+    }
+
     container.addEventListener('keydown', handleKeyDown)
     container.addEventListener('focusin', handleFocusIn)
 
     return () => {
       container.removeEventListener('keydown', handleKeyDown)
       container.removeEventListener('focusin', handleFocusIn)
+      observer?.disconnect()
       if (
         previouslyFocusedRef.current &&
         previouslyFocusedRef.current !== document.activeElement
