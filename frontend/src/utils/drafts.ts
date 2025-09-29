@@ -5,5 +5,5 @@ export const stripDraftMeta = <TDraft>(
 ): TDraft | null => {
   if (!draft) return null
   const { updatedAt: _updatedAt, ...rest } = draft
-  return rest
+  return rest as TDraft
 }

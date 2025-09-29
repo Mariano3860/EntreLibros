@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw'
 
 import { RELATIVE_API_ROUTES } from '@src/api/routes'
+import { PublishBookPayload } from '@src/api/books/publishBook.types'
 
 let lastGeneratedId = 5000
 
@@ -8,7 +9,7 @@ export const publishBookHandler = http.post(
   RELATIVE_API_ROUTES.BOOKS.PUBLISH,
   async ({ request }) => {
     await new Promise((resolve) => setTimeout(resolve, 400))
-    const body = await request.json()
+    const body = (await request.json()) as PublishBookPayload
 
     if (body.metadata?.title?.toLowerCase?.().includes('error')) {
       return HttpResponse.json({ message: 'publish failed' }, { status: 500 })

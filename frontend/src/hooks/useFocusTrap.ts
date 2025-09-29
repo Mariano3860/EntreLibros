@@ -1,19 +1,23 @@
-import { RefObject, useEffect, useRef } from 'react'
+import { MutableRefObject, RefObject, useEffect, useRef } from 'react'
 
 const focusableSelectors =
   'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
 
-type UseFocusTrapOptions = {
-  containerRef: RefObject<HTMLElement>
+type FocusTrapRef<TElement extends HTMLElement> =
+  | RefObject<TElement | null>
+  | MutableRefObject<TElement | null>
+
+type UseFocusTrapOptions<TElement extends HTMLElement = HTMLElement> = {
+  containerRef: FocusTrapRef<TElement>
   active: boolean
   onEscape?: () => void
 }
 
-export const useFocusTrap = ({
+export const useFocusTrap = <TElement extends HTMLElement = HTMLElement>({
   containerRef,
   active,
   onEscape,
-}: UseFocusTrapOptions) => {
+}: UseFocusTrapOptions<TElement>) => {
   const escapeRef = useRef(onEscape)
   const lastActiveElementRef = useRef<HTMLElement | null>(null)
   const previouslyFocusedRef = useRef<HTMLElement | null>(null)
