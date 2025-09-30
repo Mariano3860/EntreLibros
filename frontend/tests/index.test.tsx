@@ -1,17 +1,28 @@
 import { screen, act } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
-vi.mock('@src/api/auth/me.service', () => ({
-  fetchMe: vi.fn(),
-}))
-vi.mock('@src/hooks/api/useBooks', () => ({
-  useBooks: () => ({ data: [] }),
-}))
-vi.mock('@mocks/browser', () => ({
-  worker: { start: vi.fn() },
-}))
+const setupMocks = async () => {
+  const pathFactory = () => ({
+    isDirectorySync: () => false,
+  })
 
-import { fetchMe } from '@src/api/auth/me.service'
+  const fetchMeMock = vi.fn()
+  const worker = { start: vi.fn() }
+
+  vi.doMock('@src/api/auth/me.service', () => ({
+    fetchMe: fetchMeMock,
+  }))
+  vi.doMock('@src/hooks/api/useBooks', () => ({
+    useBooks: () => ({ data: [] }),
+  }))
+  vi.doMock('@mocks/browser', () => ({ worker }))
+  vi.doMock('path-type', pathFactory)
+  vi.doMock('path-type/index.js', pathFactory)
+
+  const { fetchMe } = await import('@src/api/auth/me.service')
+
+  return { fetchMe, worker }
+}
 
 describe('index.tsx', () => {
   test('should render App in root element for guest users', async () => {
@@ -19,9 +30,11 @@ describe('index.tsx', () => {
     rootElement.id = 'root'
     document.body.appendChild(rootElement)
 
+    vi.resetModules()
+    const { fetchMe } = await setupMocks()
+
     vi.mocked(fetchMe).mockRejectedValue(new Error('unauthenticated'))
 
-    vi.resetModules()
     await act(async () => {
       await import('@src/index')
     })
@@ -36,9 +49,11 @@ describe('index.tsx', () => {
     rootElement.id = 'root'
     document.body.appendChild(rootElement)
 
+    vi.resetModules()
+    const { fetchMe } = await setupMocks()
+
     vi.mocked(fetchMe).mockResolvedValue({ id: 1, email: 'test@example.com' })
 
-    vi.resetModules()
     await act(async () => {
       await import('@src/index')
     })
@@ -57,12 +72,14 @@ describe('index.tsx', () => {
     process.env.NODE_ENV = 'development'
 
     vi.resetModules()
-    const { worker } = await import('@mocks/browser')
+    const { fetchMe, worker } = await setupMocks()
+
     vi.mocked(fetchMe).mockRejectedValue(new Error('unauthenticated'))
 
     await act(async () => {
       await import('@src/index')
     })
+
     expect(await screen.findByText('home.hero_title')).toBeTruthy()
     expect(worker.start).toHaveBeenCalledWith({ onUnhandledRequest: 'bypass' })
 

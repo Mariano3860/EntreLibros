@@ -9,7 +9,7 @@ import { stripDraftMeta } from '@utils/drafts'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
-import isEqual from 'fast-deep-equal'
+import isEqual from 'lodash/isEqual'
 
 import styles from './PublishBookModal.module.scss'
 import {

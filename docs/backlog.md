@@ -80,6 +80,7 @@ Feature 3.1 Publicación y calidad del dato
   - Éxito: 90% publicaciones con campos mínimos.
   - Actualización 2025-10-05: se entregó el flujo completo en frontend (modal por ruta, stepper, autosave, preview e i18n) consumiendo mocks MSW; queda pendiente integrar con backend real y telemetría persistente.
   - Actualización 2025-10-06: se ajustó el autosave para evitar sobrescrituras del borrador al reanudar y se mejoró la accesibilidad del focus trap.
+  - Actualización 2025-10-07: se reforzó la suite automatizada (MSW + RTL) cubriendo autosave, reanudación, publicación y errores, elevando la cobertura global del workspace por encima del 85% requerido.
 - [~] S-3.2 Normalización asistida por ISBN/metadata (Should, E2; BR-22)
   - Éxito: autocompletado; reducción de duplicados/ambigüedades.
 - [ ] S-3.3 Contenidos permitidos/denegados (política editorial) (Must, E1; BR-24)
@@ -121,6 +122,7 @@ Feature 5.1 Mensajería 1:1
   - Actualización 2025-01-09: se creó el wrapper `BubbleBase` y se adaptaron los mensajes genéricos para reutilizarlo sin alterar el estilo actual, preparando el chat para nuevas variantes de burbuja.
   - Actualización 2025-09-29: se ajustaron los mocks del chat al español y se corrigió el layout para que la barra de mensajes permanezca visible mientras el historial hace scroll.
   - Actualización 2025-09-30: se enriqueció la conversación mockeada con un flujo lógico de intercambio, se diferenciaron visualmente los libros propios vs. del interlocutor y se alinearon las insignias/acciones con la UI.
+  - Actualización 2025-10-07: se añadieron pruebas unitarias de burbujas, pestañas y socket mockeado para garantizar traducciones, estados offline/online y envío de mensajes sin regresiones.
 - [ ] S-5.2 Bloqueo/Reporte en conversación y ficha (Must, E1; BR-43)
   - Éxito: acción en ≤2 pasos.
 
