@@ -9,18 +9,18 @@ type UsePublishDraftParams<TDraft> = {
   storageKey: string
   serializer?: (draft: PublishDraft<TDraft>) => string
   parser?: (raw: string) => PublishDraft<TDraft> | null
+  isEqual?: (a: TDraft, b: TDraft) => boolean
 }
 
 export const usePublishDraft = <TDraft>(
   params: UsePublishDraftParams<TDraft>
 ) => {
-  const { storageKey, serializer, parser } = params
+  const { storageKey, serializer, parser, isEqual } = params
+
   const parse = useCallback(
     (raw: string): PublishDraft<TDraft> | null => {
       try {
-        if (parser) {
-          return parser(raw)
-        }
+        if (parser) return parser(raw)
         return JSON.parse(raw) as PublishDraft<TDraft>
       } catch {
         return null
@@ -37,6 +37,19 @@ export const usePublishDraft = <TDraft>(
   })
 
   const lastSavedRef = useRef<PublishDraft<TDraft> | null>(draft)
+
+  const dataEqual = useCallback(
+    (a: TDraft, b: TDraft) =>
+      isEqual ? isEqual(a, b) : JSON.stringify(a) === JSON.stringify(b),
+    [isEqual]
+  )
+
+  const getDataPart = useCallback((pd: PublishDraft<TDraft>): TDraft => {
+    const { updatedAt: _updatedAt, ...rest } = pd as unknown as {
+      updatedAt?: number
+    } & TDraft
+    return rest as TDraft
+  }, [])
 
   const persist = useCallback(
     (next: PublishDraft<TDraft>) => {
@@ -60,29 +73,43 @@ export const usePublishDraft = <TDraft>(
 
   const scheduleSave = useCallback(
     (data: TDraft, delay = DEFAULT_AUTOSAVE_DELAY) => {
+      // Skip scheduling if unchanged vs last saved
+      if (
+        lastSavedRef.current &&
+        dataEqual(getDataPart(lastSavedRef.current), data)
+      ) {
+        return
+      }
+
       if (scheduleRef.current) {
         window.clearTimeout(scheduleRef.current)
       }
       scheduleRef.current = window.setTimeout(() => {
-        persist({ ...data, updatedAt: Date.now() })
+        persist({ ...data, updatedAt: Date.now() } as PublishDraft<TDraft>)
         scheduleRef.current = null
       }, delay)
     },
-    [persist]
+    [dataEqual, getDataPart, persist]
   )
 
   const saveNow = useCallback(
     (data: TDraft) => {
+      if (
+        lastSavedRef.current &&
+        dataEqual(getDataPart(lastSavedRef.current), data)
+      ) {
+        // No-op if unchanged
+        return
+      }
       if (scheduleRef.current) {
         window.clearTimeout(scheduleRef.current)
         scheduleRef.current = null
       }
-      persist({ ...data, updatedAt: Date.now() })
+      persist({ ...data, updatedAt: Date.now() } as PublishDraft<TDraft>)
     },
-    [persist]
+    [dataEqual, getDataPart, persist]
   )
 
-  // cleanup pending timeout on unmount
   useEffect(() => {
     return () => {
       if (scheduleRef.current) {
