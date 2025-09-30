@@ -1,5 +1,5 @@
 import { DraftWithMeta } from '@utils/drafts'
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 export type PublishDraft<TDraft> = DraftWithMeta<TDraft>
 
@@ -61,11 +61,10 @@ export const usePublishDraft = <TDraft>(
       if (scheduleRef.current) {
         window.clearTimeout(scheduleRef.current)
       }
-      const timeoutId = window.setTimeout(() => {
+      scheduleRef.current = window.setTimeout(() => {
         persist({ ...data, updatedAt: Date.now() })
         scheduleRef.current = null
       }, delay)
-      scheduleRef.current = timeoutId
     },
     [persist]
   )
@@ -80,6 +79,16 @@ export const usePublishDraft = <TDraft>(
     },
     [persist]
   )
+
+  // cleanup pending timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (scheduleRef.current) {
+        window.clearTimeout(scheduleRef.current)
+        scheduleRef.current = null
+      }
+    }
+  }, [])
 
   return {
     draft,
