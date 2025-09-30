@@ -5,7 +5,7 @@ import { useFocusTrap } from '@hooks/useFocusTrap'
 import { usePublishDraft } from '@hooks/usePublishDraft'
 import { stripDraftMeta } from '@utils/drafts'
 import { isEqual } from 'lodash'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
 
@@ -462,6 +462,12 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
     setAutosaveEnabled(true)
   }
 
+  // Single memoized blur handler reused across all inputs
+  const handleBlur = useCallback<React.FocusEventHandler<HTMLElement>>(() => {
+    // Pass the current serializable draft to scheduleSave
+    scheduleSave(serializableState)
+  }, [scheduleSave, serializableState])
+
   if (!isOpen) return null
 
   return (
@@ -563,7 +569,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                             searchQuery: event.target.value,
                           }))
                         }
-                        onBlur={() => saveNow(serializableState)}
+                        onBlur={handleBlur}
                       />
                     </div>
                     {isFetching && (
@@ -659,7 +665,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                         onChange={(event) =>
                           updateMetadata({ title: event.target.value })
                         }
-                        onBlur={() => saveNow(serializableState)}
+                        onBlur={handleBlur}
                         required
                         aria-invalid={identifyErrors.title ? 'true' : 'false'}
                       />
@@ -680,7 +686,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                         onChange={(event) =>
                           updateMetadata({ author: event.target.value })
                         }
-                        onBlur={() => saveNow(serializableState)}
+                        onBlur={handleBlur}
                         required
                         aria-invalid={identifyErrors.author ? 'true' : 'false'}
                       />
@@ -701,7 +707,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                         onChange={(event) =>
                           updateMetadata({ language: event.target.value })
                         }
-                        onBlur={() => saveNow(serializableState)}
+                        onBlur={handleBlur}
                         required
                         aria-invalid={
                           identifyErrors.language ? 'true' : 'false'
@@ -724,7 +730,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                         onChange={(event) =>
                           updateMetadata({ format: event.target.value })
                         }
-                        onBlur={() => saveNow(serializableState)}
+                        onBlur={handleBlur}
                         required
                         aria-invalid={identifyErrors.format ? 'true' : 'false'}
                       />
@@ -745,7 +751,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                         onChange={(event) =>
                           updateMetadata({ publisher: event.target.value })
                         }
-                        onBlur={() => saveNow(serializableState)}
+                        onBlur={handleBlur}
                       />
                     </div>
                     <div className={styles.formGroup}>
@@ -759,7 +765,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                         onChange={(event) =>
                           updateMetadata({ year: event.target.value })
                         }
-                        onBlur={() => saveNow(serializableState)}
+                        onBlur={handleBlur}
                         inputMode="numeric"
                       />
                     </div>
@@ -774,7 +780,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                         onChange={(event) =>
                           updateMetadata({ isbn: event.target.value })
                         }
-                        onBlur={() => saveNow(serializableState)}
+                        onBlur={handleBlur}
                       />
                     </div>
                   </div>
@@ -914,7 +920,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                           onChange={(event) =>
                             updateOffer({ priceAmount: event.target.value })
                           }
-                          onBlur={() => saveNow(serializableState)}
+                          onBlur={handleBlur}
                           aria-invalid={offerErrors.price ? 'true' : 'false'}
                         />
                         {offerErrors.price && (
@@ -991,7 +997,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                       onChange={(event) =>
                         updateOffer({ notes: event.target.value })
                       }
-                      onBlur={() => saveNow(serializableState)}
+                      onBlur={handleBlur}
                     />
                     <span className={styles.toastInline}>
                       {t('publishBook.offer.notes.counter', {
@@ -1081,6 +1087,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                                 .value as PublishBookOffer['delivery']['shippingPayer'],
                             })
                           }
+                          onBlur={handleBlur}
                         >
                           <option value="owner">
                             {t(
