@@ -18,6 +18,16 @@ export const BookCard: React.FC<BookCardProps> = ({
 }) => {
   const { t } = useTranslation()
 
+  const conditionLabel = (() => {
+    if (!condition) return null
+    const normalized = condition.toString().toLowerCase()
+    const known = ['new', 'very_good', 'good', 'acceptable']
+    if (known.includes(normalized)) {
+      return t(`publishBook.preview.condition.${normalized}`)
+    }
+    return condition
+  })()
+
   const renderTradePreferences = () => {
     if (!tradePreferences || tradePreferences.length === 0) return null
     const shown = tradePreferences.slice(0, 3).join(', ')
@@ -41,7 +51,9 @@ export const BookCard: React.FC<BookCardProps> = ({
             {t(`booksPage.status.${status}`)}
           </span>
         )}
-        {condition && <span className={styles.condition}>{condition}</span>}
+        {conditionLabel && (
+          <span className={styles.condition}>{conditionLabel}</span>
+        )}
         <div className={styles.pills}>
           {isForSale && (
             <span className={styles.sale}>

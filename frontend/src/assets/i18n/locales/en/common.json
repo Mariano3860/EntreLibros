@@ -93,6 +93,7 @@
       "available": "Available"
     },
     "publish_button": "Publish a book",
+    "recently_published": "Your new book",
     "tabs": {
       "mine": "My books",
       "for_trade": "Available for trade",
@@ -118,6 +119,150 @@
       "seeking": "Seeking"
     },
     "cover_alt": "Cover of {{title}}"
+  },
+  "publishBook": {
+    "title": "Publish a book",
+    "subtitle": "Complete the steps to share it with the community",
+    "cancel": "Cancel",
+    "saveDraft": "Save draft",
+    "back": "Back",
+    "next": "Next",
+    "publish": "Publish",
+    "publishing": "Publishing...",
+    "published": "Book published!",
+    "publishError": "We couldn't publish it. Please try again.",
+    "draftSaved": "Draft saved",
+    "prefilled": "We pre-filled the information",
+    "confirmClose": "You have unsaved changes. Do you want to leave anyway?",
+    "progress": "Publication progress",
+    "resume": {
+      "title": "Resume draft",
+      "description": "We found a saved draft. Continue editing or start from scratch?",
+      "discard": "Discard",
+      "continue": "Continue"
+    },
+    "steps": {
+      "identify": {
+        "title": "Identification",
+        "description": "Search by ISBN or fill it manually"
+      },
+      "offer": {
+        "title": "Offer",
+        "description": "Choose condition, modalities and delivery"
+      },
+      "review": {
+        "title": "Review",
+        "description": "Preview before publishing"
+      }
+    },
+    "search": {
+      "label": "Search the catalog",
+      "placeholder": "ISBN, title, author...",
+      "loading": "Searching...",
+      "error": "We couldn't search right now.",
+      "retry": "Retry",
+      "empty": "No results found. Try another query or fill it manually.",
+      "use": "Use this book",
+      "cover": "Cover of {{title}}"
+    },
+    "manualToggle": "Fill manually",
+    "fields": {
+      "title": "Title",
+      "author": "Author",
+      "language": "Language",
+      "format": "Format",
+      "publisher": "Publisher",
+      "year": "Year",
+      "isbn": "ISBN",
+      "images": "Images"
+    },
+    "uploader": {
+      "title": "Drag and drop your photos",
+      "hint": "Up to {{count}} images 3:2",
+      "cta": "Select files",
+      "remove": "Remove image"
+    },
+    "offer": {
+      "modes": {
+        "label": "Modalities",
+        "trade": "Trade",
+        "sale": "Sale",
+        "donation": "Donation"
+      },
+      "condition": {
+        "label": "Book condition",
+        "options": {
+          "new": "New",
+          "very_good": "Very good",
+          "good": "Good",
+          "acceptable": "Acceptable"
+        }
+      },
+      "price": {
+        "label": "Price",
+        "currency": "Currency"
+      },
+      "trade": {
+        "label": "Trade preferences",
+        "genres": {
+          "fiction": "Fiction",
+          "nonfiction": "Non-fiction",
+          "fantasy": "Fantasy",
+          "history": "History",
+          "science": "Science",
+          "romance": "Romance",
+          "selfHelp": "Self-help"
+        }
+      },
+      "notes": {
+        "label": "Owner notes",
+        "counter": "{{count}}/300"
+      },
+      "availability": {
+        "label": "Availability",
+        "options": {
+          "public": "Public",
+          "private": "Private with link"
+        }
+      },
+      "delivery": {
+        "label": "Delivery",
+        "options": {
+          "nearBookCorner": "Nearby Book Corner",
+          "inPerson": "In person",
+          "shipping": "Shipping"
+        },
+        "shippingPayer": {
+          "label": "Who pays shipping?",
+          "owner": "Owner",
+          "requester": "Requester",
+          "split": "Split"
+        }
+      }
+    },
+    "preview": {
+      "condition": {
+        "new": "New",
+        "very_good": "Very good",
+        "good": "Good",
+        "acceptable": "Acceptable"
+      }
+    },
+    "review": {
+      "terms": "I confirm the information is accurate and I accept EntreLibros' terms",
+      "hint": "We will publish your book and refresh the grid right away."
+    },
+    "errors": {
+      "title": "Enter a title",
+      "author": "Enter at least one author",
+      "language": "Select the language",
+      "format": "Select the format",
+      "image": "Add at least one image",
+      "condition": "Choose a condition",
+      "modes": "Pick at least one modality",
+      "price": "Price must be greater than 0"
+    },
+    "previewAlt": "Preview cover"
   },
   "community": {
     "title": "Community",

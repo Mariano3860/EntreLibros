@@ -6,7 +6,11 @@ import { MemoryRouter } from 'react-router-dom'
 import { AuthProvider } from '@src/contexts/auth/AuthContext'
 import { ThemeProvider } from '@src/contexts/theme/ThemeContext'
 
-export const createWrapper = () => {
+type WrapperOptions = {
+  initialEntries?: string[]
+}
+
+export const createWrapper = (options?: WrapperOptions) => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: { retry: false },
@@ -15,7 +19,7 @@ export const createWrapper = () => {
   })
 
   const Wrapper = ({ children }: { children: ReactNode }) => (
-    <MemoryRouter>
+    <MemoryRouter initialEntries={options?.initialEntries}>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <ThemeProvider>{children}</ThemeProvider>
@@ -27,7 +31,10 @@ export const createWrapper = () => {
   return { Wrapper, queryClient }
 }
 
-export const renderWithProviders = (ui: ReactElement) => {
-  const { Wrapper, queryClient } = createWrapper()
+export const renderWithProviders = (
+  ui: ReactElement,
+  options?: WrapperOptions
+) => {
+  const { Wrapper, queryClient } = createWrapper(options)
   return { queryClient, ...render(ui, { wrapper: Wrapper }) }
 }

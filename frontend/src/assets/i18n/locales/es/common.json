@@ -93,6 +93,7 @@
       "available": "Disponible"
     },
     "publish_button": "Publicar un libro",
+    "recently_published": "Tu nuevo libro",
     "tabs": {
       "mine": "Mis libros",
       "for_trade": "Disponibles para intercambio",
@@ -118,6 +119,150 @@
       "seeking": "Buscando"
     },
     "cover_alt": "Portada de {{title}}"
+  },
+  "publishBook": {
+    "title": "Publicar un libro",
+    "subtitle": "Completá los pasos para ofrecerlo a la comunidad",
+    "cancel": "Cancelar",
+    "saveDraft": "Guardar borrador",
+    "back": "Volver",
+    "next": "Siguiente",
+    "publish": "Publicar",
+    "publishing": "Publicando...",
+    "published": "¡Libro publicado!",
+    "publishError": "No se pudo publicar. Intentalo nuevamente.",
+    "draftSaved": "Borrador guardado",
+    "prefilled": "Completamos los datos por vos",
+    "confirmClose": "Hay cambios sin guardar. ¿Querés salir igualmente?",
+    "progress": "Progreso de publicación",
+    "resume": {
+      "title": "Retomar borrador",
+      "description": "Encontramos un borrador guardado. ¿Querés continuarlo o empezar uno nuevo?",
+      "discard": "Descartar",
+      "continue": "Continuar"
+    },
+    "steps": {
+      "identify": {
+        "title": "Identificación",
+        "description": "Buscá por ISBN o completá manualmente"
+      },
+      "offer": {
+        "title": "Oferta",
+        "description": "Definí estado, modalidades y entrega"
+      },
+      "review": {
+        "title": "Revisión",
+        "description": "Previsualizá antes de publicar"
+      }
+    },
+    "search": {
+      "label": "Buscar en el catálogo",
+      "placeholder": "ISBN, título, autor...",
+      "loading": "Buscando...",
+      "error": "No pudimos buscar ahora.",
+      "retry": "Reintentar",
+      "empty": "No encontramos resultados. Probá con otro término o completá manualmente.",
+      "use": "Usar este libro",
+      "cover": "Portada de {{title}}"
+    },
+    "manualToggle": "Completar manualmente",
+    "fields": {
+      "title": "Título",
+      "author": "Autor/a",
+      "language": "Idioma",
+      "format": "Formato",
+      "publisher": "Editorial",
+      "year": "Año",
+      "isbn": "ISBN",
+      "images": "Imágenes"
+    },
+    "uploader": {
+      "title": "Arrastrá y soltá tus fotos",
+      "hint": "Hasta {{count}} imágenes 3:2",
+      "cta": "Elegir archivos",
+      "remove": "Eliminar imagen"
+    },
+    "offer": {
+      "modes": {
+        "label": "Modalidad",
+        "trade": "Intercambio",
+        "sale": "Venta",
+        "donation": "Donación"
+      },
+      "condition": {
+        "label": "Estado del libro",
+        "options": {
+          "new": "Nuevo",
+          "very_good": "Muy bueno",
+          "good": "Bueno",
+          "acceptable": "Aceptable"
+        }
+      },
+      "price": {
+        "label": "Precio",
+        "currency": "Moneda"
+      },
+      "trade": {
+        "label": "Preferencias de intercambio",
+        "genres": {
+          "fiction": "Ficción",
+          "nonfiction": "No ficción",
+          "fantasy": "Fantasía",
+          "history": "Historia",
+          "science": "Ciencia",
+          "romance": "Romance",
+          "selfHelp": "Desarrollo personal"
+        }
+      },
+      "notes": {
+        "label": "Notas para quien lo reciba",
+        "counter": "{{count}}/300"
+      },
+      "availability": {
+        "label": "Disponibilidad",
+        "options": {
+          "public": "Pública",
+          "private": "Privada con link"
+        }
+      },
+      "delivery": {
+        "label": "Entrega",
+        "options": {
+          "nearBookCorner": "Rincón de Libros cercano",
+          "inPerson": "En mano",
+          "shipping": "Envío"
+        },
+        "shippingPayer": {
+          "label": "¿Quién paga el envío?",
+          "owner": "Quien publica",
+          "requester": "Quien solicita",
+          "split": "Se comparte"
+        }
+      }
+    },
+    "preview": {
+      "condition": {
+        "new": "Nuevo",
+        "very_good": "Muy bueno",
+        "good": "Bueno",
+        "acceptable": "Aceptable"
+      }
+    },
+    "review": {
+      "terms": "Confirmo que la información es correcta y acepto los términos de EntreLibros",
+      "hint": "Publicaremos tu libro y lo verás en la grilla al instante."
+    },
+    "errors": {
+      "title": "Ingresá un título",
+      "author": "Ingresá al menos un autor",
+      "language": "Indicá el idioma",
+      "format": "Indicá el formato",
+      "image": "Necesitás al menos una imagen",
+      "condition": "Seleccioná un estado",
+      "modes": "Elegí al menos una modalidad",
+      "price": "El precio debe ser mayor a 0"
+    },
+    "previewAlt": "Vista previa de la portada"
   },
   "community": {
     "title": "Comunidad",
