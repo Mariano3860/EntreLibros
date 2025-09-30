@@ -3,6 +3,7 @@ import { usePublishBook } from '@hooks/api/usePublishBook'
 import { useFocusTrap } from '@hooks/useFocusTrap'
 import { usePublishDraft } from '@hooks/usePublishDraft'
 import { stripDraftMeta } from '@utils/drafts'
+import isEqual from 'lodash/isEqual'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
@@ -48,9 +49,6 @@ type PublishBookModalProps = {
 
 const usePublishBookDraft = () =>
   usePublishDraft<PublishBookDraftState>({ storageKey: STORAGE_KEY })
-
-const areDraftsEqual = (a: PublishBookDraftState, b: PublishBookDraftState) =>
-  JSON.stringify(a) === JSON.stringify(b)
 
 const usePublishState = (draft: PublishBookDraftState | null) => {
   const [state, setState] = useState<PublishBookFormState>(initialState)
@@ -159,7 +157,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
   const baseState = useMemo(() => sanitizeDraft(draft), [draft])
 
   const closeWithConfirmation = useCallback(() => {
-    const hasChanges = !areDraftsEqual(serializableState, baselineDraft)
+    const hasChanges = !isEqual(serializableState, baselineDraft)
     if (hasChanges) {
       const confirmed = window.confirm(t('publishBook.confirmClose'))
       if (!confirmed) {
@@ -178,7 +176,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
   useEffect(() => {
     if (!isOpen) return
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      if (!areDraftsEqual(serializableState, baselineDraft)) {
+      if (!isEqual(serializableState, baselineDraft)) {
         event.preventDefault()
         event.returnValue = ''
       }
@@ -191,7 +189,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
 
   useEffect(() => {
     if (!isOpen || showDraftPrompt || !autosaveEnabled) return
-    if (areDraftsEqual(serializableState, baselineDraft)) return
+    if (isEqual(serializableState, baselineDraft)) return
     scheduleSave(serializableState)
   }, [
     autosaveEnabled,
