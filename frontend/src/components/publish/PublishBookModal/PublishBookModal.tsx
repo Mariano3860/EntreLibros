@@ -438,7 +438,8 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
       toast.success(t('publishBook.published'))
       clear()
       onPublished(created.id)
-    } catch {
+    } catch (error) {
+      console.error('Failed to publish book', error)
       toast.error(t('publishBook.publishError'))
     }
   }
