@@ -1,11 +1,9 @@
-import { MutableRefObject, RefObject, useEffect, useRef } from 'react'
+import { useEffect, useRef, type RefObject } from 'react'
 
 const focusableSelectors =
   'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
 
-type FocusTrapRef<TElement extends HTMLElement> =
-  | RefObject<TElement | null>
-  | MutableRefObject<TElement | null>
+type FocusTrapRef<TElement extends HTMLElement> = RefObject<TElement>
 
 type UseFocusTrapOptions<TElement extends HTMLElement = HTMLElement> = {
   containerRef: FocusTrapRef<TElement>

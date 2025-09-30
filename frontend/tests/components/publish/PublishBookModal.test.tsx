@@ -276,8 +276,8 @@ describe('PublishBookModal', () => {
         this.onload?.({} as ProgressEvent<FileReader>)
       }
     }
-    // @ts-expect-error - jsdom FileReader signature is not fully typed for mocks
-    globalThis.FileReader = FileReaderMock
+
+    globalThis.FileReader = FileReaderMock as unknown as typeof FileReader
 
     try {
       renderModal()
