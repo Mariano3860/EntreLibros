@@ -13,4 +13,6 @@ export const HOME_URLS = {
   REGISTER: 'register',
 } as const
 
+export const MAX_IMAGES_UPLOAD = 5
+
 export const COMMUNITY_STATS_RANGES = [7, 30, 90] as const

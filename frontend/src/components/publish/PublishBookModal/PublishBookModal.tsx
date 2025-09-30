@@ -11,6 +11,7 @@ import { toast } from 'react-toastify'
 
 import { PublishBookPayload } from '@src/api/books/publishBook.types'
 import { ApiBookSearchResult } from '@src/api/books/searchBooks.types'
+import { MAX_IMAGES_UPLOAD } from '@src/constants/constants'
 
 import styles from './PublishBookModal.module.scss'
 import {
@@ -62,8 +63,6 @@ const initialState: PublishBookFormState = {
   step: 'identify',
   acceptedTerms: false,
 }
-
-const MAX_IMAGES = 5
 
 const genres = [
   'fiction',
@@ -300,7 +299,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
 
   const handleFiles = async (files: FileList | null) => {
     if (!files) return
-    const fileArray = Array.from(files).slice(0, MAX_IMAGES)
+    const fileArray = Array.from(files).slice(0, MAX_IMAGES_UPLOAD)
     const uploads: PublishBookImage[] = await Promise.all(
       fileArray.map(
         (file, index) =>
@@ -320,7 +319,10 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
       )
     )
     setState((prev) => {
-      const nextImages = [...prev.images, ...uploads].slice(0, MAX_IMAGES)
+      const nextImages = [...prev.images, ...uploads].slice(
+        0,
+        MAX_IMAGES_UPLOAD
+      )
       return { ...prev, images: nextImages }
     })
     setAutosaveEnabled(true)
@@ -803,7 +805,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
                         <p>{t('publishBook.uploader.title')}</p>
                         <span className={styles.uploadHint}>
                           {t('publishBook.uploader.hint', {
-                            count: MAX_IMAGES,
+                            count: MAX_IMAGES_UPLOAD,
                           })}
                         </span>
                         <label
