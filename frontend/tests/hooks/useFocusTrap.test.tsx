@@ -91,7 +91,7 @@ describe('useFocusTrap', () => {
       )
     }
 
-    const { getByText, getByTestId } = render(<RestoreTest />)
+    const { getByText } = render(<RestoreTest />)
 
     expect(document.activeElement).toBe(getByText('First'))
     fireEvent.click(getByText('Deactivate'))

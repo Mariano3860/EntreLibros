@@ -3,13 +3,14 @@ import { useBookSearch } from '@hooks/api/useBookSearch'
 import { usePublishBook } from '@hooks/api/usePublishBook'
 import { useFocusTrap } from '@hooks/useFocusTrap'
 import { usePublishDraft } from '@hooks/usePublishDraft'
-import { PublishBookPayload } from '@src/api/books/publishBook.types'
-import { ApiBookSearchResult } from '@src/api/books/searchBooks.types'
 import { stripDraftMeta } from '@utils/drafts'
+import { isEqual } from 'lodash'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
-import isEqual from 'lodash/isEqual'
+
+import { PublishBookPayload } from '@src/api/books/publishBook.types'
+import { ApiBookSearchResult } from '@src/api/books/searchBooks.types'
 
 import styles from './PublishBookModal.module.scss'
 import {
@@ -437,8 +438,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
       toast.success(t('publishBook.published'))
       clear()
       onPublished(created.id)
-    } catch (error) {
-      console.error(error)
+    } catch {
       toast.error(t('publishBook.publishError'))
     }
   }

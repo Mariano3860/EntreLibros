@@ -1,5 +1,6 @@
 import { BookCard } from '@components/book/BookCard'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
+import { PublishBookModal } from '@components/publish/PublishBookModal/PublishBookModal'
 import { TabsMenu } from '@components/ui/tabs-menu/TabsMenu'
 import { useUserBooks } from '@hooks/api/useUserBooks'
 import { getPathSegment } from '@utils/path'
@@ -10,7 +11,6 @@ import { useLocation, useMatch, useNavigate } from 'react-router-dom'
 import type { ApiUserBook } from '@src/api/books/userBooks.types'
 
 import styles from './BooksPage.module.scss'
-import { PublishBookModal } from '@components/publish/PublishBookModal/PublishBookModal'
 
 export const BooksPage = () => {
   const { t } = useTranslation()

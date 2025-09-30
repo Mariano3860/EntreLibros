@@ -1,6 +1,5 @@
-import { useCallback, useRef, useState } from 'react'
-
 import { DraftWithMeta } from '@utils/drafts'
+import { useCallback, useRef, useState } from 'react'
 
 export type PublishDraft<TDraft> = DraftWithMeta<TDraft>
 
@@ -21,8 +20,7 @@ export const usePublishDraft = <TDraft>(
           return parser(raw)
         }
         return JSON.parse(raw) as PublishDraft<TDraft>
-      } catch (error) {
-        console.warn('Failed to parse draft', error)
+      } catch {
         return null
       }
     },
