@@ -25,9 +25,9 @@ describe('index.tsx', () => {
     document.body.appendChild(rootElement)
 
     vi.resetModules()
-    const { fetchMe } = await setupMocks()
+    const mocks = await setupMocks()
 
-    vi.mocked(fetchMe).mockRejectedValue(new Error('unauthenticated'))
+    vi.mocked(mocks.fetchMe).mockRejectedValue(new Error('unauthenticated'))
 
     await act(async () => {
       await import('@src/index')
@@ -44,9 +44,12 @@ describe('index.tsx', () => {
     document.body.appendChild(rootElement)
 
     vi.resetModules()
-    const { fetchMe } = await setupMocks()
+    const mocks = await setupMocks()
 
-    vi.mocked(fetchMe).mockResolvedValue({ id: 1, email: 'test@example.com' })
+    vi.mocked(mocks.fetchMe).mockResolvedValue({
+      id: 1,
+      email: 'test@example.com',
+    })
 
     await act(async () => {
       await import('@src/index')
@@ -66,16 +69,18 @@ describe('index.tsx', () => {
     process.env.NODE_ENV = 'development'
 
     vi.resetModules()
-    const { fetchMe, worker } = await setupMocks()
+    const mocks = await setupMocks()
 
-    vi.mocked(fetchMe).mockRejectedValue(new Error('unauthenticated'))
+    vi.mocked(mocks.fetchMe).mockRejectedValue(new Error('unauthenticated'))
 
     await act(async () => {
       await import('@src/index')
     })
 
     expect(await screen.findByText('home.hero_title')).toBeTruthy()
-    expect(worker.start).toHaveBeenCalledWith({ onUnhandledRequest: 'bypass' })
+    expect(mocks.worker.start).toHaveBeenCalledWith({
+      onUnhandledRequest: 'bypass',
+    })
 
     document.body.removeChild(rootElement)
     process.env.NODE_ENV = originalEnv
