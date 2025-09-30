@@ -1,6 +1,8 @@
 import { DraftWithMeta } from '@utils/drafts'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import { DEFAULT_AUTOSAVE_DELAY } from '@src/constants/constants'
+
 export type PublishDraft<TDraft> = DraftWithMeta<TDraft>
 
 type UsePublishDraftParams<TDraft> = {
@@ -57,7 +59,7 @@ export const usePublishDraft = <TDraft>(
   const scheduleRef = useRef<number | null>(null)
 
   const scheduleSave = useCallback(
-    (data: TDraft, delay = 2500) => {
+    (data: TDraft, delay = DEFAULT_AUTOSAVE_DELAY) => {
       if (scheduleRef.current) {
         window.clearTimeout(scheduleRef.current)
       }
