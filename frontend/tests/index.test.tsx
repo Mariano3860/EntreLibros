@@ -2,10 +2,6 @@ import { screen, act } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
 const setupMocks = async () => {
-  const pathFactory = () => ({
-    isDirectorySync: () => false,
-  })
-
   const fetchMeMock = vi.fn()
   const worker = { start: vi.fn() }
 
@@ -16,8 +12,6 @@ const setupMocks = async () => {
     useBooks: () => ({ data: [] }),
   }))
   vi.doMock('@mocks/browser', () => ({ worker }))
-  vi.doMock('path-type', pathFactory)
-  vi.doMock('path-type/index.js', pathFactory)
 
   const { fetchMe } = await import('@src/api/auth/me.service')
 

@@ -91,11 +91,10 @@ const renderModal = () => {
 }
 
 const applyDraft = (draft: PublishBookDraftState) => {
-  const stored: DraftWithMeta<PublishBookDraftState> = {
+  draftApi.draft = {
     ...draft,
     updatedAt: Date.now(),
   }
-  draftApi.draft = stored
   mockUsePublishDraft.mockReturnValue(draftApi)
 }
 
@@ -465,7 +464,7 @@ describe('PublishBookModal', () => {
   })
 
   test('shows error toast when publish request fails', async () => {
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    mutateAsync.mockRejectedValueOnce(new Error('network'))
 
     renderModal()
 
@@ -473,35 +472,34 @@ describe('PublishBookModal', () => {
       screen.getByPlaceholderText('publishBook.search.placeholder'),
       { target: { value: '1984' } }
     )
-
     fireEvent.click(
-      await screen.findByRole(
-        'button',
-        { name: 'publishBook.search.use' },
-        { timeout: 2000 }
-      )
+      await screen.findByRole('button', { name: 'publishBook.search.use' })
     )
 
-    fireEvent.click(screen.getByRole('button', { name: 'publishBook.next' }))
+    const nextIdentify = screen.getByRole('button', {
+      name: 'publishBook.next',
+    })
+    await waitFor(() => expect(nextIdentify).not.toBeDisabled())
+    fireEvent.click(nextIdentify)
 
     fireEvent.click(screen.getByLabelText('publishBook.offer.modes.sale'))
     fireEvent.click(
       screen.getByLabelText('publishBook.offer.condition.options.good')
     )
     fireEvent.change(screen.getByLabelText('publishBook.offer.price.label'), {
-      target: { value: '1500' },
+      target: { value: '1700' },
     })
 
-    fireEvent.click(screen.getByRole('button', { name: 'publishBook.next' }))
+    const nextOffer = screen.getByRole('button', { name: 'publishBook.next' })
+    await waitFor(() => expect(nextOffer).not.toBeDisabled())
+    fireEvent.click(nextOffer)
 
     fireEvent.click(screen.getByLabelText('publishBook.review.terms'))
-
-    mutateAsync.mockRejectedValueOnce(new Error('server error'))
-
     fireEvent.click(screen.getByRole('button', { name: 'publishBook.publish' }))
 
-    await waitFor(() => expect(toastError).toHaveBeenCalled())
-    expect(consoleSpy).toHaveBeenCalled()
-    consoleSpy.mockRestore()
+    await waitFor(() => expect(mutateAsync).toHaveBeenCalledTimes(1))
+    expect(toastError).toHaveBeenCalledWith('publishBook.publishError')
+    expect(draftApi.clear).not.toHaveBeenCalled()
+    expect(toastSuccess).not.toHaveBeenCalled()
   })
 })

@@ -1,7 +1,7 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(8, 15, 32, 0.65);
+  background: rgb(8 15 32 / 65%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -18,12 +18,12 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 24px 64px rgba(8, 15, 32, 0.25);
+  box-shadow: 0 24px 64px rgb(8 15 32 / 25%);
 }
 
 .header {
   padding: 24px;
-  border-bottom: 1px solid rgba(8, 15, 32, 0.08);
+  border-bottom: 1px solid rgb(8 15 32 / 8%);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -112,7 +112,7 @@
 
 .actions {
   padding: 24px;
-  border-top: 1px solid rgba(8, 15, 32, 0.08);
+  border-top: 1px solid rgb(8 15 32 / 8%);
   display: flex;
   justify-content: space-between;
   gap: 16px;
@@ -154,7 +154,7 @@
 .primaryButton {
   background: var(--primary-500, #2d57ff);
   color: #fff;
-  box-shadow: 0 8px 20px rgba(45, 87, 255, 0.25);
+  box-shadow: 0 8px 20px rgb(45 87 255 / 25%);
 }
 
 .primaryButton:disabled,
@@ -196,7 +196,7 @@
 .textarea,
 .select {
   border-radius: 12px;
-  border: 1px solid rgba(8, 15, 32, 0.12);
+  border: 1px solid rgb(8 15 32 / 12%);
   padding: 12px 14px;
   font-size: 0.95rem;
   transition:
@@ -209,7 +209,7 @@
 .select:focus {
   outline: none;
   border-color: var(--primary-400, #4e6dff);
-  box-shadow: 0 0 0 4px rgba(45, 87, 255, 0.12);
+  box-shadow: 0 0 0 4px rgb(45 87 255 / 12%);
 }
 
 .error {
@@ -229,7 +229,7 @@
   align-items: center;
   padding: 12px;
   border-radius: 12px;
-  border: 1px solid rgba(8, 15, 32, 0.08);
+  border: 1px solid rgb(8 15 32 / 8%);
   background: var(--neutral-50, #f8fafc);
 }
 
@@ -238,7 +238,7 @@
   height: 72px;
   object-fit: cover;
   border-radius: 8px;
-  background: rgba(8, 15, 32, 0.08);
+  background: rgb(8 15 32 / 8%);
 }
 
 .searchMeta {
@@ -259,6 +259,7 @@
 
 .searchButton {
   @extend .secondaryButton;
+
   white-space: nowrap;
 }
 
@@ -275,7 +276,7 @@
 }
 
 .uploader {
-  border: 2px dashed rgba(8, 15, 32, 0.16);
+  border: 2px dashed rgb(8 15 32 / 16%);
   border-radius: 16px;
   padding: 20px;
   display: flex;
@@ -284,7 +285,7 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  background: rgba(45, 87, 255, 0.04);
+  background: rgb(45 87 255 / 4%);
 }
 
 .uploader input[type='file'] {
@@ -312,7 +313,7 @@
   height: 144px;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(8, 15, 32, 0.16);
+  box-shadow: 0 4px 12px rgb(8 15 32 / 16%);
 }
 
 .previewItem img {
@@ -326,7 +327,7 @@
   top: 4px;
   right: 4px;
   border: none;
-  background: rgba(8, 15, 32, 0.75);
+  background: rgb(8 15 32 / 75%);
   color: #fff;
   border-radius: 999px;
   width: 24px;
@@ -345,7 +346,7 @@
 .badge {
   border-radius: 999px;
   padding: 6px 14px;
-  background: rgba(45, 87, 255, 0.08);
+  background: rgb(45 87 255 / 8%);
   color: var(--primary-600, #1c3fcc);
   cursor: pointer;
   border: 1px solid transparent;
@@ -392,7 +393,7 @@
   background: var(--surface-elevated, #fff);
   border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 16px 40px rgba(8, 15, 32, 0.2);
+  box-shadow: 0 16px 40px rgb(8 15 32 / 20%);
   width: min(420px, 100%);
   display: flex;
   flex-direction: column;
@@ -419,7 +420,7 @@
 .spinner {
   width: 16px;
   height: 16px;
-  border: 2px solid rgba(45, 87, 255, 0.2);
+  border: 2px solid rgb(45 87 255 / 20%);
   border-top-color: var(--primary-500, #2d57ff);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
@@ -431,7 +432,7 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .overlay {
     padding: 0;
   }

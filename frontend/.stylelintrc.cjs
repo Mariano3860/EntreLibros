@@ -9,6 +9,7 @@ module.exports = {
     'property-no-vendor-prefix': null,
     'selector-class-pattern': null,
     'no-descending-specificity': null,
+    'scss/at-extend-no-missing-placeholder': null,
   },
   ignoreFiles: ['**/node_modules/**', '**/dist/**'],
 }
