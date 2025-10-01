@@ -1,15 +1,15 @@
-import type { Response, NextFunction } from 'express';
+import type { NextFunction, Response } from 'express';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import jwt from 'jsonwebtoken';
 import {
   authenticate,
   type AuthenticatedRequest,
 } from '../../src/middleware/auth.js';
-import * as userRepository from '../../src/repositories/userRepository.js';
 import type {
   PublicUser,
   User,
 } from '../../src/repositories/userRepository.js';
+import * as userRepository from '../../src/repositories/userRepository.js';
 import { logger } from '../../src/utils/logger.js';
 
 describe('authenticate middleware', () => {
@@ -36,11 +36,10 @@ describe('authenticate middleware', () => {
   });
 
   function createResponseMock() {
-    const res = {
+    return {
       status: vi.fn().mockReturnThis(),
       json: vi.fn().mockReturnThis(),
     } as unknown as Response;
-    return res;
   }
 
   function createNextMock() {
