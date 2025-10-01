@@ -18,6 +18,7 @@ export const sanitizeDraft = (
     ...draft,
     metadata: { ...initialMetadata, ...draft.metadata },
     offer: { ...initialOffer, ...draft.offer },
+    corner: draft.corner ?? null,
   }
 }
 

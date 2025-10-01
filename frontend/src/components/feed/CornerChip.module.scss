@@ -1,0 +1,28 @@
+@import '@styles/variables';
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-1;
+  padding: $spacing-1x5 $spacing-2;
+  border-radius: rem(999px);
+  border: none;
+  background: var(--color-neutral-200);
+  color: var(--text-secondary);
+  font-size: $small-font-size;
+  cursor: pointer;
+  transition:
+    background $transition-duration-fast $transition-timing-function,
+    color $transition-duration-fast $transition-timing-function;
+
+  span:first-child {
+    font-size: 0.9rem;
+  }
+
+  &:hover,
+  &:focus-visible {
+    background: rgb(var(--primary-rgb), 0.15);
+    color: var(--primary-dark);
+    outline: none;
+  }
+}

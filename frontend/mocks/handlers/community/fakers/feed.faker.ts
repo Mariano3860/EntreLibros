@@ -1,6 +1,8 @@
 import { FeedItem } from '@components/feed/FeedItem.types'
 import { faker } from '@faker-js/faker'
 
+import { generateCornerSummaries } from './corners.faker'
+
 const relativeTimeFromNow = (date: Date) => {
   const diff = Date.now() - date.getTime()
   const minutes = Math.floor(diff / 60000)
@@ -16,12 +18,21 @@ const relativeTimeFromNow = (date: Date) => {
 }
 
 const generateItem = (): FeedItem => {
+  const availableCorners = generateCornerSummaries()
+
+  const selectedCorner = faker.helpers.maybe(() =>
+    faker.helpers.arrayElement(availableCorners)
+  )
+
   const base = {
     id: faker.string.uuid(),
     user: faker.person.firstName(),
     avatar: faker.image.avatar(),
     time: relativeTimeFromNow(faker.date.recent({ days: 7 })),
     likes: faker.number.int({ min: 0, max: 100 }),
+    corner: selectedCorner
+      ? { id: selectedCorner.id, name: selectedCorner.name }
+      : undefined,
   }
   const type = faker.helpers.arrayElement(['book', 'swap', 'sale', 'seeking'])
   switch (type) {

@@ -218,6 +218,14 @@
         "label": "Owner notes",
         "counter": "{{count}}/300"
       },
+      "corner": {
+        "label": "Attach a Book Corner (optional)",
+        "placeholder": "Select a Book Corner",
+        "loading": "Loading corners...",
+        "helper": "Let readers know where you'd prefer to exchange it.",
+        "selected": "You'll meet at {{name}}.",
+        "error": "We couldn't load the list of Book Corners right now."
+      },
       "availability": {
         "label": "Availability",
         "options": {
@@ -395,7 +403,28 @@
       "seeking": { "description": "{{user}} is looking for {{title}}" },
       "house": { "distance": "{{distance}} km away" },
       "person": { "match": "{{match}}% match" },
-      "suggestions": "Suggestions"
+      "suggestions": "Suggestions",
+      "cornerChip": {
+        "ariaLabel": "View Book Corner {{name}}"
+      },
+      "corners": {
+        "title": "Book corners near you",
+        "viewMap": "View map",
+        "distance": "{{distance}} km away",
+        "empty": "No nearby book corners yet.",
+        "error": "We couldn't load nearby corners. Try again later."
+      },
+      "cornersMap": {
+        "title": "Corners map",
+        "description": "See the most active book corners around your area.",
+        "footer": "Open the full map to explore more corners.",
+        "error": "We couldn't load the map.",
+        "actions": {
+          "nearby": "Center near me",
+          "filter": "Filter corners",
+          "expand": "Open full map"
+        }
+      }
     }
   }
 }

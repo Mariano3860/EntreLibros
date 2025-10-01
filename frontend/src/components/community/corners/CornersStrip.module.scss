@@ -1,0 +1,149 @@
+@import '@styles/variables';
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+  margin: $spacing-4 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+}
+
+.title {
+  font-size: $h4-font-size;
+  margin: 0;
+}
+
+.mapLink {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-size: $small-font-size;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  padding: $spacing-1;
+  transition: color $transition-duration-fast $transition-timing-function;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--primary-dark);
+    outline: none;
+  }
+}
+
+.cards {
+  display: flex;
+  gap: $spacing-3;
+  overflow-x: auto;
+  padding-bottom: $spacing-1;
+  scroll-snap-type: x proximity;
+}
+
+.card {
+  flex: 0 0 auto;
+  width: rem(200px);
+  background: var(--background-card);
+  border: 1px solid var(--border-color);
+  border-radius: rem(20px);
+  padding: $spacing-4;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+  scroll-snap-align: start;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+}
+
+.avatar {
+  width: rem(48px);
+  height: rem(48px);
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1x5;
+}
+
+.name {
+  font-size: $h6-font-size;
+  margin: 0;
+}
+
+.distance {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-1;
+  font-size: $small-font-size;
+  color: var(--text-secondary);
+  background: var(--color-neutral-200);
+  border-radius: rem(999px);
+  padding: $spacing-1x5 $spacing-2;
+}
+
+.activity {
+  font-size: $small-font-size;
+  color: var(--color-success);
+}
+
+.status {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: $small-font-size;
+}
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  min-height: rem(120px);
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      rgb(255 255 255 / 0%) 0%,
+      rgb(255 255 255 / 50%) 50%,
+      rgb(255 255 255 / 0%) 100%
+    );
+    animation: shimmer 1.4s infinite;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (max-width: $breakpoint-tablet) {
+  .wrapper {
+    margin: $spacing-3 0;
+  }
+
+  .title {
+    font-size: $h5-font-size;
+  }
+
+  .card {
+    width: rem(160px);
+    padding: $spacing-3;
+  }
+}

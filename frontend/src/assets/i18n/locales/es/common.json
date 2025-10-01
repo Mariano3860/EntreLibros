@@ -218,6 +218,14 @@
         "label": "Notas para quien lo reciba",
         "counter": "{{count}}/300"
       },
+      "corner": {
+        "label": "Adjuntar un Rincón (opcional)",
+        "placeholder": "Selecciona un Rincón",
+        "loading": "Cargando rincones...",
+        "helper": "Contá dónde te gustaría concretar el intercambio.",
+        "selected": "Te encontrarás en {{name}}.",
+        "error": "No pudimos cargar la lista de Rincones en este momento."
+      },
       "availability": {
         "label": "Disponibilidad",
         "options": {
@@ -395,7 +403,28 @@
       "seeking": { "description": "{{user}} busca {{title}}" },
       "house": { "distance": "A {{distance}} km" },
       "person": { "match": "Coincidencia {{match}}%" },
-      "suggestions": "Sugerencias"
+      "suggestions": "Sugerencias",
+      "cornerChip": {
+        "ariaLabel": "Ver Rincón {{name}}"
+      },
+      "corners": {
+        "title": "Rincones de libros cerca de ti",
+        "viewMap": "Ver mapa",
+        "distance": "a {{distance}} km",
+        "empty": "Aún no hay rincones cercanos.",
+        "error": "No pudimos cargar los rincones cercanos. Intenta más tarde."
+      },
+      "cornersMap": {
+        "title": "Mapa de Rincones",
+        "description": "Explora los Rincones activos en tu zona.",
+        "footer": "Abre el mapa completo para ver más Rincones.",
+        "error": "No pudimos cargar el mapa.",
+        "actions": {
+          "nearby": "Centrar cerca de mí",
+          "filter": "Filtrar Rincones",
+          "expand": "Abrir mapa completo"
+        }
+      }
     }
   }
 }

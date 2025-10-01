@@ -2,13 +2,16 @@ import { TFunction } from 'i18next'
 import React from 'react'
 
 import styles from '../PublishBookModal.module.scss'
-import { PublishBookOffer } from '../PublishBookModal.types'
+import { PublishBookCorner, PublishBookOffer } from '../PublishBookModal.types'
+
+import { CornerPicker } from './CornerPicker'
 
 type OfferStepErrors = Partial<Record<'modes' | 'condition' | 'price', string>>
 
 type OfferStepProps = {
   t: TFunction
   offer: PublishBookOffer
+  corner: PublishBookCorner | null
   errors: OfferStepErrors
   genres: readonly PublishBookOffer['tradePreferences'][number][]
   onOfferChange: (update: Partial<PublishBookOffer>) => void
@@ -16,6 +19,7 @@ type OfferStepProps = {
   onToggleTradePreference: (
     genre: PublishBookOffer['tradePreferences'][number]
   ) => void
+  onCornerChange: (corner: PublishBookCorner | null) => void
   onBlur: React.FocusEventHandler<HTMLElement>
 }
 
@@ -23,11 +27,13 @@ export const OfferStep: React.FC<OfferStepProps> = React.memo(
   ({
     t,
     offer,
+    corner,
     errors,
     genres,
     onOfferChange,
     onDeliveryChange,
     onToggleTradePreference,
+    onCornerChange,
     onBlur,
   }) => (
     <div className={styles.stepLayout}>
@@ -165,6 +171,8 @@ export const OfferStep: React.FC<OfferStepProps> = React.memo(
           })}
         </span>
       </div>
+
+      <CornerPicker value={corner} onChange={onCornerChange} onBlur={onBlur} />
 
       <div className={styles.formGroup}>
         <label>{t('publishBook.offer.availability.label')}</label>

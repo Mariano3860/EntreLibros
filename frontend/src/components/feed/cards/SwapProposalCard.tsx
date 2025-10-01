@@ -6,6 +6,7 @@ import { FeedActions } from '../FeedActions'
 import type { SwapProposalItem } from '../FeedItem.types'
 
 import styles from './FeedCard.module.scss'
+import { FeedCardHeader } from './FeedCardHeader'
 
 interface Props {
   item: SwapProposalItem
@@ -23,10 +24,7 @@ export const SwapProposalCard = ({ item }: Props) => {
 
   return (
     <article className={styles.card}>
-      <header className={styles.header}>
-        <img src={item.avatar} alt={item.user} />
-        <span>{item.user}</span>
-      </header>
+      <FeedCardHeader item={item} />
       <div className={styles.swapImages}>
         <img src={offeredImage} alt={item.offered} />
         <img src={requestedImage} alt={item.requested} />

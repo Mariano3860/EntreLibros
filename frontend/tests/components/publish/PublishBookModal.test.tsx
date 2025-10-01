@@ -138,6 +138,7 @@ const baseDraftState: PublishBookDraftState = {
   searchQuery: '',
   step: 'identify',
   acceptedTerms: true,
+  corner: null,
 }
 
 describe('PublishBookModal', () => {

@@ -1,3 +1,4 @@
+import { CornersStrip } from '@components/community/corners/CornersStrip'
 import { ActivityBar } from '@components/feed/ActivityBar'
 import { FeedFilters } from '@components/feed/FeedFilters'
 import { FeedList } from '@components/feed/FeedList'
@@ -69,6 +70,7 @@ export const CommunityFeedPage = () => {
             onFilterChange={setFilter}
             onSearchChange={setSearch}
           />
+          <CornersStrip />
           <FeedList items={filtered} />
           <div ref={loaderRef} className={styles.loader} />
         </main>
