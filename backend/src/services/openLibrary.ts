@@ -24,9 +24,15 @@ async function getJson(
   fetchFn: typeof fetch
 ): Promise<OpenLibrarySearchResponse> {
   const response = await fetchFn(url);
-  if (!response.ok) {
+  if (response.ok === false) {
+    const status =
+      typeof response.status === 'number' ? response.status : 'unknown';
+    const statusText =
+      typeof response.statusText === 'string' && response.statusText.length > 0
+        ? ` ${response.statusText}`
+        : '';
     throw new Error(
-      `OpenLibrary request failed with status ${response.status}`
+      `OpenLibrary request failed (${status}${statusText}) for ${url}`
     );
   }
   const data = (await response.json()) as OpenLibrarySearchResponse;

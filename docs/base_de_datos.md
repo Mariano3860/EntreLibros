@@ -55,7 +55,7 @@ classDiagram
     }
 ```
 
-\*Las columnas `created_at` y `updated_at` provienen de valores por defecto de PostgreSQL si se
+*Las columnas `created_at` y `updated_at` provienen de valores por defecto de PostgreSQL si se
 configuran `DEFAULT now()` en futuras migraciones; hoy no están definidas explícitamente.
 
 ### Campos derivados en el repositorio
