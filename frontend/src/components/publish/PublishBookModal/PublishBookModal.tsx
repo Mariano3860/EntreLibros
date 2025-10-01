@@ -32,7 +32,6 @@ import {
   PublishBookImage,
   PublishBookMetadata,
   PublishBookOffer,
-  PublishBookStep,
 } from './PublishBookModal.types'
 import {
   ensureCover,
@@ -534,7 +533,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
             <PublishBookStepper
               currentStep={state.step}
               t={t}
-              stepOrder={stepOrder as PublishBookStep[]}
+              stepOrder={stepOrder}
               stepIndex={stepIndex}
             />
 
