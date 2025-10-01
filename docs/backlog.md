@@ -86,6 +86,7 @@ Feature 3.1 Publicación y calidad del dato
   - Actualización 2025-10-06: se ajustó el autosave para evitar sobrescrituras del borrador al reanudar y se mejoró la accesibilidad del focus trap.
   - Actualización 2025-10-07: se reforzó la suite automatizada (MSW + RTL) cubriendo autosave, reanudación, publicación y errores, elevando la cobertura global del workspace por encima del 85% requerido.
   - Actualización 2025-10-08: se refactorizó el modal en componentes reutilizables, optimizando renders y mantenimiento sin alterar el flujo funcional.
+  - Actualización 2025-10-08 (backend): se documentó en `docs/base_de_datos.md` la brecha entre el flujo del frontend y el modelo real (solo `users`/`books`). TODO: migraciones para `publications`, endpoints `/books/mine`, `/books/:id` y soporte de imágenes.
 - [~] S-3.2 Normalización asistida por ISBN/metadata (Should, E2; BR-22)
   - Éxito: autocompletado; reducción de duplicados/ambigüedades.
 - [ ] S-3.3 Contenidos permitidos/denegados (política editorial) (Must, E1; BR-24)

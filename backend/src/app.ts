@@ -26,4 +26,8 @@ app.use('/api/books', booksRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
 
+// TODO(api-alignment): montar rutas para `/api/books/mine`, `/api/community/*` y
+// `/api/contact/submit` cuando el backend cubra las necesidades del frontend y
+// dejemos de depender de mocks MSW.
+
 export default app;

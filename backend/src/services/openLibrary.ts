@@ -19,10 +19,23 @@ interface OpenLibrarySearchResponse {
   numFound?: number;
 }
 
+async function getJson(
+  url: string,
+  fetchFn: typeof fetch
+): Promise<OpenLibrarySearchResponse> {
+  const response = await fetchFn(url);
+  if (!response.ok) {
+    throw new Error(
+      `OpenLibrary request failed with status ${response.status}`
+    );
+  }
+  const data = (await response.json()) as OpenLibrarySearchResponse;
+  return data;
+}
+
 export async function searchBooks(query: string): Promise<OpenLibraryBook[]> {
   const url = `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=10`;
-  const res = await fetch(url);
-  const data: OpenLibrarySearchResponse = await res.json();
+  const data = await getJson(url, fetch);
   return (data.docs ?? []).map((doc) => ({
     title: doc.title,
     author: doc.author_name ? doc.author_name[0] : null,
@@ -51,8 +64,7 @@ export async function checkBookExists(
   }
   const url = `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=1`;
   try {
-    const res = await fetchFn(url);
-    const data: OpenLibrarySearchResponse = await res.json();
+    const data = await getJson(url, fetchFn);
     return (data.numFound ?? 0) > 0;
   } catch {
     return false;
