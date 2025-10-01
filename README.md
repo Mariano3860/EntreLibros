@@ -11,6 +11,19 @@ El sistema incluye un bot de chat básico. Para hablarle:
 
 El backend enviará una respuesta automática en el mismo canal usando el usuario `{ id: 0, name: 'Bot' }`.
 
+## Cobertura actual del backend
+
+El frontend ya consume rutas mockeadas para publicaciones, estadísticas de comunidad y
+formulario de contacto. El backend solo implementa autenticación básica, gestión de idioma de
+usuario y un CRUD mínimo de libros (`/api/books`, `/api/books/search`, `/api/books/:id/verify`).
+
+- TODO(api-gap): implementar `/api/books/mine`, `/api/books/:id` (GET/PUT/PATCH) y soporte para
+  borradores, disponibilidad y preferencias de entrega según `PublishBookPayload`.
+- TODO(api-gap): crear controladores reales para `/api/community/*` y `/api/contact/submit`,
+  reemplazando los mocks de MSW en el frontend.
+- TODO(db-gap): ampliar las migraciones según lo detallado en `docs/base_de_datos.md` para
+  almacenar publicaciones, imágenes y métricas necesarias.
+
 ### Guía rápida para testers
 
 1. Inicia el backend y el frontend con `npm run dev`.

@@ -12,6 +12,11 @@ import {
 
 const router = Router();
 
+// TODO(books-backlog): implementar endpoints autenticados para `/books/mine`, borradores y
+// estado de oferta (venta/donación/intercambio) cuando se incorporen los campos avanzados
+// del flujo de publicación del frontend. Requiere ampliar el repositorio y las migraciones
+// para persistir disponibilidad, preferencias de entrega e imágenes.
+
 router.get('/', async (_req, res) => {
   const books = await listBooks();
   res.json(books);
