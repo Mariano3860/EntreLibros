@@ -44,19 +44,12 @@
   padding-bottom: $spacing-1;
   scroll-snap-type: x proximity;
   scroll-padding-left: $spacing-1;
-}
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 
-.cards::-webkit-scrollbar {
-  height: rem(4px);
-}
-
-.cards::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.cards::-webkit-scrollbar-thumb {
-  background: rgb(0 0 0 / 12%);
-  border-radius: rem(999px);
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .card {
