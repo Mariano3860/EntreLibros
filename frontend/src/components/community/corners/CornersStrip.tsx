@@ -25,10 +25,7 @@ export const CornersStrip = () => {
       return (
         <div className={styles.cards} aria-live="polite">
           {Array.from({ length: 4 }).map((_, index) => (
-            <div
-              key={index}
-              className={`${styles.card} ${styles.skeleton}`}
-            />
+            <div key={index} className={`${styles.card} ${styles.skeleton}`} />
           ))}
         </div>
       )

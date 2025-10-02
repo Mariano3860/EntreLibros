@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { fetchNearbyCorners } from '@src/api/community/corners.service'
+import { useNearbyCorners } from '@src/hooks/api/useNearbyCorners'
 
 import styles from '../PublishBookModal.module.scss'
 
@@ -22,39 +22,11 @@ export const CornerPicker: React.FC<CornerPickerProps> = ({
   onBlur,
 }) => {
   const { t } = useTranslation()
-  const [{ corners, status }, setState] = useState<{
-    corners: CornerPickerValue[]
-    status: 'idle' | 'loading' | 'success' | 'error'
-  }>({ corners: [], status: 'idle' })
-
-  useEffect(() => {
-    let cancelled = false
-
-    const loadCorners = async () => {
-      setState((prev) => ({ ...prev, status: 'loading' }))
-      try {
-        const response = await fetchNearbyCorners()
-        if (cancelled) return
-        const mapped = response.map((corner) => ({
-          id: corner.id,
-          name: corner.name,
-        }))
-        setState({ corners: mapped, status: 'success' })
-      } catch {
-        if (cancelled) return
-        setState((prev) => ({ ...prev, status: 'error' }))
-      }
-    }
-
-    void loadCorners()
-
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  const isLoading = status === 'loading'
-  const isError = status === 'error'
+  const { data, isLoading, isError } = useNearbyCorners()
+  const corners: CornerPickerValue[] = (data ?? []).map((corner) => ({
+    id: corner.id,
+    name: corner.name,
+  }))
   const isDisabled = corners.length === 0 && isLoading
 
   return (
