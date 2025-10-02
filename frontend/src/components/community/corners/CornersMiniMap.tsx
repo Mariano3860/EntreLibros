@@ -1,4 +1,3 @@
-import classNames from 'classnames'
 import { useTranslation } from 'react-i18next'
 
 import { useCornersMap } from '@src/hooks/api/useCornersMap'
@@ -43,7 +42,7 @@ export const CornersMiniMap = () => {
           </button>
         </div>
         <div
-          className={classNames(styles.map, { [styles.loading]: isLoading })}
+          className={`${styles.map}${isLoading ? ` ${styles.loading}` : ''}`}
         >
           {isLoading && <span className={styles.loader} aria-hidden />}
           {isError && !isLoading && (
@@ -53,17 +52,22 @@ export const CornersMiniMap = () => {
           )}
           {!isLoading &&
             !isError &&
-            pins.map((pin) => (
-              <span
-                key={pin.id}
-                className={classNames(styles.pin, {
-                  [styles.pinQuiet]: pin.status === 'quiet',
-                })}
-                style={{ left: `${pin.x}%`, top: `${pin.y}%` }}
-              >
-                •
-              </span>
-            ))}
+            pins.map((pin) => {
+              const pinClassName =
+                pin.status === 'quiet'
+                  ? `${styles.pin} ${styles.pinQuiet}`
+                  : styles.pin
+
+              return (
+                <span
+                  key={pin.id}
+                  className={pinClassName}
+                  style={{ left: `${pin.x}%`, top: `${pin.y}%` }}
+                >
+                  •
+                </span>
+              )
+            })}
         </div>
       </div>
       <p className={styles.footer}>{t('community.feed.cornersMap.footer')}</p>

@@ -1,4 +1,3 @@
-import classNames from 'classnames'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -28,7 +27,7 @@ export const CornersStrip = () => {
           {Array.from({ length: 4 }).map((_, index) => (
             <div
               key={index}
-              className={classNames(styles.card, styles.skeleton)}
+              className={`${styles.card} ${styles.skeleton}`}
             />
           ))}
         </div>
@@ -55,29 +54,29 @@ export const CornersStrip = () => {
       <div className={styles.cards}>
         {cornersList.map((corner) => (
           <article key={corner.id} className={styles.card}>
-            <div className={styles.cardHeader}>
+            <figure className={styles.figure}>
               <img
                 src={corner.imageUrl}
                 alt={corner.name}
                 className={styles.avatar}
                 loading="lazy"
                 decoding="async"
-                width={44}
-                height={44}
+                width={60}
+                height={60}
                 onError={(event) => {
                   event.currentTarget.onerror = null
                   event.currentTarget.src =
-                    'https://picsum.photos/seed/corner-fallback/120/120'
+                    'https://picsum.photos/seed/corner-fallback/160/160'
                 }}
               />
-              <div className={styles.meta}>
-                <strong className={styles.name}>{corner.name}</strong>
-                <span className={styles.distance}>
-                  {t('community.feed.corners.distance', {
-                    distance: formatter.format(corner.distanceKm),
-                  })}
-                </span>
-              </div>
+            </figure>
+            <div className={styles.meta}>
+              <strong className={styles.name}>{corner.name}</strong>
+              <span className={styles.distance}>
+                {t('community.feed.corners.distance', {
+                  distance: formatter.format(corner.distanceKm),
+                })}
+              </span>
             </div>
             {corner.activityLabel && (
               <span className={styles.activity}>{corner.activityLabel}</span>

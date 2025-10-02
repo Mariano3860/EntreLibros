@@ -39,7 +39,7 @@
 
 .cards {
   display: flex;
-  gap: $spacing-2;
+  gap: $spacing-1x5;
   overflow-x: auto;
   padding-bottom: $spacing-1;
   scroll-snap-type: x proximity;
@@ -54,14 +54,15 @@
 
 .card {
   flex: 0 0 auto;
-  width: rem(180px);
+  width: rem(168px);
   background: #fff;
   border: 1px solid rgb(0 0 0 / 6%);
   border-radius: rem(16px);
-  padding: $spacing-3;
+  padding: $spacing-2x5 $spacing-2;
   box-shadow: $box-shadow-sm;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: $spacing-1x5;
   scroll-snap-align: start;
   transition:
@@ -75,15 +76,17 @@
   }
 }
 
-.cardHeader {
+.figure {
+  margin: 0;
+  width: 100%;
   display: flex;
   align-items: center;
-  gap: $spacing-2;
+  justify-content: center;
 }
 
 .avatar {
-  width: rem(44px);
-  height: rem(44px);
+  width: rem(60px);
+  height: rem(60px);
   border-radius: 50%;
   object-fit: cover;
   border: 1px solid rgb(0 0 0 / 8%);
@@ -94,7 +97,9 @@
 .meta {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: $spacing-1;
+  text-align: center;
 }
 
 .name {
@@ -107,6 +112,7 @@
 .distance {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: $spacing-1;
   font-size: $small-font-size;
   color: var(--text-secondary);
@@ -118,6 +124,7 @@
 .activity {
   font-size: $small-font-size;
   color: var(--color-success);
+  text-align: center;
 }
 
 .status {
@@ -129,7 +136,7 @@
 .skeleton {
   position: relative;
   overflow: hidden;
-  min-height: rem(112px);
+  min-height: rem(132px);
 
   &::after {
     content: '';
@@ -165,12 +172,24 @@
   }
 
   .card {
-    width: rem(150px);
-    padding: $spacing-2x5;
+    width: rem(140px);
+    padding: $spacing-2 $spacing-1x5;
+    gap: $spacing-1x5;
   }
 
   .avatar {
-    width: rem(40px);
-    height: rem(40px);
+    width: rem(52px);
+    height: rem(52px);
+  }
+}
+
+@media (max-width: $breakpoint-mobile) {
+  .card {
+    width: rem(128px);
+  }
+
+  .avatar {
+    width: rem(48px);
+    height: rem(48px);
   }
 }

@@ -1,4 +1,3 @@
-import classNames from 'classnames'
 import { useTranslation } from 'react-i18next'
 
 import styles from './CornerChip.module.scss'
@@ -13,10 +12,12 @@ type CornerChipProps = {
 export const CornerChip = ({ corner, className, onClick }: CornerChipProps) => {
   const { t } = useTranslation()
 
+  const chipClassName = className ? `${styles.chip} ${className}` : styles.chip
+
   return (
     <button
       type="button"
-      className={classNames(styles.chip, className)}
+      className={chipClassName}
       onClick={onClick}
       aria-label={
         t('community.feed.cornerChip.ariaLabel', { name: corner.name }) ?? ''

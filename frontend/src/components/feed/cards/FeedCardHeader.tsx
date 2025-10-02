@@ -1,5 +1,4 @@
 import { CornerChip } from '@components/feed/CornerChip'
-import classNames from 'classnames'
 
 import type { FeedBase } from '../FeedItem.types'
 
@@ -11,8 +10,12 @@ type FeedCardHeaderProps = {
 }
 
 export const FeedCardHeader = ({ item, className }: FeedCardHeaderProps) => {
+  const headerClassName = className
+    ? `${styles.header} ${className}`
+    : styles.header
+
   return (
-    <header className={classNames(styles.header, className)}>
+    <header className={headerClassName}>
       <img src={item.avatar} alt={item.user} />
       <div className={styles.headerContent}>
         <div className={styles.headerTop}>
