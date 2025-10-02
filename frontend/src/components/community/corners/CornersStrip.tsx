@@ -58,9 +58,17 @@ export const CornersStrip = () => {
             <div className={styles.cardHeader}>
               <img
                 src={corner.imageUrl}
-                alt=""
-                aria-hidden
+                alt={corner.name}
                 className={styles.avatar}
+                loading="lazy"
+                decoding="async"
+                width={44}
+                height={44}
+                onError={(event) => {
+                  event.currentTarget.onerror = null
+                  event.currentTarget.src =
+                    'https://picsum.photos/seed/corner-fallback/120/120'
+                }}
               />
               <div className={styles.meta}>
                 <strong className={styles.name}>{corner.name}</strong>

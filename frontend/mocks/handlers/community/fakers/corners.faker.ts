@@ -14,32 +14,34 @@ const ensureCorners = () => {
 
   faker.seed(2024)
 
-  cachedCorners = Array.from({ length: 8 }).map(() => ({
-    id: faker.string.uuid(),
-    name: `${faker.person.firstName()} ${faker.helpers.arrayElement([
+  cachedCorners = Array.from({ length: 8 }).map(() => {
+    const suffix = faker.helpers.arrayElement([
       'Readers',
       'Books',
       'Corner',
       'Club',
-    ])}`,
-    imageUrl: faker.image.urlLoremFlickr({
-      category: 'books',
-      width: 96,
-      height: 96,
-    }),
-    distanceKm: Number(
-      faker.number.float({ min: 0.4, max: 6, fractionDigits: 1 }).toFixed(1)
-    ),
-    activityLabel: faker.helpers.arrayElement([
-      faker.helpers.maybe(
-        () =>
-          `${faker.number.int({ min: 1, max: 6 })} intercambios esta semana`,
-        { probability: 0.6 }
+    ])
+    const name = `${faker.person.firstName()} ${suffix}`
+    const seed = faker.string.alphanumeric(10)
+
+    return {
+      id: faker.string.uuid(),
+      name,
+      imageUrl: `https://picsum.photos/seed/${seed}/160/160`,
+      distanceKm: Number(
+        faker.number.float({ min: 0.4, max: 6, fractionDigits: 1 }).toFixed(1)
       ),
-      'Activo',
-      undefined,
-    ]),
-  }))
+      activityLabel: faker.helpers.arrayElement([
+        faker.helpers.maybe(
+          () =>
+            `${faker.number.int({ min: 1, max: 6 })} intercambios esta semana`,
+          { probability: 0.6 }
+        ),
+        'Activo',
+        undefined,
+      ]),
+    }
+  })
 
   return cachedCorners
 }

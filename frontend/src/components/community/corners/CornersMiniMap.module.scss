@@ -1,19 +1,20 @@
 @import '@styles/variables';
 
 .card {
-  background: var(--background-card);
-  border: 1px solid var(--border-color);
-  border-radius: rem(20px);
-  padding: $spacing-4;
-  box-shadow: var(--shadow-md);
+  background: #fff;
+  border: 1px solid rgb(0 0 0 / 6%);
+  border-radius: rem(16px);
+  padding: $spacing-3;
+  box-shadow: $box-shadow-sm;
   display: flex;
   flex-direction: column;
-  gap: $spacing-3;
+  gap: $spacing-2;
 }
 
 .title {
   margin: 0;
-  font-size: $h5-font-size;
+  font-size: $h6-font-size;
+  font-weight: $font-weight-medium;
 }
 
 .description {
@@ -28,14 +29,15 @@
 
 .map {
   position: relative;
-  border-radius: rem(16px);
+  border-radius: rem(14px);
   background: linear-gradient(
     135deg,
     var(--color-neutral-100),
-    var(--color-neutral-200)
+    rgb(255 255 255)
   );
   overflow: hidden;
-  height: rem(240px);
+  border: 1px solid rgb(0 0 0 / 4%);
+  height: rem(220px);
 }
 
 .loading {
@@ -45,10 +47,10 @@
 }
 
 .loader {
-  width: rem(32px);
-  height: rem(32px);
+  width: rem(28px);
+  height: rem(28px);
   border-radius: 50%;
-  border: 3px solid rgb(var(--primary-rgb), 0.2);
+  border: 3px solid rgb(var(--primary-rgb), 0.16);
   border-top-color: var(--primary-color);
   animation: spin 1s linear infinite;
 }
@@ -58,16 +60,16 @@
   top: $spacing-2;
   right: $spacing-2;
   display: flex;
-  gap: $spacing-1;
+  gap: $spacing-1x5;
   z-index: 1;
 }
 
 .iconButton {
-  width: rem(32px);
-  height: rem(32px);
+  width: rem(30px);
+  height: rem(30px);
   border-radius: 50%;
-  border: 1px solid var(--border-color);
-  background: rgb(255 255 255 / 90%);
+  border: 1px solid rgb(0 0 0 / 10%);
+  background: rgb(255 255 255 / 92%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -79,7 +81,7 @@
   &:hover,
   &:focus-visible {
     background: #fff;
-    transform: translateY(-1px);
+    transform: translateY(rem(-1px));
     outline: none;
   }
 }
@@ -96,6 +98,7 @@
   justify-content: center;
   font-size: 0.75rem;
   transform: translate(-50%, -50%);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 20%);
 }
 
 .pinQuiet {
@@ -121,7 +124,7 @@
 
 @media (max-width: $breakpoint-tablet) {
   .card {
-    padding: $spacing-3;
+    padding: $spacing-2x5;
   }
 
   .map {
