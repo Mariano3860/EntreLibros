@@ -14,6 +14,12 @@ export type FeedBase = {
   avatar: string
   time: string
   likes: number
+  corner?: FeedCorner
+}
+
+export type FeedCorner = {
+  id: string
+  name: string
 }
 
 export type BookItem = FeedBase & {

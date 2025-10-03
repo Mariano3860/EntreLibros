@@ -50,6 +50,8 @@ Feature 1.1 Cuenta y acceso
 - [x] S-1.7 Cobertura automatizada de autenticación y servicios transversales (Should, E1; QA-01)
   - Éxito: middleware de auth y servicios comunes protegidos por pruebas unitarias que fallan ante regresiones críticas.
   - Actualización 2025-09-30: se añadieron tests de middleware de autenticación, servicio de Open Library y utilidades de logging para sostener respuestas i18n coherentes ante fallos.
+  - Actualización 2025-10-10: se ampliaron las pruebas automatizadas del frontend cubriendo el `BaseLayout` y el `Header`, asegurando que la estructura principal, los puntos de acceso y los controles de idioma/tema permanezcan estables.
+  - Actualización 2025-10-10 (2): se extendió la cobertura de la interfaz comunitaria (feed, toggles y filtros) elevando la cobertura de ramas del frontend por encima del 85% requerido.
 
 Feature 1.2 Perfil y privacidad
 
@@ -110,8 +112,9 @@ Feature 4.1 Mapa y listados
 
 - [~] S-4.1 Geolocalización de usuario (base) (Must, E1; soporte de BR-30)
   - Éxito: detección de zona para ordenar por cercanía.
-- [ ] S-4.2 Mapa de RdL + listado ordenado por cercanía/afinidad (Must, E1; BR-30)
+- [~] S-4.2 Mapa de RdL + listado ordenado por cercanía/afinidad (Must, E1; BR-30)
   - Éxito: resultados consistentes entre lista y mapa.
+  - Actualización 2025-10-09: se integró en Community la tira de Rincones cercanos, un mini-mapa en la barra lateral y la vinculación de publicaciones/flujo de publicación con Rincones (chips y selector), quedando pendiente la conexión con datos en tiempo real y filtros avanzados.
 
 Feature 4.2 Descubrimiento avanzado
 

@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 import { PublishBookModal } from '@components/publish/PublishBookModal/PublishBookModal'
 import { PublishBookDraftState } from '@components/publish/PublishBookModal/PublishBookModal.types'
 import { ApiBookSearchResult } from '@src/api/books/searchBooks.types'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 const { mockUseFocusTrap } = vi.hoisted(() => ({
   mockUseFocusTrap: vi.fn(),
@@ -82,10 +83,13 @@ const sampleResult: ApiBookSearchResult = {
 }
 
 const renderModal = () => {
+  const queryClient = new QueryClient()
   const onClose = vi.fn()
   const onPublished = vi.fn()
   const result = render(
-    <PublishBookModal isOpen onClose={onClose} onPublished={onPublished} />
+    <QueryClientProvider client={queryClient}>
+      <PublishBookModal isOpen onClose={onClose} onPublished={onPublished} />
+    </QueryClientProvider>
   )
   return { ...result, onClose, onPublished }
 }
@@ -138,6 +142,7 @@ const baseDraftState: PublishBookDraftState = {
   searchQuery: '',
   step: 'identify',
   acceptedTerms: true,
+  corner: null,
 }
 
 describe('PublishBookModal', () => {

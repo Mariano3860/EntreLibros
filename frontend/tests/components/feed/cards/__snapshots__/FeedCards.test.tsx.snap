@@ -12,9 +12,24 @@ exports[`Feed cards snapshots > book card matches snapshot (dark/es) 1`] = `
         alt="User"
         src="https://i.pravatar.cc/100?img=1"
       />
-      <span>
-        User
-      </span>
+      <div
+        class="_headerContent_9f5b00"
+      >
+        <div
+          class="_headerTop_9f5b00"
+        >
+          <span
+            class="_userName_9f5b00"
+          >
+            User
+          </span>
+          <span
+            class="_time_9f5b00"
+          >
+            now
+          </span>
+        </div>
+      </div>
     </header>
     <img
       alt="Dune"
@@ -119,9 +134,24 @@ exports[`Feed cards snapshots > book card matches snapshot (light/en) 1`] = `
         alt="User"
         src="https://i.pravatar.cc/100?img=1"
       />
-      <span>
-        User
-      </span>
+      <div
+        class="_headerContent_9f5b00"
+      >
+        <div
+          class="_headerTop_9f5b00"
+        >
+          <span
+            class="_userName_9f5b00"
+          >
+            User
+          </span>
+          <span
+            class="_time_9f5b00"
+          >
+            now
+          </span>
+        </div>
+      </div>
     </header>
     <img
       alt="Dune"
@@ -226,9 +256,24 @@ exports[`Feed cards snapshots > event card matches snapshot (dark/es) 1`] = `
         alt="User"
         src="https://i.pravatar.cc/100?img=1"
       />
-      <span>
-        User
-      </span>
+      <div
+        class="_headerContent_9f5b00"
+      >
+        <div
+          class="_headerTop_9f5b00"
+        >
+          <span
+            class="_userName_9f5b00"
+          >
+            User
+          </span>
+          <span
+            class="_time_9f5b00"
+          >
+            now
+          </span>
+        </div>
+      </div>
     </header>
     <img
       alt="Book Fair"
@@ -333,9 +378,24 @@ exports[`Feed cards snapshots > event card matches snapshot (light/en) 1`] = `
         alt="User"
         src="https://i.pravatar.cc/100?img=1"
       />
-      <span>
-        User
-      </span>
+      <div
+        class="_headerContent_9f5b00"
+      >
+        <div
+          class="_headerTop_9f5b00"
+        >
+          <span
+            class="_userName_9f5b00"
+          >
+            User
+          </span>
+          <span
+            class="_time_9f5b00"
+          >
+            now
+          </span>
+        </div>
+      </div>
     </header>
     <img
       alt="Book Fair"
@@ -440,9 +500,24 @@ exports[`Feed cards snapshots > house card matches snapshot (dark/es) 1`] = `
         alt="User"
         src="https://i.pravatar.cc/100?img=1"
       />
-      <span>
-        User
-      </span>
+      <div
+        class="_headerContent_9f5b00"
+      >
+        <div
+          class="_headerTop_9f5b00"
+        >
+          <span
+            class="_userName_9f5b00"
+          >
+            User
+          </span>
+          <span
+            class="_time_9f5b00"
+          >
+            now
+          </span>
+        </div>
+      </div>
     </header>
     <img
       alt="Casita Norte"
@@ -547,9 +622,24 @@ exports[`Feed cards snapshots > house card matches snapshot (light/en) 1`] = `
         alt="User"
         src="https://i.pravatar.cc/100?img=1"
       />
-      <span>
-        User
-      </span>
+      <div
+        class="_headerContent_9f5b00"
+      >
+        <div
+          class="_headerTop_9f5b00"
+        >
+          <span
+            class="_userName_9f5b00"
+          >
+            User
+          </span>
+          <span
+            class="_time_9f5b00"
+          >
+            now
+          </span>
+        </div>
+      </div>
     </header>
     <img
       alt="Casita Norte"
@@ -654,9 +744,24 @@ exports[`Feed cards snapshots > person card matches snapshot (dark/es) 1`] = `
         alt="User"
         src="https://i.pravatar.cc/100?img=1"
       />
-      <span>
-        User
-      </span>
+      <div
+        class="_headerContent_9f5b00"
+      >
+        <div
+          class="_headerTop_9f5b00"
+        >
+          <span
+            class="_userName_9f5b00"
+          >
+            User
+          </span>
+          <span
+            class="_time_9f5b00"
+          >
+            now
+          </span>
+        </div>
+      </div>
     </header>
     <img
       alt="Carlos"
@@ -761,9 +866,24 @@ exports[`Feed cards snapshots > person card matches snapshot (light/en) 1`] = `
         alt="User"
         src="https://i.pravatar.cc/100?img=1"
       />
-      <span>
-        User
-      </span>
+      <div
+        class="_headerContent_9f5b00"
+      >
+        <div
+          class="_headerTop_9f5b00"
+        >
+          <span
+            class="_userName_9f5b00"
+          >
+            User
+          </span>
+          <span
+            class="_time_9f5b00"
+          >
+            now
+          </span>
+        </div>
+      </div>
     </header>
     <img
       alt="Carlos"
@@ -868,9 +988,24 @@ exports[`Feed cards snapshots > review card matches snapshot (dark/es) 1`] = `
         alt="User"
         src="https://i.pravatar.cc/100?img=1"
       />
-      <span>
-        User
-      </span>
+      <div
+        class="_headerContent_9f5b00"
+      >
+        <div
+          class="_headerTop_9f5b00"
+        >
+          <span
+            class="_userName_9f5b00"
+          >
+            User
+          </span>
+          <span
+            class="_time_9f5b00"
+          >
+            now
+          </span>
+        </div>
+      </div>
     </header>
     <img
       alt="Dune"
@@ -975,9 +1110,24 @@ exports[`Feed cards snapshots > review card matches snapshot (light/en) 1`] = `
         alt="User"
         src="https://i.pravatar.cc/100?img=1"
       />
-      <span>
-        User
-      </span>
+      <div
+        class="_headerContent_9f5b00"
+      >
+        <div
+          class="_headerTop_9f5b00"
+        >
+          <span
+            class="_userName_9f5b00"
+          >
+            User
+          </span>
+          <span
+            class="_time_9f5b00"
+          >
+            now
+          </span>
+        </div>
+      </div>
     </header>
     <img
       alt="Dune"
@@ -1082,9 +1232,24 @@ exports[`Feed cards snapshots > sale card matches snapshot (dark/es) 1`] = `
         alt="User"
         src="https://i.pravatar.cc/100?img=1"
       />
-      <span>
-        User
-      </span>
+      <div
+        class="_headerContent_9f5b00"
+      >
+        <div
+          class="_headerTop_9f5b00"
+        >
+          <span
+            class="_userName_9f5b00"
+          >
+            User
+          </span>
+          <span
+            class="_time_9f5b00"
+          >
+            now
+          </span>
+        </div>
+      </div>
     </header>
     <img
       alt="Foundation"
@@ -1189,9 +1354,24 @@ exports[`Feed cards snapshots > sale card matches snapshot (light/en) 1`] = `
         alt="User"
         src="https://i.pravatar.cc/100?img=1"
       />
-      <span>
-        User
-      </span>
+      <div
+        class="_headerContent_9f5b00"
+      >
+        <div
+          class="_headerTop_9f5b00"
+        >
+          <span
+            class="_userName_9f5b00"
+          >
+            User
+          </span>
+          <span
+            class="_time_9f5b00"
+          >
+            now
+          </span>
+        </div>
+      </div>
     </header>
     <img
       alt="Foundation"
@@ -1296,9 +1476,24 @@ exports[`Feed cards snapshots > seeking card matches snapshot (dark/es) 1`] = `
         alt="User"
         src="https://i.pravatar.cc/100?img=1"
       />
-      <span>
-        User
-      </span>
+      <div
+        class="_headerContent_9f5b00"
+      >
+        <div
+          class="_headerTop_9f5b00"
+        >
+          <span
+            class="_userName_9f5b00"
+          >
+            User
+          </span>
+          <span
+            class="_time_9f5b00"
+          >
+            now
+          </span>
+        </div>
+      </div>
     </header>
     <img
       alt="Sapiens"
@@ -1398,9 +1593,24 @@ exports[`Feed cards snapshots > seeking card matches snapshot (light/en) 1`] = `
         alt="User"
         src="https://i.pravatar.cc/100?img=1"
       />
-      <span>
-        User
-      </span>
+      <div
+        class="_headerContent_9f5b00"
+      >
+        <div
+          class="_headerTop_9f5b00"
+        >
+          <span
+            class="_userName_9f5b00"
+          >
+            User
+          </span>
+          <span
+            class="_time_9f5b00"
+          >
+            now
+          </span>
+        </div>
+      </div>
     </header>
     <img
       alt="Sapiens"
@@ -1500,9 +1710,24 @@ exports[`Feed cards snapshots > swap card matches snapshot (dark/es) 1`] = `
         alt="User"
         src="https://i.pravatar.cc/100?img=1"
       />
-      <span>
-        User
-      </span>
+      <div
+        class="_headerContent_9f5b00"
+      >
+        <div
+          class="_headerTop_9f5b00"
+        >
+          <span
+            class="_userName_9f5b00"
+          >
+            User
+          </span>
+          <span
+            class="_time_9f5b00"
+          >
+            now
+          </span>
+        </div>
+      </div>
     </header>
     <div
       class="_swapImages_9f5b00"
@@ -1635,9 +1860,24 @@ exports[`Feed cards snapshots > swap card matches snapshot (light/en) 1`] = `
         alt="User"
         src="https://i.pravatar.cc/100?img=1"
       />
-      <span>
-        User
-      </span>
+      <div
+        class="_headerContent_9f5b00"
+      >
+        <div
+          class="_headerTop_9f5b00"
+        >
+          <span
+            class="_userName_9f5b00"
+          >
+            User
+          </span>
+          <span
+            class="_time_9f5b00"
+          >
+            now
+          </span>
+        </div>
+      </div>
     </header>
     <div
       class="_swapImages_9f5b00"

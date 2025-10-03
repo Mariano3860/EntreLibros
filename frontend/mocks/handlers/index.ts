@@ -9,6 +9,10 @@ import { userBooksHandler } from './books/userBooks.handler'
 import { activityHandler } from './community/activity.handler'
 import { communityStatsHandler } from './community/communityStats.handler'
 import { communityFeedHandler } from './community/feed.handler'
+import {
+  cornersMapHandler,
+  nearbyCornersHandler,
+} from './community/corners.handler'
 import { suggestionsHandler } from './community/suggestions.handler'
 import { contactFormHandler } from './contactForm/contactForm.handler'
 import { userLanguageHandler } from './language/language.handler'
@@ -27,6 +31,8 @@ export const handlers = [
   userLanguageHandler,
   communityStatsHandler,
   communityFeedHandler,
+  nearbyCornersHandler,
+  cornersMapHandler,
   activityHandler,
   suggestionsHandler,
 ]

@@ -1,0 +1,133 @@
+@import '@styles/variables';
+
+.card {
+  background: var(--background-card);
+  border: 1px solid rgb(0 0 0 / 6%);
+  border-radius: rem(16px);
+  padding: $spacing-2;
+  box-shadow: $box-shadow-sm;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+.title {
+  margin: 0;
+  font-size: $h6-font-size;
+  font-weight: $font-weight-medium;
+}
+
+.description {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: $small-font-size;
+}
+
+.mapWrapper {
+  position: relative;
+}
+
+.map {
+  position: relative;
+  border-radius: rem(14px);
+  background: linear-gradient(
+    135deg,
+    var(--color-neutral-100),
+    rgb(255 255 255)
+  );
+  overflow: hidden;
+  border: 1px solid rgb(0 0 0 / 4%);
+  height: rem(220px);
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader {
+  width: rem(28px);
+  height: rem(28px);
+  border-radius: 50%;
+  border: 3px solid rgb(var(--primary-rgb), 0.16);
+  border-top-color: var(--primary-color);
+  animation: spin 1s linear infinite;
+}
+
+.mapActions {
+  position: absolute;
+  top: $spacing-2;
+  right: $spacing-2;
+  display: flex;
+  gap: $spacing-1x5;
+  z-index: 1;
+}
+
+.iconButton {
+  width: rem(30px);
+  height: rem(30px);
+  border-radius: 50%;
+  border: 1px solid rgb(0 0 0 / 10%);
+  background: rgb(255 255 255 / 92%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background $transition-duration-fast $transition-timing-function,
+    transform $transition-duration-fast $transition-timing-function;
+
+  &:hover,
+  &:focus-visible {
+    background: #fff;
+    transform: translateY(rem(-1px));
+    outline: none;
+  }
+}
+
+.pin {
+  position: absolute;
+  width: rem(12px);
+  height: rem(12px);
+  background: var(--primary-color);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 20%);
+}
+
+.pinQuiet {
+  background: var(--color-neutral-400);
+}
+
+.status {
+  color: var(--text-secondary);
+  font-size: $small-font-size;
+}
+
+.footer {
+  margin: 0;
+  font-size: $small-font-size;
+  color: var(--text-secondary);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: $breakpoint-tablet) {
+  .card {
+    padding: $spacing-2x5;
+  }
+
+  .map {
+    height: rem(180px);
+  }
+}
