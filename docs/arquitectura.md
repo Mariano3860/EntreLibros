@@ -77,7 +77,17 @@ En la subred privada corre una EC2 con Docker que orquesta tres contenedores:
 Este recorte entre borde, cómputo y datos mantiene superficies limpias y reglas simples de circulación:
 - Nada de servicios de negocio de cara a Internet fuera de nginx.
 - Puertos internos mínimos y explícitos.
-## Flujo de despliegue
+
+**Flujo de operación:**
+- El cliente entra por IGW → nginx (443).
+- Nginx valida y reenvía la solicitud al backend (8000, privado).
+- La API procesa operaciones transaccionales y geoespaciales contra Postgres (5432).
+- Cuando hay intercambio de archivos, la API solicita a S3 una URL prefirmada con vencimiento y restricciones de método/tipo de contenido.
+- El navegador usa esa URL para subir/bajar directamente al bucket, mientras la API guarda solo los metadatos necesarios.
+
+La subred privada no es alcanzable desde Internet; el mantenimiento se realiza por túneles (p.ej., SSM Session Manager), sin abrir 8000 ni 5432 al exterior.
+
+El esquema aplica menor privilegio (único servicio público: nginx), reduce acoples entre camino transaccional y manejo de binarios, y queda listo para escalar horizontalmente (réplicas del backend detrás del mismo proxy y/o externalización definitiva de estáticos vía S3/CloudFront) sin tocar el modelo de seguridad ni la semántica de puertos.
 
 1. **Entrada del cliente:** El cliente accede a través del Internet Gateway (IGW) y llega al servidor nginx expuesto en el puerto 443 (HTTPS).
 2. **Ruteo y validación:** nginx valida la solicitud y la reenvía al backend ubicado en la subred privada, comunicándose por el puerto 8000.
