@@ -3,19 +3,18 @@
 .wrapper {
   width: 100%;
   max-width: 100vw;
-  padding: $spacing-4;
   padding-top: 0;
   padding-left: 0;
   box-sizing: border-box;
   overflow-x: hidden;
   display: flex;
   justify-content: center;
-  gap: $spacing-6;
+  gap: $spacing-5;
 }
 
 .main {
   width: 100%;
-  max-width: 70vw;
+  max-width: 65vw;
 }
 
 .header {

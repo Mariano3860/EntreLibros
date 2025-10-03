@@ -5,6 +5,14 @@ import { useNearbyCorners } from '@src/hooks/api/useNearbyCorners'
 
 import styles from './CornersStrip.module.scss'
 
+// Extracts the first number found in the label to show in the compact badge.
+// Returns null when no number is present so the badge is not rendered.
+const extractBadgeNumber = (label?: string | null): string | null => {
+  if (!label) return null
+  const match = label.match(/\d+/)
+  return match ? match[0] : null
+}
+
 export const CornersStrip = () => {
   const { t, i18n } = useTranslation()
   const { data, isLoading, isError } = useNearbyCorners()
@@ -49,37 +57,55 @@ export const CornersStrip = () => {
 
     return (
       <div className={styles.cards}>
-        {cornersList.map((corner) => (
-          <article key={corner.id} className={styles.card}>
-            <figure className={styles.figure}>
-              <img
-                src={corner.imageUrl}
-                alt={corner.name}
-                className={styles.avatar}
-                loading="lazy"
-                decoding="async"
-                width={60}
-                height={60}
-                onError={(event) => {
-                  event.currentTarget.onerror = null
-                  event.currentTarget.src =
-                    'https://picsum.photos/seed/corner-fallback/160/160'
-                }}
-              />
-            </figure>
-            <div className={styles.meta}>
-              <strong className={styles.name}>{corner.name}</strong>
-              <span className={styles.distance}>
-                {t('community.feed.corners.distance', {
-                  distance: formatter.format(corner.distanceKm),
-                })}
-              </span>
-            </div>
-            {corner.activityLabel && (
-              <span className={styles.activity}>{corner.activityLabel}</span>
-            )}
-          </article>
-        ))}
+        {cornersList.map((corner) => {
+          const badgeNumber = extractBadgeNumber(corner.activityLabel)
+
+          return (
+            <article key={corner.id} className={styles.card}>
+              <figure className={styles.figure}>
+                {/* Wrap avatar to anchor the badge to the same 1:1 box */}
+                <div className={styles.avatarWrap}>
+                  <img
+                    src={corner.imageUrl}
+                    alt={corner.name}
+                    className={styles.avatar}
+                    loading="lazy"
+                    decoding="async"
+                    width={100}
+                    height={100}
+                    onError={(event) => {
+                      // Fallback image without infinite loop
+                      event.currentTarget.onerror = null
+                      event.currentTarget.src =
+                        'https://picsum.photos/seed/corner-fallback/160/160'
+                    }}
+                  />
+                  {/* Compact badge: only the number, full text in title/aria-label */}
+                  {badgeNumber && (
+                    <span
+                      className={styles.activity}
+                      title={corner.activityLabel ?? undefined} // fallback nativo
+                      data-title={corner.activityLabel ?? undefined} // tooltip CSS
+                      aria-label={corner.activityLabel ?? undefined} // accesible
+                      tabIndex={0} // permite focus con teclado/touch
+                    >
+                      {badgeNumber}
+                    </span>
+                  )}
+                </div>
+              </figure>
+
+              <div className={styles.meta}>
+                <strong className={styles.name}>{corner.name}</strong>
+                <span className={styles.distance}>
+                  {t('community.feed.corners.distance', {
+                    distance: formatter.format(corner.distanceKm),
+                  })}
+                </span>
+              </div>
+            </article>
+          )
+        })}
       </div>
     )
   }, [data, formatter, isError, isLoading, t])
