@@ -68,8 +68,8 @@
   gap: $spacing-1x5;
   scroll-snap-align: start;
   transition:
-          box-shadow $transition-duration-fast $transition-timing-function,
-          transform $transition-duration-fast $transition-timing-function;
+    box-shadow $transition-duration-fast $transition-timing-function,
+    transform $transition-duration-fast $transition-timing-function;
 
   &:hover,
   &:focus-within {
@@ -121,6 +121,7 @@
   margin: 0;
   color: var(--text-primary);
   line-height: 1.2;
+
   /* keep card heights consistent with long names */
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -147,7 +148,6 @@
   right: rem(-6px);
   bottom: rem(-4px);
   z-index: 2;
-
   min-width: rem(22px);
   height: rem(22px);
   padding: 0 $spacing-1;
@@ -156,17 +156,14 @@
   align-items: center;
   justify-content: center;
   gap: rem(4px); /* space for the icon */
-
   font-size: rem(13px);
   line-height: 1;
   font-weight: $font-weight-medium;
-
   color: var(--primary-light);
   background: rgb(var(--primary-super-dark) / 50%);
   background: color-mix(in srgb, var(--primary-super-dark) 50%, transparent);
   box-shadow: 0 2px 8px rgb(var(--shadow-md) / 25%);
   backdrop-filter: blur(5px);
-
   pointer-events: auto; /* needed to receive focus/hover for tooltip */
   white-space: nowrap;
   outline: none;
@@ -174,7 +171,7 @@
 
 /* Small semantic icon: left-right arrows */
 .activity::before {
-  content: "⇄"; /* swap/exchange icon */
+  content: '⇄'; /* swap/exchange icon */
   font-size: rem(12px);
   opacity: 0.9;
 }
@@ -194,8 +191,9 @@
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
-  transition: opacity $transition-duration-fast $transition-timing-function,
-  transform $transition-duration-fast $transition-timing-function;
+  transition:
+    opacity $transition-duration-fast $transition-timing-function,
+    transform $transition-duration-fast $transition-timing-function;
 }
 
 /* Show tooltip on hover/focus (desktop + keyboard) */
@@ -208,7 +206,9 @@
 }
 
 /* If empty, don't render any box at all */
-.activity:empty { display: none; }
+.activity:empty {
+  display: none;
+}
 
 /* ====== Status & Skeleton ====== */
 .status {
@@ -227,18 +227,22 @@
     position: absolute;
     inset: 0;
     background: linear-gradient(
-                    90deg,
-                    rgb(255 255 255 / 0%) 0%,
-                    rgb(255 255 255 / 50%) 50%,
-                    rgb(255 255 255 / 0%) 100%
+      90deg,
+      rgb(255 255 255 / 0%) 0%,
+      rgb(255 255 255 / 50%) 50%,
+      rgb(255 255 255 / 0%) 100%
     );
     animation: shimmer 1.4s infinite;
   }
 }
 
 @keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 /* ====== Breakpoints ====== */
