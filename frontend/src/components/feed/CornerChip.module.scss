@@ -1,0 +1,31 @@
+@import '@styles/variables';
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-1;
+  padding: $spacing-1 $spacing-2;
+  border-radius: rem(999px);
+  border: none;
+  background: rgb(var(--primary-rgb), 0.12);
+  color: var(--primary-dark);
+  font-size: $small-font-size;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition:
+    background $transition-duration-fast $transition-timing-function,
+    color $transition-duration-fast $transition-timing-function,
+    box-shadow $transition-duration-fast $transition-timing-function;
+
+  span:first-child {
+    font-size: 0.9rem;
+  }
+
+  &:hover,
+  &:focus-visible {
+    background: rgb(var(--primary-rgb), 0.18);
+    color: var(--primary-dark);
+    outline: none;
+    box-shadow: 0 0 0 2px rgb(var(--primary-rgb), 0.2);
+  }
+}

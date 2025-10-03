@@ -110,8 +110,9 @@ Feature 4.1 Mapa y listados
 
 - [~] S-4.1 Geolocalización de usuario (base) (Must, E1; soporte de BR-30)
   - Éxito: detección de zona para ordenar por cercanía.
-- [ ] S-4.2 Mapa de RdL + listado ordenado por cercanía/afinidad (Must, E1; BR-30)
+- [~] S-4.2 Mapa de RdL + listado ordenado por cercanía/afinidad (Must, E1; BR-30)
   - Éxito: resultados consistentes entre lista y mapa.
+  - Actualización 2025-10-09: se integró en Community la tira de Rincones cercanos, un mini-mapa en la barra lateral y la vinculación de publicaciones/flujo de publicación con Rincones (chips y selector), quedando pendiente la conexión con datos en tiempo real y filtros avanzados.
 
 Feature 4.2 Descubrimiento avanzado
 

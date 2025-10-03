@@ -23,6 +23,33 @@
   border-radius: 50%;
 }
 
+.headerContent {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1x5;
+}
+
+.headerTop {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-1x5;
+  align-items: baseline;
+}
+
+.userName {
+  font-weight: $font-weight-medium;
+}
+
+.time {
+  font-size: $small-font-size;
+  color: var(--text-secondary);
+}
+
+.cornerChip {
+  margin-top: $spacing-1x5;
+  align-self: flex-start;
+}
+
 .image {
   width: 100%;
   height: auto;

@@ -35,6 +35,7 @@ export type PublishBookPayload = {
       shippingPayer?: 'owner' | 'requester' | 'split'
     }
   }
+  cornerId?: string | null
   draft?: boolean
 }
 
@@ -46,4 +47,5 @@ export type PublishBookResponse = ApiUserBook & {
   isbn?: string
   availability?: 'public' | 'private'
   delivery?: PublishBookPayload['offer']['delivery']
+  cornerId?: string | null
 }

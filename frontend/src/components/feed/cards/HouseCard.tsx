@@ -6,6 +6,7 @@ import { FeedActions } from '../FeedActions'
 import type { HouseItem } from '../FeedItem.types'
 
 import styles from './FeedCard.module.scss'
+import { FeedCardHeader } from './FeedCardHeader'
 
 interface Props {
   item: HouseItem
@@ -22,10 +23,7 @@ export const HouseCard = ({ item }: Props) => {
 
   return (
     <article className={styles.card}>
-      <header className={styles.header}>
-        <img src={item.avatar} alt={item.user} />
-        <span>{item.user}</span>
-      </header>
+      <FeedCardHeader item={item} />
       <img src={image} alt={item.name} className={styles.image} />
       <FeedActions initialLikes={item.likes} />
       <div className={styles.content}>

@@ -411,6 +411,11 @@
   color: var(--neutral-500, #596070);
 }
 
+.helperText {
+  font-size: 0.85rem;
+  color: var(--neutral-500, #596070);
+}
+
 .loadingRow {
   display: flex;
   gap: 8px;

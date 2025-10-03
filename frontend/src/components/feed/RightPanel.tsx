@@ -1,3 +1,4 @@
+import { CornersMiniMap } from '@components/community/corners/CornersMiniMap'
 import { useTranslation } from 'react-i18next'
 
 import { useSuggestions } from '@src/hooks/api/useSuggestions'
@@ -11,15 +12,23 @@ export const RightPanel = () => {
 
   return (
     <aside className={styles.panel}>
-      <h2>{t('community.feed.suggestions')}</h2>
-      <ul>
-        {suggestions.map((s) => (
-          <li key={s.id}>
-            <img src={s.avatar} alt={s.user} />
-            <span>{s.user}</span>
-          </li>
-        ))}
-      </ul>
+      <CornersMiniMap />
+      <section
+        className={styles.card}
+        aria-labelledby="community-suggestions-title"
+      >
+        <h2 id="community-suggestions-title">
+          {t('community.feed.suggestions')}
+        </h2>
+        <ul>
+          {suggestions.map((s) => (
+            <li key={s.id}>
+              <img src={s.avatar} alt={s.user} />
+              <span>{s.user}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
     </aside>
   )
 }
