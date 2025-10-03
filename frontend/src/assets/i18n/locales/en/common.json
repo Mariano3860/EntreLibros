@@ -426,5 +426,99 @@
         }
       }
     }
+  },
+  "map": {
+    "search": {
+      "placeholder": "Search by neighborhood, corner, title or ISBN",
+      "zoneFallback": "Select a neighborhood or city"
+    },
+    "filters": {
+      "ariaLabel": "Map filters",
+      "distance": "Distance",
+      "distanceValue": "Within {{value}} km",
+      "withinKm": "Within {{count}} km",
+      "types": {
+        "label": "Layers",
+        "corners": "Book corners",
+        "publications": "Nearby publications"
+      },
+      "activity": "Activity heatmap",
+      "themes": "Themes",
+      "more": "More options",
+      "openNow": "Open now",
+      "recentActivity": "Recent activity",
+      "hide": "Hide filters",
+      "show": "Show filters",
+      "locateMe": "Center on my location"
+    },
+    "status": {
+      "ready": "Updated",
+      "updating": "Updating...",
+      "loading": "Loading map...",
+      "error": "We couldn't load the map. Try again.",
+      "locationDenied": "Location permission denied"
+    },
+    "badge": {
+      "live": "Live",
+      "privacy": "Privacy protected"
+    },
+    "drawer": {
+      "placeholderTitle": "Select a pin to see the details",
+      "close": "Close detail",
+      "tabs": {
+        "corner": "Corner",
+        "publications": "Publications",
+        "activity": "Activity"
+      },
+      "empty": "Choose a corner or publication to see more."
+    },
+    "detail": {
+      "corner": {
+        "noInventoryNote": "EntreLibros does not display inventories. Coordinate directly with the host via messages.",
+        "location": "Neighborhood / City",
+        "locationUnknown": "Location not available",
+        "referencePoint": "Reference point",
+        "rules": "House rules"
+      }
+    },
+    "cta": {
+      "createCorner": "Create corner",
+      "proposeMeeting": "Propose meetup",
+      "sendMessage": "Send message",
+      "openReference": "Open reference"
+    },
+    "empty": {
+      "title": "No activity in this area yet",
+      "description": "Try adjusting the filters or explore nearby neighborhoods to discover active book corners.",
+      "cta": {
+        "createCorner": "Create corner"
+      }
+    },
+    "activity": {
+      "legend": "Activity in the last 30 days",
+      "empty": "No signals in the selected period.",
+      "summary": "{{count}} recent interactions"
+    },
+    "publications": {
+      "empty": "No nearby publications yet.",
+      "distance": "{{count}} km away",
+      "types": {
+        "offer": "Offer",
+        "want": "Wants",
+        "donation": "Donation",
+        "sale": "For sale"
+      }
+    },
+    "cluster": {
+      "more": "Show {{count}} pins",
+      "collapse": "Collapse cluster"
+    },
+    "modal": {
+      "cornerLabel": "Choose a nearby corner",
+      "dateLabel": "Date",
+      "timeLabel": "Time",
+      "cancel": "Cancel",
+      "confirm": "Confirm"
+    }
   }
 }

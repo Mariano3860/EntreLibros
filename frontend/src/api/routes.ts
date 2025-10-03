@@ -28,4 +28,7 @@ export const RELATIVE_API_ROUTES = {
   LANGUAGE: {
     UPDATE: `/user/language`,
   },
+  MAP: {
+    ROOT: `/map`,
+  },
 }

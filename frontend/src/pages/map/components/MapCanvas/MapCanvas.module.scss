@@ -1,0 +1,148 @@
+@import '@styles/variables';
+
+.canvas {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - $spacing-6 * 2);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--primary-color) 4%, var(--background-card)),
+    var(--background-card)
+  );
+  border-radius: rem(24px);
+  overflow: hidden;
+  box-shadow: $box-shadow-lg;
+
+  @media (max-width: $breakpoint-mobile) {
+    height: 60vh;
+  }
+}
+
+.grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--border-color) 24%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      0deg,
+      color-mix(in srgb, var(--border-color) 24%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 80px 80px;
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+.layer {
+  position: absolute;
+  inset: 0;
+}
+
+.heatCell {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--color-warning) 55%, transparent) 0%,
+    color-mix(in srgb, var(--color-error) 45%, transparent) 70%,
+    transparent 100%
+  );
+  filter: blur(16px);
+  opacity: 0.6;
+}
+
+.pinBase {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-1;
+  cursor: pointer;
+  transition: transform $transition-duration-fast;
+
+  &:focus-visible,
+  &:hover {
+    transform: translate(-50%, -110%);
+  }
+}
+
+.pinIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  box-shadow: $box-shadow-md;
+}
+
+.pinCorner {
+  background: var(--primary-color);
+  color: var(--background-primary);
+}
+
+.pinPublication {
+  background: var(--background-primary);
+  color: var(--primary-dark);
+  border: 2px solid var(--primary-color);
+}
+
+.pinSelected {
+  transform: translate(-50%, -120%);
+}
+
+.clusterPin {
+  background: var(--color-info);
+  color: var(--background-primary);
+  min-width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  font-weight: $font-weight-bold;
+  display: grid;
+  place-items: center;
+}
+
+.halo {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--primary-color) 25%, transparent);
+  filter: blur(12px);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translate(-50%, -$spacing-2);
+  background: var(--background-primary);
+  color: var(--text-primary);
+  padding: $spacing-2 $spacing-3;
+  border-radius: rem(12px);
+  box-shadow: $box-shadow-md;
+  white-space: nowrap;
+  font-size: $small-font-size;
+  border: 1px solid var(--border-color);
+}
+
+.emptyOverlay,
+.loadingOverlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--background-card) 75%, transparent 25%);
+}
+
+.clusterExpansion {
+  pointer-events: none;
+}

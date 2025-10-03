@@ -1,0 +1,29 @@
+import type { ReactNode } from 'react'
+
+import styles from './Badge.module.scss'
+
+type BadgeTone = 'success' | 'warning' | 'error' | 'info' | 'neutral'
+
+type BadgeProps = {
+  label: string
+  tone?: BadgeTone
+  icon?: ReactNode
+  className?: string
+}
+
+export const Badge = ({
+  label,
+  tone = 'neutral',
+  icon,
+  className,
+}: BadgeProps) => {
+  const toneClass = styles[tone]
+  const classes = [styles.badge, toneClass, className].filter(Boolean).join(' ')
+
+  return (
+    <span className={classes} aria-label={label} role="status">
+      {icon}
+      {label}
+    </span>
+  )
+}

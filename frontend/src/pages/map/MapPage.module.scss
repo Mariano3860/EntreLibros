@@ -1,0 +1,114 @@
+@import '@styles/variables';
+
+.mapPage {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--background-primary);
+  color: var(--text-primary);
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  gap: $spacing-4;
+  padding: 0 $spacing-4 $spacing-4;
+  min-height: 0;
+
+  @media (max-width: $breakpoint-tablet) {
+    gap: $spacing-2;
+    padding: 0 $spacing-3 $spacing-3;
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    flex-direction: column;
+    gap: $spacing-2;
+    padding: 0 $spacing-2 $spacing-2;
+  }
+}
+
+.railWrapper {
+  width: 296px;
+  flex-shrink: 0;
+  transition: transform $transition-duration-fast;
+
+  @media (max-width: $breakpoint-tablet) {
+    position: relative;
+    width: auto;
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    display: contents;
+  }
+}
+
+.railHidden {
+  @media (max-width: $breakpoint-tablet) {
+    transform: translateX(-110%);
+    position: absolute;
+    inset: 0;
+  }
+}
+
+.mapArea {
+  flex: 1;
+  display: flex;
+  gap: $spacing-4;
+  min-height: 0;
+
+  @media (max-width: $breakpoint-tablet) {
+    gap: $spacing-2;
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    flex-direction: column;
+    gap: $spacing-2;
+  }
+}
+
+.mapCanvasWrapper {
+  flex: 1;
+  min-height: 0;
+}
+
+.drawerWrapper {
+  width: 380px;
+  flex-shrink: 0;
+  min-height: 0;
+
+  @media (max-width: $breakpoint-desktop) {
+    width: 340px;
+  }
+
+  @media (max-width: $breakpoint-tablet) {
+    position: fixed;
+    inset: auto $spacing-3 $spacing-3;
+    width: auto;
+    max-width: none;
+    pointer-events: none;
+    z-index: $z-index-modal;
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    inset: auto $spacing-2 $spacing-2;
+  }
+}
+
+.drawerWrapper > * {
+  pointer-events: auto;
+}
+
+.notifications {
+  position: fixed;
+  top: $spacing-4;
+  right: $spacing-4;
+  z-index: $z-index-toast;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+
+  @media (max-width: $breakpoint-mobile) {
+    right: $spacing-2;
+    left: $spacing-2;
+  }
+}
