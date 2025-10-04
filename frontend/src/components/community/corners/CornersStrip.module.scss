@@ -160,7 +160,7 @@
   line-height: 1;
   font-weight: $font-weight-medium;
   color: var(--primary-light);
-  background: rgb(var(--primary-super-dark), 0.5);
+  background: rgba(var(--primary-super-dark), 0.5);
   background: color-mix(in srgb, var(--primary-super-dark) 50%, transparent);
   box-shadow: 0 2px 8px rgb(var(--shadow-md) / 25%);
   backdrop-filter: blur(5px);
