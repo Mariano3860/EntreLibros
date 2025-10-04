@@ -3,17 +3,16 @@
 .header {
   display: flex;
   align-items: center;
-  gap: $spacing-3;
-  padding: $spacing-3 $spacing-4;
+  gap: $spacing-2;
+  padding: $spacing-1x5 $spacing-2;
   border-bottom: 1px solid var(--border-color);
   background: var(--background-primary);
-  min-height: $spacing-6 * 2;
 
   @media (max-width: $breakpoint-mobile) {
     flex-direction: column;
     align-items: stretch;
-    gap: $spacing-2;
-    padding: $spacing-2;
+    gap: $spacing-1;
+    padding: $spacing-1;
   }
 }
 
@@ -21,10 +20,9 @@
   flex: 1;
   display: flex;
   align-items: center;
-  gap: $spacing-2;
+  gap: $spacing-1;
   background: var(--background-card);
   border-radius: rem(999px);
-  padding: $spacing-1x5 $spacing-3;
   border: 1px solid var(--border-color);
   box-shadow: $box-shadow-sm;
 }
@@ -41,15 +39,19 @@
   }
 }
 
+.mapButton {
+  margin-right: $spacing-2;
+}
+
 .chips {
   display: flex;
   align-items: center;
-  gap: $spacing-2;
+  gap: $spacing-1x5;
   flex-wrap: wrap;
 }
 
 .chip {
-  padding: $spacing-1x5 $spacing-3;
+  padding: $spacing-1x5 $spacing-2;
   border-radius: rem(999px);
   border: 1px solid var(--border-color);
   background: var(--background-card);
@@ -57,6 +59,7 @@
   font-size: $small-font-size;
   font-weight: $font-weight-medium;
   transition: background $transition-duration-fast;
+  color: var(--text-primary);
 
   &:hover,
   &:focus-visible {
@@ -83,7 +86,7 @@
     display: inline-flex;
     align-items: center;
     gap: $spacing-1;
-    padding: $spacing-1x5 $spacing-3;
+    padding: $spacing-1x5 $spacing-2;
     border-radius: rem(999px);
     border: 1px solid var(--border-color);
     background: var(--background-card);

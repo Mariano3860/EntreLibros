@@ -3,7 +3,7 @@
 .canvas {
   position: relative;
   width: 100%;
-  height: calc(100vh - $spacing-3 * 4);
+  height: 80vh;
   border-radius: rem(16px);
   overflow: hidden;
   background: var(--background-card);

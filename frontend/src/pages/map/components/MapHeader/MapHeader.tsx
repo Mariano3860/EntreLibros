@@ -108,6 +108,7 @@ export const MapHeader = ({
           onChange={(event) => onSearchChange(event.target.value)}
         />
         <button
+          className={styles.mapButton}
           type="button"
           onClick={onLocateMe}
           aria-label={t('map.filters.locateMe') ?? ''}

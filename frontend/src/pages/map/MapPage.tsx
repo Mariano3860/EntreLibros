@@ -1,3 +1,5 @@
+import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
+import sharedStyles from '@styles/shared.module.scss'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -10,6 +12,7 @@ import type {
 } from '@src/api/map/map.types'
 import { useMapData } from '@src/hooks/api/useMapData'
 import { track } from '@src/utils/analytics'
+import { cx } from '@src/utils/cx'
 
 import { EmptyState } from './components/common/EmptyState'
 import { ErrorBanner } from './components/common/ErrorBanner'
@@ -221,99 +224,101 @@ export const MapPage = () => {
   }
 
   return (
-    <div className={styles.mapPage}>
-      <MapHeader
-        searchValue={searchInput}
-        onSearchChange={setSearchInput}
-        layers={layers}
-        onToggleLayer={handleToggleLayer}
-        openNow={filters.openNow}
-        onToggleOpenNow={handleToggleOpenNow}
-        recentActivity={filters.recentActivity}
-        onToggleRecentActivity={handleToggleRecentActivity}
-        onToggleRail={handleToggleRail}
-        railOpen={isFilterRailOpen}
-        isFetching={isFetching}
-        onLocateMe={handleLocateMe}
-        geolocationDenied={geolocationDenied}
-        zoneFallback={zoneFallback}
-        onZoneFallbackChange={handleZoneFallbackChange}
-      />
+    <BaseLayout id={'map-page'}>
+      <div className={styles.mapPage}>
+        <MapHeader
+          searchValue={searchInput}
+          onSearchChange={setSearchInput}
+          layers={layers}
+          onToggleLayer={handleToggleLayer}
+          openNow={filters.openNow}
+          onToggleOpenNow={handleToggleOpenNow}
+          recentActivity={filters.recentActivity}
+          onToggleRecentActivity={handleToggleRecentActivity}
+          onToggleRail={handleToggleRail}
+          railOpen={isFilterRailOpen}
+          isFetching={isFetching}
+          onLocateMe={handleLocateMe}
+          geolocationDenied={geolocationDenied}
+          zoneFallback={zoneFallback}
+          onZoneFallbackChange={handleZoneFallbackChange}
+        />
 
-      <div className={styles.content}>
-        <div
-          className={[
-            styles.railWrapper,
-            isFilterRailOpen ? '' : styles.railHidden,
-          ]
-            .filter(Boolean)
-            .join(' ')}
-        >
-          <FilterRail
-            distanceKm={filters.distanceKm}
-            onDistanceChange={handleDistanceChange}
-            layers={layers}
-            onToggleLayer={handleToggleLayer}
-            availableThemes={AVAILABLE_THEMES}
-            selectedThemes={filters.themes}
-            onToggleTheme={handleToggleTheme}
-            openNow={filters.openNow}
-            onToggleOpenNow={handleToggleOpenNow}
-            recentActivity={filters.recentActivity}
-            onToggleRecentActivity={handleToggleRecentActivity}
-          />
-        </div>
-
-        <div className={styles.mapArea}>
-          <div className={styles.mapCanvasWrapper}>
-            <MapCanvas
-              bbox={bbox}
-              corners={data?.corners ?? []}
-              publications={data?.publications ?? []}
-              activity={activityPoints}
+        <div className={cx(styles.content, sharedStyles.scrollbar)}>
+          <div
+            className={[
+              styles.railWrapper,
+              isFilterRailOpen ? '' : styles.railHidden,
+            ]
+              .filter(Boolean)
+              .join(' ')}
+          >
+            <FilterRail
+              distanceKm={filters.distanceKm}
+              onDistanceChange={handleDistanceChange}
               layers={layers}
-              selectedPin={selectedPin}
-              onSelectPin={handleSelectPin}
-              isLoading={isLoading}
-              isFetching={isFetching}
-              isEmpty={isEmpty}
+              onToggleLayer={handleToggleLayer}
+              availableThemes={AVAILABLE_THEMES}
+              selectedThemes={filters.themes}
+              onToggleTheme={handleToggleTheme}
+              openNow={filters.openNow}
+              onToggleOpenNow={handleToggleOpenNow}
+              recentActivity={filters.recentActivity}
+              onToggleRecentActivity={handleToggleRecentActivity}
             />
-            {isEmpty && !isLoading ? (
-              <EmptyState
-                title={t('map.empty.title')}
-                description={t('map.empty.description')}
-                actionLabel={t('map.empty.cta.createCorner')}
-                onAction={handleCreateCorner}
-              />
-            ) : null}
           </div>
 
-          <div
-            className={styles.detailPlaceholder}
-            data-testid="map-detail-placeholder"
-            aria-hidden="true"
-            data-has-selection={Boolean(selectedPin)}
-          />
+          <div className={styles.mapArea}>
+            <div className={styles.mapCanvasWrapper}>
+              <MapCanvas
+                bbox={bbox}
+                corners={data?.corners ?? []}
+                publications={data?.publications ?? []}
+                activity={activityPoints}
+                layers={layers}
+                selectedPin={selectedPin}
+                onSelectPin={handleSelectPin}
+                isLoading={isLoading}
+                isFetching={isFetching}
+                isEmpty={isEmpty}
+              />
+              {isEmpty && !isLoading ? (
+                <EmptyState
+                  title={t('map.empty.title')}
+                  description={t('map.empty.description')}
+                  actionLabel={t('map.empty.cta.createCorner')}
+                  onAction={handleCreateCorner}
+                />
+              ) : null}
+            </div>
+
+            <div
+              className={styles.detailPlaceholder}
+              data-testid="map-detail-placeholder"
+              aria-hidden="true"
+              data-has-selection={Boolean(selectedPin)}
+            />
+          </div>
+        </div>
+
+        <CreateCornerFab onClick={handleCreateCorner} />
+
+        <div className={styles.notifications}>
+          {isError ? (
+            <ErrorBanner
+              message={t('map.status.error')}
+              tone="error"
+              onDismiss={refetch}
+            />
+          ) : null}
+          {geolocationDenied ? (
+            <ErrorBanner
+              message={t('map.status.locationDenied')}
+              tone="warning"
+            />
+          ) : null}
         </div>
       </div>
-
-      <CreateCornerFab onClick={handleCreateCorner} />
-
-      <div className={styles.notifications}>
-        {isError ? (
-          <ErrorBanner
-            message={t('map.status.error')}
-            tone="error"
-            onDismiss={refetch}
-          />
-        ) : null}
-        {geolocationDenied ? (
-          <ErrorBanner
-            message={t('map.status.locationDenied')}
-            tone="warning"
-          />
-        ) : null}
-      </div>
-    </div>
+    </BaseLayout>
   )
 }

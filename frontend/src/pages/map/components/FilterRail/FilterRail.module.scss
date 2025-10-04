@@ -1,16 +1,13 @@
 @import '@styles/variables';
 
 .rail {
-  position: sticky;
-  top: $spacing-4;
   display: flex;
   flex-direction: column;
-  gap: $spacing-4;
+  gap: $spacing-3;
   background: var(--background-card);
-  padding: $spacing-4;
   border-radius: rem(20px);
   box-shadow: $box-shadow-md;
-  height: calc(100vh - $spacing-6 * 2);
+  height: 80vh;
   overflow-y: auto;
 
   @media (max-width: $breakpoint-tablet) {
@@ -20,7 +17,7 @@
   }
 
   @media (max-width: $breakpoint-mobile) {
-    padding: $spacing-3;
+    padding: $spacing-2;
   }
 }
 
@@ -28,6 +25,14 @@
   display: flex;
   flex-direction: column;
   gap: $spacing-2;
+  margin: 0 $spacing-3;
+
+    &:first-child {
+      margin-top: $spacing-3;
+    }
+    &:last-child {
+      margin-bottom: $spacing-3;
+    }
 }
 
 .sectionTitle {
@@ -41,7 +46,7 @@
   gap: $spacing-2;
 
   input[type='range'] {
-    width: 100%;
+    width: 70%;
   }
 }
 
@@ -61,15 +66,16 @@
 .themes {
   display: flex;
   flex-wrap: wrap;
-  gap: $spacing-2;
+  gap: $spacing-1;
 }
 
 .theme {
-  padding: $spacing-1x5 $spacing-3;
+  padding: $spacing-1 $spacing-2;
   border-radius: rem(999px);
   border: 1px solid var(--border-color);
   cursor: pointer;
-  background: var(--background-primary);
+  background: var(--background-card);
+  color: var(--text-primary);
 
   @media (pointer: fine) {
     &:hover {

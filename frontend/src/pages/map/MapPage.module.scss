@@ -3,7 +3,7 @@
 .mapPage {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: 95vh;
   background: var(--background-primary);
   color: var(--text-primary);
 }
@@ -12,8 +12,8 @@
   flex: 1;
   display: flex;
   gap: $spacing-2;
-  padding: 0 $spacing-2 $spacing-2;
   min-height: 0;
+  margin-top: $spacing-2;
 
   @media (max-width: $breakpoint-tablet) {
     gap: $spacing-1x5;
@@ -28,7 +28,7 @@
 }
 
 .railWrapper {
-  width: 296px;
+  width: rem(320px);
   flex-shrink: 0;
   transition: transform $transition-duration-fast;
 
@@ -55,6 +55,7 @@
   display: flex;
   gap: $spacing-2;
   min-height: 0;
+  height: 80vh;
 
   @media (max-width: $breakpoint-tablet) {
     gap: $spacing-1x5;
