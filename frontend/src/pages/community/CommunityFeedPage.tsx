@@ -8,9 +8,7 @@ import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { LogoEntreLibros } from '@components/logo/LogoEntreLibros'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
 
-import { HOME_URLS } from '@src/constants/constants'
 import { useCommunityFeed } from '@src/hooks/api/useCommunityFeed'
 
 import styles from './CommunityFeedPage.module.scss'
@@ -59,13 +57,6 @@ export const CommunityFeedPage = () => {
         <main className={styles.main}>
           <header className={styles.header}>
             <LogoEntreLibros />
-            <Link
-              to={`/${HOME_URLS.MAP}`}
-              className={styles.mapButton}
-              aria-label={t('community.feed.cta.viewMap')}
-            >
-              {t('community.feed.cta.viewMap')}
-            </Link>
             <button
               className={styles.publishButton}
               aria-label={t('community.feed.cta.publish')}

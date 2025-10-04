@@ -1,3 +1,4 @@
+import { cx } from '@utils/cx'
 import { useTranslation } from 'react-i18next'
 
 import type { MapLayerKey, MapLayerToggles } from '@src/api/map/map.types'
@@ -91,9 +92,7 @@ export const FilterRail = ({
         <div className={styles.themes}>
           {availableThemes.map((theme) => {
             const active = selectedThemes.includes(theme)
-            const className = [styles.theme, active ? styles.themeActive : '']
-              .filter(Boolean)
-              .join(' ')
+            const className = cx(styles.theme, active ? styles.themeActive : '')
             return (
               <button
                 key={theme}

@@ -1,3 +1,5 @@
+import { cx } from '@utils/cx'
+
 import styles from './ErrorBanner.module.scss'
 
 type ErrorBannerTone = 'error' | 'warning' | 'info'
@@ -14,7 +16,7 @@ export const ErrorBanner = ({
   onDismiss,
 }: ErrorBannerProps) => {
   const toneClass = styles[tone]
-  const classes = [styles.banner, toneClass].filter(Boolean).join(' ')
+  const classes = cx(styles.banner, toneClass)
 
   return (
     <div role="alert" className={classes}>

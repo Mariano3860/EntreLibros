@@ -29,6 +29,7 @@
   cursor: pointer;
   padding: $spacing-1;
   transition: color $transition-duration-fast $transition-timing-function;
+  text-decoration: none;
 
   &:hover,
   &:focus-visible {

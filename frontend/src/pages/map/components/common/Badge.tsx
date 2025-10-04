@@ -1,3 +1,4 @@
+import { cx } from '@utils/cx'
 import type { ReactNode } from 'react'
 
 import styles from './Badge.module.scss'
@@ -18,7 +19,7 @@ export const Badge = ({
   className,
 }: BadgeProps) => {
   const toneClass = styles[tone]
-  const classes = [styles.badge, toneClass, className].filter(Boolean).join(' ')
+  const classes = cx(styles.badge, toneClass, className)
 
   return (
     <span className={classes} aria-label={label} role="status">

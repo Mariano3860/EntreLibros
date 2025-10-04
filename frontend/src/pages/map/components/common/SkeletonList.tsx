@@ -1,3 +1,5 @@
+import { cx } from '@utils/cx'
+
 import styles from './SkeletonList.module.scss'
 
 type SkeletonListProps = {
@@ -6,7 +8,7 @@ type SkeletonListProps = {
 }
 
 export const SkeletonList = ({ count = 3, className }: SkeletonListProps) => {
-  const classes = [styles.list, className].filter(Boolean).join(' ')
+  const classes = cx(styles.list, className)
 
   return (
     <div className={classes} aria-hidden="true">

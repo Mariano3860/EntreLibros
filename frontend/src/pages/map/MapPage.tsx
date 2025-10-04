@@ -248,12 +248,10 @@ export const MapPage = () => {
 
         <div className={cx(styles.content, sharedStyles.scrollbar)}>
           <div
-            className={[
+            className={cx(
               styles.railWrapper,
-              isFilterRailOpen ? '' : styles.railHidden,
-            ]
-              .filter(Boolean)
-              .join(' ')}
+              isFilterRailOpen ? '' : styles.railHidden
+            )}
           >
             <FilterRail
               distanceKm={filters.distanceKm}
