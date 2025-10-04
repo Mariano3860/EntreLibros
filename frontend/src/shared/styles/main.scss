@@ -51,7 +51,7 @@ h6 {
   overflow: auto;
 
   /* Firefox */
-  scrollbar-color: var(--scrollbar-thumb, rgb(var(--scroll-bar-color), 0.50)) transparent;
+  scrollbar-color: var(--scrollbar-thumb, rgb(var(--scroll-bar-color), 0.40)) transparent;
 
   /* Chromium/WebKit */
   &::-webkit-scrollbar {
@@ -62,7 +62,7 @@ h6 {
     background: transparent;
   }
   &::-webkit-scrollbar-thumb {
-    background-color: var(rgba(var(--scroll-bar-color), 0.50));
+    background-color: var(rgba(var(--scroll-bar-color), 0.40));
     border-radius: 8px;
   }
 }
