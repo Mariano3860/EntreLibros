@@ -54,6 +54,8 @@ const DEFAULT_LAYERS: MapLayerToggles = {
 
 const DEBOUNCE_MS = 300
 
+const KM_PER_DEGREE = 111 // Approximate conversion factor
+
 export const MapPage = () => {
   const { t, i18n } = useTranslation()
   const [searchInput, setSearchInput] = useState('')
@@ -195,7 +197,7 @@ export const MapPage = () => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords
-        const delta = Math.max(filters.distanceKm / 111, 0.05)
+        const delta = Math.max(filters.distanceKm / KM_PER_DEGREE, 0.05)
         const nextBbox: MapBoundingBox = {
           north: latitude + delta,
           south: latitude - delta,
