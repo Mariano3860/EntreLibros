@@ -27,12 +27,13 @@
   gap: $spacing-2;
   margin: 0 $spacing-3;
 
-    &:first-child {
-      margin-top: $spacing-3;
-    }
-    &:last-child {
-      margin-bottom: $spacing-3;
-    }
+  &:first-child {
+    margin-top: $spacing-3;
+  }
+
+  &:last-child {
+    margin-bottom: $spacing-3;
+  }
 }
 
 .sectionTitle {
