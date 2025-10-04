@@ -116,7 +116,7 @@ Feature 4.1 Mapa y listados
 - [~] S-4.2 Mapa de RdL + listado ordenado por cercanía/afinidad (Must, E1; BR-30)
   - Éxito: resultados consistentes entre lista y mapa.
   - Actualización 2025-10-09: se integró en Community la tira de Rincones cercanos, un mini-mapa en la barra lateral y la vinculación de publicaciones/flujo de publicación con Rincones (chips y selector), quedando pendiente la conexión con datos en tiempo real y filtros avanzados.
-  - Actualización 2025-10-12: se desplegó la vista `/map` como hub territorial con rail de filtros, detalle responsive, heatmap y telemetría instrumentada sobre mocks MSW; resta conectar servicios reales y geocercas dinámicas.
+  - Actualización 2025-10-12: se desplegó la vista `/map` como hub territorial con rail de filtros y heatmap sobre mocks MSW; el panel de detalle queda como bloque placeholder hasta la próxima iteración mientras se termina de definir contenido y acciones. Resta conectar servicios reales y geocercas dinámicas.
 
 Feature 4.2 Descubrimiento avanzado
 

@@ -1,9 +1,11 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
+import { Badge } from '@src/pages/map/components/common/Badge'
 import { EmptyState } from '@src/pages/map/components/common/EmptyState'
 import { ErrorBanner } from '@src/pages/map/components/common/ErrorBanner'
 import { HeatLayerLegend } from '@src/pages/map/components/common/HeatLayerLegend'
+import { KeyValue } from '@src/pages/map/components/common/KeyValue'
 import { SkeletonList } from '@src/pages/map/components/common/SkeletonList'
 
 import { renderWithProviders } from '../../../../test-utils'
@@ -60,5 +62,22 @@ describe('Map common components', () => {
     renderWithProviders(<HeatLayerLegend label="map.activity.legend" />)
 
     expect(screen.getByText('map.activity.legend')).toBeInTheDocument()
+  })
+
+  test('renders badge with icon and tone styling', () => {
+    renderWithProviders(
+      <Badge label="map.badge.live" tone="success" icon={<span>!</span>} />
+    )
+
+    const badge = screen.getByRole('status', { name: 'map.badge.live' })
+    expect(badge).toHaveTextContent('map.badge.live')
+    expect(badge).toContainHTML('!')
+  })
+
+  test('renders key value pair', () => {
+    renderWithProviders(<KeyValue label="Barrio" value="Palermo" />)
+
+    expect(screen.getByText('Barrio')).toBeInTheDocument()
+    expect(screen.getByText('Palermo')).toBeInTheDocument()
   })
 })

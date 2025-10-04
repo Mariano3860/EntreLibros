@@ -13,16 +13,10 @@ import { track } from '@src/utils/analytics'
 
 import { EmptyState } from './components/common/EmptyState'
 import { ErrorBanner } from './components/common/ErrorBanner'
-import { SkeletonList } from './components/common/SkeletonList'
 import { CreateCornerFab } from './components/CreateCornerFab/CreateCornerFab'
-import {
-  DetailDrawer,
-  type DetailTab,
-} from './components/DetailDrawer/DetailDrawer'
 import { FilterRail } from './components/FilterRail/FilterRail'
 import { MapCanvas } from './components/MapCanvas/MapCanvas'
 import { MapHeader } from './components/MapHeader/MapHeader'
-import { ProposeMeetingModal } from './components/ProposeMeetingModal/ProposeMeetingModal'
 import styles from './MapPage.module.scss'
 
 const DEFAULT_BBOX: MapBoundingBox = {
@@ -65,10 +59,7 @@ export const MapPage = () => {
   const [layers, setLayers] = useState<MapLayerToggles>(DEFAULT_LAYERS)
   const [bbox, setBbox] = useState<MapBoundingBox>(DEFAULT_BBOX)
   const [selectedPin, setSelectedPin] = useState<MapPin | null>(null)
-  const [activeTab, setActiveTab] = useState<DetailTab>('corner')
-  const [isDrawerOpen, setDrawerOpen] = useState(false)
   const [isFilterRailOpen, setFilterRailOpen] = useState(true)
-  const [isMeetingOpen, setMeetingOpen] = useState(false)
   const [geolocationDenied, setGeolocationDenied] = useState(false)
   const [zoneFallback, setZoneFallback] = useState('')
 
@@ -132,23 +123,6 @@ export const MapPage = () => {
 
   const activityPoints = filters.recentActivity ? (data?.activity ?? []) : []
 
-  const selectedCorner = useMemo(() => {
-    if (!data || !selectedPin) return null
-    if (selectedPin.type === 'corner') return selectedPin.data
-    return (
-      data.corners.find((corner) => corner.id === selectedPin.data.cornerId) ??
-      null
-    )
-  }, [data, selectedPin])
-
-  const publicationsForCorner = useMemo(() => {
-    if (!data) return []
-    if (!selectedCorner) return data.publications
-    return data.publications.filter(
-      (publication) => publication.cornerId === selectedCorner.id
-    )
-  }, [data, selectedCorner])
-
   const handleToggleLayer = (layer: MapLayerKey) => {
     setLayers((prev) => {
       const next = { ...prev, [layer]: !prev[layer] }
@@ -202,43 +176,7 @@ export const MapPage = () => {
 
   const handleSelectPin = (pin: MapPin) => {
     setSelectedPin(pin)
-    setDrawerOpen(true)
-    setActiveTab(pin.type === 'corner' ? 'corner' : 'publications')
     track('pin.opened', { type: pin.type, id: pin.data.id })
-    track('drawer.opened', { type: pin.type })
-  }
-
-  const handleCloseDrawer = () => {
-    setDrawerOpen(false)
-    setSelectedPin(null)
-  }
-
-  const handleProposeMeeting = () => {
-    setMeetingOpen(true)
-    track('agreement.proposed_from_map', {
-      cornerId: selectedCorner?.id,
-    })
-  }
-
-  const handleMeetingSubmit = () => {
-    track('agreement.proposed_from_map_submitted', {
-      cornerId: selectedCorner?.id,
-    })
-    setMeetingOpen(false)
-  }
-
-  const handleStartChat = (context?: { publicationId?: string }) => {
-    track('chat.started_from_map', {
-      cornerId: selectedCorner?.id,
-      publicationId: context?.publicationId,
-    })
-  }
-
-  const handleOpenReference = () => {
-    track('map.filter_changed', {
-      filter: 'reference_opened',
-      value: selectedCorner?.id,
-    })
   }
 
   const handleCreateCorner = () => {
@@ -350,37 +288,16 @@ export const MapPage = () => {
             ) : null}
           </div>
 
-          <div className={styles.drawerWrapper}>
-            {isLoading ? (
-              <SkeletonList />
-            ) : (
-              <DetailDrawer
-                isOpen={isDrawerOpen && Boolean(selectedPin)}
-                selectedPin={selectedPin}
-                corner={selectedCorner}
-                publications={publicationsForCorner}
-                activity={activityPoints}
-                activeTab={activeTab}
-                onTabChange={setActiveTab}
-                onClose={handleCloseDrawer}
-                onProposeMeeting={handleProposeMeeting}
-                onStartChat={handleStartChat}
-                onOpenReference={handleOpenReference}
-              />
-            )}
-          </div>
+          <div
+            className={styles.detailPlaceholder}
+            data-testid="map-detail-placeholder"
+            aria-hidden="true"
+            data-has-selection={Boolean(selectedPin)}
+          />
         </div>
       </div>
 
       <CreateCornerFab onClick={handleCreateCorner} />
-
-      <ProposeMeetingModal
-        isOpen={isMeetingOpen}
-        onClose={() => setMeetingOpen(false)}
-        availableCorners={data?.corners ?? []}
-        defaultCornerId={selectedCorner?.id}
-        onSubmit={handleMeetingSubmit}
-      />
 
       <div className={styles.notifications}>
         {isError ? (

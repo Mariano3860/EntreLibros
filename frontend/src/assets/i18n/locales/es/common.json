@@ -31,6 +31,7 @@
     "home": "Inicio",
     "books": "Mis Libros",
     "community": "Comunidad",
+    "map": "Mapa",
     "messages": "Mensajes",
     "stats": "Estadísticas",
     "contact": "Contacto"
@@ -377,6 +378,7 @@
       "search": "Buscar en el feed",
       "cta": {
         "publish": "Publicar",
+        "viewMap": "Ver mapa",
         "propose_swap": "Proponer intercambio",
         "accept": "Aceptar",
         "buy": "Comprar",

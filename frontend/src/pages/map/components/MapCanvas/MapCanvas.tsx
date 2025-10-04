@@ -1,5 +1,12 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import {
+  CircleMarker,
+  MapContainer,
+  TileLayer,
+  Tooltip,
+  useMap,
+} from 'react-leaflet'
 
 import type {
   MapActivityPoint,
@@ -9,6 +16,8 @@ import type {
   MapPin,
   MapPublicationPin,
 } from '@src/api/map/map.types'
+
+import 'leaflet/dist/leaflet.css'
 
 import styles from './MapCanvas.module.scss'
 
@@ -25,142 +34,37 @@ type MapCanvasProps = {
   isEmpty: boolean
 }
 
-type PinNode = {
-  id: string
-  type: 'corner' | 'publication'
-  lat: number
-  lon: number
-  corner?: MapCornerPin
-  publication?: MapPublicationPin
-}
+const BoundsController = ({ bbox }: { bbox: MapBoundingBox }) => {
+  const map = useMap()
 
-type Cluster = {
-  id: string
-  lat: number
-  lon: number
-  members: PinNode[]
-}
+  useEffect(() => {
+    const southWest: [number, number] = [bbox.south, bbox.west]
+    const northEast: [number, number] = [bbox.north, bbox.east]
+    map.fitBounds([southWest, northEast], { padding: [16, 16] })
+  }, [map, bbox])
 
-type ProjectedPoint = {
-  x: number
-  y: number
-}
-
-const projectPoint = (
-  lat: number,
-  lon: number,
-  bbox: MapBoundingBox
-): ProjectedPoint => {
-  const clamp = (value: number, min: number, max: number) =>
-    Math.max(min, Math.min(value, max))
-
-  const eastWestRange = bbox.east - bbox.west || 1
-  const northSouthRange = bbox.north - bbox.south || 1
-  const x = ((lon - bbox.west) / eastWestRange) * 100
-  const y = (1 - (lat - bbox.south) / northSouthRange) * 100
-  return {
-    x: clamp(x, 2, 98),
-    y: clamp(y, 2, 98),
-  }
-}
-
-const euclideanDistance = (a: PinNode, b: PinNode) => {
-  const latDiff = a.lat - b.lat
-  const lonDiff = a.lon - b.lon
-  return Math.sqrt(latDiff * latDiff + lonDiff * lonDiff)
-}
-
-const buildClusters = (nodes: PinNode[]): Cluster[] => {
-  const clusters: Cluster[] = []
-  const radius = 0.02
-
-  nodes.forEach((node) => {
-    const cluster = clusters.find((candidate) => {
-      const centroid = { lat: candidate.lat, lon: candidate.lon } as PinNode
-      return euclideanDistance(node, centroid) < radius
-    })
-
-    if (cluster) {
-      cluster.members.push(node)
-    } else {
-      clusters.push({
-        id: `cluster-${node.id}`,
-        lat: node.lat,
-        lon: node.lon,
-        members: [node],
-      })
-    }
-  })
-
-  return clusters
-}
-
-const createPinNodes = (
-  corners: MapCornerPin[],
-  publications: MapPublicationPin[],
-  layers: MapLayerToggles
-): PinNode[] => {
-  const nodes: PinNode[] = []
-  const cornerIndex = new Map(corners.map((corner) => [corner.id, corner]))
-
-  if (layers.corners) {
-    nodes.push(
-      ...corners.map((corner) => ({
-        id: corner.id,
-        type: 'corner' as const,
-        lat: corner.lat,
-        lon: corner.lon,
-        corner,
-      }))
-    )
-  }
-
-  if (layers.publications) {
-    nodes.push(
-      ...publications.map((publication, index) => {
-        const corner = cornerIndex.get(publication.cornerId)
-        const baseLat = publication.lat ?? corner?.lat ?? 0
-        const baseLon = publication.lon ?? corner?.lon ?? 0
-        const offset = (index % 4) * 0.002
-        return {
-          id: `publication-${publication.id}`,
-          type: 'publication' as const,
-          lat: baseLat + offset,
-          lon: baseLon + offset,
-          publication,
-        }
-      })
-    )
-  }
-
-  return nodes
-}
-
-const buildPinFromNode = (node: PinNode): MapPin | null => {
-  if (node.type === 'corner' && node.corner) {
-    return { type: 'corner', data: node.corner }
-  }
-  if (node.type === 'publication' && node.publication) {
-    return { type: 'publication', data: node.publication }
-  }
   return null
 }
 
-type PinTooltipProps = {
-  title: string
-  subtitle: string
-  distance?: string
+const resolvePublicationPosition = (
+  publication: MapPublicationPin,
+  cornerLookup: Map<string, MapCornerPin>
+): [number, number] => {
+  const corner = cornerLookup.get(publication.cornerId)
+  const lat = publication.lat ?? corner?.lat ?? 0
+  const lon = publication.lon ?? corner?.lon ?? 0
+  return [lat, lon]
 }
 
-const PinTooltip = ({ title, subtitle, distance }: PinTooltipProps) => {
-  return (
-    <div className={styles.tooltip} role="tooltip">
-      <strong>{title}</strong>
-      <div>{subtitle}</div>
-      {distance ? <div>{distance}</div> : null}
-    </div>
-  )
-}
+const cornerToPin = (corner: MapCornerPin): MapPin => ({
+  type: 'corner',
+  data: corner,
+})
+
+const publicationToPin = (publication: MapPublicationPin): MapPin => ({
+  type: 'publication',
+  data: publication,
+})
 
 export const MapCanvas = ({
   bbox,
@@ -175,189 +79,151 @@ export const MapCanvas = ({
   isEmpty,
 }: MapCanvasProps) => {
   const { t } = useTranslation()
-  const [expandedClusterId, setExpandedClusterId] = useState<string | null>(
-    null
+
+  const center = useMemo(() => {
+    const lat = (bbox.north + bbox.south) / 2
+    const lon = (bbox.east + bbox.west) / 2
+    return [lat, lon] as [number, number]
+  }, [bbox])
+
+  const cornerLookup = useMemo(
+    () => new Map(corners.map((corner) => [corner.id, corner])),
+    [corners]
   )
-  const [hoveredPinId, setHoveredPinId] = useState<string | null>(null)
 
-  const nodes = useMemo(
-    () => createPinNodes(corners, publications, layers),
-    [corners, publications, layers]
-  )
+  const cornerPins = useMemo(() => {
+    if (!layers.corners) return []
+    return corners.map((corner) => {
+      const isSelected =
+        selectedPin?.type === 'corner' && selectedPin.data.id === corner.id
 
-  const clusters = useMemo(() => buildClusters(nodes), [nodes])
-
-  const singlePins = clusters.filter((cluster) => cluster.members.length === 1)
-  const multiPins = clusters.filter((cluster) => cluster.members.length > 1)
-
-  const handleClusterClick = (clusterId: string) => {
-    setExpandedClusterId((current) =>
-      current === clusterId ? null : clusterId
-    )
-  }
-
-  const renderPin = (node: PinNode) => {
-    const projected = projectPoint(node.lat, node.lon, bbox)
-    const mapPin = buildPinFromNode(node)
-    if (!mapPin) return null
-
-    const isSelected =
-      (selectedPin?.type === 'corner' &&
-        node.type === 'corner' &&
-        selectedPin.data.id === node.corner?.id) ||
-      (selectedPin?.type === 'publication' &&
-        node.type === 'publication' &&
-        selectedPin.data.id === node.publication?.id)
-
-    const tooltipTitle =
-      node.type === 'corner'
-        ? (node.corner?.name ?? '')
-        : (node.publication?.title ?? '')
-
-    const tooltipSubtitle =
-      node.type === 'corner'
-        ? `${node.corner?.barrio ?? ''}`
-        : `${node.publication?.authors?.[0] ?? ''}`
-
-    const tooltipDistance =
-      node.type === 'publication'
-        ? t('map.publications.distance', {
-            count: node.publication?.distanceKm ?? 0,
-          })
-        : undefined
-
-    const buttonClasses = [
-      styles.pinBase,
-      node.type === 'corner' ? styles.pinCorner : styles.pinPublication,
-      isSelected ? styles.pinSelected : '',
-    ]
-
-    return (
-      <button
-        key={node.id}
-        type="button"
-        className={buttonClasses.filter(Boolean).join(' ')}
-        style={{ left: `${projected.x}%`, top: `${projected.y}%` }}
-        onClick={() => onSelectPin(mapPin)}
-        onMouseEnter={() => setHoveredPinId(node.id)}
-        onMouseLeave={() =>
-          setHoveredPinId((current) => (current === node.id ? null : current))
-        }
-        onFocus={() => setHoveredPinId(node.id)}
-        onBlur={() =>
-          setHoveredPinId((current) => (current === node.id ? null : current))
-        }
-        aria-label={tooltipTitle}
-      >
-        <span
-          className={[
-            styles.pinIcon,
-            node.type === 'corner' ? styles.pinCorner : styles.pinPublication,
-          ]
-            .filter(Boolean)
-            .join(' ')}
+      return (
+        <CircleMarker
+          key={corner.id}
+          center={[corner.lat, corner.lon]}
+          radius={isSelected ? 12 : 8}
+          pathOptions={{
+            color: 'var(--primary-color)',
+            fillColor: 'var(--primary-color)',
+            fillOpacity: isSelected ? 0.9 : 0.7,
+            weight: isSelected ? 4 : 2,
+          }}
+          eventHandlers={{
+            click: () => onSelectPin(cornerToPin(corner)),
+          }}
+          className={styles.cornerMarker}
         >
-          {node.type === 'corner' ? '📚' : '📖'}
-        </span>
-        <span className={styles.halo} aria-hidden="true" />
-        {hoveredPinId === node.id ? (
-          <PinTooltip
-            title={tooltipTitle}
-            subtitle={tooltipSubtitle}
-            distance={tooltipDistance}
-          />
-        ) : null}
-      </button>
-    )
-  }
+          <Tooltip
+            direction="top"
+            offset={[0, -12]}
+            sticky
+            className={styles.tooltip}
+            permanent={isSelected}
+          >
+            <div className={styles.tooltipContent}>
+              <strong>{corner.name}</strong>
+              <span>{corner.barrio}</span>
+            </div>
+          </Tooltip>
+        </CircleMarker>
+      )
+    })
+  }, [corners, layers.corners, onSelectPin, selectedPin])
+
+  const publicationPins = useMemo(() => {
+    if (!layers.publications) return []
+    return publications.map((publication) => {
+      const [lat, lon] = resolvePublicationPosition(publication, cornerLookup)
+      const isSelected =
+        selectedPin?.type === 'publication' &&
+        selectedPin.data.id === publication.id
+
+      return (
+        <CircleMarker
+          key={publication.id}
+          center={[lat, lon]}
+          radius={isSelected ? 10 : 7}
+          pathOptions={{
+            color: 'var(--color-info)',
+            fillColor: 'var(--color-info)',
+            fillOpacity: isSelected ? 0.85 : 0.65,
+            weight: isSelected ? 4 : 2,
+          }}
+          eventHandlers={{
+            click: () => onSelectPin(publicationToPin(publication)),
+          }}
+          className={styles.publicationMarker}
+        >
+          <Tooltip
+            direction="top"
+            offset={[0, -10]}
+            sticky
+            className={styles.tooltip}
+            permanent={isSelected}
+          >
+            <div className={styles.tooltipContent}>
+              <strong>{publication.title}</strong>
+              <span>{publication.authors[0] ?? ''}</span>
+              <span className={styles.tooltipMeta}>
+                {t('map.publications.distance', {
+                  count: publication.distanceKm,
+                })}
+              </span>
+            </div>
+          </Tooltip>
+        </CircleMarker>
+      )
+    })
+  }, [
+    cornerLookup,
+    layers.publications,
+    onSelectPin,
+    publications,
+    selectedPin,
+    t,
+  ])
+
+  const activityMarkers = useMemo(() => {
+    if (!layers.activity) return []
+    return activity.map((point) => (
+      <CircleMarker
+        key={point.id}
+        center={[point.lat, point.lon]}
+        radius={Math.max(6, point.intensity * 3)}
+        pathOptions={{
+          color: 'var(--color-warning)',
+          fillColor: 'var(--color-warning)',
+          fillOpacity: 0.25,
+          weight: 0,
+        }}
+        className={styles.activityMarker}
+      />
+    ))
+  }, [activity, layers.activity])
 
   return (
-    <div className={styles.canvas} role="presentation">
-      <div className={styles.grid} aria-hidden="true" />
-      {layers.activity ? (
-        <div
-          className={styles.layer}
-          aria-hidden="true"
-          data-testid="heat-layer"
-        >
-          {activity.map((cell) => {
-            const projected = projectPoint(cell.lat, cell.lon, bbox)
-            return (
-              <span
-                key={cell.id}
-                className={styles.heatCell}
-                style={{ left: `${projected.x}%`, top: `${projected.y}%` }}
-              />
-            )
-          })}
-        </div>
-      ) : null}
-
-      {singlePins.map((cluster) => renderPin(cluster.members[0]))}
-
-      {multiPins.map((cluster) => {
-        const projected = projectPoint(cluster.lat, cluster.lon, bbox)
-        const isExpanded = expandedClusterId === cluster.id
-
-        if (!isExpanded) {
-          return (
-            <button
-              key={cluster.id}
-              type="button"
-              className={[styles.pinBase, styles.clusterPin].join(' ')}
-              style={{ left: `${projected.x}%`, top: `${projected.y}%` }}
-              onClick={() => handleClusterClick(cluster.id)}
-              aria-label={t('map.cluster.more', {
-                count: cluster.members.length,
-              })}
-            >
-              {cluster.members.length}
-            </button>
-          )
-        }
-
-        return (
-          <div
-            key={cluster.id}
-            className={styles.clusterExpansion}
-            style={{
-              left: `${projected.x}%`,
-              top: `${projected.y}%`,
-              position: 'absolute',
-            }}
-          >
-            {cluster.members.map((member, index) => {
-              const angle = (index / cluster.members.length) * Math.PI * 2
-              const offsetRadius = 6
-              const nodeWithOffset: PinNode = {
-                ...member,
-                id: `${member.id}-${index}`,
-                lat: member.lat + (Math.sin(angle) * offsetRadius) / 100,
-                lon: member.lon + (Math.cos(angle) * offsetRadius) / 100,
-              }
-              return renderPin(nodeWithOffset)
-            })}
-            <button
-              type="button"
-              className={[styles.pinBase, styles.clusterPin].join(' ')}
-              style={{ left: `${projected.x}%`, top: `${projected.y}%` }}
-              onClick={() => handleClusterClick(cluster.id)}
-              aria-label={t('map.cluster.collapse')}
-            >
-              ×
-            </button>
-          </div>
-        )
-      })}
+    <div className={styles.canvas} role="presentation" data-testid="map-canvas">
+      <MapContainer
+        center={center}
+        zoom={13}
+        className={styles.mapRoot}
+        scrollWheelZoom
+      >
+        <BoundsController bbox={bbox} />
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        {activityMarkers}
+        {cornerPins}
+        {publicationPins}
+      </MapContainer>
 
       {isLoading || isFetching ? (
-        <div className={styles.loadingOverlay} aria-live="polite">
+        <div className={styles.overlay} aria-live="polite">
           {t('map.status.loading')}
         </div>
       ) : null}
 
       {isEmpty && !isLoading && !isFetching ? (
-        <div className={styles.emptyOverlay}>{t('map.empty.description')}</div>
+        <div className={styles.overlay}>{t('map.empty.description')}</div>
       ) : null}
     </div>
   )

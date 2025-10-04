@@ -1,6 +1,6 @@
 ## /map feature overview
 
-La ruta `/map` funciona como hub territorial para descubrir Rincones de Libros, publicaciones cercanas y señales de actividad. El mock se apoya en `msw` y genera datos deterministas a partir de la semilla `2048`.
+La ruta `/map` funciona como hub territorial para descubrir Rincones de Libros, publicaciones cercanas y señales de actividad. El mock se apoya en `msw` y genera datos deterministas a partir de la semilla `2048`. El panel lateral permanece como bloque placeholder hasta definir el detalle definitivo.
 
 ### Cómo probar el mapa en desarrollo
 
@@ -14,17 +14,13 @@ La ruta `/map` funciona como hub territorial para descubrir Rincones de Libros, 
 
 Los siguientes eventos se registran con el helper `track`:
 
-| Evento                                  | Cuándo se dispara                                                     | Propiedades                  |
-| --------------------------------------- | --------------------------------------------------------------------- | ---------------------------- |
-| `map.view_opened`                       | Al montar la página                                                   | `locale`                     |
-| `map.filter_changed`                    | Cada vez que cambia un filtro (search, capas, distancia, temas, etc.) | `filter`, `value`            |
-| `pin.opened`                            | Al seleccionar un pin                                                 | `type`, `id`                 |
-| `drawer.opened`                         | Al abrir el panel de detalle                                          | `type`                       |
-| `cta.create_corner_clicked`             | Al pulsar el FAB “Crear rincón”                                       | —                            |
-| `chat.started_from_map`                 | CTA “Enviar mensaje” desde el detalle                                 | `cornerId`, `publicationId?` |
-| `agreement.proposed_from_map`           | Al abrir el modal de propuesta                                        | `cornerId`                   |
-| `agreement.proposed_from_map_submitted` | Al confirmar el modal                                                 | `cornerId`                   |
-| `time.to.first.pin`                     | Primer render con pins disponibles                                    | `milliseconds`               |
+| Evento                      | Cuándo se dispara                                                     | Propiedades       |
+| --------------------------- | --------------------------------------------------------------------- | ----------------- |
+| `map.view_opened`           | Al montar la página                                                   | `locale`          |
+| `map.filter_changed`        | Cada vez que cambia un filtro (search, capas, distancia, temas, etc.) | `filter`, `value` |
+| `pin.opened`                | Al seleccionar un pin                                                 | `type`, `id`      |
+| `cta.create_corner_clicked` | Al pulsar el FAB “Crear rincón”                                       | —                 |
+| `time.to.first.pin`         | Primer render con pins disponibles                                    | `milliseconds`    |
 
 ### Consideraciones de privacidad
 

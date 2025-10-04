@@ -31,6 +31,7 @@
     "home": "Home",
     "books": "My Books",
     "community": "Community",
+    "map": "Map",
     "messages": "Messages",
     "stats": "Stats",
     "contact": "Contact"
@@ -377,6 +378,7 @@
       "search": "Search feed",
       "cta": {
         "publish": "Publish",
+        "viewMap": "View map",
         "propose_swap": "Propose swap",
         "accept": "Accept",
         "buy": "Buy",

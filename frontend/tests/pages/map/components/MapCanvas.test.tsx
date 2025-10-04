@@ -1,5 +1,6 @@
+import React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
-import { describe, expect, test, vi } from 'vitest'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import type {
   MapActivityPoint,
@@ -10,6 +11,44 @@ import type {
 import { MapCanvas } from '@src/pages/map/components/MapCanvas/MapCanvas'
 
 import { renderWithProviders } from '../../../test-utils'
+
+const fitBoundsMock = vi.fn()
+
+beforeEach(() => {
+  fitBoundsMock.mockClear()
+})
+
+vi.mock('react-leaflet', () => {
+  return {
+    MapContainer: ({ children }: { children: React.ReactNode }) => (
+      <div data-testid="leaflet-map">{children}</div>
+    ),
+    TileLayer: () => <div data-testid="tile-layer" />,
+    CircleMarker: ({
+      children,
+      eventHandlers,
+      className,
+    }: {
+      children?: React.ReactNode
+      eventHandlers?: { click?: () => void }
+      className?: string
+    }) => (
+      <button
+        type="button"
+        data-testid={`marker-${className ?? 'default'}`}
+        onClick={() => eventHandlers?.click?.()}
+      >
+        {children}
+      </button>
+    ),
+    Tooltip: ({ children }: { children?: React.ReactNode }) => (
+      <span>{children}</span>
+    ),
+    useMap: () => ({
+      fitBounds: fitBoundsMock,
+    }),
+  }
+})
 
 const bbox: MapBoundingBox = {
   north: -34.5,
@@ -55,7 +94,7 @@ const activity: MapActivityPoint[] = [
 ]
 
 describe('MapCanvas', () => {
-  test('expands clusters and selects pins', async () => {
+  test('renders markers and handles selection', () => {
     const handleSelectPin = vi.fn()
 
     renderWithProviders(
@@ -73,15 +112,13 @@ describe('MapCanvas', () => {
       />
     )
 
-    const clusterButton = await screen.findByRole('button', {
-      name: 'map.cluster.more',
-    })
-    fireEvent.click(clusterButton)
-
-    const cornerButton = await screen.findByRole('button', {
-      name: 'Corner Norte',
-    })
-    fireEvent.click(cornerButton)
+    const cornerMarker = screen
+      .getAllByTestId(/marker-/)
+      .find((element) =>
+        element.getAttribute('data-testid')?.includes('corner')
+      )
+    expect(cornerMarker).toBeDefined()
+    fireEvent.click(cornerMarker as HTMLElement)
 
     expect(handleSelectPin).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -89,9 +126,10 @@ describe('MapCanvas', () => {
         data: expect.objectContaining({ id: 'corner-1' }),
       })
     )
+    expect(fitBoundsMock).toHaveBeenCalled()
   })
 
-  test('shows heat layer, loading overlay and empty state', () => {
+  test('shows activity markers, loading overlay and empty state', () => {
     const { rerender } = renderWithProviders(
       <MapCanvas
         bbox={bbox}
@@ -108,7 +146,7 @@ describe('MapCanvas', () => {
     )
 
     expect(screen.getByText('map.status.loading')).toBeInTheDocument()
-    expect(screen.getByTestId('heat-layer')).toBeInTheDocument()
+    expect(screen.getAllByTestId(/marker-/)).toHaveLength(activity.length)
 
     rerender(
       <MapCanvas
@@ -125,7 +163,6 @@ describe('MapCanvas', () => {
       />
     )
 
-    expect(screen.queryByTestId('heat-layer')).not.toBeInTheDocument()
     expect(screen.getByText('map.empty.description')).toBeInTheDocument()
   })
 })
