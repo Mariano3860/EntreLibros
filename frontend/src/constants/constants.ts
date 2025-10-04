@@ -9,6 +9,7 @@ export const HOME_URLS = {
   MESSAGES: 'messages',
   STATS: 'stats',
   CONTACT: 'contact',
+  MAP: 'map',
   LOGIN: 'login',
   REGISTER: 'register',
 } as const

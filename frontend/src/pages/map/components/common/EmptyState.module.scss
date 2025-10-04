@@ -1,0 +1,47 @@
+@import '@styles/variables';
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-3;
+  padding: $spacing-6;
+  text-align: center;
+  background: color-mix(
+    in srgb,
+    var(--primary-color) 6%,
+    var(--background-card)
+  );
+  border-radius: rem(16px);
+  box-shadow: $box-shadow-md;
+  color: var(--text-secondary);
+}
+
+.title {
+  font-size: $h5-font-size;
+  font-weight: $font-weight-medium;
+  color: var(--text-primary);
+}
+
+.description {
+  max-width: 28rem;
+  line-height: 1.6;
+}
+
+.cta {
+  padding: $spacing-2 $spacing-4;
+  border-radius: rem(999px);
+  background: var(--primary-color);
+  color: var(--background-primary);
+  border: none;
+  cursor: pointer;
+  font-weight: $font-weight-medium;
+  transition: background $transition-duration-fast;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--primary-dark);
+    box-shadow: $box-shadow-md;
+  }
+}

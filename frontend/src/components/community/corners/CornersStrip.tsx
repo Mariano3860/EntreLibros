@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
 
 import { useNearbyCorners } from '@src/hooks/api/useNearbyCorners'
 
@@ -116,9 +117,9 @@ export const CornersStrip = () => {
         <h2 id="corners-strip-title" className={styles.title}>
           {t('community.feed.corners.title')}
         </h2>
-        <button type="button" className={styles.mapLink}>
+        <Link to="/map" className={styles.mapLink} role="button">
           {t('community.feed.corners.viewMap')}
-        </button>
+        </Link>
       </div>
       {content}
     </section>

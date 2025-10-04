@@ -1,0 +1,32 @@
+@import '@styles/variables';
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.6;
+  }
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
+
+.item {
+  height: 64px;
+  border-radius: rem(12px);
+  background: color-mix(
+    in srgb,
+    var(--primary-color) 4%,
+    var(--background-card)
+  );
+  animation: pulse 1.4s ease-in-out infinite;
+}

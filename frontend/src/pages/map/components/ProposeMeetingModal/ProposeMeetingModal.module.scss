@@ -1,0 +1,67 @@
+@import '@styles/variables';
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 45%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: $z-index-modal-backdrop;
+}
+
+.modal {
+  background: var(--background-primary);
+  border-radius: rem(20px);
+  padding: $spacing-5;
+  width: min(480px, 90vw);
+  box-shadow: $box-shadow-lg;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+}
+
+.title {
+  font-size: $h5-font-size;
+  font-weight: $font-weight-bold;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-2;
+}
+
+.primaryButton {
+  padding: $spacing-2 $spacing-4;
+  background: var(--primary-color);
+  color: var(--background-primary);
+  border: none;
+  border-radius: rem(999px);
+  cursor: pointer;
+  font-weight: $font-weight-medium;
+}
+
+.secondaryButton {
+  padding: $spacing-2 $spacing-4;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: rem(999px);
+  cursor: pointer;
+}
+
+.select,
+.input {
+  width: 100%;
+  padding: $spacing-2 $spacing-3;
+  border-radius: rem(12px);
+  border: 1px solid var(--border-color);
+  background: var(--background-card);
+}

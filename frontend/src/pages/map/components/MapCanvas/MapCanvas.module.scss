@@ -1,0 +1,65 @@
+@import '@styles/variables';
+
+.canvas {
+  position: relative;
+  width: 100%;
+  height: 80vh;
+  border-radius: rem(16px);
+  overflow: hidden;
+  background: var(--background-card);
+  box-shadow: $box-shadow-md;
+
+  @media (max-width: $breakpoint-mobile) {
+    height: 60vh;
+  }
+}
+
+.mapRoot {
+  width: 100%;
+  height: 100%;
+}
+
+.cornerMarker,
+.publicationMarker {
+  transition: transform $transition-duration-fast;
+}
+
+.cornerMarker:hover,
+.publicationMarker:hover,
+.cornerMarker:focus,
+.publicationMarker:focus {
+  transform: scale(1.05);
+}
+
+.activityMarker {
+  mix-blend-mode: multiply;
+}
+
+.tooltip {
+  background: var(--background-primary);
+  color: var(--text-primary);
+  padding: $spacing-1 $spacing-2;
+  border-radius: rem(12px);
+  box-shadow: $box-shadow-sm;
+  border: 1px solid var(--border-color);
+}
+
+.tooltipContent {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1;
+}
+
+.tooltipMeta {
+  color: var(--text-secondary);
+  font-size: $small-font-size;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--background-card) 70%, transparent 30%);
+  font-weight: $font-weight-medium;
+}

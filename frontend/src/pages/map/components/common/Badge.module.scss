@@ -1,0 +1,43 @@
+@import '@styles/variables';
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-1;
+  font-size: $small-font-size;
+  font-weight: $font-weight-medium;
+  padding: $spacing-1x5 $spacing-2;
+  border-radius: rem(999px);
+  border: 1px solid transparent;
+  line-height: 1;
+}
+
+.success {
+  background: color-mix(in srgb, var(--color-success) 18%, transparent);
+  color: var(--color-success);
+  border-color: color-mix(in srgb, var(--color-success) 40%, transparent);
+}
+
+.warning {
+  background: color-mix(in srgb, var(--color-warning) 18%, transparent);
+  color: var(--color-warning);
+  border-color: color-mix(in srgb, var(--color-warning) 40%, transparent);
+}
+
+.error {
+  background: color-mix(in srgb, var(--color-error) 18%, transparent);
+  color: var(--color-error);
+  border-color: color-mix(in srgb, var(--color-error) 40%, transparent);
+}
+
+.info {
+  background: color-mix(in srgb, var(--color-info) 18%, transparent);
+  color: var(--color-info);
+  border-color: color-mix(in srgb, var(--color-info) 40%, transparent);
+}
+
+.neutral {
+  background: color-mix(in srgb, var(--primary-color) 12%, transparent);
+  color: var(--primary-dark);
+  border-color: color-mix(in srgb, var(--primary-color) 30%, transparent);
+}

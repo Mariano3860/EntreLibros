@@ -1,0 +1,106 @@
+@import '@styles/variables';
+
+.mapPage {
+  display: flex;
+  flex-direction: column;
+  min-height: 95vh;
+  background: var(--background-primary);
+  color: var(--text-primary);
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  gap: $spacing-2;
+  min-height: 0;
+  margin-top: $spacing-2;
+
+  @media (max-width: $breakpoint-tablet) {
+    gap: $spacing-1x5;
+    padding: 0 $spacing-1x5 $spacing-1x5;
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    flex-direction: column;
+    gap: $spacing-1x5;
+    padding: 0 $spacing-2 $spacing-2;
+  }
+}
+
+.railWrapper {
+  width: rem(320px);
+  flex-shrink: 0;
+  transition: transform $transition-duration-fast;
+
+  @media (max-width: $breakpoint-tablet) {
+    position: relative;
+    width: auto;
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    display: contents;
+  }
+}
+
+.railHidden {
+  @media (max-width: $breakpoint-tablet) {
+    transform: translateX(-110%);
+    position: absolute;
+    inset: 0;
+  }
+}
+
+.mapArea {
+  flex: 1;
+  display: flex;
+  gap: $spacing-2;
+  min-height: 0;
+  height: 80vh;
+
+  @media (max-width: $breakpoint-tablet) {
+    gap: $spacing-1x5;
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    flex-direction: column;
+    gap: $spacing-1x5;
+  }
+}
+
+.mapCanvasWrapper {
+  flex: 1;
+  min-height: 0;
+}
+
+.detailPlaceholder {
+  width: rem(360px);
+  flex-shrink: 0;
+  min-height: 0;
+  border-radius: rem(16px);
+  background: var(--background-card);
+  box-shadow: $box-shadow-md;
+  opacity: 0.55;
+
+  @media (max-width: $breakpoint-desktop) {
+    width: rem(320px);
+  }
+
+  @media (max-width: $breakpoint-tablet) {
+    display: none;
+  }
+}
+
+.notifications {
+  position: fixed;
+  top: $spacing-3;
+  right: $spacing-3;
+  z-index: $z-index-toast;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1x5;
+
+  @media (max-width: $breakpoint-mobile) {
+    right: $spacing-2;
+    left: $spacing-2;
+  }
+}

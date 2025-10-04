@@ -31,6 +31,7 @@
     "home": "Inicio",
     "books": "Mis Libros",
     "community": "Comunidad",
+    "map": "Mapa",
     "messages": "Mensajes",
     "stats": "Estadísticas",
     "contact": "Contacto"
@@ -377,6 +378,7 @@
       "search": "Buscar en el feed",
       "cta": {
         "publish": "Publicar",
+        "viewMap": "Ver mapa",
         "propose_swap": "Proponer intercambio",
         "accept": "Aceptar",
         "buy": "Comprar",
@@ -425,6 +427,100 @@
           "expand": "Abrir mapa completo"
         }
       }
+    }
+  },
+  "map": {
+    "search": {
+      "placeholder": "Buscar por barrio, rincón, título o ISBN",
+      "zoneFallback": "Selecciona un barrio o ciudad"
+    },
+    "filters": {
+      "ariaLabel": "Filtros del mapa",
+      "distance": "Distancia",
+      "distanceValue": "A {{value}} km",
+      "withinKm": "Hasta {{count}} km",
+      "types": {
+        "label": "Capas",
+        "corners": "Rincones de libros",
+        "publications": "Publicaciones cercanas"
+      },
+      "activity": "Mapa de actividad",
+      "themes": "Temas",
+      "more": "Más opciones",
+      "openNow": "Abiertos ahora",
+      "recentActivity": "Actividad reciente",
+      "hide": "Ocultar filtros",
+      "show": "Mostrar filtros",
+      "locateMe": "Centrar en mi ubicación"
+    },
+    "status": {
+      "ready": "Actualizado",
+      "updating": "Actualizando...",
+      "loading": "Cargando mapa...",
+      "error": "No pudimos cargar el mapa. Intenta nuevamente.",
+      "locationDenied": "Permiso de ubicación denegado"
+    },
+    "badge": {
+      "live": "Vivo",
+      "privacy": "Privacidad protegida"
+    },
+    "drawer": {
+      "placeholderTitle": "Selecciona un pin para ver el detalle",
+      "close": "Cerrar detalle",
+      "tabs": {
+        "corner": "Rincón",
+        "publications": "Publicaciones",
+        "activity": "Actividad"
+      },
+      "empty": "Elegí un rincón o publicación para ver más."
+    },
+    "detail": {
+      "corner": {
+        "noInventoryNote": "EntreLibros no muestra inventarios. Coordiná directamente con la persona anfitriona por mensajes.",
+        "location": "Barrio / Ciudad",
+        "locationUnknown": "Ubicación no disponible",
+        "referencePoint": "Punto de referencia",
+        "rules": "Reglas del rincón"
+      }
+    },
+    "cta": {
+      "createCorner": "Crear rincón",
+      "proposeMeeting": "Proponer encuentro",
+      "sendMessage": "Enviar mensaje",
+      "openReference": "Abrir referencia"
+    },
+    "empty": {
+      "title": "Todavía no hay actividad en esta zona",
+      "description": "Ajustá los filtros o explorá barrios cercanos para descubrir Rincones activos.",
+      "cta": {
+        "createCorner": "Crear rincón"
+      }
+    },
+    "activity": {
+      "legend": "Movimiento de los últimos 30 días",
+      "empty": "Sin señales en el período seleccionado.",
+      "summary": "{{count}} interacciones recientes"
+    },
+    "publications": {
+      "empty": "Aún no hay publicaciones cerca.",
+      "distance": "a {{count}} km",
+      "types": {
+        "offer": "Oferta",
+        "want": "Busca",
+        "donation": "Donación",
+        "sale": "En venta"
+      }
+    },
+    "cluster": {
+      "more": "Ver {{count}} pins",
+      "collapse": "Cerrar grupo"
+    },
+    "modal": {
+      "cornerLabel": "Elegí un rincón cercano",
+      "dateLabel": "Fecha",
+      "timeLabel": "Hora",
+      "cancel": "Cancelar",
+      "confirm": "Confirmar"
     }
   }
 }
