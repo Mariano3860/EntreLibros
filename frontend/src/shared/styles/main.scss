@@ -62,7 +62,7 @@ h6 {
     background: transparent;
   }
   &::-webkit-scrollbar-thumb {
-    background-color: rgb(var(--scroll-bar-color), 0.40);
+    background-color: rgba(var(--scroll-bar-color), 0.40);
     border-radius: 8px;
   }
 }
