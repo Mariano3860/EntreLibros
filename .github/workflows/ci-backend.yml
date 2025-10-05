@@ -1,21 +1,21 @@
 name: CI Backend
 
 on:
-  push:
-    branches: ['**']
-    paths:
-      - 'backend/**'
-      - 'shared/**'
-      - '.github/workflows/ci-backend.yml'
   pull_request:
     branches: ['**']
     paths:
       - 'backend/**'
       - 'shared/**'
       - '.github/workflows/ci-backend.yml'
+  push:
+    branches: ['main']
+    paths:
+      - 'backend/**'
+      - 'shared/**'
+      - '.github/workflows/ci-backend.yml'
 
 concurrency:
-  group: ci-backend-${{ github.ref }}
+  group: ci-backend-${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -24,7 +24,6 @@ permissions:
 jobs:
   quality:
     runs-on: ubuntu-latest
-
     services:
       postgres:
         image: postgis/postgis:16-3.5
@@ -37,20 +36,16 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-
     env:
       CI: true
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/entrelibros_test
-
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
-          cache-dependency-path: backend/package-lock.json
-
+          cache-dependency-path: package-lock.json
       - run: npm ci --workspace backend
       - run: npm run format -w backend
       - run: npm run lint -w backend

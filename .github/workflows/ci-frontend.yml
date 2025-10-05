@@ -1,21 +1,21 @@
 name: CI Frontend
 
 on:
-  push:
-    branches: ['**']
-    paths:
-      - 'frontend/**'
-      - 'shared/**'
-      - '.github/workflows/ci-frontend.yml'
   pull_request:
     branches: ['**']
     paths:
       - 'frontend/**'
       - 'shared/**'
       - '.github/workflows/ci-frontend.yml'
+  push:
+    branches: ['main']
+    paths:
+      - 'frontend/**'
+      - 'shared/**'
+      - '.github/workflows/ci-frontend.yml'
 
 concurrency:
-  group: ci-frontend-${{ github.ref }}
+  group: ci-frontend-${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -28,13 +28,11 @@ jobs:
       CI: true
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
-          cache-dependency-path: frontend/package-lock.json
-
+          cache-dependency-path: package-lock.json
       - run: npm ci --workspace frontend
       - run: npm run format -w frontend
       - run: npm run lint -w frontend
