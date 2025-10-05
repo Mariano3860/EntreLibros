@@ -70,6 +70,7 @@ Feature 2.1 Alta y gestión de RdL
   - Éxito: formulario completo; visible en mapa tras aprobación.
   - Actualización 2025-10-16: se implementó el modal multipaso "Crear Rincón" con stepper, validación inline, consentimiento explícito y flujo de borrador/publicación reutilizando los componentes compartidos de publicación. Se agregó MSW (201/422) y pruebas de navegación/errores. Falta enlazar con backend real y lógica de moderación para considerarlo completado.
   - Actualización 2025-10-20: el paso de dirección ahora ofrece autocompletado con vista previa en mapa, fija latitud/longitud automáticamente y mantiene la preferencia de visibilidad sin exponer coordenadas manuales.
+  - Actualización 2025-10-21: se completaron pruebas unitarias del servicio de geocodificación, handlers MSW y del paso de ubicación (autocomplete, errores, reinicio), recuperando la cobertura de ramas >85% y asegurando la regresión de privacidad.
 - [ ] S-2.2 Estados de RdL (Activo / Pausa / Observación) (Should, E2; BR-12)
   - Éxito: pausa oculta de resultados temporalmente.
 - [ ] S-2.3 Verificación ligera de anfitrión (Could, E3; BR-14)

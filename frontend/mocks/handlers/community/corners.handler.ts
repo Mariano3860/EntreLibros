@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw'
 
-import { randomUUID } from 'crypto'
+import { faker } from '@faker-js/faker'
 
 import { RELATIVE_API_ROUTES } from '@src/api/routes'
 import {
@@ -49,7 +49,7 @@ export const createCornerSuccessHandler = http.post(
   async ({ request }) => {
     const payload = (await request.json()) as PublishCornerPayload
 
-    const id = randomUUID()
+    const id = faker.string.uuid()
     const response: PublishCornerResponse = {
       id,
       name: payload.name,
