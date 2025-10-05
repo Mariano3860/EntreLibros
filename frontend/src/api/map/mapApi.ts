@@ -34,8 +34,8 @@ export const fetchMapData = async (
     search: input.searchTerm,
     distanceKm: input.filters.distanceKm,
     themes: input.filters.themes.join(','),
-    openNow: input.filters.openNow ? '1' : '0',
-    recentActivity: input.filters.recentActivity ? '1' : '0',
+    openNow: input.filters.openNow,
+    recentActivity: input.filters.recentActivity,
     layers: activeLayers,
     locale: input.locale,
   }
