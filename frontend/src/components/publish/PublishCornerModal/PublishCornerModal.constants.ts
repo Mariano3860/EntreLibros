@@ -16,6 +16,7 @@ export const initialState: PublishCornerFormState = {
   internalContact: '',
   rules: '',
   schedule: '',
+  addressSearch: '',
   street: '',
   number: '',
   unit: '',

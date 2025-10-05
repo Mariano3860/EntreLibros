@@ -92,18 +92,23 @@ const uploadPhoto = () => {
   return restore
 }
 
-const fillLocationStep = (options?: { consent?: boolean }) => {
-  fireEvent.change(screen.getByLabelText('publishCorner.fields.street'), {
-    target: { value: 'Avenida Libertad' },
+const fillLocationStep = async (options?: { consent?: boolean }) => {
+  const searchInput = screen.getByLabelText(
+    'publishCorner.fields.addressSearch'
+  )
+
+  fireEvent.change(searchInput, { target: { value: 'Libertad 987' } })
+
+  const suggestion = await screen.findByRole('option', {
+    name: /Libertad 987/,
   })
-  fireEvent.change(screen.getByLabelText('publishCorner.fields.number'), {
-    target: { value: '1234' },
-  })
-  fireEvent.change(screen.getByLabelText('publishCorner.fields.latitude'), {
-    target: { value: '-34.603722' },
-  })
-  fireEvent.change(screen.getByLabelText('publishCorner.fields.longitude'), {
-    target: { value: '-58.381592' },
+
+  fireEvent.mouseDown(suggestion)
+
+  await waitFor(() => {
+    expect(screen.getByLabelText('publishCorner.fields.street')).toHaveValue(
+      'Libertad'
+    )
   })
 
   if (options?.consent) {
@@ -155,36 +160,36 @@ describe('PublishCornerModal', () => {
     ).toBeInTheDocument()
   })
 
-  test('validates coordinates and keeps publish disabled without consent', () => {
+  test('validates address selection and keeps publish disabled without consent', async () => {
     renderModal()
     fillDetailsStep()
     fireEvent.click(
       screen.getByRole('button', { name: 'publishCorner.actions.next' })
     )
 
-    fireEvent.change(screen.getByLabelText('publishCorner.fields.latitude'), {
-      target: { value: '200' },
+    const nextButton = screen.getByRole('button', {
+      name: 'publishCorner.actions.next',
     })
+    expect(nextButton).toBeDisabled()
     expect(
-      screen.getByText('publishCorner.errors.latitudeRange')
+      screen.getByText('publishCorner.errors.addressSearch')
     ).toBeInTheDocument()
-
-    fireEvent.change(screen.getByLabelText('publishCorner.fields.latitude'), {
-      target: { value: '-34.6037' },
-    })
-    expect(
-      screen.queryByText('publishCorner.errors.latitudeRange')
-    ).not.toBeInTheDocument()
 
     const restoreFileReader = uploadPhoto()
 
-    fillLocationStep()
+    await fillLocationStep()
 
-    fireEvent.click(
-      screen.getByRole('button', { name: 'publishCorner.actions.next' })
-    )
+    await waitFor(() => {
+      expect(
+        screen.queryByText('publishCorner.errors.addressSearch')
+      ).not.toBeInTheDocument()
+    })
 
-    let publishButton = screen.getByRole('button', {
+    expect(nextButton).not.toBeDisabled()
+
+    fireEvent.click(nextButton)
+
+    let publishButton = await screen.findByRole('button', {
       name: 'publishCorner.actions.publish',
     })
     expect(publishButton).toBeDisabled()
@@ -193,11 +198,13 @@ describe('PublishCornerModal', () => {
       screen.getByRole('button', { name: 'publishCorner.actions.back' })
     )
     fireEvent.click(screen.getByLabelText('publishCorner.fields.consent'))
-    fireEvent.click(
-      screen.getByRole('button', { name: 'publishCorner.actions.next' })
-    )
 
-    publishButton = screen.getByRole('button', {
+    const nextButtonAfterConsent = screen.getByRole('button', {
+      name: 'publishCorner.actions.next',
+    })
+    fireEvent.click(nextButtonAfterConsent)
+
+    publishButton = await screen.findByRole('button', {
       name: 'publishCorner.actions.publish',
     })
     expect(publishButton).not.toBeDisabled()
@@ -212,7 +219,7 @@ describe('PublishCornerModal', () => {
     )
 
     const restoreFileReader = uploadPhoto()
-    fillLocationStep({ consent: true })
+    await fillLocationStep({ consent: true })
 
     fireEvent.click(
       screen.getByRole('button', { name: 'publishCorner.actions.next' })
@@ -242,7 +249,7 @@ describe('PublishCornerModal', () => {
     )
 
     const restoreFileReader = uploadPhoto()
-    fillLocationStep({ consent: true })
+    await fillLocationStep({ consent: true })
 
     fireEvent.click(
       screen.getByRole('button', { name: 'publishCorner.actions.next' })

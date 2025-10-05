@@ -286,7 +286,8 @@
       "back": "Back",
       "next": "Next",
       "publish": "Publish corner",
-      "publishing": "Publishing..."
+      "publishing": "Publishing...",
+      "changeAddress": "Change address"
     },
     "steps": {
       "details": {
@@ -302,6 +303,9 @@
         "description": "Double-check the information before publishing."
       }
     },
+    "location": {
+      "searching": "Searching addresses..."
+    },
     "fields": {
       "name": "Corner name",
       "scope": "Scope",
@@ -311,16 +315,14 @@
       "rulesHint": "Write a short summary or paste a link with more details.",
       "schedule": "Suggested schedule",
       "scheduleHint": "Optional: typical days or times when it is available.",
+      "addressSearch": "Search address (street and number)",
+      "addressSearchPlaceholder": "E.g. Liberty 1234",
+      "addressSearchHint": "Type street and number to see suggestions and place the map pin.",
+      "mapPreviewTitle": "Map preview",
       "street": "Street",
       "number": "Number",
       "unit": "Floor / Apt (optional)",
       "postalCode": "Postal code (optional)",
-      "coordinates": "Map location",
-      "useCurrentLocation": "Use my current location",
-      "updateLocation": "Update location",
-      "locating": "Fetching location...",
-      "latitude": "Latitude",
-      "longitude": "Longitude",
       "visibilityPreference": "How the location will be shown",
       "photo": "Representative photo",
       "photoCta": "Upload image",
@@ -347,10 +349,11 @@
       "internalContact": "Enter an internal contact.",
       "street": "Enter the street name.",
       "number": "Enter the street number.",
-      "latitude": "Enter a valid latitude.",
+      "addressSearch": "Select an address from the list to continue.",
       "latitudeRange": "Latitude must be between -90 and 90.",
-      "longitude": "Enter a valid longitude.",
       "longitudeRange": "Longitude must be between -180 and 180.",
+      "addressNoResults": "We couldn't find matches. Try another street or number.",
+      "addressSearchFailed": "We couldn't search for addresses. Please try again.",
       "photo": "Add a representative photo.",
       "consent": "We need your authorization to publish this corner.",
       "geolocationUnsupported": "Your browser doesn't support automatic location retrieval.",
@@ -371,7 +374,7 @@
       "status": "Status",
       "emptyField": "No information",
       "photoAlt": "Corner photo",
-      "privacyNotice": "We store the exact address for logistics. Your preference defines how it will be displayed."
+      "privacyNotice": "We store the exact address; your preference defines how it will be displayed."
     }
   },
   "community": {

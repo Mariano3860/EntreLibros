@@ -31,5 +31,6 @@ export const RELATIVE_API_ROUTES = {
   },
   MAP: {
     ROOT: `/map`,
+    GEOCODE: `/map/geocode`,
   },
 }

@@ -16,6 +16,7 @@ export type PublishCornerFormState = {
   internalContact: string
   rules: string
   schedule: string
+  addressSearch: string
   street: string
   number: string
   unit: string

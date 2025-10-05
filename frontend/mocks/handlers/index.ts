@@ -17,6 +17,7 @@ import {
 import { suggestionsHandler } from './community/suggestions.handler'
 import { contactFormHandler } from './contactForm/contactForm.handler'
 import { userLanguageHandler } from './language/language.handler'
+import { geocodingHandler } from './map/geocoding.handler'
 import { mapHandler } from './map/map.handler'
 
 export const handlers = [
@@ -38,5 +39,6 @@ export const handlers = [
   createCornerSuccessHandler,
   activityHandler,
   suggestionsHandler,
+  geocodingHandler,
   mapHandler,
 ]

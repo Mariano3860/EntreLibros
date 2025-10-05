@@ -286,7 +286,8 @@
       "back": "Anterior",
       "next": "Siguiente",
       "publish": "Publicar Rincón",
-      "publishing": "Publicando..."
+      "publishing": "Publicando...",
+      "changeAddress": "Cambiar dirección"
     },
     "steps": {
       "details": {
@@ -302,6 +303,9 @@
         "description": "Verificá la información antes de publicar."
       }
     },
+    "location": {
+      "searching": "Buscando direcciones..."
+    },
     "fields": {
       "name": "Nombre del Rincón",
       "scope": "Ámbito",
@@ -311,16 +315,14 @@
       "rulesHint": "Podés escribir un resumen breve o pegar un enlace con más detalles.",
       "schedule": "Horarios sugeridos",
       "scheduleHint": "Opcional: días u horarios en los que suele estar disponible.",
+      "addressSearch": "Buscar dirección (calle y número)",
+      "addressSearchPlaceholder": "Ej.: Libertad 1234",
+      "addressSearchHint": "Escribí calle y altura para ver sugerencias y fijar el punto en el mapa.",
+      "mapPreviewTitle": "Vista previa en mapa",
       "street": "Calle",
       "number": "Número",
       "unit": "Piso / Depto (opcional)",
       "postalCode": "Código postal (opcional)",
-      "coordinates": "Ubicación en el mapa",
-      "useCurrentLocation": "Usar mi ubicación actual",
-      "updateLocation": "Actualizar ubicación",
-      "locating": "Obteniendo ubicación...",
-      "latitude": "Latitud",
-      "longitude": "Longitud",
       "visibilityPreference": "Cómo se verá la ubicación",
       "photo": "Foto representativa",
       "photoCta": "Subir imagen",
@@ -347,10 +349,11 @@
       "internalContact": "Ingresá un contacto interno.",
       "street": "Indicá la calle.",
       "number": "Indicá el número de la dirección.",
-      "latitude": "Ingresá una latitud válida.",
+      "addressSearch": "Seleccioná una dirección de la lista para continuar.",
       "latitudeRange": "La latitud debe estar entre -90 y 90.",
-      "longitude": "Ingresá una longitud válida.",
       "longitudeRange": "La longitud debe estar entre -180 y 180.",
+      "addressNoResults": "No encontramos coincidencias. Probá con otra calle o altura.",
+      "addressSearchFailed": "No pudimos buscar direcciones. Intentá nuevamente.",
       "photo": "Agregá una foto representativa.",
       "consent": "Necesitamos tu autorización para publicar este Rincón.",
       "geolocationUnsupported": "Tu navegador no permite obtener la ubicación automáticamente.",
@@ -371,7 +374,7 @@
       "status": "Estado",
       "emptyField": "Sin información",
       "photoAlt": "Foto del Rincón",
-      "privacyNotice": "Guardamos la dirección exacta para gestión y logística. Tu preferencia define cómo se verá."
+      "privacyNotice": "Guardamos la dirección exacta; tu preferencia define cómo se verá."
     }
   },
   "community": {

@@ -182,35 +182,44 @@ export const PublishCornerModal: React.FC<PublishCornerModalProps> = ({
 
   const locationErrors = useMemo(() => {
     const errors: { [key: string]: string } = {}
+
     if (!state.street.trim()) {
       errors.street = t('publishCorner.errors.street')
     }
+
     if (!state.number.trim()) {
       errors.number = t('publishCorner.errors.number')
     }
 
     const latitude = Number(state.latitude)
-    if (!state.latitude.trim() || Number.isNaN(latitude)) {
-      errors.latitude = t('publishCorner.errors.latitude')
-    } else if (latitude < -90 || latitude > 90) {
-      errors.latitude = t('publishCorner.errors.latitudeRange')
-    }
-
     const longitude = Number(state.longitude)
-    if (!state.longitude.trim() || Number.isNaN(longitude)) {
-      errors.longitude = t('publishCorner.errors.longitude')
+
+    if (!state.addressSearch.trim()) {
+      errors.addressSearch = t('publishCorner.errors.addressSearch')
+    } else if (
+      !state.latitude.trim() ||
+      Number.isNaN(latitude) ||
+      !state.longitude.trim() ||
+      Number.isNaN(longitude)
+    ) {
+      errors.addressSearch = t('publishCorner.errors.addressSearch')
+    } else if (latitude < -90 || latitude > 90) {
+      errors.addressSearch = t('publishCorner.errors.latitudeRange')
     } else if (longitude < -180 || longitude > 180) {
-      errors.longitude = t('publishCorner.errors.longitudeRange')
+      errors.addressSearch = t('publishCorner.errors.longitudeRange')
     }
 
     if (!state.photo) {
       errors.photo = t('publishCorner.errors.photo')
     }
+
     if (!state.consent) {
       errors.consent = t('publishCorner.errors.consent')
     }
+
     return errors
   }, [
+    state.addressSearch,
     state.consent,
     state.latitude,
     state.longitude,
@@ -237,6 +246,7 @@ export const PublishCornerModal: React.FC<PublishCornerModalProps> = ({
       isPending ||
       !state.consent ||
       !state.photo ||
+      !state.addressSearch.trim() ||
       !state.street.trim() ||
       !state.number.trim() ||
       !state.latitude.trim() ||
@@ -247,6 +257,7 @@ export const PublishCornerModal: React.FC<PublishCornerModalProps> = ({
       canProceedDetails,
       canProceedLocation,
       isPending,
+      state.addressSearch,
       state.latitude,
       state.longitude,
       state.consent,
