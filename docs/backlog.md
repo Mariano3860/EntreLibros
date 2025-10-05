@@ -118,6 +118,8 @@ Feature 4.1 Mapa y listados
   - Actualización 2025-10-09: se integró en Community la tira de Rincones cercanos, un mini-mapa en la barra lateral y la vinculación de publicaciones/flujo de publicación con Rincones (chips y selector), quedando pendiente la conexión con datos en tiempo real y filtros avanzados.
   - Actualización 2025-10-12: se desplegó la vista `/map` como hub territorial con rail de filtros y heatmap sobre mocks MSW; el panel de detalle queda como bloque placeholder hasta la próxima iteración mientras se termina de definir contenido y acciones. Resta conectar servicios reales y geocercas dinámicas.
   - Actualización 2025-10-13: se añadieron pruebas unitarias del mini-mapa, la tira de rincones y los chips de rincones del feed, cubriendo estados de carga/errores y asegurando la accesibilidad del panel derecho y filtros para sostener la cobertura >85%.
+  - Actualización 2025-10-14: se sustituyó la aproximación lineal de distancia por cálculos geodésicos Haversine para centrar el mapa y se modernizaron los estilos con sintaxis `rgb(var() / α)` en los componentes vinculados.
+  - Actualización 2025-10-15: se factorizaron los cálculos de geocercas con la utilidad Haversine reutilizable, se ajustó la bbox inicial del mapa y se añadieron pruebas unitarias dedicadas.
 
 Feature 4.2 Descubrimiento avanzado
 
