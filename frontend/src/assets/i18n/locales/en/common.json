@@ -273,6 +273,107 @@
     },
     "previewAlt": "Preview cover"
   },
+  "publishCorner": {
+    "title": "Create Book Corner",
+    "subtitle": "Share the main details so the community can visit it.",
+    "progress": "Corner creation progress",
+    "confirmClose": "You have unsaved changes. Do you want to leave anyway?",
+    "draftSaved": "Draft saved.",
+    "published": "Corner published successfully!",
+    "actions": {
+      "cancel": "Cancel",
+      "saveDraft": "Save draft",
+      "back": "Back",
+      "next": "Next",
+      "publish": "Publish corner",
+      "publishing": "Publishing..."
+    },
+    "steps": {
+      "details": {
+        "title": "Corner details",
+        "description": "Name, host and guidelines."
+      },
+      "location": {
+        "title": "Location & privacy",
+        "description": "Share the area and how to access without revealing the exact address."
+      },
+      "review": {
+        "title": "Review and confirm",
+        "description": "Double-check everything before publishing."
+      }
+    },
+    "fields": {
+      "name": "Corner name",
+      "scope": "Scope",
+      "hostAlias": "Host (public alias)",
+      "internalContact": "Internal contact (support only)",
+      "rules": "Local guidelines",
+      "rulesHint": "Write a short summary or paste a link with more details.",
+      "schedule": "Suggested hours",
+      "scheduleHint": "Optional: typical days or times when it is available.",
+      "country": "Country",
+      "province": "Province",
+      "city": "City",
+      "neighborhood": "Neighborhood or area",
+      "reference": "Non-exact access reference",
+      "referenceHint": "Use general references like squares, corners or nearby landmarks.",
+      "visibility": "Location visibility",
+      "photo": "Representative photo",
+      "photoCta": "Upload image",
+      "photoHint": "Show the corner without including sensitive information.",
+      "photoRemove": "Remove image",
+      "status": "Initial status",
+      "consent": "I authorize EntreLibros to publish this Corner with the selected visibility."
+    },
+    "placeholders": {
+      "country": "Select a country",
+      "province": "Select a province",
+      "city": "Select a city",
+      "neighborhood": "Select a neighborhood or area"
+    },
+    "scope": {
+      "public": "Public",
+      "semiprivate": "Semi-private"
+    },
+    "visibility": {
+      "neighborhood": "Show by neighborhood",
+      "city": "Show by city"
+    },
+    "status": {
+      "active": "Active",
+      "paused": "Paused"
+    },
+    "errors": {
+      "name": "Enter a name.",
+      "hostAlias": "Enter the host alias.",
+      "internalContact": "Enter an internal contact.",
+      "country": "Select a country.",
+      "province": "Select a province.",
+      "city": "Select a city.",
+      "neighborhood": "Select a neighborhood or area.",
+      "reference": "Enter an access reference.",
+      "referenceDigits": "Do not include the exact address or street numbers.",
+      "photo": "Add a representative photo.",
+      "consent": "We need your authorization to publish this Corner.",
+      "photoRead": "We couldn't read the image. Try again.",
+      "publish": "We couldn't create the Corner. Please try again."
+    },
+    "review": {
+      "name": "Name",
+      "scope": "Scope",
+      "host": "Host",
+      "contact": "Internal contact",
+      "rules": "Guidelines",
+      "schedule": "Hours",
+      "location": "Location",
+      "reference": "Reference",
+      "visibility": "Visibility",
+      "status": "Status",
+      "emptyField": "No information",
+      "photoAlt": "Corner photo",
+      "privacyNotice": "We never publish exact addresses or personal contact details. The location is shown by neighborhood or by city according to your settings."
+    }
+  },
   "community": {
     "title": "Community",
     "tabs": {

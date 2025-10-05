@@ -11,6 +11,7 @@ import { communityStatsHandler } from './community/communityStats.handler'
 import { communityFeedHandler } from './community/feed.handler'
 import {
   cornersMapHandler,
+  createCornerSuccessHandler,
   nearbyCornersHandler,
 } from './community/corners.handler'
 import { suggestionsHandler } from './community/suggestions.handler'
@@ -34,6 +35,7 @@ export const handlers = [
   communityFeedHandler,
   nearbyCornersHandler,
   cornersMapHandler,
+  createCornerSuccessHandler,
   activityHandler,
   suggestionsHandler,
   mapHandler,

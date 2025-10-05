@@ -1,4 +1,5 @@
 import { BookCard } from '@components/book/BookCard'
+import { PublishReviewCard } from '@components/publish/shared'
 import { TFunction } from 'i18next'
 import React from 'react'
 
@@ -17,7 +18,7 @@ type ReviewStepProps = {
 export const ReviewStep: React.FC<ReviewStepProps> = React.memo(
   ({ t, metadata, offer, coverUrl, acceptedTerms, onAcceptedTermsChange }) => (
     <div className={styles.stepLayout}>
-      <div className={styles.reviewCardWrapper}>
+      <PublishReviewCard>
         <BookCard
           title={metadata.title}
           author={metadata.author}
@@ -32,7 +33,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = React.memo(
           )}
           isSeeking={false}
         />
-      </div>
+      </PublishReviewCard>
 
       <div className={styles.checklist}>
         <label className={styles.checklistItem}>

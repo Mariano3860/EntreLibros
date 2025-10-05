@@ -1,7 +1,12 @@
 import { apiClient } from '@src/api/axios'
 import { RELATIVE_API_ROUTES } from '@src/api/routes'
 
-import { CommunityCornerMap, CommunityCornerSummary } from './corners.types'
+import {
+  CommunityCornerMap,
+  CommunityCornerSummary,
+  PublishCornerPayload,
+  PublishCornerResponse,
+} from './corners.types'
 
 export const fetchNearbyCorners = async (): Promise<
   CommunityCornerSummary[]
@@ -25,6 +30,17 @@ export const fetchCornersMap = async (): Promise<CommunityCornerMap> => {
   if (!response.data || !Array.isArray(response.data.pins)) {
     throw new Error('Invalid corners map response')
   }
+
+  return response.data
+}
+
+export const createCorner = async (
+  payload: PublishCornerPayload
+): Promise<PublishCornerResponse> => {
+  const response = await apiClient.post<PublishCornerResponse>(
+    RELATIVE_API_ROUTES.COMMUNITY.CORNERS.CREATE,
+    payload
+  )
 
   return response.data
 }

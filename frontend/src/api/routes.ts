@@ -23,6 +23,7 @@ export const RELATIVE_API_ROUTES = {
     CORNERS: {
       NEARBY: `/community/corners/nearby`,
       MAP: `/community/corners/map`,
+      CREATE: `/community/corners`,
     },
   },
   LANGUAGE: {

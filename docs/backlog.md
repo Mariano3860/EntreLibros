@@ -66,8 +66,9 @@ Feature 1.2 Perfil y privacidad
 EP-2 Rincones de Libros (RdL)
 Feature 2.1 Alta y gestión de RdL
 
-- [ ] S-2.1 Alta de RdL (foto, reglas, zona) + aprobación liviana (Must, E1; BR-10)
+- [~] S-2.1 Alta de RdL (foto, reglas, zona) + aprobación liviana (Must, E1; BR-10)
   - Éxito: formulario completo; visible en mapa tras aprobación.
+  - Actualización 2025-10-16: se implementó el modal multipaso "Crear Rincón" con stepper, validación inline, consentimiento explícito y flujo de borrador/publicación reutilizando los componentes compartidos de publicación. Se agregó MSW (201/422) y pruebas de navegación/errores. Falta enlazar con backend real y lógica de moderación para considerarlo completado.
 - [ ] S-2.2 Estados de RdL (Activo / Pausa / Observación) (Should, E2; BR-12)
   - Éxito: pausa oculta de resultados temporalmente.
 - [ ] S-2.3 Verificación ligera de anfitrión (Could, E3; BR-14)
@@ -75,8 +76,9 @@ Feature 2.1 Alta y gestión de RdL
 
 Feature 2.2 Visibilidad y actividad
 
-- [ ] S-2.4 Control de granularidad en mapa (barrio/ciudad) (Must, E1; BR-11)
+- [~] S-2.4 Control de granularidad en mapa (barrio/ciudad) (Must, E1; BR-11)
   - Éxito: 100% de RdL respetan granularidad elegida.
+  - Actualización 2025-10-16: el flujo de alta de RdL exige elegir visibilidad barrio/ciudad, persiste el consentimiento y refleja la selección en la revisión previa; resta propagarla al backend/mapa productivo.
 - [ ] S-2.5 Señales de actividad en RdL (Should, E2; BR-13)
   - Éxito: 2 señales simples (visitas, contactos cercanos).
 

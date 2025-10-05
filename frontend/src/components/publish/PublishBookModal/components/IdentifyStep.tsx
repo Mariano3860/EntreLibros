@@ -1,3 +1,4 @@
+import { PublishFileUpload, PublishTextField } from '@components/publish/shared'
 import { TFunction } from 'i18next'
 import React from 'react'
 
@@ -55,25 +56,19 @@ export const IdentifyStep: React.FC<IdentifyStepProps> = React.memo(
     onRetry,
     onBlur,
   }) => {
-    const imagesCount = images.length
-
     return (
       <div className={styles.stepLayout}>
         <div>
-          <div className={styles.formGroup}>
-            <label htmlFor="publish-search">
-              {t('publishBook.search.label')}
-            </label>
-            <input
-              id="publish-search"
-              type="search"
-              className={styles.input}
-              placeholder={t('publishBook.search.placeholder') ?? ''}
-              value={searchQuery}
-              onChange={(event) => onSearchChange(event.target.value)}
-              onBlur={onBlur}
-            />
-          </div>
+          <PublishTextField
+            id="publish-search"
+            type="search"
+            label={t('publishBook.search.label')}
+            placeholder={t('publishBook.search.placeholder') ?? ''}
+            value={searchQuery}
+            onChange={(event) => onSearchChange(event.target.value)}
+            onBlur={onBlur}
+            containerClassName={styles.formGroup}
+          />
           {isFetching && (
             <div className={styles.loadingRow} role="status">
               <span className={styles.spinner} aria-hidden />
@@ -145,186 +140,103 @@ export const IdentifyStep: React.FC<IdentifyStepProps> = React.memo(
         </div>
 
         <div className={styles.formGrid}>
-          <div className={styles.formGroup}>
-            <label htmlFor="publish-title">
-              {t('publishBook.fields.title')}
-            </label>
-            <input
-              id="publish-title"
-              className={styles.input}
-              value={metadata.title}
-              onChange={(event) =>
-                onMetadataChange({ title: event.target.value })
-              }
-              onBlur={onBlur}
-              required
-              aria-invalid={errors.title ? 'true' : 'false'}
-            />
-            {errors.title && (
-              <span className={styles.error} role="alert">
-                {errors.title}
-              </span>
-            )}
-          </div>
-          <div className={styles.formGroup}>
-            <label htmlFor="publish-author">
-              {t('publishBook.fields.author')}
-            </label>
-            <input
-              id="publish-author"
-              className={styles.input}
-              value={metadata.author}
-              onChange={(event) =>
-                onMetadataChange({ author: event.target.value })
-              }
-              onBlur={onBlur}
-              required
-              aria-invalid={errors.author ? 'true' : 'false'}
-            />
-            {errors.author && (
-              <span className={styles.error} role="alert">
-                {errors.author}
-              </span>
-            )}
-          </div>
-          <div className={styles.formGroup}>
-            <label htmlFor="publish-language">
-              {t('publishBook.fields.language')}
-            </label>
-            <input
-              id="publish-language"
-              className={styles.input}
-              value={metadata.language}
-              onChange={(event) =>
-                onMetadataChange({ language: event.target.value })
-              }
-              onBlur={onBlur}
-              required
-              aria-invalid={errors.language ? 'true' : 'false'}
-            />
-            {errors.language && (
-              <span className={styles.error} role="alert">
-                {errors.language}
-              </span>
-            )}
-          </div>
-          <div className={styles.formGroup}>
-            <label htmlFor="publish-format">
-              {t('publishBook.fields.format')}
-            </label>
-            <input
-              id="publish-format"
-              className={styles.input}
-              value={metadata.format}
-              onChange={(event) =>
-                onMetadataChange({ format: event.target.value })
-              }
-              onBlur={onBlur}
-              required
-              aria-invalid={errors.format ? 'true' : 'false'}
-            />
-            {errors.format && (
-              <span className={styles.error} role="alert">
-                {errors.format}
-              </span>
-            )}
-          </div>
-          <div className={styles.formGroup}>
-            <label htmlFor="publish-publisher">
-              {t('publishBook.fields.publisher')}
-            </label>
-            <input
-              id="publish-publisher"
-              className={styles.input}
-              value={metadata.publisher}
-              onChange={(event) =>
-                onMetadataChange({ publisher: event.target.value })
-              }
-              onBlur={onBlur}
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label htmlFor="publish-year">{t('publishBook.fields.year')}</label>
-            <input
-              id="publish-year"
-              className={styles.input}
-              value={metadata.year}
-              onChange={(event) =>
-                onMetadataChange({ year: event.target.value })
-              }
-              onBlur={onBlur}
-              inputMode="numeric"
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label htmlFor="publish-isbn">{t('publishBook.fields.isbn')}</label>
-            <input
-              id="publish-isbn"
-              className={styles.input}
-              value={metadata.isbn}
-              onChange={(event) =>
-                onMetadataChange({ isbn: event.target.value })
-              }
-              onBlur={onBlur}
-            />
-          </div>
+          <PublishTextField
+            id="publish-title"
+            label={t('publishBook.fields.title')}
+            value={metadata.title}
+            onChange={(event) =>
+              onMetadataChange({ title: event.target.value })
+            }
+            onBlur={onBlur}
+            required
+            error={errors.title}
+            containerClassName={styles.formGroup}
+          />
+          <PublishTextField
+            id="publish-author"
+            label={t('publishBook.fields.author')}
+            value={metadata.author}
+            onChange={(event) =>
+              onMetadataChange({ author: event.target.value })
+            }
+            onBlur={onBlur}
+            required
+            error={errors.author}
+            containerClassName={styles.formGroup}
+          />
+          <PublishTextField
+            id="publish-language"
+            label={t('publishBook.fields.language')}
+            value={metadata.language}
+            onChange={(event) =>
+              onMetadataChange({ language: event.target.value })
+            }
+            onBlur={onBlur}
+            required
+            error={errors.language}
+            containerClassName={styles.formGroup}
+          />
+          <PublishTextField
+            id="publish-format"
+            label={t('publishBook.fields.format')}
+            value={metadata.format}
+            onChange={(event) =>
+              onMetadataChange({ format: event.target.value })
+            }
+            onBlur={onBlur}
+            required
+            error={errors.format}
+            containerClassName={styles.formGroup}
+          />
+          <PublishTextField
+            id="publish-publisher"
+            label={t('publishBook.fields.publisher')}
+            value={metadata.publisher}
+            onChange={(event) =>
+              onMetadataChange({ publisher: event.target.value })
+            }
+            onBlur={onBlur}
+            containerClassName={styles.formGroup}
+          />
+          <PublishTextField
+            id="publish-year"
+            label={t('publishBook.fields.year')}
+            value={metadata.year}
+            onChange={(event) => onMetadataChange({ year: event.target.value })}
+            onBlur={onBlur}
+            inputMode="numeric"
+            containerClassName={styles.formGroup}
+          />
+          <PublishTextField
+            id="publish-isbn"
+            label={t('publishBook.fields.isbn')}
+            value={metadata.isbn}
+            onChange={(event) => onMetadataChange({ isbn: event.target.value })}
+            onBlur={onBlur}
+            containerClassName={styles.formGroup}
+          />
         </div>
 
         <div>
-          <div className={styles.formGroup}>
-            <label>{t('publishBook.fields.images')}</label>
-            <div
-              className={styles.uploader}
-              role="group"
-              onDragOver={(event) => {
-                event.preventDefault()
-                event.stopPropagation()
-              }}
-              onDrop={(event) => {
-                event.preventDefault()
-                onFiles(event.dataTransfer.files)
-              }}
-            >
-              <p>{t('publishBook.uploader.title')}</p>
-              <span className={styles.uploadHint}>
-                {t('publishBook.uploader.hint', {
-                  count: maxImages,
-                })}
-              </span>
-              <label className={styles.uploadButton} htmlFor="publish-upload">
-                {t('publishBook.uploader.cta')}
-              </label>
-              <input
-                id="publish-upload"
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={(event) => onFiles(event.target.files)}
-              />
-            </div>
-            {errors.images && (
-              <span className={styles.error} role="alert">
-                {errors.images}
-              </span>
-            )}
-          </div>
-          {imagesCount > 0 && (
-            <div className={styles.previews}>
-              {images.map((image) => (
-                <figure key={image.id} className={styles.previewItem}>
-                  <img src={image.url} alt={t('publishBook.previewAlt')} />
-                  <button
-                    type="button"
-                    className={styles.removePreview}
-                    onClick={() => onRemoveImage(image.id)}
-                    aria-label={t('publishBook.uploader.remove') ?? ''}
-                  >
-                    ×
-                  </button>
-                </figure>
-              ))}
-            </div>
-          )}
+          <PublishFileUpload
+            id="publish-upload"
+            label={t('publishBook.fields.images')}
+            buttonLabel={t('publishBook.uploader.cta')}
+            hint={t('publishBook.uploader.hint', { count: maxImages })}
+            accept="image/*"
+            multiple
+            previews={images.map((image) => ({
+              id: image.id,
+              url: image.url,
+              alt: t('publishBook.previewAlt'),
+            }))}
+            onFilesSelected={(files) => onFiles(files)}
+            onDropFiles={(files) => onFiles(files)}
+            onRemoveFile={onRemoveImage}
+            removeLabel={t('publishBook.uploader.remove') ?? ''}
+            error={errors.images}
+            containerClassName={styles.formGroup}
+          />
         </div>
       </div>
     )

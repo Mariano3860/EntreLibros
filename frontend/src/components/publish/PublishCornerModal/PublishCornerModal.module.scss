@@ -1,0 +1,59 @@
+.stepContent {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.stepLayout {
+  display: grid;
+  gap: 24px;
+}
+
+.gridTwo {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.consentRow {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.consentRow input[type='checkbox'] {
+  margin-top: 4px;
+}
+
+.error {
+  color: var(--error-500, #c62828);
+  font-size: 0.85rem;
+}
+
+.privacyNotice {
+  background: rgb(45 87 255 / 8%);
+  border-radius: 16px;
+  padding: 16px;
+  color: var(--neutral-600, #3d4451);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.reviewWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.photoPreview {
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgb(8 15 32 / 12%);
+}
+
+.photoPreview img {
+  width: 100%;
+  height: auto;
+  display: block;
+}

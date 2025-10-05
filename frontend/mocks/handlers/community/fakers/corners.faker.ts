@@ -67,3 +67,8 @@ export const generateCornersMap = (): CommunityCornerMap => {
     })),
   }
 }
+
+export const registerCorner = (corner: CommunityCornerSummary) => {
+  const corners = ensureCorners()
+  cachedCorners = [corner, ...corners.filter((item) => item.id !== corner.id)]
+}

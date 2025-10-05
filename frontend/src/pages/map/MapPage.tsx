@@ -1,6 +1,7 @@
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
+import { PublishCornerModal } from '@components/publish/PublishCornerModal'
 import sharedStyles from '@styles/shared.module.scss'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type {
@@ -68,6 +69,7 @@ export const MapPage = () => {
   const [isFilterRailOpen, setFilterRailOpen] = useState(true)
   const [geolocationDenied, setGeolocationDenied] = useState(false)
   const [zoneFallback, setZoneFallback] = useState('')
+  const [isCreateCornerOpen, setCreateCornerOpen] = useState(false)
 
   const viewStartedAtRef = useRef<number | null>(null)
   const trackedFirstPinRef = useRef(false)
@@ -187,7 +189,12 @@ export const MapPage = () => {
 
   const handleCreateCorner = () => {
     track('cta.create_corner_clicked')
+    setCreateCornerOpen(true)
   }
+
+  const handleCloseCornerModal = useCallback(() => {
+    setCreateCornerOpen(false)
+  }, [])
 
   const handleLocateMe = () => {
     if (typeof navigator === 'undefined' || !navigator.geolocation) {
@@ -224,6 +231,14 @@ export const MapPage = () => {
     setSearchInput(value)
     track('map.filter_changed', { filter: 'zone', value })
   }
+
+  const handleCornerCreated = useCallback(
+    (_cornerId: string) => {
+      setCreateCornerOpen(false)
+      void refetch()
+    },
+    [refetch]
+  )
 
   return (
     <BaseLayout id={'map-page'}>
@@ -318,6 +333,12 @@ export const MapPage = () => {
             />
           ) : null}
         </div>
+
+        <PublishCornerModal
+          isOpen={isCreateCornerOpen}
+          onClose={handleCloseCornerModal}
+          onCreated={handleCornerCreated}
+        />
       </div>
     </BaseLayout>
   )

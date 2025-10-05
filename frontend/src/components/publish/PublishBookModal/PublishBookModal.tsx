@@ -1,3 +1,8 @@
+import {
+  PublishModal,
+  PublishModalAction,
+  PublishModalActions,
+} from '@components/publish/shared'
 import { useBookSearch } from '@hooks/api/useBookSearch'
 import { usePublishBook } from '@hooks/api/usePublishBook'
 import { useFocusTrap } from '@hooks/useFocusTrap'
@@ -21,7 +26,6 @@ import {
   STORAGE_KEY,
   genres,
   initialState,
-  stepIndex,
   stepOrder,
   toSerializableDraft,
 } from './PublishBookModal.constants'
@@ -506,159 +510,160 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
     [setState]
   )
 
+  const stepperSteps = useMemo(
+    () =>
+      stepOrder.map((step) => ({
+        id: step,
+        label: t(`publishBook.steps.${step}.title`),
+        description: t(`publishBook.steps.${step}.description`),
+      })),
+    [t]
+  )
+
+  const leftActions = useMemo<PublishModalAction[]>(
+    () => [
+      {
+        label: t('publishBook.cancel'),
+        onClick: closeWithConfirmation,
+        variant: 'secondary',
+      },
+      {
+        label: t('publishBook.saveDraft'),
+        onClick: handleSaveDraft,
+        variant: 'secondary',
+      },
+    ],
+    [closeWithConfirmation, handleSaveDraft, t]
+  )
+
+  const rightActions = useMemo<PublishModalAction[]>(() => {
+    const actions: PublishModalAction[] = []
+    if (state.step !== 'identify') {
+      actions.push({
+        label: t('publishBook.back'),
+        onClick: previousStep,
+        variant: 'secondary',
+      })
+    }
+
+    if (state.step !== 'review') {
+      actions.push({
+        label: t('publishBook.next'),
+        onClick: nextStep,
+        variant: 'primary',
+        disabled:
+          (state.step === 'identify' && !canProceedIdentify) ||
+          (state.step === 'offer' && !canProceedOffer),
+      })
+    } else {
+      actions.push({
+        label: isPending
+          ? t('publishBook.publishing')
+          : t('publishBook.publish'),
+        onClick: handlePublish,
+        variant: 'primary',
+        disabled: publishDisabled,
+      })
+    }
+
+    return actions
+  }, [
+    state.step,
+    t,
+    previousStep,
+    nextStep,
+    canProceedIdentify,
+    canProceedOffer,
+    isPending,
+    handlePublish,
+    publishDisabled,
+  ])
+
   if (!isOpen) return null
 
-  return (
-    <div className={styles.overlay} role="presentation" aria-hidden={!isOpen}>
-      {showDraftPrompt ? (
+  if (showDraftPrompt) {
+    return (
+      <div className={styles.overlay} role="presentation" aria-hidden={!isOpen}>
         <ResumeDraftPrompt
           t={t}
           onDiscard={discardDraft}
           onResume={resumeDraft}
         />
-      ) : (
-        <div
-          className={styles.modal}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="publish-book-title"
-          ref={modalRef}
-        >
-          <header className={styles.header}>
-            <div className={styles.titleGroup}>
-              <h2 id="publish-book-title">{t('publishBook.title')}</h2>
-              <span className={styles.toastInline}>
-                {t('publishBook.subtitle')}
-              </span>
-            </div>
-            <div className={styles.headerActions}>
-              <button
-                type="button"
-                className={styles.closeButton}
-                onClick={closeWithConfirmation}
-              >
-                {t('publishBook.cancel')}
-              </button>
-            </div>
-          </header>
+      </div>
+    )
+  }
 
-          <section className={styles.content}>
-            <PublishBookStepper
-              currentStep={state.step}
-              t={t}
-              stepOrder={stepOrder}
-              stepIndex={stepIndex}
-            />
+  return (
+    <PublishModal
+      ref={modalRef}
+      isOpen={isOpen}
+      title={t('publishBook.title')}
+      subtitle={t('publishBook.subtitle')}
+      onClose={closeWithConfirmation}
+      closeLabel={t('publishBook.cancel')}
+      footer={
+        <PublishModalActions
+          leftActions={leftActions}
+          rightActions={rightActions}
+        />
+      }
+    >
+      <PublishBookStepper
+        steps={stepperSteps}
+        currentStep={state.step}
+        ariaLabel={t('publishBook.progress')}
+      />
 
-            <div className={styles.stepContent}>
-              {state.step === 'identify' && (
-                <IdentifyStep
-                  t={t}
-                  metadata={state.metadata}
-                  manualMode={state.manualMode}
-                  searchQuery={state.searchQuery}
-                  images={state.images}
-                  errors={identifyErrors}
-                  results={results}
-                  isFetching={isFetching}
-                  isError={isError}
-                  maxImages={MAX_IMAGES_UPLOAD}
-                  onMetadataChange={updateMetadata}
-                  onSearchChange={handleSearchChange}
-                  onManualModeToggle={handleManualModeToggle}
-                  onResultSelect={handleResult}
-                  onFiles={handleFiles}
-                  onRemoveImage={removeImage}
-                  onRetry={handleRetrySearch}
-                  onBlur={handleBlur}
-                />
-              )}
+      <div className={styles.stepContent}>
+        {state.step === 'identify' && (
+          <IdentifyStep
+            t={t}
+            metadata={state.metadata}
+            manualMode={state.manualMode}
+            searchQuery={state.searchQuery}
+            images={state.images}
+            errors={identifyErrors}
+            results={results}
+            isFetching={isFetching}
+            isError={isError}
+            maxImages={MAX_IMAGES_UPLOAD}
+            onMetadataChange={updateMetadata}
+            onSearchChange={handleSearchChange}
+            onManualModeToggle={handleManualModeToggle}
+            onResultSelect={handleResult}
+            onFiles={handleFiles}
+            onRemoveImage={removeImage}
+            onRetry={handleRetrySearch}
+            onBlur={handleBlur}
+          />
+        )}
 
-              {state.step === 'offer' && (
-                <OfferStep
-                  t={t}
-                  offer={state.offer}
-                  corner={state.corner}
-                  errors={offerErrors}
-                  genres={genres}
-                  onOfferChange={updateOffer}
-                  onDeliveryChange={updateDelivery}
-                  onToggleTradePreference={toggleTradePreference}
-                  onCornerChange={updateCorner}
-                  onBlur={handleBlur}
-                />
-              )}
+        {state.step === 'offer' && (
+          <OfferStep
+            t={t}
+            offer={state.offer}
+            corner={state.corner}
+            errors={offerErrors}
+            genres={genres}
+            onOfferChange={updateOffer}
+            onDeliveryChange={updateDelivery}
+            onToggleTradePreference={toggleTradePreference}
+            onCornerChange={updateCorner}
+            onBlur={handleBlur}
+          />
+        )}
 
-              {state.step === 'review' && (
-                <ReviewStep
-                  t={t}
-                  metadata={state.metadata}
-                  offer={state.offer}
-                  coverUrl={coverUrl}
-                  acceptedTerms={state.acceptedTerms}
-                  onAcceptedTermsChange={handleAcceptedTermsChange}
-                />
-              )}
-            </div>
-          </section>
-
-          <footer className={styles.actions}>
-            <div className={styles.ctaGroup}>
-              <button
-                type="button"
-                className={styles.secondaryButton}
-                onClick={closeWithConfirmation}
-              >
-                {t('publishBook.cancel')}
-              </button>
-              <button
-                type="button"
-                className={styles.secondaryButton}
-                onClick={handleSaveDraft}
-              >
-                {t('publishBook.saveDraft')}
-              </button>
-            </div>
-
-            <div className={styles.ctaGroup}>
-              {state.step !== 'identify' && (
-                <button
-                  type="button"
-                  className={styles.secondaryButton}
-                  onClick={previousStep}
-                >
-                  {t('publishBook.back')}
-                </button>
-              )}
-              {state.step !== 'review' && (
-                <button
-                  type="button"
-                  className={styles.primaryButton}
-                  onClick={nextStep}
-                  disabled={
-                    (state.step === 'identify' && !canProceedIdentify) ||
-                    (state.step === 'offer' && !canProceedOffer)
-                  }
-                >
-                  {t('publishBook.next')}
-                </button>
-              )}
-              {state.step === 'review' && (
-                <button
-                  type="button"
-                  className={styles.primaryButton}
-                  onClick={handlePublish}
-                  disabled={publishDisabled}
-                >
-                  {isPending
-                    ? t('publishBook.publishing')
-                    : t('publishBook.publish')}
-                </button>
-              )}
-            </div>
-          </footer>
-        </div>
-      )}
-    </div>
+        {state.step === 'review' && (
+          <ReviewStep
+            t={t}
+            metadata={state.metadata}
+            offer={state.offer}
+            coverUrl={coverUrl}
+            acceptedTerms={state.acceptedTerms}
+            onAcceptedTermsChange={handleAcceptedTermsChange}
+          />
+        )}
+      </div>
+    </PublishModal>
   )
 }
