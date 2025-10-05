@@ -1,3 +1,4 @@
+import { cx } from '@utils/cx'
 import { ReactNode } from 'react'
 
 import type { MessageRole, MessageTone } from '../../Messages.types'
@@ -30,16 +31,13 @@ export const BubbleBase = ({
   bodyClassName,
   ariaLabel,
 }: BubbleBaseProps) => {
-  const bubbleClassName = [
+  const bubbleClassName = cx(
     styles.bubble,
     styles[`role-${role}`],
     styles[`tone-${tone}`],
-    className,
-  ]
-    .filter(Boolean)
-    .join(' ')
-
-  const bodyClassNames = [styles.body, bodyClassName].filter(Boolean).join(' ')
+    className
+  )
+  const bodyClassNames = cx(styles.body, bodyClassName)
 
   return (
     <article className={bubbleClassName} role="group" aria-label={ariaLabel}>

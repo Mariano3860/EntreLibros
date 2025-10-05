@@ -16,6 +16,7 @@ import {
 import { suggestionsHandler } from './community/suggestions.handler'
 import { contactFormHandler } from './contactForm/contactForm.handler'
 import { userLanguageHandler } from './language/language.handler'
+import { mapHandler } from './map/map.handler'
 
 export const handlers = [
   loginHandler,
@@ -35,4 +36,5 @@ export const handlers = [
   cornersMapHandler,
   activityHandler,
   suggestionsHandler,
+  mapHandler,
 ]

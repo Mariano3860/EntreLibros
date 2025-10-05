@@ -1,3 +1,4 @@
+import { cx } from '@utils/cx'
 import { Outlet } from 'react-router-dom'
 
 import { Sidebar } from '../../sidebar/Sidebar'
@@ -15,12 +16,8 @@ export const BaseLayout = ({
   mainClassName,
   id,
 }: BaseLayoutProps) => {
-  const containerClass = [className, styles.baseLayout]
-    .filter(Boolean)
-    .join(' ')
-  const mainClass = [mainClassName, styles.mainContent]
-    .filter(Boolean)
-    .join(' ')
+  const containerClass = cx(className, styles.baseLayout)
+  const mainClass = cx(mainClassName, styles.mainContent)
   return (
     <div className={containerClass} {...(id ? { id: `${id}-container` } : {})}>
       <Sidebar />

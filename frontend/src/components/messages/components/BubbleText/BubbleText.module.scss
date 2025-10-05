@@ -48,7 +48,7 @@
 
 .ownership-mine {
   box-shadow: inset 0 0 0 1px
-    color-mix(in srgb, rgb(var(--primary-rgb)) 45%, transparent 55%);
+    color-mix(in srgb, rgb(var(--primary-color-rgb)) 45%, transparent 55%);
 }
 
 .ownership-theirs {

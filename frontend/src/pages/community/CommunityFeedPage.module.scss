@@ -20,12 +20,12 @@
 .header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: $spacing-1;
   margin-bottom: $spacing-2;
 }
 
 .publishButton {
-  margin-left: auto;
   background-color: var(--primary-color);
   color: #fff;
   border: none;

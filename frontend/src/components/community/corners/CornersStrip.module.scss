@@ -29,6 +29,7 @@
   cursor: pointer;
   padding: $spacing-1;
   transition: color $transition-duration-fast $transition-timing-function;
+  text-decoration: none;
 
   &:hover,
   &:focus-visible {
@@ -137,7 +138,7 @@
   gap: $spacing-1;
   font-size: $small-font-size;
   color: var(--text-secondary);
-  background: rgb(var(--primary-rgb), 0.08);
+  background: rgb(var(--primary-color-rgb), 0.08);
   border-radius: rem(999px);
   padding: $spacing-1x5 $spacing-2;
 }
@@ -160,7 +161,7 @@
   line-height: 1;
   font-weight: $font-weight-medium;
   color: var(--primary-light);
-  background: rgba(var(--primary-super-dark), 0.5);
+  background: rgb(var(--primary-super-dark), 0.5);
   background: color-mix(in srgb, var(--primary-super-dark) 50%, transparent);
   box-shadow: 0 2px 8px rgb(var(--shadow-md) / 25%);
   backdrop-filter: blur(5px);
@@ -240,6 +241,7 @@
   0% {
     transform: translateX(-100%);
   }
+
   100% {
     transform: translateX(100%);
   }
