@@ -3,8 +3,16 @@ name: CI Frontend
 on:
   push:
     branches: ['**']
+    paths:
+      - 'frontend/**'
+      - 'shared/**'
+      - '.github/workflows/ci-frontend.yml'
   pull_request:
     branches: ['**']
+    paths:
+      - 'frontend/**'
+      - 'shared/**'
+      - '.github/workflows/ci-frontend.yml'
 
 concurrency:
   group: ci-frontend-${{ github.ref }}
