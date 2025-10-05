@@ -2,7 +2,7 @@
   overflow: auto;
 
   /* Firefox */
-  scrollbar-color: var(--scrollbar-thumb, rgb(var(--scroll-bar-color), 0.4))
+  scrollbar-color: var(--scrollbar-thumb, rgb(var(--scroll-bar-color-rgb) / 0.4))
     transparent;
 
   /* Chromium/WebKit */
@@ -16,7 +16,7 @@
   }
 
   &::-webkit-scrollbar-thumb {
-    background-color: rgb(var(--scroll-bar-color), 0.4);
+    background-color: rgb(var(--scroll-bar-color-rgb) / 0.4);
     border-radius: 8px;
   }
 }

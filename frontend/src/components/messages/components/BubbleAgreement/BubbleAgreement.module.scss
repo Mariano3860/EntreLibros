@@ -60,18 +60,18 @@
 }
 
 .actionButton:focus-visible {
-  outline: 2px solid rgb(var(--primary-rgb));
+  outline: 2px solid rgb(var(--primary-color-rgb));
   outline-offset: 2px;
 }
 
 .actionButtonConfirm {
-  background: rgb(var(--primary-rgb));
+  background: rgb(var(--primary-color-rgb));
   color: #fff;
   box-shadow: 0 1px 2px rgb(0 0 0 / 12%);
 }
 
 .actionButtonConfirm:hover {
-  background: color-mix(in srgb, rgb(var(--primary-rgb)) 88%, #000 12%);
+  background: color-mix(in srgb, rgb(var(--primary-color-rgb)) 88%, #000 12%);
 }
 
 .actionButtonSuggest {
