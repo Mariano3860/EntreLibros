@@ -29,7 +29,6 @@
     "complete-check": "npm run complete-check:backend && npm run complete-check:frontend"
   },
   "devDependencies": {
-    "@types/leaflet": "^1.9.20",
     "npm-run-all": "^4.1.5"
   }
 }
