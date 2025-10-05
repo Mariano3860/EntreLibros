@@ -13,6 +13,7 @@ import type {
 import { useMapData } from '@src/hooks/api/useMapData'
 import { track } from '@src/utils/analytics'
 import { cx } from '@src/utils/cx'
+import { boundingBoxFromCenter } from '@src/utils/geospatial'
 
 import { EmptyState } from './components/common/EmptyState'
 import { ErrorBanner } from './components/common/ErrorBanner'
@@ -21,13 +22,6 @@ import { FilterRail } from './components/FilterRail/FilterRail'
 import { MapCanvas } from './components/MapCanvas/MapCanvas'
 import { MapHeader } from './components/MapHeader/MapHeader'
 import styles from './MapPage.module.scss'
-
-const DEFAULT_BBOX: MapBoundingBox = {
-  north: -34.54,
-  south: -34.72,
-  east: -58.36,
-  west: -58.55,
-}
 
 const AVAILABLE_THEMES = [
   'Club lector',
@@ -53,8 +47,15 @@ const DEFAULT_LAYERS: MapLayerToggles = {
 }
 
 const DEBOUNCE_MS = 300
+const MIN_BOUNDING_BOX_RADIUS_KM = 5.55
+const DEFAULT_CENTER = { latitude: -34.63, longitude: -58.47 }
 
-const KM_PER_DEGREE = 111 // Approximate conversion factor
+const DEFAULT_BBOX: MapBoundingBox = boundingBoxFromCenter(
+  DEFAULT_CENTER.latitude,
+  DEFAULT_CENTER.longitude,
+  DEFAULT_FILTERS.distanceKm,
+  { minDistanceKm: MIN_BOUNDING_BOX_RADIUS_KM }
+)
 
 export const MapPage = () => {
   const { t, i18n } = useTranslation()
@@ -197,13 +198,12 @@ export const MapPage = () => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords
-        const delta = Math.max(filters.distanceKm / KM_PER_DEGREE, 0.05)
-        const nextBbox: MapBoundingBox = {
-          north: latitude + delta,
-          south: latitude - delta,
-          east: longitude + delta,
-          west: longitude - delta,
-        }
+        const nextBbox: MapBoundingBox = boundingBoxFromCenter(
+          latitude,
+          longitude,
+          filters.distanceKm,
+          { minDistanceKm: MIN_BOUNDING_BOX_RADIUS_KM }
+        )
         setBbox(nextBbox)
         setGeolocationDenied(false)
         setZoneFallback('')
