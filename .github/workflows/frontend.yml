@@ -1,25 +1,35 @@
-name: Frontend
+name: CI Frontend
 
 on:
   push:
-    branches: [main]
+    branches: ['**']
   pull_request:
-    branches: [main]
+    branches: ['**']
+
+concurrency:
+  group: ci-frontend-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
-  test:
+  quality:
     runs-on: ubuntu-latest
+    env:
+      CI: true
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
       - run: npm ci --workspace frontend
       - run: npm run format -w frontend
       - run: npm run lint -w frontend
+      - run: npm run stylelint -w frontend
       - run: npm run typecheck -w frontend
       - run: npm run test -w frontend
-      - name: Build Docker image
-        if: github.ref == 'refs/heads/main'
-        run: docker build -t frontend -f frontend/Dockerfile .

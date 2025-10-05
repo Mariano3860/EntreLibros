@@ -1,3 +1,4 @@
+import { cx } from '@utils/cx'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -121,9 +122,7 @@ export const MapHeader = ({
           <button
             key={chip.key}
             type="button"
-            className={[styles.chip, chip.active ? styles.chipActive : ''].join(
-              ' '
-            )}
+            className={cx(styles.chip, chip.active ? styles.chipActive : '')}
             onClick={chip.onClick}
             aria-pressed={chip.active}
           >

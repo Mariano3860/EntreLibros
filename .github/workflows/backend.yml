@@ -1,14 +1,22 @@
-name: Backend
+name: CI Backend
 
 on:
   push:
-    branches: [main]
+    branches: ['**']
   pull_request:
-    branches: [main]
+    branches: ['**']
+
+concurrency:
+  group: ci-backend-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
-  test:
+  quality:
     runs-on: ubuntu-latest
+
     services:
       postgres:
         image: postgis/postgis:16-3.5
@@ -16,26 +24,27 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: entrelibros_test
-        ports:
-          - 5432:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U postgres"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+
     env:
-      DATABASE_URL: postgres://postgres:postgres@localhost:5432/entrelibros_test
+      CI: true
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/entrelibros_test
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
+          cache-dependency-path: backend/package-lock.json
+
       - run: npm ci --workspace backend
       - run: npm run format -w backend
       - run: npm run lint -w backend
       - run: npm run typecheck -w backend
       - run: npm run test -w backend
-      - name: Build Docker image
-        if: github.ref == 'refs/heads/main'
-        run: docker build -t backend -f backend/Dockerfile .
