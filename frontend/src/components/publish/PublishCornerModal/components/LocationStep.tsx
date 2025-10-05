@@ -1,24 +1,17 @@
 import {
   PublishFileUpload,
   PublishSegmentedControl,
-  PublishSelectField,
   PublishTextField,
 } from '@components/publish/shared'
 import { TFunction } from 'i18next'
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 
 import styles from '../PublishCornerModal.module.scss'
 import { PublishCornerFormState } from '../PublishCornerModal.types'
 
 type LocationStepErrors = Partial<
   Record<
-    | 'country'
-    | 'province'
-    | 'city'
-    | 'neighborhood'
-    | 'reference'
-    | 'photo'
-    | 'consent',
+    'street' | 'number' | 'latitude' | 'longitude' | 'photo' | 'consent',
     string
   >
 >
@@ -32,37 +25,15 @@ type LocationStepProps = {
   onRemovePhoto: () => void
 }
 
-const countries = ['Argentina', 'Uruguay'] as const
-
-const provinces: Record<(typeof countries)[number], string[]> = {
-  Argentina: ['Buenos Aires', 'Córdoba', 'Santa Fe'],
-  Uruguay: ['Montevideo', 'Canelones'],
-}
-
-const cities: Record<string, string[]> = {
-  'Buenos Aires': ['La Plata', 'Mar del Plata', 'Bahía Blanca'],
-  Córdoba: ['Córdoba Capital', 'Villa María'],
-  'Santa Fe': ['Rosario', 'Santa Fe'],
-  Montevideo: ['Montevideo'],
-  Canelones: ['Las Piedras', 'Ciudad de la Costa'],
-}
-
-const neighborhoods: Record<string, string[]> = {
-  'La Plata': ['Centro', 'Tolosa', 'Gonnet'],
-  'Mar del Plata': ['Los Troncos', 'La Perla'],
-  'Bahía Blanca': ['Centro', 'Villa Mitre'],
-  'Córdoba Capital': ['Nueva Córdoba', 'Güemes'],
-  'Villa María': ['Centro', 'Barrio General Paz'],
-  Rosario: ['Pichincha', 'República de la Sexta'],
-  'Santa Fe': ['Candioti', 'Constituyentes'],
-  Montevideo: ['Ciudad Vieja', 'Pocitos'],
-  'Las Piedras': ['Centro', 'Obelisco'],
-  'Ciudad de la Costa': ['Solymar', 'Lagomar'],
-}
-
 const visibilityOptions = [
-  { id: 'neighborhood', labelKey: 'publishCorner.visibility.neighborhood' },
-  { id: 'city', labelKey: 'publishCorner.visibility.city' },
+  {
+    id: 'exact',
+    labelKey: 'publishCorner.visibilityPreference.exact',
+  },
+  {
+    id: 'approximate',
+    labelKey: 'publishCorner.visibilityPreference.approximate',
+  },
 ] as const
 
 const statusOptions = [
@@ -78,130 +49,133 @@ export const LocationStep: React.FC<LocationStepProps> = ({
   onPhotoSelect,
   onRemovePhoto,
 }) => {
-  const availableProvinces = useMemo(
-    () => provinces[state.country as keyof typeof provinces] ?? [],
-    [state.country]
+  const [isLocating, setIsLocating] = useState(false)
+  const [locationError, setLocationError] = useState<string | null>(null)
+
+  const coordinatesFilled = useMemo(
+    () => Boolean(state.latitude.trim() && state.longitude.trim()),
+    [state.latitude, state.longitude]
   )
 
-  const availableCities = useMemo(
-    () => cities[state.province] ?? [],
-    [state.province]
-  )
+  const handleUseCurrentLocation = useCallback(() => {
+    if (isLocating) return
 
-  const availableNeighborhoods = useMemo(
-    () => neighborhoods[state.city] ?? [],
-    [state.city]
-  )
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
+      setLocationError(t('publishCorner.errors.geolocationUnsupported'))
+      return
+    }
+
+    setIsLocating(true)
+    setLocationError(null)
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        onChange({
+          latitude: coords.latitude.toFixed(6),
+          longitude: coords.longitude.toFixed(6),
+        })
+        setIsLocating(false)
+      },
+      () => {
+        setLocationError(t('publishCorner.errors.geolocationDenied'))
+        setIsLocating(false)
+      }
+    )
+  }, [isLocating, onChange, t])
 
   return (
     <div className={styles.stepLayout}>
       <div className={styles.gridTwo}>
-        <PublishSelectField
-          id="corner-country"
-          label={t('publishCorner.fields.country')}
-          value={state.country}
-          onChange={(event) =>
-            onChange({
-              country: event.target.value,
-              province: '',
-              city: '',
-              neighborhood: '',
-            })
-          }
-          error={errors.country}
+        <PublishTextField
+          id="corner-street"
+          label={t('publishCorner.fields.street')}
+          value={state.street}
+          onChange={(event) => onChange({ street: event.target.value })}
+          error={errors.street}
           required
-        >
-          <option value="">{t('publishCorner.placeholders.country')}</option>
-          {countries.map((country) => (
-            <option key={country} value={country}>
-              {country}
-            </option>
-          ))}
-        </PublishSelectField>
-
-        <PublishSelectField
-          id="corner-province"
-          label={t('publishCorner.fields.province')}
-          value={state.province}
-          onChange={(event) =>
-            onChange({
-              province: event.target.value,
-              city: '',
-              neighborhood: '',
-            })
-          }
-          disabled={!state.country}
-          error={errors.province}
+        />
+        <PublishTextField
+          id="corner-number"
+          label={t('publishCorner.fields.number')}
+          value={state.number}
+          onChange={(event) => onChange({ number: event.target.value })}
+          error={errors.number}
           required
-        >
-          <option value="">{t('publishCorner.placeholders.province')}</option>
-          {availableProvinces.map((province) => (
-            <option key={province} value={province}>
-              {province}
-            </option>
-          ))}
-        </PublishSelectField>
-
-        <PublishSelectField
-          id="corner-city"
-          label={t('publishCorner.fields.city')}
-          value={state.city}
-          onChange={(event) =>
-            onChange({ city: event.target.value, neighborhood: '' })
-          }
-          disabled={!state.province}
-          error={errors.city}
-          required
-        >
-          <option value="">{t('publishCorner.placeholders.city')}</option>
-          {availableCities.map((city) => (
-            <option key={city} value={city}>
-              {city}
-            </option>
-          ))}
-        </PublishSelectField>
-
-        <PublishSelectField
-          id="corner-neighborhood"
-          label={t('publishCorner.fields.neighborhood')}
-          value={state.neighborhood}
-          onChange={(event) => onChange({ neighborhood: event.target.value })}
-          disabled={!state.city}
-          error={errors.neighborhood}
-          required
-        >
-          <option value="">
-            {t('publishCorner.placeholders.neighborhood')}
-          </option>
-          {availableNeighborhoods.map((neighborhood) => (
-            <option key={neighborhood} value={neighborhood}>
-              {neighborhood}
-            </option>
-          ))}
-        </PublishSelectField>
+        />
+        <PublishTextField
+          id="corner-unit"
+          label={t('publishCorner.fields.unit')}
+          value={state.unit}
+          onChange={(event) => onChange({ unit: event.target.value })}
+        />
+        <PublishTextField
+          id="corner-postal-code"
+          label={t('publishCorner.fields.postalCode')}
+          value={state.postalCode}
+          onChange={(event) => onChange({ postalCode: event.target.value })}
+        />
       </div>
 
-      <PublishTextField
-        id="corner-reference"
-        label={t('publishCorner.fields.reference')}
-        value={state.reference}
-        onChange={(event) => onChange({ reference: event.target.value })}
-        error={errors.reference}
-        hint={t('publishCorner.fields.referenceHint') ?? undefined}
-        required
-      />
+      <div className={styles.coordinatesSection}>
+        <div className={styles.coordinatesHeader}>
+          <h4>{t('publishCorner.fields.coordinates')}</h4>
+          <button
+            type="button"
+            className={styles.secondaryButton}
+            onClick={handleUseCurrentLocation}
+            disabled={isLocating}
+          >
+            {isLocating
+              ? t('publishCorner.fields.locating')
+              : coordinatesFilled
+                ? t('publishCorner.fields.updateLocation')
+                : t('publishCorner.fields.useCurrentLocation')}
+          </button>
+        </div>
+
+        <div className={styles.coordinatesGrid}>
+          <PublishTextField
+            id="corner-latitude"
+            label={t('publishCorner.fields.latitude')}
+            type="number"
+            inputMode="decimal"
+            step="any"
+            value={state.latitude}
+            onChange={(event) => onChange({ latitude: event.target.value })}
+            error={errors.latitude}
+            required
+          />
+          <PublishTextField
+            id="corner-longitude"
+            label={t('publishCorner.fields.longitude')}
+            type="number"
+            inputMode="decimal"
+            step="any"
+            value={state.longitude}
+            onChange={(event) => onChange({ longitude: event.target.value })}
+            error={errors.longitude}
+            required
+          />
+        </div>
+
+        {locationError ? (
+          <p className={styles.error} role="alert">
+            {locationError}
+          </p>
+        ) : null}
+      </div>
 
       <PublishSegmentedControl
         id="corner-visibility"
-        label={t('publishCorner.fields.visibility')}
-        value={state.visibility}
+        label={t('publishCorner.fields.visibilityPreference')}
+        value={state.visibilityPreference}
         options={visibilityOptions.map((option) => ({
           value: option.id,
           label: t(option.labelKey),
         }))}
         onChange={(value) =>
           onChange({
-            visibility: value as PublishCornerFormState['visibility'],
+            visibilityPreference:
+              value as PublishCornerFormState['visibilityPreference'],
           })
         }
       />

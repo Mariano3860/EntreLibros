@@ -15,6 +15,57 @@
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
+.coordinatesSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.coordinatesHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.coordinatesHeader h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--neutral-700, #2c3440);
+}
+
+.secondaryButton {
+  appearance: none;
+  background: transparent;
+  border: 1px solid rgb(45 87 255 / 32%);
+  border-radius: 999px;
+  color: var(--primary-600, #2d57ff);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 6px 16px;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.secondaryButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.secondaryButton:not(:disabled):hover,
+.secondaryButton:not(:disabled):focus {
+  background: rgb(45 87 255 / 12%);
+}
+
+.coordinatesGrid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
 .consentRow {
   display: flex;
   gap: 12px;

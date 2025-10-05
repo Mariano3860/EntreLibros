@@ -21,7 +21,25 @@ export type CommunityCornerMap = {
 
 export type PublishCornerScope = 'public' | 'semiprivate'
 
-export type PublishCornerVisibility = 'neighborhood' | 'city'
+export type PublishCornerVisibilityPreference = 'exact' | 'approximate'
+
+export type PublishCornerAddress = {
+  street: string
+  number: string
+  unit?: string
+  postalCode?: string
+}
+
+export type PublishCornerCoordinates = {
+  latitude: number
+  longitude: number
+}
+
+export type PublishCornerLocationPayload = {
+  address: PublishCornerAddress
+  coordinates: PublishCornerCoordinates
+  visibilityPreference: PublishCornerVisibilityPreference
+}
 
 export type PublishCornerStatus = 'active' | 'paused'
 
@@ -37,14 +55,7 @@ export type PublishCornerPayload = {
   internalContact: string
   rules?: string
   schedule?: string
-  location: {
-    country: string
-    province: string
-    city: string
-    neighborhood: string
-    reference: string
-    visibility: PublishCornerVisibility
-  }
+  location: PublishCornerLocationPayload
   consent: boolean
   photo: PublishCornerPhoto
   status: PublishCornerStatus

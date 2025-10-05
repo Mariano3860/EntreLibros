@@ -11,6 +11,14 @@ type ReviewStepProps = {
 }
 
 export const ReviewStep: React.FC<ReviewStepProps> = ({ t, state }) => {
+  const addressParts = [
+    `${state.street} ${state.number}`.trim(),
+    state.unit.trim(),
+    state.postalCode.trim(),
+  ].filter(Boolean)
+
+  const address = addressParts.join(' · ')
+
   const entries = [
     {
       label: t('publishCorner.review.name'),
@@ -37,16 +45,18 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({ t, state }) => {
       value: state.schedule || t('publishCorner.review.emptyField'),
     },
     {
-      label: t('publishCorner.review.location'),
-      value: `${state.neighborhood}, ${state.city} · ${state.province}, ${state.country}`,
+      label: t('publishCorner.review.address'),
+      value: address || t('publishCorner.review.emptyField'),
     },
     {
-      label: t('publishCorner.review.reference'),
-      value: state.reference,
+      label: t('publishCorner.review.coordinates'),
+      value: `${state.latitude}, ${state.longitude}`,
     },
     {
-      label: t('publishCorner.review.visibility'),
-      value: t(`publishCorner.visibility.${state.visibility}`),
+      label: t('publishCorner.review.visibilityPreference'),
+      value: t(
+        `publishCorner.visibilityPreference.${state.visibilityPreference}`
+      ),
     },
     {
       label: t('publishCorner.review.status'),

@@ -31,10 +31,17 @@ export const cornersMapHandler = http.get(
 )
 
 const buildLocationSummary = (payload: PublishCornerPayload): string => {
-  if (payload.location.visibility === 'neighborhood') {
-    return `${payload.location.neighborhood}, ${payload.location.city}`
+  const {
+    location: { address, visibilityPreference },
+  } = payload
+
+  if (visibilityPreference === 'approximate') {
+    return address.postalCode
+      ? `${address.street} · CP ${address.postalCode}`
+      : `${address.street} · Zona aproximada`
   }
-  return `${payload.location.city}, ${payload.location.province}`
+
+  return `${address.street} ${address.number}`
 }
 
 export const createCornerSuccessHandler = http.post(
@@ -68,7 +75,7 @@ export const createCornerValidationHandler = http.post(
     return HttpResponse.json(
       {
         errors: {
-          reference: 'La referencia no puede incluir números ni datos exactos.',
+          street: 'La calle es obligatoria para guardar el Rincón.',
         },
       },
       { status: 422 }

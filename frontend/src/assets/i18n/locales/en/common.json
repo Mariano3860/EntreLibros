@@ -274,10 +274,10 @@
     "previewAlt": "Preview cover"
   },
   "publishCorner": {
-    "title": "Create Book Corner",
-    "subtitle": "Share the main details so the community can visit it.",
-    "progress": "Corner creation progress",
-    "confirmClose": "You have unsaved changes. Do you want to leave anyway?",
+    "title": "Create Reading Corner",
+    "subtitle": "Share the basics so the community can visit it.",
+    "progress": "Creation progress",
+    "confirmClose": "You have unsaved changes. Do you still want to leave?",
     "draftSaved": "Draft saved.",
     "published": "Corner published successfully!",
     "actions": {
@@ -294,12 +294,12 @@
         "description": "Name, host and guidelines."
       },
       "location": {
-        "title": "Location & privacy",
-        "description": "Share the area and how to access without revealing the exact address."
+        "title": "Address & visibility",
+        "description": "Confirm the exact address and choose how it will be displayed to the community."
       },
       "review": {
-        "title": "Review and confirm",
-        "description": "Double-check everything before publishing."
+        "title": "Review & confirm",
+        "description": "Double-check the information before publishing."
       }
     },
     "fields": {
@@ -309,35 +309,33 @@
       "internalContact": "Internal contact (support only)",
       "rules": "Local guidelines",
       "rulesHint": "Write a short summary or paste a link with more details.",
-      "schedule": "Suggested hours",
+      "schedule": "Suggested schedule",
       "scheduleHint": "Optional: typical days or times when it is available.",
-      "country": "Country",
-      "province": "Province",
-      "city": "City",
-      "neighborhood": "Neighborhood or area",
-      "reference": "Non-exact access reference",
-      "referenceHint": "Use general references like squares, corners or nearby landmarks.",
-      "visibility": "Location visibility",
+      "street": "Street",
+      "number": "Number",
+      "unit": "Floor / Apt (optional)",
+      "postalCode": "Postal code (optional)",
+      "coordinates": "Map location",
+      "useCurrentLocation": "Use my current location",
+      "updateLocation": "Update location",
+      "locating": "Fetching location...",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "visibilityPreference": "How the location will be shown",
       "photo": "Representative photo",
       "photoCta": "Upload image",
-      "photoHint": "Show the corner without including sensitive information.",
+      "photoHint": "Show the corner without revealing sensitive information.",
       "photoRemove": "Remove image",
       "status": "Initial status",
-      "consent": "I authorize EntreLibros to publish this Corner with the selected visibility."
-    },
-    "placeholders": {
-      "country": "Select a country",
-      "province": "Select a province",
-      "city": "Select a city",
-      "neighborhood": "Select a neighborhood or area"
+      "consent": "I allow EntreLibros to publish this corner with the selected visibility."
     },
     "scope": {
       "public": "Public",
       "semiprivate": "Semi-private"
     },
-    "visibility": {
-      "neighborhood": "Show by neighborhood",
-      "city": "Show by city"
+    "visibilityPreference": {
+      "exact": "Show exact address",
+      "approximate": "Show approximate area"
     },
     "status": {
       "active": "Active",
@@ -347,16 +345,18 @@
       "name": "Enter a name.",
       "hostAlias": "Enter the host alias.",
       "internalContact": "Enter an internal contact.",
-      "country": "Select a country.",
-      "province": "Select a province.",
-      "city": "Select a city.",
-      "neighborhood": "Select a neighborhood or area.",
-      "reference": "Enter an access reference.",
-      "referenceDigits": "Do not include the exact address or street numbers.",
+      "street": "Enter the street name.",
+      "number": "Enter the street number.",
+      "latitude": "Enter a valid latitude.",
+      "latitudeRange": "Latitude must be between -90 and 90.",
+      "longitude": "Enter a valid longitude.",
+      "longitudeRange": "Longitude must be between -180 and 180.",
       "photo": "Add a representative photo.",
-      "consent": "We need your authorization to publish this Corner.",
+      "consent": "We need your authorization to publish this corner.",
+      "geolocationUnsupported": "Your browser doesn't support automatic location retrieval.",
+      "geolocationDenied": "We couldn't access your location. Check the permissions and try again.",
       "photoRead": "We couldn't read the image. Try again.",
-      "publish": "We couldn't create the Corner. Please try again."
+      "publish": "We couldn't create the corner. Please try again."
     },
     "review": {
       "name": "Name",
@@ -364,14 +364,14 @@
       "host": "Host",
       "contact": "Internal contact",
       "rules": "Guidelines",
-      "schedule": "Hours",
-      "location": "Location",
-      "reference": "Reference",
-      "visibility": "Visibility",
+      "schedule": "Schedule",
+      "address": "Address",
+      "coordinates": "Coordinates",
+      "visibilityPreference": "Visibility",
       "status": "Status",
       "emptyField": "No information",
       "photoAlt": "Corner photo",
-      "privacyNotice": "We never publish exact addresses or personal contact details. The location is shown by neighborhood or by city according to your settings."
+      "privacyNotice": "We store the exact address for logistics. Your preference defines how it will be displayed."
     }
   },
   "community": {
@@ -502,10 +502,18 @@
         "offered": "Offered",
         "requested": "Requested"
       },
-      "sale": { "price": "Price: ${{price}}" },
-      "seeking": { "description": "{{user}} is looking for {{title}}" },
-      "house": { "distance": "{{distance}} km away" },
-      "person": { "match": "{{match}}% match" },
+      "sale": {
+        "price": "Price: ${{price}}"
+      },
+      "seeking": {
+        "description": "{{user}} is looking for {{title}}"
+      },
+      "house": {
+        "distance": "{{distance}} km away"
+      },
+      "person": {
+        "match": "{{match}}% match"
+      },
       "suggestions": "Suggestions",
       "cornerChip": {
         "ariaLabel": "View Book Corner {{name}}"

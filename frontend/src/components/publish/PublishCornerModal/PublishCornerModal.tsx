@@ -182,23 +182,27 @@ export const PublishCornerModal: React.FC<PublishCornerModalProps> = ({
 
   const locationErrors = useMemo(() => {
     const errors: { [key: string]: string } = {}
-    if (!state.country) {
-      errors.country = t('publishCorner.errors.country')
+    if (!state.street.trim()) {
+      errors.street = t('publishCorner.errors.street')
     }
-    if (!state.province) {
-      errors.province = t('publishCorner.errors.province')
+    if (!state.number.trim()) {
+      errors.number = t('publishCorner.errors.number')
     }
-    if (!state.city) {
-      errors.city = t('publishCorner.errors.city')
+
+    const latitude = Number(state.latitude)
+    if (!state.latitude.trim() || Number.isNaN(latitude)) {
+      errors.latitude = t('publishCorner.errors.latitude')
+    } else if (latitude < -90 || latitude > 90) {
+      errors.latitude = t('publishCorner.errors.latitudeRange')
     }
-    if (!state.neighborhood) {
-      errors.neighborhood = t('publishCorner.errors.neighborhood')
+
+    const longitude = Number(state.longitude)
+    if (!state.longitude.trim() || Number.isNaN(longitude)) {
+      errors.longitude = t('publishCorner.errors.longitude')
+    } else if (longitude < -180 || longitude > 180) {
+      errors.longitude = t('publishCorner.errors.longitudeRange')
     }
-    if (!state.reference.trim()) {
-      errors.reference = t('publishCorner.errors.reference')
-    } else if (/\d/.test(state.reference)) {
-      errors.reference = t('publishCorner.errors.referenceDigits')
-    }
+
     if (!state.photo) {
       errors.photo = t('publishCorner.errors.photo')
     }
@@ -207,13 +211,12 @@ export const PublishCornerModal: React.FC<PublishCornerModalProps> = ({
     }
     return errors
   }, [
-    state.city,
     state.consent,
-    state.country,
-    state.neighborhood,
+    state.latitude,
+    state.longitude,
+    state.number,
     state.photo,
-    state.province,
-    state.reference,
+    state.street,
     t,
   ])
 
@@ -234,14 +237,22 @@ export const PublishCornerModal: React.FC<PublishCornerModalProps> = ({
       isPending ||
       !state.consent ||
       !state.photo ||
+      !state.street.trim() ||
+      !state.number.trim() ||
+      !state.latitude.trim() ||
+      !state.longitude.trim() ||
       !canProceedDetails ||
       !canProceedLocation,
     [
       canProceedDetails,
       canProceedLocation,
       isPending,
+      state.latitude,
+      state.longitude,
       state.consent,
       state.photo,
+      state.number,
+      state.street,
     ]
   )
 
@@ -271,12 +282,17 @@ export const PublishCornerModal: React.FC<PublishCornerModalProps> = ({
       rules: state.rules || undefined,
       schedule: state.schedule || undefined,
       location: {
-        country: state.country,
-        province: state.province,
-        city: state.city,
-        neighborhood: state.neighborhood,
-        reference: state.reference,
-        visibility: state.visibility,
+        address: {
+          street: state.street.trim(),
+          number: state.number.trim(),
+          unit: state.unit.trim() || undefined,
+          postalCode: state.postalCode.trim() || undefined,
+        },
+        coordinates: {
+          latitude: Number(state.latitude),
+          longitude: Number(state.longitude),
+        },
+        visibilityPreference: state.visibilityPreference,
       },
       consent: state.consent,
       photo: {

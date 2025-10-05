@@ -122,6 +122,7 @@ Feature 4.1 Mapa y listados
   - Actualización 2025-10-13: se añadieron pruebas unitarias del mini-mapa, la tira de rincones y los chips de rincones del feed, cubriendo estados de carga/errores y asegurando la accesibilidad del panel derecho y filtros para sostener la cobertura >85%.
   - Actualización 2025-10-14: se sustituyó la aproximación lineal de distancia por cálculos geodésicos Haversine para centrar el mapa y se modernizaron los estilos con sintaxis `rgb(var() / α)` en los componentes vinculados.
   - Actualización 2025-10-15: se factorizaron los cálculos de geocercas con la utilidad Haversine reutilizable, se ajustó la bbox inicial del mapa y se añadieron pruebas unitarias dedicadas.
+  - Actualización 2025-10-19: el modal de alta de Rincones ahora captura la dirección exacta (calle, número, opcionales) y coordenadas, almacena la preferencia de visibilidad (exacta/aproximada) y actualiza la confirmación de privacidad. Se adaptaron payloads/mock MSW, validaciones y pruebas para reflejar la política de logística y visualización.
 
 Feature 4.2 Descubrimiento avanzado
 

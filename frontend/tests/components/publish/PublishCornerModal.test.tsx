@@ -93,20 +93,17 @@ const uploadPhoto = () => {
 }
 
 const fillLocationStep = (options?: { consent?: boolean }) => {
-  fireEvent.change(screen.getByLabelText('publishCorner.fields.country'), {
-    target: { value: 'Argentina' },
+  fireEvent.change(screen.getByLabelText('publishCorner.fields.street'), {
+    target: { value: 'Avenida Libertad' },
   })
-  fireEvent.change(screen.getByLabelText('publishCorner.fields.province'), {
-    target: { value: 'Buenos Aires' },
+  fireEvent.change(screen.getByLabelText('publishCorner.fields.number'), {
+    target: { value: '1234' },
   })
-  fireEvent.change(screen.getByLabelText('publishCorner.fields.city'), {
-    target: { value: 'La Plata' },
+  fireEvent.change(screen.getByLabelText('publishCorner.fields.latitude'), {
+    target: { value: '-34.603722' },
   })
-  fireEvent.change(screen.getByLabelText('publishCorner.fields.neighborhood'), {
-    target: { value: 'Centro' },
-  })
-  fireEvent.change(screen.getByLabelText('publishCorner.fields.reference'), {
-    target: { value: 'Frente a la plaza Moreno' },
+  fireEvent.change(screen.getByLabelText('publishCorner.fields.longitude'), {
+    target: { value: '-58.381592' },
   })
 
   if (options?.consent) {
@@ -154,29 +151,29 @@ describe('PublishCornerModal', () => {
 
     fireEvent.click(nextButton)
     expect(
-      screen.getByLabelText('publishCorner.fields.country')
+      screen.getByLabelText('publishCorner.fields.street')
     ).toBeInTheDocument()
   })
 
-  test('validates location reference and keeps publish disabled without consent', () => {
+  test('validates coordinates and keeps publish disabled without consent', () => {
     renderModal()
     fillDetailsStep()
     fireEvent.click(
       screen.getByRole('button', { name: 'publishCorner.actions.next' })
     )
 
-    fireEvent.change(screen.getByLabelText('publishCorner.fields.reference'), {
-      target: { value: 'Calle 123' },
+    fireEvent.change(screen.getByLabelText('publishCorner.fields.latitude'), {
+      target: { value: '200' },
     })
     expect(
-      screen.getByText('publishCorner.errors.referenceDigits')
+      screen.getByText('publishCorner.errors.latitudeRange')
     ).toBeInTheDocument()
 
-    fireEvent.change(screen.getByLabelText('publishCorner.fields.reference'), {
-      target: { value: 'Frente a la plaza Moreno' },
+    fireEvent.change(screen.getByLabelText('publishCorner.fields.latitude'), {
+      target: { value: '-34.6037' },
     })
     expect(
-      screen.queryByText('publishCorner.errors.referenceDigits')
+      screen.queryByText('publishCorner.errors.latitudeRange')
     ).not.toBeInTheDocument()
 
     const restoreFileReader = uploadPhoto()

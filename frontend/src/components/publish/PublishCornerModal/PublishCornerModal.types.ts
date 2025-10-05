@@ -2,7 +2,7 @@ import {
   PublishCornerPayload,
   PublishCornerScope,
   PublishCornerStatus,
-  PublishCornerVisibility,
+  PublishCornerVisibilityPreference,
 } from '@api/community/corners.types'
 import { PublishFilePreview } from '@components/publish/shared'
 
@@ -16,12 +16,13 @@ export type PublishCornerFormState = {
   internalContact: string
   rules: string
   schedule: string
-  country: string
-  province: string
-  city: string
-  neighborhood: string
-  reference: string
-  visibility: PublishCornerVisibility
+  street: string
+  number: string
+  unit: string
+  postalCode: string
+  latitude: string
+  longitude: string
+  visibilityPreference: PublishCornerVisibilityPreference
   consent: boolean
   photo: PublishFilePreview | null
   status: PublishCornerStatus

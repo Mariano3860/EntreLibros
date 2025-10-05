@@ -294,8 +294,8 @@
         "description": "Nombre, anfitrión y lineamientos."
       },
       "location": {
-        "title": "Ubicación y privacidad",
-        "description": "Indicá la zona y cómo llegar sin publicar la dirección exacta."
+        "title": "Dirección y visibilidad",
+        "description": "Confirmá la dirección exacta y elegí cómo se mostrará a la comunidad."
       },
       "review": {
         "title": "Revisar y confirmar",
@@ -311,13 +311,17 @@
       "rulesHint": "Podés escribir un resumen breve o pegar un enlace con más detalles.",
       "schedule": "Horarios sugeridos",
       "scheduleHint": "Opcional: días u horarios en los que suele estar disponible.",
-      "country": "País",
-      "province": "Provincia",
-      "city": "Ciudad",
-      "neighborhood": "Barrio o zona",
-      "reference": "Referencia de acceso no exacta",
-      "referenceHint": "Usá referencias generales como plazas, esquinas o hitos cercanos.",
-      "visibility": "Visibilidad de ubicación",
+      "street": "Calle",
+      "number": "Número",
+      "unit": "Piso / Depto (opcional)",
+      "postalCode": "Código postal (opcional)",
+      "coordinates": "Ubicación en el mapa",
+      "useCurrentLocation": "Usar mi ubicación actual",
+      "updateLocation": "Actualizar ubicación",
+      "locating": "Obteniendo ubicación...",
+      "latitude": "Latitud",
+      "longitude": "Longitud",
+      "visibilityPreference": "Cómo se verá la ubicación",
       "photo": "Foto representativa",
       "photoCta": "Subir imagen",
       "photoHint": "Mostrá el rincón sin incluir información sensible.",
@@ -325,19 +329,13 @@
       "status": "Estado inicial",
       "consent": "Autorizo que EntreLibros publique este Rincón con la visibilidad seleccionada."
     },
-    "placeholders": {
-      "country": "Seleccioná un país",
-      "province": "Seleccioná una provincia",
-      "city": "Seleccioná una ciudad",
-      "neighborhood": "Seleccioná un barrio o zona"
-    },
     "scope": {
       "public": "Público",
       "semiprivate": "Semiprivado"
     },
-    "visibility": {
-      "neighborhood": "Mostrar por barrio",
-      "city": "Mostrar por ciudad"
+    "visibilityPreference": {
+      "exact": "Mostrar dirección exacta",
+      "approximate": "Mostrar aproximada (solo zona)"
     },
     "status": {
       "active": "Activo",
@@ -347,14 +345,16 @@
       "name": "Ingresá un nombre.",
       "hostAlias": "Ingresá el alias de la persona anfitriona.",
       "internalContact": "Ingresá un contacto interno.",
-      "country": "Seleccioná un país.",
-      "province": "Seleccioná una provincia.",
-      "city": "Seleccioná una ciudad.",
-      "neighborhood": "Seleccioná un barrio o zona.",
-      "reference": "Ingresá una referencia de acceso.",
-      "referenceDigits": "No incluyas la dirección exacta ni números de altura.",
+      "street": "Indicá la calle.",
+      "number": "Indicá el número de la dirección.",
+      "latitude": "Ingresá una latitud válida.",
+      "latitudeRange": "La latitud debe estar entre -90 y 90.",
+      "longitude": "Ingresá una longitud válida.",
+      "longitudeRange": "La longitud debe estar entre -180 y 180.",
       "photo": "Agregá una foto representativa.",
       "consent": "Necesitamos tu autorización para publicar este Rincón.",
+      "geolocationUnsupported": "Tu navegador no permite obtener la ubicación automáticamente.",
+      "geolocationDenied": "No pudimos obtener tu ubicación. Revisá los permisos e intentá nuevamente.",
       "photoRead": "No pudimos leer la imagen. Intentalo de nuevo.",
       "publish": "No pudimos crear el Rincón. Probá otra vez."
     },
@@ -365,13 +365,13 @@
       "contact": "Contacto interno",
       "rules": "Reglas",
       "schedule": "Horarios",
-      "location": "Ubicación",
-      "reference": "Referencia",
-      "visibility": "Visibilidad",
+      "address": "Dirección",
+      "coordinates": "Coordenadas",
+      "visibilityPreference": "Visibilidad",
       "status": "Estado",
       "emptyField": "Sin información",
       "photoAlt": "Foto del Rincón",
-      "privacyNotice": "No publicamos direcciones exactas ni datos personales. La ubicación se muestra por barrio o por ciudad según tu configuración."
+      "privacyNotice": "Guardamos la dirección exacta para gestión y logística. Tu preferencia define cómo se verá."
     }
   },
   "community": {
