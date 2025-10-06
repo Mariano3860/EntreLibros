@@ -193,15 +193,13 @@ function optionalString(value: unknown): string | null {
 }
 
 function toUserBookListing(listing: BookListing) {
-  const displayStatus =
-    listing.status === 'draft' ? 'available' : listing.status;
   return {
     id: String(listing.id),
     title: listing.title,
     author: listing.author ?? '',
     coverUrl: listing.coverUrl,
     condition: listing.condition ?? undefined,
-    status: displayStatus,
+    status: listing.status,
     bookListingStatus: listing.status,
     isForSale: listing.sale,
     price: listing.sale ? listing.priceAmount : null,
@@ -225,15 +223,13 @@ function toUserBookListing(listing: BookListing) {
 }
 
 function toPublicBookListing(listing: BookListing) {
-  const displayStatus =
-    listing.status === 'draft' ? 'available' : listing.status;
   return {
     id: String(listing.id),
     title: listing.title,
     author: listing.author ?? '',
     coverUrl: listing.coverUrl,
     condition: listing.condition ?? undefined,
-    status: displayStatus,
+    status: listing.status,
     bookListingStatus: listing.status,
     type: listing.type,
     isForSale: listing.sale,
