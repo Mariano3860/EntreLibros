@@ -1,4 +1,4 @@
-import { query } from '../db.js';
+import { query, withTransaction, type DbClient } from '../db.js';
 import { createBook, type NewBook } from './bookRepository.js';
 
 export type PublicationStatus = 'draft' | 'available' | 'reserved' | 'inactive';
@@ -191,6 +191,19 @@ function mapRow(row: PublicationRow): Publication {
   };
 }
 
+function normalizeNewBook(b: NewBook) {
+  return {
+    title: b.title,
+    author: b.author ?? null,
+    publisher: b.publisher ?? null,
+    publishedYear: b.publishedYear ?? null,
+    language: b.language ?? null,
+    format: b.format ?? null,
+    isbn: b.isbn ?? null,
+    coverUrl: b.coverUrl ?? null,
+  };
+}
+
 async function fetchPublications(
   whereClause: string,
   params: unknown[]
@@ -202,111 +215,153 @@ async function fetchPublications(
   return rows.map(mapRow);
 }
 
-async function fetchPublicationById(id: number): Promise<Publication | null> {
-  const publications = await fetchPublications('WHERE p.id = $1', [id]);
-  return publications[0] ?? null;
+async function fetchPublicationsWithClient(
+  client: DbClient,
+  whereClause: string,
+  params: unknown[]
+) {
+  const { rows } = await client.query<PublicationRow>(
+    `${PUBLICATION_SELECT} ${whereClause} ORDER BY p.created_at DESC`,
+    params as any[]
+  );
+  return rows.map(mapRow);
+}
+
+async function fetchPublicationByIdWithClient(
+  client: DbClient,
+  id: number
+): Promise<Publication | null> {
+  const pubs = await fetchPublicationsWithClient(client, 'WHERE p.id = $1', [
+    id,
+  ]);
+  return pubs[0] ?? null;
 }
 
 export async function createPublication(
   publication: NewPublication
 ): Promise<Publication> {
-  const book = await createBook(publication.book);
-  const {
-    userId,
-    type,
-    condition,
-    notes,
-    sale,
-    donation,
-    trade,
-    priceAmount,
-    priceCurrency,
-    tradePreferences,
-    availability,
-    isDraft,
-    cornerId,
-    delivery,
-    images,
-  } = publication;
+  return withTransaction(async (client) => {
+    // 1) Insert book
+    const nb = normalizeNewBook(publication.book);
+    const bookRes = await client.query<{ id: number }>(
+      `INSERT INTO books (
+        title, author, publisher, published_year, language, format, isbn, cover_url
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      RETURNING id`,
+      [
+        nb.title,
+        nb.author,
+        nb.publisher,
+        nb.publishedYear,
+        nb.language,
+        nb.format,
+        nb.isbn,
+        nb.coverUrl,
+      ]
+    );
+    const bookId = bookRes.rows[0].id;
 
-  const { rows } = await query<{ id: number }>(
-    `INSERT INTO publications (
-      user_id,
-      book_id,
-      status,
-      type,
-      description,
-      condition,
-      sale,
-      donation,
-      trade,
-      price_amount,
-      price_currency,
-      trade_preferences,
-      availability,
-      is_draft,
-      delivery_near_book_corner,
-      delivery_in_person,
-      delivery_shipping,
-      delivery_shipping_payer,
-      corner_id
-    ) VALUES (
-      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19
-    ) RETURNING id`,
-    [
+    // 2) Insert publication
+    const {
       userId,
-      book.id,
-      isDraft ? 'draft' : 'available',
       type,
-      notes,
       condition,
+      notes,
       sale,
       donation,
       trade,
-      sale && priceAmount !== null ? priceAmount : null,
-      sale && priceCurrency ? priceCurrency : null,
+      priceAmount,
+      priceCurrency,
       tradePreferences,
       availability,
       isDraft,
-      delivery.nearBookCorner,
-      delivery.inPerson,
-      delivery.shipping,
-      delivery.shipping ? delivery.shippingPayer : null,
       cornerId,
-    ]
-  );
+      delivery,
+      images,
+    } = publication;
 
-  const publicationId = rows[0].id;
+    const pubRes = await client.query<{ id: number }>(
+      `INSERT INTO publications (
+        user_id,
+        book_id,
+        status,
+        type,
+        description,
+        condition,
+        sale,
+        donation,
+        trade,
+        price_amount,
+        price_currency,
+        trade_preferences,
+        availability,
+        is_draft,
+        delivery_near_book_corner,
+        delivery_in_person,
+        delivery_shipping,
+        delivery_shipping_payer,
+        corner_id
+      ) VALUES (
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19
+      )
+      RETURNING id`,
+      [
+        userId,
+        bookId,
+        isDraft ? 'draft' : 'available',
+        type,
+        notes,
+        condition,
+        sale,
+        donation,
+        trade,
+        sale && priceAmount !== null ? priceAmount : null,
+        sale && priceCurrency ? priceCurrency : null,
+        tradePreferences,
+        availability,
+        isDraft,
+        delivery.nearBookCorner,
+        delivery.inPerson,
+        delivery.shipping,
+        delivery.shipping ? delivery.shippingPayer : null,
+        cornerId,
+      ]
+    );
 
-  if (images.length > 0) {
-    const prepared = images.map((image, index) => {
-      const metadata =
-        image.metadata ?? (image.source ? { source: image.source } : null);
-      return query(
-        `INSERT INTO publication_images (
-          publication_id,
-          url,
-          is_primary,
-          source,
-          metadata
-        ) VALUES ($1, $2, $3, $4, $5)`,
-        [
-          publicationId,
-          image.url,
-          image.isPrimary ?? index === 0,
-          image.source ?? null,
-          metadata ? JSON.stringify(metadata) : null,
-        ]
-      );
-    });
-    await Promise.all(prepared);
-  }
+    const publicationId = pubRes.rows[0].id;
 
-  const created = await fetchPublicationById(publicationId);
-  if (!created) {
-    throw new Error('Publication creation failed');
-  }
-  return created;
+    // 3) Insert images
+    if (images.length > 0) {
+      const inserts = images.map((image, index) => {
+        const metadata =
+          image.metadata ?? (image.source ? { source: image.source } : null);
+        return client.query(
+          `INSERT INTO publication_images (
+            publication_id,
+            url,
+            is_primary,
+            source,
+            metadata
+          ) VALUES ($1, $2, $3, $4, $5)`,
+          [
+            publicationId,
+            image.url,
+            image.isPrimary ?? index === 0,
+            image.source ?? null,
+            metadata ? JSON.stringify(metadata) : null,
+          ]
+        );
+      });
+      await Promise.all(inserts);
+    }
+
+    // 4) Fetch created publication inside the same transaction
+    const created = await fetchPublicationByIdWithClient(client, publicationId);
+    if (!created) {
+      throw new Error('Publication creation failed');
+    }
+    return created;
+  });
 }
 
 export async function listUserPublications(
