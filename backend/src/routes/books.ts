@@ -1,16 +1,16 @@
 import { Router } from 'express';
 import { verifyBook } from '../repositories/bookRepository.js';
 import {
-  createPublication,
-  listPublicPublications,
-  listUserPublications,
-  type Publication,
-  type PublicationDelivery,
-  type PublicationCondition,
-  type PublicationType,
-  type PublicationAvailability,
-  type PublicationShippingPayer,
-} from '../repositories/publicationRepository.js';
+  createBookListing,
+  listPublicBookListings,
+  listUserBookListings,
+  type BookListing,
+  type BookListingDelivery,
+  type BookListingCondition,
+  type BookListingType,
+  type BookListingAvailability,
+  type BookListingShippingPayer,
+} from '../repositories/bookListingRepository.js';
 import {
   searchBooksApiResults,
   checkBookExists,
@@ -20,8 +20,8 @@ import { authenticate, type AuthenticatedRequest } from '../middleware/auth.js';
 const router = Router();
 
 router.get('/', async (_req, res) => {
-  const publications = await listPublicPublications();
-  res.json(publications.map(toPublicPublication));
+  const listings = await listPublicBookListings();
+  res.json(listings.map(toPublicBookListing));
 });
 
 router.get('/search', async (req, res) => {
@@ -70,7 +70,7 @@ router.post('/', authenticate, async (req: AuthenticatedRequest, res) => {
     verified = false;
   }
 
-  const publication = await createPublication({
+  const listing = await createBookListing({
     userId: req.user.id,
     book: {
       title: metadata.title,
@@ -103,7 +103,7 @@ router.post('/', authenticate, async (req: AuthenticatedRequest, res) => {
     })),
   });
 
-  res.status(201).json(toUserPublication(publication));
+  res.status(201).json(toUserBookListing(listing));
 });
 
 router.get('/mine', authenticate, async (req: AuthenticatedRequest, res) => {
@@ -113,8 +113,8 @@ router.get('/mine', authenticate, async (req: AuthenticatedRequest, res) => {
       message: 'auth.errors.unauthorized',
     });
   }
-  const publications = await listUserPublications(req.user.id);
-  res.json(publications.map(toUserPublication));
+  const listings = await listUserBookListings(req.user.id);
+  res.json(listings.map(toUserBookListing));
 });
 
 router.post('/:id/verify', async (req, res) => {
@@ -152,29 +152,29 @@ type ValidatedPublishData = {
     trade: boolean;
     priceAmount: number | null;
     priceCurrency: string | null;
-    condition: PublicationCondition;
+    condition: BookListingCondition;
     tradePreferences: string[];
     notes: string | null;
-    availability: PublicationAvailability;
-    delivery: PublicationDelivery;
+    availability: BookListingAvailability;
+    delivery: BookListingDelivery;
   };
   draft: boolean;
-  type: PublicationType;
+  type: BookListingType;
   cornerId: string | null;
 };
 
-const ALLOWED_CONDITIONS: readonly PublicationCondition[] = [
+const ALLOWED_CONDITIONS: readonly BookListingCondition[] = [
   'new',
   'very_good',
   'good',
   'acceptable',
 ];
-const ALLOWED_AVAILABILITIES: readonly PublicationAvailability[] = [
+const ALLOWED_AVAILABILITIES: readonly BookListingAvailability[] = [
   'public',
   'private',
 ];
-const ALLOWED_TYPES: readonly PublicationType[] = ['offer', 'want'];
-const ALLOWED_SHIPPING_PAYERS: readonly PublicationShippingPayer[] = [
+const ALLOWED_TYPES: readonly BookListingType[] = ['offer', 'want'];
+const ALLOWED_SHIPPING_PAYERS: readonly BookListingShippingPayer[] = [
   'owner',
   'requester',
   'split',
@@ -192,56 +192,56 @@ function optionalString(value: unknown): string | null {
   return trimmed.length > 0 ? trimmed : null;
 }
 
-function toUserPublication(publication: Publication) {
+function toUserBookListing(listing: BookListing) {
   const displayStatus =
-    publication.status === 'draft' ? 'available' : publication.status;
+    listing.status === 'draft' ? 'available' : listing.status;
   return {
-    id: String(publication.id),
-    title: publication.title,
-    author: publication.author ?? '',
-    coverUrl: publication.coverUrl,
-    condition: publication.condition ?? undefined,
+    id: String(listing.id),
+    title: listing.title,
+    author: listing.author ?? '',
+    coverUrl: listing.coverUrl,
+    condition: listing.condition ?? undefined,
     status: displayStatus,
-    publicationStatus: publication.status,
-    isForSale: publication.sale,
-    price: publication.sale ? publication.priceAmount : null,
-    priceCurrency: publication.sale ? publication.priceCurrency : null,
-    isForTrade: publication.trade,
-    tradePreferences: publication.tradePreferences,
-    isSeeking: publication.isSeeking,
-    isForDonation: publication.donation,
-    availability: publication.availability,
-    delivery: publication.delivery,
-    notes: publication.notes ?? undefined,
-    cornerId: publication.cornerId ?? undefined,
-    publisher: publication.metadata.publisher ?? undefined,
-    year: publication.metadata.publishedYear ?? undefined,
-    language: publication.metadata.language ?? undefined,
-    format: publication.metadata.format ?? undefined,
-    isbn: publication.metadata.isbn ?? undefined,
-    draft: publication.isDraft,
-    type: publication.type,
+    bookListingStatus: listing.status,
+    isForSale: listing.sale,
+    price: listing.sale ? listing.priceAmount : null,
+    priceCurrency: listing.sale ? listing.priceCurrency : null,
+    isForTrade: listing.trade,
+    tradePreferences: listing.tradePreferences,
+    isSeeking: listing.isSeeking,
+    isForDonation: listing.donation,
+    availability: listing.availability,
+    delivery: listing.delivery,
+    notes: listing.notes ?? undefined,
+    cornerId: listing.cornerId ?? undefined,
+    publisher: listing.metadata.publisher ?? undefined,
+    year: listing.metadata.publishedYear ?? undefined,
+    language: listing.metadata.language ?? undefined,
+    format: listing.metadata.format ?? undefined,
+    isbn: listing.metadata.isbn ?? undefined,
+    draft: listing.isDraft,
+    type: listing.type,
   };
 }
 
-function toPublicPublication(publication: Publication) {
+function toPublicBookListing(listing: BookListing) {
   const displayStatus =
-    publication.status === 'draft' ? 'available' : publication.status;
+    listing.status === 'draft' ? 'available' : listing.status;
   return {
-    id: String(publication.id),
-    title: publication.title,
-    author: publication.author ?? '',
-    coverUrl: publication.coverUrl,
-    condition: publication.condition ?? undefined,
+    id: String(listing.id),
+    title: listing.title,
+    author: listing.author ?? '',
+    coverUrl: listing.coverUrl,
+    condition: listing.condition ?? undefined,
     status: displayStatus,
-    publicationStatus: publication.status,
-    type: publication.type,
-    isForSale: publication.sale,
-    price: publication.sale ? publication.priceAmount : null,
-    priceCurrency: publication.sale ? publication.priceCurrency : null,
-    isForTrade: publication.trade,
-    isSeeking: publication.isSeeking,
-    isForDonation: publication.donation,
+    bookListingStatus: listing.status,
+    type: listing.type,
+    isForSale: listing.sale,
+    price: listing.sale ? listing.priceAmount : null,
+    priceCurrency: listing.sale ? listing.priceCurrency : null,
+    isForTrade: listing.trade,
+    isSeeking: listing.isSeeking,
+    isForDonation: listing.donation,
   };
 }
 
@@ -379,7 +379,7 @@ function validatePublishRequest(
       },
     };
   }
-  if (!ALLOWED_CONDITIONS.includes(conditionRaw as PublicationCondition)) {
+  if (!ALLOWED_CONDITIONS.includes(conditionRaw as BookListingCondition)) {
     return {
       status: 400,
       error: {
@@ -388,7 +388,7 @@ function validatePublishRequest(
       },
     };
   }
-  const condition = conditionRaw as PublicationCondition;
+  const condition = conditionRaw as BookListingCondition;
 
   const tradePreferencesRaw = offerRaw.tradePreferences;
   const tradePreferences: string[] = Array.isArray(tradePreferencesRaw)
@@ -401,7 +401,7 @@ function validatePublishRequest(
 
   const availabilityRaw = optionalString(offerRaw.availability) ?? 'public';
   if (
-    !ALLOWED_AVAILABILITIES.includes(availabilityRaw as PublicationAvailability)
+    !ALLOWED_AVAILABILITIES.includes(availabilityRaw as BookListingAvailability)
   ) {
     return {
       status: 400,
@@ -411,7 +411,7 @@ function validatePublishRequest(
       },
     };
   }
-  const availability = availabilityRaw as PublicationAvailability;
+  const availability = availabilityRaw as BookListingAvailability;
 
   const deliveryRaw = offerRaw.delivery;
   if (!isRecord(deliveryRaw)) {
@@ -427,7 +427,7 @@ function validatePublishRequest(
   const nearBookCorner = deliveryRaw.nearBookCorner === true;
   const inPerson = deliveryRaw.inPerson === true;
   const shipping = deliveryRaw.shipping === true;
-  let shippingPayer: PublicationShippingPayer | null = null;
+  let shippingPayer: BookListingShippingPayer | null = null;
   if (shipping) {
     if (typeof deliveryRaw.shippingPayer !== 'string') {
       return {
@@ -440,7 +440,7 @@ function validatePublishRequest(
     }
     if (
       !ALLOWED_SHIPPING_PAYERS.includes(
-        deliveryRaw.shippingPayer as PublicationShippingPayer
+        deliveryRaw.shippingPayer as BookListingShippingPayer
       )
     ) {
       return {
@@ -451,14 +451,14 @@ function validatePublishRequest(
         },
       };
     }
-    shippingPayer = deliveryRaw.shippingPayer as PublicationShippingPayer;
+    shippingPayer = deliveryRaw.shippingPayer as BookListingShippingPayer;
   } else if (
     typeof deliveryRaw.shippingPayer === 'string' &&
     ALLOWED_SHIPPING_PAYERS.includes(
-      deliveryRaw.shippingPayer as PublicationShippingPayer
+      deliveryRaw.shippingPayer as BookListingShippingPayer
     )
   ) {
-    shippingPayer = deliveryRaw.shippingPayer as PublicationShippingPayer;
+    shippingPayer = deliveryRaw.shippingPayer as BookListingShippingPayer;
   }
 
   let priceAmount: number | null = null;
@@ -499,10 +499,10 @@ function validatePublishRequest(
 
   const draft = typeof body.draft === 'boolean' ? body.draft : false;
 
-  let type: PublicationType = 'offer';
+  let type: BookListingType = 'offer';
   if (typeof body.type === 'string') {
     const normalized = body.type.trim().toLowerCase();
-    if (!ALLOWED_TYPES.includes(normalized as PublicationType)) {
+    if (!ALLOWED_TYPES.includes(normalized as BookListingType)) {
       return {
         status: 400,
         error: {
@@ -511,7 +511,7 @@ function validatePublishRequest(
         },
       };
     }
-    type = normalized as PublicationType;
+    type = normalized as BookListingType;
   }
 
   const cornerId = optionalString(body.cornerId) ?? null;

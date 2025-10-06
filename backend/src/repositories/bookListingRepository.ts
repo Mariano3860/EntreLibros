@@ -1,29 +1,29 @@
 import { query, withTransaction, type DbClient } from '../db.js';
 import { type NewBook } from './bookRepository.js';
 
-export type PublicationStatus = 'draft' | 'available' | 'reserved' | 'inactive';
-export type PublicationType = 'offer' | 'want';
-export type PublicationAvailability = 'public' | 'private';
-export type PublicationCondition = 'new' | 'very_good' | 'good' | 'acceptable';
-export type PublicationShippingPayer = 'owner' | 'requester' | 'split';
+export type BookListingStatus = 'draft' | 'available' | 'reserved' | 'inactive';
+export type BookListingType = 'offer' | 'want';
+export type BookListingAvailability = 'public' | 'private';
+export type BookListingCondition = 'new' | 'very_good' | 'good' | 'acceptable';
+export type BookListingShippingPayer = 'owner' | 'requester' | 'split';
 
-export interface PublicationDelivery {
+export interface BookListingDelivery {
   nearBookCorner: boolean;
   inPerson: boolean;
   shipping: boolean;
-  shippingPayer: PublicationShippingPayer | null;
+  shippingPayer: BookListingShippingPayer | null;
 }
 
-export interface Publication {
+export interface BookListing {
   id: number;
   userId: number;
   bookId: number;
   title: string;
   author: string | null;
   coverUrl: string;
-  condition: PublicationCondition | null;
-  status: PublicationStatus;
-  type: PublicationType;
+  condition: BookListingCondition | null;
+  status: BookListingStatus;
+  type: BookListingType;
   sale: boolean;
   donation: boolean;
   trade: boolean;
@@ -31,11 +31,11 @@ export interface Publication {
   priceCurrency: string | null;
   tradePreferences: string[];
   notes: string | null;
-  availability: PublicationAvailability;
+  availability: BookListingAvailability;
   isDraft: boolean;
   isSeeking: boolean;
   cornerId: string | null;
-  delivery: PublicationDelivery;
+  delivery: BookListingDelivery;
   metadata: {
     publisher: string | null;
     publishedYear: number | null;
@@ -46,13 +46,13 @@ export interface Publication {
   };
 }
 
-interface PublicationRow {
+interface BookListingRow {
   id: number;
   user_id: number;
   book_id: number;
-  status: PublicationStatus;
-  type: PublicationType;
-  condition: PublicationCondition | null;
+  status: BookListingStatus;
+  type: BookListingType;
+  condition: BookListingCondition | null;
   description: string | null;
   sale: boolean;
   donation: boolean;
@@ -60,12 +60,12 @@ interface PublicationRow {
   price_amount: string | null;
   price_currency: string | null;
   trade_preferences: string[] | null;
-  availability: PublicationAvailability;
+  availability: BookListingAvailability;
   is_draft: boolean;
   delivery_near_book_corner: boolean;
   delivery_in_person: boolean;
   delivery_shipping: boolean;
-  delivery_shipping_payer: PublicationShippingPayer | null;
+  delivery_shipping_payer: BookListingShippingPayer | null;
   corner_id: string | null;
   title: string;
   author: string | null;
@@ -78,18 +78,18 @@ interface PublicationRow {
   primary_image_url: string | null;
 }
 
-export interface PublicationImageInput {
+export interface BookListingImageInput {
   url: string;
   source?: string | null;
   isPrimary?: boolean;
   metadata?: Record<string, unknown> | null;
 }
 
-export interface NewPublication {
+export interface NewBookListing {
   userId: number;
   book: NewBook;
-  type: PublicationType;
-  condition: PublicationCondition | null;
+  type: BookListingType;
+  condition: BookListingCondition | null;
   notes: string | null;
   sale: boolean;
   donation: boolean;
@@ -97,14 +97,14 @@ export interface NewPublication {
   priceAmount: number | null;
   priceCurrency: string | null;
   tradePreferences: string[];
-  availability: PublicationAvailability;
+  availability: BookListingAvailability;
   isDraft: boolean;
   cornerId: string | null;
-  delivery: PublicationDelivery;
-  images: PublicationImageInput[];
+  delivery: BookListingDelivery;
+  images: BookListingImageInput[];
 }
 
-const PUBLICATION_SELECT = `
+const BOOK_LISTING_SELECT = `
   SELECT
     p.id,
     p.user_id,
@@ -135,18 +135,18 @@ const PUBLICATION_SELECT = `
     b.isbn,
     b.cover_url AS book_cover_url,
     img.url AS primary_image_url
-  FROM publications p
-  JOIN books b ON p.book_id = b.id
-  LEFT JOIN LATERAL (
+  FROM book_listings p
+         JOIN books b ON p.book_id = b.id
+         LEFT JOIN LATERAL (
     SELECT url
-    FROM publication_images
-    WHERE publication_id = p.id
+    FROM book_listing_images
+    WHERE book_listing_id = p.id
     ORDER BY is_primary DESC, id ASC
     LIMIT 1
-  ) img ON true
+    ) img ON true
 `;
 
-function mapRow(row: PublicationRow): Publication {
+function mapRow(row: BookListingRow): BookListing {
   const priceAmount = row.price_amount ? Number(row.price_amount) : null;
   const tradePreferences = row.trade_preferences ?? [];
   const coverUrl = row.primary_image_url ?? row.book_cover_url ?? '';
@@ -204,50 +204,50 @@ function normalizeNewBook(b: NewBook) {
   };
 }
 
-async function fetchPublications(
+async function fetchBookListings(
   whereClause: string,
   params: unknown[]
-): Promise<Publication[]> {
-  const { rows } = await query<PublicationRow>(
-    `${PUBLICATION_SELECT} ${whereClause} ORDER BY p.created_at DESC`,
+): Promise<BookListing[]> {
+  const { rows } = await query<BookListingRow>(
+    `${BOOK_LISTING_SELECT} ${whereClause} ORDER BY p.created_at DESC`,
     params
   );
   return rows.map(mapRow);
 }
 
-async function fetchPublicationsWithClient(
+async function fetchBookListingsWithClient(
   client: DbClient,
   whereClause: string,
   params: unknown[]
 ) {
-  const { rows } = await client.query<PublicationRow>(
-    `${PUBLICATION_SELECT} ${whereClause} ORDER BY p.created_at DESC`,
+  const { rows } = await client.query<BookListingRow>(
+    `${BOOK_LISTING_SELECT} ${whereClause} ORDER BY p.created_at DESC`,
     params as any[]
   );
   return rows.map(mapRow);
 }
 
-async function fetchPublicationByIdWithClient(
+async function fetchBookListingByIdWithClient(
   client: DbClient,
   id: number
-): Promise<Publication | null> {
-  const pubs = await fetchPublicationsWithClient(client, 'WHERE p.id = $1', [
+): Promise<BookListing | null> {
+  const pubs = await fetchBookListingsWithClient(client, 'WHERE p.id = $1', [
     id,
   ]);
   return pubs[0] ?? null;
 }
 
-export async function createPublication(
-  publication: NewPublication
-): Promise<Publication> {
+export async function createBookListing(
+  listing: NewBookListing
+): Promise<BookListing> {
   return withTransaction(async (client) => {
     // 1) Insert book
-    const nb = normalizeNewBook(publication.book);
+    const nb = normalizeNewBook(listing.book);
     const bookRes = await client.query<{ id: number }>(
       `INSERT INTO books (
         title, author, publisher, published_year, language, format, isbn, cover_url
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-      RETURNING id`,
+       RETURNING id`,
       [
         nb.title,
         nb.author,
@@ -261,7 +261,7 @@ export async function createPublication(
     );
     const bookId = bookRes.rows[0].id;
 
-    // 2) Insert publication
+    // 2) Insert listing (books)
     const {
       userId,
       type,
@@ -278,10 +278,10 @@ export async function createPublication(
       cornerId,
       delivery,
       images,
-    } = publication;
+    } = listing;
 
     const pubRes = await client.query<{ id: number }>(
-      `INSERT INTO publications (
+      `INSERT INTO book_listings (
         user_id,
         book_id,
         status,
@@ -302,9 +302,9 @@ export async function createPublication(
         delivery_shipping_payer,
         corner_id
       ) VALUES (
-        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19
-      )
-      RETURNING id`,
+                 $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19
+               )
+       RETURNING id`,
       [
         userId,
         bookId,
@@ -328,7 +328,7 @@ export async function createPublication(
       ]
     );
 
-    const publicationId = pubRes.rows[0].id;
+    const bookListingId = pubRes.rows[0].id;
 
     // 3) Insert images
     if (images.length > 0) {
@@ -336,15 +336,15 @@ export async function createPublication(
         const metadata =
           image.metadata ?? (image.source ? { source: image.source } : null);
         return client.query(
-          `INSERT INTO publication_images (
-            publication_id,
+          `INSERT INTO book_listing_images (
+            book_listing_id,
             url,
             is_primary,
             source,
             metadata
           ) VALUES ($1, $2, $3, $4, $5)`,
           [
-            publicationId,
+            bookListingId,
             image.url,
             image.isPrimary ?? index === 0,
             image.source ?? null,
@@ -355,23 +355,23 @@ export async function createPublication(
       await Promise.all(inserts);
     }
 
-    // 4) Fetch created publication inside the same transaction
-    const created = await fetchPublicationByIdWithClient(client, publicationId);
+    // 4) Fetch created listing inside the same transaction
+    const created = await fetchBookListingByIdWithClient(client, bookListingId);
     if (!created) {
-      throw new Error('Publication creation failed');
+      throw new Error('Book listing creation failed');
     }
     return created;
   });
 }
 
-export async function listUserPublications(
+export async function listUserBookListings(
   userId: number
-): Promise<Publication[]> {
-  return fetchPublications('WHERE p.user_id = $1', [userId]);
+): Promise<BookListing[]> {
+  return fetchBookListings('WHERE p.user_id = $1', [userId]);
 }
 
-export async function listPublicPublications(): Promise<Publication[]> {
-  return fetchPublications(
+export async function listPublicBookListings(): Promise<BookListing[]> {
+  return fetchBookListings(
     "WHERE p.status = 'available' AND p.availability = 'public' AND p.is_draft = false",
     []
   );

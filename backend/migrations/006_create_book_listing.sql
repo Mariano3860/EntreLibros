@@ -9,7 +9,7 @@ ALTER TABLE books
   ADD COLUMN IF NOT EXISTS language TEXT,
   ADD COLUMN IF NOT EXISTS format TEXT;
 
-CREATE TABLE publications (
+CREATE TABLE book_listings (
   id SERIAL PRIMARY KEY,
   user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   book_id INTEGER NOT NULL REFERENCES books(id) ON DELETE CASCADE,
@@ -34,13 +34,13 @@ CREATE TABLE publications (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX publications_user_id_idx ON publications(user_id);
-CREATE INDEX publications_status_idx ON publications(status);
-CREATE INDEX publications_availability_idx ON publications(availability);
+CREATE INDEX publications_user_id_idx ON book_listings(user_id);
+CREATE INDEX publications_status_idx ON book_listings(status);
+CREATE INDEX publications_availability_idx ON book_listings(availability);
 
-CREATE TABLE publication_images (
+CREATE TABLE book_listing_images (
   id SERIAL PRIMARY KEY,
-  publication_id INTEGER NOT NULL REFERENCES publications(id) ON DELETE CASCADE,
+  book_listing_id INTEGER NOT NULL REFERENCES book_listings(id) ON DELETE CASCADE,
   url TEXT NOT NULL,
   is_primary BOOLEAN NOT NULL DEFAULT false,
   source TEXT,
@@ -48,4 +48,4 @@ CREATE TABLE publication_images (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX publication_images_publication_id_idx ON publication_images(publication_id);
+CREATE INDEX publication_images_publication_id_idx ON book_listing_images(book_listing_id);
