@@ -60,12 +60,6 @@ export const genres = [
 
 export const stepOrder: PublishBookStep[] = ['identify', 'offer', 'review']
 
-export const stepIndex: Record<PublishBookStep, number> = {
-  identify: 0,
-  offer: 1,
-  review: 2,
-}
-
 export const toSerializableDraft = (
   state: PublishBookFormState
 ): PublishBookDraftState => ({

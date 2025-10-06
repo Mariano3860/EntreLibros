@@ -11,11 +11,13 @@ import { communityStatsHandler } from './community/communityStats.handler'
 import { communityFeedHandler } from './community/feed.handler'
 import {
   cornersMapHandler,
+  createCornerSuccessHandler,
   nearbyCornersHandler,
 } from './community/corners.handler'
 import { suggestionsHandler } from './community/suggestions.handler'
 import { contactFormHandler } from './contactForm/contactForm.handler'
 import { userLanguageHandler } from './language/language.handler'
+import { geocodingHandler } from './map/geocoding.handler'
 import { mapHandler } from './map/map.handler'
 
 export const handlers = [
@@ -34,7 +36,9 @@ export const handlers = [
   communityFeedHandler,
   nearbyCornersHandler,
   cornersMapHandler,
+  createCornerSuccessHandler,
   activityHandler,
   suggestionsHandler,
+  geocodingHandler,
   mapHandler,
 ]

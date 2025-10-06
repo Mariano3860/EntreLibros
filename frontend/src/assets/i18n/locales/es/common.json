@@ -273,6 +273,110 @@
     },
     "previewAlt": "Vista previa de la portada"
   },
+  "publishCorner": {
+    "title": "Crear Rincón de Libros",
+    "subtitle": "Compartí los datos principales para que la comunidad pueda visitarlo.",
+    "progress": "Progreso de creación",
+    "confirmClose": "Hay cambios sin guardar. ¿Querés salir igualmente?",
+    "draftSaved": "Borrador guardado.",
+    "published": "¡Rincón publicado con éxito!",
+    "actions": {
+      "cancel": "Cancelar",
+      "saveDraft": "Guardar borrador",
+      "back": "Anterior",
+      "next": "Siguiente",
+      "publish": "Publicar Rincón",
+      "publishing": "Publicando...",
+      "changeAddress": "Cambiar dirección"
+    },
+    "steps": {
+      "details": {
+        "title": "Datos del Rincón",
+        "description": "Nombre, anfitrión y lineamientos."
+      },
+      "location": {
+        "title": "Dirección y visibilidad",
+        "description": "Confirmá la dirección exacta y elegí cómo se mostrará a la comunidad."
+      },
+      "review": {
+        "title": "Revisar y confirmar",
+        "description": "Verificá la información antes de publicar."
+      }
+    },
+    "location": {
+      "searching": "Buscando direcciones..."
+    },
+    "fields": {
+      "name": "Nombre del Rincón",
+      "scope": "Ámbito",
+      "hostAlias": "Persona anfitriona (alias público)",
+      "internalContact": "Contacto interno (solo soporte)",
+      "rules": "Reglas locales de convivencia",
+      "rulesHint": "Podés escribir un resumen breve o pegar un enlace con más detalles.",
+      "schedule": "Horarios sugeridos",
+      "scheduleHint": "Opcional: días u horarios en los que suele estar disponible.",
+      "addressSearch": "Buscar dirección (calle y número)",
+      "addressSearchPlaceholder": "Ej.: Libertad 1234",
+      "addressSearchHint": "Escribí calle y altura para ver sugerencias y fijar el punto en el mapa.",
+      "mapPreviewTitle": "Vista previa en mapa",
+      "street": "Calle",
+      "number": "Número",
+      "unit": "Piso / Depto (opcional)",
+      "postalCode": "Código postal (opcional)",
+      "visibilityPreference": "Cómo se verá la ubicación",
+      "photo": "Foto representativa",
+      "photoCta": "Subir imagen",
+      "photoHint": "Mostrá el rincón sin incluir información sensible.",
+      "photoRemove": "Eliminar imagen",
+      "status": "Estado inicial",
+      "consent": "Autorizo que EntreLibros publique este Rincón con la visibilidad seleccionada."
+    },
+    "scope": {
+      "public": "Público",
+      "semiprivate": "Semiprivado"
+    },
+    "visibilityPreference": {
+      "exact": "Mostrar dirección exacta",
+      "approximate": "Mostrar aproximada (solo zona)"
+    },
+    "status": {
+      "active": "Activo",
+      "paused": "En pausa"
+    },
+    "errors": {
+      "name": "Ingresá un nombre.",
+      "hostAlias": "Ingresá el alias de la persona anfitriona.",
+      "internalContact": "Ingresá un contacto interno.",
+      "street": "Indicá la calle.",
+      "number": "Indicá el número de la dirección.",
+      "addressSearch": "Seleccioná una dirección de la lista para continuar.",
+      "latitudeRange": "La latitud debe estar entre -90 y 90.",
+      "longitudeRange": "La longitud debe estar entre -180 y 180.",
+      "addressNoResults": "No encontramos coincidencias. Probá con otra calle o altura.",
+      "addressSearchFailed": "No pudimos buscar direcciones. Intentá nuevamente.",
+      "photo": "Agregá una foto representativa.",
+      "consent": "Necesitamos tu autorización para publicar este Rincón.",
+      "geolocationUnsupported": "Tu navegador no permite obtener la ubicación automáticamente.",
+      "geolocationDenied": "No pudimos obtener tu ubicación. Revisá los permisos e intentá nuevamente.",
+      "photoRead": "No pudimos leer la imagen. Intentalo de nuevo.",
+      "publish": "No pudimos crear el Rincón. Probá otra vez."
+    },
+    "review": {
+      "name": "Nombre",
+      "scope": "Ámbito",
+      "host": "Anfitrión/a",
+      "contact": "Contacto interno",
+      "rules": "Reglas",
+      "schedule": "Horarios",
+      "address": "Dirección",
+      "coordinates": "Coordenadas",
+      "visibilityPreference": "Visibilidad",
+      "status": "Estado",
+      "emptyField": "Sin información",
+      "photoAlt": "Foto del Rincón",
+      "privacyNotice": "Guardamos la dirección exacta; tu preferencia define cómo se verá."
+    }
+  },
   "community": {
     "title": "Comunidad",
     "tabs": {

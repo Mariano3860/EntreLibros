@@ -66,8 +66,12 @@ Feature 1.2 Perfil y privacidad
 EP-2 Rincones de Libros (RdL)
 Feature 2.1 Alta y gestión de RdL
 
-- [ ] S-2.1 Alta de RdL (foto, reglas, zona) + aprobación liviana (Must, E1; BR-10)
+- [~] S-2.1 Alta de RdL (foto, reglas, zona) + aprobación liviana (Must, E1; BR-10)
   - Éxito: formulario completo; visible en mapa tras aprobación.
+  - Actualización 2025-10-16: se implementó el modal multipaso "Crear Rincón" con stepper, validación inline, consentimiento explícito y flujo de borrador/publicación reutilizando los componentes compartidos de publicación. Se agregó MSW (201/422) y pruebas de navegación/errores. Falta enlazar con backend real y lógica de moderación para considerarlo completado.
+  - Actualización 2025-10-20: el paso de dirección ahora ofrece autocompletado con vista previa en mapa, fija latitud/longitud automáticamente y mantiene la preferencia de visibilidad sin exponer coordenadas manuales.
+  - Actualización 2025-10-21: se completaron pruebas unitarias del servicio de geocodificación, handlers MSW y del paso de ubicación (autocomplete, errores, reinicio), recuperando la cobertura de ramas >85% y asegurando la regresión de privacidad.
+  - Actualización 2025-10-22: se modularizó el paso de ubicación (inputs, carga de foto y consentimiento) y el modal completo via hooks dedicados para simplificar mantenimiento, agregando pruebas unitarias de navegación, errores y reinicio que elevan la cobertura de ramas y validan escenarios de teclado.
 - [ ] S-2.2 Estados de RdL (Activo / Pausa / Observación) (Should, E2; BR-12)
   - Éxito: pausa oculta de resultados temporalmente.
 - [ ] S-2.3 Verificación ligera de anfitrión (Could, E3; BR-14)
@@ -75,8 +79,9 @@ Feature 2.1 Alta y gestión de RdL
 
 Feature 2.2 Visibilidad y actividad
 
-- [ ] S-2.4 Control de granularidad en mapa (barrio/ciudad) (Must, E1; BR-11)
+- [~] S-2.4 Control de granularidad en mapa (barrio/ciudad) (Must, E1; BR-11)
   - Éxito: 100% de RdL respetan granularidad elegida.
+  - Actualización 2025-10-16: el flujo de alta de RdL exige elegir visibilidad barrio/ciudad, persiste el consentimiento y refleja la selección en la revisión previa; resta propagarla al backend/mapa productivo.
 - [ ] S-2.5 Señales de actividad en RdL (Should, E2; BR-13)
   - Éxito: 2 señales simples (visitas, contactos cercanos).
 
@@ -120,6 +125,8 @@ Feature 4.1 Mapa y listados
   - Actualización 2025-10-13: se añadieron pruebas unitarias del mini-mapa, la tira de rincones y los chips de rincones del feed, cubriendo estados de carga/errores y asegurando la accesibilidad del panel derecho y filtros para sostener la cobertura >85%.
   - Actualización 2025-10-14: se sustituyó la aproximación lineal de distancia por cálculos geodésicos Haversine para centrar el mapa y se modernizaron los estilos con sintaxis `rgb(var() / α)` en los componentes vinculados.
   - Actualización 2025-10-15: se factorizaron los cálculos de geocercas con la utilidad Haversine reutilizable, se ajustó la bbox inicial del mapa y se añadieron pruebas unitarias dedicadas.
+  - Actualización 2025-10-19: el modal de alta de Rincones ahora captura la dirección exacta (calle, número, opcionales) y coordenadas, almacena la preferencia de visibilidad (exacta/aproximada) y actualiza la confirmación de privacidad. Se adaptaron payloads/mock MSW, validaciones y pruebas para reflejar la política de logística y visualización.
+  - Actualización 2025-10-22: se robusteció el cálculo de estados vacíos en el mapa considerando capas visibles y actividad reciente, evitando falsos positivos cuando se ocultan capas; se añadieron pruebas unitarias del paso de ubicación para sostener la cobertura mínima requerida.
 
 Feature 4.2 Descubrimiento avanzado
 

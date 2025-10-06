@@ -1,3 +1,4 @@
+import { PublishSelectField } from '@components/publish/shared'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -30,46 +31,37 @@ export const CornerPicker: React.FC<CornerPickerProps> = ({
   const isDisabled = corners.length === 0 && isLoading
 
   return (
-    <div className={styles.formGroup}>
-      <label htmlFor="publish-corner">
-        {t('publishBook.offer.corner.label')}
-      </label>
-      <select
-        id="publish-corner"
-        className={styles.select}
-        value={value?.id ?? ''}
-        onChange={(event) => {
-          const next = corners.find(
-            (corner) => corner.id === event.target.value
-          )
-          onChange(next ? { id: next.id, name: next.name } : null)
-        }}
-        onBlur={onBlur}
-        disabled={isLoading || isDisabled || isError}
-      >
-        <option value="">
-          {isLoading
-            ? t('publishBook.offer.corner.loading')
-            : t('publishBook.offer.corner.placeholder')}
-        </option>
-        {corners.map((corner) => (
-          <option key={corner.id} value={corner.id}>
-            {corner.name}
-          </option>
-        ))}
-      </select>
-      {isError ? (
-        <span className={styles.error} role="alert">
-          {t('publishBook.offer.corner.error')}
-        </span>
-      ) : (
-        <span className={styles.helperText}>
-          {value
+    <PublishSelectField
+      id="publish-corner"
+      label={t('publishBook.offer.corner.label')}
+      value={value?.id ?? ''}
+      onChange={(event) => {
+        const next = corners.find((corner) => corner.id === event.target.value)
+        onChange(next ? { id: next.id, name: next.name } : null)
+      }}
+      onBlur={onBlur}
+      disabled={isLoading || isDisabled || isError}
+      containerClassName={styles.formGroup}
+      error={isError ? t('publishBook.offer.corner.error') : undefined}
+      hint={
+        isError
+          ? undefined
+          : value
             ? t('publishBook.offer.corner.selected', { name: value.name })
-            : t('publishBook.offer.corner.helper')}
-        </span>
-      )}
-    </div>
+            : t('publishBook.offer.corner.helper')
+      }
+    >
+      <option value="">
+        {isLoading
+          ? t('publishBook.offer.corner.loading')
+          : t('publishBook.offer.corner.placeholder')}
+      </option>
+      {corners.map((corner) => (
+        <option key={corner.id} value={corner.id}>
+          {corner.name}
+        </option>
+      ))}
+    </PublishSelectField>
   )
 }
 

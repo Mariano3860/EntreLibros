@@ -236,4 +236,29 @@ describe('MapPage', () => {
       trackSpy.mockRestore()
     }
   })
+
+  test('only shows the empty state when all visible datasets are empty', async () => {
+    renderWithProviders(<MapPage />)
+
+    await waitFor(() => {
+      expect(getPinButtons().length).toBeGreaterThan(0)
+    })
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'map.filters.types.corners' })
+    )
+    fireEvent.click(
+      screen.getByRole('button', { name: 'map.filters.types.publications' })
+    )
+    fireEvent.click(
+      screen.getByRole('button', { name: 'map.filters.activity' })
+    )
+    fireEvent.click(
+      screen.getByRole('button', { name: 'map.filters.recentActivity' })
+    )
+
+    await waitFor(() => {
+      expect(screen.getByText('map.empty.title')).toBeInTheDocument()
+    })
+  })
 })

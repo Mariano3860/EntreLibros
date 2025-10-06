@@ -1,0 +1,45 @@
+.stepper {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  position: relative;
+}
+
+.stepIndicator {
+  min-width: 32px;
+  min-height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 600;
+  border: 2px solid transparent;
+  background: var(--background-primary);
+  color: var(--text-secondary);
+}
+
+.stepActive {
+  background: var(--primary-color);
+  color: #fff;
+  border-color: var(--primary-color);
+}
+
+.stepLabel {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.stepDescription {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}

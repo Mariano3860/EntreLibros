@@ -1,3 +1,8 @@
+import {
+  PublishSelectField,
+  PublishTextField,
+  PublishTextareaField,
+} from '@components/publish/shared'
 import { TFunction } from 'i18next'
 import React from 'react'
 
@@ -89,44 +94,31 @@ export const OfferStep: React.FC<OfferStepProps> = React.memo(
 
       {offer.sale && (
         <div className={styles.priceGrid}>
-          <div className={styles.formGroup}>
-            <label htmlFor="publish-price">
-              {t('publishBook.offer.price.label')}
-            </label>
-            <input
-              id="publish-price"
-              className={styles.input}
-              inputMode="decimal"
-              value={offer.priceAmount}
-              onChange={(event) =>
-                onOfferChange({ priceAmount: event.target.value })
-              }
-              onBlur={onBlur}
-              aria-invalid={errors.price ? 'true' : 'false'}
-            />
-            {errors.price && (
-              <span className={styles.error} role="alert">
-                {errors.price}
-              </span>
-            )}
-          </div>
-          <div className={styles.formGroup}>
-            <label htmlFor="publish-currency">
-              {t('publishBook.offer.price.currency')}
-            </label>
-            <select
-              id="publish-currency"
-              className={styles.select}
-              value={offer.priceCurrency}
-              onChange={(event) =>
-                onOfferChange({ priceCurrency: event.target.value })
-              }
-            >
-              <option value="ARS">ARS</option>
-              <option value="USD">USD</option>
-              <option value="EUR">EUR</option>
-            </select>
-          </div>
+          <PublishTextField
+            id="publish-price"
+            label={t('publishBook.offer.price.label')}
+            value={offer.priceAmount}
+            inputMode="decimal"
+            onChange={(event) =>
+              onOfferChange({ priceAmount: event.target.value })
+            }
+            onBlur={onBlur}
+            error={errors.price}
+            containerClassName={styles.formGroup}
+          />
+          <PublishSelectField
+            id="publish-currency"
+            label={t('publishBook.offer.price.currency')}
+            value={offer.priceCurrency}
+            onChange={(event) =>
+              onOfferChange({ priceCurrency: event.target.value })
+            }
+            containerClassName={styles.formGroup}
+          >
+            <option value="ARS">ARS</option>
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+          </PublishSelectField>
         </div>
       )}
 
@@ -154,12 +146,9 @@ export const OfferStep: React.FC<OfferStepProps> = React.memo(
       )}
 
       <div className={styles.formGroup}>
-        <label htmlFor="publish-notes">
-          {t('publishBook.offer.notes.label')}
-        </label>
-        <textarea
+        <PublishTextareaField
           id="publish-notes"
-          className={styles.textarea}
+          label={t('publishBook.offer.notes.label')}
           value={offer.notes}
           maxLength={300}
           onChange={(event) => onOfferChange({ notes: event.target.value })}
@@ -231,33 +220,29 @@ export const OfferStep: React.FC<OfferStepProps> = React.memo(
       </div>
 
       {offer.delivery.shipping && (
-        <div className={styles.formGroup}>
-          <label htmlFor="publish-shipping-payer">
-            {t('publishBook.offer.delivery.shippingPayer.label')}
-          </label>
-          <select
-            id="publish-shipping-payer"
-            className={styles.select}
-            value={offer.delivery.shippingPayer}
-            onChange={(event) =>
-              onDeliveryChange({
-                shippingPayer: event.target
-                  .value as PublishBookOffer['delivery']['shippingPayer'],
-              })
-            }
-            onBlur={onBlur}
-          >
-            <option value="owner">
-              {t('publishBook.offer.delivery.shippingPayer.owner')}
-            </option>
-            <option value="requester">
-              {t('publishBook.offer.delivery.shippingPayer.requester')}
-            </option>
-            <option value="split">
-              {t('publishBook.offer.delivery.shippingPayer.split')}
-            </option>
-          </select>
-        </div>
+        <PublishSelectField
+          id="publish-shipping-payer"
+          label={t('publishBook.offer.delivery.shippingPayer.label')}
+          value={offer.delivery.shippingPayer}
+          onChange={(event) =>
+            onDeliveryChange({
+              shippingPayer: event.target
+                .value as PublishBookOffer['delivery']['shippingPayer'],
+            })
+          }
+          onBlur={onBlur}
+          containerClassName={styles.formGroup}
+        >
+          <option value="owner">
+            {t('publishBook.offer.delivery.shippingPayer.owner')}
+          </option>
+          <option value="requester">
+            {t('publishBook.offer.delivery.shippingPayer.requester')}
+          </option>
+          <option value="split">
+            {t('publishBook.offer.delivery.shippingPayer.split')}
+          </option>
+        </PublishSelectField>
       )}
     </div>
   )

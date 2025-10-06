@@ -273,6 +273,110 @@
     },
     "previewAlt": "Preview cover"
   },
+  "publishCorner": {
+    "title": "Create Reading Corner",
+    "subtitle": "Share the basics so the community can visit it.",
+    "progress": "Creation progress",
+    "confirmClose": "You have unsaved changes. Do you still want to leave?",
+    "draftSaved": "Draft saved.",
+    "published": "Corner published successfully!",
+    "actions": {
+      "cancel": "Cancel",
+      "saveDraft": "Save draft",
+      "back": "Back",
+      "next": "Next",
+      "publish": "Publish corner",
+      "publishing": "Publishing...",
+      "changeAddress": "Change address"
+    },
+    "steps": {
+      "details": {
+        "title": "Corner details",
+        "description": "Name, host and guidelines."
+      },
+      "location": {
+        "title": "Address & visibility",
+        "description": "Confirm the exact address and choose how it will be displayed to the community."
+      },
+      "review": {
+        "title": "Review & confirm",
+        "description": "Double-check the information before publishing."
+      }
+    },
+    "location": {
+      "searching": "Searching addresses..."
+    },
+    "fields": {
+      "name": "Corner name",
+      "scope": "Scope",
+      "hostAlias": "Host (public alias)",
+      "internalContact": "Internal contact (support only)",
+      "rules": "Local guidelines",
+      "rulesHint": "Write a short summary or paste a link with more details.",
+      "schedule": "Suggested schedule",
+      "scheduleHint": "Optional: typical days or times when it is available.",
+      "addressSearch": "Search address (street and number)",
+      "addressSearchPlaceholder": "E.g. Liberty 1234",
+      "addressSearchHint": "Type street and number to see suggestions and place the map pin.",
+      "mapPreviewTitle": "Map preview",
+      "street": "Street",
+      "number": "Number",
+      "unit": "Floor / Apt (optional)",
+      "postalCode": "Postal code (optional)",
+      "visibilityPreference": "How the location will be shown",
+      "photo": "Representative photo",
+      "photoCta": "Upload image",
+      "photoHint": "Show the corner without revealing sensitive information.",
+      "photoRemove": "Remove image",
+      "status": "Initial status",
+      "consent": "I allow EntreLibros to publish this corner with the selected visibility."
+    },
+    "scope": {
+      "public": "Public",
+      "semiprivate": "Semi-private"
+    },
+    "visibilityPreference": {
+      "exact": "Show exact address",
+      "approximate": "Show approximate area"
+    },
+    "status": {
+      "active": "Active",
+      "paused": "Paused"
+    },
+    "errors": {
+      "name": "Enter a name.",
+      "hostAlias": "Enter the host alias.",
+      "internalContact": "Enter an internal contact.",
+      "street": "Enter the street name.",
+      "number": "Enter the street number.",
+      "addressSearch": "Select an address from the list to continue.",
+      "latitudeRange": "Latitude must be between -90 and 90.",
+      "longitudeRange": "Longitude must be between -180 and 180.",
+      "addressNoResults": "We couldn't find matches. Try another street or number.",
+      "addressSearchFailed": "We couldn't search for addresses. Please try again.",
+      "photo": "Add a representative photo.",
+      "consent": "We need your authorization to publish this corner.",
+      "geolocationUnsupported": "Your browser doesn't support automatic location retrieval.",
+      "geolocationDenied": "We couldn't access your location. Check the permissions and try again.",
+      "photoRead": "We couldn't read the image. Try again.",
+      "publish": "We couldn't create the corner. Please try again."
+    },
+    "review": {
+      "name": "Name",
+      "scope": "Scope",
+      "host": "Host",
+      "contact": "Internal contact",
+      "rules": "Guidelines",
+      "schedule": "Schedule",
+      "address": "Address",
+      "coordinates": "Coordinates",
+      "visibilityPreference": "Visibility",
+      "status": "Status",
+      "emptyField": "No information",
+      "photoAlt": "Corner photo",
+      "privacyNotice": "We store the exact address; your preference defines how it will be displayed."
+    }
+  },
   "community": {
     "title": "Community",
     "tabs": {
@@ -401,10 +505,18 @@
         "offered": "Offered",
         "requested": "Requested"
       },
-      "sale": { "price": "Price: ${{price}}" },
-      "seeking": { "description": "{{user}} is looking for {{title}}" },
-      "house": { "distance": "{{distance}} km away" },
-      "person": { "match": "{{match}}% match" },
+      "sale": {
+        "price": "Price: ${{price}}"
+      },
+      "seeking": {
+        "description": "{{user}} is looking for {{title}}"
+      },
+      "house": {
+        "distance": "{{distance}} km away"
+      },
+      "person": {
+        "match": "{{match}}% match"
+      },
       "suggestions": "Suggestions",
       "cornerChip": {
         "ariaLabel": "View Book Corner {{name}}"
