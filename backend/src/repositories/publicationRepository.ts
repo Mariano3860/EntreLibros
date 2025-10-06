@@ -1,5 +1,5 @@
 import { query, withTransaction, type DbClient } from '../db.js';
-import { createBook, type NewBook } from './bookRepository.js';
+import { type NewBook } from './bookRepository.js';
 
 export type PublicationStatus = 'draft' | 'available' | 'reserved' | 'inactive';
 export type PublicationType = 'offer' | 'want';
