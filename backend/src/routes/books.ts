@@ -12,7 +12,7 @@ import {
   type PublicationShippingPayer,
 } from '../repositories/publicationRepository.js';
 import {
-  searchBooks as searchExternalBooks,
+  searchBooksApiResults,
   checkBookExists,
 } from '../services/openLibrary.js';
 import { authenticate, type AuthenticatedRequest } from '../middleware/auth.js';
@@ -25,21 +25,22 @@ router.get('/', async (_req, res) => {
 });
 
 router.get('/search', async (req, res) => {
-  const q = req.query.q as string | undefined;
-  if (!q) {
-    return res.status(400).json({
-      error: 'MissingFields',
-      message: 'books.errors.q_required',
-    });
-  }
   try {
-    const books = await searchExternalBooks(q);
-    res.json(books);
-  } catch {
-    res.status(502).json({
-      error: 'SearchFailed',
-      message: 'books.errors.search_failed',
-    });
+    const raw = (req.query.q ?? req.query.query ?? '') as string | string[];
+    const val = Array.isArray(raw) ? raw[0] : raw;
+    const q = (val ?? '').toString().trim();
+
+    if (!q) {
+      return res.status(400).json({
+        error: 'q_required',
+        message: 'Missing q (or query) parameter',
+      });
+    }
+
+    const results = await searchBooksApiResults(q);
+    return res.json(results);
+  } catch (e) {
+    return res.status(502).json({ error: `openlibrary_error: ${String(e)}` });
   }
 });
 
@@ -58,11 +59,16 @@ router.post('/', authenticate, async (req: AuthenticatedRequest, res) => {
 
   const { metadata, images, offer, draft, type, cornerId } = validation.data;
 
-  const verified = await checkBookExists({
-    title: metadata.title,
-    author: metadata.author ?? undefined,
-    isbn: metadata.isbn ?? undefined,
-  });
+  let verified: boolean;
+  try {
+    verified = await checkBookExists({
+      isbn: metadata.isbn || undefined,
+      title: metadata.title || undefined,
+      author: metadata.author || undefined,
+    });
+  } catch {
+    verified = false;
+  }
 
   const publication = await createPublication({
     userId: req.user.id,
