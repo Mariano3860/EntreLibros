@@ -1,3 +1,5 @@
+@import '@styles/variables';
+
 .overlay {
   position: fixed;
   inset: 0;
@@ -6,13 +8,12 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: 24px;
+  padding: rem(24px);
 }
 
 .modal {
-  background: var(--surface-elevated, #fff);
-  color: var(--text-primary, #1d1d1d);
-  border-radius: 16px;
+  background: var(--background-primary);
+  border-radius: rem(16px);
   width: min(960px, 100%);
   max-height: calc(100vh - 48px);
   overflow: hidden;
@@ -22,12 +23,12 @@
 }
 
 .header {
-  padding: 24px;
+  padding: rem(24px);
   border-bottom: 1px solid rgb(8 15 32 / 8%);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 16px;
+  gap: rem(16px);
 }
 
 .titleGroup {
@@ -39,12 +40,12 @@
 
 .subtitle {
   font-size: 0.9rem;
-  color: var(--neutral-500, #596070);
+  color: var(--text-secondary);
 }
 
 .headerActions {
   display: flex;
-  gap: 8px;
+  gap: rem(8px);
   flex-wrap: wrap;
   justify-content: flex-end;
 }
@@ -67,10 +68,10 @@
 .content {
   flex: 1;
   overflow-y: auto;
-  padding: 24px;
+  padding: rem(24px);
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: rem(24px);
 }
 
 .footer {
@@ -85,10 +86,10 @@
 
   .header,
   .footer {
-    padding: 20px;
+    padding: rem(20px);
   }
 
   .content {
-    padding: 20px;
+    padding: rem(20px);
   }
 }

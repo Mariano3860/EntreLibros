@@ -59,12 +59,12 @@
 
 .suggestionButton:hover,
 .suggestionButton:focus {
-  background: rgb(45 87 255 / 12%);
+  background: rgb(var(--primary-super-dark-rgb) / 12%);
   outline: none;
 }
 
 .suggestionButtonActive {
-  background: rgb(45 87 255 / 16%);
+  background: rgb(var(--primary-super-dark-rgb) / 16%);
 }
 
 .suggestionPrimary {
@@ -110,7 +110,7 @@
   appearance: none;
   border: 0;
   background: transparent;
-  color: var(--primary-600, #2d57ff);
+  color: var(--primary-color);
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
@@ -147,7 +147,7 @@
 }
 
 .privacyNotice {
-  background: rgb(45 87 255 / 8%);
+  background: rgb(var(--primary-super-dark-rgb) / 8%);
   border-radius: 16px;
   padding: 16px;
   color: var(--neutral-600, #3d4451);

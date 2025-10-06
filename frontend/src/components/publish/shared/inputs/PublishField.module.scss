@@ -7,38 +7,38 @@
 .label {
   font-weight: 600;
   font-size: 0.9rem;
-  color: var(--neutral-700, #1d1d1d);
+  color: var(--text-secondary);
 }
 
 .input,
 .textarea,
 .select {
   border-radius: 12px;
-  border: 1px solid rgb(8 15 32 / 12%);
+  border: 1px solid rgb(137 171 255 / 12%);
   padding: 12px 14px;
   font-size: 0.95rem;
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease;
-  background: #fff;
+  background: var(--background-card);
 }
 
 .input:focus,
 .textarea:focus,
 .select:focus {
   outline: none;
-  border-color: var(--primary-400, #4e6dff);
-  box-shadow: 0 0 0 4px rgb(45 87 255 / 12%);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px rgb(var(--primary-super-dark-rgb) / 12%);
 }
 
 .errorMessage {
-  color: var(--error-500, #c62828);
+  color: var(--color-error-dark);
   font-size: 0.8rem;
 }
 
 .hint {
   font-size: 0.8rem;
-  color: var(--neutral-500, #596070);
+  color: var(--text-secondary);
 }
 
 .segmented {
@@ -50,9 +50,9 @@
 .segmentButton {
   border-radius: 999px;
   padding: 8px 16px;
-  border: 1px solid rgb(45 87 255 / 24%);
-  background: rgb(45 87 255 / 4%);
-  color: var(--primary-600, #1c3fcc);
+  border: 1px solid rgb(var(--primary-super-dark-rgb) / 24%);
+  background: rgb(var(--primary-super-dark-rgb) / 4%);
+  color: var(--primary-dark);
   cursor: pointer;
   transition:
     background 0.2s ease,
@@ -60,14 +60,14 @@
 }
 
 .segmentButton[aria-pressed='true'] {
-  background: var(--primary-500, #2d57ff);
+  background: var(--primary-color);
   color: #fff;
-  border-color: var(--primary-500, #2d57ff);
+  border-color: var(--primary-color);
 }
 
 .segmentButton:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 4px rgb(45 87 255 / 25%);
+  box-shadow: 0 0 0 4px rgb(var(--primary-super-dark-rgb) / 25%);
 }
 
 .upload {
@@ -80,7 +80,7 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  background: rgb(45 87 255 / 4%);
+  background: rgb(var(--primary-super-dark-rgb) / 4%);
 }
 
 .upload input[type='file'] {
@@ -99,7 +99,7 @@
 
 .uploadButton:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 4px rgb(45 87 255 / 25%);
+  box-shadow: 0 0 0 4px rgb(var(--primary-super-dark-rgb) / 25%);
 }
 
 .previewList {

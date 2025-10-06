@@ -76,8 +76,8 @@
 .badge {
   border-radius: 999px;
   padding: 6px 14px;
-  background: rgb(45 87 255 / 8%);
-  color: var(--primary-600, #1c3fcc);
+  background: rgb(var(--primary-super-dark-rgb) / 8%);
+  color: var(--primary-dark);
   cursor: pointer;
   border: 1px solid transparent;
   font-size: 0.85rem;
@@ -85,7 +85,7 @@
 }
 
 .badgeActive {
-  background: var(--primary-500, #2d57ff);
+  background: var(--primary-color);
   color: #fff;
 }
 
@@ -98,8 +98,8 @@
 .spinner {
   width: 16px;
   height: 16px;
-  border: 2px solid rgb(45 87 255 / 20%);
-  border-top-color: var(--primary-500, #2d57ff);
+  border: 2px solid rgb(var(--primary-super-dark-rgb) / 20%);
+  border-top-color: var(--primary-color);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -214,9 +214,9 @@
 }
 
 .primaryButton {
-  background: var(--primary-500, #2d57ff);
+  background: var(--primary-color);
   color: #fff;
-  box-shadow: 0 8px 20px rgb(45 87 255 / 25%);
+  box-shadow: 0 8px 20px rgb(var(--primary-super-dark-rgb) / 25%);
 }
 
 .primaryButton:disabled,

@@ -37,9 +37,9 @@
 }
 
 .primary {
-  background: var(--primary-500, #2d57ff);
+  background: var(--primary-color);
   color: #fff;
-  box-shadow: 0 8px 20px rgb(45 87 255 / 25%);
+  box-shadow: 0 8px 20px rgb(var(--primary-super-dark-rgb) / 25%);
 }
 
 .primary:disabled,
@@ -51,7 +51,7 @@
 
 .button:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 4px rgb(45 87 255 / 25%);
+  box-shadow: 0 0 0 4px rgb(var(--primary-super-dark-rgb) / 25%);
 }
 
 .button:active:not(:disabled) {
