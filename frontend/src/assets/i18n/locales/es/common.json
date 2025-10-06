@@ -112,14 +112,17 @@
       "available": "Disponible",
       "reserved": "Reservado",
       "sold": "Vendido",
-      "exchanged": "Intercambiado"
+      "exchanged": "Intercambiado",
+      "completed": "Completado",
+      "draft": "Borrador"
     },
     "badge": {
       "for_sale": "A la venta · ${{price}}",
       "for_trade": "Intercambio",
       "seeking": "Buscando"
     },
-    "cover_alt": "Portada de {{title}}"
+    "cover_alt": "Portada de {{title}}",
+    "openDetail": "Ver detalles de {{title}}"
   },
   "publishBook": {
     "title": "Publicar un libro",
@@ -272,6 +275,79 @@
       "price": "El precio debe ser mayor a 0"
     },
     "previewAlt": "Vista previa de la portada"
+  },
+  "bookDetail": {
+    "title": "Detalle de la publicación",
+    "subtitleOwner": "Actualizá la información para mantenerla al día",
+    "subtitleGuest": "Información visible para la comunidad",
+    "roleDescription": "Modal con información de la publicación",
+    "status": {
+      "available": "Disponible",
+      "reserved": "Reservado",
+      "completed": "Completado",
+      "draft": "Borrador"
+    },
+    "sections": {
+      "details": "Detalles",
+      "images": "Imágenes"
+    },
+    "fields": {
+      "title": "Título",
+      "notes": "Notas",
+      "condition": "Condición",
+      "status": "Estado",
+      "availability": "Disponibilidad",
+      "price": "Precio",
+      "delivery": "Opciones de entrega",
+      "publisher": "Editorial",
+      "year": "Año",
+      "updated": "Actualizado",
+      "imageUrl": "URL de la imagen"
+    },
+    "availability": {
+      "public": "Visible para todos",
+      "private": "Solo visible para vos"
+    },
+    "delivery": {
+      "inPerson": "Retiro en persona",
+      "corner": "Entrega en casita",
+      "shipping": "Envío",
+      "shippingPayer": "Quién paga el envío",
+      "payer": {
+        "owner": "Lo pago yo",
+        "requester": "Lo paga quien solicita",
+        "split": "Costo compartido"
+      }
+    },
+    "actions": {
+      "save": "Guardar cambios",
+      "saving": "Guardando...",
+      "cancel": "Cancelar",
+      "close": "Cerrar",
+      "changeStatus": "Cambiar estado",
+      "addImage": "Agregar imagen",
+      "removeImage": "Eliminar"
+    },
+    "messages": {
+      "saved": "Publicación actualizada",
+      "error": "No pudimos actualizar la publicación.",
+      "validation": "Revisá los campos marcados para continuar.",
+      "forbidden": "Solo el dueño puede editar esta publicación.",
+      "notFound": "No encontramos la publicación.",
+      "network": "No pudimos conectar. Probá de nuevo.",
+      "noChanges": "No hay cambios para guardar."
+    },
+    "validation": {
+      "price": "Ingresá un precio válido o dejalo vacío."
+    },
+    "empty": "No encontramos esta publicación.",
+    "emptyImages": "Sin imágenes cargadas.",
+    "confirm": {
+      "close": "Tenés cambios sin guardar. ¿Querés salir igualmente?",
+      "reopen": "¿Confirmás volver a marcar el libro como disponible?",
+      "cancel": "Cancelar",
+      "accept": "Confirmar"
+    }
   },
   "publishCorner": {
     "title": "Crear Rincón de Libros",

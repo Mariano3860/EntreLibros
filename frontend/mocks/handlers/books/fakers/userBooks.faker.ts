@@ -2,6 +2,8 @@ import { faker } from '@faker-js/faker'
 
 import { ApiUserBook } from '@src/api/books/userBooks.types'
 
+import { publicationStore } from './publications.faker'
+
 const coverFromIsbn = (isbn: string) =>
   `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg?default=false`
 
@@ -77,7 +79,14 @@ export const generateUserBooks = (seed?: number): ApiUserBook[] => {
   faker.seed(seed ?? 202)
   const [first, second, ...rest] = USER_BOOKS
   const others = faker.helpers.arrayElements(rest, 3)
-  return [first, second, ...others].map((b) => ({
+  const statusMap: Record<string, 'available' | 'reserved' | 'completed'> = {
+    available: 'available',
+    reserved: 'reserved',
+    sold: 'completed',
+    exchanged: 'completed',
+  }
+
+  const books = [first, second, ...others].map((b) => ({
     ...b,
     id: faker.string.uuid(),
     coverUrl: b.isbn ? coverFromIsbn(b.isbn) : coverFromTitle(b.title),
@@ -85,4 +94,17 @@ export const generateUserBooks = (seed?: number): ApiUserBook[] => {
       ? faker.number.int({ min: 8000, max: 20000 })
       : undefined,
   })) as ApiUserBook[]
+
+  books.forEach((book) => {
+    const mappedStatus = statusMap[book.status ?? 'available'] ?? 'available'
+    publicationStore.seedFromPreview(book.id, {
+      title: book.title,
+      author: book.author,
+      coverUrl: book.coverUrl,
+      status: mappedStatus,
+      isOwner: true,
+    })
+  })
+
+  return books
 }

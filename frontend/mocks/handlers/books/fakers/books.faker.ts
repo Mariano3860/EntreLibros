@@ -2,6 +2,8 @@ import { faker } from '@faker-js/faker'
 
 import { ApiBook } from '@src/api/books/books.types'
 
+import { publicationStore } from './publications.faker'
+
 interface BookData {
   author: string
   isbn: string
@@ -55,11 +57,23 @@ export const generateBooks = (
   language: string = 'es'
 ): ApiBook[] => {
   faker.seed(seed ?? 201)
-  return faker.helpers
+  const books = faker.helpers
     .arrayElements(BOOKS, 3)
-    .map(({ titles, author, isbn }) => ({
-      title: titles[language as 'en' | 'es'] || titles.es,
-      author,
-      coverUrl: coverFromIsbn(isbn),
-    }))
+    .map(({ titles, author, isbn }) => {
+      const id = faker.string.uuid()
+      const coverUrl = coverFromIsbn(isbn)
+      publicationStore.seedFromPreview(id, {
+        title: titles[language as 'en' | 'es'] || titles.es,
+        author,
+        coverUrl,
+        isOwner: false,
+      })
+      return {
+        id,
+        title: titles[language as 'en' | 'es'] || titles.es,
+        author,
+        coverUrl,
+      }
+    })
+  return books
 }

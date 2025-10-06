@@ -1,10 +1,12 @@
 import { BookCardProps } from '@components/book/BookCard.types'
-import React from 'react'
+import { BookDetailModalContext } from '@contexts/book/BookDetailModalContext'
+import React, { useCallback, useContext } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import styles from './BookCard.module.scss'
 
 export const BookCard: React.FC<BookCardProps> = ({
+  id,
   title,
   author,
   coverUrl,
@@ -17,6 +19,7 @@ export const BookCard: React.FC<BookCardProps> = ({
   isSeeking,
 }) => {
   const { t } = useTranslation()
+  const modal = useContext(BookDetailModalContext)
 
   const conditionLabel = (() => {
     if (!condition) return null
@@ -28,6 +31,12 @@ export const BookCard: React.FC<BookCardProps> = ({
     return condition
   })()
 
+  const handleOpen = useCallback(() => {
+    if (id && modal?.open) {
+      modal.open(id)
+    }
+  }, [id, modal])
+
   const renderTradePreferences = () => {
     if (!tradePreferences || tradePreferences.length === 0) return null
     const shown = tradePreferences.slice(0, 3).join(', ')
@@ -37,7 +46,12 @@ export const BookCard: React.FC<BookCardProps> = ({
   }
 
   return (
-    <div className={styles.card}>
+    <button
+      type="button"
+      className={styles.card}
+      onClick={handleOpen}
+      aria-label={t('booksPage.openDetail', { title })}
+    >
       <img
         src={coverUrl}
         alt={t('booksPage.cover_alt', { title })}
@@ -78,6 +92,6 @@ export const BookCard: React.FC<BookCardProps> = ({
           )}
         </div>
       </div>
-    </div>
+    </button>
   )
 }

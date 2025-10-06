@@ -1,5 +1,6 @@
 import { Toaster } from '@components/ui/toaster/Toaster'
 import { AuthProvider } from '@contexts/auth/AuthContext'
+import { BookDetailModalProvider } from '@contexts/book'
 import { ThemeProvider } from '@contexts/theme/ThemeContext'
 import { useUserLanguage } from '@hooks/language/useUserLanguage'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -23,10 +24,12 @@ const App = () => {
       <AuthProvider>
         <ThemeProvider>
           <LanguageInitializer />
-          <div>
-            <AppRoutes />
-            <Toaster />
-          </div>
+          <BookDetailModalProvider>
+            <div>
+              <AppRoutes />
+              <Toaster />
+            </div>
+          </BookDetailModalProvider>
         </ThemeProvider>
       </AuthProvider>
     </QueryClientProvider>

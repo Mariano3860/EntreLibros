@@ -112,14 +112,17 @@
       "available": "Available",
       "reserved": "Reserved",
       "sold": "Sold",
-      "exchanged": "Exchanged"
+      "exchanged": "Exchanged",
+      "completed": "Completed",
+      "draft": "Draft"
     },
     "badge": {
       "for_sale": "For sale · ${{price}}",
       "for_trade": "Trade",
       "seeking": "Seeking"
     },
-    "cover_alt": "Cover of {{title}}"
+    "cover_alt": "Cover of {{title}}",
+    "openDetail": "Open details for {{title}}"
   },
   "publishBook": {
     "title": "Publish a book",
@@ -633,6 +636,79 @@
       "timeLabel": "Time",
       "cancel": "Cancel",
       "confirm": "Confirm"
+    }
+  },
+  "bookDetail": {
+    "title": "Publication detail",
+    "subtitleOwner": "Keep your listing up to date",
+    "subtitleGuest": "Information shared with the community",
+    "roleDescription": "Modal dialog with publication details",
+    "status": {
+      "available": "Available",
+      "reserved": "Reserved",
+      "completed": "Completed",
+      "draft": "Draft"
+    },
+    "sections": {
+      "details": "Details",
+      "images": "Images"
+    },
+    "fields": {
+      "title": "Title",
+      "notes": "Notes",
+      "condition": "Condition",
+      "status": "Status",
+      "availability": "Availability",
+      "price": "Price",
+      "delivery": "Delivery options",
+      "publisher": "Publisher",
+      "year": "Year",
+      "updated": "Updated",
+      "imageUrl": "Image URL"
+    },
+    "availability": {
+      "public": "Visible to everyone",
+      "private": "Visible only to you"
+    },
+    "delivery": {
+      "inPerson": "In-person pickup",
+      "corner": "Book corner drop-off",
+      "shipping": "Shipping",
+      "shippingPayer": "Who pays for shipping",
+      "payer": {
+        "owner": "I cover it",
+        "requester": "Requester pays",
+        "split": "Split cost"
+      }
+    },
+    "actions": {
+      "save": "Save changes",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "close": "Close",
+      "changeStatus": "Change status",
+      "addImage": "Add image",
+      "removeImage": "Remove"
+    },
+    "messages": {
+      "saved": "Publication updated",
+      "error": "We couldn't update the publication.",
+      "validation": "Please review the highlighted fields.",
+      "forbidden": "Only the owner can edit this publication.",
+      "notFound": "We couldn't find this publication.",
+      "network": "Connection failed. Try again.",
+      "noChanges": "No changes to save."
+    },
+    "validation": {
+      "price": "Enter a valid price or leave it empty."
+    },
+    "empty": "We couldn't find this publication.",
+    "emptyImages": "No images yet.",
+    "confirm": {
+      "close": "You have unsaved changes. Do you want to leave anyway?",
+      "reopen": "Are you sure you want to mark the book as available again?",
+      "cancel": "Cancel",
+      "accept": "Confirm"
     }
   }
 }

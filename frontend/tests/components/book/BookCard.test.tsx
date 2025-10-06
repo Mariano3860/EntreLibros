@@ -37,5 +37,8 @@ describe('BookCard', () => {
       screen.getByText((content) => content.includes('A, B, C +1'))
     ).toBeInTheDocument()
     expect(screen.getByText('booksPage.badge.seeking')).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'booksPage.openDetail' })
+    ).toBeInTheDocument()
   })
 })

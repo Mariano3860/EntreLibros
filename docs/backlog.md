@@ -96,6 +96,7 @@ Feature 3.1 Publicación y calidad del dato
   - Actualización 2025-10-08: se refactorizó el modal en componentes reutilizables, optimizando renders y mantenimiento sin alterar el flujo funcional.
   - Actualización 2025-10-08 (backend): se documentó en `docs/base_de_datos.md` la brecha entre el flujo del frontend y el modelo real (solo `users`/`books`). TODO: migraciones para `publications`, endpoints `/books/mine`, `/books/:id` y soporte de imágenes.
   - Actualización 2025-10-30: se agregó persistencia real de publicaciones (tabla `publications` + `publication_images`), endpoints `/api/books` y `/api/books/mine`, validaciones de oferta/entrega y pruebas end-to-end para publicar y listar ejemplares propios.
+  - Actualización 2025-10-31: el frontend ahora permite consultar y editar publicaciones existentes en un modal accesible, con datos en vivo vía hooks de React Query, actualización optimista, validaciones básicas y handlers MSW (GET/PUT) para garantizar coherencia mock/backend.
 - [~] S-3.2 Normalización asistida por ISBN/metadata (Should, E2; BR-22)
   - Éxito: autocompletado; reducción de duplicados/ambigüedades.
 - [ ] S-3.3 Contenidos permitidos/denegados (política editorial) (Must, E1; BR-24)

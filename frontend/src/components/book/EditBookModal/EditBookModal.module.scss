@@ -1,0 +1,317 @@
+@import '@styles/variables';
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: rem(24px);
+}
+
+.heroRow {
+  display: grid;
+  grid-template-columns: minmax(200px, 240px) 1fr;
+  gap: rem(24px);
+}
+
+.heroImage {
+  width: 100%;
+  border-radius: rem(12px);
+  object-fit: cover;
+  box-shadow: 0 16px 32px rgb(8 15 32 / 18%);
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: rem(12px);
+}
+
+.metaHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: rem(12px);
+}
+
+.metaAuthor {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+.metaList {
+  display: grid;
+  gap: rem(8px);
+  font-size: 0.9rem;
+}
+
+.metaList dt {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.metaList dd {
+  margin: 0;
+}
+
+.statusBadge {
+  border-radius: 999px;
+  padding: rem(6px) rem(14px);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: rgb(var(--primary-super-dark-rgb) / 10%);
+  color: var(--primary-dark);
+}
+
+.statusBadge.available {
+  background: rgb(var(--success-rgb) / 12%);
+  color: var(--success-color);
+}
+
+.statusBadge.reserved {
+  background: rgb(var(--warning-rgb) / 12%);
+  color: var(--warning-color);
+}
+
+.statusBadge.completed {
+  background: rgb(var(--neutral-700-rgb) / 12%);
+  color: var(--neutral-700);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: rem(16px);
+}
+
+.section h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.formGrid {
+  display: grid;
+  gap: rem(16px);
+}
+
+.fieldLabel {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+select,
+input,
+textarea {
+  padding: rem(10px) rem(12px);
+  border-radius: rem(8px);
+  border: 1px solid rgb(8 15 32 / 15%);
+  font: inherit;
+  background: var(--background-secondary);
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+  cursor: not-allowed;
+  background: rgb(8 15 32 / 6%);
+}
+
+.availabilityGroup {
+  display: grid;
+  gap: rem(8px);
+  border: 1px solid rgb(8 15 32 / 12%);
+  border-radius: rem(12px);
+  padding: rem(12px);
+}
+
+.availabilityGroup legend {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.priceRow {
+  display: grid;
+  gap: rem(8px);
+}
+
+.priceInputs {
+  display: flex;
+  gap: rem(12px);
+  align-items: center;
+}
+
+.currencyInput {
+  width: 96px;
+  text-transform: uppercase;
+}
+
+.inlineError {
+  color: var(--error-500, #c62828);
+  font-size: 0.85rem;
+}
+
+.deliveryGroup {
+  display: grid;
+  gap: rem(10px);
+  border: 1px solid rgb(8 15 32 / 12%);
+  border-radius: rem(12px);
+  padding: rem(12px);
+}
+
+.shippingPayer {
+  display: flex;
+  flex-direction: column;
+  gap: rem(6px);
+  font-size: 0.9rem;
+}
+
+.imagesSection {
+  display: flex;
+  flex-direction: column;
+  gap: rem(16px);
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: rem(12px);
+}
+
+.addImageButton,
+.removeImageButton,
+.errorState button {
+  border: none;
+  background: var(--primary-color);
+  color: #fff;
+  border-radius: rem(8px);
+  padding: rem(8px) rem(14px);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.removeImageButton {
+  background: rgb(var(--error-rgb) / 85%);
+}
+
+.addImageButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.imageList {
+  display: grid;
+  gap: rem(16px);
+}
+
+.imageItem {
+  display: grid;
+  gap: rem(8px);
+  border: 1px solid rgb(8 15 32 / 12%);
+  border-radius: rem(12px);
+  padding: rem(12px);
+}
+
+.imageItem img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: rem(10px);
+}
+
+.empty {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.loading {
+  display: grid;
+  gap: rem(12px);
+}
+
+.skeleton {
+  height: rem(120px);
+  border-radius: rem(12px);
+  background: linear-gradient(
+    90deg,
+    rgb(8 15 32 / 8%),
+    rgb(8 15 32 / 16%),
+    rgb(8 15 32 / 8%)
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.errorState {
+  display: flex;
+  flex-direction: column;
+  gap: rem(16px);
+  align-items: flex-start;
+}
+
+.confirmOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgb(8 15 32 / 45%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.confirmDialog {
+  background: var(--background-primary);
+  padding: rem(24px);
+  border-radius: rem(12px);
+  display: grid;
+  gap: rem(16px);
+  max-width: 360px;
+}
+
+.confirmActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: rem(12px);
+}
+
+.confirmActions button {
+  border: none;
+  padding: rem(8px) rem(14px);
+  border-radius: rem(8px);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.confirmActions button:first-child {
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.confirmActions button:last-child {
+  background: var(--primary-color);
+  color: #fff;
+}
+
+@media (width <= 768px) {
+  .heroRow {
+    grid-template-columns: 1fr;
+  }
+
+  .metaHeader {
+    align-items: flex-start;
+  }
+}

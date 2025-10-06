@@ -4,6 +4,7 @@ import { ReactElement, ReactNode } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 
 import { AuthProvider } from '@src/contexts/auth/AuthContext'
+import { BookDetailModalProvider } from '@src/contexts/book'
 import { ThemeProvider } from '@src/contexts/theme/ThemeContext'
 
 type WrapperOptions = {
@@ -22,7 +23,9 @@ export const createWrapper = (options?: WrapperOptions) => {
     <MemoryRouter initialEntries={options?.initialEntries}>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <ThemeProvider>{children}</ThemeProvider>
+          <ThemeProvider>
+            <BookDetailModalProvider>{children}</BookDetailModalProvider>
+          </ThemeProvider>
         </AuthProvider>
       </QueryClientProvider>
     </MemoryRouter>
