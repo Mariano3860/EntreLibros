@@ -122,12 +122,15 @@ export const MapPage = () => {
     })
   }, [data, layers])
 
-  const isEmpty = Boolean(
-    data &&
-      data.corners.length === 0 &&
-      data.publications.length === 0 &&
-      data.activity.length === 0
-  )
+  const visibleCorners = layers.corners ? (data?.corners?.length ?? 0) : 0
+  const visiblePublications = layers.publications
+    ? (data?.publications?.length ?? 0)
+    : 0
+  const visibleActivity =
+    layers.activity && filters.recentActivity
+      ? (data?.activity?.length ?? 0)
+      : 0
+  const isEmpty = visibleCorners + visiblePublications + visibleActivity === 0
 
   const activityPoints = filters.recentActivity ? (data?.activity ?? []) : []
 
