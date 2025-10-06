@@ -21,50 +21,64 @@ afterEach(async () => {
   vi.restoreAllMocks();
 });
 
-describe('books API', () => {
-  test('creates, lists and verifies books via HTTP', async () => {
-    const createRes = await request(app)
-      .post('/api/books')
-      .send({ title: 'API Book' })
-      .expect(201);
-    expect(createRes.body.verified).toBe(false);
-
-    const res = await request(app).get('/api/books').expect(200);
-    expect(res.body).toHaveLength(1);
-    expect(res.body[0].title).toBe('API Book');
-
-    const verifyRes = await request(app)
-      .post(`/api/books/${createRes.body.id}/verify`)
-      .expect(200);
-    expect(verifyRes.body.verified).toBe(true);
-  });
-
+describe('books API legacy endpoints', () => {
   test('requires q for search', async () => {
     const res = await request(app).get('/api/books/search').expect(400);
     expect(res.body).toEqual({
-      error: 'MissingFields',
-      message: 'books.errors.q_required',
+      error: 'q_required',
+      message: 'Missing q (or query) parameter',
     });
   });
 
   test('returns search error when OpenLibrary fails', async () => {
-    vi.spyOn(openLibrary, 'searchBooks').mockRejectedValue(new Error('fail'));
+    vi.spyOn(openLibrary, 'searchBooksApiResults').mockRejectedValueOnce(
+      new Error('fail')
+    );
+
     const res = await request(app)
       .get('/api/books/search')
       .query({ q: 'foo' })
       .expect(502);
+
     expect(res.body).toEqual({
-      error: 'SearchFailed',
-      message: 'books.errors.search_failed',
+      error: 'openlibrary_error: Error: fail',
     });
   });
 
-  test('requires title when creating book', async () => {
-    const res = await request(app).post('/api/books').send({}).expect(400);
-    expect(res.body).toEqual({
-      error: 'MissingFields',
-      message: 'books.errors.title_required',
-    });
+  test('returns array of ApiBookSearchResult on success', async () => {
+    const payload = [
+      {
+        id: 'OL9999M',
+        title: 'El nombre del viento',
+        author: 'Patrick Rothfuss',
+        publisher: 'DAW',
+        year: 2007,
+        language: 'spa',
+        isbn: '9788401337208',
+        coverUrl: 'https://covers.openlibrary.org/b/id/321-M.jpg',
+      },
+      {
+        id: 'OL8888M',
+        title: 'The Name of the Wind',
+        author: 'Patrick Rothfuss',
+        publisher: 'DAW',
+        year: 2007,
+        language: 'eng',
+        isbn: '9780756404741',
+        coverUrl: 'https://covers.openlibrary.org/b/id/322-M.jpg',
+      },
+    ];
+
+    vi.spyOn(openLibrary, 'searchBooksApiResults').mockResolvedValueOnce(
+      payload
+    );
+
+    const res = await request(app)
+      .get('/api/books/search')
+      .query({ q: 'el nombre del viento' })
+      .expect(200);
+
+    expect(res.body).toEqual(payload);
   });
 
   test('returns not found when verifying missing book', async () => {

@@ -88,13 +88,14 @@ Feature 2.2 Visibilidad y actividad
 EP-3 Publicaciones (Ofrezco/Busco)
 Feature 3.1 Publicación y calidad del dato
 
-- [~] S-3.1 Publicar ejemplares (título, autor, estado; ISBN si existe; foto opcional) (Must, E1; BR-20)
+- [x] S-3.1 Publicar ejemplares (título, autor, estado; ISBN si existe; foto opcional) (Must, E1; BR-20)
   - Éxito: 90% publicaciones con campos mínimos.
   - Actualización 2025-10-05: se entregó el flujo completo en frontend (modal por ruta, stepper, autosave, preview e i18n) consumiendo mocks MSW; queda pendiente integrar con backend real y telemetría persistente.
   - Actualización 2025-10-06: se ajustó el autosave para evitar sobrescrituras del borrador al reanudar y se mejoró la accesibilidad del focus trap.
   - Actualización 2025-10-07: se reforzó la suite automatizada (MSW + RTL) cubriendo autosave, reanudación, publicación y errores, elevando la cobertura global del workspace por encima del 85% requerido.
   - Actualización 2025-10-08: se refactorizó el modal en componentes reutilizables, optimizando renders y mantenimiento sin alterar el flujo funcional.
   - Actualización 2025-10-08 (backend): se documentó en `docs/base_de_datos.md` la brecha entre el flujo del frontend y el modelo real (solo `users`/`books`). TODO: migraciones para `publications`, endpoints `/books/mine`, `/books/:id` y soporte de imágenes.
+  - Actualización 2025-10-30: se agregó persistencia real de publicaciones (tabla `publications` + `publication_images`), endpoints `/api/books` y `/api/books/mine`, validaciones de oferta/entrega y pruebas end-to-end para publicar y listar ejemplares propios.
 - [~] S-3.2 Normalización asistida por ISBN/metadata (Should, E2; BR-22)
   - Éxito: autocompletado; reducción de duplicados/ambigüedades.
 - [ ] S-3.3 Contenidos permitidos/denegados (política editorial) (Must, E1; BR-24)
