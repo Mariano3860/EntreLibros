@@ -39,14 +39,15 @@ classDiagram
         <<table>>
         +id: serial PK
         +title: text
+        +author: text
         +isbn: text
-        +authors: text
         +publisher: text
         +published_year: integer
-        +description: text
         +verified: boolean
-        +created_at: timestamptz
-        +createBook(title: text, author: text, isbn: text, publisher: text, publishedYear: integer): Book
+        +language: text
+        +format: text
+        +cover_url: text
+        +createBook(title: text, author: text, isbn: text, publisher: text, publishedYear: integer, metadata): Book
         +listBooks(): Book[]
         +verifyBook(id: integer): Book
     }
@@ -73,16 +74,25 @@ classDiagram
         +status: publication_status
         +type: publication_type
         +description: text
-        +condition: text
+        +condition: publication_condition
+        +sale: boolean
+        +donation: boolean
+        +trade: boolean
+        +price_amount: numeric
+        +price_currency: text
+        +trade_preferences: text[]
+        +availability: publication_availability
+        +delivery_near_book_corner: boolean
+        +delivery_in_person: boolean
+        +delivery_shipping: boolean
+        +delivery_shipping_payer: publication_shipping_payer
+        +is_draft: boolean
+        +corner_id: text
         +created_at: timestamptz
         +updated_at: timestamptz
-        +verified_at: timestamptz
-        +verified_by: integer FK -> users.id
-        +location: geography(Point,4326)
-        +createPublication(userId: integer, bookId: integer, type: publication_type, description: text, condition: text, location: geography?): Publication
-        +listPublications(filters): Publication[]
-        +updatePublicationStatus(id: integer, status: publication_status): Publication
-        +updatePublicationDetails(id: integer, description: text, condition: text, location: geography?): Publication
+        +createPublication(userId: integer, metadata, offer, delivery): Publication
+        +listPublicPublications(): Publication[]
+        +listUserPublications(userId: integer): Publication[]
     }
 
     class publication_stats {
@@ -106,6 +116,7 @@ classDiagram
         +publication_id: integer FK -> publications.id
         +url: text
         +is_primary: boolean
+        +source: text
         +metadata: jsonb
         +created_at: timestamptz
         +addPublicationImage(pubId: integer, url: text, isPrimary: boolean): PublicationImage
@@ -290,6 +301,7 @@ classDiagram
 | `book_id` (FK→`books.id`) | INTEGER     | Libro asociado            |
 | `url`                     | TEXT        | Ruta a la imagen          |
 | `is_primary`              | BOOLEAN     | Marca la imagen principal |
+| `source`                  | TEXT        | Origen (portada o subida) |
 | `metadata`                | JSONB       | Información adicional     |
 | `created_at`              | TIMESTAMPTZ | Fecha de carga            |
 
@@ -307,22 +319,31 @@ classDiagram
 | `id` (PK)                     | SERIAL                                        | Identificador                      |
 | `user_id` (FK→`users.id`)     | INTEGER                                       | Autor de la publicación            |
 | `book_id` (FK→`books.id`)     | INTEGER                                       | Libro referenciado                 |
-| `status`                      | ENUM('draft','pending','verified','rejected') | Estado de la publicación           |
-| `type`                        | ENUM('offer','request','exchange')            | Tipo de interacción                |
+| `status`                      | ENUM('draft','available','reserved','inactive') | Estado operativo                   |
+| `type`                        | ENUM('offer','want')                          | Modalidad (ofrezco/busco)          |
 | `description`                 | TEXT                                          | Detalle del ejemplar               |
-| `condition`                   | TEXT                                          | Estado físico del ejemplar (por ejemplo: "nuevo", "bueno", "aceptable", "malo") |
-| `location`                    | GEOGRAPHY(Point,4326)                         | Ubicación opcional del intercambio |
+| `condition`                   | ENUM('new','very_good','good','acceptable')   | Estado físico declarado            |
+| `sale`                        | BOOLEAN                                       | Indica si se ofrece venta          |
+| `donation`                    | BOOLEAN                                       | Indica si se ofrece donación       |
+| `trade`                       | BOOLEAN                                       | Indica si se ofrece intercambio    |
+| `price_amount`                | NUMERIC(10,2)                                 | Precio sugerido (si hay venta)     |
+| `price_currency`              | TEXT                                          | Moneda del precio                  |
+| `trade_preferences`           | TEXT[]                                        | Preferencias de intercambio        |
+| `availability`                | ENUM('public','private')                      | Visibilidad (comunidad o privada)  |
+| `delivery_near_book_corner`   | BOOLEAN                                       | Prefiere encuentro en Rincón       |
+| `delivery_in_person`          | BOOLEAN                                       | Prefiere entrega presencial        |
+| `delivery_shipping`           | BOOLEAN                                       | Acepta envío                       |
+| `delivery_shipping_payer`     | ENUM('owner','requester','split')             | Quién asume el envío               |
+| `is_draft`                    | BOOLEAN                                       | Marca de borrador                  |
+| `corner_id`                   | TEXT                                          | Rincón sugerido (opcional)         |
 | `created_at`                  | TIMESTAMPTZ                                   | Fecha de creación                  |
 | `updated_at`                  | TIMESTAMPTZ                                   | Última actualización               |
-| `verified_at`                 | TIMESTAMPTZ                                   | Fecha de verificación (moderación) |
-| `verified_by` (FK→`users.id`) | INTEGER                                       | Usuario verificador (moderador)    |
 
 #### Métodos asociados
 
-* `createPublication(userId, bookId, type, description, condition, location?)` – Crea una publicación y la deja en estado inicial `pending`.
-* `listPublications(filters)` – Lista publicaciones aplicando filtros como distancia, género, estado o tipo.
-* `updatePublicationStatus(id, status)` – Cambia el estado (`draft`, `pending`, `verified`, `rejected`) y registra quién modera.
-* `updatePublicationDetails(id, description, condition, location?)` – Permite editar la descripción, el estado físico y la ubicación propuesta.
+* `createPublication(userId, metadata, oferta, delivery)` – Crea una publicación con la oferta (venta/donación/intercambio) y preferencias de entrega.
+* `listPublicPublications()` – Lista publicaciones visibles para la comunidad.
+* `listUserPublications(userId)` – Recupera las publicaciones creadas por la persona autenticada.
 
 ### `publication_stats`
 
@@ -479,7 +500,7 @@ classDiagram
 
 * **users**: personas usuarias, datos de autenticación/perfil y ubicación aproximada (granularidad barrio/ciudad por diseño).
 * **books**: catálogo normalizado de obras (evita duplicidad entre publicaciones).
-* **publications**: anuncios de “ofrezco/busco/intercambio” de un libro; guarda estado, tipo, descripción, condición y ubicación opcional del encuentro.
+* **publications**: anuncios de “ofrezco/busco” de un libro; guarda estado, modalidad (venta/donación/intercambio), descripción, condición declarada, visibilidad y preferencias de entrega.
 * **publication_stats**: métricas mínimas ligadas 1:1 a la publicación (misma clave).
 * **book_images / publication_images**: imágenes de portadas y de ejemplares reales, respectivamente (composición).
 * **conversations / messages**: mensajería 1:1 organizada por conversación; `publication_id` en `conversations` es **opcional** para soportar chats generales o desde ficha.

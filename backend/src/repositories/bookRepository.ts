@@ -8,6 +8,9 @@ interface BookRow {
   publisher: string | null;
   published_year: number | null;
   verified: boolean;
+  language: string | null;
+  format: string | null;
+  cover_url: string | null;
 }
 
 export interface Book {
@@ -18,11 +21,18 @@ export interface Book {
   publisher: string | null;
   publishedYear: number | null;
   verified: boolean;
+  language: string | null;
+  format: string | null;
+  coverUrl: string | null;
 }
 
 function rowToBook(row: BookRow): Book {
-  const { published_year, ...rest } = row;
-  return { ...rest, publishedYear: published_year };
+  const { published_year, cover_url, ...rest } = row;
+  return {
+    ...rest,
+    publishedYear: published_year,
+    coverUrl: cover_url,
+  };
 }
 
 export interface NewBook {
@@ -32,6 +42,9 @@ export interface NewBook {
   publisher?: string | null;
   publishedYear?: number | null;
   verified?: boolean;
+  language?: string | null;
+  format?: string | null;
+  coverUrl?: string | null;
 }
 
 export async function createBook(book: NewBook): Promise<Book> {
@@ -42,9 +55,15 @@ export async function createBook(book: NewBook): Promise<Book> {
     publisher,
     publishedYear,
     verified = false,
+    language,
+    format,
+    coverUrl,
   } = book;
   const { rows } = await query<BookRow>(
-    'INSERT INTO books (title, author, isbn, publisher, published_year, verified) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+    `INSERT INTO books
+      (title, author, isbn, publisher, published_year, verified, language, format, cover_url)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    RETURNING *`,
     [
       title,
       author ?? null,
@@ -52,6 +71,9 @@ export async function createBook(book: NewBook): Promise<Book> {
       publisher ?? null,
       publishedYear ?? null,
       verified,
+      language ?? null,
+      format ?? null,
+      coverUrl ?? null,
     ]
   );
   return rowToBook(rows[0]);
