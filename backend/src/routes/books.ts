@@ -441,7 +441,7 @@ function validatePublishRequest(
         status: 400,
         error: {
           error: 'InvalidFields',
-          message: 'books.errors.shipping_payer_required',
+          message: 'books.errors.invalid_shipping_payer',
         },
       };
     }
