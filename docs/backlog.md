@@ -82,6 +82,7 @@ Feature 2.2 Visibilidad y actividad
 - [~] S-2.4 Control de granularidad en mapa (barrio/ciudad) (Must, E1; BR-11)
   - Éxito: 100% de RdL respetan granularidad elegida.
   - Actualización 2025-10-16: el flujo de alta de RdL exige elegir visibilidad barrio/ciudad, persiste el consentimiento y refleja la selección en la revisión previa; resta propagarla al backend/mapa productivo.
+  - Actualización 2025-10-30: se publicaron los endpoints `/api/map` y `/api/map/geocode` conectados al frontend, con filtrado real por capas, geocodificación de Nominatim y dataset territorial inicial respetando los límites solicitados.
 - [ ] S-2.5 Señales de actividad en RdL (Should, E2; BR-13)
   - Éxito: 2 señales simples (visitas, contactos cercanos).
 

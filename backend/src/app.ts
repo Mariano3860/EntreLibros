@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import booksRouter from './routes/books.js';
 import authRouter from './routes/auth.js';
 import userRouter from './routes/user.js';
+import mapRouter from './routes/map.js';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './config/swagger.js';
 
@@ -25,6 +26,7 @@ app.get('/api/health', (_req, res) => {
 app.use('/api/books', booksRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
+app.use('/api/map', mapRouter);
 
 // TODO(api-alignment): montar rutas para `/api/books/mine`, `/api/community/*` y
 // `/api/contact/submit` cuando el backend cubra las necesidades del frontend y
