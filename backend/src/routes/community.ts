@@ -14,11 +14,24 @@ const router = Router();
 
 interface CreateCornerPayload {
   name: string;
-  description: string | null;
+  scope: 'public' | 'semiprivate';
+  hostAlias: string;
+  internalContact: string;
+  rules: string | null;
+  schedule: string | null;
+  street: string;
+  streetNumber: string;
+  unit: string | null;
+  postalCode: string | null;
+  latitude: number;
+  longitude: number;
+  visibilityPreference: 'exact' | 'approximate';
+  consent: boolean;
+  photoUrl: string | null;
+  status: 'active' | 'paused';
+  themes: string[];
   area: string | null;
-  imageUrl: string | null;
-  latitude: number | null;
-  longitude: number | null;
+  city: string | null;
 }
 
 function parseCreateCornerPayload(
@@ -39,8 +52,17 @@ function parseCreateCornerPayload(
   }
 
   const raw = body as Record<string, unknown>;
-  const nameRaw = raw.name;
-  if (typeof nameRaw !== 'string' || nameRaw.trim().length === 0) {
+
+  const asTrimmedString = (value: unknown): string | null => {
+    if (typeof value !== 'string') {
+      return null;
+    }
+    const trimmed = value.trim();
+    return trimmed.length > 0 ? trimmed : null;
+  };
+
+  const name = asTrimmedString(raw.name);
+  if (!name) {
     return {
       error: {
         status: 400,
@@ -52,47 +74,56 @@ function parseCreateCornerPayload(
     };
   }
 
-  const description =
-    typeof raw.description === 'string' && raw.description.trim().length > 0
-      ? raw.description.trim()
-      : null;
+  const scopeRaw = asTrimmedString(raw.scope);
+  const scope: CreateCornerPayload['scope'] =
+    scopeRaw === 'public' || scopeRaw === 'semiprivate' ? scopeRaw : 'public';
 
-  const areaSource =
-    typeof raw.area === 'string'
-      ? raw.area
-      : typeof raw.zone === 'string'
-        ? raw.zone
-        : null;
-  const area =
-    areaSource && areaSource.trim().length > 0 ? areaSource.trim() : null;
+  const hostAlias = asTrimmedString(raw.hostAlias);
+  const internalContact = asTrimmedString(raw.internalContact);
 
-  const imageSource =
-    typeof raw.imageUrl === 'string'
-      ? raw.imageUrl
-      : typeof raw.photoUrl === 'string'
-        ? raw.photoUrl
-        : null;
-  const imageUrl =
-    imageSource && imageSource.trim().length > 0 ? imageSource.trim() : null;
+  if (!hostAlias || !internalContact) {
+    return {
+      error: {
+        status: 400,
+        payload: {
+          error: 'InvalidFields',
+          message: 'community.corners.errors.invalid_payload',
+        },
+      },
+    };
+  }
 
-  const locationRaw = (raw.location ?? {}) as Record<string, unknown>;
-  const latitudeCandidate =
-    typeof raw.latitude === 'number'
-      ? raw.latitude
-      : typeof locationRaw.latitude === 'number'
-        ? locationRaw.latitude
-        : null;
-  const longitudeCandidate =
-    typeof raw.longitude === 'number'
-      ? raw.longitude
-      : typeof locationRaw.longitude === 'number'
-        ? locationRaw.longitude
-        : null;
+  const rules = asTrimmedString(raw.rules);
+  const schedule = asTrimmedString(raw.schedule);
 
-  if (
-    (latitudeCandidate === null && longitudeCandidate !== null) ||
-    (latitudeCandidate !== null && longitudeCandidate === null)
-  ) {
+  const locationRaw = raw.location as Record<string, unknown> | undefined;
+  const addressRaw =
+    (locationRaw?.address as Record<string, unknown> | undefined) ?? undefined;
+  const coordinatesRaw =
+    (locationRaw?.coordinates as Record<string, unknown> | undefined) ??
+    (locationRaw as Record<string, unknown> | undefined);
+
+  const street = addressRaw ? asTrimmedString(addressRaw.street) : null;
+  const streetNumber = addressRaw ? asTrimmedString(addressRaw.number) : null;
+  const unit = addressRaw ? asTrimmedString(addressRaw.unit) : null;
+  const postalCode = addressRaw ? asTrimmedString(addressRaw.postalCode) : null;
+
+  if (!street || !streetNumber) {
+    return {
+      error: {
+        status: 400,
+        payload: {
+          error: 'InvalidAddress',
+          message: 'community.corners.errors.invalid_payload',
+        },
+      },
+    };
+  }
+
+  const latitudeRaw = coordinatesRaw?.latitude ?? raw.latitude;
+  const longitudeRaw = coordinatesRaw?.longitude ?? raw.longitude;
+
+  if (latitudeRaw === undefined || longitudeRaw === undefined) {
     return {
       error: {
         status: 400,
@@ -104,40 +135,85 @@ function parseCreateCornerPayload(
     };
   }
 
-  let latitude: number | null = null;
-  let longitude: number | null = null;
-  if (latitudeCandidate !== null && longitudeCandidate !== null) {
-    if (
-      Number.isFinite(latitudeCandidate) &&
-      Number.isFinite(longitudeCandidate) &&
-      latitudeCandidate >= -90 &&
-      latitudeCandidate <= 90 &&
-      longitudeCandidate >= -180 &&
-      longitudeCandidate <= 180
-    ) {
-      latitude = latitudeCandidate;
-      longitude = longitudeCandidate;
-    } else {
-      return {
-        error: {
-          status: 400,
-          payload: {
-            error: 'InvalidFields',
-            message: 'community.corners.errors.invalid_location',
-          },
+  const latitude = Number(latitudeRaw);
+  const longitude = Number(longitudeRaw);
+
+  if (
+    !Number.isFinite(latitude) ||
+    !Number.isFinite(longitude) ||
+    latitude < -90 ||
+    latitude > 90 ||
+    longitude < -180 ||
+    longitude > 180
+  ) {
+    return {
+      error: {
+        status: 400,
+        payload: {
+          error: 'InvalidFields',
+          message: 'community.corners.errors.invalid_location',
         },
-      };
-    }
+      },
+    };
   }
+
+  const visibilityPreferenceRaw = asTrimmedString(
+    locationRaw?.visibilityPreference
+  );
+  const visibilityPreference: CreateCornerPayload['visibilityPreference'] =
+    visibilityPreferenceRaw === 'approximate' ? 'approximate' : 'exact';
+
+  const consentValue = raw.consent;
+  const consent = typeof consentValue === 'boolean' ? consentValue : false;
+  if (!consent) {
+    return {
+      error: {
+        status: 400,
+        payload: {
+          error: 'ConsentRequired',
+          message: 'community.corners.errors.invalid_payload',
+        },
+      },
+    };
+  }
+
+  const photoRaw = raw.photo as Record<string, unknown> | undefined;
+  const photoUrl =
+    asTrimmedString(photoRaw?.url) ?? asTrimmedString(raw.imageUrl);
+
+  const statusRaw = asTrimmedString(raw.status);
+  const status: CreateCornerPayload['status'] =
+    statusRaw === 'paused' ? 'paused' : 'active';
+
+  const themesRaw = Array.isArray(raw.themes) ? raw.themes : [];
+  const themes = themesRaw
+    .map((theme) => asTrimmedString(theme))
+    .filter((theme): theme is string => Boolean(theme));
+
+  const area = asTrimmedString(raw.area) ?? asTrimmedString(raw.neighborhood);
+  const city = asTrimmedString(raw.city);
 
   return {
     data: {
-      name: nameRaw.trim(),
-      description,
-      area,
-      imageUrl,
+      name,
+      scope,
+      hostAlias,
+      internalContact,
+      rules,
+      schedule,
+      street,
+      streetNumber,
+      unit,
+      postalCode,
       latitude,
       longitude,
+      visibilityPreference,
+      consent,
+      photoUrl,
+      status,
+      themes,
+      area,
+      city,
     },
   };
 }
@@ -148,6 +224,12 @@ function toPublicCorner(corner: BookCorner) {
     name: corner.name,
     description: corner.description,
     area: corner.area,
+    neighborhood: corner.neighborhood,
+    city: corner.city,
+    street: corner.street,
+    streetNumber: corner.streetNumber,
+    unit: corner.unit,
+    postalCode: corner.postalCode,
     imageUrl: corner.imageUrl,
     location: corner.location,
     activityStatus: corner.activityStatus,
@@ -156,6 +238,17 @@ function toPublicCorner(corner: BookCorner) {
     lastActivityAt: corner.lastActivityAt,
     createdAt: corner.createdAt,
     updatedAt: corner.updatedAt,
+    referencePointLabel: corner.referencePointLabel,
+    schedule: corner.schedule,
+    rules: corner.rules,
+    isOpenNow: corner.isOpenNow,
+    themes: corner.themes,
+    scope: corner.scope,
+    hostAlias: corner.hostAlias,
+    internalContact: corner.internalContact,
+    visibilityPreference: corner.visibilityPreference,
+    consent: corner.consent,
+    status: corner.status,
   };
 }
 
@@ -178,9 +271,26 @@ router.post(
     const { data } = parsed;
     const corner = await createBookCorner({
       name: data.name,
-      description: data.description,
+      description: data.rules,
+      rules: data.rules,
+      schedule: data.schedule,
       area: data.area,
-      imageUrl: data.imageUrl,
+      neighborhood: data.area,
+      city: data.city,
+      street: data.street,
+      streetNumber: data.streetNumber,
+      unit: data.unit,
+      postalCode: data.postalCode,
+      visibilityPreference: data.visibilityPreference,
+      consent: data.consent,
+      scope: data.scope,
+      hostAlias: data.hostAlias,
+      internalContact: data.internalContact,
+      status: data.status,
+      isOpenNow: data.status === 'active',
+      themes: data.themes,
+      imageUrl: data.photoUrl,
+      photoUrls: data.photoUrl ? [data.photoUrl] : [],
       latitude: data.latitude,
       longitude: data.longitude,
       createdBy: req.user.id,

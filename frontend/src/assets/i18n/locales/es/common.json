@@ -505,10 +505,18 @@
         "offered": "Ofrece",
         "requested": "Solicita"
       },
-      "sale": { "price": "Precio: ${{price}}" },
-      "seeking": { "description": "{{user}} busca {{title}}" },
-      "house": { "distance": "A {{distance}} km" },
-      "person": { "match": "Coincidencia {{match}}%" },
+      "sale": {
+        "price": "Precio: ${{price}}"
+      },
+      "seeking": {
+        "description": "{{user}} busca {{title}}"
+      },
+      "house": {
+        "distance": "A {{distance}} km"
+      },
+      "person": {
+        "match": "Coincidencia {{match}}%"
+      },
       "suggestions": "Sugerencias",
       "cornerChip": {
         "ariaLabel": "Ver Rincón {{name}}"
@@ -613,6 +621,11 @@
         "want": "Busca",
         "donation": "Donación",
         "sale": "En venta"
+      }
+    },
+    "geocode": {
+      "errors": {
+        "query_required": "Ingresa una búsqueda para obtener sugerencias."
       }
     },
     "cluster": {

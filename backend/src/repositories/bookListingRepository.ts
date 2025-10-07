@@ -46,6 +46,20 @@ export interface BookListing {
   };
 }
 
+export interface MapListing {
+  id: number;
+  title: string;
+  authors: string[];
+  type: 'offer' | 'want' | 'donation' | 'sale';
+  photo: string | null;
+  distanceKm: number | null;
+  cornerId: number | null;
+  latitude: number | null;
+  longitude: number | null;
+  themes: string[];
+  isCornerOpenNow: boolean | null;
+}
+
 interface BookListingRow {
   id: number;
   user_id: number;
@@ -102,6 +116,19 @@ export interface NewBookListing {
   cornerId: string | null;
   delivery: BookListingDelivery;
   images: BookListingImageInput[];
+}
+
+export interface MapListingsQueryParams {
+  west: number;
+  south: number;
+  east: number;
+  north: number;
+  centerLongitude: number;
+  centerLatitude: number;
+  distanceMeters?: number | null;
+  search?: string | null;
+  themes?: string[] | null;
+  openNow?: boolean | null;
 }
 
 const BOOK_LISTING_SELECT = `
@@ -375,4 +402,139 @@ export async function listPublicBookListings(): Promise<BookListing[]> {
     "WHERE p.status = 'available' AND p.availability = 'public' AND p.is_draft = false",
     []
   );
+}
+
+export async function listAvailableListingsForMap(
+  params: MapListingsQueryParams
+): Promise<MapListing[]> {
+  const searchTerm = params.search?.trim();
+  const searchPattern =
+    searchTerm && searchTerm.length > 0 ? `%${searchTerm}%` : null;
+  const themes = Array.isArray(params.themes)
+    ? params.themes.filter((theme) => theme.trim().length > 0)
+    : [];
+
+  const { rows } = await query<{
+    id: number;
+    title: string;
+    author: string | null;
+    listing_type: BookListingType;
+    sale: boolean;
+    donation: boolean;
+    photo: string | null;
+    distance_meters: number | null;
+    corner_id: number | null;
+    latitude: number | null;
+    longitude: number | null;
+    themes: string[] | null;
+    is_open_now: boolean | null;
+  }>(
+    `SELECT
+      bl.id,
+      b.title,
+      b.author,
+      bl.type AS listing_type,
+      bl.sale,
+      bl.donation,
+      img.url AS photo,
+      corner_data.corner_id,
+      corner_data.latitude,
+      corner_data.longitude,
+      corner_data.distance_meters,
+      corner_data.themes,
+      corner_data.is_open_now
+    FROM book_listings bl
+    JOIN books b ON bl.book_id = b.id
+    LEFT JOIN LATERAL (
+      SELECT url
+      FROM book_listing_images
+      WHERE book_listing_id = bl.id
+      ORDER BY is_primary DESC, id ASC
+      LIMIT 1
+    ) img ON true
+    JOIN LATERAL (
+      SELECT
+        bc.id AS corner_id,
+        ST_Y(bc.location::geometry) AS latitude,
+        ST_X(bc.location::geometry) AS longitude,
+        bc.themes,
+        bc.is_open_now,
+        ST_Distance(
+          bc.location,
+          ST_SetSRID(ST_MakePoint($5, $6), 4326)::geography
+        ) AS distance_meters
+      FROM book_corners bc
+      WHERE
+        bc.approved = true
+        AND bc.location IS NOT NULL
+        AND bc.id = CASE
+          WHEN bl.corner_id ~ '^[0-9]+$' THEN bl.corner_id::INTEGER
+          ELSE NULL
+        END
+        AND ST_Within(
+          bc.location::geometry,
+          ST_MakeEnvelope($1, $2, $3, $4, 4326)
+        )
+        AND ($7::BOOLEAN IS NULL OR bc.is_open_now = $7)
+        AND (cardinality($8::TEXT[]) = 0 OR bc.themes && $8::TEXT[])
+      LIMIT 1
+    ) corner_data ON true
+    WHERE
+      bl.status = 'available'
+      AND bl.is_draft = false
+      AND bl.availability = 'public'
+      AND ($9::TEXT IS NULL OR b.title ILIKE $9 OR b.author ILIKE $9)
+      AND ($10::DOUBLE PRECISION IS NULL OR corner_data.distance_meters <= $10)
+    ORDER BY corner_data.distance_meters ASC NULLS LAST, bl.updated_at DESC, bl.id ASC`,
+    [
+      params.west,
+      params.south,
+      params.east,
+      params.north,
+      params.centerLongitude,
+      params.centerLatitude,
+      params.openNow ?? null,
+      themes,
+      searchPattern,
+      params.distanceMeters ?? null,
+    ]
+  );
+
+  return rows.map((row) => {
+    const authors: string[] = row.author
+      ? row.author
+          .split(',')
+          .map((name) => name.trim())
+          .filter((name) => name.length > 0)
+      : [];
+    let type: MapListing['type'];
+    if (row.listing_type === 'want') {
+      type = 'want';
+    } else if (row.sale) {
+      type = 'sale';
+    } else if (row.donation) {
+      type = 'donation';
+    } else {
+      type = 'offer';
+    }
+
+    const distanceKm =
+      typeof row.distance_meters === 'number'
+        ? Number((row.distance_meters / 1000).toFixed(2))
+        : null;
+
+    return {
+      id: row.id,
+      title: row.title,
+      authors,
+      type,
+      photo: row.photo,
+      distanceKm,
+      cornerId: row.corner_id,
+      latitude: row.latitude,
+      longitude: row.longitude,
+      themes: row.themes ?? [],
+      isCornerOpenNow: row.is_open_now,
+    };
+  });
 }

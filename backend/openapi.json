@@ -756,30 +756,108 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["name"],
+                "required": [
+                  "name",
+                  "scope",
+                  "hostAlias",
+                  "internalContact",
+                  "location",
+                  "consent",
+                  "photo",
+                  "status"
+                ],
                 "properties": {
                   "name": {
                     "type": "string"
                   },
-                  "description": {
+                  "scope": {
+                    "type": "string",
+                    "enum": ["public", "semiprivate"]
+                  },
+                  "hostAlias": {
                     "type": "string"
                   },
-                  "area": {
+                  "internalContact": {
                     "type": "string"
                   },
-                  "imageUrl": {
+                  "rules": {
                     "type": "string"
+                  },
+                  "schedule": {
+                    "type": "string"
+                  },
+                  "themes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
                   },
                   "location": {
                     "type": "object",
+                    "required": [
+                      "address",
+                      "coordinates",
+                      "visibilityPreference"
+                    ],
                     "properties": {
-                      "latitude": {
-                        "type": "number"
+                      "address": {
+                        "type": "object",
+                        "required": ["street", "number"],
+                        "properties": {
+                          "street": {
+                            "type": "string"
+                          },
+                          "number": {
+                            "type": "string"
+                          },
+                          "unit": {
+                            "type": "string"
+                          },
+                          "postalCode": {
+                            "type": "string"
+                          }
+                        }
                       },
-                      "longitude": {
-                        "type": "number"
+                      "coordinates": {
+                        "type": "object",
+                        "required": ["latitude", "longitude"],
+                        "properties": {
+                          "latitude": {
+                            "type": "number"
+                          },
+                          "longitude": {
+                            "type": "number"
+                          }
+                        }
+                      },
+                      "visibilityPreference": {
+                        "type": "string",
+                        "enum": ["exact", "approximate"]
                       }
                     }
+                  },
+                  "consent": {
+                    "type": "boolean"
+                  },
+                  "photo": {
+                    "type": "object",
+                    "required": ["id", "url"],
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "url": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    }
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": ["active", "paused"]
+                  },
+                  "draft": {
+                    "type": "boolean"
                   }
                 }
               }
@@ -804,6 +882,24 @@
                       "type": ["string", "null"]
                     },
                     "area": {
+                      "type": ["string", "null"]
+                    },
+                    "neighborhood": {
+                      "type": ["string", "null"]
+                    },
+                    "city": {
+                      "type": ["string", "null"]
+                    },
+                    "street": {
+                      "type": ["string", "null"]
+                    },
+                    "streetNumber": {
+                      "type": ["string", "null"]
+                    },
+                    "unit": {
+                      "type": ["string", "null"]
+                    },
+                    "postalCode": {
                       "type": ["string", "null"]
                     },
                     "imageUrl": {
@@ -849,6 +945,41 @@
                     "updatedAt": {
                       "type": "string",
                       "format": "date-time"
+                    },
+                    "referencePointLabel": {
+                      "type": ["string", "null"]
+                    },
+                    "schedule": {
+                      "type": ["string", "null"]
+                    },
+                    "rules": {
+                      "type": ["string", "null"]
+                    },
+                    "isOpenNow": {
+                      "type": ["boolean", "null"]
+                    },
+                    "themes": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "scope": {
+                      "type": ["string", "null"],
+                      "enum": ["public", "semiprivate", null]
+                    },
+                    "hostAlias": {
+                      "type": ["string", "null"]
+                    },
+                    "internalContact": {
+                      "type": ["string", "null"]
+                    },
+                    "visibilityPreference": {
+                      "type": ["string", "null"],
+                      "enum": ["exact", "approximate", null]
+                    },
+                    "consent": {
+                      "type": ["boolean", "null"]
                     },
                     "status": {
                       "type": "string",
@@ -909,6 +1040,24 @@
                       "area": {
                         "type": ["string", "null"]
                       },
+                      "neighborhood": {
+                        "type": ["string", "null"]
+                      },
+                      "city": {
+                        "type": ["string", "null"]
+                      },
+                      "street": {
+                        "type": ["string", "null"]
+                      },
+                      "streetNumber": {
+                        "type": ["string", "null"]
+                      },
+                      "unit": {
+                        "type": ["string", "null"]
+                      },
+                      "postalCode": {
+                        "type": ["string", "null"]
+                      },
                       "imageUrl": {
                         "type": ["string", "null"]
                       },
@@ -952,6 +1101,45 @@
                       "updatedAt": {
                         "type": "string",
                         "format": "date-time"
+                      },
+                      "referencePointLabel": {
+                        "type": ["string", "null"]
+                      },
+                      "schedule": {
+                        "type": ["string", "null"]
+                      },
+                      "rules": {
+                        "type": ["string", "null"]
+                      },
+                      "isOpenNow": {
+                        "type": ["boolean", "null"]
+                      },
+                      "themes": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "scope": {
+                        "type": ["string", "null"],
+                        "enum": ["public", "semiprivate", null]
+                      },
+                      "hostAlias": {
+                        "type": ["string", "null"]
+                      },
+                      "internalContact": {
+                        "type": ["string", "null"]
+                      },
+                      "visibilityPreference": {
+                        "type": ["string", "null"],
+                        "enum": ["exact", "approximate", null]
+                      },
+                      "consent": {
+                        "type": ["boolean", "null"]
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": ["pending", "approved"]
                       },
                       "distanceKm": {
                         "type": ["number", "null"]
@@ -1024,6 +1212,24 @@
                           "area": {
                             "type": ["string", "null"]
                           },
+                          "neighborhood": {
+                            "type": ["string", "null"]
+                          },
+                          "city": {
+                            "type": ["string", "null"]
+                          },
+                          "street": {
+                            "type": ["string", "null"]
+                          },
+                          "streetNumber": {
+                            "type": ["string", "null"]
+                          },
+                          "unit": {
+                            "type": ["string", "null"]
+                          },
+                          "postalCode": {
+                            "type": ["string", "null"]
+                          },
                           "imageUrl": {
                             "type": ["string", "null"]
                           },
@@ -1067,9 +1273,428 @@
                           "updatedAt": {
                             "type": "string",
                             "format": "date-time"
+                          },
+                          "referencePointLabel": {
+                            "type": ["string", "null"]
+                          },
+                          "schedule": {
+                            "type": ["string", "null"]
+                          },
+                          "rules": {
+                            "type": ["string", "null"]
+                          },
+                          "isOpenNow": {
+                            "type": ["boolean", "null"]
+                          },
+                          "themes": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "scope": {
+                            "type": ["string", "null"],
+                            "enum": ["public", "semiprivate", null]
+                          },
+                          "hostAlias": {
+                            "type": ["string", "null"]
+                          },
+                          "internalContact": {
+                            "type": ["string", "null"]
+                          },
+                          "visibilityPreference": {
+                            "type": ["string", "null"],
+                            "enum": ["exact", "approximate", null]
+                          },
+                          "consent": {
+                            "type": ["boolean", "null"]
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": ["pending", "approved"]
                           }
                         }
                       }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/map/geocode": {
+      "get": {
+        "summary": "Search address suggestions for the map",
+        "tags": ["Map"],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search term to geocode"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 15
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Geocoding suggestions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "id",
+                      "label",
+                      "street",
+                      "number",
+                      "coordinates"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "label": {
+                        "type": "string"
+                      },
+                      "secondaryLabel": {
+                        "type": "string"
+                      },
+                      "street": {
+                        "type": "string"
+                      },
+                      "number": {
+                        "type": "string"
+                      },
+                      "postalCode": {
+                        "type": "string"
+                      },
+                      "coordinates": {
+                        "type": "object",
+                        "required": ["latitude", "longitude"],
+                        "properties": {
+                          "latitude": {
+                            "type": "number"
+                          },
+                          "longitude": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/map": {
+      "get": {
+        "summary": "Retrieve map data for corners, publications and activity",
+        "tags": ["Map"],
+        "parameters": [
+          {
+            "name": "north",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "south",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "east",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "west",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "distanceKm",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "themes",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma separated themes"
+          },
+          {
+            "name": "openNow",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "recentActivity",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "layers",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma separated layer keys"
+          },
+          {
+            "name": "locale",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Map payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "corners": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "name",
+                          "barrio",
+                          "city",
+                          "lat",
+                          "lon",
+                          "photos",
+                          "themes"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "barrio": {
+                            "type": "string"
+                          },
+                          "city": {
+                            "type": "string"
+                          },
+                          "lat": {
+                            "type": "number"
+                          },
+                          "lon": {
+                            "type": "number"
+                          },
+                          "lastSignalAt": {
+                            "type": ["string", "null"],
+                            "format": "date-time"
+                          },
+                          "photos": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "format": "uri"
+                            }
+                          },
+                          "rules": {
+                            "type": "string"
+                          },
+                          "referencePointLabel": {
+                            "type": "string"
+                          },
+                          "themes": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "isOpenNow": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    },
+                    "publications": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "title",
+                          "authors",
+                          "type",
+                          "distanceKm",
+                          "cornerId"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "authors": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": ["offer", "want", "donation", "sale"]
+                          },
+                          "photo": {
+                            "type": "string",
+                            "format": "uri"
+                          },
+                          "distanceKm": {
+                            "type": "number"
+                          },
+                          "cornerId": {
+                            "type": "string"
+                          },
+                          "lat": {
+                            "type": "number"
+                          },
+                          "lon": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    },
+                    "activity": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["id", "lat", "lon", "intensity"],
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "lat": {
+                            "type": "number"
+                          },
+                          "lon": {
+                            "type": "number"
+                          },
+                          "intensity": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": {
+                        "bbox": {
+                          "type": "object",
+                          "properties": {
+                            "north": {
+                              "type": "number"
+                            },
+                            "south": {
+                              "type": "number"
+                            },
+                            "east": {
+                              "type": "number"
+                            },
+                            "west": {
+                              "type": "number"
+                            }
+                          }
+                        },
+                        "generatedAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid bounds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
                     }
                   }
                 }

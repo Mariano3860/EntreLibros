@@ -56,28 +56,49 @@ describe('POST /api/community/corners', () => {
   test('creates a corner pending approval', async () => {
     const { cookie, userId } = await registerAndLogin('corner@example.com');
 
-    const res = await request(app)
-      .post('/api/community/corners')
-      .set('Cookie', cookie)
-      .send({
-        name: 'Rincón Centro',
-        description: 'Intercambio en el centro cultural',
-        area: 'Centro',
-        imageUrl: 'https://example.com/corner.jpg',
-        location: {
+    const payload = {
+      name: 'Rincón Centro',
+      scope: 'public',
+      hostAlias: 'Centro Cultural',
+      internalContact: 'centro@example.com',
+      rules: 'Intercambio en el centro cultural',
+      schedule: 'Lunes a viernes',
+      themes: ['Infancias', 'Club lector'],
+      location: {
+        address: {
+          street: 'Av. Corrientes',
+          number: '1234',
+          postalCode: 'C1043',
+        },
+        coordinates: {
           latitude: -34.6037,
           longitude: -58.3816,
         },
-      })
+        visibilityPreference: 'exact',
+      },
+      consent: true,
+      photo: { id: 'photo-1', url: 'https://example.com/corner.jpg' },
+      status: 'active',
+      draft: false,
+    };
+
+    const res = await request(app)
+      .post('/api/community/corners')
+      .set('Cookie', cookie)
+      .send(payload)
       .expect(201);
 
     expect(res.body).toMatchObject({
       name: 'Rincón Centro',
-      area: 'Centro',
-      description: 'Intercambio en el centro cultural',
+      area: null,
+      rules: 'Intercambio en el centro cultural',
       imageUrl: 'https://example.com/corner.jpg',
+      street: 'Av. Corrientes',
+      streetNumber: '1234',
+      postalCode: 'C1043',
       status: 'pending',
       approved: false,
+      themes: ['Infancias', 'Club lector'],
     });
     expect(res.body.id).toBeGreaterThan(0);
     expect(res.body.location).toEqual({
@@ -87,8 +108,13 @@ describe('POST /api/community/corners', () => {
 
     const { rows } = await client.query<{
       name: string;
-      description: string | null;
+      rules: string | null;
+      schedule: string | null;
       area: string | null;
+      street: string | null;
+      street_number: string | null;
+      postal_code: string | null;
+      themes: string[];
       image_url: string | null;
       approved: boolean;
       created_by: number;
@@ -97,8 +123,13 @@ describe('POST /api/community/corners', () => {
     }>(
       `SELECT
         name,
-        description,
+        rules,
+        schedule,
         area,
+        street,
+        street_number,
+        postal_code,
+        themes,
         image_url,
         approved,
         created_by,
@@ -111,8 +142,13 @@ describe('POST /api/community/corners', () => {
 
     expect(rows[0]).toMatchObject({
       name: 'Rincón Centro',
-      description: 'Intercambio en el centro cultural',
-      area: 'Centro',
+      rules: 'Intercambio en el centro cultural',
+      schedule: 'Lunes a viernes',
+      area: null,
+      street: 'Av. Corrientes',
+      street_number: '1234',
+      postal_code: 'C1043',
+      themes: ['Infancias', 'Club lector'],
       image_url: 'https://example.com/corner.jpg',
       approved: false,
       created_by: userId,

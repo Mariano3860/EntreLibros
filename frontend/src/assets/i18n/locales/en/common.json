@@ -623,6 +623,11 @@
         "sale": "For sale"
       }
     },
+    "geocode": {
+      "errors": {
+        "query_required": "Enter a search to see suggestions."
+      }
+    },
     "cluster": {
       "more": "Show {{count}} pins",
       "collapse": "Collapse cluster"

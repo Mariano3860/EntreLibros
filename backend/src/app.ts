@@ -6,6 +6,7 @@ import booksRouter from './routes/books.js';
 import authRouter from './routes/auth.js';
 import userRouter from './routes/user.js';
 import communityRouter from './routes/community.js';
+import mapRouter from './routes/map.js';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './config/swagger.js';
 
@@ -27,6 +28,7 @@ app.use('/api/books', booksRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
 app.use('/api/community', communityRouter);
+app.use('/api/map', mapRouter);
 
 // TODO(api-alignment): montar rutas pendientes como `/api/books/mine` y
 // `/api/contact/submit` cuando el backend cubra las necesidades del frontend y

@@ -129,6 +129,7 @@ Feature 4.1 Mapa y listados
   - Actualización 2025-10-15: se factorizaron los cálculos de geocercas con la utilidad Haversine reutilizable, se ajustó la bbox inicial del mapa y se añadieron pruebas unitarias dedicadas.
   - Actualización 2025-10-19: el modal de alta de Rincones ahora captura la dirección exacta (calle, número, opcionales) y coordenadas, almacena la preferencia de visibilidad (exacta/aproximada) y actualiza la confirmación de privacidad. Se adaptaron payloads/mock MSW, validaciones y pruebas para reflejar la política de logística y visualización.
   - Actualización 2025-10-22: se robusteció el cálculo de estados vacíos en el mapa considerando capas visibles y actividad reciente, evitando falsos positivos cuando se ocultan capas; se añadieron pruebas unitarias del paso de ubicación para sostener la cobertura mínima requerida.
+  - Actualización 2025-10-24: el backend expone `/api/map` y `/api/map/geocode` con geocodificación por dirección, agregados de publicaciones y actividad, y la API de alta de Rincones ahora persiste calles, visibilidad y metadatos alineados al frontend.
 
 Feature 4.2 Descubrimiento avanzado
 
