@@ -746,6 +746,339 @@
         }
       }
     },
+    "/api/community/corners": {
+      "post": {
+        "summary": "Register a new community book corner",
+        "tags": ["Community"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name"],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "area": {
+                    "type": "string"
+                  },
+                  "imageUrl": {
+                    "type": "string"
+                  },
+                  "location": {
+                    "type": "object",
+                    "properties": {
+                      "latitude": {
+                        "type": "number"
+                      },
+                      "longitude": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Corner created in pending status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": ["string", "null"]
+                    },
+                    "area": {
+                      "type": ["string", "null"]
+                    },
+                    "imageUrl": {
+                      "type": ["string", "null"]
+                    },
+                    "location": {
+                      "oneOf": [
+                        {
+                          "type": "null"
+                        },
+                        {
+                          "type": "object",
+                          "required": ["latitude", "longitude"],
+                          "properties": {
+                            "latitude": {
+                              "type": "number"
+                            },
+                            "longitude": {
+                              "type": "number"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "activityStatus": {
+                      "type": "string",
+                      "enum": ["active", "quiet"]
+                    },
+                    "approved": {
+                      "type": "boolean"
+                    },
+                    "recentExchangeCount": {
+                      "type": "integer"
+                    },
+                    "lastActivityAt": {
+                      "type": ["string", "null"],
+                      "format": "date-time"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["pending", "approved"]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/community/corners/nearby": {
+      "get": {
+        "summary": "List approved book corners near the authenticated user",
+        "tags": ["Community"],
+        "responses": {
+          "200": {
+            "description": "Array of nearby corners",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": ["string", "null"]
+                      },
+                      "area": {
+                        "type": ["string", "null"]
+                      },
+                      "imageUrl": {
+                        "type": ["string", "null"]
+                      },
+                      "location": {
+                        "oneOf": [
+                          {
+                            "type": "null"
+                          },
+                          {
+                            "type": "object",
+                            "required": ["latitude", "longitude"],
+                            "properties": {
+                              "latitude": {
+                                "type": "number"
+                              },
+                              "longitude": {
+                                "type": "number"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      "activityStatus": {
+                        "type": "string",
+                        "enum": ["active", "quiet"]
+                      },
+                      "approved": {
+                        "type": "boolean"
+                      },
+                      "recentExchangeCount": {
+                        "type": "integer"
+                      },
+                      "lastActivityAt": {
+                        "type": ["string", "null"],
+                        "format": "date-time"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "distanceKm": {
+                        "type": ["number", "null"]
+                      },
+                      "radiusKm": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Location required",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/community/corners/map": {
+      "get": {
+        "summary": "Return approved corners for the community map",
+        "tags": ["Community"],
+        "responses": {
+          "200": {
+            "description": "Corner pins ready to render on map",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "introKey": {
+                      "type": "string"
+                    },
+                    "intro": {
+                      "type": "string"
+                    },
+                    "pins": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": ["string", "null"]
+                          },
+                          "area": {
+                            "type": ["string", "null"]
+                          },
+                          "imageUrl": {
+                            "type": ["string", "null"]
+                          },
+                          "location": {
+                            "oneOf": [
+                              {
+                                "type": "null"
+                              },
+                              {
+                                "type": "object",
+                                "required": ["latitude", "longitude"],
+                                "properties": {
+                                  "latitude": {
+                                    "type": "number"
+                                  },
+                                  "longitude": {
+                                    "type": "number"
+                                  }
+                                }
+                              }
+                            ]
+                          },
+                          "activityStatus": {
+                            "type": "string",
+                            "enum": ["active", "quiet"]
+                          },
+                          "approved": {
+                            "type": "boolean"
+                          },
+                          "recentExchangeCount": {
+                            "type": "integer"
+                          },
+                          "lastActivityAt": {
+                            "type": ["string", "null"],
+                            "format": "date-time"
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/books/{id}/verify": {
       "post": {
         "summary": "Verify a book",

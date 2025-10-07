@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import booksRouter from './routes/books.js';
 import authRouter from './routes/auth.js';
 import userRouter from './routes/user.js';
+import communityRouter from './routes/community.js';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './config/swagger.js';
 
@@ -25,8 +26,9 @@ app.get('/api/health', (_req, res) => {
 app.use('/api/books', booksRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
+app.use('/api/community', communityRouter);
 
-// TODO(api-alignment): montar rutas para `/api/books/mine`, `/api/community/*` y
+// TODO(api-alignment): montar rutas pendientes como `/api/books/mine` y
 // `/api/contact/submit` cuando el backend cubra las necesidades del frontend y
 // dejemos de depender de mocks MSW.
 
