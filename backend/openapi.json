@@ -10,6 +10,325 @@
     }
   ],
   "paths": {
+    "/api/map": {
+      "get": {
+        "summary": "Retrieve map datasets for the requested bounding box",
+        "tags": ["Map"],
+        "parameters": [
+          {
+            "name": "north",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "number" },
+            "description": "Northern latitude of the bounding box"
+          },
+          {
+            "name": "south",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "number" },
+            "description": "Southern latitude of the bounding box"
+          },
+          {
+            "name": "east",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "number" },
+            "description": "Eastern longitude of the bounding box"
+          },
+          {
+            "name": "west",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "number" },
+            "description": "Western longitude of the bounding box"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" },
+            "description": "Free text filter applied to corners and publications"
+          },
+          {
+            "name": "distanceKm",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "number" },
+            "description": "Maximum distance in kilometres for publications"
+          },
+          {
+            "name": "themes",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" },
+            "description": "Comma separated list of themes to filter by"
+          },
+          {
+            "name": "openNow",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "boolean" },
+            "description": "If true, only corners currently open are returned"
+          },
+          {
+            "name": "recentActivity",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "boolean" },
+            "description": "If false, recent activity points are omitted"
+          },
+          {
+            "name": "layers",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" },
+            "description": "Comma separated layers to include (corners, publications, activity)"
+          },
+          {
+            "name": "locale",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" },
+            "description": "Locale hint used for upstream providers"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Map payload with the requested datasets",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["corners", "publications", "activity", "meta"],
+                  "properties": {
+                    "corners": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "name",
+                          "barrio",
+                          "city",
+                          "lat",
+                          "lon",
+                          "photos",
+                          "themes"
+                        ],
+                        "properties": {
+                          "id": { "type": "string" },
+                          "name": { "type": "string" },
+                          "barrio": { "type": "string" },
+                          "city": { "type": "string" },
+                          "lat": { "type": "number" },
+                          "lon": { "type": "number" },
+                          "lastSignalAt": {
+                            "type": ["string", "null"],
+                            "format": "date-time"
+                          },
+                          "photos": {
+                            "type": "array",
+                            "items": { "type": "string" }
+                          },
+                          "rules": { "type": "string" },
+                          "referencePointLabel": { "type": "string" },
+                          "themes": {
+                            "type": "array",
+                            "items": { "type": "string" }
+                          },
+                          "isOpenNow": { "type": "boolean" }
+                        }
+                      }
+                    },
+                    "publications": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id",
+                          "title",
+                          "authors",
+                          "type",
+                          "distanceKm",
+                          "cornerId"
+                        ],
+                        "properties": {
+                          "id": { "type": "string" },
+                          "title": { "type": "string" },
+                          "authors": {
+                            "type": "array",
+                            "items": { "type": "string" }
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": ["offer", "want", "donation", "sale"]
+                          },
+                          "photo": { "type": "string" },
+                          "distanceKm": { "type": "number" },
+                          "cornerId": { "type": "string" },
+                          "lat": { "type": "number" },
+                          "lon": { "type": "number" }
+                        }
+                      }
+                    },
+                    "activity": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["id", "lat", "lon", "intensity"],
+                        "properties": {
+                          "id": { "type": "string" },
+                          "lat": { "type": "number" },
+                          "lon": { "type": "number" },
+                          "intensity": { "type": "number" }
+                        }
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "required": ["bbox", "generatedAt"],
+                      "properties": {
+                        "bbox": {
+                          "type": "object",
+                          "required": ["north", "south", "east", "west"],
+                          "properties": {
+                            "north": { "type": "number" },
+                            "south": { "type": "number" },
+                            "east": { "type": "number" },
+                            "west": { "type": "number" }
+                          }
+                        },
+                        "generatedAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid bounding box parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string" },
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error while generating map data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string" },
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/map/geocode": {
+      "get": {
+        "summary": "Search address suggestions",
+        "tags": ["Map"],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Query text to geocode"
+          },
+          {
+            "name": "locale",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" },
+            "description": "Locale hint forwarded to the geocoding provider"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of matching address suggestions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "id",
+                      "label",
+                      "street",
+                      "number",
+                      "coordinates"
+                    ],
+                    "properties": {
+                      "id": { "type": "string" },
+                      "label": { "type": "string" },
+                      "secondaryLabel": { "type": "string" },
+                      "street": { "type": "string" },
+                      "number": { "type": "string" },
+                      "postalCode": { "type": "string" },
+                      "coordinates": {
+                        "type": "object",
+                        "required": ["latitude", "longitude"],
+                        "properties": {
+                          "latitude": { "type": "number" },
+                          "longitude": { "type": "number" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing query parameter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string" },
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Upstream geocoding provider failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string" },
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/auth/register": {
       "post": {
         "summary": "Register a new user",
