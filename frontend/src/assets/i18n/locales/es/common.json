@@ -302,7 +302,8 @@
       "publisher": "Editorial",
       "year": "Año",
       "updated": "Actualizado",
-      "imageUrl": "URL de la imagen"
+      "imageUrl": "URL de la imagen",
+      "primaryImageUrl": "Imagen principal (URL)"
     },
     "availability": {
       "public": "Visible para todos",
@@ -342,6 +343,11 @@
     },
     "empty": "No encontramos esta publicación.",
     "emptyImages": "Sin imágenes cargadas.",
+    "images": {
+      "placeholder": "Sin imagen disponible",
+      "placeholderOwner": "Agregá un enlace para mostrar la portada",
+      "onlyPrimary": "Solo se muestra la imagen principal"
+    },
     "confirm": {
       "close": "Tenés cambios sin guardar. ¿Querés salir igualmente?",
       "reopen": "¿Confirmás volver a marcar el libro como disponible?",

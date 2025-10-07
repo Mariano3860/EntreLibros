@@ -1,5 +1,3 @@
-import { resolveBooksPath } from './books/config'
-
 export const RELATIVE_API_ROUTES = {
   AUTH: {
     LOGIN: `/auth/login`,
@@ -12,11 +10,11 @@ export const RELATIVE_API_ROUTES = {
     SUBMIT: `/contact/submit`,
   },
   BOOKS: {
-    LIST: resolveBooksPath('/books'),
-    MINE: resolveBooksPath('/books/mine'),
-    SEARCH: resolveBooksPath('/books/search'),
-    PUBLISH: resolveBooksPath('/books'),
-    DETAIL: (id: string) => resolveBooksPath(`/books/${id}`),
+    LIST: `/api/books`,
+    MINE: `/api/books/mine`,
+    SEARCH: `/api/books/search`,
+    PUBLISH: `/api/books`,
+    DETAIL: (id: string) => `/api/books/${id}`,
   },
   COMMUNITY: {
     STATS: `/community/stats`,

@@ -664,7 +664,8 @@
       "publisher": "Publisher",
       "year": "Year",
       "updated": "Updated",
-      "imageUrl": "Image URL"
+      "imageUrl": "Image URL",
+      "primaryImageUrl": "Main image URL"
     },
     "availability": {
       "public": "Visible to everyone",
@@ -704,6 +705,11 @@
     },
     "empty": "We couldn't find this publication.",
     "emptyImages": "No images yet.",
+    "images": {
+      "placeholder": "No image available",
+      "placeholderOwner": "Add an image URL to highlight the cover",
+      "onlyPrimary": "Only the main image is displayed"
+    },
     "confirm": {
       "close": "You have unsaved changes. Do you want to leave anyway?",
       "reopen": "Are you sure you want to mark the book as available again?",

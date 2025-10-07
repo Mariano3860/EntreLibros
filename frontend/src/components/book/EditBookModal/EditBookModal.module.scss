@@ -12,11 +12,47 @@
   gap: rem(24px);
 }
 
+.heroMedia {
+  display: flex;
+  flex-direction: column;
+  gap: rem(12px);
+}
+
+.heroImageFrame {
+  border-radius: rem(12px);
+  overflow: hidden;
+  background: rgb(var(--color-neutral-900-rgb) / 6%);
+  box-shadow: 0 16px 32px rgb(var(--color-neutral-900-rgb) / 18%);
+  aspect-ratio: 3 / 4;
+  display: flex;
+  align-items: stretch;
+}
+
 .heroImage {
   width: 100%;
-  border-radius: rem(12px);
+  height: 100%;
   object-fit: cover;
-  box-shadow: 0 16px 32px rgb(8 15 32 / 18%);
+  display: block;
+}
+
+.heroPlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: rem(24px);
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.primaryImageControls {
+  display: grid;
+  gap: rem(8px);
+}
+
+.primaryImageControls .removeImageButton {
+  justify-self: flex-start;
 }
 
 .meta {
@@ -63,18 +99,18 @@
 }
 
 .statusBadge.available {
-  background: rgb(var(--success-rgb) / 12%);
-  color: var(--success-color);
+  background: rgb(var(--color-success-rgb) / 12%);
+  color: var(--color-success);
 }
 
 .statusBadge.reserved {
-  background: rgb(var(--warning-rgb) / 12%);
-  color: var(--warning-color);
+  background: rgb(var(--color-warning-rgb) / 12%);
+  color: var(--color-warning);
 }
 
 .statusBadge.completed {
-  background: rgb(var(--neutral-700-rgb) / 12%);
-  color: var(--neutral-700);
+  background: rgb(var(--color-neutral-700-rgb) / 12%);
+  color: var(--color-neutral-700);
 }
 
 .section {
@@ -106,24 +142,25 @@ textarea {
 select,
 input,
 textarea {
+  width: 100%;
   padding: rem(10px) rem(12px);
   border-radius: rem(8px);
-  border: 1px solid rgb(8 15 32 / 15%);
+  border: 1px solid rgb(var(--color-neutral-900-rgb) / 15%);
   font: inherit;
-  background: var(--background-secondary);
+  background: var(--background-card);
 }
 
 input:disabled,
 select:disabled,
 textarea:disabled {
   cursor: not-allowed;
-  background: rgb(8 15 32 / 6%);
+  background: rgb(var(--color-neutral-900-rgb) / 6%);
 }
 
 .availabilityGroup {
   display: grid;
   gap: rem(8px);
-  border: 1px solid rgb(8 15 32 / 12%);
+  border: 1px solid rgb(var(--color-neutral-900-rgb) / 12%);
   border-radius: rem(12px);
   padding: rem(12px);
 }
@@ -150,14 +187,14 @@ textarea:disabled {
 }
 
 .inlineError {
-  color: var(--error-500, #c62828);
+  color: var(--color-error-dark);
   font-size: 0.85rem;
 }
 
 .deliveryGroup {
   display: grid;
   gap: rem(10px);
-  border: 1px solid rgb(8 15 32 / 12%);
+  border: 1px solid rgb(var(--color-neutral-900-rgb) / 12%);
   border-radius: rem(12px);
   padding: rem(12px);
 }
@@ -187,7 +224,7 @@ textarea:disabled {
 .errorState button {
   border: none;
   background: var(--primary-color);
-  color: #fff;
+  color: var(--color-neutral-100);
   border-radius: rem(8px);
   padding: rem(8px) rem(14px);
   cursor: pointer;
@@ -195,7 +232,8 @@ textarea:disabled {
 }
 
 .removeImageButton {
-  background: rgb(var(--error-rgb) / 85%);
+  background: var(--color-error);
+  color: var(--color-neutral-100);
 }
 
 .addImageButton:disabled {
@@ -203,24 +241,51 @@ textarea:disabled {
   cursor: not-allowed;
 }
 
-.imageList {
+.imageGrid {
+  list-style: none;
   display: grid;
   gap: rem(16px);
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  padding: 0;
+  margin: 0;
 }
 
-.imageItem {
+.imageCard {
   display: grid;
-  gap: rem(8px);
-  border: 1px solid rgb(8 15 32 / 12%);
+  gap: rem(12px);
+  border: 1px solid rgb(var(--color-neutral-900-rgb) / 12%);
   border-radius: rem(12px);
   padding: rem(12px);
+  background: var(--background-card);
 }
 
-.imageItem img {
+.imagePreview {
   width: 100%;
-  max-height: 220px;
+  height: rem(180px);
   object-fit: cover;
   border-radius: rem(10px);
+  display: block;
+}
+
+.imagePlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: rem(180px);
+  border-radius: rem(10px);
+  background: rgb(var(--color-neutral-900-rgb) / 6%);
+  color: var(--text-secondary);
+  text-align: center;
+  padding: rem(16px);
+}
+
+.imageControls {
+  display: grid;
+  gap: rem(8px);
+}
+
+.imageControls .removeImageButton {
+  justify-self: flex-start;
 }
 
 .empty {
@@ -238,9 +303,9 @@ textarea:disabled {
   border-radius: rem(12px);
   background: linear-gradient(
     90deg,
-    rgb(8 15 32 / 8%),
-    rgb(8 15 32 / 16%),
-    rgb(8 15 32 / 8%)
+    rgb(var(--color-neutral-900-rgb) / 8%),
+    rgb(var(--color-neutral-900-rgb) / 16%),
+    rgb(var(--color-neutral-900-rgb) / 8%)
   );
   background-size: 200% 100%;
   animation: shimmer 1.4s ease-in-out infinite;
@@ -266,7 +331,7 @@ textarea:disabled {
 .confirmOverlay {
   position: fixed;
   inset: 0;
-  background: rgb(8 15 32 / 45%);
+  background: rgb(var(--color-neutral-900-rgb) / 45%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -303,7 +368,7 @@ textarea:disabled {
 
 .confirmActions button:last-child {
   background: var(--primary-color);
-  color: #fff;
+  color: var(--color-neutral-100);
 }
 
 @media (width <= 768px) {

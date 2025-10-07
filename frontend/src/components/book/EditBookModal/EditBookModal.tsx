@@ -57,11 +57,15 @@ const CONDITION_OPTIONS: PublicationCondition[] = [
   'unknown',
 ]
 
+let imageIdCounter = 0
 const createImageId = () => {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
     return crypto.randomUUID()
   }
-  return `img-${Math.random().toString(36).slice(2, 9)}`
+  imageIdCounter += 1
+  const timestamp = Date.now().toString(36)
+  const random = Math.random().toString(36).slice(2, 9)
+  return `img-${timestamp}-${random}-${imageIdCounter}`
 }
 
 const publicationToFormState = (publication: Publication): FormState => ({
@@ -74,9 +78,7 @@ const publicationToFormState = (publication: Publication): FormState => ({
   status: publication.status,
   availability: publication.availability,
   priceAmount:
-    publication.price.amount === null
-      ? ''
-      : String(publication.price.amount ?? ''),
+    publication.price.amount === null ? '' : String(publication.price.amount),
   priceCurrency: publication.price.currency,
   delivery: {
     nearBookCorner: publication.delivery.nearBookCorner,
@@ -159,9 +161,15 @@ const buildUpdatePayload = (
   }
 
   const originalImages = original.images
-  const imagesChanged =
-    form.images.length !== originalImages.length ||
-    form.images.some((image, index) => image.url !== originalImages[index]?.url)
+  let imagesChanged = form.images.length !== originalImages.length
+
+  if (!imagesChanged) {
+    imagesChanged = form.images.some((image, index) => {
+      const originalImage = originalImages[index]
+      if (!originalImage) return true
+      return image.url !== originalImage.url || image.alt !== originalImage.alt
+    })
+  }
 
   if (imagesChanged) {
     update.images = form.images.map((image, index) => ({
@@ -329,9 +337,18 @@ export const EditBookModal = ({
     setFormState((prev) => {
       if (!prev) return prev
       const images = [...prev.images]
+      const existingImage = images[index]
+      const baseImage: PublicationImage = existingImage
+        ? existingImage
+        : {
+            id: createImageId(),
+            url: '',
+            alt: prev.title,
+          }
       images[index] = {
-        ...images[index],
+        ...baseImage,
         url: value,
+        alt: baseImage.alt || prev.title,
       }
       return { ...prev, images }
     })
@@ -386,6 +403,11 @@ export const EditBookModal = ({
 
   const renderImages = () => {
     if (!formState) return null
+    const images = formState.images
+    const secondaryImages = images.slice(1)
+    const hasImages = images.length > 0
+    const hasSecondaryImages = secondaryImages.length > 0
+
     return (
       <div className={styles.imagesSection}>
         <header className={styles.sectionHeader}>
@@ -401,43 +423,65 @@ export const EditBookModal = ({
             </button>
           ) : null}
         </header>
-        <div className={styles.imageList}>
-          {formState.images.length === 0 ? (
-            <p className={styles.empty}>{t('bookDetail.emptyImages')}</p>
-          ) : (
-            formState.images.map((image, index) => (
-              <div key={image.id} className={styles.imageItem}>
-                <img src={image.url} alt={image.alt} />
-                {isOwner ? (
-                  <>
-                    <label
-                      className={styles.fieldLabel}
-                      htmlFor={`image-${image.id}`}
-                    >
-                      {t('bookDetail.fields.imageUrl')}
-                    </label>
-                    <input
-                      id={`image-${image.id}`}
-                      type="url"
-                      value={image.url}
-                      onChange={(event) =>
-                        handleImageUrlChange(index, event.target.value)
-                      }
-                      disabled={!isOwner}
+        {!hasImages ? (
+          <p className={styles.empty}>{t('bookDetail.emptyImages')}</p>
+        ) : !hasSecondaryImages ? (
+          <p className={styles.empty}>{t('bookDetail.images.onlyPrimary')}</p>
+        ) : (
+          <ul className={styles.imageGrid}>
+            {secondaryImages.map((image, index) => {
+              const displayIndex = index + 1
+              const hasUrl = Boolean(image.url)
+              return (
+                <li key={image.id} className={styles.imageCard}>
+                  {hasUrl ? (
+                    <img
+                      src={image.url}
+                      alt={image.alt}
+                      className={styles.imagePreview}
                     />
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveImage(index)}
-                      className={styles.removeImageButton}
-                    >
-                      {t('bookDetail.actions.removeImage')}
-                    </button>
-                  </>
-                ) : null}
-              </div>
-            ))
-          )}
-        </div>
+                  ) : (
+                    <div className={styles.imagePlaceholder}>
+                      <span>
+                        {t(
+                          isOwner
+                            ? 'bookDetail.images.placeholderOwner'
+                            : 'bookDetail.images.placeholder'
+                        )}
+                      </span>
+                    </div>
+                  )}
+                  {isOwner ? (
+                    <div className={styles.imageControls}>
+                      <label
+                        className={styles.fieldLabel}
+                        htmlFor={`image-${image.id}`}
+                      >
+                        {t('bookDetail.fields.imageUrl')}
+                      </label>
+                      <input
+                        id={`image-${image.id}`}
+                        type="url"
+                        value={image.url}
+                        onChange={(event) =>
+                          handleImageUrlChange(displayIndex, event.target.value)
+                        }
+                        disabled={!isOwner}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveImage(displayIndex)}
+                        className={styles.removeImageButton}
+                      >
+                        {t('bookDetail.actions.removeImage')}
+                      </button>
+                    </div>
+                  ) : null}
+                </li>
+              )
+            })}
+          </ul>
+        )}
       </div>
     )
   }
@@ -516,14 +560,61 @@ export const EditBookModal = ({
       )
     }
 
+    const primaryImage = formState.images[0]
+    const hasPrimaryImage = Boolean(primaryImage?.url)
+
     return (
       <div className={styles.content}>
         <div className={styles.heroRow}>
-          <img
-            src={formState.images[0]?.url ?? ''}
-            alt={formState.images[0]?.alt ?? formState.title}
-            className={styles.heroImage}
-          />
+          <div className={styles.heroMedia}>
+            <div className={styles.heroImageFrame}>
+              {hasPrimaryImage ? (
+                <img
+                  src={primaryImage?.url}
+                  alt={primaryImage?.alt ?? formState.title}
+                  className={styles.heroImage}
+                />
+              ) : (
+                <div className={styles.heroPlaceholder}>
+                  <span>
+                    {t(
+                      isOwner
+                        ? 'bookDetail.images.placeholderOwner'
+                        : 'bookDetail.images.placeholder'
+                    )}
+                  </span>
+                </div>
+              )}
+            </div>
+            {isOwner ? (
+              <div className={styles.primaryImageControls}>
+                <label
+                  className={styles.fieldLabel}
+                  htmlFor="book-primary-image"
+                >
+                  {t('bookDetail.fields.primaryImageUrl')}
+                </label>
+                <input
+                  id="book-primary-image"
+                  type="url"
+                  value={primaryImage?.url ?? ''}
+                  onChange={(event) =>
+                    handleImageUrlChange(0, event.target.value)
+                  }
+                  disabled={!isOwner}
+                />
+                {formState.images.length > 0 ? (
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveImage(0)}
+                    className={styles.removeImageButton}
+                  >
+                    {t('bookDetail.actions.removeImage')}
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
           <div className={styles.meta}>
             <div className={styles.metaHeader}>
               <h2>{formState.title}</h2>
