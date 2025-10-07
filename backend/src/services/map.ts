@@ -219,7 +219,8 @@ const DATASET: MapDataset = {
   ],
   meta: {
     bbox: BASE_BOUNDS,
-    generatedAt: new Date().toISOString(),
+    generatedAt: '',
+    // generatedAt will be set dynamically in getMapData
   },
 };
 
@@ -249,11 +250,14 @@ const hasThemeOverlap = (themes: string[], filters: string[]) => {
   return filters.some((filter) => normalizedThemes.includes(normalize(filter)));
 };
 
-const withinBounds = (corner: MapCornerPin, bbox: MapBoundingBox) =>
-  corner.lat <= bbox.north &&
-  corner.lat >= bbox.south &&
-  corner.lon <= bbox.east &&
-  corner.lon >= bbox.west;
+const withinBounds = (
+  coordinates: { lat: number; lon: number },
+  bbox: MapBoundingBox
+) =>
+  coordinates.lat <= bbox.north &&
+  coordinates.lat >= bbox.south &&
+  coordinates.lon <= bbox.east &&
+  coordinates.lon >= bbox.west;
 
 export const getMapData = (query: MapQuery): MapResponse => {
   const searchTerm = query.search.trim().toLowerCase();
@@ -294,7 +298,9 @@ export const getMapData = (query: MapQuery): MapResponse => {
     return matchesTerm && matchesTheme && matchesDistance;
   });
 
-  const activity = query.filters.recentActivity ? DATASET.activity : [];
+  const activity = query.filters.recentActivity
+    ? DATASET.activity.filter((point) => withinBounds(point, query.bbox))
+    : [];
 
   return {
     corners: query.layers.has('corners') ? corners : [],

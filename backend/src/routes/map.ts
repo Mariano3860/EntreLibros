@@ -74,7 +74,6 @@ router.get('/geocode', async (req, res) => {
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
 
-    // eslint-disable-next-line no-console
     console.error('Geocoding request failed', message);
     return res.status(502).json({
       error: 'GeocodingUnavailable',
@@ -140,7 +139,6 @@ router.get('/', (req, res) => {
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
 
-    // eslint-disable-next-line no-console
     console.error('Map data generation failed', message);
     return res.status(500).json({
       error: 'MapGenerationFailed',
