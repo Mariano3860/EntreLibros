@@ -19,77 +19,99 @@
             "name": "north",
             "in": "query",
             "required": true,
-            "schema": { "type": "number" },
+            "schema": {
+              "type": "number"
+            },
             "description": "Northern latitude of the bounding box"
           },
           {
             "name": "south",
             "in": "query",
             "required": true,
-            "schema": { "type": "number" },
+            "schema": {
+              "type": "number"
+            },
             "description": "Southern latitude of the bounding box"
           },
           {
             "name": "east",
             "in": "query",
             "required": true,
-            "schema": { "type": "number" },
+            "schema": {
+              "type": "number"
+            },
             "description": "Eastern longitude of the bounding box"
           },
           {
             "name": "west",
             "in": "query",
             "required": true,
-            "schema": { "type": "number" },
+            "schema": {
+              "type": "number"
+            },
             "description": "Western longitude of the bounding box"
           },
           {
             "name": "search",
             "in": "query",
             "required": false,
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "description": "Free text filter applied to corners and publications"
           },
           {
             "name": "distanceKm",
             "in": "query",
             "required": false,
-            "schema": { "type": "number" },
+            "schema": {
+              "type": "number"
+            },
             "description": "Maximum distance in kilometres for publications"
           },
           {
             "name": "themes",
             "in": "query",
             "required": false,
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "description": "Comma separated list of themes to filter by"
           },
           {
             "name": "openNow",
             "in": "query",
             "required": false,
-            "schema": { "type": "boolean" },
+            "schema": {
+              "type": "boolean"
+            },
             "description": "If true, only corners currently open are returned"
           },
           {
             "name": "recentActivity",
             "in": "query",
             "required": false,
-            "schema": { "type": "boolean" },
+            "schema": {
+              "type": "boolean"
+            },
             "description": "If false, recent activity points are omitted"
           },
           {
             "name": "layers",
             "in": "query",
             "required": false,
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "description": "Comma separated layers to include (corners, publications, activity)"
           },
           {
             "name": "locale",
             "in": "query",
             "required": false,
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "description": "Locale hint used for upstream providers"
           }
         ],
@@ -117,27 +139,49 @@
                           "themes"
                         ],
                         "properties": {
-                          "id": { "type": "string" },
-                          "name": { "type": "string" },
-                          "barrio": { "type": "string" },
-                          "city": { "type": "string" },
-                          "lat": { "type": "number" },
-                          "lon": { "type": "number" },
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "barrio": {
+                            "type": "string"
+                          },
+                          "city": {
+                            "type": "string"
+                          },
+                          "lat": {
+                            "type": "number"
+                          },
+                          "lon": {
+                            "type": "number"
+                          },
                           "lastSignalAt": {
                             "type": ["string", "null"],
                             "format": "date-time"
                           },
                           "photos": {
                             "type": "array",
-                            "items": { "type": "string" }
+                            "items": {
+                              "type": "string"
+                            }
                           },
-                          "rules": { "type": "string" },
-                          "referencePointLabel": { "type": "string" },
+                          "rules": {
+                            "type": "string"
+                          },
+                          "referencePointLabel": {
+                            "type": "string"
+                          },
                           "themes": {
                             "type": "array",
-                            "items": { "type": "string" }
+                            "items": {
+                              "type": "string"
+                            }
                           },
-                          "isOpenNow": { "type": "boolean" }
+                          "isOpenNow": {
+                            "type": "boolean"
+                          }
                         }
                       }
                     },
@@ -154,21 +198,37 @@
                           "cornerId"
                         ],
                         "properties": {
-                          "id": { "type": "string" },
-                          "title": { "type": "string" },
+                          "id": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
                           "authors": {
                             "type": "array",
-                            "items": { "type": "string" }
+                            "items": {
+                              "type": "string"
+                            }
                           },
                           "type": {
                             "type": "string",
                             "enum": ["offer", "want", "donation", "sale"]
                           },
-                          "photo": { "type": "string" },
-                          "distanceKm": { "type": "number" },
-                          "cornerId": { "type": "string" },
-                          "lat": { "type": "number" },
-                          "lon": { "type": "number" }
+                          "photo": {
+                            "type": "string"
+                          },
+                          "distanceKm": {
+                            "type": "number"
+                          },
+                          "cornerId": {
+                            "type": "string"
+                          },
+                          "lat": {
+                            "type": "number"
+                          },
+                          "lon": {
+                            "type": "number"
+                          }
                         }
                       }
                     },
@@ -178,10 +238,18 @@
                         "type": "object",
                         "required": ["id", "lat", "lon", "intensity"],
                         "properties": {
-                          "id": { "type": "string" },
-                          "lat": { "type": "number" },
-                          "lon": { "type": "number" },
-                          "intensity": { "type": "number" }
+                          "id": {
+                            "type": "string"
+                          },
+                          "lat": {
+                            "type": "number"
+                          },
+                          "lon": {
+                            "type": "number"
+                          },
+                          "intensity": {
+                            "type": "number"
+                          }
                         }
                       }
                     },
@@ -193,10 +261,18 @@
                           "type": "object",
                           "required": ["north", "south", "east", "west"],
                           "properties": {
-                            "north": { "type": "number" },
-                            "south": { "type": "number" },
-                            "east": { "type": "number" },
-                            "west": { "type": "number" }
+                            "north": {
+                              "type": "number"
+                            },
+                            "south": {
+                              "type": "number"
+                            },
+                            "east": {
+                              "type": "number"
+                            },
+                            "west": {
+                              "type": "number"
+                            }
                           }
                         },
                         "generatedAt": {
@@ -217,8 +293,12 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "error": { "type": "string" },
-                    "message": { "type": "string" }
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
                   }
                 }
               }
@@ -231,8 +311,12 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "error": { "type": "string" },
-                    "message": { "type": "string" }
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
                   }
                 }
               }
@@ -250,14 +334,18 @@
             "name": "q",
             "in": "query",
             "required": true,
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "description": "Query text to geocode"
           },
           {
             "name": "locale",
             "in": "query",
             "required": false,
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "description": "Locale hint forwarded to the geocoding provider"
           }
         ],
@@ -278,18 +366,34 @@
                       "coordinates"
                     ],
                     "properties": {
-                      "id": { "type": "string" },
-                      "label": { "type": "string" },
-                      "secondaryLabel": { "type": "string" },
-                      "street": { "type": "string" },
-                      "number": { "type": "string" },
-                      "postalCode": { "type": "string" },
+                      "id": {
+                        "type": "string"
+                      },
+                      "label": {
+                        "type": "string"
+                      },
+                      "secondaryLabel": {
+                        "type": "string"
+                      },
+                      "street": {
+                        "type": "string"
+                      },
+                      "number": {
+                        "type": "string"
+                      },
+                      "postalCode": {
+                        "type": "string"
+                      },
                       "coordinates": {
                         "type": "object",
                         "required": ["latitude", "longitude"],
                         "properties": {
-                          "latitude": { "type": "number" },
-                          "longitude": { "type": "number" }
+                          "latitude": {
+                            "type": "number"
+                          },
+                          "longitude": {
+                            "type": "number"
+                          }
                         }
                       }
                     }
@@ -305,8 +409,12 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "error": { "type": "string" },
-                    "message": { "type": "string" }
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
                   }
                 }
               }
@@ -319,8 +427,12 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "error": { "type": "string" },
-                    "message": { "type": "string" }
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
                   }
                 }
               }
@@ -1118,8 +1230,299 @@
           }
         }
       }
+    },
+    "/api/community/corners/nearby": {
+      "get": {
+        "summary": "List community corners near the requester",
+        "tags": ["Community"],
+        "responses": {
+          "200": {
+            "description": "Nearby community corners",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CommunityCornerSummary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/community/corners/map": {
+      "get": {
+        "summary": "Retrieve pins for the community mini map",
+        "tags": ["Community"],
+        "responses": {
+          "200": {
+            "description": "Mini map payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommunityCornerMap"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/community/corners": {
+      "post": {
+        "summary": "Publish a new community corner",
+        "tags": ["Community"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublishCornerPayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Corner published successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublishCornerResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation errors",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommunityCornerValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
-  "components": {},
-  "tags": []
+  "components": {
+    "schemas": {
+      "CommunityCornerSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "imageUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "distanceKm": {
+            "type": "number"
+          },
+          "activityLabel": {
+            "type": "string"
+          }
+        },
+        "required": ["id", "name", "imageUrl", "distanceKm"]
+      },
+      "CommunityCornerMap": {
+        "type": "object",
+        "properties": {
+          "pins": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommunityCornerMapPin"
+            }
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": ["pins"]
+      },
+      "CommunityCornerMapPin": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "x": {
+            "type": "number"
+          },
+          "y": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "quiet"]
+          }
+        },
+        "required": ["id", "name", "x", "y", "status"]
+      },
+      "PublishCornerAddress": {
+        "type": "object",
+        "properties": {
+          "street": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          },
+          "unit": {
+            "type": "string"
+          },
+          "postalCode": {
+            "type": "string"
+          }
+        },
+        "required": ["street", "number"]
+      },
+      "PublishCornerCoordinates": {
+        "type": "object",
+        "properties": {
+          "latitude": {
+            "type": "number"
+          },
+          "longitude": {
+            "type": "number"
+          }
+        },
+        "required": ["latitude", "longitude"]
+      },
+      "PublishCornerLocation": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "$ref": "#/components/schemas/PublishCornerAddress"
+          },
+          "coordinates": {
+            "$ref": "#/components/schemas/PublishCornerCoordinates"
+          },
+          "visibilityPreference": {
+            "type": "string",
+            "enum": ["exact", "approximate"]
+          }
+        },
+        "required": ["address", "coordinates", "visibilityPreference"]
+      },
+      "PublishCornerPhoto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": ["id", "url"]
+      },
+      "PublishCornerPayload": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "scope": {
+            "type": "string",
+            "enum": ["public", "semiprivate"]
+          },
+          "hostAlias": {
+            "type": "string"
+          },
+          "internalContact": {
+            "type": "string"
+          },
+          "rules": {
+            "type": "string"
+          },
+          "schedule": {
+            "type": "string"
+          },
+          "location": {
+            "$ref": "#/components/schemas/PublishCornerLocation"
+          },
+          "consent": {
+            "type": "boolean"
+          },
+          "photo": {
+            "$ref": "#/components/schemas/PublishCornerPhoto"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "paused"]
+          },
+          "draft": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name",
+          "scope",
+          "hostAlias",
+          "internalContact",
+          "location",
+          "consent",
+          "photo",
+          "status",
+          "draft"
+        ]
+      },
+      "PublishCornerResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "imageUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "paused"]
+          },
+          "locationSummary": {
+            "type": "string"
+          }
+        },
+        "required": ["id", "name", "imageUrl", "status", "locationSummary"]
+      },
+      "CommunityCornerValidationError": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["errors"]
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Map"
+    },
+    {
+      "name": "Community"
+    }
+  ]
 }

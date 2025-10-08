@@ -1,7 +1,14 @@
 import request from 'supertest';
-import { afterEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import app from '../../src/app.js';
+import { pool } from '../../src/db.js';
+
+const truncateCommunityTables = async () => {
+  await pool.query(
+    'TRUNCATE community_corner_photos, community_corner_metrics, community_corners RESTART IDENTITY CASCADE'
+  );
+};
 
 describe('map geocoding endpoint', () => {
   afterEach(() => {
@@ -78,6 +85,10 @@ describe('map geocoding endpoint', () => {
 });
 
 describe('map data endpoint', () => {
+  beforeEach(async () => {
+    await truncateCommunityTables();
+  });
+
   test('requires bounding box parameters', async () => {
     const response = await request(app).get('/api/map').expect(400);
 
@@ -88,6 +99,24 @@ describe('map data endpoint', () => {
   });
 
   test('returns filtered data respecting layers', async () => {
+    const payload = {
+      name: 'Rincón Prueba',
+      scope: 'public',
+      hostAlias: 'Anfitrión',
+      internalContact: 'contacto@entrelibros.org',
+      location: {
+        address: { street: 'Pringles', number: '100', postalCode: '1183' },
+        coordinates: { latitude: -34.62, longitude: -58.43 },
+        visibilityPreference: 'exact',
+      },
+      consent: true,
+      photo: { id: 'test-photo', url: 'https://example.com/corner.jpg' },
+      status: 'active',
+      draft: false,
+    };
+
+    await request(app).post('/api/community/corners').send(payload).expect(201);
+
     const response = await request(app)
       .get('/api/map')
       .query({
@@ -95,9 +124,9 @@ describe('map data endpoint', () => {
         south: -34.68,
         east: -58.36,
         west: -58.53,
-        search: 'Palermo',
+        search: 'Rincón',
         distanceKm: 3,
-        themes: 'Infancias',
+        themes: '',
         openNow: 'true',
         recentActivity: 'false',
         layers: 'corners,publications',
@@ -108,8 +137,8 @@ describe('map data endpoint', () => {
     expect(Array.isArray(response.body.corners)).toBe(true);
     expect(response.body.corners.length).toBeGreaterThan(0);
     expect(
-      response.body.corners.every((corner: { barrio: string }) =>
-        corner.barrio.includes('Palermo')
+      response.body.corners.every((corner: { name: string }) =>
+        corner.name.includes('Rincón')
       )
     ).toBe(true);
     expect(
