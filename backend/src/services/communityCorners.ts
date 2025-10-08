@@ -18,7 +18,7 @@ const DEFAULT_NEARBY_COORDINATES = {
   longitude: -58.47,
 };
 
-const DEFAULT_NEARBY_RADIUS_KM = 6;
+const DEFAULT_NEARBY_RADIUS_KM = 10;
 const DEFAULT_NEARBY_LIMIT = 12;
 const FALLBACK_CORNER_IMAGE =
   'https://picsum.photos/seed/corner-fallback/160/160';
@@ -79,12 +79,17 @@ export interface PublishCornerResponse {
   locationSummary: string;
 }
 
+export interface CommunityCornerActivityLabel {
+  key: string;
+  values?: Record<string, number | string>;
+}
+
 export interface CommunityCornerSummary {
   id: string;
   name: string;
   imageUrl: string;
   distanceKm: number;
-  activityLabel?: string;
+  activityLabel?: CommunityCornerActivityLabel;
 }
 
 export interface CommunityCornerMapPin {
@@ -288,22 +293,25 @@ const buildLocationSummaryFromCorner = (
 
 const computeActivityLabel = (
   metrics: CommunityCornerMetricsRecord | null | undefined
-): string | undefined => {
+): CommunityCornerActivityLabel | undefined => {
   if (!metrics) {
     return undefined;
   }
 
-  if (metrics.interactionsLastWeek > 1) {
-    return `${metrics.interactionsLastWeek} intercambios esta semana`;
-  }
-  if (metrics.interactionsLastWeek === 1) {
-    return '1 intercambio esta semana';
+  if (metrics.interactionsLastWeek > 0) {
+    return {
+      key: 'community.corners.activity.interactions_this_week',
+      values: { count: metrics.interactionsLastWeek },
+    };
   }
   if (metrics.activeListings > 0) {
-    return 'Activo';
+    return {
+      key: 'community.corners.activity.active_listings',
+      values: { count: metrics.activeListings },
+    };
   }
   if (metrics.totalVisits > 15) {
-    return 'Muy visitado';
+    return { key: 'community.corners.activity.popular' };
   }
   return undefined;
 };

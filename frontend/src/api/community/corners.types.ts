@@ -1,9 +1,14 @@
+export type CommunityCornerActivityLabel = {
+  key: string
+  values?: Record<string, string | number>
+}
+
 export type CommunityCornerSummary = {
   id: string
   name: string
   imageUrl: string
   distanceKm: number
-  activityLabel?: string
+  activityLabel?: CommunityCornerActivityLabel | null
 }
 
 export type CommunityCornerMapPin = {

@@ -151,11 +151,18 @@ export const getMapData = async (query: MapQuery): Promise<MapResponse> => {
           )
         : 0;
       const authors = listing.author ? [listing.author] : [];
-      const type: PublicationType = listing.donation
+      const inferredType = listing.donation
         ? 'donation'
         : listing.sale
           ? 'sale'
           : listing.type;
+      const type: PublicationType =
+        inferredType === 'donation' ||
+        inferredType === 'sale' ||
+        inferredType === 'offer' ||
+        inferredType === 'want'
+          ? inferredType
+          : 'offer';
       return {
         id: String(listing.id),
         title: listing.title,

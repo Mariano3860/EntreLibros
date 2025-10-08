@@ -1311,6 +1311,28 @@
   },
   "components": {
     "schemas": {
+      "CommunityCornerActivityLabel": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "values": {
+            "type": "object",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                }
+              ]
+            }
+          }
+        },
+        "required": ["key"]
+      },
       "CommunityCornerSummary": {
         "type": "object",
         "properties": {
@@ -1328,7 +1350,12 @@
             "type": "number"
           },
           "activityLabel": {
-            "type": "string"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CommunityCornerActivityLabel"
+              }
+            ],
+            "nullable": true
           }
         },
         "required": ["id", "name", "imageUrl", "distanceKm"]

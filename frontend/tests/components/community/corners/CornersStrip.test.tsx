@@ -1,6 +1,7 @@
 import { fireEvent, screen, within } from '@testing-library/react'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
+import type { CommunityCornerSummary } from '@src/api/community/corners.types'
 import { CornersStrip } from '@src/components/community/corners/CornersStrip'
 import styles from '@src/components/community/corners/CornersStrip.module.scss'
 
@@ -12,20 +13,23 @@ vi.mock('@src/hooks/api/useNearbyCorners', () => ({
   useNearbyCorners: useNearbyCornersMock,
 }))
 
-const mockCorners = [
+const mockCorners: CommunityCornerSummary[] = [
   {
     id: 'corner-1',
     name: 'Rincón Centro',
     distanceKm: 1.25,
     imageUrl: 'https://example.com/corner-1.png',
-    activityLabel: '32 actividades esta semana',
+    activityLabel: {
+      key: 'community.corners.activity.interactions_this_week',
+      values: { count: 32 },
+    },
   },
   {
     id: 'corner-2',
     name: 'Rincón Norte',
     distanceKm: 0.4,
     imageUrl: 'https://example.com/corner-2.png',
-    activityLabel: 'Sin número en la etiqueta',
+    activityLabel: { key: 'community.corners.activity.popular' },
   },
   {
     id: 'corner-3',
@@ -106,7 +110,10 @@ describe('CornersStrip', () => {
 
     expect(within(cards[0]).getByText('Rincón Centro')).toBeInTheDocument()
     const badge = within(cards[0]).getByText('32')
-    expect(badge).toHaveAttribute('aria-label', '32 actividades esta semana')
+    expect(badge).toHaveAttribute(
+      'aria-label',
+      mockCorners[0].activityLabel?.key ?? ''
+    )
 
     const images = container.querySelectorAll('img')
     fireEvent.error(images[0])

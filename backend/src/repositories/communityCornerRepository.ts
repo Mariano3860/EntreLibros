@@ -366,7 +366,7 @@ export const listCornersNear = async (
       ) AS distance_m
     `)}
     WHERE ($5 OR c.draft = false)
-      AND (c.status <> 'paused' OR c.status IS NULL)
+      AND c.status <> 'paused'
       AND ($4 = 0 OR ST_DWithin(
         c.location,
         ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography,
@@ -390,7 +390,7 @@ export const listCornersWithinBoundingBox = async (
   const result = await query<CornerRow>(
     `${buildCornerSelect()}
     WHERE ($5 OR c.draft = false)
-      AND (c.status <> 'paused' OR c.status IS NULL)
+      AND c.status <> 'paused'
       AND ST_Y(c.location::geometry) BETWEEN $1 AND $2
       AND ST_X(c.location::geometry) BETWEEN $3 AND $4
     ORDER BY c.created_at DESC`,

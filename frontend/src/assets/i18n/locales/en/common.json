@@ -525,6 +525,11 @@
         "title": "Book corners near you",
         "viewMap": "View map",
         "distance": "{{distance}} km away",
+        "activity": {
+          "interactions_this_week": "{{count}} exchanges this week",
+          "active_listings": "{{count}} active listings",
+          "popular": "Popular spot"
+        },
         "empty": "No nearby book corners yet.",
         "error": "We couldn't load nearby corners. Try again later."
       },

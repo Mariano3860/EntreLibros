@@ -33,11 +33,14 @@ const ensureCorners = () => {
       ),
       activityLabel: faker.helpers.arrayElement([
         faker.helpers.maybe(
-          () =>
-            `${faker.number.int({ min: 1, max: 6 })} intercambios esta semana`,
+          () => ({
+            key: 'community.corners.activity.interactions_this_week',
+            values: { count: faker.number.int({ min: 1, max: 6 }) },
+          }),
           { probability: 0.6 }
         ),
-        'Activo',
+        { key: 'community.corners.activity.popular' },
+        null,
         undefined,
       ]),
     }

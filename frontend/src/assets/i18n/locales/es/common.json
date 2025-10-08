@@ -517,6 +517,11 @@
         "title": "Rincones de libros cerca de ti",
         "viewMap": "Ver mapa",
         "distance": "a {{distance}} km",
+        "activity": {
+          "interactions_this_week": "{{count}} intercambios esta semana",
+          "active_listings": "{{count}} publicaciones activas",
+          "popular": "Muy visitado"
+        },
         "empty": "Aún no hay rincones cercanos.",
         "error": "No pudimos cargar los rincones cercanos. Intenta más tarde."
       },

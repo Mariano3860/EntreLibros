@@ -2,15 +2,28 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
+import type { CommunityCornerActivityLabel } from '@src/api/community/corners.types'
 import { useNearbyCorners } from '@src/hooks/api/useNearbyCorners'
 
 import styles from './CornersStrip.module.scss'
 
-// Extracts the first number found in the label to show in the compact badge.
-// Returns null when no number is present so the badge is not rendered.
-const extractBadgeNumber = (label?: string | null): string | null => {
+const extractBadgeNumber = (
+  label?: CommunityCornerActivityLabel | null
+): string | null => {
   if (!label) return null
-  const match = label.match(/\d+/)
+  const count = label.values?.count
+  if (typeof count === 'number') {
+    return String(count)
+  }
+  if (typeof count === 'string' && count.trim().length > 0) {
+    return count
+  }
+  return null
+}
+
+const extractNumberFromText = (value?: string): string | null => {
+  if (!value) return null
+  const match = value.match(/\d+/)
   return match ? match[0] : null
 }
 
@@ -59,7 +72,12 @@ export const CornersStrip = () => {
     return (
       <div className={styles.cards}>
         {cornersList.map((corner) => {
-          const badgeNumber = extractBadgeNumber(corner.activityLabel)
+          const activityLabelText = corner.activityLabel
+            ? t(corner.activityLabel.key, corner.activityLabel.values)
+            : undefined
+          const badgeNumber =
+            extractBadgeNumber(corner.activityLabel) ??
+            extractNumberFromText(activityLabelText)
 
           return (
             <article key={corner.id} className={styles.card}>
@@ -85,9 +103,9 @@ export const CornersStrip = () => {
                   {badgeNumber && (
                     <span
                       className={styles.activity}
-                      title={corner.activityLabel ?? undefined} // fallback nativo
-                      data-title={corner.activityLabel ?? undefined} // tooltip CSS
-                      aria-label={corner.activityLabel ?? undefined} // accesible
+                      title={activityLabelText ?? undefined} // fallback nativo
+                      data-title={activityLabelText ?? undefined} // tooltip CSS
+                      aria-label={activityLabelText ?? undefined} // accesible
                       tabIndex={0} // permite focus con teclado/touch
                     >
                       {badgeNumber}
