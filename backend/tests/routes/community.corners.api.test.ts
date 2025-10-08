@@ -2,13 +2,7 @@ import request from 'supertest';
 import { afterAll, beforeEach, describe, expect, test } from 'vitest';
 
 import app from '../../src/app.js';
-import { pool } from '../../src/db.js';
-
-const truncateCommunityTables = async () => {
-  await pool.query(
-    'TRUNCATE community_corner_photos, community_corner_metrics, community_corners RESTART IDENTITY CASCADE'
-  );
-};
+import { truncateCommunityCornerTables } from '../utils/communityCorners.js';
 
 const basePayload = {
   name: 'Rincón Centro',
@@ -36,11 +30,11 @@ const basePayload = {
 } as const;
 
 beforeEach(async () => {
-  await truncateCommunityTables();
+  await truncateCommunityCornerTables();
 });
 
 afterAll(async () => {
-  await truncateCommunityTables();
+  await truncateCommunityCornerTables();
 });
 
 describe('community corners API', () => {

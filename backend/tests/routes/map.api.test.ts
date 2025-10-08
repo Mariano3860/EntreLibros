@@ -2,13 +2,7 @@ import request from 'supertest';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import app from '../../src/app.js';
-import { pool } from '../../src/db.js';
-
-const truncateCommunityTables = async () => {
-  await pool.query(
-    'TRUNCATE community_corner_photos, community_corner_metrics, community_corners RESTART IDENTITY CASCADE'
-  );
-};
+import { truncateCommunityCornerTables } from '../utils/communityCorners.js';
 
 describe('map geocoding endpoint', () => {
   afterEach(() => {
@@ -86,7 +80,7 @@ describe('map geocoding endpoint', () => {
 
 describe('map data endpoint', () => {
   beforeEach(async () => {
-    await truncateCommunityTables();
+    await truncateCommunityCornerTables();
   });
 
   test('requires bounding box parameters', async () => {
