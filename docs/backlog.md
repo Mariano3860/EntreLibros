@@ -179,6 +179,7 @@ Feature 7.1 Métricas mínimas y tableros
 
 - [ ] S-7.1 Métricas mínimas (nº RdL activos, publicaciones activas, acuerdos confirmados, tiempo de descubrimiento) (Must, E1; BR-70)
   - Éxito: tablero básico visible a coordinación.
+  - Actualización 2025-11-01: se habilitaron los endpoints `/api/community/stats`, `/api/community/feed`, `/api/community/activity` y `/api/community/suggestions` con agregaciones deterministas (KPIs, tendencias, búsquedas y participantes), documentación OpenAPI y pruebas de regresión, dejando la información lista para tableros y SSR.
 - [ ] S-7.2 Indicadores por zona y actividad (Should, E2; BR-71)
   - Éxito: filtro por zona en tablero.
 - [ ] S-7.3 Embudos publicación→contacto→acuerdo→confirmación (Could, E3; BR-72)
