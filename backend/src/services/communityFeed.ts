@@ -1,10 +1,10 @@
+import type { CommunityListing } from './communityStats.js';
 import {
   COMMUNITY_CORNERS,
   COMMUNITY_LISTINGS,
   COMMUNITY_REFERENCE_DATE,
   COMMUNITY_USERS,
-  type CommunityListing,
-} from './communityStats.js';
+} from './communityStats.mocks.js';
 
 export type FeedItem = BookFeedItem | SaleFeedItem | SeekingFeedItem;
 
