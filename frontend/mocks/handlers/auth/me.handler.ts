@@ -1,6 +1,8 @@
 import { RELATIVE_API_ROUTES } from '@api/routes'
 import { http, HttpResponse } from 'msw'
 
+import { apiRouteMatcher } from '../utils'
+
 import { generateMeUser, generateUnauthorized } from './fakers/me.faker'
 
 const successUser = generateMeUser()
@@ -39,7 +41,7 @@ export const authStateHandler = http.get('/_msw/auth/state', ({ request }) => {
  *  2) Otherwise, presence of "sessionToken" cookie (set by /auth/login handler)
  */
 export const meHandler = http.get(
-  RELATIVE_API_ROUTES.AUTH.ME,
+  apiRouteMatcher(RELATIVE_API_ROUTES.AUTH.ME),
   ({ cookies }) => {
     // 1) Override wins
     if (AUTH_OVERRIDE === 'logged-in') {

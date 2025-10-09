@@ -22,6 +22,7 @@ declare module '*.svg' {
 type ImportMetaEnv = {
   readonly PUBLIC_MSW_FORCE_AUTH?: 'auto' | 'logged-in' | 'logged-out'
   readonly PUBLIC_API_BASE_URL?: string
+  readonly PUBLIC_API_USE_MOCKS?: string
   readonly PROD: boolean
 }
 interface ImportMeta {

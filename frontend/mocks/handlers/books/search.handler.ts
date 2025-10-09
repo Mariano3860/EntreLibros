@@ -2,10 +2,11 @@ import { http, HttpResponse } from 'msw'
 
 import { RELATIVE_API_ROUTES } from '@src/api/routes'
 
+import { apiRouteMatcher } from '../utils'
 import { searchBooksDataset } from './fakers/searchBooks.faker'
 
 export const searchBooksHandler = http.get(
-  RELATIVE_API_ROUTES.BOOKS.SEARCH,
+  apiRouteMatcher(RELATIVE_API_ROUTES.BOOKS.SEARCH),
   async ({ request }) => {
     const url = new URL(request.url)
     const query = url.searchParams.get('query') ?? ''

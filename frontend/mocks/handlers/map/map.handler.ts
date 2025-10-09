@@ -2,12 +2,14 @@ import { http, HttpResponse } from 'msw'
 
 import { RELATIVE_API_ROUTES } from '@src/api/routes'
 
+import { apiRouteMatcher } from '../utils'
+
 import { generateMapResponse } from './fakers/map.faker'
 
 const normalize = (value: string | null) => value?.trim().toLowerCase() ?? ''
 
 export const mapHandler = http.get(
-  RELATIVE_API_ROUTES.MAP.ROOT,
+  apiRouteMatcher(RELATIVE_API_ROUTES.MAP.ROOT),
   ({ request }) => {
     const base = generateMapResponse()
     const url = new URL(request.url)

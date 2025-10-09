@@ -2,10 +2,11 @@ import { http, HttpResponse } from 'msw'
 
 import { RELATIVE_API_ROUTES } from '@src/api/routes'
 
+import { apiRouteMatcher } from '../utils'
 import { generateFeedItems } from './fakers/feed.faker'
 
 export const communityFeedHandler = http.get(
-  RELATIVE_API_ROUTES.COMMUNITY.FEED,
+  apiRouteMatcher(RELATIVE_API_ROUTES.COMMUNITY.FEED),
   ({ request }) => {
     const url = new URL(request.url)
     const page = Number(url.searchParams.get('page') ?? '0')
