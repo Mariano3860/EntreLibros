@@ -103,8 +103,9 @@ const MINI_MAP_BOUNDS: MapBounds = {
 
 const DEFAULT_NEARBY_POINT = { latitude: -34.6037, longitude: -58.3816 };
 const DEFAULT_NEARBY_RADIUS_KM = 5;
-const DEFAULT_DESCRIPTION =
-  'Explora los Rincones activos en tu zona.';
+const DEFAULT_DESCRIPTION = 'Explora los Rincones activos en tu zona.';
+const DEFAULT_CORNER_IMAGE_URL =
+  'https://picsum.photos/seed/corner-fallback/160/160';
 
 const ERROR_MESSAGES = {
   name: 'community.corners.errors.name_required',
@@ -188,9 +189,7 @@ const validatePayload = (
     errors.name = ERROR_MESSAGES.name;
   }
 
-  const scope = allowedScopes.includes(payload.scope)
-    ? payload.scope
-    : null;
+  const scope = allowedScopes.includes(payload.scope) ? payload.scope : null;
   if (!scope) {
     errors.scope = ERROR_MESSAGES.scope;
   }
@@ -218,18 +217,22 @@ const validatePayload = (
     errors.number = ERROR_MESSAGES.number;
   }
 
-  const latitude = parseNumber((rawCoordinates as PublishCornerCoordinates).latitude);
+  const latitude = parseNumber(
+    (rawCoordinates as PublishCornerCoordinates).latitude
+  );
   if (latitude === null || latitude < -90 || latitude > 90) {
     errors.latitude = ERROR_MESSAGES.latitude;
   }
 
-  const longitude = parseNumber((rawCoordinates as PublishCornerCoordinates).longitude);
+  const longitude = parseNumber(
+    (rawCoordinates as PublishCornerCoordinates).longitude
+  );
   if (longitude === null || longitude < -180 || longitude > 180) {
     errors.longitude = ERROR_MESSAGES.longitude;
   }
 
   const visibilityPreference = allowedVisibilities.includes(
-    (payload.location?.visibilityPreference ?? 'exact')
+    payload.location?.visibilityPreference ?? 'exact'
   )
     ? payload.location.visibilityPreference
     : null;
@@ -247,7 +250,9 @@ const validatePayload = (
     errors.photo = ERROR_MESSAGES.photo;
   }
 
-  const status = allowedStatuses.includes(payload.status) ? payload.status : null;
+  const status = allowedStatuses.includes(payload.status)
+    ? payload.status
+    : null;
   if (!status) {
     errors.status = ERROR_MESSAGES.status;
   }
@@ -267,9 +272,11 @@ const validatePayload = (
       address: {
         street,
         number,
-        unit: normalizeString((rawAddress as PublishCornerAddress).unit) || null,
+        unit:
+          normalizeString((rawAddress as PublishCornerAddress).unit) || null,
         postalCode:
-          normalizeString((rawAddress as PublishCornerAddress).postalCode) || null,
+          normalizeString((rawAddress as PublishCornerAddress).postalCode) ||
+          null,
       },
       coordinates: {
         latitude: latitude!,
@@ -288,12 +295,10 @@ const ensureImageUrl = (corner: CommunityCornerEntity): string => {
   if (corner.photo?.url) {
     return corner.photo.url;
   }
-  return '';
+  return DEFAULT_CORNER_IMAGE_URL;
 };
 
-const derivePinStatus = (
-  corner: CommunityCornerEntity
-): 'active' | 'quiet' => {
+const derivePinStatus = (corner: CommunityCornerEntity): 'active' | 'quiet' => {
   if (corner.status === 'active' && corner.metrics.weeklyExchanges > 0) {
     return 'active';
   }
@@ -307,7 +312,10 @@ const derivePinStatus = (
   return 'quiet';
 };
 
-const projectToBounds = (point: PublishCornerCoordinates, bounds: MapBounds) => {
+const projectToBounds = (
+  point: PublishCornerCoordinates,
+  bounds: MapBounds
+) => {
   const xRange = bounds.east - bounds.west || 0.000001;
   const yRange = bounds.north - bounds.south || 0.000001;
 
@@ -379,8 +387,8 @@ export const publishCorner = async (
     status: validated.status as CommunityCornerStatus,
     draft: validated.draft,
     consent: validated.consent,
-    visibilityPreference:
-      validated.location.visibilityPreference as CommunityCornerVisibilityPreference,
+    visibilityPreference: validated.location
+      .visibilityPreference as CommunityCornerVisibilityPreference,
     address: validated.location.address,
     coordinates: validated.location.coordinates,
     photo: validated.photo,

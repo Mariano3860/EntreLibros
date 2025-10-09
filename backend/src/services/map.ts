@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto';
+
 import { query } from '../db.js';
 import {
   listCornersForMap,
@@ -93,10 +95,7 @@ const normalize = (value: string) => value.toLowerCase();
 const matchesSearch = (value: string, term: string) =>
   normalize(value).includes(normalize(term));
 
-const matchesCornerSearch = (
-  corner: CommunityCornerEntity,
-  term: string
-) =>
+const matchesCornerSearch = (corner: CommunityCornerEntity, term: string) =>
   matchesSearch(corner.name, term) ||
   matchesSearch(corner.locationSummary, term) ||
   matchesSearch(corner.address.street, term);
@@ -117,15 +116,6 @@ const hasThemeOverlap = (themes: string[], filters: string[]) => {
   return filters.some((filter) => normalizedThemes.includes(normalize(filter)));
 };
 
-const withinBounds = (
-  coordinates: { lat: number; lon: number },
-  bbox: MapBoundingBox
-) =>
-  coordinates.lat <= bbox.north &&
-  coordinates.lat >= bbox.south &&
-  coordinates.lon <= bbox.east &&
-  coordinates.lon >= bbox.west;
-
 const toRadians = (value: number) => (value * Math.PI) / 180;
 
 const haversineDistanceKm = (
@@ -141,8 +131,7 @@ const haversineDistanceKm = (
   const sinLat = Math.sin(dLat / 2);
   const sinLon = Math.sin(dLon / 2);
 
-  const c =
-    sinLat * sinLat + Math.cos(lat1) * Math.cos(lat2) * sinLon * sinLon;
+  const c = sinLat * sinLat + Math.cos(lat1) * Math.cos(lat2) * sinLon * sinLon;
   const d = 2 * Math.atan2(Math.sqrt(c), Math.sqrt(1 - c));
 
   return Math.round(R * d * 10) / 10;
@@ -157,22 +146,72 @@ const getCornerThemes = (corner: CommunityCornerEntity): string[] => {
   return themes;
 };
 
+const metersToDegreesLat = (meters: number) => meters / 111_320;
+
+const metersToDegreesLon = (meters: number, latitude: number) => {
+  const radians = toRadians(latitude);
+  const metersPerDegree = Math.max(1, 111_320 * Math.cos(radians));
+  return meters / metersPerDegree;
+};
+
+const deriveOffsetFromId = (id: string) => {
+  const hash = createHash('sha256').update(id).digest();
+  const latFactor = hash[0] / 255;
+  const lonFactor = hash[1] / 255;
+  return {
+    latFactor: latFactor * 2 - 1,
+    lonFactor: lonFactor * 2 - 1,
+  };
+};
+
+const APPROXIMATION_OFFSET_METERS = 150;
+
+const getDisplayCoordinates = (
+  corner: CommunityCornerEntity
+): { lat: number; lon: number; approximate: boolean } => {
+  const { latitude, longitude } = corner.coordinates;
+
+  if (corner.visibilityPreference !== 'approximate') {
+    return { lat: latitude, lon: longitude, approximate: false };
+  }
+
+  const { latFactor, lonFactor } = deriveOffsetFromId(corner.id);
+  const latOffset = metersToDegreesLat(latFactor * APPROXIMATION_OFFSET_METERS);
+  const lonOffset = metersToDegreesLon(
+    lonFactor * APPROXIMATION_OFFSET_METERS,
+    latitude
+  );
+
+  return {
+    lat: latitude + latOffset,
+    lon: longitude + lonOffset,
+    approximate: true,
+  };
+};
+
 const buildCornerPin = (corner: CommunityCornerEntity): MapCornerPin => {
   const photos = corner.photo?.url ? [corner.photo.url] : [];
   const barrio = corner.address.postalCode ?? DEFAULT_BARRIO;
-  return {
+  const coordinates = getDisplayCoordinates(corner);
+  const basePin: MapCornerPin = {
     id: corner.id,
     name: corner.name,
     barrio,
     city: DEFAULT_CITY,
-    lat: corner.coordinates.latitude,
-    lon: corner.coordinates.longitude,
+    lat: coordinates.lat,
+    lon: coordinates.lon,
     lastSignalAt: corner.metrics.lastActivityAt,
     photos,
     rules: corner.rules ?? undefined,
     themes: getCornerThemes(corner),
     isOpenNow: corner.status === 'active',
   };
+
+  if (coordinates.approximate) {
+    basePin.referencePointLabel = corner.locationSummary;
+  }
+
+  return basePin;
 };
 
 const buildActivityPoints = (
@@ -188,10 +227,11 @@ const buildActivityPoints = (
       }
 
       const intensity = Math.max(1, Math.min(5, intensitySource));
+      const coordinates = getDisplayCoordinates(corner);
       return {
         id: `${corner.id}-activity`,
-        lat: corner.coordinates.latitude,
-        lon: corner.coordinates.longitude,
+        lat: coordinates.lat,
+        lon: coordinates.lon,
         intensity,
       } satisfies MapActivityPoint;
     })
@@ -221,6 +261,8 @@ const fetchPublications = async (
     return [];
   }
 
+  const cornerIds = [...cornerLookup.keys()];
+
   const { rows } = await query<MapPublicationRow>(
     `SELECT
       bl.id,
@@ -243,56 +285,61 @@ const fetchPublications = async (
     WHERE bl.status = 'available'
       AND bl.availability = 'public'
       AND bl.is_draft = false
-      AND bl.corner_id IS NOT NULL`
+      AND bl.corner_id IS NOT NULL
+      AND bl.corner_id = ANY($1::uuid[])`,
+    [cornerIds]
   );
 
-  return rows
-    .map((row) => {
-      const corner = row.corner_id ? cornerLookup.get(row.corner_id) : undefined;
-      if (!corner) {
-        return null;
-      }
+  const pins: MapPublicationPin[] = [];
 
-      if (
-        search.length > 0 &&
-        !matchesPublicationSearch(row, search) &&
-        !matchesCornerSearch(corner, search)
-      ) {
-        return null;
-      }
+  for (const row of rows) {
+    const corner = row.corner_id ? cornerLookup.get(row.corner_id) : undefined;
+    if (!corner) {
+      continue;
+    }
 
-      if (!hasThemeOverlap(getCornerThemes(corner), themeFilters)) {
-        return null;
-      }
+    if (
+      search.length > 0 &&
+      !matchesPublicationSearch(row, search) &&
+      !matchesCornerSearch(corner, search)
+    ) {
+      continue;
+    }
 
-      const distanceKm = haversineDistanceKm(
-        { lat: corner.coordinates.latitude, lon: corner.coordinates.longitude },
-        center
-      );
+    if (!hasThemeOverlap(getCornerThemes(corner), themeFilters)) {
+      continue;
+    }
 
-      if (maxDistanceKm > 0 && distanceKm > maxDistanceKm) {
-        return null;
-      }
+    const distanceKm = haversineDistanceKm(
+      { lat: corner.coordinates.latitude, lon: corner.coordinates.longitude },
+      center
+    );
 
-      const authors = row.author ? [row.author] : [];
-      const photo = row.photo_url ?? corner.photo?.url;
+    if (maxDistanceKm > 0 && distanceKm > maxDistanceKm) {
+      continue;
+    }
 
-      return {
-        id: `listing-${row.id}`,
-        title: row.title,
-        authors,
-        type: derivePublicationType(row),
-        photo: photo ?? undefined,
-        distanceKm,
-        cornerId: corner.id,
-        lat: corner.coordinates.latitude,
-        lon: corner.coordinates.longitude,
-      } satisfies MapPublicationPin;
-    })
-    .filter((pin): pin is MapPublicationPin => pin !== null);
+    const authors = row.author ? [row.author] : [];
+    const photo = row.photo_url ?? corner.photo?.url ?? undefined;
+    const coordinates = getDisplayCoordinates(corner);
+
+    pins.push({
+      id: `listing-${row.id}`,
+      title: row.title,
+      authors,
+      type: derivePublicationType(row),
+      photo,
+      distanceKm,
+      cornerId: corner.id,
+      lat: coordinates.lat,
+      lon: coordinates.lon,
+    });
+  }
+
+  return pins;
 };
 
-export const getMapData = async (query: MapQuery): Promise<MapResponse> => {
+export async function getMapData(query: MapQuery): Promise<MapResponse> {
   const searchTerm = query.search.trim();
   const normalizedSearch = searchTerm.toLowerCase();
   const themeFilters = query.filters.themes
@@ -303,13 +350,6 @@ export const getMapData = async (query: MapQuery): Promise<MapResponse> => {
   const corners = await listCornersForMap(query.bbox);
 
   const filteredCorners = corners.filter((corner) => {
-    if (!withinBounds(
-      { lat: corner.coordinates.latitude, lon: corner.coordinates.longitude },
-      query.bbox
-    )) {
-      return false;
-    }
-
     const matchesTerm =
       normalizedSearch.length === 0 ||
       matchesCornerSearch(corner, normalizedSearch);
@@ -356,4 +396,4 @@ export const getMapData = async (query: MapQuery): Promise<MapResponse> => {
       generatedAt: new Date().toISOString(),
     },
   };
-};
+}

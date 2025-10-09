@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 
 import { query, withTransaction, type DbClient } from '../db.js';
 
@@ -126,7 +126,9 @@ const BASE_FROM = `
     ON metrics.corner_id = c.id
 `;
 
-const formatDistanceKm = (distanceMeters: number | null | undefined): number | null => {
+const formatDistanceKm = (
+  distanceMeters: number | null | undefined
+): number | null => {
   if (!Number.isFinite(distanceMeters)) {
     return null;
   }
@@ -147,10 +149,7 @@ const buildLocationSummary = (row: CommunityCornerRow): string => {
   return `${row.address_street} ${row.address_number}${unit}`.trim();
 };
 
-const buildActivityLabel = (
-  weekly: number,
-  total: number
-): string | null => {
+const buildActivityLabel = (weekly: number, total: number): string | null => {
   if (weekly > 0) {
     return `${weekly} intercambios esta semana`;
   }
@@ -161,6 +160,11 @@ const buildActivityLabel = (
 
   return null;
 };
+
+const derivePhotoId = (row: CommunityCornerRow): string =>
+  createHash('sha256')
+    .update(`${row.id}:${row.photo_url ?? ''}`)
+    .digest('hex');
 
 const mapRowToEntity = (row: CommunityCornerRow): CommunityCornerEntity => {
   const latitude = Number(row.latitude);
@@ -190,8 +194,8 @@ const mapRowToEntity = (row: CommunityCornerRow): CommunityCornerEntity => {
       row.photo_url && row.photo_external_id
         ? { id: row.photo_external_id, url: row.photo_url }
         : row.photo_url
-        ? { id: randomUUID(), url: row.photo_url }
-        : null,
+          ? { id: derivePhotoId(row), url: row.photo_url }
+          : null,
     locationSummary: buildLocationSummary(row),
     activityLabel: buildActivityLabel(weekly, total),
     metrics: {
