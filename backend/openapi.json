@@ -1307,6 +1307,115 @@
           }
         }
       }
+    },
+    "/api/community/stats": {
+      "get": {
+        "summary": "Retrieve aggregated community statistics",
+        "tags": ["Community"],
+        "responses": {
+          "200": {
+            "description": "Community KPIs and trends",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommunityStats"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/community/feed": {
+      "get": {
+        "summary": "Retrieve the paginated community feed",
+        "tags": ["Community"],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "description": "Page number starting from 0"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20,
+              "default": 8
+            },
+            "description": "Number of items per page (max 20)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Community feed items",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FeedItem"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "community.errors.invalid_pagination"
+          }
+        }
+      }
+    },
+    "/api/community/activity": {
+      "get": {
+        "summary": "List recent community activity avatars",
+        "tags": ["Community"],
+        "responses": {
+          "200": {
+            "description": "Recent activity participants",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ActivityItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/community/suggestions": {
+      "get": {
+        "summary": "Suggest community members to connect with",
+        "tags": ["Community"],
+        "responses": {
+          "200": {
+            "description": "Suggested community members",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SuggestionItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1541,6 +1650,281 @@
           }
         },
         "required": ["errors"]
+      },
+      "CommunityStats": {
+        "type": "object",
+        "properties": {
+          "kpis": {
+            "$ref": "#/components/schemas/CommunityStatsKpis"
+          },
+          "trendExchanges": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
+          "trendNewBooks": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
+          "topContributors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TopContributor"
+            }
+          },
+          "hotSearches": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HotSearch"
+            }
+          },
+          "activeHousesMap": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MapPin"
+            }
+          }
+        },
+        "required": [
+          "kpis",
+          "trendExchanges",
+          "trendNewBooks",
+          "topContributors",
+          "hotSearches",
+          "activeHousesMap"
+        ]
+      },
+      "CommunityStatsKpis": {
+        "type": "object",
+        "properties": {
+          "exchanges": {
+            "type": "integer"
+          },
+          "activeHouses": {
+            "type": "integer"
+          },
+          "activeUsers": {
+            "type": "integer"
+          },
+          "booksPublished": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "exchanges",
+          "activeHouses",
+          "activeUsers",
+          "booksPublished"
+        ]
+      },
+      "TopContributor": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "metric": {
+            "type": "string",
+            "enum": ["exchanges", "books"]
+          },
+          "value": {
+            "type": "integer"
+          }
+        },
+        "required": ["username", "metric", "value"]
+      },
+      "HotSearch": {
+        "type": "object",
+        "properties": {
+          "term": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer"
+          }
+        },
+        "required": ["term", "count"]
+      },
+      "MapPin": {
+        "type": "object",
+        "properties": {
+          "top": {
+            "type": "string"
+          },
+          "left": {
+            "type": "string"
+          }
+        },
+        "required": ["top", "left"]
+      },
+      "FeedCorner": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": ["id", "name"]
+      },
+      "FeedBase": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "user": {
+            "type": "string"
+          },
+          "avatar": {
+            "type": "string",
+            "format": "uri"
+          },
+          "time": {
+            "type": "string"
+          },
+          "likes": {
+            "type": "integer"
+          },
+          "corner": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/FeedCorner"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": ["id", "user", "avatar", "time", "likes"]
+      },
+      "BookFeedItem": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FeedBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["book"]
+              },
+              "title": {
+                "type": "string"
+              },
+              "author": {
+                "type": "string"
+              },
+              "cover": {
+                "type": "string",
+                "format": "uri"
+              }
+            },
+            "required": ["type", "title", "author", "cover"]
+          }
+        ]
+      },
+      "SaleFeedItem": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FeedBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["sale"]
+              },
+              "title": {
+                "type": "string"
+              },
+              "price": {
+                "type": "number"
+              },
+              "condition": {
+                "type": "string"
+              },
+              "cover": {
+                "type": "string",
+                "format": "uri"
+              }
+            },
+            "required": ["type", "title", "price", "condition", "cover"]
+          }
+        ]
+      },
+      "SeekingFeedItem": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FeedBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["seeking"]
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": ["type", "title"]
+          }
+        ]
+      },
+      "FeedItem": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/BookFeedItem"
+          },
+          {
+            "$ref": "#/components/schemas/SaleFeedItem"
+          },
+          {
+            "$ref": "#/components/schemas/SeekingFeedItem"
+          }
+        ]
+      },
+      "ActivityItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "user": {
+            "type": "string"
+          },
+          "avatar": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": ["id", "user", "avatar"]
+      },
+      "SuggestionItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "user": {
+            "type": "string"
+          },
+          "avatar": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": ["id", "user", "avatar"]
       }
     }
   },

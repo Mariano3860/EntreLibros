@@ -489,17 +489,27 @@ export const getNearbyCorners = async (
     typeof params.longitude === 'number'
       ? params.longitude
       : DEFAULT_NEARBY_COORDINATES.longitude;
-  const radiusKm =
+  const requestedRadius =
     typeof params.radiusKm === 'number' && params.radiusKm > 0
       ? params.radiusKm
-      : DEFAULT_NEARBY_RADIUS_KM;
+      : undefined;
+  const radiusKm = requestedRadius ?? DEFAULT_NEARBY_RADIUS_KM;
 
-  const corners = await listCornersNear({
+  let corners = await listCornersNear({
     latitude,
     longitude,
     radiusKm,
     limit: DEFAULT_NEARBY_LIMIT,
   });
+
+  if (!requestedRadius && corners.length === 0) {
+    corners = await listCornersNear({
+      latitude,
+      longitude,
+      radiusKm: DEFAULT_NEARBY_RADIUS_KM * 3,
+      limit: DEFAULT_NEARBY_LIMIT,
+    });
+  }
 
   return corners.map((corner) => ({
     id: corner.id,

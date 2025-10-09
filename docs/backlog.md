@@ -85,6 +85,7 @@ Feature 2.2 Visibilidad y actividad
   - Actualización 2025-10-16: el flujo de alta de RdL exige elegir visibilidad barrio/ciudad, persiste el consentimiento y refleja la selección en la revisión previa; resta propagarla al backend/mapa productivo.
   - Actualización 2025-10-30: se publicaron los endpoints `/api/map` y `/api/map/geocode` conectados al frontend, con filtrado real por capas, geocodificación de Nominatim y dataset territorial inicial respetando los límites solicitados.
   - Actualización 2025-11-05: el mapa y el mini mapa ahora consumen datos reales desde PostGIS y publicaciones activas, reemplazando los mocks locales para reflejar nuevos Rincones inmediatamente tras su alta.
+  - Actualización 2025-11-07: los listados cercanos y el mini mapa exponen claves i18n para las insignias de actividad y amplían el radio automático al consultar sin coordenadas, asegurando que los nuevos Rincones queden visibles tras la publicación.
 - [ ] S-2.5 Señales de actividad en RdL (Should, E2; BR-13)
   - Éxito: 2 señales simples (visitas, contactos cercanos).
 
@@ -181,6 +182,7 @@ Feature 7.1 Métricas mínimas y tableros
 
 - [ ] S-7.1 Métricas mínimas (nº RdL activos, publicaciones activas, acuerdos confirmados, tiempo de descubrimiento) (Must, E1; BR-70)
   - Éxito: tablero básico visible a coordinación.
+  - Actualización 2025-11-01: se habilitaron los endpoints `/api/community/stats`, `/api/community/feed`, `/api/community/activity` y `/api/community/suggestions` con agregaciones deterministas (KPIs, tendencias, búsquedas y participantes), documentación OpenAPI y pruebas de regresión, dejando la información lista para tableros y SSR.
 - [ ] S-7.2 Indicadores por zona y actividad (Should, E2; BR-71)
   - Éxito: filtro por zona en tablero.
 - [ ] S-7.3 Embudos publicación→contacto→acuerdo→confirmación (Could, E3; BR-72)
