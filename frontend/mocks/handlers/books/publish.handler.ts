@@ -3,10 +3,12 @@ import { http, HttpResponse } from 'msw'
 import { RELATIVE_API_ROUTES } from '@src/api/routes'
 import { PublishBookPayload } from '@src/api/books/publishBook.types'
 
+import { apiRouteMatcher } from '../utils'
+
 let lastGeneratedId = 5000
 
 export const publishBookHandler = http.post(
-  RELATIVE_API_ROUTES.BOOKS.PUBLISH,
+  apiRouteMatcher(RELATIVE_API_ROUTES.BOOKS.PUBLISH),
   async ({ request }) => {
     await new Promise((resolve) => setTimeout(resolve, 400))
     const body = (await request.json()) as PublishBookPayload

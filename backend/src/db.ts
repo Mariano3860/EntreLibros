@@ -31,6 +31,10 @@ export type DbClient = PoolClient;
 export async function withTransaction<T>(
   work: (client: DbClient) => Promise<T>
 ): Promise<T> {
+  if (testClient) {
+    return work(testClient);
+  }
+
   const client = await pool.connect();
   try {
     await client.query('BEGIN');

@@ -131,6 +131,7 @@ export const MapPage = () => {
       ? (data?.activity?.length ?? 0)
       : 0
   const isEmpty = visibleCorners + visiblePublications + visibleActivity === 0
+  const showEmptyState = isEmpty && !isLoading && !isFetching
 
   const activityPoints = filters.recentActivity ? (data?.activity ?? []) : []
 
@@ -300,7 +301,14 @@ export const MapPage = () => {
                 isFetching={isFetching}
                 isEmpty={isEmpty}
               />
-              {isEmpty && !isLoading ? (
+            </div>
+
+            <div
+              className={styles.detailPlaceholder}
+              data-testid="map-detail-placeholder"
+              data-has-selection={Boolean(selectedPin)}
+            >
+              {showEmptyState ? (
                 <EmptyState
                   title={t('map.empty.title')}
                   description={t('map.empty.description')}
@@ -309,13 +317,6 @@ export const MapPage = () => {
                 />
               ) : null}
             </div>
-
-            <div
-              className={styles.detailPlaceholder}
-              data-testid="map-detail-placeholder"
-              aria-hidden="true"
-              data-has-selection={Boolean(selectedPin)}
-            />
           </div>
         </div>
 

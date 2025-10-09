@@ -2,6 +2,8 @@ import { http, HttpResponse } from 'msw'
 
 import { RELATIVE_API_ROUTES } from '@src/api/routes'
 
+import { apiRouteMatcher } from '../utils'
+
 const successResponse = {
   message: '¡Gracias por tu mensaje! Te responderemos lo antes posible.',
 }
@@ -12,7 +14,7 @@ const errorResponse = {
 }
 
 export const contactFormHandler = http.post(
-  RELATIVE_API_ROUTES.CONTACT_FORM.SUBMIT,
+  apiRouteMatcher(RELATIVE_API_ROUTES.CONTACT_FORM.SUBMIT),
   async ({ request }) => {
     const body = await request.json()
     const { name } = body as { name: string }

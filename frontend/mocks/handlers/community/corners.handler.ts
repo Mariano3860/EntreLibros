@@ -8,6 +8,7 @@ import {
   PublishCornerResponse,
 } from '@src/api/community/corners.types'
 
+import { apiRouteMatcher } from '../utils'
 import {
   generateCornerSummaries,
   generateCornersMap,
@@ -15,7 +16,7 @@ import {
 } from './fakers/corners.faker'
 
 export const nearbyCornersHandler = http.get(
-  RELATIVE_API_ROUTES.COMMUNITY.CORNERS.NEARBY,
+  apiRouteMatcher(RELATIVE_API_ROUTES.COMMUNITY.CORNERS.NEARBY),
   () => {
     const corners = generateCornerSummaries()
     return HttpResponse.json(corners, { status: 200 })
@@ -23,7 +24,7 @@ export const nearbyCornersHandler = http.get(
 )
 
 export const cornersMapHandler = http.get(
-  RELATIVE_API_ROUTES.COMMUNITY.CORNERS.MAP,
+  apiRouteMatcher(RELATIVE_API_ROUTES.COMMUNITY.CORNERS.MAP),
   () => {
     const map = generateCornersMap()
     return HttpResponse.json(map, { status: 200 })
@@ -45,7 +46,7 @@ const buildLocationSummary = (payload: PublishCornerPayload): string => {
 }
 
 export const createCornerSuccessHandler = http.post(
-  RELATIVE_API_ROUTES.COMMUNITY.CORNERS.CREATE,
+  apiRouteMatcher(RELATIVE_API_ROUTES.COMMUNITY.CORNERS.CREATE),
   async ({ request }) => {
     const payload = (await request.json()) as PublishCornerPayload
 
@@ -70,7 +71,7 @@ export const createCornerSuccessHandler = http.post(
 )
 
 export const createCornerValidationHandler = http.post(
-  RELATIVE_API_ROUTES.COMMUNITY.CORNERS.CREATE,
+  apiRouteMatcher(RELATIVE_API_ROUTES.COMMUNITY.CORNERS.CREATE),
   async () => {
     return HttpResponse.json(
       {

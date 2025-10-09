@@ -4,6 +4,8 @@ import { http, HttpResponse } from 'msw'
 import { RegisterRequest } from '@src/api/auth/register.types'
 import { RELATIVE_API_ROUTES } from '@src/api/routes'
 
+import { apiRouteMatcher } from '../utils'
+
 import { DEFAULT_EMAIL } from '../../constants/constants'
 
 import {
@@ -13,7 +15,7 @@ import {
 import { setLoggedInState } from './me.handler'
 
 export const registerHandler = http.post(
-  RELATIVE_API_ROUTES.AUTH.REGISTER,
+  apiRouteMatcher(RELATIVE_API_ROUTES.AUTH.REGISTER),
   async ({ request }) => {
     const body = (await request.json()) as RegisterRequest
     const { email } = body

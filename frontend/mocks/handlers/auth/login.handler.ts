@@ -4,13 +4,15 @@ import { http, HttpResponse } from 'msw'
 import { LoginRequest } from '@src/api/auth/login.types'
 import { RELATIVE_API_ROUTES } from '@src/api/routes'
 
+import { apiRouteMatcher } from '../utils'
+
 import { DEFAULT_EMAIL, DEFAULT_PASS } from '../../constants/constants'
 
 import { generateLoginError, generateLoginSuccess } from './fakers/login.faker'
 import { setLoggedInState } from './me.handler'
 
 export const loginHandler = http.post(
-  RELATIVE_API_ROUTES.AUTH.LOGIN,
+  apiRouteMatcher(RELATIVE_API_ROUTES.AUTH.LOGIN),
   async ({ request }) => {
     const body = (await request.json()) as LoginRequest
     const { email, password } = body
