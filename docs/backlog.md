@@ -66,12 +66,13 @@ Feature 1.2 Perfil y privacidad
 EP-2 Rincones de Libros (RdL)
 Feature 2.1 Alta y gestión de RdL
 
-- [~] S-2.1 Alta de RdL (foto, reglas, zona) + aprobación liviana (Must, E1; BR-10)
+- [x] S-2.1 Alta de RdL (foto, reglas, zona) + aprobación liviana (Must, E1; BR-10)
   - Éxito: formulario completo; visible en mapa tras aprobación.
   - Actualización 2025-10-16: se implementó el modal multipaso "Crear Rincón" con stepper, validación inline, consentimiento explícito y flujo de borrador/publicación reutilizando los componentes compartidos de publicación. Se agregó MSW (201/422) y pruebas de navegación/errores. Falta enlazar con backend real y lógica de moderación para considerarlo completado.
   - Actualización 2025-10-20: el paso de dirección ahora ofrece autocompletado con vista previa en mapa, fija latitud/longitud automáticamente y mantiene la preferencia de visibilidad sin exponer coordenadas manuales.
   - Actualización 2025-10-21: se completaron pruebas unitarias del servicio de geocodificación, handlers MSW y del paso de ubicación (autocomplete, errores, reinicio), recuperando la cobertura de ramas >85% y asegurando la regresión de privacidad.
   - Actualización 2025-10-22: se modularizó el paso de ubicación (inputs, carga de foto y consentimiento) y el modal completo via hooks dedicados para simplificar mantenimiento, agregando pruebas unitarias de navegación, errores y reinicio que elevan la cobertura de ramas y validan escenarios de teclado.
+  - Actualización 2025-11-01: se incorporó persistencia real de Rincones (migraciones PostGIS, repositorio y endpoints `/api/community/corners*`), con validaciones i18n, publicación efectiva y proyección en el mini mapa.
 - [ ] S-2.2 Estados de RdL (Activo / Pausa / Observación) (Should, E2; BR-12)
   - Éxito: pausa oculta de resultados temporalmente.
 - [ ] S-2.3 Verificación ligera de anfitrión (Could, E3; BR-14)
@@ -83,6 +84,7 @@ Feature 2.2 Visibilidad y actividad
   - Éxito: 100% de RdL respetan granularidad elegida.
   - Actualización 2025-10-16: el flujo de alta de RdL exige elegir visibilidad barrio/ciudad, persiste el consentimiento y refleja la selección en la revisión previa; resta propagarla al backend/mapa productivo.
   - Actualización 2025-10-30: se publicaron los endpoints `/api/map` y `/api/map/geocode` conectados al frontend, con filtrado real por capas, geocodificación de Nominatim y dataset territorial inicial respetando los límites solicitados.
+  - Actualización 2025-11-01: el servicio de mapa consume ahora los Rincones persistidos y publicaciones activas, generando pines con barrio y actividad desde PostGIS y alineando el mapa principal con el mini mapa comunitario.
 - [ ] S-2.5 Señales de actividad en RdL (Should, E2; BR-13)
   - Éxito: 2 señales simples (visitas, contactos cercanos).
 

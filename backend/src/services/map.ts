@@ -1,3 +1,9 @@
+import { query } from '../db.js';
+import {
+  listCornersForMap,
+  type CommunityCornerEntity,
+} from '../repositories/communityCornerRepository.js';
+
 export interface MapBoundingBox {
   north: number;
   south: number;
@@ -67,180 +73,40 @@ export interface MapResponse {
   meta: MapResponseMeta;
 }
 
-interface MapDataset {
-  corners: MapCornerPin[];
-  publications: MapPublicationPin[];
-  activity: MapActivityPoint[];
-  meta: MapResponseMeta;
+interface MapPublicationRow {
+  id: number;
+  title: string;
+  author: string | null;
+  type: 'offer' | 'want';
+  sale: boolean;
+  donation: boolean;
+  corner_id: string | null;
+  photo_url: string | null;
 }
 
-const BASE_BOUNDS: MapBoundingBox = {
-  north: -34.54,
-  south: -34.72,
-  east: -58.36,
-  west: -58.55,
-};
-
-const DATASET: MapDataset = {
-  corners: [
-    {
-      id: 'corner-1',
-      name: 'Rincón Plaza Malabia',
-      barrio: 'Palermo',
-      city: 'Buenos Aires',
-      lat: -34.58802,
-      lon: -58.43044,
-      lastSignalAt: '2025-10-25T12:04:00.000Z',
-      photos: ['https://picsum.photos/seed/rincon-plaza-malabia/640/360'],
-      rules: 'Traé un libro y llevate otro, dejá una nota para la comunidad.',
-      referencePointLabel: 'Junto al mástil central de la plaza',
-      themes: ['Infancias', 'Narrativa contemporánea'],
-      isOpenNow: true,
-    },
-    {
-      id: 'corner-2',
-      name: 'Bibliorincón Parque Patricios',
-      barrio: 'Parque Patricios',
-      city: 'Buenos Aires',
-      lat: -34.63421,
-      lon: -58.40438,
-      lastSignalAt: '2025-10-24T18:36:00.000Z',
-      photos: [
-        'https://picsum.photos/seed/bibliorincon-parque-patricios/640/360',
-      ],
-      referencePointLabel: 'Ingreso principal del Distrito Tecnológico',
-      themes: ['Historia', 'Ensayo'],
-      isOpenNow: false,
-    },
-    {
-      id: 'corner-3',
-      name: 'Club de Lectura Chacarita',
-      barrio: 'Chacarita',
-      city: 'Buenos Aires',
-      lat: -34.59561,
-      lon: -58.45673,
-      lastSignalAt: '2025-10-23T09:12:00.000Z',
-      photos: ['https://picsum.photos/seed/club-lectura-chacarita/640/360'],
-      referencePointLabel: 'Dentro del centro cultural comunal',
-      themes: ['Poesía', 'Ciencia ficción'],
-      isOpenNow: true,
-    },
-    {
-      id: 'corner-4',
-      name: 'Rincón Barracas Sur',
-      barrio: 'Barracas',
-      city: 'Buenos Aires',
-      lat: -34.65628,
-      lon: -58.36792,
-      lastSignalAt: '2025-10-20T15:20:00.000Z',
-      photos: ['https://picsum.photos/seed/rincon-barracas-sur/640/360'],
-      themes: ['Infancias', 'Historia'],
-      isOpenNow: false,
-    },
-    {
-      id: 'corner-5',
-      name: 'Punto de Lectura Villa Crespo',
-      barrio: 'Villa Crespo',
-      city: 'Buenos Aires',
-      lat: -34.59983,
-      lon: -58.44126,
-      lastSignalAt: '2025-10-26T08:50:00.000Z',
-      photos: ['https://picsum.photos/seed/punto-lectura-villa-crespo/640/360'],
-      referencePointLabel: 'Terraza del centro barrial',
-      themes: ['Narrativa contemporánea', 'Poesía'],
-      isOpenNow: true,
-    },
-  ],
-  publications: [
-    {
-      id: 'pub-1',
-      title: 'Los años felices',
-      authors: ['Claudia Piñeiro'],
-      type: 'offer',
-      photo: 'https://picsum.photos/seed/publicacion-anios-felices/400/400',
-      distanceKm: 1.2,
-      cornerId: 'corner-1',
-      lat: -34.58901,
-      lon: -58.42812,
-    },
-    {
-      id: 'pub-2',
-      title: 'Rayuela',
-      authors: ['Julio Cortázar'],
-      type: 'donation',
-      photo: 'https://picsum.photos/seed/publicacion-rayuela/400/400',
-      distanceKm: 2.4,
-      cornerId: 'corner-3',
-    },
-    {
-      id: 'pub-3',
-      title: 'La invención de Morel',
-      authors: ['Adolfo Bioy Casares'],
-      type: 'sale',
-      photo:
-        'https://picsum.photos/seed/publicacion-invencion-de-morel/400/400',
-      distanceKm: 3.2,
-      cornerId: 'corner-2',
-      lat: -34.63311,
-      lon: -58.40157,
-    },
-    {
-      id: 'pub-4',
-      title: 'El Eternauta',
-      authors: ['Héctor Germán Oesterheld'],
-      type: 'want',
-      distanceKm: 4.8,
-      cornerId: 'corner-5',
-    },
-    {
-      id: 'pub-5',
-      title: 'Breve historia argentina',
-      authors: ['Felipe Pigna'],
-      type: 'offer',
-      distanceKm: 5.1,
-      cornerId: 'corner-4',
-    },
-    {
-      id: 'pub-6',
-      title: 'Mujer en tránsito',
-      authors: ['Gabriela Cabezón Cámara'],
-      type: 'donation',
-      photo: 'https://picsum.photos/seed/publicacion-mujer-transito/400/400',
-      distanceKm: 1.8,
-      cornerId: 'corner-5',
-    },
-  ],
-  activity: [
-    { id: 'activity-1', lat: -34.58621, lon: -58.43351, intensity: 4 },
-    { id: 'activity-2', lat: -34.63218, lon: -58.40711, intensity: 3 },
-    { id: 'activity-3', lat: -34.59774, lon: -58.44892, intensity: 5 },
-    { id: 'activity-4', lat: -34.66092, lon: -58.37385, intensity: 2 },
-    { id: 'activity-5', lat: -34.60481, lon: -58.43965, intensity: 4 },
-    { id: 'activity-6', lat: -34.61203, lon: -58.42112, intensity: 3 },
-  ],
-  meta: {
-    bbox: BASE_BOUNDS,
-    generatedAt: '',
-    // generatedAt will be set dynamically in getMapData
-  },
-};
+const DEFAULT_CITY = 'Ciudad Autónoma de Buenos Aires';
+const DEFAULT_BARRIO = 'Zona comunitaria';
+const DEFAULT_THEMES = ['Comunidad'];
 
 const normalize = (value: string) => value.toLowerCase();
 
 const matchesSearch = (value: string, term: string) =>
   normalize(value).includes(normalize(term));
 
-const matchesCornerSearch = (corner: MapCornerPin, term: string) =>
+const matchesCornerSearch = (
+  corner: CommunityCornerEntity,
+  term: string
+) =>
   matchesSearch(corner.name, term) ||
-  matchesSearch(corner.barrio, term) ||
-  matchesSearch(corner.city, term);
+  matchesSearch(corner.locationSummary, term) ||
+  matchesSearch(corner.address.street, term);
 
 const matchesPublicationSearch = (
-  publication: MapPublicationPin,
+  publication: MapPublicationRow,
   term: string
 ) =>
   matchesSearch(publication.title, term) ||
-  publication.authors.some((author) => matchesSearch(author, term));
+  (publication.author ? matchesSearch(publication.author, term) : false);
 
 const hasThemeOverlap = (themes: string[], filters: string[]) => {
   if (filters.length === 0) {
@@ -260,53 +126,231 @@ const withinBounds = (
   coordinates.lon <= bbox.east &&
   coordinates.lon >= bbox.west;
 
-export const getMapData = (query: MapQuery): MapResponse => {
-  const searchTerm = query.search.trim().toLowerCase();
+const toRadians = (value: number) => (value * Math.PI) / 180;
+
+const haversineDistanceKm = (
+  a: { lat: number; lon: number },
+  b: { lat: number; lon: number }
+) => {
+  const R = 6371; // km
+  const dLat = toRadians(b.lat - a.lat);
+  const dLon = toRadians(b.lon - a.lon);
+  const lat1 = toRadians(a.lat);
+  const lat2 = toRadians(b.lat);
+
+  const sinLat = Math.sin(dLat / 2);
+  const sinLon = Math.sin(dLon / 2);
+
+  const c =
+    sinLat * sinLat + Math.cos(lat1) * Math.cos(lat2) * sinLon * sinLon;
+  const d = 2 * Math.atan2(Math.sqrt(c), Math.sqrt(1 - c));
+
+  return Math.round(R * d * 10) / 10;
+};
+
+const getCornerThemes = (corner: CommunityCornerEntity): string[] => {
+  const themes = [...DEFAULT_THEMES];
+  themes.push(
+    corner.scope === 'public' ? 'Espacio abierto' : 'Espacio semiprivado'
+  );
+  themes.push(corner.status === 'active' ? 'Activo' : 'En pausa');
+  return themes;
+};
+
+const buildCornerPin = (corner: CommunityCornerEntity): MapCornerPin => {
+  const photos = corner.photo?.url ? [corner.photo.url] : [];
+  const barrio = corner.address.postalCode ?? DEFAULT_BARRIO;
+  return {
+    id: corner.id,
+    name: corner.name,
+    barrio,
+    city: DEFAULT_CITY,
+    lat: corner.coordinates.latitude,
+    lon: corner.coordinates.longitude,
+    lastSignalAt: corner.metrics.lastActivityAt,
+    photos,
+    rules: corner.rules ?? undefined,
+    themes: getCornerThemes(corner),
+    isOpenNow: corner.status === 'active',
+  };
+};
+
+const buildActivityPoints = (
+  corners: CommunityCornerEntity[]
+): MapActivityPoint[] =>
+  corners
+    .map((corner) => {
+      const weekly = corner.metrics.weeklyExchanges;
+      const total = corner.metrics.totalExchanges;
+      const intensitySource = weekly > 0 ? weekly : total;
+      if (intensitySource <= 0) {
+        return null;
+      }
+
+      const intensity = Math.max(1, Math.min(5, intensitySource));
+      return {
+        id: `${corner.id}-activity`,
+        lat: corner.coordinates.latitude,
+        lon: corner.coordinates.longitude,
+        intensity,
+      } satisfies MapActivityPoint;
+    })
+    .filter((point): point is MapActivityPoint => point !== null);
+
+const derivePublicationType = (row: MapPublicationRow): PublicationType => {
+  if (row.sale) {
+    return 'sale';
+  }
+  if (row.donation) {
+    return 'donation';
+  }
+  if (row.type === 'want') {
+    return 'want';
+  }
+  return 'offer';
+};
+
+const fetchPublications = async (
+  cornerLookup: Map<string, CommunityCornerEntity>,
+  search: string,
+  themeFilters: string[],
+  center: { lat: number; lon: number },
+  maxDistanceKm: number
+): Promise<MapPublicationPin[]> => {
+  if (cornerLookup.size === 0) {
+    return [];
+  }
+
+  const { rows } = await query<MapPublicationRow>(
+    `SELECT
+      bl.id,
+      b.title,
+      b.author,
+      bl.type,
+      bl.sale,
+      bl.donation,
+      bl.corner_id,
+      img.url AS photo_url
+    FROM book_listings bl
+    JOIN books b ON bl.book_id = b.id
+    LEFT JOIN LATERAL (
+      SELECT url
+      FROM book_listing_images
+      WHERE book_listing_id = bl.id
+      ORDER BY is_primary DESC, id ASC
+      LIMIT 1
+    ) img ON true
+    WHERE bl.status = 'available'
+      AND bl.availability = 'public'
+      AND bl.is_draft = false
+      AND bl.corner_id IS NOT NULL`
+  );
+
+  return rows
+    .map((row) => {
+      const corner = row.corner_id ? cornerLookup.get(row.corner_id) : undefined;
+      if (!corner) {
+        return null;
+      }
+
+      if (
+        search.length > 0 &&
+        !matchesPublicationSearch(row, search) &&
+        !matchesCornerSearch(corner, search)
+      ) {
+        return null;
+      }
+
+      if (!hasThemeOverlap(getCornerThemes(corner), themeFilters)) {
+        return null;
+      }
+
+      const distanceKm = haversineDistanceKm(
+        { lat: corner.coordinates.latitude, lon: corner.coordinates.longitude },
+        center
+      );
+
+      if (maxDistanceKm > 0 && distanceKm > maxDistanceKm) {
+        return null;
+      }
+
+      const authors = row.author ? [row.author] : [];
+      const photo = row.photo_url ?? corner.photo?.url;
+
+      return {
+        id: `listing-${row.id}`,
+        title: row.title,
+        authors,
+        type: derivePublicationType(row),
+        photo: photo ?? undefined,
+        distanceKm,
+        cornerId: corner.id,
+        lat: corner.coordinates.latitude,
+        lon: corner.coordinates.longitude,
+      } satisfies MapPublicationPin;
+    })
+    .filter((pin): pin is MapPublicationPin => pin !== null);
+};
+
+export const getMapData = async (query: MapQuery): Promise<MapResponse> => {
+  const searchTerm = query.search.trim();
+  const normalizedSearch = searchTerm.toLowerCase();
   const themeFilters = query.filters.themes
     .map((theme) => theme.trim())
-    .filter(Boolean);
+    .filter((theme) => theme.length > 0)
+    .map((theme) => theme.toLowerCase());
 
-  const corners = DATASET.corners.filter((corner) => {
-    if (!withinBounds(corner, query.bbox)) {
+  const corners = await listCornersForMap(query.bbox);
+
+  const filteredCorners = corners.filter((corner) => {
+    if (!withinBounds(
+      { lat: corner.coordinates.latitude, lon: corner.coordinates.longitude },
+      query.bbox
+    )) {
       return false;
     }
 
     const matchesTerm =
-      searchTerm.length === 0 || matchesCornerSearch(corner, searchTerm);
-    const matchesTheme = hasThemeOverlap(corner.themes, themeFilters);
-    const matchesOpen = !query.filters.openNow || Boolean(corner.isOpenNow);
+      normalizedSearch.length === 0 ||
+      matchesCornerSearch(corner, normalizedSearch);
+    const matchesTheme = hasThemeOverlap(getCornerThemes(corner), themeFilters);
+    const matchesOpen = !query.filters.openNow || corner.status === 'active';
 
-    return matchesTerm && matchesTheme && matchesOpen;
+    return matchesTerm && matchesTheme && matchesOpen && !corner.draft;
   });
 
-  const cornerLookup = new Map(corners.map((corner) => [corner.id, corner]));
+  const cornerLookup = new Map(
+    filteredCorners.map((corner) => [corner.id, corner])
+  );
 
-  const publications = DATASET.publications.filter((publication) => {
-    const corner = cornerLookup.get(publication.cornerId);
-    if (!corner) {
-      return false;
-    }
+  const centerPoint = {
+    lat: (query.bbox.north + query.bbox.south) / 2,
+    lon: (query.bbox.east + query.bbox.west) / 2,
+  };
 
-    const matchesTerm =
-      searchTerm.length === 0 ||
-      matchesPublicationSearch(publication, searchTerm);
-    const matchesTheme = hasThemeOverlap(corner.themes, themeFilters);
-    const matchesDistance =
-      Number.isFinite(query.filters.distanceKm) && query.filters.distanceKm > 0
-        ? publication.distanceKm <= query.filters.distanceKm
-        : true;
+  const publications = query.layers.has('publications')
+    ? await fetchPublications(
+        cornerLookup,
+        normalizedSearch,
+        themeFilters,
+        centerPoint,
+        query.filters.distanceKm
+      )
+    : [];
 
-    return matchesTerm && matchesTheme && matchesDistance;
-  });
+  const activity =
+    query.layers.has('activity') && query.filters.recentActivity
+      ? buildActivityPoints(filteredCorners)
+      : [];
 
-  const activity = query.filters.recentActivity
-    ? DATASET.activity.filter((point) => withinBounds(point, query.bbox))
+  const cornerPins = query.layers.has('corners')
+    ? filteredCorners.map((corner) => buildCornerPin(corner))
     : [];
 
   return {
-    corners: query.layers.has('corners') ? corners : [],
-    publications: query.layers.has('publications') ? publications : [],
-    activity: query.layers.has('activity') ? activity : [],
+    corners: cornerPins,
+    publications,
+    activity,
     meta: {
       bbox: query.bbox,
       generatedAt: new Date().toISOString(),
