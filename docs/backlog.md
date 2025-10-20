@@ -132,6 +132,7 @@ Feature 4.1 Mapa y listados
   - Actualización 2025-10-19: el modal de alta de Rincones ahora captura la dirección exacta (calle, número, opcionales) y coordenadas, almacena la preferencia de visibilidad (exacta/aproximada) y actualiza la confirmación de privacidad. Se adaptaron payloads/mock MSW, validaciones y pruebas para reflejar la política de logística y visualización.
   - Actualización 2025-10-22: se robusteció el cálculo de estados vacíos en el mapa considerando capas visibles y actividad reciente, evitando falsos positivos cuando se ocultan capas; se añadieron pruebas unitarias del paso de ubicación para sostener la cobertura mínima requerida.
   - Actualización 2025-11-02: la vista `/map` ahora consulta el backend real por defecto (MSW solo se habilita explícitamente) y el estado vacío se despliega en el panel derecho, alineando la UI con el diseño previsto y mostrando Rincones recién publicados sin recargar manualmente.
+  - Actualización 2025-11-03: el backend del mapa amplía el bounding box consultado y reutiliza coordenadas proyectadas para no omitir rincones recién cargados al borde de la vista, manteniendo la privacidad de ubicaciones aproximadas.
 
 Feature 4.2 Descubrimiento avanzado
 

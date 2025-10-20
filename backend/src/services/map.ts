@@ -189,10 +189,14 @@ const getDisplayCoordinates = (
   };
 };
 
-const buildCornerPin = (corner: CommunityCornerEntity): MapCornerPin => {
+type DisplayCoordinates = ReturnType<typeof getDisplayCoordinates>;
+
+const buildCornerPin = (
+  corner: CommunityCornerEntity,
+  coordinates: DisplayCoordinates
+): MapCornerPin => {
   const photos = corner.photo?.url ? [corner.photo.url] : [];
   const barrio = corner.address.postalCode ?? DEFAULT_BARRIO;
-  const coordinates = getDisplayCoordinates(corner);
   const basePin: MapCornerPin = {
     id: corner.id,
     name: corner.name,
@@ -215,7 +219,8 @@ const buildCornerPin = (corner: CommunityCornerEntity): MapCornerPin => {
 };
 
 const buildActivityPoints = (
-  corners: CommunityCornerEntity[]
+  corners: CommunityCornerEntity[],
+  displayCoordinates: Map<string, DisplayCoordinates>
 ): MapActivityPoint[] =>
   corners
     .map((corner) => {
@@ -227,7 +232,8 @@ const buildActivityPoints = (
       }
 
       const intensity = Math.max(1, Math.min(5, intensitySource));
-      const coordinates = getDisplayCoordinates(corner);
+      const coordinates =
+        displayCoordinates.get(corner.id) ?? getDisplayCoordinates(corner);
       return {
         id: `${corner.id}-activity`,
         lat: coordinates.lat,
@@ -252,6 +258,7 @@ const derivePublicationType = (row: MapPublicationRow): PublicationType => {
 
 const fetchPublications = async (
   cornerLookup: Map<string, CommunityCornerEntity>,
+  displayCoordinates: Map<string, DisplayCoordinates>,
   search: string,
   themeFilters: string[],
   center: { lat: number; lon: number },
@@ -321,7 +328,8 @@ const fetchPublications = async (
 
     const authors = row.author ? [row.author] : [];
     const photo = row.photo_url ?? corner.photo?.url ?? undefined;
-    const coordinates = getDisplayCoordinates(corner);
+    const coordinates =
+      displayCoordinates.get(corner.id) ?? getDisplayCoordinates(corner);
 
     pins.push({
       id: `listing-${row.id}`,
@@ -339,6 +347,47 @@ const fetchPublications = async (
   return pins;
 };
 
+const MAP_FETCH_PADDING_METERS = 1_500;
+
+const expandBounds = (
+  bounds: MapBoundingBox,
+  paddingMeters: number
+): MapBoundingBox => {
+  if (paddingMeters <= 0) {
+    return bounds;
+  }
+
+  const centerLat = (bounds.north + bounds.south) / 2;
+  const latPadding = metersToDegreesLat(paddingMeters);
+  const lonPadding = metersToDegreesLon(paddingMeters, centerLat);
+
+  return {
+    north: Math.min(90, bounds.north + latPadding),
+    south: Math.max(-90, bounds.south - latPadding),
+    east: Math.min(180, bounds.east + lonPadding),
+    west: Math.max(-180, bounds.west - lonPadding),
+  };
+};
+
+const withinBounds = (
+  coordinates: { lat: number; lon: number },
+  bbox: MapBoundingBox
+) => {
+  const latInRange =
+    coordinates.lat <= bbox.north && coordinates.lat >= bbox.south;
+
+  if (!latInRange) {
+    return false;
+  }
+
+  if (bbox.east >= bbox.west) {
+    return coordinates.lon <= bbox.east && coordinates.lon >= bbox.west;
+  }
+
+  // Bounding boxes that cross the antimeridian will have east < west.
+  return coordinates.lon >= bbox.west || coordinates.lon <= bbox.east;
+};
+
 export async function getMapData(query: MapQuery): Promise<MapResponse> {
   const searchTerm = query.search.trim();
   const normalizedSearch = searchTerm.toLowerCase();
@@ -347,16 +396,32 @@ export async function getMapData(query: MapQuery): Promise<MapResponse> {
     .filter((theme) => theme.length > 0)
     .map((theme) => theme.toLowerCase());
 
-  const corners = await listCornersForMap(query.bbox);
+  const searchBounds = expandBounds(query.bbox, MAP_FETCH_PADDING_METERS);
+  const corners = await listCornersForMap(searchBounds);
+
+  const displayCoordinates = new Map<string, DisplayCoordinates>();
 
   const filteredCorners = corners.filter((corner) => {
+    const coordinates = getDisplayCoordinates(corner);
+
+    if (!withinBounds(coordinates, query.bbox)) {
+      return false;
+    }
+
     const matchesTerm =
       normalizedSearch.length === 0 ||
       matchesCornerSearch(corner, normalizedSearch);
     const matchesTheme = hasThemeOverlap(getCornerThemes(corner), themeFilters);
     const matchesOpen = !query.filters.openNow || corner.status === 'active';
 
-    return matchesTerm && matchesTheme && matchesOpen && !corner.draft;
+    const isVisible =
+      matchesTerm && matchesTheme && matchesOpen && !corner.draft;
+
+    if (isVisible) {
+      displayCoordinates.set(corner.id, coordinates);
+    }
+
+    return isVisible;
   });
 
   const cornerLookup = new Map(
@@ -371,6 +436,7 @@ export async function getMapData(query: MapQuery): Promise<MapResponse> {
   const publications = query.layers.has('publications')
     ? await fetchPublications(
         cornerLookup,
+        displayCoordinates,
         normalizedSearch,
         themeFilters,
         centerPoint,
@@ -380,11 +446,16 @@ export async function getMapData(query: MapQuery): Promise<MapResponse> {
 
   const activity =
     query.layers.has('activity') && query.filters.recentActivity
-      ? buildActivityPoints(filteredCorners)
+      ? buildActivityPoints(filteredCorners, displayCoordinates)
       : [];
 
   const cornerPins = query.layers.has('corners')
-    ? filteredCorners.map((corner) => buildCornerPin(corner))
+    ? filteredCorners.map((corner) =>
+        buildCornerPin(
+          corner,
+          displayCoordinates.get(corner.id) ?? getDisplayCoordinates(corner)
+        )
+      )
     : [];
 
   return {
