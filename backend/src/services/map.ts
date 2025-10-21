@@ -349,6 +349,40 @@ const fetchPublications = async (
 
 const MAP_FETCH_PADDING_METERS = 1_500;
 
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(Math.max(value, min), max);
+
+const adjustDisplayCoordinates = (
+  coordinates: DisplayCoordinates,
+  bbox: MapBoundingBox
+): DisplayCoordinates => {
+  if (!coordinates.approximate) {
+    return coordinates;
+  }
+
+  if (withinBounds({ lat: coordinates.lat, lon: coordinates.lon }, bbox)) {
+    return coordinates;
+  }
+
+  const lat = clamp(coordinates.lat, bbox.south, bbox.north);
+
+  if (bbox.east >= bbox.west) {
+    const lon = clamp(coordinates.lon, bbox.west, bbox.east);
+    return { ...coordinates, lat, lon };
+  }
+
+  const wraps = coordinates.lon >= bbox.west || coordinates.lon <= bbox.east;
+  if (wraps) {
+    return { ...coordinates, lat };
+  }
+
+  const distanceToWest = Math.abs(coordinates.lon - bbox.west);
+  const distanceToEast = Math.abs(coordinates.lon - bbox.east);
+  const lon = distanceToWest <= distanceToEast ? bbox.west : bbox.east;
+
+  return { ...coordinates, lat, lon };
+};
+
 const expandBounds = (
   bounds: MapBoundingBox,
   paddingMeters: number
@@ -402,11 +436,19 @@ export async function getMapData(query: MapQuery): Promise<MapResponse> {
   const displayCoordinates = new Map<string, DisplayCoordinates>();
 
   const filteredCorners = corners.filter((corner) => {
-    const coordinates = getDisplayCoordinates(corner);
+    const actualCoordinates = {
+      lat: corner.coordinates.latitude,
+      lon: corner.coordinates.longitude,
+    };
 
-    if (!withinBounds(coordinates, query.bbox)) {
+    if (!withinBounds(actualCoordinates, query.bbox)) {
       return false;
     }
+
+    const displayCoordinatesForCorner = adjustDisplayCoordinates(
+      getDisplayCoordinates(corner),
+      query.bbox
+    );
 
     const matchesTerm =
       normalizedSearch.length === 0 ||
@@ -418,7 +460,7 @@ export async function getMapData(query: MapQuery): Promise<MapResponse> {
       matchesTerm && matchesTheme && matchesOpen && !corner.draft;
 
     if (isVisible) {
-      displayCoordinates.set(corner.id, coordinates);
+      displayCoordinates.set(corner.id, displayCoordinatesForCorner);
     }
 
     return isVisible;

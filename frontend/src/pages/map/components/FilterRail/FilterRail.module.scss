@@ -63,34 +63,3 @@
     font-size: $small-font-size;
   }
 }
-
-.themes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: $spacing-1;
-}
-
-.theme {
-  padding: $spacing-1 $spacing-2;
-  border-radius: rem(999px);
-  border: 1px solid var(--border-color);
-  cursor: pointer;
-  background: var(--background-card);
-  color: var(--text-primary);
-
-  @media (pointer: fine) {
-    &:hover {
-      background: color-mix(
-        in srgb,
-        var(--primary-color) 12%,
-        var(--background-primary)
-      );
-    }
-  }
-}
-
-.themeActive {
-  background: var(--primary-color);
-  color: var(--background-primary);
-  border-color: var(--primary-dark);
-}

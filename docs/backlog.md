@@ -134,6 +134,7 @@ Feature 4.1 Mapa y listados
   - Actualización 2025-11-02: la vista `/map` ahora consulta el backend real por defecto (MSW solo se habilita explícitamente) y el estado vacío se despliega en el panel derecho, alineando la UI con el diseño previsto y mostrando Rincones recién publicados sin recargar manualmente.
   - Actualización 2025-11-03: el backend del mapa amplía el bounding box consultado y reutiliza coordenadas proyectadas para no omitir rincones recién cargados al borde de la vista, manteniendo la privacidad de ubicaciones aproximadas.
   - Actualización 2025-11-04: se corrigió la intersección geoespacial del mapa para respetar el bounding box del viewport (incluyendo cruces por antimeridiano) y se elevó el límite de carga JSON del backend para aceptar formularios de Rincones con imágenes en base64 sin errores `413`.
+  - Actualización 2025-11-05: la API del mapa ajusta las coordenadas aproximadas dentro del viewport para no ocultar Rincones recién publicados y la vista `/map` simplifica el panel de filtros retirando la sección de temas obsoleta.
 
 Feature 4.2 Descubrimiento avanzado
 

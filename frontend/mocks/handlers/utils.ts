@@ -1,5 +1,5 @@
 const escapeRegex = (value: string): string =>
-  value.replace(/[.*+?^${}()|[\]\\]/g, '\$&')
+  value.replace(/[.*+?^${}()|[\]\\]/g, (match) => `\\${match}`)
 
 const ensureLeadingSlash = (path: string): string =>
   path.startsWith('/') ? path : `/${path}`

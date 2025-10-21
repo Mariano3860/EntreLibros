@@ -9,7 +9,6 @@ describe('FilterRail', () => {
   test('invokes callbacks when interacting with controls', () => {
     const handleDistanceChange = vi.fn()
     const handleToggleLayer = vi.fn()
-    const handleToggleTheme = vi.fn()
     const handleToggleOpenNow = vi.fn()
     const handleToggleRecentActivity = vi.fn()
 
@@ -19,9 +18,6 @@ describe('FilterRail', () => {
         onDistanceChange={handleDistanceChange}
         layers={{ corners: true, publications: true, activity: true }}
         onToggleLayer={handleToggleLayer}
-        availableThemes={['Club lector', 'Poesía']}
-        selectedThemes={['Poesía']}
-        onToggleTheme={handleToggleTheme}
         openNow={false}
         onToggleOpenNow={handleToggleOpenNow}
         recentActivity
@@ -40,9 +36,6 @@ describe('FilterRail', () => {
     expect(handleToggleLayer).toHaveBeenCalledWith('corners')
     expect(handleToggleLayer).toHaveBeenCalledWith('publications')
     expect(handleToggleLayer).toHaveBeenCalledWith('activity')
-
-    fireEvent.click(screen.getByRole('button', { name: 'Club lector' }))
-    expect(handleToggleTheme).toHaveBeenCalledWith('Club lector')
 
     fireEvent.click(screen.getByLabelText('map.filters.openNow'))
     expect(handleToggleOpenNow).toHaveBeenCalled()

@@ -1,4 +1,3 @@
-import { cx } from '@utils/cx'
 import { useTranslation } from 'react-i18next'
 
 import type { MapLayerKey, MapLayerToggles } from '@src/api/map/map.types'
@@ -10,9 +9,6 @@ type FilterRailProps = {
   onDistanceChange: (value: number) => void
   layers: MapLayerToggles
   onToggleLayer: (layer: MapLayerKey) => void
-  availableThemes: string[]
-  selectedThemes: string[]
-  onToggleTheme: (theme: string) => void
   openNow: boolean
   onToggleOpenNow: () => void
   recentActivity: boolean
@@ -24,9 +20,6 @@ export const FilterRail = ({
   onDistanceChange,
   layers,
   onToggleLayer,
-  availableThemes,
-  selectedThemes,
-  onToggleTheme,
   openNow,
   onToggleOpenNow,
   recentActivity,
@@ -84,27 +77,6 @@ export const FilterRail = ({
             />
             {t('map.filters.activity')}
           </label>
-        </div>
-      </section>
-
-      <section className={styles.section}>
-        <h3 className={styles.sectionTitle}>{t('map.filters.themes')}</h3>
-        <div className={styles.themes}>
-          {availableThemes.map((theme) => {
-            const active = selectedThemes.includes(theme)
-            const className = cx(styles.theme, active ? styles.themeActive : '')
-            return (
-              <button
-                key={theme}
-                type="button"
-                className={className}
-                onClick={() => onToggleTheme(theme)}
-                aria-pressed={active}
-              >
-                {theme}
-              </button>
-            )
-          })}
         </div>
       </section>
 

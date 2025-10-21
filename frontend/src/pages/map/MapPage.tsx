@@ -24,16 +24,6 @@ import { MapCanvas } from './components/MapCanvas/MapCanvas'
 import { MapHeader } from './components/MapHeader/MapHeader'
 import styles from './MapPage.module.scss'
 
-const AVAILABLE_THEMES = [
-  'Club lector',
-  'Infancias',
-  'Ciencia ficción',
-  'Poesía',
-  'Ensayo',
-  'True crime',
-  'Historia',
-]
-
 const DEFAULT_FILTERS: MapFilters = {
   distanceKm: 5,
   themes: [],
@@ -155,18 +145,6 @@ export const MapPage = () => {
     })
   }
 
-  const handleToggleTheme = (theme: string) => {
-    setFilters((prev) => {
-      const exists = prev.themes.includes(theme)
-      const nextThemes = exists
-        ? prev.themes.filter((item) => item !== theme)
-        : [...prev.themes, theme]
-      const next = { ...prev, themes: nextThemes }
-      track('map.filter_changed', { filter: 'themes', value: nextThemes })
-      return next
-    })
-  }
-
   const handleToggleOpenNow = () => {
     setFilters((prev) => {
       const next = { ...prev, openNow: !prev.openNow }
@@ -277,9 +255,6 @@ export const MapPage = () => {
               onDistanceChange={handleDistanceChange}
               layers={layers}
               onToggleLayer={handleToggleLayer}
-              availableThemes={AVAILABLE_THEMES}
-              selectedThemes={filters.themes}
-              onToggleTheme={handleToggleTheme}
               openNow={filters.openNow}
               onToggleOpenNow={handleToggleOpenNow}
               recentActivity={filters.recentActivity}
