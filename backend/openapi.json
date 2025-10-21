@@ -1349,28 +1349,39 @@
             "name": "lat",
             "in": "query",
             "required": false,
-            "schema": { "type": "number" },
+            "schema": {
+              "type": "number"
+            },
             "description": "Latitude to centre the search"
           },
           {
             "name": "lon",
             "in": "query",
             "required": false,
-            "schema": { "type": "number" },
+            "schema": {
+              "type": "number"
+            },
             "description": "Longitude to centre the search"
           },
           {
             "name": "radiusKm",
             "in": "query",
             "required": false,
-            "schema": { "type": "number", "minimum": 0 },
+            "schema": {
+              "type": "number",
+              "minimum": 0
+            },
             "description": "Search radius in kilometres"
           },
           {
             "name": "limit",
             "in": "query",
             "required": false,
-            "schema": { "type": "integer", "minimum": 1, "maximum": 50 },
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            },
             "description": "Maximum number of corners to return"
           }
         ],
@@ -1395,8 +1406,12 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "error": { "type": "string" },
-                    "message": { "type": "string" }
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
                   }
                 }
               }
@@ -1409,8 +1424,12 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "error": { "type": "string" },
-                    "message": { "type": "string" }
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
                   }
                 }
               }
@@ -1441,8 +1460,12 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "error": { "type": "string" },
-                    "message": { "type": "string" }
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
                   }
                 }
               }
@@ -1485,7 +1508,9 @@
                   "properties": {
                     "errors": {
                       "type": "object",
-                      "additionalProperties": { "type": "string" }
+                      "additionalProperties": {
+                        "type": "string"
+                      }
                     }
                   }
                 }
@@ -1499,8 +1524,12 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "error": { "type": "string" },
-                    "message": { "type": "string" }
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
                   }
                 }
               }
@@ -1790,21 +1819,39 @@
       "CommunityCornerSummary": {
         "type": "object",
         "properties": {
-          "id": { "type": "string" },
-          "name": { "type": "string" },
-          "imageUrl": { "type": "string" },
-          "distanceKm": { "type": "number" },
-          "activityLabel": { "type": ["string", "null"] }
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "imageUrl": {
+            "type": "string"
+          },
+          "distanceKm": {
+            "type": "number"
+          },
+          "activityLabel": {
+            "type": ["string", "null"]
+          }
         },
         "required": ["id", "name", "imageUrl", "distanceKm"]
       },
       "CommunityCornerMapPin": {
         "type": "object",
         "properties": {
-          "id": { "type": "string" },
-          "name": { "type": "string" },
-          "x": { "type": "number" },
-          "y": { "type": "number" },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "x": {
+            "type": "number"
+          },
+          "y": {
+            "type": "number"
+          },
           "status": {
             "type": "string",
             "enum": ["active", "quiet"]
@@ -1817,35 +1864,55 @@
         "properties": {
           "pins": {
             "type": "array",
-            "items": { "$ref": "#/components/schemas/CommunityCornerMapPin" }
+            "items": {
+              "$ref": "#/components/schemas/CommunityCornerMapPin"
+            }
           },
-          "description": { "type": "string" }
+          "description": {
+            "type": "string"
+          }
         },
         "required": ["pins"]
       },
       "PublishCornerAddress": {
         "type": "object",
         "properties": {
-          "street": { "type": "string" },
-          "number": { "type": "string" },
-          "unit": { "type": ["string", "null"] },
-          "postalCode": { "type": ["string", "null"] }
+          "street": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          },
+          "unit": {
+            "type": ["string", "null"]
+          },
+          "postalCode": {
+            "type": ["string", "null"]
+          }
         },
         "required": ["street", "number"]
       },
       "PublishCornerCoordinates": {
         "type": "object",
         "properties": {
-          "latitude": { "type": "number" },
-          "longitude": { "type": "number" }
+          "latitude": {
+            "type": "number"
+          },
+          "longitude": {
+            "type": "number"
+          }
         },
         "required": ["latitude", "longitude"]
       },
       "PublishCornerLocation": {
         "type": "object",
         "properties": {
-          "address": { "$ref": "#/components/schemas/PublishCornerAddress" },
-          "coordinates": { "$ref": "#/components/schemas/PublishCornerCoordinates" },
+          "address": {
+            "$ref": "#/components/schemas/PublishCornerAddress"
+          },
+          "coordinates": {
+            "$ref": "#/components/schemas/PublishCornerCoordinates"
+          },
           "visibilityPreference": {
             "type": "string",
             "enum": ["exact", "approximate"]
@@ -1856,31 +1923,53 @@
       "PublishCornerPhoto": {
         "type": "object",
         "properties": {
-          "id": { "type": "string" },
-          "url": { "type": "string" }
+          "id": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
         },
         "required": ["id", "url"]
       },
       "PublishCornerPayload": {
         "type": "object",
         "properties": {
-          "name": { "type": "string" },
+          "name": {
+            "type": "string"
+          },
           "scope": {
             "type": "string",
             "enum": ["public", "semiprivate"]
           },
-          "hostAlias": { "type": "string" },
-          "internalContact": { "type": "string" },
-          "rules": { "type": ["string", "null"] },
-          "schedule": { "type": ["string", "null"] },
-          "location": { "$ref": "#/components/schemas/PublishCornerLocation" },
-          "consent": { "type": "boolean" },
-          "photo": { "$ref": "#/components/schemas/PublishCornerPhoto" },
+          "hostAlias": {
+            "type": "string"
+          },
+          "internalContact": {
+            "type": "string"
+          },
+          "rules": {
+            "type": ["string", "null"]
+          },
+          "schedule": {
+            "type": ["string", "null"]
+          },
+          "location": {
+            "$ref": "#/components/schemas/PublishCornerLocation"
+          },
+          "consent": {
+            "type": "boolean"
+          },
+          "photo": {
+            "$ref": "#/components/schemas/PublishCornerPhoto"
+          },
           "status": {
             "type": "string",
             "enum": ["active", "paused"]
           },
-          "draft": { "type": "boolean" }
+          "draft": {
+            "type": "boolean"
+          }
         },
         "required": [
           "name",
@@ -1897,14 +1986,22 @@
       "PublishCornerResponse": {
         "type": "object",
         "properties": {
-          "id": { "type": "string" },
-          "name": { "type": "string" },
-          "imageUrl": { "type": "string" },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "imageUrl": {
+            "type": "string"
+          },
           "status": {
             "type": "string",
             "enum": ["active", "paused"]
           },
-          "locationSummary": { "type": "string" }
+          "locationSummary": {
+            "type": "string"
+          }
         },
         "required": ["id", "name", "imageUrl", "status", "locationSummary"]
       }

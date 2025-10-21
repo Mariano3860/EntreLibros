@@ -436,19 +436,14 @@ export async function getMapData(query: MapQuery): Promise<MapResponse> {
   const displayCoordinates = new Map<string, DisplayCoordinates>();
 
   const filteredCorners = corners.filter((corner) => {
-    const actualCoordinates = {
-      lat: corner.coordinates.latitude,
-      lon: corner.coordinates.longitude,
-    };
-
-    if (!withinBounds(actualCoordinates, query.bbox)) {
-      return false;
-    }
-
     const displayCoordinatesForCorner = adjustDisplayCoordinates(
       getDisplayCoordinates(corner),
       query.bbox
     );
+
+    if (!withinBounds(displayCoordinatesForCorner, query.bbox)) {
+      return false;
+    }
 
     const matchesTerm =
       normalizedSearch.length === 0 ||
