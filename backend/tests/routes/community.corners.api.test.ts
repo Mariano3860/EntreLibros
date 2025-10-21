@@ -163,7 +163,9 @@ describe('community corners API', () => {
       .expect(200);
 
     expect(Array.isArray(response.body.pins)).toBe(true);
-    const pin = response.body.pins.find((item: { id: string }) => item.id === created.id);
+    const pin = response.body.pins.find(
+      (item: { id: string }) => item.id === created.id
+    );
     expect(pin).toBeTruthy();
     expect(pin).toMatchObject({
       name: created.name,

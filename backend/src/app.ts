@@ -15,7 +15,11 @@ const app = express();
 app.use(helmet());
 const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
 app.use(cors({ origin: frontendUrl, credentials: true }));
-app.use(express.json());
+app.use(
+  express.json({
+    limit: process.env.API_JSON_LIMIT || '10mb',
+  })
+);
 app.use(morgan('dev'));
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));

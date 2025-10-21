@@ -16,9 +16,7 @@ import {
 
 const router = Router();
 
-const parseOptionalNumber = (
-  value: unknown
-): number | undefined => {
+const parseOptionalNumber = (value: unknown): number | undefined => {
   if (value === undefined) {
     return undefined;
   }

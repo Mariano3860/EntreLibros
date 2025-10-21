@@ -133,6 +133,7 @@ Feature 4.1 Mapa y listados
   - Actualización 2025-10-22: se robusteció el cálculo de estados vacíos en el mapa considerando capas visibles y actividad reciente, evitando falsos positivos cuando se ocultan capas; se añadieron pruebas unitarias del paso de ubicación para sostener la cobertura mínima requerida.
   - Actualización 2025-11-02: la vista `/map` ahora consulta el backend real por defecto (MSW solo se habilita explícitamente) y el estado vacío se despliega en el panel derecho, alineando la UI con el diseño previsto y mostrando Rincones recién publicados sin recargar manualmente.
   - Actualización 2025-11-03: el backend del mapa amplía el bounding box consultado y reutiliza coordenadas proyectadas para no omitir rincones recién cargados al borde de la vista, manteniendo la privacidad de ubicaciones aproximadas.
+  - Actualización 2025-11-04: se corrigió la intersección geoespacial del mapa para respetar el bounding box del viewport (incluyendo cruces por antimeridiano) y se elevó el límite de carga JSON del backend para aceptar formularios de Rincones con imágenes en base64 sin errores `413`.
 
 Feature 4.2 Descubrimiento avanzado
 

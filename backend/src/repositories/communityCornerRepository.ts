@@ -376,17 +376,43 @@ export interface MapBounds {
 export async function listCornersForMap(
   bounds?: MapBounds
 ): Promise<CommunityCornerEntity[]> {
-  const params: Array<number> = [];
-  let whereClause = 'WHERE c.draft = false';
+  const params: number[] = [];
+  const whereConditions: string[] = ['c.draft = false'];
 
   if (bounds) {
-    params.push(bounds.west, bounds.south, bounds.east, bounds.north);
-    whereClause += `
-      AND ST_Intersects(
-        c.location,
-        ST_MakeEnvelope($1, $2, $3, $4, 4326)::geography
-      )`;
+    const { west, south, east, north } = bounds;
+
+    if (east >= west) {
+      params.push(west, south, east, north);
+      const baseIndex = params.length - 3;
+      whereConditions.push(`
+        ST_Intersects(
+          c.location::geometry,
+          ST_MakeEnvelope($${baseIndex}, $${baseIndex + 1}, $${baseIndex + 2}, $${baseIndex + 3}, 4326)
+        )
+      `);
+    } else {
+      params.push(west, south, 180, north);
+      const firstBaseIndex = params.length - 3;
+      params.push(-180, south, east, north);
+      const secondBaseIndex = params.length - 3;
+
+      whereConditions.push(`
+        (
+          ST_Intersects(
+            c.location::geometry,
+            ST_MakeEnvelope($${firstBaseIndex}, $${firstBaseIndex + 1}, $${firstBaseIndex + 2}, $${firstBaseIndex + 3}, 4326)
+          )
+          OR ST_Intersects(
+            c.location::geometry,
+            ST_MakeEnvelope($${secondBaseIndex}, $${secondBaseIndex + 1}, $${secondBaseIndex + 2}, $${secondBaseIndex + 3}, 4326)
+          )
+        )
+      `);
+    }
   }
+
+  const whereClause = `WHERE ${whereConditions.join('\n      AND ')}`;
 
   const { rows } = await query<CommunityCornerRow>(
     `${BASE_FIELDS}
