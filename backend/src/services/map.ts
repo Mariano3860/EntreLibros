@@ -302,7 +302,7 @@ const fetchPublications = async (
       AND bl.availability = 'public'
       AND bl.is_draft = false
       AND bl.corner_id IS NOT NULL
-      AND bl.corner_id = ANY($1::uuid[])`,
+      AND bl.corner_id = ANY($1)`,
     [cornerIds]
   );
 
