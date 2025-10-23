@@ -53,6 +53,7 @@ Feature 1.1 Cuenta y acceso
   - Actualización 2025-09-30: se añadieron tests de middleware de autenticación, servicio de Open Library y utilidades de logging para sostener respuestas i18n coherentes ante fallos.
   - Actualización 2025-10-10: se ampliaron las pruebas automatizadas del frontend cubriendo el `BaseLayout` y el `Header`, asegurando que la estructura principal, los puntos de acceso y los controles de idioma/tema permanezcan estables.
   - Actualización 2025-10-10 (2): se extendió la cobertura de la interfaz comunitaria (feed, toggles y filtros) elevando la cobertura de ramas del frontend por encima del 85% requerido.
+  - Actualización 2025-10-23: se corrigió un error SQL en el servicio de mapa del backend que impedía la recuperación de publicaciones (cast incorrecto de uuid[]). Se añadieron pruebas para `useCornersMap` y utilidades de `path`, elevando la cobertura de ramas del frontend a 85.24% y garantizando que todos los tests pasen.
 
 Feature 1.2 Perfil y privacidad
 
