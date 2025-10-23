@@ -382,41 +382,26 @@ export async function listCornersForMap(
   if (bounds) {
     const { west, south, east, north } = bounds;
 
-    const addEnvelope = (
-      minLon: number,
-      minLat: number,
-      maxLon: number,
-      maxLat: number
-    ) => {
-      const baseIndex = params.length + 1;
-      params.push(minLon, minLat, maxLon, maxLat);
-      return `ST_MakeEnvelope($${baseIndex}, $${baseIndex + 1}, $${baseIndex + 2}, $${baseIndex + 3}, 4326)`;
-    };
+    const latitudeIndex = params.length + 1;
+    params.push(south, north);
+    whereConditions.push(
+      `ST_Y(c.location::geometry) BETWEEN $${latitudeIndex} AND $${latitudeIndex + 1}`
+    );
 
     if (east >= west) {
-      const envelope = addEnvelope(west, south, east, north);
-      whereConditions.push(`
-        ST_Intersects(
-          c.location::geometry,
-          ${envelope}
-        )
-      `);
+      const longitudeIndex = params.length + 1;
+      params.push(west, east);
+      whereConditions.push(
+        `ST_X(c.location::geometry) BETWEEN $${longitudeIndex} AND $${longitudeIndex + 1}`
+      );
     } else {
-      const easternHemisphereEnvelope = addEnvelope(west, south, 180, north);
-      const westernHemisphereEnvelope = addEnvelope(-180, south, east, north);
-
-      whereConditions.push(`
-        (
-          ST_Intersects(
-            c.location::geometry,
-            ${easternHemisphereEnvelope}
-          )
-          OR ST_Intersects(
-            c.location::geometry,
-            ${westernHemisphereEnvelope}
-          )
-        )
-      `);
+      const westIndex = params.length + 1;
+      params.push(west);
+      const eastIndex = params.length + 1;
+      params.push(east);
+      whereConditions.push(
+        `(ST_X(c.location::geometry) >= $${westIndex} OR ST_X(c.location::geometry) <= $${eastIndex})`
+      );
     }
   }
 

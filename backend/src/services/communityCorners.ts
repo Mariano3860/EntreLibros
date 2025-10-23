@@ -292,14 +292,7 @@ const ensureImageUrl = (corner: CommunityCornerEntity): string => {
 };
 
 const derivePinStatus = (corner: CommunityCornerEntity): 'active' | 'quiet' => {
-  if (corner.status === 'active' && corner.metrics.weeklyExchanges > 0) {
-    return 'active';
-  }
-  if (
-    corner.status === 'active' &&
-    corner.metrics.lastActivityAt !== null &&
-    !corner.draft
-  ) {
+  if (corner.status === 'active') {
     return 'active';
   }
   return 'quiet';

@@ -137,6 +137,7 @@ Feature 4.1 Mapa y listados
   - Actualización 2025-11-04: se corrigió la intersección geoespacial del mapa para respetar el bounding box del viewport (incluyendo cruces por antimeridiano) y se elevó el límite de carga JSON del backend para aceptar formularios de Rincones con imágenes en base64 sin errores `413`.
   - Actualización 2025-11-05: la API del mapa ajusta las coordenadas aproximadas dentro del viewport para no ocultar Rincones recién publicados y la vista `/map` simplifica el panel de filtros retirando la sección de temas obsoleta.
   - Actualización 2025-11-06: se corrigió la intersección geoespacial del mapa para respetar el SRID de PostGIS y se filtraron los pines con las coordenadas proyectadas, evitando errores 500 intermitentes y mostrando los Rincones recién guardados en el viewport.
+  - Actualización 2025-11-07: el backend del mapa volvió a usar filtros cartesianos sobre latitud/longitud para estabilizar las consultas sin depender de envolventes PostGIS, alineó el estado de los pines con el del Rincón y se reforzó la suite de mocks MSW para respetar el prefijo `/api`.
 
 Feature 4.2 Descubrimiento avanzado
 

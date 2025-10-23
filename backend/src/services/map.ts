@@ -270,6 +270,9 @@ const fetchPublications = async (
   }
 
   const cornerIds = [...cornerLookup.keys()];
+  if (cornerIds.length === 0) {
+    return [];
+  }
 
   const { rows } = await query<MapPublicationRow>(
     `SELECT
