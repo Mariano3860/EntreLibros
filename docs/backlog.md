@@ -138,6 +138,8 @@ Feature 4.1 Mapa y listados
   - Actualización 2025-11-05: la API del mapa ajusta las coordenadas aproximadas dentro del viewport para no ocultar Rincones recién publicados y la vista `/map` simplifica el panel de filtros retirando la sección de temas obsoleta.
   - Actualización 2025-11-06: se corrigió la intersección geoespacial del mapa para respetar el SRID de PostGIS y se filtraron los pines con las coordenadas proyectadas, evitando errores 500 intermitentes y mostrando los Rincones recién guardados en el viewport.
   - Actualización 2025-11-07: el backend del mapa volvió a usar filtros cartesianos sobre latitud/longitud para estabilizar las consultas sin depender de envolventes PostGIS, alineó el estado de los pines con el del Rincón y se reforzó la suite de mocks MSW para respetar el prefijo `/api`.
+  - Actualización 2025-11-08: se agregó un fallback seguro en la API del mapa para recuperar Rincones aun cuando la intersección geoespacial falle, se expone el estado real de cada pin y se endurecieron las pruebas de MSW/`index.tsx` para habilitar o deshabilitar mocks explícitamente elevando la cobertura de ramas >85%.
+  - Actualización 2025-11-09: se robusteció el servicio de mapa con una segunda consulta sin límites cuando la búsqueda acotada falla y se ajustaron las pruebas de arranque del frontend para orquestar `setupMocks` de forma determinística, recuperando los escenarios de error en servicios REST y el umbral de cobertura global. Además, se corrigió la intersección geográfica mediante envolventes `ST_MakeEnvelope` compatibles con antimeridiano y se añadió un polyfill controlado de `ProgressEvent` para que MSW se inicie sin rechazos en entornos de prueba.
 
 Feature 4.2 Descubrimiento avanzado
 

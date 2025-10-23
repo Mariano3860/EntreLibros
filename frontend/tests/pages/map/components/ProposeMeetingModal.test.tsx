@@ -17,6 +17,7 @@ const corners: MapCornerPin[] = [
     lastSignalAt: new Date().toISOString(),
     photos: [],
     themes: ['Infancias'],
+    status: 'active',
   },
   {
     id: 'corner-2',
@@ -28,6 +29,7 @@ const corners: MapCornerPin[] = [
     lastSignalAt: new Date().toISOString(),
     photos: [],
     themes: ['Poesía'],
+    status: 'paused',
   },
 ]
 

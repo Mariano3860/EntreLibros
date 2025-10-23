@@ -1,10 +1,13 @@
 import { createHash } from 'node:crypto';
 
+import { DatabaseError } from 'pg';
+
 import { query } from '../db.js';
 import { clamp } from '../utils/math.js';
 import {
   listCornersForMap,
   type CommunityCornerEntity,
+  type CommunityCornerStatus,
 } from '../repositories/communityCornerRepository.js';
 
 export interface MapBoundingBox {
@@ -27,6 +30,7 @@ export interface MapCornerPin {
   referencePointLabel?: string;
   themes: string[];
   isOpenNow?: boolean;
+  status: CommunityCornerStatus;
 }
 
 export type PublicationType = 'offer' | 'want' | 'donation' | 'sale';
@@ -210,6 +214,7 @@ const buildCornerPin = (
     rules: corner.rules ?? undefined,
     themes: getCornerThemes(corner),
     isOpenNow: corner.status === 'active',
+    status: corner.status,
   };
 
   if (coordinates.approximate) {
@@ -432,7 +437,29 @@ export async function getMapData(query: MapQuery): Promise<MapResponse> {
     .map((theme) => theme.toLowerCase());
 
   const searchBounds = expandBounds(query.bbox, MAP_FETCH_PADDING_METERS);
-  const corners = await listCornersForMap(searchBounds);
+  let corners: CommunityCornerEntity[] = [];
+  try {
+    corners = await listCornersForMap(searchBounds);
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : String(error ?? 'unknown error');
+    console.warn(
+      'Falling back to unbounded corner query after bounded lookup failed',
+      message
+    );
+
+    try {
+      corners = await listCornersForMap();
+    } catch (fallbackError) {
+      if (fallbackError instanceof DatabaseError) {
+        console.error(
+          'Unbounded community corner lookup failed',
+          fallbackError.message
+        );
+      }
+      throw fallbackError;
+    }
+  }
 
   const displayCoordinates = new Map<string, DisplayCoordinates>();
 
@@ -471,16 +498,26 @@ export async function getMapData(query: MapQuery): Promise<MapResponse> {
     lon: (query.bbox.east + query.bbox.west) / 2,
   };
 
-  const publications = query.layers.has('publications')
-    ? await fetchPublications(
+  let publications: MapPublicationPin[] = [];
+  if (query.layers.has('publications')) {
+    try {
+      publications = await fetchPublications(
         cornerLookup,
         displayCoordinates,
         normalizedSearch,
         themeFilters,
         centerPoint,
         query.filters.distanceKm
-      )
-    : [];
+      );
+    } catch (error) {
+      if (error instanceof DatabaseError) {
+        console.warn('Failed to load publications for map view', error.message);
+        publications = [];
+      } else {
+        throw error;
+      }
+    }
+  }
 
   const activity =
     query.layers.has('activity') && query.filters.recentActivity

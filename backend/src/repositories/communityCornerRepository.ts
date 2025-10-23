@@ -380,28 +380,31 @@ export async function listCornersForMap(
   const whereConditions: string[] = ['c.draft = false', 'c.consent = true'];
 
   if (bounds) {
-    const { west, south, east, north } = bounds;
+    const minLat = Math.min(bounds.south, bounds.north);
+    const maxLat = Math.max(bounds.south, bounds.north);
 
-    const latitudeIndex = params.length + 1;
-    params.push(south, north);
-    whereConditions.push(
-      `ST_Y(c.location::geometry) BETWEEN $${latitudeIndex} AND $${latitudeIndex + 1}`
-    );
-
-    if (east >= west) {
-      const longitudeIndex = params.length + 1;
-      params.push(west, east);
-      whereConditions.push(
-        `ST_X(c.location::geometry) BETWEEN $${longitudeIndex} AND $${longitudeIndex + 1}`
-      );
+    if (bounds.east >= bounds.west) {
+      const baseIndex = params.length + 1;
+      params.push(bounds.west, minLat, bounds.east, maxLat);
+      whereConditions.push(`ST_Intersects(
+        c.location::geometry,
+        ST_MakeEnvelope($${baseIndex}, $${baseIndex + 1}, $${baseIndex + 2}, $${baseIndex + 3}, 4326)
+      )`);
     } else {
-      const westIndex = params.length + 1;
-      params.push(west);
-      const eastIndex = params.length + 1;
-      params.push(east);
-      whereConditions.push(
-        `(ST_X(c.location::geometry) >= $${westIndex} OR ST_X(c.location::geometry) <= $${eastIndex})`
-      );
+      const firstIndex = params.length + 1;
+      params.push(bounds.west, minLat, 180, maxLat);
+      const secondIndex = params.length + 1;
+      params.push(-180, minLat, bounds.east, maxLat);
+      whereConditions.push(`(
+        ST_Intersects(
+          c.location::geometry,
+          ST_MakeEnvelope($${firstIndex}, $${firstIndex + 1}, $${firstIndex + 2}, $${firstIndex + 3}, 4326)
+        )
+        OR ST_Intersects(
+          c.location::geometry,
+          ST_MakeEnvelope($${secondIndex}, $${secondIndex + 1}, $${secondIndex + 2}, $${secondIndex + 3}, 4326)
+        )
+      )`);
     }
   }
 

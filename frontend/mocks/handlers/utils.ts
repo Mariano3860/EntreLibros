@@ -6,5 +6,6 @@ const ensureLeadingSlash = (path: string): string =>
 
 export const apiRouteMatcher = (route: string): RegExp => {
   const normalized = ensureLeadingSlash(route)
-  return new RegExp(`${escapeRegex(normalized)}$`)
+  const escaped = escapeRegex(normalized)
+  return new RegExp(`(?:/api)?${escaped}(?:\\?.*)?$`)
 }
