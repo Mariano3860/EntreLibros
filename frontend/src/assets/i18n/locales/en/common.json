@@ -634,5 +634,63 @@
       "cancel": "Cancel",
       "confirm": "Confirm"
     }
+  },
+  "bookDetail": {
+    "title": "Book Details",
+    "loading": "Loading...",
+    "error": "Failed to load book",
+    "notFound": "Book not found",
+    "retry": "Retry",
+    "close": "Close",
+    "edit": "Edit",
+    "save": "Save changes",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "saved": "Changes saved",
+    "saveError": "Failed to save",
+    "confirmClose": "You have unsaved changes. Do you want to leave anyway?",
+    "readOnly": "Read-only",
+    "owner": "Your publication",
+    "status": {
+      "available": "Available",
+      "reserved": "Reserved",
+      "completed": "Completed",
+      "draft": "Draft"
+    },
+    "changeStatus": "Change status",
+    "fields": {
+      "title": "Title",
+      "author": "Author",
+      "publisher": "Publisher",
+      "year": "Year",
+      "language": "Language",
+      "format": "Format",
+      "isbn": "ISBN",
+      "condition": "Condition",
+      "notes": "Notes",
+      "status": "Publication status",
+      "images": "Images"
+    },
+    "offer": {
+      "title": "Delivery options",
+      "sale": "For sale",
+      "donation": "Donation",
+      "trade": "Trade",
+      "price": "Price",
+      "tradePreferences": "Trade preferences",
+      "availability": "Availability",
+      "delivery": {
+        "title": "Delivery methods",
+        "nearBookCorner": "Near Book Corner",
+        "inPerson": "In person",
+        "shipping": "Shipping",
+        "shippingPayer": "Who pays shipping"
+      }
+    },
+    "errors": {
+      "forbidden": "You don't have permission to edit this book",
+      "validation": "Please check the entered data",
+      "unknown": "An unexpected error occurred"
+    }
   }
 }
