@@ -105,4 +105,29 @@ describe('RegisterForm', () => {
     await screen.findByRole('button', { name: 'register' })
     expect(showToastMock).toHaveBeenCalledWith('auth.errors.unknown', 'error')
   })
+
+  test('handles error with message property', async () => {
+    mockMutate.mockImplementation((_data, { onError }) => {
+      onError?.({ message: 'Email already exists' })
+    })
+
+    renderWithProviders(<RegisterForm />)
+
+    fireEvent.change(screen.getByPlaceholderText('name'), {
+      target: { value: 'John' },
+    })
+    fireEvent.change(screen.getByPlaceholderText('email'), {
+      target: { value: 'john@example.com' },
+    })
+    fireEvent.change(screen.getByPlaceholderText('password'), {
+      target: { value: '123456' },
+    })
+    fireEvent.change(screen.getByPlaceholderText('confirm_password'), {
+      target: { value: '123456' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'register' }))
+
+    await screen.findByRole('button', { name: 'register' })
+    expect(showToastMock).toHaveBeenCalledWith('Email already exists', 'error')
+  })
 })

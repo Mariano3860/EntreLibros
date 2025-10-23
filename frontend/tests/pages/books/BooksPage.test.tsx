@@ -150,4 +150,13 @@ describe('BooksPage', () => {
     expect(titleInput).toHaveValue('Li')
     expect(document.activeElement).toBe(titleInput)
   })
+
+  test('does not open detail modal when navigating to /books/new', () => {
+    renderWithProviders(<BooksPage />, { initialEntries: ['/books/new'] })
+
+    // Should show publish modal, not detail modal
+    expect(screen.getByText('publishBook.title')).toBeInTheDocument()
+    // Should not show detail modal elements
+    expect(screen.queryByText('bookDetail.loading')).not.toBeInTheDocument()
+  })
 })
