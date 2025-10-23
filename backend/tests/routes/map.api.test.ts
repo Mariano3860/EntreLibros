@@ -39,6 +39,34 @@ const CORNER_INPUT: CreateCommunityCornerInput = {
   },
 };
 
+const SEVILLE_CORNER_INPUT: CreateCommunityCornerInput = {
+  id: 'bbbbbbbb-cccc-dddd-eeee-ffffffffffff',
+  name: 'Rincón Sevilla',
+  scope: 'public',
+  hostAlias: 'Host Sevilla',
+  internalContact: 'sevilla@example.com',
+  rules: null,
+  schedule: null,
+  status: 'active',
+  draft: false,
+  consent: true,
+  visibilityPreference: 'exact',
+  address: {
+    street: 'Calle Cardenal Ilundáin',
+    number: '18',
+    unit: null,
+    postalCode: '41013',
+  },
+  coordinates: {
+    latitude: 37.3641411,
+    longitude: -5.9818124,
+  },
+  photo: {
+    id: 'corner-sevilla-photo',
+    url: 'https://example.com/corner-sevilla.jpg',
+  },
+};
+
 beforeEach(async () => {
   client = await pool.connect();
   await client.query('BEGIN');
@@ -246,5 +274,34 @@ describe('map data endpoint', () => {
       id: `${corner.id}-activity`,
       intensity: 4,
     });
+  });
+
+  test('returns corners for european bounding boxes without failing', async () => {
+    const corner = await createCorner(SEVILLE_CORNER_INPUT);
+
+    const response = await request(app)
+      .get('/api/map')
+      .query({
+        north: 37.41445603260632,
+        south: 37.314631335827066,
+        east: -5.918702824686989,
+        west: -6.04430158314608,
+        search: '',
+        distanceKm: 25,
+        themes: '',
+        openNow: 'true',
+        recentActivity: 'true',
+        layers: 'corners,publications,activity',
+      })
+      .expect(200);
+
+    expect(response.body.corners).toEqual([
+      expect.objectContaining({
+        id: corner.id,
+        name: 'Rincón Sevilla',
+      }),
+    ]);
+    expect(response.body.activity).toEqual([]);
+    expect(response.body.publications).toEqual([]);
   });
 });

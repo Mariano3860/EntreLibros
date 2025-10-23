@@ -7,6 +7,7 @@ import {
   type CommunityCornerVisibilityPreference,
   type MapBounds,
 } from '../repositories/communityCornerRepository.js';
+import { clamp } from '../utils/math.js';
 
 export type PublishCornerScope = 'public' | 'semiprivate';
 export type PublishCornerVisibilityPreference = 'exact' | 'approximate';
@@ -152,13 +153,6 @@ interface ValidatedPublishCornerPayload {
   draft: boolean;
 }
 
-const clamp = (value: number, min: number, max: number): number => {
-  if (Number.isNaN(value)) {
-    return min;
-  }
-  return Math.min(Math.max(value, min), max);
-};
-
 const normalizeString = (value: unknown): string => {
   if (typeof value !== 'string') {
     return '';
@@ -204,38 +198,33 @@ const validatePayload = (
     errors.internalContact = ERROR_MESSAGES.internalContact;
   }
 
-  const rawAddress = payload.location?.address ?? {};
-  const rawCoordinates = payload.location?.coordinates ?? {};
+  const rawAddress = payload.location?.address;
+  const rawCoordinates = payload.location?.coordinates;
 
-  const street = normalizeString((rawAddress as PublishCornerAddress).street);
+  const street = normalizeString(rawAddress?.street);
   if (!street) {
     errors.street = ERROR_MESSAGES.street;
   }
 
-  const number = normalizeString((rawAddress as PublishCornerAddress).number);
+  const number = normalizeString(rawAddress?.number);
   if (!number) {
     errors.number = ERROR_MESSAGES.number;
   }
 
-  const latitude = parseNumber(
-    (rawCoordinates as PublishCornerCoordinates).latitude
-  );
+  const latitude = parseNumber(rawCoordinates?.latitude);
   if (latitude === null || latitude < -90 || latitude > 90) {
     errors.latitude = ERROR_MESSAGES.latitude;
   }
 
-  const longitude = parseNumber(
-    (rawCoordinates as PublishCornerCoordinates).longitude
-  );
+  const longitude = parseNumber(rawCoordinates?.longitude);
   if (longitude === null || longitude < -180 || longitude > 180) {
     errors.longitude = ERROR_MESSAGES.longitude;
   }
 
-  const visibilityPreference = allowedVisibilities.includes(
-    payload.location?.visibilityPreference ?? 'exact'
-  )
-    ? payload.location.visibilityPreference
-    : null;
+  const visibilityPreference =
+    allowedVisibilities.find(
+      (value) => value === payload.location?.visibilityPreference
+    ) ?? null;
   if (!visibilityPreference) {
     errors.visibility = ERROR_MESSAGES.visibility;
   }
@@ -261,9 +250,16 @@ const validatePayload = (
     throw new CornerValidationError(errors);
   }
 
+  const validScope = scope as PublishCornerScope;
+  const validLatitude = latitude as number;
+  const validLongitude = longitude as number;
+  const validVisibility =
+    visibilityPreference as PublishCornerVisibilityPreference;
+  const validStatus = status as PublishCornerStatus;
+
   return {
     name,
-    scope: scope!,
+    scope: validScope,
     hostAlias,
     internalContact,
     rules: normalizeString(payload.rules) || null,
@@ -272,21 +268,18 @@ const validatePayload = (
       address: {
         street,
         number,
-        unit:
-          normalizeString((rawAddress as PublishCornerAddress).unit) || null,
-        postalCode:
-          normalizeString((rawAddress as PublishCornerAddress).postalCode) ||
-          null,
+        unit: normalizeString(rawAddress?.unit) || null,
+        postalCode: normalizeString(rawAddress?.postalCode) || null,
       },
       coordinates: {
-        latitude: latitude!,
-        longitude: longitude!,
+        latitude: validLatitude,
+        longitude: validLongitude,
       },
-      visibilityPreference: visibilityPreference!,
+      visibilityPreference: validVisibility,
     },
     consent: true,
     photo: { id: photoId, url: photoUrl },
-    status: status!,
+    status: validStatus,
     draft: Boolean(payload.draft),
   };
 };

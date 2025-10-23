@@ -377,7 +377,7 @@ export async function listCornersForMap(
   bounds?: MapBounds
 ): Promise<CommunityCornerEntity[]> {
   const params: number[] = [];
-  const whereConditions: string[] = ['c.draft = false'];
+  const whereConditions: string[] = ['c.draft = false', 'c.consent = true'];
 
   if (bounds) {
     const { west, south, east, north } = bounds;
@@ -388,16 +388,16 @@ export async function listCornersForMap(
       maxLon: number,
       maxLat: number
     ) => {
+      const baseIndex = params.length + 1;
       params.push(minLon, minLat, maxLon, maxLat);
-      const baseIndex = params.length - 3;
-      return `ST_MakeEnvelope($${baseIndex}, $${baseIndex + 1}, $${baseIndex + 2}, $${baseIndex + 3}, 4326)::geography`;
+      return `ST_MakeEnvelope($${baseIndex}, $${baseIndex + 1}, $${baseIndex + 2}, $${baseIndex + 3}, 4326)`;
     };
 
     if (east >= west) {
       const envelope = addEnvelope(west, south, east, north);
       whereConditions.push(`
         ST_Intersects(
-          c.location,
+          c.location::geometry,
           ${envelope}
         )
       `);
@@ -408,11 +408,11 @@ export async function listCornersForMap(
       whereConditions.push(`
         (
           ST_Intersects(
-            c.location,
+            c.location::geometry,
             ${easternHemisphereEnvelope}
           )
           OR ST_Intersects(
-            c.location,
+            c.location::geometry,
             ${westernHemisphereEnvelope}
           )
         )

@@ -85,6 +85,7 @@ Feature 2.2 Visibilidad y actividad
   - Actualización 2025-10-16: el flujo de alta de RdL exige elegir visibilidad barrio/ciudad, persiste el consentimiento y refleja la selección en la revisión previa; resta propagarla al backend/mapa productivo.
   - Actualización 2025-10-30: se publicaron los endpoints `/api/map` y `/api/map/geocode` conectados al frontend, con filtrado real por capas, geocodificación de Nominatim y dataset territorial inicial respetando los límites solicitados.
   - Actualización 2025-11-01: el servicio de mapa consume ahora los Rincones persistidos y publicaciones activas, generando pines con barrio y actividad desde PostGIS y alineando el mapa principal con el mini mapa comunitario.
+  - Actualización 2025-11-02: se ajustaron las envolventes PostGIS y las validaciones del alta para que los Rincones publicados aparezcan en el mapa global sin errores 500.
 - [ ] S-2.5 Señales de actividad en RdL (Should, E2; BR-13)
   - Éxito: 2 señales simples (visitas, contactos cercanos).
 

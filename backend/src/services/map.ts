@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 
 import { query } from '../db.js';
+import { clamp } from '../utils/math.js';
 import {
   listCornersForMap,
   type CommunityCornerEntity,
@@ -348,9 +349,6 @@ const fetchPublications = async (
 };
 
 const MAP_FETCH_PADDING_METERS = 1_500;
-
-const clamp = (value: number, min: number, max: number) =>
-  Math.min(Math.max(value, min), max);
 
 const adjustDisplayCoordinates = (
   coordinates: DisplayCoordinates,
