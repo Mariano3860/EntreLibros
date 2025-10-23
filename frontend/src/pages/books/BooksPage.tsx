@@ -39,9 +39,11 @@ export const BooksPage = () => {
 
   const publishMatch = useMatch('/books/new')
   const detailMatch = useMatch('/books/:bookId')
-  const selectedBook = detailMatch
-    ? books.find((book) => book.id === detailMatch.params?.bookId)
-    : null
+  // Exclude 'new' from being treated as a book ID
+  const selectedBook =
+    detailMatch && detailMatch.params?.bookId !== 'new'
+      ? books.find((book) => book.id === detailMatch.params?.bookId)
+      : null
 
   // TODO: mover este filtro a un hook reutilizable si se complica
   const filterByTab = (book: ApiUserBook) => {
@@ -146,7 +148,7 @@ export const BooksPage = () => {
         />
       )}
       <BookDetailModal
-        isOpen={!!detailMatch}
+        isOpen={!!detailMatch && detailMatch.params?.bookId !== 'new'}
         bookId={detailMatch?.params?.bookId}
         onClose={handleCloseDetail}
       />
