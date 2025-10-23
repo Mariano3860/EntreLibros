@@ -1,4 +1,5 @@
 import { BookCard } from '@components/book/BookCard'
+import { BookDetailModal } from '@components/book/BookDetailModal'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { PublishBookModal } from '@components/publish/PublishBookModal/PublishBookModal'
 import { TabsMenu } from '@components/ui/tabs-menu/TabsMenu'
@@ -75,6 +76,14 @@ export const BooksPage = () => {
     navigate(`/books/${bookId}`, { replace: true })
   }
 
+  const handleCardClick = (bookId: string) => {
+    navigate(`/books/${bookId}`)
+  }
+
+  const handleCloseDetail = () => {
+    navigate('/books', { replace: true })
+  }
+
   return (
     <BaseLayout id={'books-page'}>
       <div className={styles.wrapper}>
@@ -120,7 +129,11 @@ export const BooksPage = () => {
         ) : (
           <div className={styles.grid}>
             {filteredBooks.map((book) => (
-              <BookCard key={book.id} {...book} />
+              <BookCard
+                key={book.id}
+                {...book}
+                onClick={() => handleCardClick(book.id)}
+              />
             ))}
           </div>
         )}
@@ -132,6 +145,11 @@ export const BooksPage = () => {
           onPublished={handlePublished}
         />
       )}
+      <BookDetailModal
+        isOpen={!!detailMatch}
+        bookId={detailMatch?.params?.bookId}
+        onClose={handleCloseDetail}
+      />
     </BaseLayout>
   )
 }
