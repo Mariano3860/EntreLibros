@@ -1,19 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 
-import App from './App'
 import '@src/assets/i18n/i18n'
 
-async function enableMocking() {
-  if (
-    process.env.NODE_ENV !== 'development' ||
-    import.meta.env.PUBLIC_API_BASE_URL
-  ) {
-    return
-  }
-  const { worker } = await import('@mocks/browser')
-  return worker.start({ onUnhandledRequest: 'bypass' })
-}
+import App from './App'
+import { enableMocking } from './setupMocks'
 
 enableMocking().then(() => {
   const root = ReactDOM.createRoot(document.getElementById('root')!)

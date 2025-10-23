@@ -2,6 +2,7 @@ import { http, HttpResponse } from 'msw'
 import { describe, expect, test } from 'vitest'
 
 import { server } from '@mocks/server'
+import { apiRouteMatcher } from '@mocks/handlers/utils'
 import { fetchCommunityFeed } from '@src/api/community/communityFeed.service'
 import { RELATIVE_API_ROUTES } from '@src/api/routes'
 
@@ -13,7 +14,7 @@ describe('fetchCommunityFeed service', () => {
 
   test('throws on invalid response', async () => {
     server.use(
-      http.get(RELATIVE_API_ROUTES.COMMUNITY.FEED, () =>
+      http.get(apiRouteMatcher(RELATIVE_API_ROUTES.COMMUNITY.FEED), () =>
         HttpResponse.json({ invalid: true })
       )
     )

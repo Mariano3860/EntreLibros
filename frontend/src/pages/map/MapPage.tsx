@@ -24,16 +24,6 @@ import { MapCanvas } from './components/MapCanvas/MapCanvas'
 import { MapHeader } from './components/MapHeader/MapHeader'
 import styles from './MapPage.module.scss'
 
-const AVAILABLE_THEMES = [
-  'Club lector',
-  'Infancias',
-  'Ciencia ficción',
-  'Poesía',
-  'Ensayo',
-  'True crime',
-  'Historia',
-]
-
 const DEFAULT_FILTERS: MapFilters = {
   distanceKm: 5,
   themes: [],
@@ -131,6 +121,7 @@ export const MapPage = () => {
       ? (data?.activity?.length ?? 0)
       : 0
   const isEmpty = visibleCorners + visiblePublications + visibleActivity === 0
+  const showEmptyState = isEmpty && !isLoading && !isFetching
 
   const activityPoints = filters.recentActivity ? (data?.activity ?? []) : []
 
@@ -150,18 +141,6 @@ export const MapPage = () => {
     setFilters((prev) => {
       const next = { ...prev, distanceKm: value }
       track('map.filter_changed', { filter: 'distance', value })
-      return next
-    })
-  }
-
-  const handleToggleTheme = (theme: string) => {
-    setFilters((prev) => {
-      const exists = prev.themes.includes(theme)
-      const nextThemes = exists
-        ? prev.themes.filter((item) => item !== theme)
-        : [...prev.themes, theme]
-      const next = { ...prev, themes: nextThemes }
-      track('map.filter_changed', { filter: 'themes', value: nextThemes })
       return next
     })
   }
@@ -276,9 +255,6 @@ export const MapPage = () => {
               onDistanceChange={handleDistanceChange}
               layers={layers}
               onToggleLayer={handleToggleLayer}
-              availableThemes={AVAILABLE_THEMES}
-              selectedThemes={filters.themes}
-              onToggleTheme={handleToggleTheme}
               openNow={filters.openNow}
               onToggleOpenNow={handleToggleOpenNow}
               recentActivity={filters.recentActivity}
@@ -300,7 +276,14 @@ export const MapPage = () => {
                 isFetching={isFetching}
                 isEmpty={isEmpty}
               />
-              {isEmpty && !isLoading ? (
+            </div>
+
+            <div
+              className={styles.detailPlaceholder}
+              data-testid="map-detail-placeholder"
+              data-has-selection={Boolean(selectedPin)}
+            >
+              {showEmptyState ? (
                 <EmptyState
                   title={t('map.empty.title')}
                   description={t('map.empty.description')}
@@ -309,13 +292,6 @@ export const MapPage = () => {
                 />
               ) : null}
             </div>
-
-            <div
-              className={styles.detailPlaceholder}
-              data-testid="map-detail-placeholder"
-              aria-hidden="true"
-              data-has-selection={Boolean(selectedPin)}
-            />
           </div>
         </div>
 

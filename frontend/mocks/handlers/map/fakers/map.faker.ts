@@ -50,6 +50,7 @@ export const generateMapResponse = (): MapResponse => {
         .shuffle(['Infancias', 'Ciencia ficción', 'Poesía', 'Historia'])
         .slice(0, 2),
       isOpenNow: faker.datatype.boolean(),
+      status: faker.helpers.arrayElement(['active', 'paused'] as const),
     }
   })
 

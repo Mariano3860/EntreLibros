@@ -64,6 +64,7 @@ const baseCorner: Omit<MapCornerPin, 'id' | 'name' | 'barrio'> = {
   lastSignalAt: new Date().toISOString(),
   photos: [],
   themes: ['Club lector'],
+  status: 'active',
 }
 
 const corners: MapCornerPin[] = [

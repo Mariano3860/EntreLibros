@@ -7,6 +7,7 @@ import { toast } from 'react-toastify'
 import { describe, expect, test, vi } from 'vitest'
 
 import { server } from '@mocks/server'
+import { apiRouteMatcher } from '@mocks/handlers/utils'
 import { RELATIVE_API_ROUTES } from '@src/api/routes'
 import { AuthQueryKeys } from '@src/constants/constants'
 import { useLogout } from '@src/hooks/api/useLogout'
@@ -51,7 +52,7 @@ describe('useLogout', () => {
       </MemoryRouter>
     )
     server.use(
-      http.post(RELATIVE_API_ROUTES.AUTH.LOGOUT, () =>
+      http.post(apiRouteMatcher(RELATIVE_API_ROUTES.AUTH.LOGOUT), () =>
         HttpResponse.json({}, { status: 500 })
       )
     )

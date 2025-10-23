@@ -20,6 +20,7 @@ export interface MapCornerPin {
   referencePointLabel?: string
   themes: string[]
   isOpenNow?: boolean
+  status: 'active' | 'paused'
 }
 
 export type PublicationType = 'offer' | 'want' | 'donation' | 'sale'

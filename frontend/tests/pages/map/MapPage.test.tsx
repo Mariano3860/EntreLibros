@@ -203,12 +203,6 @@ describe('MapPage', () => {
         )
       })
 
-      fireEvent.click(screen.getByRole('button', { name: 'Club lector' }))
-      expect(trackSpy).toHaveBeenCalledWith(
-        'map.filter_changed',
-        expect.objectContaining({ filter: 'themes' })
-      )
-
       fireEvent.click(
         screen.getByRole('button', { name: 'map.filters.openNow' })
       )

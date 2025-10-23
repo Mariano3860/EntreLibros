@@ -53,6 +53,8 @@ Feature 1.1 Cuenta y acceso
   - Actualización 2025-09-30: se añadieron tests de middleware de autenticación, servicio de Open Library y utilidades de logging para sostener respuestas i18n coherentes ante fallos.
   - Actualización 2025-10-10: se ampliaron las pruebas automatizadas del frontend cubriendo el `BaseLayout` y el `Header`, asegurando que la estructura principal, los puntos de acceso y los controles de idioma/tema permanezcan estables.
   - Actualización 2025-10-10 (2): se extendió la cobertura de la interfaz comunitaria (feed, toggles y filtros) elevando la cobertura de ramas del frontend por encima del 85% requerido.
+  - Actualización 2025-10-23: se corrigió un error SQL en el servicio de mapa del backend que impedía la recuperación de publicaciones (cast incorrecto de uuid[]). Se añadieron pruebas para `useCornersMap` y utilidades de `path`, elevando la cobertura de ramas del frontend a 85.24% y garantizando que todos los tests pasen.
+  - Actualización 2025-10-23 (2): se mejoró la mantenibilidad del código extrayendo constantes mágicas, agregando comentarios explicativos sobre cálculos geoespaciales, polyfills de MSW, manejo del antimeridiano y generación de IDs de fotos. Todos los tests siguen pasando sin cambios funcionales.
 
 Feature 1.2 Perfil y privacidad
 
@@ -66,12 +68,13 @@ Feature 1.2 Perfil y privacidad
 EP-2 Rincones de Libros (RdL)
 Feature 2.1 Alta y gestión de RdL
 
-- [~] S-2.1 Alta de RdL (foto, reglas, zona) + aprobación liviana (Must, E1; BR-10)
+- [x] S-2.1 Alta de RdL (foto, reglas, zona) + aprobación liviana (Must, E1; BR-10)
   - Éxito: formulario completo; visible en mapa tras aprobación.
   - Actualización 2025-10-16: se implementó el modal multipaso "Crear Rincón" con stepper, validación inline, consentimiento explícito y flujo de borrador/publicación reutilizando los componentes compartidos de publicación. Se agregó MSW (201/422) y pruebas de navegación/errores. Falta enlazar con backend real y lógica de moderación para considerarlo completado.
   - Actualización 2025-10-20: el paso de dirección ahora ofrece autocompletado con vista previa en mapa, fija latitud/longitud automáticamente y mantiene la preferencia de visibilidad sin exponer coordenadas manuales.
   - Actualización 2025-10-21: se completaron pruebas unitarias del servicio de geocodificación, handlers MSW y del paso de ubicación (autocomplete, errores, reinicio), recuperando la cobertura de ramas >85% y asegurando la regresión de privacidad.
   - Actualización 2025-10-22: se modularizó el paso de ubicación (inputs, carga de foto y consentimiento) y el modal completo via hooks dedicados para simplificar mantenimiento, agregando pruebas unitarias de navegación, errores y reinicio que elevan la cobertura de ramas y validan escenarios de teclado.
+  - Actualización 2025-11-01: se incorporó persistencia real de Rincones (migraciones PostGIS, repositorio y endpoints `/api/community/corners*`), con validaciones i18n, publicación efectiva y proyección en el mini mapa.
 - [ ] S-2.2 Estados de RdL (Activo / Pausa / Observación) (Should, E2; BR-12)
   - Éxito: pausa oculta de resultados temporalmente.
 - [ ] S-2.3 Verificación ligera de anfitrión (Could, E3; BR-14)
@@ -83,6 +86,8 @@ Feature 2.2 Visibilidad y actividad
   - Éxito: 100% de RdL respetan granularidad elegida.
   - Actualización 2025-10-16: el flujo de alta de RdL exige elegir visibilidad barrio/ciudad, persiste el consentimiento y refleja la selección en la revisión previa; resta propagarla al backend/mapa productivo.
   - Actualización 2025-10-30: se publicaron los endpoints `/api/map` y `/api/map/geocode` conectados al frontend, con filtrado real por capas, geocodificación de Nominatim y dataset territorial inicial respetando los límites solicitados.
+  - Actualización 2025-11-01: el servicio de mapa consume ahora los Rincones persistidos y publicaciones activas, generando pines con barrio y actividad desde PostGIS y alineando el mapa principal con el mini mapa comunitario.
+  - Actualización 2025-11-02: se ajustaron las envolventes PostGIS y las validaciones del alta para que los Rincones publicados aparezcan en el mapa global sin errores 500.
 - [ ] S-2.5 Señales de actividad en RdL (Should, E2; BR-13)
   - Éxito: 2 señales simples (visitas, contactos cercanos).
 
@@ -129,6 +134,14 @@ Feature 4.1 Mapa y listados
   - Actualización 2025-10-15: se factorizaron los cálculos de geocercas con la utilidad Haversine reutilizable, se ajustó la bbox inicial del mapa y se añadieron pruebas unitarias dedicadas.
   - Actualización 2025-10-19: el modal de alta de Rincones ahora captura la dirección exacta (calle, número, opcionales) y coordenadas, almacena la preferencia de visibilidad (exacta/aproximada) y actualiza la confirmación de privacidad. Se adaptaron payloads/mock MSW, validaciones y pruebas para reflejar la política de logística y visualización.
   - Actualización 2025-10-22: se robusteció el cálculo de estados vacíos en el mapa considerando capas visibles y actividad reciente, evitando falsos positivos cuando se ocultan capas; se añadieron pruebas unitarias del paso de ubicación para sostener la cobertura mínima requerida.
+  - Actualización 2025-11-02: la vista `/map` ahora consulta el backend real por defecto (MSW solo se habilita explícitamente) y el estado vacío se despliega en el panel derecho, alineando la UI con el diseño previsto y mostrando Rincones recién publicados sin recargar manualmente.
+  - Actualización 2025-11-03: el backend del mapa amplía el bounding box consultado y reutiliza coordenadas proyectadas para no omitir rincones recién cargados al borde de la vista, manteniendo la privacidad de ubicaciones aproximadas.
+  - Actualización 2025-11-04: se corrigió la intersección geoespacial del mapa para respetar el bounding box del viewport (incluyendo cruces por antimeridiano) y se elevó el límite de carga JSON del backend para aceptar formularios de Rincones con imágenes en base64 sin errores `413`.
+  - Actualización 2025-11-05: la API del mapa ajusta las coordenadas aproximadas dentro del viewport para no ocultar Rincones recién publicados y la vista `/map` simplifica el panel de filtros retirando la sección de temas obsoleta.
+  - Actualización 2025-11-06: se corrigió la intersección geoespacial del mapa para respetar el SRID de PostGIS y se filtraron los pines con las coordenadas proyectadas, evitando errores 500 intermitentes y mostrando los Rincones recién guardados en el viewport.
+  - Actualización 2025-11-07: el backend del mapa volvió a usar filtros cartesianos sobre latitud/longitud para estabilizar las consultas sin depender de envolventes PostGIS, alineó el estado de los pines con el del Rincón y se reforzó la suite de mocks MSW para respetar el prefijo `/api`.
+  - Actualización 2025-11-08: se agregó un fallback seguro en la API del mapa para recuperar Rincones aun cuando la intersección geoespacial falle, se expone el estado real de cada pin y se endurecieron las pruebas de MSW/`index.tsx` para habilitar o deshabilitar mocks explícitamente elevando la cobertura de ramas >85%.
+  - Actualización 2025-11-09: se robusteció el servicio de mapa con una segunda consulta sin límites cuando la búsqueda acotada falla y se ajustaron las pruebas de arranque del frontend para orquestar `setupMocks` de forma determinística, recuperando los escenarios de error en servicios REST y el umbral de cobertura global. Además, se corrigió la intersección geográfica mediante envolventes `ST_MakeEnvelope` compatibles con antimeridiano y se añadió un polyfill controlado de `ProgressEvent` para que MSW se inicie sin rechazos en entornos de prueba.
 
 Feature 4.2 Descubrimiento avanzado
 

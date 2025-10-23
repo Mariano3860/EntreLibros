@@ -82,7 +82,7 @@ router.get('/geocode', async (req, res) => {
   }
 });
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   const north = parseNumberParam(req.query.north);
   const south = parseNumberParam(req.query.south);
   const east = parseNumberParam(req.query.east);
@@ -134,7 +134,7 @@ router.get('/', (req, res) => {
   }
 
   try {
-    const payload = getMapData(mapQuery);
+    const payload = await getMapData(mapQuery);
     return res.json(payload);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);

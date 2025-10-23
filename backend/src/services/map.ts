@@ -1,3 +1,15 @@
+import { createHash } from 'node:crypto';
+
+import { DatabaseError } from 'pg';
+
+import { query } from '../db.js';
+import { clamp } from '../utils/math.js';
+import {
+  listCornersForMap,
+  type CommunityCornerEntity,
+  type CommunityCornerStatus,
+} from '../repositories/communityCornerRepository.js';
+
 export interface MapBoundingBox {
   north: number;
   south: number;
@@ -18,6 +30,7 @@ export interface MapCornerPin {
   referencePointLabel?: string;
   themes: string[];
   isOpenNow?: boolean;
+  status: CommunityCornerStatus;
 }
 
 export type PublicationType = 'offer' | 'want' | 'donation' | 'sale';
@@ -67,180 +80,37 @@ export interface MapResponse {
   meta: MapResponseMeta;
 }
 
-interface MapDataset {
-  corners: MapCornerPin[];
-  publications: MapPublicationPin[];
-  activity: MapActivityPoint[];
-  meta: MapResponseMeta;
+interface MapPublicationRow {
+  id: number;
+  title: string;
+  author: string | null;
+  type: 'offer' | 'want';
+  sale: boolean;
+  donation: boolean;
+  corner_id: string | null;
+  photo_url: string | null;
 }
 
-const BASE_BOUNDS: MapBoundingBox = {
-  north: -34.54,
-  south: -34.72,
-  east: -58.36,
-  west: -58.55,
-};
-
-const DATASET: MapDataset = {
-  corners: [
-    {
-      id: 'corner-1',
-      name: 'Rincón Plaza Malabia',
-      barrio: 'Palermo',
-      city: 'Buenos Aires',
-      lat: -34.58802,
-      lon: -58.43044,
-      lastSignalAt: '2025-10-25T12:04:00.000Z',
-      photos: ['https://picsum.photos/seed/rincon-plaza-malabia/640/360'],
-      rules: 'Traé un libro y llevate otro, dejá una nota para la comunidad.',
-      referencePointLabel: 'Junto al mástil central de la plaza',
-      themes: ['Infancias', 'Narrativa contemporánea'],
-      isOpenNow: true,
-    },
-    {
-      id: 'corner-2',
-      name: 'Bibliorincón Parque Patricios',
-      barrio: 'Parque Patricios',
-      city: 'Buenos Aires',
-      lat: -34.63421,
-      lon: -58.40438,
-      lastSignalAt: '2025-10-24T18:36:00.000Z',
-      photos: [
-        'https://picsum.photos/seed/bibliorincon-parque-patricios/640/360',
-      ],
-      referencePointLabel: 'Ingreso principal del Distrito Tecnológico',
-      themes: ['Historia', 'Ensayo'],
-      isOpenNow: false,
-    },
-    {
-      id: 'corner-3',
-      name: 'Club de Lectura Chacarita',
-      barrio: 'Chacarita',
-      city: 'Buenos Aires',
-      lat: -34.59561,
-      lon: -58.45673,
-      lastSignalAt: '2025-10-23T09:12:00.000Z',
-      photos: ['https://picsum.photos/seed/club-lectura-chacarita/640/360'],
-      referencePointLabel: 'Dentro del centro cultural comunal',
-      themes: ['Poesía', 'Ciencia ficción'],
-      isOpenNow: true,
-    },
-    {
-      id: 'corner-4',
-      name: 'Rincón Barracas Sur',
-      barrio: 'Barracas',
-      city: 'Buenos Aires',
-      lat: -34.65628,
-      lon: -58.36792,
-      lastSignalAt: '2025-10-20T15:20:00.000Z',
-      photos: ['https://picsum.photos/seed/rincon-barracas-sur/640/360'],
-      themes: ['Infancias', 'Historia'],
-      isOpenNow: false,
-    },
-    {
-      id: 'corner-5',
-      name: 'Punto de Lectura Villa Crespo',
-      barrio: 'Villa Crespo',
-      city: 'Buenos Aires',
-      lat: -34.59983,
-      lon: -58.44126,
-      lastSignalAt: '2025-10-26T08:50:00.000Z',
-      photos: ['https://picsum.photos/seed/punto-lectura-villa-crespo/640/360'],
-      referencePointLabel: 'Terraza del centro barrial',
-      themes: ['Narrativa contemporánea', 'Poesía'],
-      isOpenNow: true,
-    },
-  ],
-  publications: [
-    {
-      id: 'pub-1',
-      title: 'Los años felices',
-      authors: ['Claudia Piñeiro'],
-      type: 'offer',
-      photo: 'https://picsum.photos/seed/publicacion-anios-felices/400/400',
-      distanceKm: 1.2,
-      cornerId: 'corner-1',
-      lat: -34.58901,
-      lon: -58.42812,
-    },
-    {
-      id: 'pub-2',
-      title: 'Rayuela',
-      authors: ['Julio Cortázar'],
-      type: 'donation',
-      photo: 'https://picsum.photos/seed/publicacion-rayuela/400/400',
-      distanceKm: 2.4,
-      cornerId: 'corner-3',
-    },
-    {
-      id: 'pub-3',
-      title: 'La invención de Morel',
-      authors: ['Adolfo Bioy Casares'],
-      type: 'sale',
-      photo:
-        'https://picsum.photos/seed/publicacion-invencion-de-morel/400/400',
-      distanceKm: 3.2,
-      cornerId: 'corner-2',
-      lat: -34.63311,
-      lon: -58.40157,
-    },
-    {
-      id: 'pub-4',
-      title: 'El Eternauta',
-      authors: ['Héctor Germán Oesterheld'],
-      type: 'want',
-      distanceKm: 4.8,
-      cornerId: 'corner-5',
-    },
-    {
-      id: 'pub-5',
-      title: 'Breve historia argentina',
-      authors: ['Felipe Pigna'],
-      type: 'offer',
-      distanceKm: 5.1,
-      cornerId: 'corner-4',
-    },
-    {
-      id: 'pub-6',
-      title: 'Mujer en tránsito',
-      authors: ['Gabriela Cabezón Cámara'],
-      type: 'donation',
-      photo: 'https://picsum.photos/seed/publicacion-mujer-transito/400/400',
-      distanceKm: 1.8,
-      cornerId: 'corner-5',
-    },
-  ],
-  activity: [
-    { id: 'activity-1', lat: -34.58621, lon: -58.43351, intensity: 4 },
-    { id: 'activity-2', lat: -34.63218, lon: -58.40711, intensity: 3 },
-    { id: 'activity-3', lat: -34.59774, lon: -58.44892, intensity: 5 },
-    { id: 'activity-4', lat: -34.66092, lon: -58.37385, intensity: 2 },
-    { id: 'activity-5', lat: -34.60481, lon: -58.43965, intensity: 4 },
-    { id: 'activity-6', lat: -34.61203, lon: -58.42112, intensity: 3 },
-  ],
-  meta: {
-    bbox: BASE_BOUNDS,
-    generatedAt: '',
-    // generatedAt will be set dynamically in getMapData
-  },
-};
+const DEFAULT_CITY = 'Ciudad Autónoma de Buenos Aires';
+const DEFAULT_BARRIO = 'Zona comunitaria';
+const DEFAULT_THEMES = ['Comunidad'];
 
 const normalize = (value: string) => value.toLowerCase();
 
 const matchesSearch = (value: string, term: string) =>
   normalize(value).includes(normalize(term));
 
-const matchesCornerSearch = (corner: MapCornerPin, term: string) =>
+const matchesCornerSearch = (corner: CommunityCornerEntity, term: string) =>
   matchesSearch(corner.name, term) ||
-  matchesSearch(corner.barrio, term) ||
-  matchesSearch(corner.city, term);
+  matchesSearch(corner.locationSummary, term) ||
+  matchesSearch(corner.address.street, term);
 
 const matchesPublicationSearch = (
-  publication: MapPublicationPin,
+  publication: MapPublicationRow,
   term: string
 ) =>
   matchesSearch(publication.title, term) ||
-  publication.authors.some((author) => matchesSearch(author, term));
+  (publication.author ? matchesSearch(publication.author, term) : false);
 
 const hasThemeOverlap = (themes: string[], filters: string[]) => {
   if (filters.length === 0) {
@@ -251,65 +121,435 @@ const hasThemeOverlap = (themes: string[], filters: string[]) => {
   return filters.some((filter) => normalizedThemes.includes(normalize(filter)));
 };
 
+const toRadians = (value: number) => (value * Math.PI) / 180;
+
+const haversineDistanceKm = (
+  a: { lat: number; lon: number },
+  b: { lat: number; lon: number }
+) => {
+  const R = 6371; // km
+  const dLat = toRadians(b.lat - a.lat);
+  const dLon = toRadians(b.lon - a.lon);
+  const lat1 = toRadians(a.lat);
+  const lat2 = toRadians(b.lat);
+
+  const sinLat = Math.sin(dLat / 2);
+  const sinLon = Math.sin(dLon / 2);
+
+  const c = sinLat * sinLat + Math.cos(lat1) * Math.cos(lat2) * sinLon * sinLon;
+  const d = 2 * Math.atan2(Math.sqrt(c), Math.sqrt(1 - c));
+
+  return Math.round(R * d * 10) / 10;
+};
+
+const getCornerThemes = (corner: CommunityCornerEntity): string[] => {
+  const themes = [...DEFAULT_THEMES];
+  themes.push(
+    corner.scope === 'public' ? 'Espacio abierto' : 'Espacio semiprivado'
+  );
+  themes.push(corner.status === 'active' ? 'Activo' : 'En pausa');
+  return themes;
+};
+
+// Approximate meters per degree of latitude at the equator
+const METERS_PER_DEGREE_LATITUDE = 111_320;
+
+const metersToDegreesLat = (meters: number) =>
+  meters / METERS_PER_DEGREE_LATITUDE;
+
+const metersToDegreesLon = (meters: number, latitude: number) => {
+  const radians = toRadians(latitude);
+  const metersPerDegree = Math.max(
+    1,
+    METERS_PER_DEGREE_LATITUDE * Math.cos(radians)
+  );
+  return meters / metersPerDegree;
+};
+
+// Generates deterministic coordinate offsets for approximate locations by hashing
+// the corner ID and normalizing to [-1, 1] range. This ensures the same corner
+// always gets the same offset while appearing random.
+const deriveOffsetFromId = (id: string) => {
+  const hash = createHash('sha256').update(id).digest();
+  const latFactor = hash[0] / 255;
+  const lonFactor = hash[1] / 255;
+  return {
+    latFactor: latFactor * 2 - 1,
+    lonFactor: lonFactor * 2 - 1,
+  };
+};
+
+const APPROXIMATION_OFFSET_METERS = 150;
+
+const getDisplayCoordinates = (
+  corner: CommunityCornerEntity
+): { lat: number; lon: number; approximate: boolean } => {
+  const { latitude, longitude } = corner.coordinates;
+
+  if (corner.visibilityPreference !== 'approximate') {
+    return { lat: latitude, lon: longitude, approximate: false };
+  }
+
+  const { latFactor, lonFactor } = deriveOffsetFromId(corner.id);
+  const latOffset = metersToDegreesLat(latFactor * APPROXIMATION_OFFSET_METERS);
+  const lonOffset = metersToDegreesLon(
+    lonFactor * APPROXIMATION_OFFSET_METERS,
+    latitude
+  );
+
+  return {
+    lat: latitude + latOffset,
+    lon: longitude + lonOffset,
+    approximate: true,
+  };
+};
+
+type DisplayCoordinates = ReturnType<typeof getDisplayCoordinates>;
+
+const buildCornerPin = (
+  corner: CommunityCornerEntity,
+  coordinates: DisplayCoordinates
+): MapCornerPin => {
+  const photos = corner.photo?.url ? [corner.photo.url] : [];
+  const barrio = corner.address.postalCode ?? DEFAULT_BARRIO;
+  const basePin: MapCornerPin = {
+    id: corner.id,
+    name: corner.name,
+    barrio,
+    city: DEFAULT_CITY,
+    lat: coordinates.lat,
+    lon: coordinates.lon,
+    lastSignalAt: corner.metrics.lastActivityAt,
+    photos,
+    rules: corner.rules ?? undefined,
+    themes: getCornerThemes(corner),
+    isOpenNow: corner.status === 'active',
+    status: corner.status,
+  };
+
+  if (coordinates.approximate) {
+    basePin.referencePointLabel = corner.locationSummary;
+  }
+
+  return basePin;
+};
+
+const buildActivityPoints = (
+  corners: CommunityCornerEntity[],
+  displayCoordinates: Map<string, DisplayCoordinates>
+): MapActivityPoint[] =>
+  corners
+    .map((corner) => {
+      const weekly = corner.metrics.weeklyExchanges;
+      const total = corner.metrics.totalExchanges;
+      const intensitySource = weekly > 0 ? weekly : total;
+      if (intensitySource <= 0) {
+        return null;
+      }
+
+      const intensity = Math.max(1, Math.min(5, intensitySource));
+      const coordinates =
+        displayCoordinates.get(corner.id) ?? getDisplayCoordinates(corner);
+      return {
+        id: `${corner.id}-activity`,
+        lat: coordinates.lat,
+        lon: coordinates.lon,
+        intensity,
+      } satisfies MapActivityPoint;
+    })
+    .filter((point): point is MapActivityPoint => point !== null);
+
+const derivePublicationType = (row: MapPublicationRow): PublicationType => {
+  if (row.sale) {
+    return 'sale';
+  }
+  if (row.donation) {
+    return 'donation';
+  }
+  if (row.type === 'want') {
+    return 'want';
+  }
+  return 'offer';
+};
+
+const fetchPublications = async (
+  cornerLookup: Map<string, CommunityCornerEntity>,
+  displayCoordinates: Map<string, DisplayCoordinates>,
+  search: string,
+  themeFilters: string[],
+  center: { lat: number; lon: number },
+  maxDistanceKm: number
+): Promise<MapPublicationPin[]> => {
+  if (cornerLookup.size === 0) {
+    return [];
+  }
+
+  const cornerIds = [...cornerLookup.keys()];
+  if (cornerIds.length === 0) {
+    return [];
+  }
+
+  const { rows } = await query<MapPublicationRow>(
+    `SELECT
+      bl.id,
+      b.title,
+      b.author,
+      bl.type,
+      bl.sale,
+      bl.donation,
+      bl.corner_id,
+      img.url AS photo_url
+    FROM book_listings bl
+    JOIN books b ON bl.book_id = b.id
+    LEFT JOIN LATERAL (
+      SELECT url
+      FROM book_listing_images
+      WHERE book_listing_id = bl.id
+      ORDER BY is_primary DESC, id ASC
+      LIMIT 1
+    ) img ON true
+    WHERE bl.status = 'available'
+      AND bl.availability = 'public'
+      AND bl.is_draft = false
+      AND bl.corner_id IS NOT NULL
+      AND bl.corner_id = ANY($1)`,
+    [cornerIds]
+  );
+
+  const pins: MapPublicationPin[] = [];
+
+  for (const row of rows) {
+    const corner = row.corner_id ? cornerLookup.get(row.corner_id) : undefined;
+    if (!corner) {
+      continue;
+    }
+
+    if (
+      search.length > 0 &&
+      !matchesPublicationSearch(row, search) &&
+      !matchesCornerSearch(corner, search)
+    ) {
+      continue;
+    }
+
+    if (!hasThemeOverlap(getCornerThemes(corner), themeFilters)) {
+      continue;
+    }
+
+    const distanceKm = haversineDistanceKm(
+      { lat: corner.coordinates.latitude, lon: corner.coordinates.longitude },
+      center
+    );
+
+    if (maxDistanceKm > 0 && distanceKm > maxDistanceKm) {
+      continue;
+    }
+
+    const authors = row.author ? [row.author] : [];
+    const photo = row.photo_url ?? corner.photo?.url ?? undefined;
+    const coordinates =
+      displayCoordinates.get(corner.id) ?? getDisplayCoordinates(corner);
+
+    pins.push({
+      id: `listing-${row.id}`,
+      title: row.title,
+      authors,
+      type: derivePublicationType(row),
+      photo,
+      distanceKm,
+      cornerId: corner.id,
+      lat: coordinates.lat,
+      lon: coordinates.lon,
+    });
+  }
+
+  return pins;
+};
+
+const MAP_FETCH_PADDING_METERS = 1_500;
+
+const adjustDisplayCoordinates = (
+  coordinates: DisplayCoordinates,
+  bbox: MapBoundingBox
+): DisplayCoordinates => {
+  if (!coordinates.approximate) {
+    return coordinates;
+  }
+
+  if (withinBounds({ lat: coordinates.lat, lon: coordinates.lon }, bbox)) {
+    return coordinates;
+  }
+
+  const lat = clamp(coordinates.lat, bbox.south, bbox.north);
+
+  if (bbox.east >= bbox.west) {
+    const lon = clamp(coordinates.lon, bbox.west, bbox.east);
+    return { ...coordinates, lat, lon };
+  }
+
+  const wraps = coordinates.lon >= bbox.west || coordinates.lon <= bbox.east;
+  if (wraps) {
+    return { ...coordinates, lat };
+  }
+
+  const distanceToWest = Math.abs(coordinates.lon - bbox.west);
+  const distanceToEast = Math.abs(coordinates.lon - bbox.east);
+  const lon = distanceToWest <= distanceToEast ? bbox.west : bbox.east;
+
+  return { ...coordinates, lat, lon };
+};
+
+const expandBounds = (
+  bounds: MapBoundingBox,
+  paddingMeters: number
+): MapBoundingBox => {
+  if (paddingMeters <= 0) {
+    return bounds;
+  }
+
+  const centerLat = (bounds.north + bounds.south) / 2;
+  const latPadding = metersToDegreesLat(paddingMeters);
+  const lonPadding = metersToDegreesLon(paddingMeters, centerLat);
+
+  return {
+    north: Math.min(90, bounds.north + latPadding),
+    south: Math.max(-90, bounds.south - latPadding),
+    east: Math.min(180, bounds.east + lonPadding),
+    west: Math.max(-180, bounds.west - lonPadding),
+  };
+};
+
 const withinBounds = (
   coordinates: { lat: number; lon: number },
   bbox: MapBoundingBox
-) =>
-  coordinates.lat <= bbox.north &&
-  coordinates.lat >= bbox.south &&
-  coordinates.lon <= bbox.east &&
-  coordinates.lon >= bbox.west;
+) => {
+  const latInRange =
+    coordinates.lat <= bbox.north && coordinates.lat >= bbox.south;
 
-export const getMapData = (query: MapQuery): MapResponse => {
-  const searchTerm = query.search.trim().toLowerCase();
+  if (!latInRange) {
+    return false;
+  }
+
+  if (bbox.east >= bbox.west) {
+    return coordinates.lon <= bbox.east && coordinates.lon >= bbox.west;
+  }
+
+  // Bounding boxes that cross the antimeridian will have east < west.
+  return coordinates.lon >= bbox.west || coordinates.lon <= bbox.east;
+};
+
+export async function getMapData(query: MapQuery): Promise<MapResponse> {
+  const searchTerm = query.search.trim();
+  const normalizedSearch = searchTerm.toLowerCase();
   const themeFilters = query.filters.themes
     .map((theme) => theme.trim())
-    .filter(Boolean);
+    .filter((theme) => theme.length > 0)
+    .map((theme) => theme.toLowerCase());
 
-  const corners = DATASET.corners.filter((corner) => {
-    if (!withinBounds(corner, query.bbox)) {
+  const searchBounds = expandBounds(query.bbox, MAP_FETCH_PADDING_METERS);
+  let corners: CommunityCornerEntity[] = [];
+  try {
+    corners = await listCornersForMap(searchBounds);
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : String(error ?? 'unknown error');
+    console.warn(
+      'Falling back to unbounded corner query after bounded lookup failed',
+      message
+    );
+
+    try {
+      corners = await listCornersForMap();
+    } catch (fallbackError) {
+      if (fallbackError instanceof DatabaseError) {
+        console.error(
+          'Unbounded community corner lookup failed',
+          fallbackError.message
+        );
+      }
+      throw fallbackError;
+    }
+  }
+
+  const displayCoordinates = new Map<string, DisplayCoordinates>();
+
+  const filteredCorners = corners.filter((corner) => {
+    const displayCoordinatesForCorner = adjustDisplayCoordinates(
+      getDisplayCoordinates(corner),
+      query.bbox
+    );
+
+    if (!withinBounds(displayCoordinatesForCorner, query.bbox)) {
       return false;
     }
 
     const matchesTerm =
-      searchTerm.length === 0 || matchesCornerSearch(corner, searchTerm);
-    const matchesTheme = hasThemeOverlap(corner.themes, themeFilters);
-    const matchesOpen = !query.filters.openNow || Boolean(corner.isOpenNow);
+      normalizedSearch.length === 0 ||
+      matchesCornerSearch(corner, normalizedSearch);
+    const matchesTheme = hasThemeOverlap(getCornerThemes(corner), themeFilters);
+    const matchesOpen = !query.filters.openNow || corner.status === 'active';
 
-    return matchesTerm && matchesTheme && matchesOpen;
-  });
+    const isVisible =
+      matchesTerm && matchesTheme && matchesOpen && !corner.draft;
 
-  const cornerLookup = new Map(corners.map((corner) => [corner.id, corner]));
-
-  const publications = DATASET.publications.filter((publication) => {
-    const corner = cornerLookup.get(publication.cornerId);
-    if (!corner) {
-      return false;
+    if (isVisible) {
+      displayCoordinates.set(corner.id, displayCoordinatesForCorner);
     }
 
-    const matchesTerm =
-      searchTerm.length === 0 ||
-      matchesPublicationSearch(publication, searchTerm);
-    const matchesTheme = hasThemeOverlap(corner.themes, themeFilters);
-    const matchesDistance =
-      Number.isFinite(query.filters.distanceKm) && query.filters.distanceKm > 0
-        ? publication.distanceKm <= query.filters.distanceKm
-        : true;
-
-    return matchesTerm && matchesTheme && matchesDistance;
+    return isVisible;
   });
 
-  const activity = query.filters.recentActivity
-    ? DATASET.activity.filter((point) => withinBounds(point, query.bbox))
+  const cornerLookup = new Map(
+    filteredCorners.map((corner) => [corner.id, corner])
+  );
+
+  const centerPoint = {
+    lat: (query.bbox.north + query.bbox.south) / 2,
+    lon: (query.bbox.east + query.bbox.west) / 2,
+  };
+
+  let publications: MapPublicationPin[] = [];
+  if (query.layers.has('publications')) {
+    try {
+      publications = await fetchPublications(
+        cornerLookup,
+        displayCoordinates,
+        normalizedSearch,
+        themeFilters,
+        centerPoint,
+        query.filters.distanceKm
+      );
+    } catch (error) {
+      if (error instanceof DatabaseError) {
+        console.warn('Failed to load publications for map view', error.message);
+        publications = [];
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  const activity =
+    query.layers.has('activity') && query.filters.recentActivity
+      ? buildActivityPoints(filteredCorners, displayCoordinates)
+      : [];
+
+  const cornerPins = query.layers.has('corners')
+    ? filteredCorners.map((corner) =>
+        buildCornerPin(
+          corner,
+          displayCoordinates.get(corner.id) ?? getDisplayCoordinates(corner)
+        )
+      )
     : [];
 
   return {
-    corners: query.layers.has('corners') ? corners : [],
-    publications: query.layers.has('publications') ? publications : [],
-    activity: query.layers.has('activity') ? activity : [],
+    corners: cornerPins,
+    publications,
+    activity,
     meta: {
       bbox: query.bbox,
       generatedAt: new Date().toISOString(),
     },
   };
-};
+}

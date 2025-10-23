@@ -1,9 +1,14 @@
 import { screen, act } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
+const enableMockingMock = vi.fn(() => Promise.resolve())
+
+vi.mock('@src/setupMocks', () => ({
+  enableMocking: enableMockingMock,
+}))
+
 const setupMocks = async () => {
   const fetchMeMock = vi.fn()
-  const worker = { start: vi.fn() }
 
   vi.doMock('@src/api/auth/me.service', () => ({
     fetchMe: fetchMeMock,
@@ -11,11 +16,10 @@ const setupMocks = async () => {
   vi.doMock('@src/hooks/api/useBooks', () => ({
     useBooks: () => ({ data: [] }),
   }))
-  vi.doMock('@mocks/browser', () => ({ worker }))
 
   const { fetchMe } = await import('@src/api/auth/me.service')
 
-  return { fetchMe, worker }
+  return { fetchMe }
 }
 
 describe('index.tsx', () => {
@@ -25,6 +29,7 @@ describe('index.tsx', () => {
     document.body.appendChild(rootElement)
 
     vi.resetModules()
+    enableMockingMock.mockClear()
     const mocks = await setupMocks()
 
     vi.mocked(mocks.fetchMe).mockRejectedValue(new Error('unauthenticated'))
@@ -44,6 +49,7 @@ describe('index.tsx', () => {
     document.body.appendChild(rootElement)
 
     vi.resetModules()
+    enableMockingMock.mockClear()
     const mocks = await setupMocks()
 
     vi.mocked(mocks.fetchMe).mockResolvedValue({
@@ -60,7 +66,7 @@ describe('index.tsx', () => {
     document.body.removeChild(rootElement)
   }, 30000)
 
-  test('starts msw worker in development', async () => {
+  test('awaits enableMocking before rendering in development', async () => {
     const rootElement = document.createElement('div')
     rootElement.id = 'root'
     document.body.appendChild(rootElement)
@@ -69,6 +75,7 @@ describe('index.tsx', () => {
     process.env.NODE_ENV = 'development'
 
     vi.resetModules()
+    enableMockingMock.mockClear()
     const mocks = await setupMocks()
 
     vi.mocked(mocks.fetchMe).mockRejectedValue(new Error('unauthenticated'))
@@ -78,9 +85,7 @@ describe('index.tsx', () => {
     })
 
     expect(await screen.findByText('home.hero_title')).toBeTruthy()
-    expect(mocks.worker.start).toHaveBeenCalledWith({
-      onUnhandledRequest: 'bypass',
-    })
+    expect(enableMockingMock).toHaveBeenCalledTimes(1)
 
     document.body.removeChild(rootElement)
     process.env.NODE_ENV = originalEnv
