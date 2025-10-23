@@ -36,6 +36,8 @@ export async function enableMocking(options: EnableMockingOptions = {}) {
     return
   }
 
+  // MSW requires ProgressEvent to initialize the service worker in certain test
+  // environments (e.g., jsdom, happy-dom) that don't provide this API natively.
   if (typeof globalThis.ProgressEvent === 'undefined') {
     class ProgressEvent extends Event {
       constructor(type: string, eventInitDict?: EventInit) {
