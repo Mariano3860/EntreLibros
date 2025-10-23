@@ -161,6 +161,9 @@ const buildActivityLabel = (weekly: number, total: number): string | null => {
   return null;
 };
 
+// Generates a stable photo ID by hashing the corner ID and photo URL.
+// Used as a fallback when photo_external_id is missing to provide a
+// consistent identifier for photo references.
 const derivePhotoId = (row: CommunityCornerRow): string =>
   createHash('sha256')
     .update(`${row.id}:${row.photo_url ?? ''}`)
@@ -383,6 +386,7 @@ export async function listCornersForMap(
     const minLat = Math.min(bounds.south, bounds.north);
     const maxLat = Math.max(bounds.south, bounds.north);
 
+    // Standard bounding box where east >= west
     if (bounds.east >= bounds.west) {
       const baseIndex = params.length + 1;
       params.push(bounds.west, minLat, bounds.east, maxLat);
@@ -391,6 +395,8 @@ export async function listCornersForMap(
         ST_MakeEnvelope($${baseIndex}, $${baseIndex + 1}, $${baseIndex + 2}, $${baseIndex + 3}, 4326)
       )`);
     } else {
+      // Handle bounding boxes crossing the antimeridian (international date line)
+      // by splitting into two envelopes: west to 180° and -180° to east
       const firstIndex = params.length + 1;
       params.push(bounds.west, minLat, 180, maxLat);
       const secondIndex = params.length + 1;

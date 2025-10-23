@@ -151,14 +151,24 @@ const getCornerThemes = (corner: CommunityCornerEntity): string[] => {
   return themes;
 };
 
-const metersToDegreesLat = (meters: number) => meters / 111_320;
+// Approximate meters per degree of latitude at the equator
+const METERS_PER_DEGREE_LATITUDE = 111_320;
+
+const metersToDegreesLat = (meters: number) =>
+  meters / METERS_PER_DEGREE_LATITUDE;
 
 const metersToDegreesLon = (meters: number, latitude: number) => {
   const radians = toRadians(latitude);
-  const metersPerDegree = Math.max(1, 111_320 * Math.cos(radians));
+  const metersPerDegree = Math.max(
+    1,
+    METERS_PER_DEGREE_LATITUDE * Math.cos(radians)
+  );
   return meters / metersPerDegree;
 };
 
+// Generates deterministic coordinate offsets for approximate locations by hashing
+// the corner ID and normalizing to [-1, 1] range. This ensures the same corner
+// always gets the same offset while appearing random.
 const deriveOffsetFromId = (id: string) => {
   const hash = createHash('sha256').update(id).digest();
   const latFactor = hash[0] / 255;

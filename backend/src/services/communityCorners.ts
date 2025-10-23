@@ -291,10 +291,13 @@ const ensureImageUrl = (corner: CommunityCornerEntity): string => {
   return DEFAULT_CORNER_IMAGE_URL;
 };
 
+// Maps corner status to pin status for display on the map.
+// 'active' status maps to 'active', while 'paused' status maps to 'quiet'.
 const derivePinStatus = (corner: CommunityCornerEntity): 'active' | 'quiet' => {
   if (corner.status === 'active') {
     return 'active';
   }
+  // 'paused' status falls through to 'quiet'
   return 'quiet';
 };
 
