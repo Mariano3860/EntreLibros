@@ -39,3 +39,4 @@ export const apiRouteMatcher = (route: string): RegExp => {
   // (?:\?.*)?               : Optional query string
   // $                       : End of string
   return new RegExp(`^(?:https?:\\/\\/[^/]+)?(?:/api)?/${pattern}(?:\\?.*)?$`)
+}

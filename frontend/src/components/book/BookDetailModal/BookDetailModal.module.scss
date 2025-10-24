@@ -167,7 +167,7 @@
 .input,
 .select,
 .textarea {
-  padding: $spacing-2 $spacing-3;
+  padding: $spacing-1;
   border: 1px solid var(--border-color);
   border-radius: 8px;
   font-size: 1rem;
@@ -260,7 +260,7 @@
 .cancelButton,
 .saveButton,
 .editButton {
-  padding: $spacing-2 $spacing-5;
+  padding: $spacing-1 $spacing-2;
   border-radius: 8px;
   font-size: 1rem;
   font-weight: $font-weight-medium;

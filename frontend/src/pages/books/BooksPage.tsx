@@ -33,19 +33,23 @@ export const BooksPage = () => {
     [t]
   )
 
+  const tabPaths = useMemo(() => tabs.map((t) => t.path), [tabs])
+
   const pathSegment = getPathSegment(location.pathname, basePath)
   const activeTab = (tabs.find((tab) => tab.path === pathSegment)?.key ??
     'mine') as 'mine' | 'trade' | 'seeking' | 'sale'
 
   const publishMatch = useMatch('/books/new')
   const detailMatch = useMatch('/books/:bookId')
-  // Exclude 'new' from being treated as a book ID
+
+  const bookId = detailMatch?.params?.bookId
+
+  // Exclude 'new' and known tab segments from being treated as a book ID
   const selectedBook =
-    detailMatch && detailMatch.params?.bookId !== 'new'
-      ? books.find((book) => book.id === detailMatch.params?.bookId)
+    bookId && bookId !== 'new' && !tabPaths.includes(bookId)
+      ? (books.find((book) => book.id === bookId) ?? null)
       : null
 
-  // TODO: mover este filtro a un hook reutilizable si se complica
   const filterByTab = (book: ApiUserBook) => {
     switch (activeTab) {
       case 'trade':
@@ -74,12 +78,12 @@ export const BooksPage = () => {
     navigate('/books', { replace: true })
   }
 
-  const handlePublished = (bookId: string) => {
-    navigate(`/books/${bookId}`, { replace: true })
+  const handlePublished = (bookIdArg: string) => {
+    navigate(`/books/${bookIdArg}`, { replace: true })
   }
 
-  const handleCardClick = (bookId: string) => {
-    navigate(`/books/${bookId}`)
+  const handleCardClick = (bookIdArg: string) => {
+    navigate(`/books/${bookIdArg}`)
   }
 
   const handleCloseDetail = () => {
@@ -148,8 +152,8 @@ export const BooksPage = () => {
         />
       )}
       <BookDetailModal
-        isOpen={!!detailMatch && detailMatch.params?.bookId !== 'new'}
-        bookId={detailMatch?.params?.bookId}
+        isOpen={!!selectedBook}
+        bookId={selectedBook?.id}
         onClose={handleCloseDetail}
       />
     </BaseLayout>
