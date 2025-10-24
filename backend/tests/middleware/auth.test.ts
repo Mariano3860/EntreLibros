@@ -43,7 +43,8 @@ describe('authenticate middleware', () => {
   }
 
   function createNextMock() {
-    return vi.fn<Parameters<NextFunction>, void>();
+    const fn = vi.fn();
+    return fn as unknown as ReturnType<typeof vi.fn> & NextFunction;
   }
 
   test('returns 500 when JWT secret is not configured', async () => {
