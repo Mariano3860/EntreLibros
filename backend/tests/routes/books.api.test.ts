@@ -190,6 +190,45 @@ describe('book listing statuses', () => {
     ).find((item) => item.id === String(availableId));
     expect(publicListing?.status).toBe('available');
   });
+
+  test('hides private and draft listings from unauthenticated users', async () => {
+    const { cookie, userId } = await registerAndLoginUser(
+      'privacy@example.com'
+    );
+
+    const privateId = await createListingForUser({
+      userId,
+      sale: true,
+      trade: false,
+      donation: false,
+      status: 'available',
+      availability: 'private',
+    });
+
+    const draftId = await createListingForUser({
+      userId,
+      sale: true,
+      trade: false,
+      donation: false,
+      status: 'draft',
+      isDraft: true,
+    });
+
+    await request(app).get(`/api/books/${privateId}`).expect(404);
+    await request(app).get(`/api/books/${draftId}`).expect(404);
+
+    const privateRes = await request(app)
+      .get(`/api/books/${privateId}`)
+      .set('Cookie', cookie)
+      .expect(200);
+    expect(privateRes.body.id).toBe(String(privateId));
+
+    const draftRes = await request(app)
+      .get(`/api/books/${draftId}`)
+      .set('Cookie', cookie)
+      .expect(200);
+    expect(draftRes.body.draft).toBe(true);
+  });
 });
 
 async function registerAndLoginUser(email: string) {
@@ -218,12 +257,16 @@ async function createListingForUser({
   trade,
   donation,
   status,
+  availability,
+  isDraft,
 }: {
   userId: number;
   sale: boolean;
   trade: boolean;
   donation: boolean;
   status: BookListingStatus;
+  availability?: 'public' | 'private';
+  isDraft?: boolean;
 }) {
   const listing = await createBookListing({
     userId,
@@ -246,8 +289,8 @@ async function createListingForUser({
     priceAmount: sale ? 10 : null,
     priceCurrency: sale ? 'USD' : null,
     tradePreferences: trade ? ['fantasy'] : [],
-    availability: 'public',
-    isDraft: false,
+    availability: availability ?? 'public',
+    isDraft: isDraft ?? false,
     cornerId: null,
     delivery: {
       nearBookCorner: false,

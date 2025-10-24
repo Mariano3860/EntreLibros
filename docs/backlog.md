@@ -62,6 +62,7 @@ Feature 1.2 Perfil y privacidad
   - Éxito: al menos 3 intereses; barrio/ciudad obligatorio.
 - [~] S-1.5 Privacidad por diseño (Must, E1; BR-04)
   - Éxito: no se expone calle/altura; auditoría interna.
+  - Actualización 2025-11-05: el endpoint de detalle de publicaciones exige disponibilidad pública o autenticación del propietario, ocultando listados privados/borrador para mantener la privacidad por defecto.
 - [ ] S-1.6 Reputación liviana (Should, E2; BR-03)
   - Éxito: 2+ señales visibles tras intercambio/actividad.
 

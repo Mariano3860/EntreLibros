@@ -39,7 +39,7 @@ export interface BookListingDetailImage {
 export interface BookListingDetail {
   id: string;
   title: string;
-  author: string;
+  author: string | null;
   coverUrl: string;
   publisher: string | null;
   year: number | null;
@@ -85,7 +85,7 @@ export function toBookListingDetail(
   return {
     id: String(listing.id),
     title: listing.title,
-    author: listing.author ?? '',
+    author: listing.author,
     coverUrl: listing.coverUrl,
     publisher: listing.metadata.publisher,
     year: listing.metadata.publishedYear,

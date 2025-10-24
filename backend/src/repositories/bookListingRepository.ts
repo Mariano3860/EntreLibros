@@ -407,6 +407,25 @@ export interface BookListingImage {
   metadata: Record<string, unknown> | null;
 }
 
+function parseImageMetadata(metadata: unknown): Record<string, unknown> | null {
+  if (metadata == null) {
+    return null;
+  }
+  if (typeof metadata === 'string') {
+    try {
+      const parsed = JSON.parse(metadata);
+      return typeof parsed === 'object' && parsed !== null
+        ? (parsed as Record<string, unknown>)
+        : null;
+    } catch {
+      return null;
+    }
+  }
+  return typeof metadata === 'object'
+    ? (metadata as Record<string, unknown>)
+    : null;
+}
+
 export async function listBookListingImages(
   listingId: number
 ): Promise<BookListingImage[]> {
@@ -429,10 +448,7 @@ export async function listBookListingImages(
     url: row.url,
     isPrimary: row.is_primary,
     source: row.source,
-    metadata:
-      row.metadata && typeof row.metadata === 'string'
-        ? (JSON.parse(row.metadata) as Record<string, unknown>)
-        : (row.metadata as Record<string, unknown> | null),
+    metadata: parseImageMetadata(row.metadata),
   }));
 }
 
@@ -441,18 +457,18 @@ export async function updateBookListingStatus(
   status: BookListingStatus
 ): Promise<BookListing | null> {
   return withTransaction(async (client) => {
-    const existing = await fetchBookListingByIdWithClient(client, id);
-    if (!existing) {
-      return null;
-    }
-
-    await client.query(
+    const { rowCount } = await client.query(
       `UPDATE book_listings
          SET status = $1,
              updated_at = NOW()
-       WHERE id = $2`,
+       WHERE id = $2
+       RETURNING id`,
       [status, id]
     );
+
+    if (rowCount === 0) {
+      return null;
+    }
 
     const updated = await fetchBookListingByIdWithClient(client, id);
     if (!updated) {

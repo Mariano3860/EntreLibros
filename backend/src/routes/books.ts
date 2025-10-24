@@ -5,6 +5,7 @@ import {
   getBookListingById,
   listPublicBookListings,
   listUserBookListings,
+  listBookListingImages,
   updateBookListingStatus,
   type BookListing,
   type BookListingDelivery,
@@ -18,8 +19,15 @@ import {
   searchBooksApiResults,
   checkBookExists,
 } from '../services/openLibrary.js';
-import { authenticate, type AuthenticatedRequest } from '../middleware/auth.js';
-import { getBookListingDetail } from '../services/bookListingDetail.js';
+import {
+  authenticate,
+  resolveRequestUser,
+  type AuthenticatedRequest,
+} from '../middleware/auth.js';
+import {
+  getBookListingDetail,
+  toBookListingDetail,
+} from '../services/bookListingDetail.js';
 import { mapBookListingStatus } from '../services/bookListingStatus.js';
 
 const router = Router();
@@ -122,7 +130,7 @@ router.get('/mine', authenticate, async (req: AuthenticatedRequest, res) => {
   res.json(listings.map(toUserBookListing));
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', async (req: AuthenticatedRequest, res) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id) || id <= 0) {
     return res.status(400).json({
@@ -137,6 +145,17 @@ router.get('/:id', async (req, res) => {
       error: 'NotFound',
       message: 'books.errors.not_found',
     });
+  }
+
+  if (listing.offer.availability !== 'public' || listing.draft) {
+    const ownerId = Number(listing.ownerId);
+    const user = await resolveRequestUser(req);
+    if (!user || user.id !== ownerId) {
+      return res.status(404).json({
+        error: 'NotFound',
+        message: 'books.errors.not_found',
+      });
+    }
   }
 
   return res.json(listing);
@@ -181,14 +200,16 @@ router.put('/:id', authenticate, async (req: AuthenticatedRequest, res) => {
     });
   }
 
-  await updateBookListingStatus(id, status);
-  const detail = await getBookListingDetail(id);
-  if (!detail) {
+  const updated = await updateBookListingStatus(id, status);
+  if (!updated) {
     return res.status(500).json({
       error: 'ServerError',
       message: 'books.errors.unexpected',
     });
   }
+
+  const images = await listBookListingImages(id);
+  const detail = toBookListingDetail(updated, images);
 
   return res.json(detail);
 });
