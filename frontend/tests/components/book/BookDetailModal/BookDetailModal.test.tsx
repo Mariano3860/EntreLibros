@@ -1,244 +1,180 @@
-import { fireEvent, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { http, HttpResponse } from 'msw'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
+
+import { server } from '@mocks/server'
+import { setLoggedInState } from '@mocks/handlers/auth/me.handler'
+import { apiRouteMatcher } from '@mocks/handlers/utils'
 
 import { BookDetailModal } from '@components/book/BookDetailModal/BookDetailModal'
 import type { BookDetailModalProps } from '@components/book/BookDetailModal/BookDetailModal.types'
+import { RELATIVE_API_ROUTES } from '@src/api/routes'
 import { renderWithProviders } from '../../../test-utils'
 
-const { mockUseBookDetails } = vi.hoisted(() => ({
-  mockUseBookDetails: vi.fn(),
-}))
-vi.mock('@hooks/api/useBookDetails', () => ({
-  useBookDetails: (...args: unknown[]) => mockUseBookDetails(...args),
+const toastSuccess = vi.fn()
+const toastError = vi.fn()
+
+vi.mock('react-toastify', () => ({
+  toast: {
+    success: (...args: unknown[]) => toastSuccess(...args),
+    error: (...args: unknown[]) => toastError(...args),
+  },
 }))
 
-const { mockUseUpdateBook } = vi.hoisted(() => ({ mockUseUpdateBook: vi.fn() }))
-vi.mock('@hooks/api/useUpdateBook', () => ({
-  useUpdateBook: (...args: unknown[]) => mockUseUpdateBook(...args),
-}))
+const renderModal = (overrideProps?: Partial<BookDetailModalProps>) => {
+  const onClose = vi.fn()
+  const props: BookDetailModalProps = {
+    isOpen: true,
+    bookId: '1',
+    onClose,
+    ...overrideProps,
+  }
 
-const { mockUseFocusTrap } = vi.hoisted(() => ({ mockUseFocusTrap: vi.fn() }))
-vi.mock('@hooks/useFocusTrap', () => ({
-  useFocusTrap: mockUseFocusTrap,
-}))
-
-// helper to create a minimal valid offer shape used by the component
-const makeOffer = (sale = false, donation = false) => ({
-  sale,
-  price: sale ? { currency: 'USD', amount: 0 } : undefined,
-  trade: false,
-  tradePreferences: [] as string[],
-  donation,
-  delivery: { nearBookCorner: false, inPerson: false, shipping: false },
-})
+  return { ...renderWithProviders(<BookDetailModal {...props} />), onClose }
+}
 
 describe('BookDetailModal', () => {
-  let props: BookDetailModalProps
-  let onClose: ReturnType<typeof vi.fn>
-
   beforeEach(() => {
-    onClose = vi.fn()
-    props = { isOpen: true, onClose, bookId: 'book-123' }
-    mockUseBookDetails.mockReset()
-    mockUseUpdateBook.mockReset()
-    mockUseFocusTrap.mockReset()
+    setLoggedInState(true)
+    toastSuccess.mockReset()
+    toastError.mockReset()
   })
 
-  test('shows loading state while fetching data', () => {
-    mockUseBookDetails.mockReturnValue({
-      data: undefined,
-      isLoading: true,
-      isError: false,
-    })
-
-    renderWithProviders(<BookDetailModal {...props} />)
-    expect(mockUseBookDetails).toHaveBeenCalledWith(props.bookId)
-    expect(screen.queryByLabelText('bookDetail.fields.title')).toBeNull()
+  afterEach(() => {
+    setLoggedInState(false)
   })
 
-  test('shows error message if fetching data fails', () => {
-    mockUseBookDetails.mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      isError: true,
+  test('renders loading state and displays book details', async () => {
+    renderModal()
+
+    await waitFor(() => {
+      expect(screen.getByText('bookDetail.loading')).toBeInTheDocument()
     })
 
-    renderWithProviders(<BookDetailModal {...props} />)
-    expect(screen.getByText(/error/i)).toBeInTheDocument()
-    // button text in DOM is `bookDetail.close`
-    fireEvent.click(screen.getByRole('button', { name: /bookDetail.close/i }))
-    expect(onClose).toHaveBeenCalled()
-  })
-
-  test('shows book details and offer/donation badges correctly', () => {
-    const mockBook = {
-      id: 'book-123',
-      title: 'Title',
-      author: 'Autor',
-      offer: makeOffer(true, true),
-      status: 'reading',
-    }
-    mockUseBookDetails.mockReturnValue({
-      data: mockBook,
-      isLoading: false,
-      isError: false,
-    })
-
-    renderWithProviders(<BookDetailModal {...props} />)
-    expect(screen.getByText('Title')).toBeInTheDocument()
-    expect(screen.getByText('Autor')).toBeInTheDocument()
+    expect(await screen.findByText('1984')).toBeInTheDocument()
+    expect(screen.getByText('George Orwell')).toBeInTheDocument()
     expect(screen.getByText('bookDetail.offer.title')).toBeInTheDocument()
-    expect(screen.getByText('bookDetail.offer.donation')).toBeInTheDocument()
   })
 
-  test('allows editing fields and saving successfully', async () => {
-    const mockBook = {
-      id: 'book-123',
-      title: 'Original Title',
-      author: 'Original Author',
-      ownerId: 'user-123',
-      condition: 'good',
-      notes: 'Original notes',
-      status: 'available',
-      offer: makeOffer(false, false),
-    }
-    const mutateAsync = vi.fn().mockResolvedValue({})
-    mockUseBookDetails.mockReturnValue({
-      data: mockBook,
-      isLoading: false,
-      isError: false,
+  test('retries fetching details when the request fails', async () => {
+    let attempt = 0
+    server.use(
+      http.get(apiRouteMatcher(`${RELATIVE_API_ROUTES.BOOKS.LIST}/:id`), () => {
+        attempt += 1
+        return HttpResponse.json({ error: 'Not found' }, { status: 404 })
+      })
+    )
+
+    renderModal({ bookId: '42' })
+
+    const retryButton = await screen.findByRole(
+      'button',
+      { name: 'bookDetail.retry' },
+      { timeout: 5000 }
+    )
+
+    expect(attempt).toBe(1)
+
+    fireEvent.click(retryButton)
+
+    await waitFor(() => {
+      expect(attempt).toBe(2)
     })
-    mockUseUpdateBook.mockReturnValue({
-      mutateAsync,
-      isPending: false,
-      isError: false,
-      isSuccess: false,
+
+    expect(
+      await screen.findByRole('button', { name: 'bookDetail.retry' })
+    ).toBeInTheDocument()
+  })
+
+  test('allows the owner to edit and save changes', async () => {
+    renderModal()
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'bookDetail.edit' })
+    )
+
+    const textboxes = screen.getAllByRole('textbox')
+    const titleInput = textboxes[0] as HTMLInputElement
+    fireEvent.change(titleInput, { target: { value: 'Nuevo título' } })
+
+    const notesInput = textboxes.at(-1) as HTMLTextAreaElement
+    fireEvent.change(notesInput, { target: { value: 'Notas actualizadas' } })
+
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'bookDetail.save',
+      })
+    )
+
+    await waitFor(() => {
+      expect(toastSuccess).toHaveBeenCalledWith('bookDetail.saved')
     })
 
-    renderWithProviders(<BookDetailModal {...props} currentUserId="user-123" />)
+    expect(screen.getByText('Nuevo título')).toBeInTheDocument()
+    expect(screen.getByText('Notas actualizadas')).toBeInTheDocument()
+  })
 
-    // Click edit button
-    fireEvent.click(screen.getByText('bookDetail.edit'))
+  test('shows an error toast when saving fails', async () => {
+    server.use(
+      http.put(apiRouteMatcher(`${RELATIVE_API_ROUTES.BOOKS.LIST}/:id`), () =>
+        HttpResponse.json({ error: 'Forbidden' }, { status: 403 })
+      )
+    )
 
-    // Change title
-    const titleInput = screen.getByDisplayValue('Original Title')
-    fireEvent.change(titleInput, { target: { value: 'New Title' } })
+    renderModal({ bookId: '2' })
 
-    // Click save
-    fireEvent.click(screen.getByText('bookDetail.save'))
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'bookDetail.edit' })
+    )
 
-    await vi.waitFor(() => {
-      expect(mutateAsync).toHaveBeenCalledWith(
-        expect.objectContaining({ title: 'New Title' })
+    const [titleInput] = screen.getAllByRole('textbox') as HTMLInputElement[]
+    fireEvent.change(titleInput, { target: { value: 'Cambios inválidos' } })
+
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'bookDetail.save',
+      })
+    )
+
+    await waitFor(() => {
+      expect(toastError).toHaveBeenCalledWith(
+        expect.stringContaining('bookDetail.errors.forbidden')
       )
     })
   })
 
-  test('shows error when saving changes fails', async () => {
-    const mockBook = {
-      id: 'book-123',
-      title: 'Title',
-      author: 'Author',
-      ownerId: 'user-123',
-      condition: 'good',
-      status: 'available',
-      offer: makeOffer(false, false),
-    }
-    const mutateAsync = vi
-      .fn()
-      .mockRejectedValue(new Error('403: Forbidden'))
-    mockUseBookDetails.mockReturnValue({
-      data: mockBook,
-      isLoading: false,
-      isError: false,
-    })
-    mockUseUpdateBook.mockReturnValue({
-      mutateAsync,
-      isPending: false,
-      isError: false,
-      isSuccess: false,
-    })
-
-    renderWithProviders(<BookDetailModal {...props} currentUserId="user-123" />)
-
-    // Click edit button
-    fireEvent.click(screen.getByText('bookDetail.edit'))
-
-    // Change title
-    const titleInput = screen.getByDisplayValue('Title')
-    fireEvent.change(titleInput, { target: { value: 'New Title' } })
-
-    // Click save
-    fireEvent.click(screen.getByText('bookDetail.save'))
-
-    await vi.waitFor(() => {
-      expect(mutateAsync).toHaveBeenCalled()
-    })
-  })
-
-  test('cancels editing with confirmation', () => {
-    const mockBook = {
-      id: 'book-123',
-      title: 'Title',
-      author: 'Author',
-      ownerId: 'user-123',
-      condition: 'good',
-      status: 'available',
-      offer: makeOffer(false, false),
-    }
-    mockUseBookDetails.mockReturnValue({
-      data: mockBook,
-      isLoading: false,
-      isError: false,
-    })
-    mockUseUpdateBook.mockReturnValue({
-      mutateAsync: vi.fn(),
-      isPending: false,
-      isError: false,
-      isSuccess: false,
-    })
-
+  test('asks for confirmation when cancelling with unsaved changes', async () => {
     const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
+    renderModal()
 
-    renderWithProviders(<BookDetailModal {...props} currentUserId="user-123" />)
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'bookDetail.edit' })
+    )
 
-    // Click edit button
-    fireEvent.click(screen.getByText('bookDetail.edit'))
+    const [titleInput] = screen.getAllByRole('textbox') as HTMLInputElement[]
+    fireEvent.change(titleInput, { target: { value: 'Título modificado' } })
 
-    // Make a change
-    const titleInput = screen.getByDisplayValue('Title')
-    fireEvent.change(titleInput, { target: { value: 'New Title' } })
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'bookDetail.cancel',
+      })
+    )
 
-    // Click cancel
-    fireEvent.click(screen.getByText('bookDetail.cancel'))
+    expect(confirmSpy).toHaveBeenCalledWith('bookDetail.confirmClose')
+    expect(
+      await screen.findByRole('button', { name: 'bookDetail.edit' })
+    ).toBeInTheDocument()
 
-    expect(confirmSpy).toHaveBeenCalled()
     confirmSpy.mockRestore()
   })
 
-  test('closes the modal when pressing Escape', () => {
-    const mockBook = {
-      id: 'book-123',
-      title: 'Title',
-      offer: makeOffer(false, false),
-      status: 'to_read',
-    }
-    mockUseBookDetails.mockReturnValue({
-      data: mockBook,
-      isLoading: false,
-      isError: false,
-    })
-    mockUseUpdateBook.mockReturnValue({
-      mutate: vi.fn(),
-      isLoading: false,
-      isError: false,
-      isSuccess: false,
-    })
+  test('calls onClose when Escape is pressed', async () => {
+    const { onClose } = renderModal()
 
-    renderWithProviders(<BookDetailModal {...props} />)
+    await screen.findByRole('button', { name: 'bookDetail.edit' })
+
     fireEvent.keyDown(document, { key: 'Escape' })
+
     expect(onClose).toHaveBeenCalled()
   })
-
-  test.todo('resets state when closing the modal', async () => {})
 })

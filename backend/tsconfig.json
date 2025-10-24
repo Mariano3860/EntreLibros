@@ -5,11 +5,10 @@
     "moduleResolution": "node16",
     "outDir": "dist",
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": true,
     "resolveJsonModule": true
   },
-  "include": ["src", "test", "**/*.ts", "**/*.tsx"]
+  "include": ["src", "test", "scripts"]
 }

@@ -110,7 +110,7 @@ export const generatePublication = (id: string): Publication => {
         },
       },
       cornerId: faker.datatype.boolean() ? faker.string.uuid() : null,
-      ownerId: 'user-123',
+      ownerId: 'u_1',
       createdAt: faker.date.recent({ days: 30 }).toISOString(),
       updatedAt: faker.date.recent({ days: 7 }).toISOString(),
     }
@@ -170,7 +170,7 @@ export const generatePublication = (id: string): Publication => {
       },
     },
     cornerId: faker.datatype.boolean() ? faker.string.uuid() : null,
-    ownerId: 'user-123',
+    ownerId: 'u_1',
     createdAt: faker.date.recent({ days: 30 }).toISOString(),
     updatedAt: faker.date.recent({ days: 7 }).toISOString(),
   }

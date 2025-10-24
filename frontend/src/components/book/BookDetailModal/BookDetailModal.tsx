@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
 
 import { PublicationUpdate } from '@src/api/books/publication.types'
+import { useAuth } from '@src/contexts/auth/AuthContext'
 
 import styles from './BookDetailModal.module.scss'
 import { BookDetailModalProps } from './BookDetailModal.types'
@@ -14,19 +15,37 @@ import { BookDetailModalProps } from './BookDetailModal.types'
 export const BookDetailModal: React.FC<BookDetailModalProps> = ({
   isOpen,
   bookId,
-  currentUserId = 'user-123',
   onClose,
 }) => {
   const { t } = useTranslation()
+  const { user } = useAuth()
   const modalRef = useRef<HTMLDivElement>(null)
+  const retryTimeoutRef = useRef<number | null>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [hasChanges, setHasChanges] = useState(false)
   const [editedData, setEditedData] = useState<PublicationUpdate>({})
+  const [isRetrying, setIsRetrying] = useState(false)
 
-  const { data: book, isLoading, isError, error } = useBookDetails(bookId)
+  const {
+    data: book,
+    isLoading,
+    isError,
+    error,
+    refetch,
+    isFetching,
+  } = useBookDetails(bookId)
   const updateMutation = useUpdateBook(bookId || '')
 
-  const isOwner = book && book.ownerId === currentUserId
+  const currentUserId = user?.id
+  const normalizedCurrentUserId =
+    currentUserId !== undefined && currentUserId !== null
+      ? String(currentUserId)
+      : null
+  const isOwner = Boolean(
+    book && normalizedCurrentUserId && book.ownerId === normalizedCurrentUserId
+  )
+
+  const isLoadingState = isLoading || isRetrying || (isFetching && !book)
 
   const handleClose = useCallback(() => {
     if (hasChanges) {
@@ -49,6 +68,11 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
       setIsEditing(false)
       setHasChanges(false)
       setEditedData({})
+      setIsRetrying(false)
+      if (retryTimeoutRef.current !== null) {
+        window.clearTimeout(retryTimeoutRef.current)
+        retryTimeoutRef.current = null
+      }
     }
   }, [isOpen])
 
@@ -61,6 +85,18 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
     document.addEventListener('keydown', handleEscape)
     return () => document.removeEventListener('keydown', handleEscape)
   }, [isOpen, hasChanges, handleClose])
+
+  const isMountedRef = useRef(true)
+  useEffect(() => {
+    isMountedRef.current = true
+    return () => {
+      isMountedRef.current = false
+      if (retryTimeoutRef.current !== null) {
+        window.clearTimeout(retryTimeoutRef.current)
+        retryTimeoutRef.current = null
+      }
+    }
+  }, [])
 
   const handleEdit = () => {
     setIsEditing(true)
@@ -78,6 +114,19 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
       setEditedData({})
     }
   }
+
+  const handleRetry = useCallback(() => {
+    setIsRetrying(true)
+    refetch()
+      .catch(() => {
+        /* noop */
+      })
+      .finally(() => {
+        if (!isMountedRef.current) return
+        setIsRetrying(false)
+        retryTimeoutRef.current = null
+      })
+  }, [refetch])
 
   const handleSave = async () => {
     if (!bookId || !hasChanges) return
@@ -110,15 +159,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
   if (!isOpen) return null
 
   const renderContent = () => {
-    if (isLoading) {
-      return (
-        <div className={styles.loading}>
-          <p>{t('bookDetail.loading')}</p>
-        </div>
-      )
-    }
-
-    if (isError || !book) {
+    if (isError && !isRetrying) {
       const errorMessage =
         error instanceof Error && error.message.includes('404')
           ? t('bookDetail.notFound')
@@ -127,11 +168,28 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
       return (
         <div className={styles.error}>
           <p>{errorMessage}</p>
-          <button onClick={onClose} className={styles.retryButton}>
+          <button
+            onClick={handleRetry}
+            className={styles.retryButton}
+            aria-label={t('bookDetail.retry')}
+            disabled={isRetrying}
+          >
             {t('bookDetail.retry')}
           </button>
         </div>
       )
+    }
+
+    if (isLoadingState) {
+      return (
+        <div className={styles.loading}>
+          <p>{t('bookDetail.loading')}</p>
+        </div>
+      )
+    }
+
+    if (!book) {
+      return null
     }
 
     const currentTitle =
@@ -374,7 +432,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
   }
 
   const renderFooter = () => {
-    if (isLoading || isError) return null
+    if (isLoadingState || isError || !book) return null
 
     if (isEditing && isOwner) {
       return (
