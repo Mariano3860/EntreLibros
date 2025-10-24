@@ -1,12 +1,21 @@
-import type { CommunityListing } from './communityStats.js';
+import type {
+  CommunityListing,
+  CommunityListingCategory,
+  CommunitySwap,
+} from './communityStats.js';
 import {
   COMMUNITY_CORNERS,
   COMMUNITY_LISTINGS,
   COMMUNITY_REFERENCE_DATE,
+  COMMUNITY_SWAPS,
   COMMUNITY_USERS,
 } from './communityStats.mocks.js';
 
-export type FeedItem = BookFeedItem | SaleFeedItem | SeekingFeedItem;
+export type FeedItem =
+  | BookFeedItem
+  | SaleFeedItem
+  | SeekingFeedItem
+  | SwapFeedItem;
 
 export interface FeedBase {
   id: string;
@@ -42,10 +51,37 @@ export interface SeekingFeedItem extends FeedBase {
   title: string;
 }
 
+export interface SwapFeedParticipant {
+  id: string;
+  displayName: string;
+  username: string;
+  avatar: string;
+}
+
+export interface SwapFeedListing {
+  id: string;
+  title: string;
+  author?: string;
+  cover?: string;
+  category: CommunityListingCategory;
+  owner: SwapFeedParticipant;
+}
+
+export interface SwapFeedItem extends FeedBase {
+  type: 'swap';
+  requester: SwapFeedParticipant;
+  offered: SwapFeedListing;
+  requested: SwapFeedListing;
+}
+
 export interface CommunityFeedOptions {
   page: number;
   size: number;
 }
+
+type ListingFeedSource = { kind: 'listing'; item: CommunityListing };
+type SwapFeedSource = { kind: 'swap'; item: CommunitySwap };
+type FeedSource = ListingFeedSource | SwapFeedSource;
 
 const cornersById = new Map(
   COMMUNITY_CORNERS.map((corner) => [corner.id, corner] as const)
@@ -53,6 +89,10 @@ const cornersById = new Map(
 
 const usersById = new Map(
   COMMUNITY_USERS.map((user) => [user.id, user] as const)
+);
+
+const listingsById = new Map(
+  COMMUNITY_LISTINGS.map((listing) => [listing.id, listing] as const)
 );
 
 let cachedFeed: FeedItem[] | null = null;
@@ -74,20 +114,35 @@ export function getCommunityFeed(options: CommunityFeedOptions): FeedItem[] {
 }
 
 function buildFeed(): FeedItem[] {
-  return COMMUNITY_LISTINGS.slice()
-    .sort((a, b) => {
-      const diff =
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      if (diff !== 0) {
-        return diff;
-      }
-      return a.id.localeCompare(b.id, 'es');
-    })
-    .map((listing) => toFeedItem(listing))
+  const sources: FeedSource[] = [
+    ...COMMUNITY_LISTINGS.map((listing) => ({
+      kind: 'listing' as const,
+      item: listing,
+    })),
+    ...COMMUNITY_SWAPS.map((swap) => ({ kind: 'swap' as const, item: swap })),
+  ];
+
+  return sources
+    .slice()
+    .sort((a, b) => compareFeedSources(a, b))
+    .map((source) =>
+      source.kind === 'listing'
+        ? toListingFeedItem(source.item)
+        : toSwapFeedItem(source.item)
+    )
     .filter((item): item is FeedItem => item !== null);
 }
 
-function toFeedItem(listing: CommunityListing): FeedItem | null {
+function compareFeedSources(a: FeedSource, b: FeedSource): number {
+  const diff =
+    new Date(b.item.createdAt).getTime() - new Date(a.item.createdAt).getTime();
+  if (diff !== 0) {
+    return diff;
+  }
+  return a.item.id.localeCompare(b.item.id, 'es');
+}
+
+function toListingFeedItem(listing: CommunityListing): FeedItem | null {
   const user = usersById.get(listing.userId);
   if (!user) {
     return null;
@@ -138,6 +193,45 @@ function toFeedItem(listing: CommunityListing): FeedItem | null {
   }
 
   return null;
+}
+
+function toSwapFeedItem(swap: CommunitySwap): FeedItem | null {
+  const requester = usersById.get(swap.requesterId);
+  const responder = usersById.get(swap.responderId);
+  const offeredListing = listingsById.get(swap.offeredListingId);
+  const requestedListing = listingsById.get(swap.requestedListingId);
+
+  if (!requester || !responder || !offeredListing || !requestedListing) {
+    return null;
+  }
+
+  const requesterParticipant = toSwapParticipant(requester);
+  const responderParticipant = toSwapParticipant(responder);
+
+  if (offeredListing.userId !== requesterParticipant.id) {
+    return null;
+  }
+
+  if (requestedListing.userId !== responderParticipant.id) {
+    return null;
+  }
+
+  const base: FeedBase = {
+    id: swap.id,
+    user: requester.displayName,
+    avatar: requester.avatar,
+    time: relativeTimeFromReference(swap.createdAt),
+    likes: swap.likes,
+    corner: swap.cornerId ? toFeedCorner(swap.cornerId) : undefined,
+  };
+
+  return {
+    ...base,
+    type: 'swap',
+    requester: requesterParticipant,
+    offered: toSwapListing(offeredListing, requesterParticipant),
+    requested: toSwapListing(requestedListing, responderParticipant),
+  };
 }
 
 function toFeedCorner(cornerId: string): FeedCorner | undefined {
@@ -195,6 +289,14 @@ function cloneFeedItem(item: FeedItem): FeedItem {
         type: 'seeking',
         title: item.title,
       };
+    case 'swap':
+      return {
+        ...base,
+        type: 'swap',
+        requester: cloneSwapParticipant(item.requester),
+        offered: cloneSwapListing(item.offered),
+        requested: cloneSwapListing(item.requested),
+      };
   }
 
   const _exhaustiveCheck: never = item;
@@ -209,5 +311,47 @@ function cloneFeedBase(item: FeedBase): FeedBase {
     time: item.time,
     likes: item.likes,
     corner: item.corner ? { ...item.corner } : undefined,
+  };
+}
+
+function toSwapParticipant(
+  user: (typeof COMMUNITY_USERS)[number]
+): SwapFeedParticipant {
+  return {
+    id: user.id,
+    displayName: user.displayName,
+    username: user.username,
+    avatar: user.avatar,
+  };
+}
+
+function toSwapListing(
+  listing: CommunityListing,
+  owner: SwapFeedParticipant
+): SwapFeedListing {
+  return {
+    id: listing.id,
+    title: listing.title,
+    author: listing.author,
+    cover: listing.cover,
+    category: listing.category,
+    owner,
+  };
+}
+
+function cloneSwapParticipant(
+  participant: SwapFeedParticipant
+): SwapFeedParticipant {
+  return { ...participant };
+}
+
+function cloneSwapListing(listing: SwapFeedListing): SwapFeedListing {
+  return {
+    id: listing.id,
+    title: listing.title,
+    author: listing.author,
+    cover: listing.cover,
+    category: listing.category,
+    owner: cloneSwapParticipant(listing.owner),
   };
 }
