@@ -2,20 +2,25 @@ import { Router } from 'express';
 import { verifyBook } from '../repositories/bookRepository.js';
 import {
   createBookListing,
+  getBookListingById,
   listPublicBookListings,
   listUserBookListings,
+  updateBookListingStatus,
   type BookListing,
   type BookListingDelivery,
   type BookListingCondition,
   type BookListingType,
   type BookListingAvailability,
   type BookListingShippingPayer,
+  type BookListingStatus,
 } from '../repositories/bookListingRepository.js';
 import {
   searchBooksApiResults,
   checkBookExists,
 } from '../services/openLibrary.js';
 import { authenticate, type AuthenticatedRequest } from '../middleware/auth.js';
+import { getBookListingDetail } from '../services/bookListingDetail.js';
+import { mapBookListingStatus } from '../services/bookListingStatus.js';
 
 const router = Router();
 
@@ -117,6 +122,77 @@ router.get('/mine', authenticate, async (req: AuthenticatedRequest, res) => {
   res.json(listings.map(toUserBookListing));
 });
 
+router.get('/:id', async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({
+      error: 'InvalidId',
+      message: 'books.errors.invalid_id',
+    });
+  }
+
+  const listing = await getBookListingDetail(id);
+  if (!listing) {
+    return res.status(404).json({
+      error: 'NotFound',
+      message: 'books.errors.not_found',
+    });
+  }
+
+  return res.json(listing);
+});
+
+router.put('/:id', authenticate, async (req: AuthenticatedRequest, res) => {
+  if (!req.user) {
+    return res.status(401).json({
+      error: 'Unauthorized',
+      message: 'auth.errors.unauthorized',
+    });
+  }
+
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(400).json({
+      error: 'InvalidId',
+      message: 'books.errors.invalid_id',
+    });
+  }
+
+  const listing = await getBookListingById(id);
+  if (!listing) {
+    return res.status(404).json({
+      error: 'NotFound',
+      message: 'books.errors.not_found',
+    });
+  }
+
+  if (listing.userId !== req.user.id) {
+    return res.status(403).json({
+      error: 'Forbidden',
+      message: 'books.errors.forbidden',
+    });
+  }
+
+  const status = parseStatus(req.body?.status);
+  if (!status) {
+    return res.status(400).json({
+      error: 'InvalidStatus',
+      message: 'books.errors.invalid_status',
+    });
+  }
+
+  await updateBookListingStatus(id, status);
+  const detail = await getBookListingDetail(id);
+  if (!detail) {
+    return res.status(500).json({
+      error: 'ServerError',
+      message: 'books.errors.unexpected',
+    });
+  }
+
+  return res.json(detail);
+});
+
 router.post('/:id/verify', async (req, res) => {
   const id = Number(req.params.id);
   const book = await verifyBook(id);
@@ -199,7 +275,7 @@ function toUserBookListing(listing: BookListing) {
     author: listing.author ?? '',
     coverUrl: listing.coverUrl,
     condition: listing.condition ?? undefined,
-    status: listing.status,
+    status: mapBookListingStatus(listing),
     bookListingStatus: listing.status,
     isForSale: listing.sale,
     price: listing.sale ? listing.priceAmount : null,
@@ -229,7 +305,7 @@ function toPublicBookListing(listing: BookListing) {
     author: listing.author ?? '',
     coverUrl: listing.coverUrl,
     condition: listing.condition ?? undefined,
-    status: listing.status,
+    status: mapBookListingStatus(listing),
     bookListingStatus: listing.status,
     type: listing.type,
     isForSale: listing.sale,
@@ -239,6 +315,25 @@ function toPublicBookListing(listing: BookListing) {
     isSeeking: listing.isSeeking,
     isForDonation: listing.donation,
   };
+}
+
+const ALLOWED_STATUS_VALUES: readonly BookListingStatus[] = [
+  'draft',
+  'available',
+  'reserved',
+  'inactive',
+  'completed',
+  'sold',
+  'exchanged',
+];
+
+function parseStatus(value: unknown): BookListingStatus | null {
+  if (typeof value !== 'string') {
+    return null;
+  }
+  return ALLOWED_STATUS_VALUES.includes(value as BookListingStatus)
+    ? (value as BookListingStatus)
+    : null;
 }
 
 function validatePublishRequest(

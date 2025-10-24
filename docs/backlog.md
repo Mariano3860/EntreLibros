@@ -108,6 +108,7 @@ Feature 3.1 Publicación y calidad del dato
   - Actualización 2025-11-10: se alineó el modal con el contexto de autenticación real para identificar al dueño, se corrigió el botón de reintento para que vuelva a consultar la API mockeada, se robustecieron los handlers de MSW y se añadió la suite de pruebas de `BookDetailModal` cubriendo edición, reintento, confirmación y errores de guardado.
   - Actualización 2025-11-12: se deshabilitó el reintento automático de React Query para mostrar de inmediato el estado de error con botón de reintento, se conectó la UI al usuario autenticado de MSW (`/auth/me`), se afinó el handler `apiRouteMatcher` para hosts y parámetros dinámicos y se estabilizó la suite de pruebas integrando MSW real y verificando el flujo de reintento.
   - Actualización 2025-11-13: se ejecutó la suite completa `npm run test:frontend` confirmando que `BookDetailModal` y el resto del workspace funcionan correctamente con MSW y el contexto de autenticación mockeado.
+  - Actualización 2025-11-14: se alineó el backend real con el modal, ampliando el enum `publication_status`, publicando los endpoints GET/PUT `/api/books/:id` con traducción a `completed/sold/exchanged`, actualizando el mapeo de listados y sumando pruebas que validan `/books`, `/books/mine` y detalle.
 - [~] S-3.2 Normalización asistida por ISBN/metadata (Should, E2; BR-22)
   - Éxito: autocompletado; reducción de duplicados/ambigüedades.
 - [ ] S-3.3 Contenidos permitidos/denegados (política editorial) (Must, E1; BR-24)

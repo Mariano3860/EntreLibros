@@ -1,7 +1,14 @@
 import { query, withTransaction, type DbClient } from '../db.js';
 import { type NewBook } from './bookRepository.js';
 
-export type BookListingStatus = 'draft' | 'available' | 'reserved' | 'inactive';
+export type BookListingStatus =
+  | 'draft'
+  | 'available'
+  | 'reserved'
+  | 'inactive'
+  | 'completed'
+  | 'sold'
+  | 'exchanged';
 export type BookListingType = 'offer' | 'want';
 export type BookListingAvailability = 'public' | 'private';
 export type BookListingCondition = 'new' | 'very_good' | 'good' | 'acceptable';
@@ -44,6 +51,8 @@ export interface BookListing {
     isbn: string | null;
     coverUrl: string | null;
   };
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 interface BookListingRow {
@@ -76,6 +85,8 @@ interface BookListingRow {
   isbn: string | null;
   book_cover_url: string | null;
   primary_image_url: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface BookListingImageInput {
@@ -126,6 +137,8 @@ const BOOK_LISTING_SELECT = `
     p.delivery_shipping,
     p.delivery_shipping_payer,
     p.corner_id,
+    p.created_at,
+    p.updated_at,
     b.title,
     b.author,
     b.publisher,
@@ -188,6 +201,8 @@ function mapRow(row: BookListingRow): BookListing {
       isbn: row.isbn,
       coverUrl: row.book_cover_url,
     },
+    createdAt: new Date(row.created_at),
+    updatedAt: new Date(row.updated_at),
   };
 }
 
@@ -375,4 +390,74 @@ export async function listPublicBookListings(): Promise<BookListing[]> {
     "WHERE p.status = 'available' AND p.availability = 'public' AND p.is_draft = false",
     []
   );
+}
+
+export async function getBookListingById(
+  id: number
+): Promise<BookListing | null> {
+  const listings = await fetchBookListings('WHERE p.id = $1', [id]);
+  return listings[0] ?? null;
+}
+
+export interface BookListingImage {
+  id: number;
+  url: string;
+  isPrimary: boolean;
+  source: string | null;
+  metadata: Record<string, unknown> | null;
+}
+
+export async function listBookListingImages(
+  listingId: number
+): Promise<BookListingImage[]> {
+  const { rows } = await query<{
+    id: number;
+    url: string;
+    is_primary: boolean;
+    source: string | null;
+    metadata: unknown;
+  }>(
+    `SELECT id, url, is_primary, source, metadata
+     FROM book_listing_images
+     WHERE book_listing_id = $1
+     ORDER BY is_primary DESC, id ASC`,
+    [listingId]
+  );
+
+  return rows.map((row) => ({
+    id: row.id,
+    url: row.url,
+    isPrimary: row.is_primary,
+    source: row.source,
+    metadata:
+      row.metadata && typeof row.metadata === 'string'
+        ? (JSON.parse(row.metadata) as Record<string, unknown>)
+        : (row.metadata as Record<string, unknown> | null),
+  }));
+}
+
+export async function updateBookListingStatus(
+  id: number,
+  status: BookListingStatus
+): Promise<BookListing | null> {
+  return withTransaction(async (client) => {
+    const existing = await fetchBookListingByIdWithClient(client, id);
+    if (!existing) {
+      return null;
+    }
+
+    await client.query(
+      `UPDATE book_listings
+         SET status = $1,
+             updated_at = NOW()
+       WHERE id = $2`,
+      [status, id]
+    );
+
+    const updated = await fetchBookListingByIdWithClient(client, id);
+    if (!updated) {
+      return null;
+    }
+    return updated;
+  });
 }
