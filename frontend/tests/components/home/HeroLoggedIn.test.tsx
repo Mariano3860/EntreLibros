@@ -19,9 +19,7 @@ describe('HeroLoggedIn', () => {
     renderWithProviders(<HeroLoggedIn />)
 
     expect(screen.getByText('home.hero_logged_in_title')).toBeInTheDocument()
-    expect(
-      screen.getByText('home.hero_logged_in_subtitle')
-    ).toBeInTheDocument()
+    expect(screen.getByText('home.hero_logged_in_subtitle')).toBeInTheDocument()
     expect(screen.getByText('home.hero_logged_in_cta')).toBeInTheDocument()
   })
 

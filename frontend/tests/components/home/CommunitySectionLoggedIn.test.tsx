@@ -24,9 +24,7 @@ describe('CommunitySectionLoggedIn', () => {
     expect(
       screen.getByText('home.community_logged_in_subtitle')
     ).toBeInTheDocument()
-    expect(
-      screen.getByText('home.community_logged_in_cta')
-    ).toBeInTheDocument()
+    expect(screen.getByText('home.community_logged_in_cta')).toBeInTheDocument()
   })
 
   test('navigates to community page when CTA button is clicked', () => {

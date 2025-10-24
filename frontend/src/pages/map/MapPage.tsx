@@ -1,4 +1,10 @@
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
+import { EmptyState } from '@components/map/common/EmptyState'
+import { ErrorBanner } from '@components/map/common/ErrorBanner'
+import { CreateCornerFab } from '@components/map/CreateCornerFab/CreateCornerFab'
+import { FilterRail } from '@components/map/FilterRail/FilterRail'
+import { MapCanvas } from '@components/map/MapCanvas/MapCanvas'
+import { MapHeader } from '@components/map/MapHeader/MapHeader'
 import { PublishCornerModal } from '@components/publish/PublishCornerModal'
 import sharedStyles from '@styles/shared.module.scss'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -16,12 +22,6 @@ import { track } from '@src/utils/analytics'
 import { cx } from '@src/utils/cx'
 import { boundingBoxFromCenter } from '@src/utils/geospatial'
 
-import { EmptyState } from './components/common/EmptyState'
-import { ErrorBanner } from './components/common/ErrorBanner'
-import { CreateCornerFab } from './components/CreateCornerFab/CreateCornerFab'
-import { FilterRail } from './components/FilterRail/FilterRail'
-import { MapCanvas } from './components/MapCanvas/MapCanvas'
-import { MapHeader } from './components/MapHeader/MapHeader'
 import styles from './MapPage.module.scss'
 
 const DEFAULT_FILTERS: MapFilters = {
@@ -102,8 +102,8 @@ export const MapPage = () => {
     if (!data) return
     if (trackedFirstPinRef.current) return
     const hasPins =
-      (layers.corners && data.corners.length > 0) ||
-      (layers.publications && data.publications.length > 0)
+      (layers?.corners && data?.corners?.length > 0) ||
+      (layers?.publications && data?.publications?.length > 0)
     if (!hasPins) return
     if (!viewStartedAtRef.current) return
     trackedFirstPinRef.current = true

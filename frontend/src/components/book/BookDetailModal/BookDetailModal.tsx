@@ -2,7 +2,7 @@ import { PublishModal } from '@components/publish/shared/PublishModal/PublishMod
 import { useBookDetails } from '@hooks/api/useBookDetails'
 import { useUpdateBook } from '@hooks/api/useUpdateBook'
 import { useFocusTrap } from '@hooks/useFocusTrap'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
 
@@ -28,7 +28,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
 
   const isOwner = book && book.ownerId === currentUserId
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     if (hasChanges) {
       if (window.confirm(t('bookDetail.confirmClose'))) {
         onClose()
@@ -36,7 +36,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
     } else {
       onClose()
     }
-  }
+  }, [hasChanges, t, onClose])
 
   useFocusTrap({
     containerRef: modalRef,
@@ -60,7 +60,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
     }
     document.addEventListener('keydown', handleEscape)
     return () => document.removeEventListener('keydown', handleEscape)
-  }, [isOpen, hasChanges])
+  }, [isOpen, hasChanges, handleClose])
 
   const handleEdit = () => {
     setIsEditing(true)
@@ -107,31 +107,6 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
     setHasChanges(true)
   }
 
-  const handleOfferChange = (field: string, value: unknown) => {
-    setEditedData((prev) => ({
-      ...prev,
-      offer: {
-        ...prev.offer,
-        [field]: value,
-      },
-    }))
-    setHasChanges(true)
-  }
-
-  const handleDeliveryChange = (field: string, value: unknown) => {
-    setEditedData((prev) => ({
-      ...prev,
-      offer: {
-        ...prev.offer,
-        delivery: {
-          ...prev.offer?.delivery,
-          [field]: value,
-        },
-      },
-    }))
-    setHasChanges(true)
-  }
-
   if (!isOpen) return null
 
   const renderContent = () => {
@@ -153,7 +128,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
         <div className={styles.error}>
           <p>{errorMessage}</p>
           <button onClick={onClose} className={styles.retryButton}>
-            {t('bookDetail.close')}
+            {t('bookDetail.retry')}
           </button>
         </div>
       )

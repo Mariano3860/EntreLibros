@@ -2,7 +2,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
 import type { MapCornerPin } from '@src/api/map/map.types'
-import { ProposeMeetingModal } from '@src/pages/map/components/ProposeMeetingModal/ProposeMeetingModal'
+import { ProposeMeetingModal } from '@components/map/ProposeMeetingModal/ProposeMeetingModal'
 
 import { renderWithProviders } from '../../../test-utils'
 

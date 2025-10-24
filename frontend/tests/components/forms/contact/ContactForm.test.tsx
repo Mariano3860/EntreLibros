@@ -12,7 +12,7 @@ const mockUseContactForm = vi.fn(() => ({
 }))
 
 vi.mock('@hooks/api/useContactForm', () => ({
-  useContactForm: (onSuccess: () => void) => mockUseContactForm(onSuccess),
+  useContactForm: () => mockUseContactForm(),
 }))
 
 describe('ContactForm', () => {

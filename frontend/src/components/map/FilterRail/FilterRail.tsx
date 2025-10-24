@@ -1,6 +1,5 @@
+import type { MapLayerKey, MapLayerToggles } from '@api/map/map.types'
 import { useTranslation } from 'react-i18next'
-
-import type { MapLayerKey, MapLayerToggles } from '@src/api/map/map.types'
 
 import styles from './FilterRail.module.scss'
 

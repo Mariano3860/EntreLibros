@@ -7,9 +7,7 @@ import { renderWithProviders } from '../../../../test-utils'
 
 describe('PublishTextField', () => {
   test('renders text field with label', () => {
-    renderWithProviders(
-      <PublishTextField id="test-field" label="Test Label" />
-    )
+    renderWithProviders(<PublishTextField id="test-field" label="Test Label" />)
 
     expect(screen.getByLabelText('Test Label')).toBeInTheDocument()
   })

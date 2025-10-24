@@ -128,6 +128,6 @@ describe('RegisterForm', () => {
     fireEvent.click(screen.getByRole('button', { name: 'register' }))
 
     await screen.findByRole('button', { name: 'register' })
-    expect(showToastMock).toHaveBeenCalledWith('Email already exists', 'error')
+    expect(showToastMock).toHaveBeenCalledWith('auth.errors.unknown', 'error')
   })
 })

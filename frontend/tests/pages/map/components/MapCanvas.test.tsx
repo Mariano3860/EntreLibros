@@ -8,7 +8,7 @@ import type {
   MapCornerPin,
   MapPublicationPin,
 } from '@src/api/map/map.types'
-import { MapCanvas } from '@src/pages/map/components/MapCanvas/MapCanvas'
+import { MapCanvas } from '@components/map/MapCanvas/MapCanvas'
 
 import { renderWithProviders } from '../../../test-utils'
 

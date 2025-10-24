@@ -6,8 +6,7 @@ describe('axios configuration', () => {
 
     // The default value should be '/api' based on the environment
     expect(
-      resolvedApiBaseUrl === '/api' ||
-        typeof resolvedApiBaseUrl === 'string'
+      resolvedApiBaseUrl === '/api' || typeof resolvedApiBaseUrl === 'string'
     ).toBe(true)
   })
 

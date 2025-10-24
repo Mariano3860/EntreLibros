@@ -13,7 +13,9 @@
     "/api/map": {
       "get": {
         "summary": "Retrieve map datasets for the requested bounding box",
-        "tags": ["Map"],
+        "tags": [
+          "Map"
+        ],
         "parameters": [
           {
             "name": "north",
@@ -122,7 +124,12 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["corners", "publications", "activity", "meta"],
+                  "required": [
+                    "corners",
+                    "publications",
+                    "activity",
+                    "meta"
+                  ],
                   "properties": {
                     "corners": {
                       "type": "array",
@@ -158,7 +165,10 @@
                             "type": "number"
                           },
                           "lastSignalAt": {
-                            "type": ["string", "null"],
+                            "type": [
+                              "string",
+                              "null"
+                            ],
                             "format": "date-time"
                           },
                           "photos": {
@@ -212,7 +222,12 @@
                           },
                           "type": {
                             "type": "string",
-                            "enum": ["offer", "want", "donation", "sale"]
+                            "enum": [
+                              "offer",
+                              "want",
+                              "donation",
+                              "sale"
+                            ]
                           },
                           "photo": {
                             "type": "string"
@@ -236,7 +251,12 @@
                       "type": "array",
                       "items": {
                         "type": "object",
-                        "required": ["id", "lat", "lon", "intensity"],
+                        "required": [
+                          "id",
+                          "lat",
+                          "lon",
+                          "intensity"
+                        ],
                         "properties": {
                           "id": {
                             "type": "string"
@@ -255,11 +275,19 @@
                     },
                     "meta": {
                       "type": "object",
-                      "required": ["bbox", "generatedAt"],
+                      "required": [
+                        "bbox",
+                        "generatedAt"
+                      ],
                       "properties": {
                         "bbox": {
                           "type": "object",
-                          "required": ["north", "south", "east", "west"],
+                          "required": [
+                            "north",
+                            "south",
+                            "east",
+                            "west"
+                          ],
                           "properties": {
                             "north": {
                               "type": "number"
@@ -328,7 +356,9 @@
     "/api/map/geocode": {
       "get": {
         "summary": "Search address suggestions",
-        "tags": ["Map"],
+        "tags": [
+          "Map"
+        ],
         "parameters": [
           {
             "name": "q",
@@ -386,7 +416,10 @@
                       },
                       "coordinates": {
                         "type": "object",
-                        "required": ["latitude", "longitude"],
+                        "required": [
+                          "latitude",
+                          "longitude"
+                        ],
                         "properties": {
                           "latitude": {
                             "type": "number"
@@ -444,14 +477,20 @@
     "/api/auth/register": {
       "post": {
         "summary": "Register a new user",
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["name", "email", "password"],
+                "required": [
+                  "name",
+                  "email",
+                  "password"
+                ],
                 "properties": {
                   "name": {
                     "type": "string"
@@ -550,14 +589,19 @@
     "/api/auth/login": {
       "post": {
         "summary": "Log in a user",
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["email", "password"],
+                "required": [
+                  "email",
+                  "password"
+                ],
                 "properties": {
                   "email": {
                     "type": "string"
@@ -577,7 +621,10 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["user", "message"],
+                  "required": [
+                    "user",
+                    "message"
+                  ],
                   "properties": {
                     "user": {
                       "type": "object",
@@ -638,7 +685,10 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["error", "message"],
+                  "required": [
+                    "error",
+                    "message"
+                  ],
                   "properties": {
                     "error": {
                       "type": "string"
@@ -666,7 +716,9 @@
     "/api/auth/logout": {
       "post": {
         "summary": "Log out the current user",
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "responses": {
           "200": {
             "description": "User logged out. Clears the session cookie.",
@@ -688,7 +740,9 @@
     "/api/books": {
       "get": {
         "summary": "List public publications",
-        "tags": ["Books"],
+        "tags": [
+          "Books"
+        ],
         "responses": {
           "200": {
             "description": "Array of public publications",
@@ -712,7 +766,10 @@
                         "type": "string"
                       },
                       "condition": {
-                        "type": ["string", "null"]
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "status": {
                         "type": "string"
@@ -722,16 +779,25 @@
                       },
                       "type": {
                         "type": "string",
-                        "enum": ["offer", "want"]
+                        "enum": [
+                          "offer",
+                          "want"
+                        ]
                       },
                       "isForSale": {
                         "type": "boolean"
                       },
                       "price": {
-                        "type": ["number", "null"]
+                        "type": [
+                          "number",
+                          "null"
+                        ]
                       },
                       "priceCurrency": {
-                        "type": ["string", "null"]
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "isForTrade": {
                         "type": "boolean"
@@ -752,18 +818,25 @@
       },
       "post": {
         "summary": "Create a publication",
-        "tags": ["Books"],
+        "tags": [
+          "Books"
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["metadata", "offer"],
+                "required": [
+                  "metadata",
+                  "offer"
+                ],
                 "properties": {
                   "metadata": {
                     "type": "object",
-                    "required": ["title"],
+                    "required": [
+                      "title"
+                    ],
                     "properties": {
                       "title": {
                         "type": "string"
@@ -789,7 +862,9 @@
                     "type": "array",
                     "items": {
                       "type": "object",
-                      "required": ["url"],
+                      "required": [
+                        "url"
+                      ],
                       "properties": {
                         "url": {
                           "type": "string"
@@ -824,7 +899,10 @@
                         "type": "boolean"
                       },
                       "price": {
-                        "type": ["object", "null"],
+                        "type": [
+                          "object",
+                          "null"
+                        ],
                         "properties": {
                           "amount": {
                             "type": "number"
@@ -836,7 +914,12 @@
                       },
                       "condition": {
                         "type": "string",
-                        "enum": ["new", "very_good", "good", "acceptable"]
+                        "enum": [
+                          "new",
+                          "very_good",
+                          "good",
+                          "acceptable"
+                        ]
                       },
                       "tradePreferences": {
                         "type": "array",
@@ -849,11 +932,18 @@
                       },
                       "availability": {
                         "type": "string",
-                        "enum": ["public", "private"]
+                        "enum": [
+                          "public",
+                          "private"
+                        ]
                       },
                       "delivery": {
                         "type": "object",
-                        "required": ["nearBookCorner", "inPerson", "shipping"],
+                        "required": [
+                          "nearBookCorner",
+                          "inPerson",
+                          "shipping"
+                        ],
                         "properties": {
                           "nearBookCorner": {
                             "type": "boolean"
@@ -865,8 +955,16 @@
                             "type": "boolean"
                           },
                           "shippingPayer": {
-                            "type": ["string", "null"],
-                            "enum": ["owner", "requester", "split", null]
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "enum": [
+                              "owner",
+                              "requester",
+                              "split",
+                              null
+                            ]
                           }
                         }
                       }
@@ -877,10 +975,16 @@
                   },
                   "type": {
                     "type": "string",
-                    "enum": ["offer", "want"]
+                    "enum": [
+                      "offer",
+                      "want"
+                    ]
                   },
                   "cornerId": {
-                    "type": ["string", "null"]
+                    "type": [
+                      "string",
+                      "null"
+                    ]
                   }
                 }
               }
@@ -908,7 +1012,10 @@
                       "type": "string"
                     },
                     "condition": {
-                      "type": ["string", "null"]
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "status": {
                       "type": "string"
@@ -920,10 +1027,16 @@
                       "type": "boolean"
                     },
                     "price": {
-                      "type": ["number", "null"]
+                      "type": [
+                        "number",
+                        "null"
+                      ]
                     },
                     "priceCurrency": {
-                      "type": ["string", "null"]
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "isForTrade": {
                       "type": "boolean"
@@ -956,38 +1069,70 @@
                           "type": "boolean"
                         },
                         "shippingPayer": {
-                          "type": ["string", "null"],
-                          "enum": ["owner", "requester", "split", null]
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "enum": [
+                            "owner",
+                            "requester",
+                            "split",
+                            null
+                          ]
                         }
                       }
                     },
                     "notes": {
-                      "type": ["string", "null"]
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "cornerId": {
-                      "type": ["string", "null"]
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "publisher": {
-                      "type": ["string", "null"]
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "year": {
-                      "type": ["integer", "null"]
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
                     },
                     "language": {
-                      "type": ["string", "null"]
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "format": {
-                      "type": ["string", "null"]
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "isbn": {
-                      "type": ["string", "null"]
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "draft": {
                       "type": "boolean"
                     },
                     "type": {
                       "type": "string",
-                      "enum": ["offer", "want"]
+                      "enum": [
+                        "offer",
+                        "want"
+                      ]
                     }
                   }
                 }
@@ -1006,7 +1151,9 @@
     "/api/books/mine": {
       "get": {
         "summary": "List publications created by the authenticated user",
-        "tags": ["Books"],
+        "tags": [
+          "Books"
+        ],
         "responses": {
           "200": {
             "description": "Array of user publications",
@@ -1030,7 +1177,10 @@
                         "type": "string"
                       },
                       "condition": {
-                        "type": ["string", "null"]
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "status": {
                         "type": "string"
@@ -1042,10 +1192,16 @@
                         "type": "boolean"
                       },
                       "price": {
-                        "type": ["number", "null"]
+                        "type": [
+                          "number",
+                          "null"
+                        ]
                       },
                       "priceCurrency": {
-                        "type": ["string", "null"]
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "isForTrade": {
                         "type": "boolean"
@@ -1078,38 +1234,70 @@
                             "type": "boolean"
                           },
                           "shippingPayer": {
-                            "type": ["string", "null"],
-                            "enum": ["owner", "requester", "split", null]
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "enum": [
+                              "owner",
+                              "requester",
+                              "split",
+                              null
+                            ]
                           }
                         }
                       },
                       "notes": {
-                        "type": ["string", "null"]
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "cornerId": {
-                        "type": ["string", "null"]
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "publisher": {
-                        "type": ["string", "null"]
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "year": {
-                        "type": ["integer", "null"]
+                        "type": [
+                          "integer",
+                          "null"
+                        ]
                       },
                       "language": {
-                        "type": ["string", "null"]
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "format": {
-                        "type": ["string", "null"]
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "isbn": {
-                        "type": ["string", "null"]
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "draft": {
                         "type": "boolean"
                       },
                       "type": {
                         "type": "string",
-                        "enum": ["offer", "want"]
+                        "enum": [
+                          "offer",
+                          "want"
+                        ]
                       }
                     }
                   }
@@ -1126,7 +1314,9 @@
     "/api/books/search": {
       "get": {
         "summary": "Search books via OpenLibrary",
-        "tags": ["Books"],
+        "tags": [
+          "Books"
+        ],
         "parameters": [
           {
             "name": "q",
@@ -1151,16 +1341,28 @@
                         "type": "string"
                       },
                       "author": {
-                        "type": ["string", "null"]
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "isbn": {
-                        "type": ["string", "null"]
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "publisher": {
-                        "type": ["string", "null"]
+                        "type": [
+                          "string",
+                          "null"
+                        ]
                       },
                       "publishedYear": {
-                        "type": ["integer", "null"]
+                        "type": [
+                          "integer",
+                          "null"
+                        ]
                       }
                     }
                   }
@@ -1180,7 +1382,9 @@
     "/api/books/{id}/verify": {
       "post": {
         "summary": "Verify a book",
-        "tags": ["Books"],
+        "tags": [
+          "Books"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -1206,16 +1410,28 @@
                       "type": "string"
                     },
                     "author": {
-                      "type": ["string", "null"]
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "isbn": {
-                      "type": ["string", "null"]
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "publisher": {
-                      "type": ["string", "null"]
+                      "type": [
+                        "string",
+                        "null"
+                      ]
                     },
                     "publishedYear": {
-                      "type": ["integer", "null"]
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
                     },
                     "verified": {
                       "type": "boolean"
@@ -1234,7 +1450,9 @@
     "/api/community/stats": {
       "get": {
         "summary": "Retrieve aggregated community statistics",
-        "tags": ["Community"],
+        "tags": [
+          "Community"
+        ],
         "responses": {
           "200": {
             "description": "Community KPIs and trends",
@@ -1252,7 +1470,9 @@
     "/api/community/feed": {
       "get": {
         "summary": "Retrieve the paginated community feed",
-        "tags": ["Community"],
+        "tags": [
+          "Community"
+        ],
         "parameters": [
           {
             "name": "page",
@@ -1301,7 +1521,9 @@
     "/api/community/activity": {
       "get": {
         "summary": "List recent community activity avatars",
-        "tags": ["Community"],
+        "tags": [
+          "Community"
+        ],
         "responses": {
           "200": {
             "description": "Recent activity participants",
@@ -1322,7 +1544,9 @@
     "/api/community/suggestions": {
       "get": {
         "summary": "Suggest community members to connect with",
-        "tags": ["Community"],
+        "tags": [
+          "Community"
+        ],
         "responses": {
           "200": {
             "description": "Suggested community members",
@@ -1343,7 +1567,9 @@
     "/api/community/corners/nearby": {
       "get": {
         "summary": "List nearby community corners",
-        "tags": ["Community"],
+        "tags": [
+          "Community"
+        ],
         "parameters": [
           {
             "name": "lat",
@@ -1441,7 +1667,9 @@
     "/api/community/corners/map": {
       "get": {
         "summary": "Retrieve map pins for community corners",
-        "tags": ["Community"],
+        "tags": [
+          "Community"
+        ],
         "responses": {
           "200": {
             "description": "Pins ready to render in the mini map",
@@ -1477,7 +1705,9 @@
     "/api/community/corners": {
       "post": {
         "summary": "Publish a new community corner",
-        "tags": ["Community"],
+        "tags": [
+          "Community"
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1618,13 +1848,20 @@
           },
           "metric": {
             "type": "string",
-            "enum": ["exchanges", "books"]
+            "enum": [
+              "exchanges",
+              "books"
+            ]
           },
           "value": {
             "type": "integer"
           }
         },
-        "required": ["username", "metric", "value"]
+        "required": [
+          "username",
+          "metric",
+          "value"
+        ]
       },
       "HotSearch": {
         "type": "object",
@@ -1636,7 +1873,10 @@
             "type": "integer"
           }
         },
-        "required": ["term", "count"]
+        "required": [
+          "term",
+          "count"
+        ]
       },
       "MapPin": {
         "type": "object",
@@ -1648,7 +1888,10 @@
             "type": "string"
           }
         },
-        "required": ["top", "left"]
+        "required": [
+          "top",
+          "left"
+        ]
       },
       "FeedCorner": {
         "type": "object",
@@ -1660,7 +1903,10 @@
             "type": "string"
           }
         },
-        "required": ["id", "name"]
+        "required": [
+          "id",
+          "name"
+        ]
       },
       "FeedBase": {
         "type": "object",
@@ -1692,7 +1938,13 @@
             ]
           }
         },
-        "required": ["id", "user", "avatar", "time", "likes"]
+        "required": [
+          "id",
+          "user",
+          "avatar",
+          "time",
+          "likes"
+        ]
       },
       "BookFeedItem": {
         "allOf": [
@@ -1704,7 +1956,9 @@
             "properties": {
               "type": {
                 "type": "string",
-                "enum": ["book"]
+                "enum": [
+                  "book"
+                ]
               },
               "title": {
                 "type": "string"
@@ -1717,7 +1971,12 @@
                 "format": "uri"
               }
             },
-            "required": ["type", "title", "author", "cover"]
+            "required": [
+              "type",
+              "title",
+              "author",
+              "cover"
+            ]
           }
         ]
       },
@@ -1731,7 +1990,9 @@
             "properties": {
               "type": {
                 "type": "string",
-                "enum": ["sale"]
+                "enum": [
+                  "sale"
+                ]
               },
               "title": {
                 "type": "string"
@@ -1747,7 +2008,13 @@
                 "format": "uri"
               }
             },
-            "required": ["type", "title", "price", "condition", "cover"]
+            "required": [
+              "type",
+              "title",
+              "price",
+              "condition",
+              "cover"
+            ]
           }
         ]
       },
@@ -1761,13 +2028,18 @@
             "properties": {
               "type": {
                 "type": "string",
-                "enum": ["seeking"]
+                "enum": [
+                  "seeking"
+                ]
               },
               "title": {
                 "type": "string"
               }
             },
-            "required": ["type", "title"]
+            "required": [
+              "type",
+              "title"
+            ]
           }
         ]
       },
@@ -1798,7 +2070,11 @@
             "format": "uri"
           }
         },
-        "required": ["id", "user", "avatar"]
+        "required": [
+          "id",
+          "user",
+          "avatar"
+        ]
       },
       "SuggestionItem": {
         "type": "object",
@@ -1814,7 +2090,11 @@
             "format": "uri"
           }
         },
-        "required": ["id", "user", "avatar"]
+        "required": [
+          "id",
+          "user",
+          "avatar"
+        ]
       },
       "CommunityCornerSummary": {
         "type": "object",
@@ -1832,10 +2112,18 @@
             "type": "number"
           },
           "activityLabel": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
-        "required": ["id", "name", "imageUrl", "distanceKm"]
+        "required": [
+          "id",
+          "name",
+          "imageUrl",
+          "distanceKm"
+        ]
       },
       "CommunityCornerMapPin": {
         "type": "object",
@@ -1854,10 +2142,19 @@
           },
           "status": {
             "type": "string",
-            "enum": ["active", "quiet"]
+            "enum": [
+              "active",
+              "quiet"
+            ]
           }
         },
-        "required": ["id", "name", "x", "y", "status"]
+        "required": [
+          "id",
+          "name",
+          "x",
+          "y",
+          "status"
+        ]
       },
       "CommunityCornerMap": {
         "type": "object",
@@ -1872,7 +2169,9 @@
             "type": "string"
           }
         },
-        "required": ["pins"]
+        "required": [
+          "pins"
+        ]
       },
       "PublishCornerAddress": {
         "type": "object",
@@ -1884,13 +2183,22 @@
             "type": "string"
           },
           "unit": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "postalCode": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
-        "required": ["street", "number"]
+        "required": [
+          "street",
+          "number"
+        ]
       },
       "PublishCornerCoordinates": {
         "type": "object",
@@ -1902,7 +2210,10 @@
             "type": "number"
           }
         },
-        "required": ["latitude", "longitude"]
+        "required": [
+          "latitude",
+          "longitude"
+        ]
       },
       "PublishCornerLocation": {
         "type": "object",
@@ -1915,10 +2226,17 @@
           },
           "visibilityPreference": {
             "type": "string",
-            "enum": ["exact", "approximate"]
+            "enum": [
+              "exact",
+              "approximate"
+            ]
           }
         },
-        "required": ["address", "coordinates", "visibilityPreference"]
+        "required": [
+          "address",
+          "coordinates",
+          "visibilityPreference"
+        ]
       },
       "PublishCornerPhoto": {
         "type": "object",
@@ -1930,7 +2248,10 @@
             "type": "string"
           }
         },
-        "required": ["id", "url"]
+        "required": [
+          "id",
+          "url"
+        ]
       },
       "PublishCornerPayload": {
         "type": "object",
@@ -1940,7 +2261,10 @@
           },
           "scope": {
             "type": "string",
-            "enum": ["public", "semiprivate"]
+            "enum": [
+              "public",
+              "semiprivate"
+            ]
           },
           "hostAlias": {
             "type": "string"
@@ -1949,10 +2273,16 @@
             "type": "string"
           },
           "rules": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "schedule": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "location": {
             "$ref": "#/components/schemas/PublishCornerLocation"
@@ -1965,7 +2295,10 @@
           },
           "status": {
             "type": "string",
-            "enum": ["active", "paused"]
+            "enum": [
+              "active",
+              "paused"
+            ]
           },
           "draft": {
             "type": "boolean"
@@ -1997,13 +2330,22 @@
           },
           "status": {
             "type": "string",
-            "enum": ["active", "paused"]
+            "enum": [
+              "active",
+              "paused"
+            ]
           },
           "locationSummary": {
             "type": "string"
           }
         },
-        "required": ["id", "name", "imageUrl", "status", "locationSummary"]
+        "required": [
+          "id",
+          "name",
+          "imageUrl",
+          "status",
+          "locationSummary"
+        ]
       }
     }
   },

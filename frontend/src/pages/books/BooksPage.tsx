@@ -1,5 +1,5 @@
 import { BookCard } from '@components/book/BookCard'
-import { BookDetailModal } from '@components/book/BookDetailModal'
+import { BookDetailModal } from '@components/book/BookDetailModal/BookDetailModal'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { PublishBookModal } from '@components/publish/PublishBookModal/PublishBookModal'
 import { TabsMenu } from '@components/ui/tabs-menu/TabsMenu'
