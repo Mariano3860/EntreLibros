@@ -86,8 +86,11 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
     return () => document.removeEventListener('keydown', handleEscape)
   }, [isOpen, hasChanges, handleClose])
 
+  const isMountedRef = useRef(true)
   useEffect(() => {
+    isMountedRef.current = true
     return () => {
+      isMountedRef.current = false
       if (retryTimeoutRef.current !== null) {
         window.clearTimeout(retryTimeoutRef.current)
         retryTimeoutRef.current = null
@@ -119,10 +122,9 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
         /* noop */
       })
       .finally(() => {
-        retryTimeoutRef.current = window.setTimeout(() => {
-          setIsRetrying(false)
-          retryTimeoutRef.current = null
-        }, 0)
+        if (!isMountedRef.current) return
+        setIsRetrying(false)
+        retryTimeoutRef.current = null
       })
   }, [refetch])
 

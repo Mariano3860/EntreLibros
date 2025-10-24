@@ -19,7 +19,7 @@ export const apiRouteMatcher = (route: string): RegExp => {
   const segments = normalized.split('/')
 
   const pattern = segments
-    .filter((_, index) => index > 0)
+    .slice(1)
     .map((segment) => {
       if (segment.startsWith(':')) {
         const paramName = segment.slice(1)
