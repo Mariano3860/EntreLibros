@@ -357,7 +357,7 @@ describe('books API publication update', () => {
       status: 'reserved',
       donation: true,
       trade: false,
-      price_amount: '40',
+      price_amount: '40.00',
       price_currency: 'ARS',
       description: 'Nuevas notas',
       delivery_shipping: true,
