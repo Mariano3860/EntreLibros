@@ -1,3 +1,11 @@
+import type {
+  MapActivityPoint,
+  MapBoundingBox,
+  MapCornerPin,
+  MapLayerToggles,
+  MapPin,
+  MapPublicationPin,
+} from '@api/map/map.types'
 import { useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
@@ -7,15 +15,6 @@ import {
   Tooltip,
   useMap,
 } from 'react-leaflet'
-
-import type {
-  MapActivityPoint,
-  MapBoundingBox,
-  MapCornerPin,
-  MapLayerToggles,
-  MapPin,
-  MapPublicationPin,
-} from '@src/api/map/map.types'
 
 import 'leaflet/dist/leaflet.css'
 

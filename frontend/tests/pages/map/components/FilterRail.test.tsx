@@ -1,7 +1,7 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
-import { FilterRail } from '@src/pages/map/components/FilterRail/FilterRail'
+import { FilterRail } from '@components/map/FilterRail/FilterRail'
 
 import { renderWithProviders } from '../../../test-utils'
 

@@ -1,7 +1,7 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
-import { MapHeader } from '@src/pages/map/components/MapHeader/MapHeader'
+import { MapHeader } from '@components/map/MapHeader/MapHeader'
 
 import { renderWithProviders } from '../../../test-utils'
 

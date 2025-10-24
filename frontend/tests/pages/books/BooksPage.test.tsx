@@ -1,13 +1,11 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, test, vi } from 'vitest'
+import { renderWithProviders } from '../../test-utils'
+import { BooksPage } from '@src/pages/books/BooksPage'
 
 vi.mock('@src/api/auth/me.service', () => ({
   fetchMe: vi.fn().mockRejectedValue(new Error('unauthenticated')),
 }))
-
-import { BooksPage } from '@src/pages/books/BooksPage'
-
-import { renderWithProviders } from '../../test-utils'
 
 afterEach(() => {
   vi.useRealTimers()
@@ -149,5 +147,14 @@ describe('BooksPage', () => {
 
     expect(titleInput).toHaveValue('Li')
     expect(document.activeElement).toBe(titleInput)
+  })
+
+  test('does not open detail modal when navigating to /books/new', () => {
+    renderWithProviders(<BooksPage />, { initialEntries: ['/books/new'] })
+
+    // Should show publish modal, not detail modal
+    expect(screen.getByText('publishBook.title')).toBeInTheDocument()
+    // Should not show detail modal elements
+    expect(screen.queryByText('bookDetail.loading')).not.toBeInTheDocument()
   })
 })

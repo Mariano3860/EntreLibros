@@ -81,4 +81,40 @@ describe('LoginForm', () => {
     expect(showToastMock).toHaveBeenCalledWith('auth.errors.unknown', 'error')
     expect(navigate).not.toHaveBeenCalled()
   })
+
+  test('handles error with translation key in error message', () => {
+    mockMutate.mockImplementation((_data, { onError }) => {
+      onError?.(new Error('auth.errors.invalid_credentials'))
+    })
+
+    renderWithProviders(<LoginForm onSubmit={vi.fn()} />)
+
+    fireEvent.change(screen.getByPlaceholderText('email'), {
+      target: { value: 'test@example.com' },
+    })
+    fireEvent.change(screen.getByPlaceholderText('password'), {
+      target: { value: 'secret' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'login' }))
+
+    expect(showToastMock).toHaveBeenCalled()
+  })
+
+  test('handles error with custom message', () => {
+    mockMutate.mockImplementation((_data, { onError }) => {
+      onError?.(new Error('Custom error message'))
+    })
+
+    renderWithProviders(<LoginForm onSubmit={vi.fn()} />)
+
+    fireEvent.change(screen.getByPlaceholderText('email'), {
+      target: { value: 'test@example.com' },
+    })
+    fireEvent.change(screen.getByPlaceholderText('password'), {
+      target: { value: 'secret' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'login' }))
+
+    expect(showToastMock).toHaveBeenCalledWith('Custom error message', 'error')
+  })
 })

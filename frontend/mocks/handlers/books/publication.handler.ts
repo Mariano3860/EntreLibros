@@ -26,14 +26,9 @@ export const publicationHandlers = [
         return HttpResponse.json(publicationsStore.get(id), { status: 200 })
       }
 
-      // Return mock data for known IDs
-      if (id === '1' || id === '2' || id === '3') {
-        const publication = generatePublication(id)
-        return HttpResponse.json(publication, { status: 200 })
-      }
-
-      // Return 404 for unknown IDs
-      return HttpResponse.json({ error: 'Book not found' }, { status: 404 })
+      // Generate mock data for any ID (supporting dynamic book IDs from userBooks)
+      const publication = generatePublication(id)
+      return HttpResponse.json(publication, { status: 200 })
     }
   ),
 

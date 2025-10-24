@@ -11,7 +11,7 @@ import * as analytics from '@src/utils/analytics'
 
 import { renderWithProviders } from '../../test-utils'
 
-vi.mock('@src/pages/map/components/MapCanvas/MapCanvas', () => {
+vi.mock('@src/components/map/MapCanvas/MapCanvas', () => {
   return {
     MapCanvas: ({
       corners,
