@@ -100,7 +100,7 @@ describe('BookDetailModal', () => {
   test('closes the modal when pressing Escape', () => {
     const mockBook = {
       id: 'book-123',
-      title: 'Título',
+      title: 'Title',
       offer: makeOffer(false, false),
       status: 'to_read',
     }
