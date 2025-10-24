@@ -31,5 +31,11 @@ export const apiRouteMatcher = (route: string): RegExp => {
     .join('/')
     .replace(/\//g, '\\/')
 
+  // Regex breakdown:
+  // ^                       : Start of string
+  // (?:https?:\/\/[^/]+)?   : Optional protocol and host (e.g., 'http://localhost:3000')
+  // (?:/api)?               : Optional '/api' prefix
+  // /${pattern}             : Route pattern (with path params)
+  // (?:\?.*)?               : Optional query string
+  // $                       : End of string
   return new RegExp(`^(?:https?:\\/\\/[^/]+)?(?:/api)?/${pattern}(?:\\?.*)?$`)
-}
