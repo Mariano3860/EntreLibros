@@ -91,11 +91,130 @@ describe('BookDetailModal', () => {
     expect(screen.getByText('bookDetail.offer.donation')).toBeInTheDocument()
   })
 
-  test.todo('allows editing fields and saving successfully', async () => {})
+  test('allows editing fields and saving successfully', async () => {
+    const mockBook = {
+      id: 'book-123',
+      title: 'Original Title',
+      author: 'Original Author',
+      ownerId: 'user-123',
+      condition: 'good',
+      notes: 'Original notes',
+      status: 'available',
+      offer: makeOffer(false, false),
+    }
+    const mutateAsync = vi.fn().mockResolvedValue({})
+    mockUseBookDetails.mockReturnValue({
+      data: mockBook,
+      isLoading: false,
+      isError: false,
+    })
+    mockUseUpdateBook.mockReturnValue({
+      mutateAsync,
+      isPending: false,
+      isError: false,
+      isSuccess: false,
+    })
 
-  test.todo('shows error when saving changes fails', async () => {})
+    renderWithProviders(<BookDetailModal {...props} currentUserId="user-123" />)
 
-  test.todo('cancels editing with confirmation', () => {})
+    // Click edit button
+    fireEvent.click(screen.getByText('bookDetail.edit'))
+
+    // Change title
+    const titleInput = screen.getByDisplayValue('Original Title')
+    fireEvent.change(titleInput, { target: { value: 'New Title' } })
+
+    // Click save
+    fireEvent.click(screen.getByText('bookDetail.save'))
+
+    await vi.waitFor(() => {
+      expect(mutateAsync).toHaveBeenCalledWith(
+        expect.objectContaining({ title: 'New Title' })
+      )
+    })
+  })
+
+  test('shows error when saving changes fails', async () => {
+    const mockBook = {
+      id: 'book-123',
+      title: 'Title',
+      author: 'Author',
+      ownerId: 'user-123',
+      condition: 'good',
+      status: 'available',
+      offer: makeOffer(false, false),
+    }
+    const mutateAsync = vi
+      .fn()
+      .mockRejectedValue(new Error('403: Forbidden'))
+    mockUseBookDetails.mockReturnValue({
+      data: mockBook,
+      isLoading: false,
+      isError: false,
+    })
+    mockUseUpdateBook.mockReturnValue({
+      mutateAsync,
+      isPending: false,
+      isError: false,
+      isSuccess: false,
+    })
+
+    renderWithProviders(<BookDetailModal {...props} currentUserId="user-123" />)
+
+    // Click edit button
+    fireEvent.click(screen.getByText('bookDetail.edit'))
+
+    // Change title
+    const titleInput = screen.getByDisplayValue('Title')
+    fireEvent.change(titleInput, { target: { value: 'New Title' } })
+
+    // Click save
+    fireEvent.click(screen.getByText('bookDetail.save'))
+
+    await vi.waitFor(() => {
+      expect(mutateAsync).toHaveBeenCalled()
+    })
+  })
+
+  test('cancels editing with confirmation', () => {
+    const mockBook = {
+      id: 'book-123',
+      title: 'Title',
+      author: 'Author',
+      ownerId: 'user-123',
+      condition: 'good',
+      status: 'available',
+      offer: makeOffer(false, false),
+    }
+    mockUseBookDetails.mockReturnValue({
+      data: mockBook,
+      isLoading: false,
+      isError: false,
+    })
+    mockUseUpdateBook.mockReturnValue({
+      mutateAsync: vi.fn(),
+      isPending: false,
+      isError: false,
+      isSuccess: false,
+    })
+
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
+
+    renderWithProviders(<BookDetailModal {...props} currentUserId="user-123" />)
+
+    // Click edit button
+    fireEvent.click(screen.getByText('bookDetail.edit'))
+
+    // Make a change
+    const titleInput = screen.getByDisplayValue('Title')
+    fireEvent.change(titleInput, { target: { value: 'New Title' } })
+
+    // Click cancel
+    fireEvent.click(screen.getByText('bookDetail.cancel'))
+
+    expect(confirmSpy).toHaveBeenCalled()
+    confirmSpy.mockRestore()
+  })
 
   test('closes the modal when pressing Escape', () => {
     const mockBook = {
