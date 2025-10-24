@@ -123,9 +123,11 @@ describe('useUpdateBook', () => {
 
     putMock.mockResolvedValueOnce({ data: mockResponse })
 
-    const wrapper = createWrapper()
     const queryClient = new QueryClient({
-      defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
     })
 
     // Pre-populate the cache with existing book data
@@ -133,7 +135,9 @@ describe('useUpdateBook', () => {
 
     const { result } = renderHook(() => useUpdateBook('1'), {
       wrapper: ({ children }) => (
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
       ),
     })
 
@@ -192,14 +196,19 @@ describe('useUpdateBook', () => {
     putMock.mockResolvedValueOnce({ data: mockResponse })
 
     const queryClient = new QueryClient({
-      defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
     })
 
     queryClient.setQueryData(['book', '1'], mockBook)
 
     const { result } = renderHook(() => useUpdateBook('1'), {
       wrapper: ({ children }) => (
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
       ),
     })
 
@@ -238,14 +247,19 @@ describe('useUpdateBook', () => {
     putMock.mockRejectedValueOnce(new Error('Update failed'))
 
     const queryClient = new QueryClient({
-      defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
     })
 
     queryClient.setQueryData(['book', '1'], mockBook)
 
     const { result } = renderHook(() => useUpdateBook('1'), {
       wrapper: ({ children }) => (
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
       ),
     })
 

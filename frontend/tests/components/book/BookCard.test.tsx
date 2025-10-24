@@ -69,7 +69,7 @@ describe('BookCard', () => {
     )
 
     const card = screen.getByRole('button')
-    
+
     // Test Enter key
     fireEvent.keyDown(card, { key: 'Enter' })
     expect(onClick).toHaveBeenCalledTimes(1)

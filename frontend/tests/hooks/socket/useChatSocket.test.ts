@@ -2,7 +2,7 @@ import { useChatSocket } from '@hooks/socket/useChatSocket'
 import { renderHook, act } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
-const listeners: Record<string, (args: unknown) => void> = {}
+const listeners: Record<string, (...args: unknown[]) => void> = {}
 const emit = vi.fn()
 
 vi.mock('socket.io-client', () => ({
