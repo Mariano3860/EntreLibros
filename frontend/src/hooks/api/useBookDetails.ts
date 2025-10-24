@@ -15,7 +15,7 @@ export const useBookDetails = (id: string | undefined) => {
       return getBookById(id)
     },
     enabled: !!id,
-    retry: 2,
+    retry: false,
     staleTime: 1000 * 60 * 5, // 5 minutes
   })
 }
