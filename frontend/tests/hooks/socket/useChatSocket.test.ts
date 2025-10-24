@@ -51,4 +51,27 @@ describe('useChatSocket', () => {
     expect(result.current.error).toBe('fail')
     expect(result.current.isConnected).toBe(false)
   })
+
+  test('handles connect event', () => {
+    const { result } = renderHook(() => useChatSocket())
+    act(() => {
+      listeners['connect']()
+    })
+    expect(result.current.isConnected).toBe(true)
+    expect(result.current.error).toBe(null)
+  })
+
+  test('handles disconnect event', () => {
+    const { result } = renderHook(() => useChatSocket())
+    // First connect
+    act(() => {
+      listeners['connect']()
+    })
+    expect(result.current.isConnected).toBe(true)
+    // Then disconnect
+    act(() => {
+      listeners['disconnect']()
+    })
+    expect(result.current.isConnected).toBe(false)
+  })
 })
