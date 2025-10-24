@@ -1,7 +1,7 @@
+import { BooksPage } from '@src/pages/books/BooksPage'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import { renderWithProviders } from '../../test-utils'
-import { BooksPage } from '@src/pages/books/BooksPage'
 
 vi.mock('@src/api/auth/me.service', () => ({
   fetchMe: vi.fn().mockRejectedValue(new Error('unauthenticated')),
