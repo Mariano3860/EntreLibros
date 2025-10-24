@@ -196,4 +196,35 @@ describe('usePublishDraft', () => {
     const saved = JSON.parse(window.localStorage.getItem('test-key') || '{}')
     expect(saved.title).toBe('Second')
   })
+
+  test('skips scheduling save if data is unchanged from last saved', () => {
+    const { result } = renderHook(() =>
+      usePublishDraft<{ title: string }>({ storageKey: 'test-key' })
+    )
+
+    // Save first time
+    act(() => {
+      result.current.saveNow({ title: 'Title' })
+    })
+
+    const firstTimestamp = JSON.parse(
+      window.localStorage.getItem('test-key') || '{}'
+    ).updatedAt
+
+    // Try to schedule save with same data
+    act(() => {
+      result.current.scheduleSave({ title: 'Title' }, 100)
+    })
+
+    act(() => {
+      vi.advanceTimersByTime(100)
+    })
+
+    const secondTimestamp = JSON.parse(
+      window.localStorage.getItem('test-key') || '{}'
+    ).updatedAt
+
+    // Timestamp should be the same because save was skipped
+    expect(firstTimestamp).toBe(secondTimestamp)
+  })
 })
