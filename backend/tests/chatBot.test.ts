@@ -7,10 +7,7 @@ import type {
   SocketData,
   ChatMessage,
 } from '../src/socket.js';
-import Client, {
-  type ManagerOptions,
-  type SocketOptions,
-} from 'socket.io-client';
+import Client from 'socket.io-client';
 import type { AddressInfo } from 'net';
 import { beforeAll, afterAll, describe, expect, test, vi } from 'vitest';
 import app from '../src/app.js';
@@ -48,14 +45,16 @@ describe('chat bot replies', () => {
       password: '',
       role: 'user',
       language: 'en',
+      location: null,
+      searchRadius: null,
     });
     const jwtAlgorithm = (process.env.JWT_ALGORITHM || 'HS256') as Algorithm;
     const token = jwt.sign({ id: 1 }, process.env.JWT_SECRET!, {
       algorithm: jwtAlgorithm,
     });
-    const options: Partial<ManagerOptions & SocketOptions> = {
+    const options = {
       extraHeaders: { cookie: `sessionToken=${token}` },
-    };
+    } as unknown as Parameters<typeof Client>[0];
     clientSocket = Client(`http://localhost:${port}`, options);
     await new Promise<void>((resolve) =>
       clientSocket.on('connect', () => resolve())
