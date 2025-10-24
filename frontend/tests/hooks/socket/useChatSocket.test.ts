@@ -2,7 +2,7 @@ import { useChatSocket } from '@hooks/socket/useChatSocket'
 import { renderHook, act } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
-const listeners: Record<string, (args: unknown) => void> = {}
+const listeners: Record<string, (...args: unknown[]) => void> = {}
 const emit = vi.fn()
 
 vi.mock('socket.io-client', () => ({
@@ -49,6 +49,29 @@ describe('useChatSocket', () => {
       listeners['connect_error'](new Error('fail'))
     })
     expect(result.current.error).toBe('fail')
+    expect(result.current.isConnected).toBe(false)
+  })
+
+  test('handles connect event', () => {
+    const { result } = renderHook(() => useChatSocket())
+    act(() => {
+      listeners['connect']()
+    })
+    expect(result.current.isConnected).toBe(true)
+    expect(result.current.error).toBe(null)
+  })
+
+  test('handles disconnect event', () => {
+    const { result } = renderHook(() => useChatSocket())
+    // First connect
+    act(() => {
+      listeners['connect']()
+    })
+    expect(result.current.isConnected).toBe(true)
+    // Then disconnect
+    act(() => {
+      listeners['disconnect']()
+    })
     expect(result.current.isConnected).toBe(false)
   })
 })
