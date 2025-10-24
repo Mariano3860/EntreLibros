@@ -4,6 +4,7 @@ import { authStateHandler, meHandler } from './auth/me.handler'
 import { registerHandler } from './auth/register.handler'
 import { booksHandler } from './books/books.handler'
 import { publishBookHandler } from './books/publish.handler'
+import { publicationHandlers } from './books/publication.handler'
 import { searchBooksHandler } from './books/search.handler'
 import { userBooksHandler } from './books/userBooks.handler'
 import { activityHandler } from './community/activity.handler'
@@ -30,6 +31,7 @@ export const handlers = [
   searchBooksHandler,
   publishBookHandler,
   userBooksHandler,
+  ...publicationHandlers,
   contactFormHandler,
   userLanguageHandler,
   communityStatsHandler,

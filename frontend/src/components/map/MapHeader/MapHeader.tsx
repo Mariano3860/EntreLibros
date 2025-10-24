@@ -1,8 +1,7 @@
+import type { MapLayerKey, MapLayerToggles } from '@api/map/map.types'
 import { cx } from '@utils/cx'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-
-import type { MapLayerKey, MapLayerToggles } from '@src/api/map/map.types'
 
 import styles from './MapHeader.module.scss'
 

@@ -83,4 +83,18 @@ describe('boundingBoxFromCenter', () => {
       haversineDistanceKm(latitude, longitude, latitude, bbox.west)
     ).toBeGreaterThan(0)
   })
+
+  it('handles very large radius that reaches maximum delta', () => {
+    const latitude = 0
+    const longitude = 0
+    const radiusKm = 10000 // Very large radius to test the maxDelta boundary
+
+    const bbox = boundingBoxFromCenter(latitude, longitude, radiusKm)
+
+    // The bounding box should still be valid
+    expect(bbox.north).toBeGreaterThan(latitude)
+    expect(bbox.south).toBeLessThan(latitude)
+    expect(bbox.east).toBeGreaterThan(longitude)
+    expect(bbox.west).toBeLessThan(longitude)
+  })
 })

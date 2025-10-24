@@ -16,6 +16,27 @@ const ensureLeadingSlash = (path: string): string =>
  */
 export const apiRouteMatcher = (route: string): RegExp => {
   const normalized = ensureLeadingSlash(route)
-  const escaped = escapeRegex(normalized)
-  return new RegExp(`(?:/api)?${escaped}(?:\\?.*)?$`)
+  const segments = normalized.split('/')
+
+  const pattern = segments
+    .slice(1)
+    .map((segment) => {
+      if (segment.startsWith(':')) {
+        const paramName = segment.slice(1)
+        return `(?<${paramName}>[^/]+)`
+      }
+
+      return escapeRegex(segment)
+    })
+    .join('/')
+    .replace(/\//g, '\\/')
+
+  // Regex breakdown:
+  // ^                       : Start of string
+  // (?:https?:\/\/[^/]+)?   : Optional protocol and host (e.g., 'http://localhost:3000')
+  // (?:/api)?               : Optional '/api' prefix
+  // /${pattern}             : Route pattern (with path params)
+  // (?:\?.*)?               : Optional query string
+  // $                       : End of string
+  return new RegExp(`^(?:https?:\\/\\/[^/]+)?(?:/api)?/${pattern}(?:\\?.*)?$`)
 }

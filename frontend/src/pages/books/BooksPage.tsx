@@ -1,4 +1,5 @@
 import { BookCard } from '@components/book/BookCard'
+import { BookDetailModal } from '@components/book/BookDetailModal/BookDetailModal'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { PublishBookModal } from '@components/publish/PublishBookModal/PublishBookModal'
 import { TabsMenu } from '@components/ui/tabs-menu/TabsMenu'
@@ -32,17 +33,23 @@ export const BooksPage = () => {
     [t]
   )
 
+  const tabPaths = useMemo(() => tabs.map((t) => t.path), [tabs])
+
   const pathSegment = getPathSegment(location.pathname, basePath)
   const activeTab = (tabs.find((tab) => tab.path === pathSegment)?.key ??
     'mine') as 'mine' | 'trade' | 'seeking' | 'sale'
 
   const publishMatch = useMatch('/books/new')
   const detailMatch = useMatch('/books/:bookId')
-  const selectedBook = detailMatch
-    ? books.find((book) => book.id === detailMatch.params?.bookId)
-    : null
 
-  // TODO: mover este filtro a un hook reutilizable si se complica
+  const bookId = detailMatch?.params?.bookId
+
+  // Exclude 'new' and known tab segments from being treated as a book ID
+  const selectedBook =
+    bookId && bookId !== 'new' && !tabPaths.includes(bookId)
+      ? (books.find((book) => book.id === bookId) ?? null)
+      : null
+
   const filterByTab = (book: ApiUserBook) => {
     switch (activeTab) {
       case 'trade':
@@ -71,8 +78,16 @@ export const BooksPage = () => {
     navigate('/books', { replace: true })
   }
 
-  const handlePublished = (bookId: string) => {
-    navigate(`/books/${bookId}`, { replace: true })
+  const handlePublished = (bookIdArg: string) => {
+    navigate(`/books/${bookIdArg}`, { replace: true })
+  }
+
+  const handleCardClick = (bookIdArg: string) => {
+    navigate(`/books/${bookIdArg}`)
+  }
+
+  const handleCloseDetail = () => {
+    navigate('/books', { replace: true })
   }
 
   return (
@@ -120,7 +135,11 @@ export const BooksPage = () => {
         ) : (
           <div className={styles.grid}>
             {filteredBooks.map((book) => (
-              <BookCard key={book.id} {...book} />
+              <BookCard
+                key={book.id}
+                {...book}
+                onClick={() => handleCardClick(book.id)}
+              />
             ))}
           </div>
         )}
@@ -132,6 +151,11 @@ export const BooksPage = () => {
           onPublished={handlePublished}
         />
       )}
+      <BookDetailModal
+        isOpen={!!selectedBook}
+        bookId={selectedBook?.id}
+        onClose={handleCloseDetail}
+      />
     </BaseLayout>
   )
 }

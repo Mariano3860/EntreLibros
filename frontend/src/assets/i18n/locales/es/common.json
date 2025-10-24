@@ -626,5 +626,63 @@
       "cancel": "Cancelar",
       "confirm": "Confirmar"
     }
+  },
+  "bookDetail": {
+    "title": "Detalle del libro",
+    "loading": "Cargando...",
+    "error": "No se pudo cargar el libro",
+    "notFound": "Libro no encontrado",
+    "retry": "Reintentar",
+    "close": "Cerrar",
+    "edit": "Editar",
+    "save": "Guardar cambios",
+    "cancel": "Cancelar",
+    "saving": "Guardando...",
+    "saved": "Cambios guardados",
+    "saveError": "No se pudo guardar",
+    "confirmClose": "Hay cambios sin guardar. ¿Querés salir igualmente?",
+    "readOnly": "Solo lectura",
+    "owner": "Tu publicación",
+    "status": {
+      "available": "Disponible",
+      "reserved": "Reservado",
+      "completed": "Completado",
+      "draft": "Borrador"
+    },
+    "changeStatus": "Cambiar estado",
+    "fields": {
+      "title": "Título",
+      "author": "Autor/a",
+      "publisher": "Editorial",
+      "year": "Año",
+      "language": "Idioma",
+      "format": "Formato",
+      "isbn": "ISBN",
+      "condition": "Estado del libro",
+      "notes": "Notas",
+      "status": "Estado de la publicación",
+      "images": "Imágenes"
+    },
+    "offer": {
+      "title": "Opciones de entrega",
+      "sale": "En venta",
+      "donation": "Donación",
+      "trade": "Intercambio",
+      "price": "Precio",
+      "tradePreferences": "Preferencias de intercambio",
+      "availability": "Disponibilidad",
+      "delivery": {
+        "title": "Métodos de entrega",
+        "nearBookCorner": "Rincón de Libros cercano",
+        "inPerson": "En mano",
+        "shipping": "Envío",
+        "shippingPayer": "Quien paga el envío"
+      }
+    },
+    "errors": {
+      "forbidden": "No tenés permiso para editar este libro",
+      "validation": "Verificá los datos ingresados",
+      "unknown": "Ocurrió un error inesperado"
+    }
   }
 }

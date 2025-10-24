@@ -1,7 +1,6 @@
+import type { MapCornerPin } from '@api/map/map.types'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-
-import type { MapCornerPin } from '@src/api/map/map.types'
 
 import styles from './ProposeMeetingModal.module.scss'
 

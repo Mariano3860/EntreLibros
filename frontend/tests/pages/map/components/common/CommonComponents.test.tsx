@@ -1,12 +1,12 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
-import { Badge } from '@src/pages/map/components/common/Badge'
-import { EmptyState } from '@src/pages/map/components/common/EmptyState'
-import { ErrorBanner } from '@src/pages/map/components/common/ErrorBanner'
-import { HeatLayerLegend } from '@src/pages/map/components/common/HeatLayerLegend'
-import { KeyValue } from '@src/pages/map/components/common/KeyValue'
-import { SkeletonList } from '@src/pages/map/components/common/SkeletonList'
+import { Badge } from '@components/map/common/Badge'
+import { EmptyState } from '@components/map/common/EmptyState'
+import { ErrorBanner } from '@components/map/common/ErrorBanner'
+import { HeatLayerLegend } from '@components/map/common/HeatLayerLegend'
+import { KeyValue } from '@components/map/common/KeyValue'
+import { SkeletonList } from '@components/map/common/SkeletonList'
 
 import { renderWithProviders } from '../../../../test-utils'
 

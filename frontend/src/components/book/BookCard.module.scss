@@ -4,14 +4,22 @@
   display: flex;
   flex-direction: column;
   width: rem(140px);
-  cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: transform $transition-duration-fast ease;
   border-radius: rem(8px);
   overflow: hidden;
   background-color: var(--background-card);
 
-  &:hover {
-    transform: scale(1.05);
+  &.clickable {
+    cursor: pointer;
+
+    &:hover {
+      transform: scale(1.05);
+    }
+
+    &:focus {
+      outline: 2px solid var(--primary-color);
+      outline-offset: 2px;
+    }
   }
 }
 

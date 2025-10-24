@@ -3,6 +3,7 @@
  * TODO: unificar los estados en un enum reutilizable.
  */
 export type BookCardProps = {
+  id?: string
   title: string
   author: string
   coverUrl: string
@@ -13,4 +14,5 @@ export type BookCardProps = {
   isForTrade?: boolean
   tradePreferences?: string[]
   isSeeking?: boolean
+  onClick?: () => void
 }
