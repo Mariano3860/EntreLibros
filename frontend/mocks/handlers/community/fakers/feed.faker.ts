@@ -44,14 +44,45 @@ const generateItem = (): FeedItem => {
         author: faker.person.fullName(),
         cover: `https://picsum.photos/seed/${faker.string.uuid()}/600/400`,
       }
-    case 'swap':
+    case 'swap': {
+      const requester = {
+        id: faker.string.uuid(),
+        displayName: faker.person.firstName(),
+        username: `@${faker.internet.userName().toLowerCase()}`,
+        avatar: faker.image.avatar(),
+      }
+
+      const requestedOwner = {
+        id: faker.string.uuid(),
+        displayName: faker.person.firstName(),
+        username: `@${faker.internet.userName().toLowerCase()}`,
+        avatar: faker.image.avatar(),
+      }
+
       return {
         ...base,
+        user: requester.displayName,
+        avatar: requester.avatar,
         type: 'swap',
-        requester: faker.person.firstName(),
-        offered: faker.lorem.word(),
-        requested: faker.lorem.word(),
+        requester,
+        offered: {
+          id: faker.string.uuid(),
+          title: faker.lorem.words(3),
+          author: faker.person.fullName(),
+          cover: `https://picsum.photos/seed/${faker.string.uuid()}/600/400`,
+          category: faker.helpers.arrayElement(['book', 'sale', 'seeking']),
+          owner: requester,
+        },
+        requested: {
+          id: faker.string.uuid(),
+          title: faker.lorem.words(3),
+          author: faker.person.fullName(),
+          cover: `https://picsum.photos/seed/${faker.string.uuid()}/600/400`,
+          category: faker.helpers.arrayElement(['book', 'sale', 'seeking']),
+          owner: requestedOwner,
+        },
       }
+    }
     case 'sale':
       return {
         ...base,

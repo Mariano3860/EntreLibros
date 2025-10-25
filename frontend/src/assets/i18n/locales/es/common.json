@@ -499,11 +499,12 @@
         "likes": "Me gusta"
       },
       "swap": {
-        "wants": "{{user}} quiere intercambiar tu {{offered}} por {{requested}}",
+        "wants": "{{requester}} quiere intercambiar «{{offeredTitle}}» por «{{requestedTitle}}» de {{requestedOwner}}",
         "proposalAria": "Propuesta de intercambio de {{user}}",
-        "user": "Usuario",
+        "requester": "Solicitante",
         "offered": "Ofrece",
-        "requested": "Solicita"
+        "requested": "Solicita",
+        "requestedOwner": "Propietario/a"
       },
       "sale": { "price": "Precio: ${{price}}" },
       "seeking": { "description": "{{user}} busca {{title}}" },

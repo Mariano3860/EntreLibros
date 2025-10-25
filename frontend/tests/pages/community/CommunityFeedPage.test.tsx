@@ -75,9 +75,36 @@ const swapItem: FeedItem = {
   avatar: '',
   time: '3h',
   likes: 3,
-  requester: 'Ana',
-  offered: '1984',
-  requested: 'The Hobbit',
+  requester: {
+    id: 'user-ana',
+    displayName: 'Ana',
+    username: '@ana',
+    avatar: '',
+  },
+  offered: {
+    id: 'listing-1984',
+    title: '1984',
+    author: 'George Orwell',
+    category: 'book',
+    owner: {
+      id: 'user-ana',
+      displayName: 'Ana',
+      username: '@ana',
+      avatar: '',
+    },
+  },
+  requested: {
+    id: 'listing-hobbit',
+    title: 'The Hobbit',
+    author: 'J.R.R. Tolkien',
+    category: 'book',
+    owner: {
+      id: 'user-sofia',
+      displayName: 'Sofia',
+      username: '@sofia',
+      avatar: '',
+    },
+  },
 }
 
 const defaultFeedReturn = () => ({
@@ -158,6 +185,20 @@ describe('CommunityFeedPage', () => {
     })
 
     fireEvent.change(searchInput, { target: { value: 'sofia' } })
+    await waitFor(() => {
+      expect(getLastRenderedItems()).toEqual([
+        expect.objectContaining({ id: 'swap-1' }),
+      ])
+    })
+
+    fireEvent.change(searchInput, { target: { value: '@ana' } })
+    await waitFor(() => {
+      expect(getLastRenderedItems()).toEqual([
+        expect.objectContaining({ id: 'swap-1' }),
+      ])
+    })
+
+    fireEvent.change(searchInput, { target: { value: 'hobbit' } })
     await waitFor(() => {
       expect(getLastRenderedItems()).toEqual([
         expect.objectContaining({ id: 'swap-1' }),

@@ -1707,7 +1707,7 @@ exports[`Feed cards snapshots > swap card matches snapshot (dark/es) 1`] = `
       class="_header_9f5b00"
     >
       <img
-        alt="User"
+        alt="Ana"
         src="https://i.pravatar.cc/100?img=1"
       />
       <div
@@ -1719,7 +1719,7 @@ exports[`Feed cards snapshots > swap card matches snapshot (dark/es) 1`] = `
           <span
             class="_userName_9f5b00"
           >
-            User
+            Ana
           </span>
           <span
             class="_time_9f5b00"
@@ -1738,7 +1738,7 @@ exports[`Feed cards snapshots > swap card matches snapshot (dark/es) 1`] = `
       />
       <img
         alt="The Hobbit"
-        src="https://picsum.photos/seed/The Hobbit/600/400"
+        src="https://picsum.photos/seed/the-hobbit/600/400"
       />
     </div>
     <div
@@ -1818,22 +1818,28 @@ exports[`Feed cards snapshots > swap card matches snapshot (dark/es) 1`] = `
           class="_srOnly_9f5b00"
         >
           <dt>
-            community.feed.swap.user
+            community.feed.swap.requester
           </dt>
           <dd>
-            User
+            Ana
           </dd>
           <dt>
             community.feed.swap.offered
           </dt>
           <dd>
-            1984
+            1984 — George Orwell
           </dd>
           <dt>
             community.feed.swap.requested
           </dt>
           <dd>
-            The Hobbit
+            The Hobbit — J.R.R. Tolkien
+          </dd>
+          <dt>
+            community.feed.swap.requestedOwner
+          </dt>
+          <dd>
+            Luis
           </dd>
         </dl>
       </section>
@@ -1857,7 +1863,7 @@ exports[`Feed cards snapshots > swap card matches snapshot (light/en) 1`] = `
       class="_header_9f5b00"
     >
       <img
-        alt="User"
+        alt="Ana"
         src="https://i.pravatar.cc/100?img=1"
       />
       <div
@@ -1869,7 +1875,7 @@ exports[`Feed cards snapshots > swap card matches snapshot (light/en) 1`] = `
           <span
             class="_userName_9f5b00"
           >
-            User
+            Ana
           </span>
           <span
             class="_time_9f5b00"
@@ -1888,7 +1894,7 @@ exports[`Feed cards snapshots > swap card matches snapshot (light/en) 1`] = `
       />
       <img
         alt="The Hobbit"
-        src="https://picsum.photos/seed/The Hobbit/600/400"
+        src="https://picsum.photos/seed/the-hobbit/600/400"
       />
     </div>
     <div
@@ -1968,22 +1974,28 @@ exports[`Feed cards snapshots > swap card matches snapshot (light/en) 1`] = `
           class="_srOnly_9f5b00"
         >
           <dt>
-            community.feed.swap.user
+            community.feed.swap.requester
           </dt>
           <dd>
-            User
+            Ana
           </dd>
           <dt>
             community.feed.swap.offered
           </dt>
           <dd>
-            1984
+            1984 — George Orwell
           </dd>
           <dt>
             community.feed.swap.requested
           </dt>
           <dd>
-            The Hobbit
+            The Hobbit — J.R.R. Tolkien
+          </dd>
+          <dt>
+            community.feed.swap.requestedOwner
+          </dt>
+          <dd>
+            Luis
           </dd>
         </dl>
       </section>
