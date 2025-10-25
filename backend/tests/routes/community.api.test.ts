@@ -48,6 +48,47 @@ describe('community feed endpoint', () => {
 
     expect(response.body).toHaveLength(8);
     expect(response.body[0]).toEqual({
+      id: 'swap-1',
+      type: 'swap',
+      user: 'Lucía F.',
+      avatar: 'https://i.pravatar.cc/150?img=13',
+      time: 'hace 1 d',
+      likes: 17,
+      corner: { id: 'corner-5', name: 'Punto de Lectura Villa Crespo' },
+      requester: {
+        id: 'user-3',
+        displayName: 'Lucía F.',
+        username: '@lucia',
+        avatar: 'https://i.pravatar.cc/150?img=13',
+      },
+      offered: {
+        id: 'listing-8',
+        title: 'Economías para el bien común',
+        author: 'Christian Felber',
+        cover: 'https://picsum.photos/seed/economias-del-bien-comun/600/400',
+        category: 'sale',
+        owner: {
+          id: 'user-3',
+          displayName: 'Lucía F.',
+          username: '@lucia',
+          avatar: 'https://i.pravatar.cc/150?img=13',
+        },
+      },
+      requested: {
+        id: 'listing-1',
+        title: 'Los años felices',
+        author: 'Claudia Piñeiro',
+        cover: 'https://picsum.photos/seed/anios-felices/600/400',
+        category: 'book',
+        owner: {
+          id: 'user-1',
+          displayName: 'Sofía M.',
+          username: '@sofi',
+          avatar: 'https://i.pravatar.cc/150?img=11',
+        },
+      },
+    });
+    expect(response.body[1]).toEqual({
       id: 'listing-1',
       type: 'book',
       user: 'Sofía M.',
@@ -59,7 +100,7 @@ describe('community feed endpoint', () => {
       author: 'Claudia Piñeiro',
       cover: 'https://picsum.photos/seed/anios-felices/600/400',
     });
-    expect(response.body[1]).toEqual({
+    expect(response.body[2]).toEqual({
       id: 'listing-2',
       type: 'sale',
       user: 'Marcos R.',
@@ -72,16 +113,6 @@ describe('community feed endpoint', () => {
       condition: 'como nuevo',
       cover: 'https://picsum.photos/seed/invencion-de-la-naturaleza/600/400',
     });
-    expect(response.body[2]).toEqual({
-      id: 'listing-3',
-      type: 'seeking',
-      user: 'Lucía F.',
-      avatar: 'https://i.pravatar.cc/150?img=13',
-      time: 'hace 2 d',
-      likes: 21,
-      corner: { id: 'corner-5', name: 'Punto de Lectura Villa Crespo' },
-      title: 'Busco: Antología Poesía Mapuche',
-    });
   });
 
   test('supports pagination slices', async () => {
@@ -91,6 +122,58 @@ describe('community feed endpoint', () => {
       .expect(200);
 
     expect(response.body).toEqual([
+      {
+        id: 'swap-2',
+        type: 'swap',
+        user: 'Aylén P.',
+        avatar: 'https://i.pravatar.cc/150?img=14',
+        time: 'hace 2 d',
+        likes: 23,
+        corner: { id: 'corner-3', name: 'Club de Lectura Chacarita' },
+        requester: {
+          id: 'user-4',
+          displayName: 'Aylén P.',
+          username: '@aylen',
+          avatar: 'https://i.pravatar.cc/150?img=14',
+        },
+        offered: {
+          id: 'listing-9',
+          title: 'La trama celeste',
+          author: 'Adolfo Bioy Casares',
+          cover: 'https://picsum.photos/seed/trama-celeste/600/400',
+          category: 'book',
+          owner: {
+            id: 'user-4',
+            displayName: 'Aylén P.',
+            username: '@aylen',
+            avatar: 'https://i.pravatar.cc/150?img=14',
+          },
+        },
+        requested: {
+          id: 'listing-2',
+          title: 'La invención de la naturaleza',
+          author: 'Andrea Wulf',
+          cover:
+            'https://picsum.photos/seed/invencion-de-la-naturaleza/600/400',
+          category: 'sale',
+          owner: {
+            id: 'user-2',
+            displayName: 'Marcos R.',
+            username: '@marcos',
+            avatar: 'https://i.pravatar.cc/150?img=12',
+          },
+        },
+      },
+      {
+        id: 'listing-3',
+        type: 'seeking',
+        user: 'Lucía F.',
+        avatar: 'https://i.pravatar.cc/150?img=13',
+        time: 'hace 2 d',
+        likes: 21,
+        corner: { id: 'corner-5', name: 'Punto de Lectura Villa Crespo' },
+        title: 'Busco: Antología Poesía Mapuche',
+      },
       {
         id: 'listing-4',
         type: 'book',
@@ -102,31 +185,6 @@ describe('community feed endpoint', () => {
         title: 'El jardín secreto',
         author: 'Frances Hodgson Burnett',
         cover: 'https://picsum.photos/seed/jardin-secreto/600/400',
-      },
-      {
-        id: 'listing-5',
-        type: 'sale',
-        user: 'Sofía M.',
-        avatar: 'https://i.pravatar.cc/150?img=11',
-        time: 'hace 5 d',
-        likes: 18,
-        corner: { id: 'corner-1', name: 'Rincón Plaza Malabia' },
-        title: 'Astroguía del Cono Sur',
-        price: 6800,
-        condition: 'usado',
-        cover: 'https://picsum.photos/seed/astroguia-conosur/600/400',
-      },
-      {
-        id: 'listing-6',
-        type: 'book',
-        user: 'Marcos R.',
-        avatar: 'https://i.pravatar.cc/150?img=12',
-        time: 'hace 5 d',
-        likes: 24,
-        corner: { id: 'corner-6', name: 'Rincón Colegiales' },
-        title: 'Invasión 2040',
-        author: 'Liliana Bodoc',
-        cover: 'https://picsum.photos/seed/invasion-2040/600/400',
       },
     ]);
   });

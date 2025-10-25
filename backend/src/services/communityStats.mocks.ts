@@ -2,6 +2,7 @@ import type {
   CommunityCorner,
   CommunityListing,
   CommunityUserProfile,
+  CommunitySwap,
 } from './communityStats.js';
 
 // TODO: Replace this mock dataset with real persistence-backed queries once the
@@ -264,6 +265,39 @@ export const COMMUNITY_LISTINGS: readonly CommunityListing[] = [
     likes: 9,
     createdAt: '2025-10-22T18:20:00.000Z',
     searchTags: ['historia local', 'cronica urbana'],
+  },
+] as const;
+
+export const COMMUNITY_SWAPS: readonly CommunitySwap[] = [
+  {
+    id: 'swap-1',
+    requesterId: 'user-3',
+    responderId: 'user-1',
+    offeredListingId: 'listing-8',
+    requestedListingId: 'listing-1',
+    cornerId: 'corner-5',
+    likes: 17,
+    createdAt: '2025-10-30T19:05:00.000Z',
+  },
+  {
+    id: 'swap-2',
+    requesterId: 'user-4',
+    responderId: 'user-2',
+    offeredListingId: 'listing-9',
+    requestedListingId: 'listing-2',
+    cornerId: 'corner-3',
+    likes: 23,
+    createdAt: '2025-10-29T21:45:00.000Z',
+  },
+  {
+    id: 'swap-3',
+    requesterId: 'user-1',
+    responderId: 'user-2',
+    offeredListingId: 'listing-5',
+    requestedListingId: 'listing-6',
+    cornerId: 'corner-1',
+    likes: 31,
+    createdAt: '2025-10-27T12:35:00.000Z',
   },
 ] as const;
 

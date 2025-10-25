@@ -47,6 +47,17 @@ export interface CommunityListing {
   searchTags: string[];
 }
 
+export interface CommunitySwap {
+  id: string;
+  requesterId: string;
+  responderId: string;
+  offeredListingId: string;
+  requestedListingId: string;
+  cornerId: string | null;
+  likes: number;
+  createdAt: string;
+}
+
 export interface CommunityStatsKpis {
   exchanges: number;
   activeHouses: number;

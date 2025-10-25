@@ -23,9 +23,39 @@ export const CommunityFeedPage = () => {
   const filtered = filterItems(items, filter).filter((item) => {
     const q = search.toLowerCase()
     if (!q) return true
-    if ('title' in item && item.title.toLowerCase().includes(q)) return true
-    if ('name' in item && item.name.toLowerCase().includes(q)) return true
-    if ('user' in item && item.user.toLowerCase().includes(q)) return true
+
+    if ('title' in item && item.title.toLowerCase().includes(q)) {
+      return true
+    }
+
+    if ('name' in item && item.name.toLowerCase().includes(q)) {
+      return true
+    }
+
+    if ('user' in item && item.user.toLowerCase().includes(q)) {
+      return true
+    }
+
+    if (
+      item.type === 'swap' &&
+      [
+        item.requester.displayName,
+        item.requester.username,
+        item.offered.title,
+        item.offered.author,
+        item.offered.owner.displayName,
+        item.offered.owner.username,
+        item.requested.title,
+        item.requested.author,
+        item.requested.owner.displayName,
+        item.requested.owner.username,
+      ]
+        .filter((value): value is string => Boolean(value))
+        .some((value) => value.toLowerCase().includes(q))
+    ) {
+      return true
+    }
+
     return false
   })
   const loaderRef = useRef<HTMLDivElement | null>(null)
