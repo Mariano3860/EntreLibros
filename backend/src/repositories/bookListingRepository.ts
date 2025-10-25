@@ -44,6 +44,18 @@ export interface BookListing {
     isbn: string | null;
     coverUrl: string | null;
   };
+  createdAt: Date;
+  updatedAt: Date;
+  images: BookListingImage[];
+}
+
+export interface BookListingImage {
+  id: number;
+  url: string;
+  isPrimary: boolean;
+  source: string | null;
+  metadata: Record<string, unknown> | null;
+  createdAt: Date;
 }
 
 interface BookListingRow {
@@ -76,6 +88,18 @@ interface BookListingRow {
   isbn: string | null;
   book_cover_url: string | null;
   primary_image_url: string | null;
+  created_at: Date;
+  updated_at: Date;
+}
+
+interface BookListingImageRow {
+  id: number;
+  book_listing_id: number;
+  url: string;
+  is_primary: boolean;
+  source: string | null;
+  metadata: unknown;
+  created_at: Date;
 }
 
 export interface BookListingImageInput {
@@ -83,6 +107,44 @@ export interface BookListingImageInput {
   source?: string | null;
   isPrimary?: boolean;
   metadata?: Record<string, unknown> | null;
+}
+
+export interface BookUpdateInput {
+  title?: string;
+  author?: string | null;
+  publisher?: string | null;
+  publishedYear?: number | null;
+  language?: string | null;
+  format?: string | null;
+  isbn?: string | null;
+  coverUrl?: string | null;
+}
+
+export interface BookListingUpdateInput {
+  status?: BookListingStatus;
+  isDraft?: boolean;
+  condition?: BookListingCondition | null;
+  notes?: string | null;
+  sale?: boolean;
+  donation?: boolean;
+  trade?: boolean;
+  priceAmount?: number | null;
+  priceCurrency?: string | null;
+  tradePreferences?: string[];
+  availability?: BookListingAvailability;
+  delivery?: {
+    nearBookCorner?: boolean;
+    inPerson?: boolean;
+    shipping?: boolean;
+    shippingPayer?: BookListingShippingPayer | null;
+  };
+  cornerId?: string | null;
+}
+
+export interface PersistedBookListingUpdate {
+  book?: BookUpdateInput;
+  listing?: BookListingUpdateInput;
+  images?: BookListingImageInput[];
 }
 
 export interface NewBookListing {
@@ -126,6 +188,8 @@ const BOOK_LISTING_SELECT = `
     p.delivery_shipping,
     p.delivery_shipping_payer,
     p.corner_id,
+    p.created_at,
+    p.updated_at,
     b.title,
     b.author,
     b.publisher,
@@ -188,6 +252,24 @@ function mapRow(row: BookListingRow): BookListing {
       isbn: row.isbn,
       coverUrl: row.book_cover_url,
     },
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+    images: [],
+  };
+}
+
+function mapImageRow(row: BookListingImageRow): BookListingImage {
+  const metadata =
+    row.metadata && typeof row.metadata === 'object'
+      ? (row.metadata as Record<string, unknown>)
+      : null;
+  return {
+    id: row.id,
+    url: row.url,
+    isPrimary: row.is_primary,
+    source: row.source,
+    metadata,
+    createdAt: row.created_at,
   };
 }
 
@@ -227,6 +309,20 @@ async function fetchBookListingsWithClient(
   return rows.map(mapRow);
 }
 
+async function fetchBookListingImagesWithClient(
+  client: DbClient,
+  listingId: number
+): Promise<BookListingImage[]> {
+  const { rows } = await client.query<BookListingImageRow>(
+    `SELECT id, book_listing_id, url, is_primary, source, metadata, created_at
+     FROM book_listing_images
+     WHERE book_listing_id = $1
+     ORDER BY is_primary DESC, id ASC`,
+    [listingId]
+  );
+  return rows.map(mapImageRow);
+}
+
 async function fetchBookListingByIdWithClient(
   client: DbClient,
   id: number
@@ -234,7 +330,19 @@ async function fetchBookListingByIdWithClient(
   const pubs = await fetchBookListingsWithClient(client, 'WHERE p.id = $1', [
     id,
   ]);
-  return pubs[0] ?? null;
+  if (!pubs[0]) {
+    return null;
+  }
+  const images = await fetchBookListingImagesWithClient(client, id);
+  return { ...pubs[0], images };
+}
+
+export async function getBookListingById(
+  id: number
+): Promise<BookListing | null> {
+  return withTransaction(async (client) => {
+    return fetchBookListingByIdWithClient(client, id);
+  });
 }
 
 export async function createBookListing(
@@ -361,6 +469,176 @@ export async function createBookListing(
       throw new Error('Book listing creation failed');
     }
     return created;
+  });
+}
+
+export async function updateBookListing(
+  id: number,
+  updates: PersistedBookListingUpdate
+): Promise<BookListing | null> {
+  return withTransaction(async (client) => {
+    const existing = await fetchBookListingByIdWithClient(client, id);
+    if (!existing) {
+      return null;
+    }
+
+    if (updates.book) {
+      const fields: string[] = [];
+      const values: unknown[] = [];
+      let index = 1;
+      const { book } = updates;
+      if (book.title !== undefined) {
+        fields.push(`title = $${index++}`);
+        values.push(book.title);
+      }
+      if (book.author !== undefined) {
+        fields.push(`author = $${index++}`);
+        values.push(book.author);
+      }
+      if (book.publisher !== undefined) {
+        fields.push(`publisher = $${index++}`);
+        values.push(book.publisher);
+      }
+      if (book.publishedYear !== undefined) {
+        fields.push(`published_year = $${index++}`);
+        values.push(book.publishedYear);
+      }
+      if (book.language !== undefined) {
+        fields.push(`language = $${index++}`);
+        values.push(book.language);
+      }
+      if (book.format !== undefined) {
+        fields.push(`format = $${index++}`);
+        values.push(book.format);
+      }
+      if (book.isbn !== undefined) {
+        fields.push(`isbn = $${index++}`);
+        values.push(book.isbn);
+      }
+      if (book.coverUrl !== undefined) {
+        fields.push(`cover_url = $${index++}`);
+        values.push(book.coverUrl);
+      }
+      if (fields.length > 0) {
+        values.push(existing.bookId);
+        await client.query(
+          `UPDATE books SET ${fields.join(', ')} WHERE id = $${index}`,
+          values
+        );
+      }
+    }
+
+    if (updates.listing) {
+      const fields: string[] = [];
+      const values: unknown[] = [];
+      let index = 1;
+      const { listing } = updates;
+      if (listing.status !== undefined) {
+        fields.push(`status = $${index++}`);
+        values.push(listing.status);
+      }
+      if (listing.isDraft !== undefined) {
+        fields.push(`is_draft = $${index++}`);
+        values.push(listing.isDraft);
+      }
+      if (listing.condition !== undefined) {
+        fields.push(`condition = $${index++}`);
+        values.push(listing.condition);
+      }
+      if (listing.notes !== undefined) {
+        fields.push(`description = $${index++}`);
+        values.push(listing.notes);
+      }
+      if (listing.sale !== undefined) {
+        fields.push(`sale = $${index++}`);
+        values.push(listing.sale);
+      }
+      if (listing.donation !== undefined) {
+        fields.push(`donation = $${index++}`);
+        values.push(listing.donation);
+      }
+      if (listing.trade !== undefined) {
+        fields.push(`trade = $${index++}`);
+        values.push(listing.trade);
+      }
+      if (listing.priceAmount !== undefined) {
+        fields.push(`price_amount = $${index++}`);
+        values.push(listing.priceAmount);
+      }
+      if (listing.priceCurrency !== undefined) {
+        fields.push(`price_currency = $${index++}`);
+        values.push(listing.priceCurrency);
+      }
+      if (listing.tradePreferences !== undefined) {
+        fields.push(`trade_preferences = $${index++}`);
+        values.push(listing.tradePreferences);
+      }
+      if (listing.availability !== undefined) {
+        fields.push(`availability = $${index++}`);
+        values.push(listing.availability);
+      }
+      if (listing.delivery) {
+        if (listing.delivery.nearBookCorner !== undefined) {
+          fields.push(`delivery_near_book_corner = $${index++}`);
+          values.push(listing.delivery.nearBookCorner);
+        }
+        if (listing.delivery.inPerson !== undefined) {
+          fields.push(`delivery_in_person = $${index++}`);
+          values.push(listing.delivery.inPerson);
+        }
+        if (listing.delivery.shipping !== undefined) {
+          fields.push(`delivery_shipping = $${index++}`);
+          values.push(listing.delivery.shipping);
+        }
+        if (listing.delivery.shippingPayer !== undefined) {
+          fields.push(`delivery_shipping_payer = $${index++}`);
+          values.push(listing.delivery.shippingPayer);
+        }
+      }
+      if (listing.cornerId !== undefined) {
+        fields.push(`corner_id = $${index++}`);
+        values.push(listing.cornerId);
+      }
+      if (fields.length > 0) {
+        fields.push('updated_at = NOW()');
+        values.push(id);
+        await client.query(
+          `UPDATE book_listings SET ${fields.join(', ')} WHERE id = $${index}`,
+          values
+        );
+      }
+    }
+
+    if (updates.images !== undefined) {
+      await client.query(
+        'DELETE FROM book_listing_images WHERE book_listing_id = $1',
+        [id]
+      );
+      if (updates.images.length > 0) {
+        for (const [index, image] of updates.images.entries()) {
+          const metadata =
+            image.metadata ?? (image.source ? { source: image.source } : null);
+          await client.query(
+            `INSERT INTO book_listing_images (
+              book_listing_id,
+              url,
+              is_primary,
+              source,
+              metadata
+            ) VALUES ($1, $2, $3, $4, $5)`,
+            [
+              id,
+              image.url,
+              image.isPrimary ?? index === 0,
+              image.source ?? null,
+              metadata ? JSON.stringify(metadata) : null,
+            ]
+          );
+        }
+      }
+    }
+
+    return fetchBookListingByIdWithClient(client, id);
   });
 }
 

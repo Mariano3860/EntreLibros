@@ -1003,6 +1003,320 @@
         }
       }
     },
+    "/api/books/{id}": {
+      "get": {
+        "summary": "Get publication details",
+        "tags": ["Books"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Publication details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "author": {
+                      "type": "string"
+                    },
+                    "coverUrl": {
+                      "type": "string"
+                    },
+                    "publisher": {
+                      "type": ["string", "null"]
+                    },
+                    "year": {
+                      "type": ["integer", "null"]
+                    },
+                    "language": {
+                      "type": ["string", "null"]
+                    },
+                    "format": {
+                      "type": ["string", "null"]
+                    },
+                    "isbn": {
+                      "type": ["string", "null"]
+                    },
+                    "condition": {
+                      "type": "string",
+                      "enum": ["new", "very_good", "good", "acceptable"]
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["available", "reserved", "completed", "draft"]
+                    },
+                    "notes": {
+                      "type": ["string", "null"]
+                    },
+                    "images": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "source": {
+                            "type": "string",
+                            "enum": ["cover", "upload"]
+                          }
+                        },
+                        "required": ["id", "url", "source"]
+                      }
+                    },
+                    "offer": {
+                      "type": "object",
+                      "properties": {
+                        "sale": {
+                          "type": "boolean"
+                        },
+                        "donation": {
+                          "type": "boolean"
+                        },
+                        "trade": {
+                          "type": "boolean"
+                        },
+                        "price": {
+                          "type": ["object", "null"],
+                          "properties": {
+                            "amount": {
+                              "type": "number"
+                            },
+                            "currency": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "tradePreferences": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "availability": {
+                          "type": "string",
+                          "enum": ["public", "private"]
+                        },
+                        "delivery": {
+                          "type": "object",
+                          "properties": {
+                            "nearBookCorner": {
+                              "type": "boolean"
+                            },
+                            "inPerson": {
+                              "type": "boolean"
+                            },
+                            "shipping": {
+                              "type": "boolean"
+                            },
+                            "shippingPayer": {
+                              "type": ["string", "null"],
+                              "enum": ["owner", "requester", "split", null]
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "cornerId": {
+                      "type": ["string", "null"]
+                    },
+                    "ownerId": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "books.errors.not_found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a publication",
+        "tags": ["Books"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "author": {
+                    "type": ["string", "null"]
+                  },
+                  "publisher": {
+                    "type": ["string", "null"]
+                  },
+                  "year": {
+                    "type": ["integer", "null"]
+                  },
+                  "language": {
+                    "type": ["string", "null"]
+                  },
+                  "format": {
+                    "type": ["string", "null"]
+                  },
+                  "isbn": {
+                    "type": ["string", "null"]
+                  },
+                  "condition": {
+                    "type": "string",
+                    "enum": ["new", "very_good", "good", "acceptable"]
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": ["available", "reserved", "completed", "draft"]
+                  },
+                  "notes": {
+                    "type": ["string", "null"]
+                  },
+                  "images": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "url": {
+                          "type": "string"
+                        },
+                        "source": {
+                          "type": "string",
+                          "enum": ["cover", "upload"]
+                        },
+                        "isPrimary": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": ["url", "source"]
+                    }
+                  },
+                  "offer": {
+                    "type": "object",
+                    "properties": {
+                      "sale": {
+                        "type": "boolean"
+                      },
+                      "donation": {
+                        "type": "boolean"
+                      },
+                      "trade": {
+                        "type": "boolean"
+                      },
+                      "price": {
+                        "type": ["object", "null"],
+                        "properties": {
+                          "amount": {
+                            "type": "number"
+                          },
+                          "currency": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "tradePreferences": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "availability": {
+                        "type": "string",
+                        "enum": ["public", "private"]
+                      },
+                      "delivery": {
+                        "type": "object",
+                        "properties": {
+                          "nearBookCorner": {
+                            "type": "boolean"
+                          },
+                          "inPerson": {
+                            "type": "boolean"
+                          },
+                          "shipping": {
+                            "type": "boolean"
+                          },
+                          "shippingPayer": {
+                            "type": ["string", "null"],
+                            "enum": ["owner", "requester", "split", null]
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "cornerId": {
+                    "type": ["string", "null"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Publication updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/paths/~1api~1books~1{id}/get/responses/200/content/application~1json/schema"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "books.errors.invalid_update"
+          },
+          "401": {
+            "description": "auth.errors.unauthorized"
+          },
+          "403": {
+            "description": "books.errors.not_owner"
+          },
+          "404": {
+            "description": "books.errors.not_found"
+          }
+        }
+      }
+    },
     "/api/books/mine": {
       "get": {
         "summary": "List publications created by the authenticated user",
