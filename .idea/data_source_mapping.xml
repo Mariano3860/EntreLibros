@@ -7,6 +7,7 @@
     <file url="file://$PROJECT_DIR$/backend/src/repositories/bookRepository.ts" value="2aecaab2-4403-4031-b027-4d0e2c1c72a2" />
     <file url="file://$PROJECT_DIR$/backend/src/repositories/userRepository.ts" value="2aecaab2-4403-4031-b027-4d0e2c1c72a2" />
     <file url="file://$PROJECT_DIR$/backend/src/services/map.ts" value="2aecaab2-4403-4031-b027-4d0e2c1c72a2" />
+    <file url="file://$PROJECT_DIR$/backend/tests/routes/books.api.test.ts" value="2aecaab2-4403-4031-b027-4d0e2c1c72a2" />
     <file url="file://$PROJECT_DIR$/backend/tests/routes/map.api.test.ts" value="2aecaab2-4403-4031-b027-4d0e2c1c72a2" />
   </component>
 </project>
