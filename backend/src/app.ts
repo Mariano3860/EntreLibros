@@ -36,8 +36,8 @@ app.use('/api/map', mapRouter);
 app.use('/api/community', communityRouter);
 app.use('/api/contact', contactRouter);
 
-// TODO(api-alignment): montar rutas para `/api/books/mine` y `/api/community/*`
-// cuando el backend cubra las necesidades del frontend y dejemos de depender de
-// mocks MSW.
+// TODO(api-alignment): mount routes for `/api/books/mine` and `/api/community/*`
+// when the backend covers the needs of the frontend and we stop depending on
+// MSW mocks.
 
 export default app;
