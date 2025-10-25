@@ -12,6 +12,7 @@ import {
   type BookListingImageInput,
   type BookUpdateInput,
 } from '../repositories/bookListingRepository.js';
+import { DEFAULT_LISTING_CONDITION } from '../constants.js';
 
 export type PublicationStatus =
   | 'available'
@@ -183,7 +184,7 @@ function toPublication(listing: BookListing): Publication {
     delivery.shippingPayer = listing.delivery.shippingPayer;
   }
 
-  const condition = listing.condition ?? 'good';
+  const condition = listing.condition ?? DEFAULT_LISTING_CONDITION;
 
   return {
     id: String(listing.id),
