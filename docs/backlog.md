@@ -182,6 +182,8 @@ Feature 5.3 Notificaciones
   - Éxito: opt-in por canal; silenciamiento por tipo.
 - [ ] S-5.6 Resumen semanal opcional (Should, E2; BR-61)
   - Éxito: apertura y desuscripción fácil.
+- [x] S-5.7 Buzón de contacto comunitario (Must, E1; BR-60)
+  - Éxito: API `/api/contact/submit` persiste mensajes con validaciones i18n, documentada en OpenAPI y cubierta por pruebas de integración (201/400/500).
 
 EP-6 Moderación y Convivencia
 Feature 6.1 Reportes y toolkit
