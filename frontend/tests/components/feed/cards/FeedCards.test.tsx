@@ -42,9 +42,39 @@ const swap: SwapProposalItem = {
   ...base,
   type: 'swap',
   id: 's',
-  requester: 'Ana',
-  offered: '1984',
-  requested: 'The Hobbit',
+  user: 'Ana',
+  requester: {
+    id: 'user-ana',
+    displayName: 'Ana',
+    username: '@ana',
+    avatar: 'https://i.pravatar.cc/100?img=1',
+  },
+  offered: {
+    id: 'listing-1984',
+    title: '1984',
+    author: 'George Orwell',
+    cover: 'https://picsum.photos/seed/1984/600/400',
+    category: 'book',
+    owner: {
+      id: 'user-ana',
+      displayName: 'Ana',
+      username: '@ana',
+      avatar: 'https://i.pravatar.cc/100?img=1',
+    },
+  },
+  requested: {
+    id: 'listing-hobbit',
+    title: 'The Hobbit',
+    author: 'J.R.R. Tolkien',
+    cover: 'https://picsum.photos/seed/the-hobbit/600/400',
+    category: 'book',
+    owner: {
+      id: 'user-luis',
+      displayName: 'Luis',
+      username: '@luis',
+      avatar: 'https://i.pravatar.cc/100?img=2',
+    },
+  },
 }
 
 const sale: SaleItem = {

@@ -499,11 +499,12 @@
         "likes": "likes"
       },
       "swap": {
-        "wants": "{{user}} wants to swap your {{offered}} for {{requested}}",
+        "wants": "{{requester}} wants to swap “{{offeredTitle}}” for {{requestedOwner}}'s “{{requestedTitle}}”",
         "proposalAria": "Swap proposal by {{user}}",
-        "user": "User",
-        "offered": "Offered",
-        "requested": "Requested"
+        "requester": "Requester",
+        "offered": "Offers",
+        "requested": "Requests",
+        "requestedOwner": "Owner"
       },
       "sale": {
         "price": "Price: ${{price}}"
