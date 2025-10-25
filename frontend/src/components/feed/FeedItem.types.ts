@@ -29,11 +29,27 @@ export type BookItem = FeedBase & {
   cover: string
 }
 
+export type SwapParticipant = {
+  id: string
+  displayName: string
+  username: string
+  avatar: string
+}
+
+export type SwapListing = {
+  id: string
+  title: string
+  author?: string
+  cover?: string
+  category: 'book' | 'sale' | 'seeking'
+  owner: SwapParticipant
+}
+
 export type SwapProposalItem = FeedBase & {
   type: 'swap'
-  requester: string
-  offered: string
-  requested: string
+  requester: SwapParticipant
+  offered: SwapListing
+  requested: SwapListing
 }
 
 export type SaleItem = FeedBase & {

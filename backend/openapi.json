@@ -1721,6 +1721,77 @@
           }
         ]
       },
+      "SwapFeedParticipant": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "avatar": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": ["id", "displayName", "username", "avatar"]
+      },
+      "SwapFeedListing": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string"
+          },
+          "cover": {
+            "type": "string",
+            "format": "uri"
+          },
+          "category": {
+            "type": "string",
+            "enum": ["book", "sale", "seeking"]
+          },
+          "owner": {
+            "$ref": "#/components/schemas/SwapFeedParticipant"
+          }
+        },
+        "required": ["id", "title", "category", "owner"]
+      },
+      "SwapFeedItem": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FeedBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["swap"]
+              },
+              "requester": {
+                "$ref": "#/components/schemas/SwapFeedParticipant"
+              },
+              "offered": {
+                "$ref": "#/components/schemas/SwapFeedListing"
+              },
+              "requested": {
+                "$ref": "#/components/schemas/SwapFeedListing"
+              }
+            },
+            "required": ["type", "requester", "offered", "requested"]
+          }
+        ]
+      },
       "SaleFeedItem": {
         "allOf": [
           {
@@ -1775,6 +1846,9 @@
         "oneOf": [
           {
             "$ref": "#/components/schemas/BookFeedItem"
+          },
+          {
+            "$ref": "#/components/schemas/SwapFeedItem"
           },
           {
             "$ref": "#/components/schemas/SaleFeedItem"

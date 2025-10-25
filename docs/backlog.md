@@ -149,6 +149,7 @@ Feature 4.1 Mapa y listados
   - Actualización 2025-11-08: se agregó un fallback seguro en la API del mapa para recuperar Rincones aun cuando la intersección geoespacial falle, se expone el estado real de cada pin y se endurecieron las pruebas de MSW/`index.tsx` para habilitar o deshabilitar mocks explícitamente elevando la cobertura de ramas >85%.
   - Actualización 2025-11-09: se robusteció el servicio de mapa con una segunda consulta sin límites cuando la búsqueda acotada falla y se ajustaron las pruebas de arranque del frontend para orquestar `setupMocks` de forma determinística, recuperando los escenarios de error en servicios REST y el umbral de cobertura global. Además, se corrigió la intersección geográfica mediante envolventes `ST_MakeEnvelope` compatibles con antimeridiano y se añadió un polyfill controlado de `ProgressEvent` para que MSW se inicie sin rechazos en entornos de prueba.
   - Actualización 2025-11-10: el feed comunitario incorpora ítems de swaps modelados desde la nueva entidad `community_swaps`, mostrando participantes, ofertas y pedidos en la paginación junto a publicaciones tradicionales y añadiendo pruebas de servicio que validan estructura y orden.
+  - Actualización 2025-11-10 (3): se alineó el esquema OpenAPI y la UI del feed para consumir los swaps anidados (participantes, publicaciones ofrecidas y solicitadas), mostrando carátulas y propietarios correctos sin romper la compatibilidad con los clientes existentes.
 
 Feature 4.2 Descubrimiento avanzado
 

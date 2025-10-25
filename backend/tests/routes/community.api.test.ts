@@ -153,7 +153,8 @@ describe('community feed endpoint', () => {
           id: 'listing-2',
           title: 'La invención de la naturaleza',
           author: 'Andrea Wulf',
-          cover: 'https://picsum.photos/seed/invencion-de-la-naturaleza/600/400',
+          cover:
+            'https://picsum.photos/seed/invencion-de-la-naturaleza/600/400',
           category: 'sale',
           owner: {
             id: 'user-2',
