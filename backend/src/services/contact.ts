@@ -12,7 +12,7 @@ const EMAIL_VALIDATION_OPTIONS = {
   allow_utf8_local_part: true,
   require_tld: true,
   allow_ip_domain: false,
-} as const satisfies Parameters<(typeof validator)['isEmail']>[1];
+} as const;
 
 const ERROR_MESSAGES = {
   nameRequired: 'contact.errors.name_required',
