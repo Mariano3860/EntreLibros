@@ -1,7 +1,14 @@
 import { query, withTransaction, type DbClient } from '../db.js';
 import { type NewBook } from './bookRepository.js';
 
-export type BookListingStatus = 'draft' | 'available' | 'reserved' | 'inactive';
+export type BookListingStatus =
+  | 'draft'
+  | 'available'
+  | 'reserved'
+  | 'inactive'
+  | 'completed'
+  | 'sold'
+  | 'exchanged';
 export type BookListingType = 'offer' | 'want';
 export type BookListingAvailability = 'public' | 'private';
 export type BookListingCondition = 'new' | 'very_good' | 'good' | 'acceptable';

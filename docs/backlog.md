@@ -126,6 +126,10 @@ Feature 3.2 Búsquedas y ciclo de vida
   - Actualización 2025-09-16: se corrigió la sintaxis Mermaid para que GitHub renderice el diagrama y se mantuvo terminología consistente en la documentación.
   - Actualización 2025-09-27: se ajustaron los estilos y la sintaxis del diagrama Mermaid para evitar errores de parseo/render en la documentación.
   - Actualización 2025-09-27 (2): se incorporaron métodos asociados a cada tabla, se añadió configuración Mermaid para layout uniforme y se sumó un diccionario de datos para términos en inglés.
+- [x] S-3.7 Estados visibles alineados con UI (Must, E1; BR-23)
+  - Éxito: los estados persistidos y expuestos distinguen publicaciones disponibles, reservadas, completadas, vendidas e intercambiadas.
+  - Actualización 2025-11-16: se extendió el enum `publication_status`, se ajustaron las proyecciones de `/api/books`, `/api/books/mine` y `/api/books/:id` y se añadieron pruebas que validan la traducción entre estados internos y visibles.
+
 
 EP-4 Descubrimiento y Navegación
 Feature 4.1 Mapa y listados
