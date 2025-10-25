@@ -23,6 +23,7 @@ import {
   type PublicationUpdateInput,
   type PublicationStatus,
   type PublicationImageUpdate,
+  resolvePublicationStatus,
 } from '../services/bookListings.js';
 
 const router = Router();
@@ -252,6 +253,8 @@ const ALLOWED_PUBLICATION_STATUSES: readonly PublicationStatus[] = [
   'available',
   'reserved',
   'completed',
+  'sold',
+  'exchanged',
   'draft',
 ];
 const ALLOWED_IMAGE_SOURCES: readonly PublicationImageUpdate['source'][] = [
@@ -621,14 +624,15 @@ function validatePublicationUpdate(
 }
 
 function toUserBookListing(listing: BookListing) {
+  const status = resolvePublicationStatus(listing);
   return {
     id: String(listing.id),
     title: listing.title,
     author: listing.author ?? '',
     coverUrl: listing.coverUrl,
     condition: listing.condition ?? undefined,
-    status: listing.status,
-    bookListingStatus: listing.status,
+    status,
+    bookListingStatus: status,
     isForSale: listing.sale,
     price: listing.sale ? listing.priceAmount : null,
     priceCurrency: listing.sale ? listing.priceCurrency : null,
@@ -651,14 +655,15 @@ function toUserBookListing(listing: BookListing) {
 }
 
 function toPublicBookListing(listing: BookListing) {
+  const status = resolvePublicationStatus(listing);
   return {
     id: String(listing.id),
     title: listing.title,
     author: listing.author ?? '',
     coverUrl: listing.coverUrl,
     condition: listing.condition ?? undefined,
-    status: listing.status,
-    bookListingStatus: listing.status,
+    status,
+    bookListingStatus: status,
     type: listing.type,
     isForSale: listing.sale,
     price: listing.sale ? listing.priceAmount : null,

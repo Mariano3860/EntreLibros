@@ -18,7 +18,9 @@ export type PublicationStatus =
   | 'available'
   | 'reserved'
   | 'completed'
-  | 'draft';
+  | 'draft'
+  | 'sold'
+  | 'exchanged';
 
 export interface PublicationImage {
   id: string;
@@ -152,7 +154,14 @@ function canAccessListing(listing: BookListing, viewerId?: number) {
     return false;
   }
 
-  if (listing.status === 'inactive') {
+  const status = resolvePublicationStatus(listing);
+
+  if (
+    status === 'completed' ||
+    status === 'sold' ||
+    status === 'exchanged' ||
+    status === 'reserved'
+  ) {
     return false;
   }
 
@@ -164,7 +173,7 @@ function canAccessListing(listing: BookListing, viewerId?: number) {
 }
 
 function toPublication(listing: BookListing): Publication {
-  const status = mapStatus(listing.status, listing.isDraft);
+  const status = resolvePublicationStatus(listing);
   const images = buildPublicationImages(listing.images, listing);
   const coverUrl =
     images[0]?.url ?? listing.coverUrl ?? listing.metadata.coverUrl ?? '';
@@ -216,23 +225,33 @@ function toPublication(listing: BookListing): Publication {
   };
 }
 
-function mapStatus(
-  status: BookListingStatus,
-  isDraft: boolean
+export function resolvePublicationStatus(
+  listing: BookListing
 ): PublicationStatus {
-  if (isDraft || status === 'draft') {
+  if (listing.isDraft || listing.status === 'draft') {
     return 'draft';
   }
 
-  if (status === 'inactive') {
-    return 'completed';
+  switch (listing.status) {
+    case 'reserved':
+      return 'reserved';
+    case 'sold':
+      return 'sold';
+    case 'exchanged':
+      return 'exchanged';
+    case 'completed':
+      return 'completed';
+    case 'inactive':
+      if (listing.sale) {
+        return 'sold';
+      }
+      if (listing.trade) {
+        return 'exchanged';
+      }
+      return 'completed';
+    default:
+      return 'available';
   }
-
-  if (status === 'reserved') {
-    return 'reserved';
-  }
-
-  return 'available';
 }
 
 function buildPublicationImages(
@@ -400,7 +419,11 @@ function mapToBookListingStatus(status: PublicationStatus): {
     case 'reserved':
       return { status: 'reserved', isDraft: false };
     case 'completed':
-      return { status: 'inactive', isDraft: false };
+      return { status: 'completed', isDraft: false };
+    case 'sold':
+      return { status: 'sold', isDraft: false };
+    case 'exchanged':
+      return { status: 'exchanged', isDraft: false };
     default:
       return { status: 'available', isDraft: false };
   }

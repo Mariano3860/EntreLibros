@@ -57,7 +57,14 @@ const insertBook = async (): Promise<number> => {
 const insertListing = async (params: {
   userId: number;
   bookId: number;
-  status?: 'available' | 'reserved' | 'draft' | 'inactive';
+  status?:
+    | 'available'
+    | 'reserved'
+    | 'draft'
+    | 'inactive'
+    | 'completed'
+    | 'sold'
+    | 'exchanged';
   availability?: 'public' | 'private';
   isDraft?: boolean;
   notes?: string | null;
@@ -223,6 +230,136 @@ describe('books API legacy endpoints', () => {
   });
 });
 
+describe('books API listing projections', () => {
+  test('returns UI status in public listings', async () => {
+    const userId = await insertUser({ name: 'Publicador' });
+    const bookId = await insertBook();
+    await insertListing({ userId, bookId, status: 'available' });
+
+    const res = await request(app).get('/api/books').expect(200);
+
+    expect(Array.isArray(res.body)).toBe(true);
+    expect(res.body.length).toBeGreaterThan(0);
+    expect(res.body[0]).toMatchObject({
+      status: 'available',
+      bookListingStatus: 'available',
+    });
+  });
+
+  test('translates internal statuses for owner listings', async () => {
+    const userId = await insertUser({ name: 'Owner' });
+    const bookId = await insertBook();
+    const availableId = await insertListing({
+      userId,
+      bookId,
+      status: 'available',
+    });
+    const inactiveSoldId = await insertListing({
+      userId,
+      bookId,
+      status: 'inactive',
+      sale: true,
+      trade: false,
+    });
+    const inactiveExchangeId = await insertListing({
+      userId,
+      bookId,
+      status: 'inactive',
+      sale: false,
+      trade: true,
+    });
+    const inactiveCompletedId = await insertListing({
+      userId,
+      bookId,
+      status: 'inactive',
+      sale: false,
+      trade: false,
+      donation: true,
+    });
+    const soldId = await insertListing({
+      userId,
+      bookId,
+      status: 'sold',
+      sale: true,
+      trade: false,
+    });
+    const exchangedId = await insertListing({
+      userId,
+      bookId,
+      status: 'exchanged',
+      sale: false,
+      trade: true,
+    });
+    const completedId = await insertListing({
+      userId,
+      bookId,
+      status: 'completed',
+      sale: false,
+      trade: false,
+      donation: true,
+    });
+
+    const res = await request(app)
+      .get('/api/books/mine')
+      .set('Cookie', buildAuthCookie(userId))
+      .expect(200);
+
+    expect(Array.isArray(res.body)).toBe(true);
+
+    const findListing = (id: number) =>
+      res.body.find((listing: { id: string }) => listing.id === String(id));
+
+    const availableListing = findListing(availableId);
+    expect(availableListing).toBeDefined();
+    expect(availableListing).toMatchObject({
+      status: 'available',
+      bookListingStatus: 'available',
+    });
+
+    const soldLegacyListing = findListing(inactiveSoldId);
+    expect(soldLegacyListing).toBeDefined();
+    expect(soldLegacyListing).toMatchObject({
+      status: 'sold',
+      bookListingStatus: 'sold',
+    });
+
+    const exchangedLegacyListing = findListing(inactiveExchangeId);
+    expect(exchangedLegacyListing).toBeDefined();
+    expect(exchangedLegacyListing).toMatchObject({
+      status: 'exchanged',
+      bookListingStatus: 'exchanged',
+    });
+
+    const completedLegacyListing = findListing(inactiveCompletedId);
+    expect(completedLegacyListing).toBeDefined();
+    expect(completedLegacyListing).toMatchObject({
+      status: 'completed',
+      bookListingStatus: 'completed',
+    });
+
+    const soldListing = findListing(soldId);
+    expect(soldListing).toBeDefined();
+    expect(soldListing).toMatchObject({
+      status: 'sold',
+      bookListingStatus: 'sold',
+    });
+
+    const exchangedListing = findListing(exchangedId);
+    expect(exchangedListing).toBeDefined();
+    expect(exchangedListing).toMatchObject({
+      status: 'exchanged',
+      bookListingStatus: 'exchanged',
+    });
+
+    const completedListing = findListing(completedId);
+    expect(completedListing).toBeDefined();
+    expect(completedListing).toMatchObject({
+      status: 'completed',
+      bookListingStatus: 'completed',
+    });
+  });
+});
+
 describe('books API publication detail', () => {
   test('returns publication data for public listing', async () => {
     const userId = await insertUser({ name: 'Alice' });
@@ -259,6 +396,25 @@ describe('books API publication detail', () => {
     expect(res.body.images).toHaveLength(2);
     expect(typeof res.body.createdAt).toBe('string');
     expect(typeof res.body.updatedAt).toBe('string');
+  });
+
+  test('maps inactive legacy status to sold for owner detail', async () => {
+    const ownerId = await insertUser({ name: 'Owner' });
+    const bookId = await insertBook();
+    const listingId = await insertListing({
+      userId: ownerId,
+      bookId,
+      status: 'inactive',
+      sale: true,
+      trade: false,
+    });
+
+    const res = await request(app)
+      .get(`/api/books/${listingId}`)
+      .set('Cookie', buildAuthCookie(ownerId))
+      .expect(200);
+
+    expect(res.body.status).toBe('sold');
   });
 
   test('returns 404 for private listing when viewer is not owner', async () => {
@@ -372,6 +528,32 @@ describe('books API publication update', () => {
       'https://images.example.com/new1.jpg',
       'https://images.example.com/new2.jpg',
     ]);
+  });
+
+  test('allows marking publication as sold', async () => {
+    const ownerId = await insertUser({ name: 'Owner' });
+    const bookId = await insertBook();
+    const listingId = await insertListing({ userId: ownerId, bookId });
+
+    const res = await request(app)
+      .put(`/api/books/${listingId}`)
+      .set('Cookie', buildAuthCookie(ownerId))
+      .send({ status: 'sold' })
+      .expect(200);
+
+    expect(res.body).toMatchObject({
+      status: 'sold',
+    });
+
+    const listingRow = await client.query(
+      'SELECT status, is_draft FROM book_listings WHERE id = $1',
+      [listingId]
+    );
+
+    expect(listingRow.rows[0]).toMatchObject({
+      status: 'sold',
+      is_draft: false,
+    });
   });
 
   test('returns 404 when publication does not exist', async () => {
