@@ -5,8 +5,8 @@
     <file url="file://$PROJECT_DIR$/backend/migrations/006_create_book_listing.sql" value="2aecaab2-4403-4031-b027-4d0e2c1c72a2" />
     <file url="file://$PROJECT_DIR$/backend/src/repositories/bookListingRepository.ts" value="2aecaab2-4403-4031-b027-4d0e2c1c72a2" />
     <file url="file://$PROJECT_DIR$/backend/src/repositories/bookRepository.ts" value="2aecaab2-4403-4031-b027-4d0e2c1c72a2" />
-    <file url="file://$PROJECT_DIR$/backend/src/repositories/contactMessageRepository.ts" value="2aecaab2-4403-4031-b027-4d0e2c1c72a2" />
     <file url="file://$PROJECT_DIR$/backend/src/repositories/communityCornerRepository.ts" value="2aecaab2-4403-4031-b027-4d0e2c1c72a2" />
+    <file url="file://$PROJECT_DIR$/backend/src/repositories/contactMessageRepository.ts" value="2aecaab2-4403-4031-b027-4d0e2c1c72a2" />
     <file url="file://$PROJECT_DIR$/backend/src/repositories/userRepository.ts" value="2aecaab2-4403-4031-b027-4d0e2c1c72a2" />
     <file url="file://$PROJECT_DIR$/backend/src/services/map.ts" value="2aecaab2-4403-4031-b027-4d0e2c1c72a2" />
     <file url="file://$PROJECT_DIR$/backend/tests/routes/books.api.test.ts" value="2aecaab2-4403-4031-b027-4d0e2c1c72a2" />
