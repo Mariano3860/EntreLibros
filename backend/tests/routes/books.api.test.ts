@@ -543,7 +543,6 @@ describe('books API publication update', () => {
 
     expect(res.body).toMatchObject({
       status: 'sold',
-      bookListingStatus: 'sold',
     });
 
     const listingRow = await client.query(

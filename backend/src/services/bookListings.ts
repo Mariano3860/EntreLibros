@@ -164,6 +164,7 @@ function canAccessListing(listing: BookListing, viewerId?: number) {
   ) {
     return false;
   }
+
   if (listing.availability === 'private') {
     return false;
   }
