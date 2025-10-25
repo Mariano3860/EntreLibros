@@ -156,14 +156,14 @@ function canAccessListing(listing: BookListing, viewerId?: number) {
 
   const status = resolvePublicationStatus(listing);
 
-  if (status === 'completed' || status === 'sold' || status === 'exchanged') {
+  if (
+    status === 'completed' ||
+    status === 'sold' ||
+    status === 'exchanged' ||
+    status === 'reserved'
+  ) {
     return false;
   }
-
-  if (status === 'reserved') {
-    return false;
-  }
-
   if (listing.availability === 'private') {
     return false;
   }
