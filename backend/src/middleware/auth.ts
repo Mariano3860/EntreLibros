@@ -15,7 +15,11 @@ function parseCookies(header?: string): Record<string, string> {
   if (!header) return {};
   return header.split(';').reduce<Record<string, string>>((acc, pair) => {
     const [key, ...rest] = pair.trim().split('=');
-    acc[key] = decodeURIComponent(rest.join('='));
+    try {
+      acc[key] = decodeURIComponent(rest.join('='));
+    } catch {
+      acc[key] = rest.join('='); // fallback to raw value if decoding fails
+    }
     return acc;
   }, {});
 }
