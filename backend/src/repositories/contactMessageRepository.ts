@@ -18,14 +18,14 @@ export interface ContactMessage {
   updatedAt: Date;
 }
 
-const ROW_TO_ENTITY_FIELDS = `
-  id,
-  name,
-  email,
-  message,
-  created_at,
-  updated_at
-`;
+const ROW_TO_ENTITY_FIELDS = [
+  'id',
+  'name',
+  'email',
+  'message',
+  'created_at',
+  'updated_at',
+].join(', ');
 
 function rowToEntity(row: ContactMessageRow): ContactMessage {
   return {
