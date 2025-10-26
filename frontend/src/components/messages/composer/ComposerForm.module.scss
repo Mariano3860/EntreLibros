@@ -1,0 +1,85 @@
+@import '@styles/variables';
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  border: 1px solid var(--border-color);
+  border-radius: rem(10px);
+  padding: $spacing-2;
+  background: var(--background-primary);
+  color: var(--text-primary);
+  font: inherit;
+  resize: vertical;
+  min-height: rem(42px);
+
+  &:focus {
+    outline: 2px solid color-mix(in srgb, var(--primary-color) 35%, transparent);
+  }
+}
+
+.textarea {
+  min-height: rem(72px);
+}
+
+.helperText {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-1;
+}
+
+.buttonSecondary,
+.buttonPrimary {
+  border-radius: rem(10px);
+  padding: 10px 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.04s ease;
+}
+
+.buttonSecondary {
+  border: 1px solid var(--border-color);
+  background: none;
+  color: var(--text-secondary);
+
+  &:hover {
+    background: color-mix(in srgb, var(--background-card) 92%, #000 8%);
+  }
+}
+
+.buttonPrimary {
+  border: none;
+  background: rgb(var(--primary-color-rgb));
+  color: #fff;
+
+  &:hover {
+    background: var(--primary-dark);
+  }
+
+  &:disabled {
+    background: color-mix(in srgb, var(--primary-color) 45%, #000 55%);
+    cursor: not-allowed;
+  }
+}

@@ -7,6 +7,6 @@ import { renderWithProviders } from '../../test-utils'
 describe('MessagesPage', () => {
   test('renders message input', () => {
     const { getByPlaceholderText } = renderWithProviders(<MessagesPage />)
-    expect(getByPlaceholderText('Escribe un mensaje...')).toBeInTheDocument()
+    expect(getByPlaceholderText('Escribí un mensaje...')).toBeInTheDocument()
   })
 })

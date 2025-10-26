@@ -406,6 +406,23 @@
     "messages": {
       "title": "Messages",
       "placeholder": "Messages list",
+      "status": {
+        "disconnected": "Disconnected",
+        "disconnectedError": "Disconnected: {{error}}",
+        "online": "Online",
+        "lastSeen": "Last seen {{lastSeen}}",
+        "lastSeenFallback": "just now"
+      },
+      "searchPlaceholder": "Search",
+      "searchAriaLabel": "Search conversations",
+      "actions": {
+        "profile": "View profile info"
+      },
+      "badges": {
+        "unread": "Unread",
+        "book": "Book",
+        "swap": "Swap offer"
+      },
       "agreement": {
         "proposal": {
           "title": "Agreement proposal",
@@ -424,6 +441,66 @@
         "actions": {
           "confirm": "Confirm",
           "suggestChange": "Suggest change"
+        }
+      },
+      "swap": {
+        "proposal": {
+          "title": "Swap proposal",
+          "ariaLabel": "Swap proposal: you offer {{offered}} for {{requested}}",
+          "offered": "You offer",
+          "requested": "You request"
+        }
+      },
+      "composer": {
+        "textLabel": "Write your message",
+        "placeholder": "Write a message...",
+        "send": "Send message",
+        "cancel": "Cancel",
+        "close": "Close",
+        "emoji": {
+          "open": "Emoji",
+          "close": "Close picker",
+          "insert": "Insert emoji {{emoji}}"
+        },
+        "bookModal": {
+          "trigger": "Attach book",
+          "title": "Attach book",
+          "description": "Share a book card within the conversation.",
+          "bookLabel": "Choose a book",
+          "helper": "You can add an optional note for extra context.",
+          "noteLabel": "Note (optional)",
+          "submit": "Attach",
+          "empty": "No books available",
+          "mine": "My books",
+          "theirs": "{{name}}'s books"
+        },
+        "swapModal": {
+          "trigger": "Propose swap",
+          "title": "Swap proposal",
+          "description": "Choose which book you offer and which one you'd like in return.",
+          "offeredLabel": "You offer",
+          "requestedLabel": "You request",
+          "noteLabel": "Additional message (optional)",
+          "helper": "Proposals stay in the conversation so both can review them.",
+          "submit": "Send proposal",
+          "noMine": "You have no books available for swapping.",
+          "noTheirs": "The other person has no books published."
+        },
+        "agreementModal": {
+          "trigger": "Agreement proposal",
+          "title": "Agreement proposal",
+          "description": "Set a meeting point and time to finalize the swap.",
+          "meetingLabel": "Meeting point",
+          "meetingPlaceholder": "e.g. Café at the square",
+          "areaLabel": "Area or neighborhood",
+          "areaPlaceholder": "e.g. Downtown",
+          "dateLabel": "Suggested day",
+          "datePlaceholder": "e.g. Tue 03/12",
+          "timeLabel": "Time",
+          "timePlaceholder": "e.g. 19:00",
+          "bookLabel": "Book to exchange",
+          "noBooks": "No books are listed in this conversation.",
+          "submit": "Send proposal"
         }
       },
       "snippets": {
