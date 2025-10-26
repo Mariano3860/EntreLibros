@@ -1,7 +1,13 @@
 /**
  * Status of a publication (book listing)
  */
-export type PublicationStatus = 'available' | 'reserved' | 'completed' | 'draft'
+export type PublicationStatus =
+  | 'available'
+  | 'reserved'
+  | 'completed'
+  | 'draft'
+  | 'sold'
+  | 'exchanged'
 
 /**
  * Full publication details as received from the API

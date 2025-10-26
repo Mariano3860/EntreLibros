@@ -659,7 +659,9 @@
       "available": "Available",
       "reserved": "Reserved",
       "completed": "Completed",
-      "draft": "Draft"
+      "draft": "Draft",
+      "sold": "Sold",
+      "exchanged": "Exchanged"
     },
     "changeStatus": "Change status",
     "fields": {
