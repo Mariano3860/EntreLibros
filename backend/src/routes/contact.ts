@@ -30,7 +30,10 @@ router.post('/submit', async (req, res) => {
 
     const saved = await submitContactMessage(payload);
 
-    return res.status(201).json(saved);
+    return res.status(201).json({
+      message: 'contact.success.submitted',
+      contact: saved,
+    });
   } catch (error) {
     if (error instanceof ContactValidationError) {
       return res.status(400).json({ errors: error.errors });

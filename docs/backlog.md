@@ -191,6 +191,7 @@ Feature 5.3 Notificaciones
   - Éxito: apertura y desuscripción fácil.
 - [x] S-5.7 Buzón de contacto comunitario (Must, E1; BR-60)
   - Éxito: API `/api/contact/submit` persiste mensajes con validaciones i18n, documentada en OpenAPI y cubierta por pruebas de integración (201/400/500).
+  - Actualización 2025-11-05: la API devuelve una confirmación con clave i18n y conserva el registro guardado, permitiendo que el frontend muestre el toast correcto sin exponer el mensaje del usuario.
 
 EP-6 Moderación y Convivencia
 Feature 6.1 Reportes y toolkit

@@ -25,7 +25,7 @@ describe('useContactForm', () => {
       email: 'john@example.com',
       message: 'Hi',
     })
-    expect(toast.success).toHaveBeenCalled()
+    expect(toast.success).toHaveBeenCalledWith('contact.success.submitted')
     expect(onSuccess).toHaveBeenCalled()
   })
 

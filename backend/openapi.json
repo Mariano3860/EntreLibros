@@ -365,36 +365,46 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "id": {
-                      "type": "integer"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "email": {
-                      "type": "string",
-                      "format": "email"
-                    },
                     "message": {
-                      "type": "string"
-                    },
-                    "createdAt": {
                       "type": "string",
-                      "format": "date-time"
+                      "description": "Confirmation message as an i18n key"
                     },
-                    "updatedAt": {
-                      "type": "string",
-                      "format": "date-time"
+                    "contact": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string",
+                          "format": "email"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "email",
+                        "message",
+                        "createdAt",
+                        "updatedAt"
+                      ]
                     }
                   },
-                  "required": [
-                    "id",
-                    "name",
-                    "email",
-                    "message",
-                    "createdAt",
-                    "updatedAt"
-                  ]
+                  "required": ["message", "contact"]
                 }
               }
             }

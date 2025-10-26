@@ -8,6 +8,16 @@ export type ContactFormData = {
   message: string
 }
 
+export type ContactFormMessage = {
+  id: number
+  name: string
+  email: string
+  message: string
+  createdAt: string
+  updatedAt: string
+}
+
 export type ContactFormResponse = {
   message: string
+  contact: ContactFormMessage
 }
