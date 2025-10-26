@@ -134,17 +134,25 @@ Envía el formulario de contacto.
 }
 ```
 
-**Respuesta 200**
+**Respuesta 201**
 
 ```json
 {
-  "message": "¡Gracias por tu mensaje! Te responderemos lo antes posible."
+  "message": "contact.success.submitted",
+  "contact": {
+    "id": 42,
+    "name": "María Pérez",
+    "email": "maria@example.com",
+    "message": "Quisiera más información sobre la plataforma.",
+    "createdAt": "2025-11-05T12:34:56.000Z",
+    "updatedAt": "2025-11-05T12:34:56.000Z"
+  }
 }
 ```
 
 **Errores**
 
-- `400 Bad Request` o `500 Internal Server Error` con el campo `message` describiendo el problema.
+- `400 Bad Request` o `500 Internal Server Error` con claves de i18n en el campo `message` describiendo el problema.
 
 ## Libros
 

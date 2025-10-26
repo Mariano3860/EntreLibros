@@ -44,7 +44,10 @@
     "email_placeholder": "ejemplo@correo.com",
     "message_label": "Mensaje",
     "message_placeholder": "Escribí tu mensaje...",
-    "submit_button": "Enviar mensaje"
+    "submit_button": "Enviar mensaje",
+    "success": {
+      "submitted": "¡Gracias por tu mensaje! Te responderemos lo antes posible."
+    }
   },
   "form": {
     "errors": {

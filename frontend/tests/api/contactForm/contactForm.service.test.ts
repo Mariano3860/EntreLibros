@@ -10,7 +10,13 @@ describe('contactForm service', () => {
       message: 'Hello',
     })
     expect(response).toMatchObject({
-      message: '¡Gracias por tu mensaje! Te responderemos lo antes posible.',
+      message: 'contact.success.submitted',
+      contact: {
+        id: expect.any(Number),
+        name: 'John',
+        email: 'john@example.com',
+        message: 'Hello',
+      },
     })
   })
 

@@ -4,10 +4,6 @@ import { RELATIVE_API_ROUTES } from '@src/api/routes'
 
 import { apiRouteMatcher } from '../utils'
 
-const successResponse = {
-  message: '¡Gracias por tu mensaje! Te responderemos lo antes posible.',
-}
-
 const errorResponse = {
   message:
     'Ocurrió un error al enviar tu mensaje. Por favor intenta nuevamente más tarde.',
@@ -16,8 +12,12 @@ const errorResponse = {
 export const contactFormHandler = http.post(
   apiRouteMatcher(RELATIVE_API_ROUTES.CONTACT_FORM.SUBMIT),
   async ({ request }) => {
-    const body = await request.json()
-    const { name } = body as { name: string }
+    const body = (await request.json()) as {
+      name: string
+      email: string
+      message: string
+    }
+    const { name, email, message } = body
 
     // Errores explícitos según contenido del mensaje
     if (name.includes('400')) {
@@ -37,8 +37,23 @@ export const contactFormHandler = http.post(
     // Simular pequeño retardo de red
     await new Promise((r) => setTimeout(r, 200))
 
-    return HttpResponse.json(successResponse, {
-      status: 200,
-    })
+    const timestamp = new Date().toISOString()
+
+    return HttpResponse.json(
+      {
+        message: 'contact.success.submitted',
+        contact: {
+          id: 1,
+          name,
+          email,
+          message,
+          createdAt: timestamp,
+          updatedAt: timestamp,
+        },
+      },
+      {
+        status: 201,
+      }
+    )
   }
 )

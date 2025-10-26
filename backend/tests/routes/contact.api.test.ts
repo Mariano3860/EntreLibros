@@ -22,7 +22,7 @@ afterEach(async () => {
 });
 
 describe('POST /api/contact/submit', () => {
-  test('persists a contact message and returns the saved payload', async () => {
+  test('persists a contact message and returns a confirmation payload', async () => {
     const res = await request(app)
       .post('/api/contact/submit')
       .send({
@@ -33,18 +33,21 @@ describe('POST /api/contact/submit', () => {
       .expect(201);
 
     expect(res.body).toMatchObject({
-      id: expect.any(Number),
-      name: 'Ana Pérez',
-      email: 'ana@example.com',
-      message: 'Hola, quisiera saber más sobre los intercambios.',
+      message: 'contact.success.submitted',
+      contact: {
+        id: expect.any(Number),
+        name: 'Ana Pérez',
+        email: 'ana@example.com',
+        message: 'Hola, quisiera saber más sobre los intercambios.',
+      },
     });
 
-    expect(typeof res.body.createdAt).toBe('string');
-    expect(typeof res.body.updatedAt).toBe('string');
+    expect(typeof res.body.contact.createdAt).toBe('string');
+    expect(typeof res.body.contact.updatedAt).toBe('string');
 
     const { rows } = await client.query(
       'SELECT name, email, message FROM contact_messages WHERE id = $1',
-      [res.body.id]
+      [res.body.contact.id]
     );
 
     expect(rows).toHaveLength(1);

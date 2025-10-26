@@ -44,7 +44,10 @@
     "email_placeholder": "example@email.com",
     "message_label": "Message",
     "message_placeholder": "Write your message...",
-    "submit_button": "Send message"
+    "submit_button": "Send message",
+    "success": {
+      "submitted": "Thanks for your message! We'll get back to you soon."
+    }
   },
   "form": {
     "errors": {
