@@ -129,6 +129,16 @@
     background: rgb(var(--color-info-rgb) / 10%);
     color: var(--color-info);
   }
+
+  &.sold {
+    background: rgb(var(--color-neutral-500-rgb) / 18%);
+    color: var(--color-neutral-700);
+  }
+
+  &.exchanged {
+    background: rgb(var(--color-primary-500-rgb) / 15%);
+    color: var(--color-primary-700);
+  }
 }
 
 .ownerBadge {

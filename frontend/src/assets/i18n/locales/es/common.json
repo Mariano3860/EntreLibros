@@ -651,7 +651,9 @@
       "available": "Disponible",
       "reserved": "Reservado",
       "completed": "Completado",
-      "draft": "Borrador"
+      "draft": "Borrador",
+      "sold": "Vendido",
+      "exchanged": "Intercambiado"
     },
     "changeStatus": "Cambiar estado",
     "fields": {

@@ -129,6 +129,7 @@ Feature 3.2 Búsquedas y ciclo de vida
 - [x] S-3.7 Estados visibles alineados con UI (Must, E1; BR-23)
   - Éxito: los estados persistidos y expuestos distinguen publicaciones disponibles, reservadas, completadas, vendidas e intercambiadas.
   - Actualización 2025-11-16: se extendió el enum `publication_status`, se ajustaron las proyecciones de `/api/books`, `/api/books/mine` y `/api/books/:id` y se añadieron pruebas que validan la traducción entre estados internos y visibles.
+  - Actualización 2025-11-18: el modal de detalle refleja los estados "Vendido" e "Intercambiado" con nuevas etiquetas y estilos, garantizando traducciones consistentes en ES/EN.
 
 
 EP-4 Descubrimiento y Navegación
