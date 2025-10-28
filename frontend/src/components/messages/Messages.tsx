@@ -45,6 +45,7 @@ export const Messages = () => {
     )
     const liveMessages = messages
       .filter((m) => m.channel === selected.user.name)
+      .filter((m) => m.user.id !== currentUser?.id)
       .map((m, idx) => {
         const role: MessageRole = m.user.id === currentUser?.id ? 'me' : 'them'
         const tone: Message['tone'] = role === 'me' ? 'primary' : 'neutral'
