@@ -115,22 +115,38 @@ describe('Messages component', () => {
     fireEvent.click(screen.getByText('Samuel'))
 
     // Swap proposal
-    fireEvent.click(screen.getByRole('button', { name: 'Proponer intercambio' }))
-    const swapModal = screen.getByRole('dialog', { name: /propuesta de intercambio/i })
-    fireEvent.change(within(swapModal).getByLabelText('Mensaje adicional (opcional)'), {
-      target: { value: '¿Te parece el viernes?' },
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Proponer intercambio' })
+    )
+    const swapModal = screen.getByRole('dialog', {
+      name: /propuesta de intercambio/i,
     })
-    fireEvent.click(within(swapModal).getByRole('button', { name: 'Enviar propuesta' }))
+    fireEvent.change(
+      within(swapModal).getByLabelText('Mensaje adicional (opcional)'),
+      {
+        target: { value: '¿Te parece el viernes?' },
+      }
+    )
+    fireEvent.click(
+      within(swapModal).getByRole('button', { name: 'Enviar propuesta' })
+    )
 
     expect(screen.getAllByText('Ofrecés')[0]).toBeInTheDocument()
     expect(screen.getByText('¿Te parece el viernes?')).toBeInTheDocument()
 
     // Agreement proposal
-    fireEvent.click(screen.getByRole('button', { name: 'Propuesta de acuerdo' }))
-    const agreementModal = screen.getByRole('dialog', { name: /propuesta de acuerdo/i })
-    fireEvent.change(within(agreementModal).getByLabelText('Punto de encuentro'), {
-      target: { value: 'Biblioteca central' },
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Propuesta de acuerdo' })
+    )
+    const agreementModal = screen.getByRole('dialog', {
+      name: /propuesta de acuerdo/i,
     })
+    fireEvent.change(
+      within(agreementModal).getByLabelText('Punto de encuentro'),
+      {
+        target: { value: 'Biblioteca central' },
+      }
+    )
     fireEvent.change(within(agreementModal).getByLabelText('Zona o barrio'), {
       target: { value: 'Centro' },
     })
@@ -140,10 +156,15 @@ describe('Messages component', () => {
     fireEvent.change(within(agreementModal).getByLabelText('Horario'), {
       target: { value: '18:00' },
     })
-    fireEvent.change(within(agreementModal).getByLabelText('Libro a intercambiar'), {
-      target: { value: 'me-1' },
-    })
-    fireEvent.click(within(agreementModal).getByRole('button', { name: 'Enviar propuesta' }))
+    fireEvent.change(
+      within(agreementModal).getByLabelText('Libro a intercambiar'),
+      {
+        target: { value: 'me-1' },
+      }
+    )
+    fireEvent.click(
+      within(agreementModal).getByRole('button', { name: 'Enviar propuesta' })
+    )
 
     expect(
       screen.getByText('Biblioteca central — Centro', { exact: false })

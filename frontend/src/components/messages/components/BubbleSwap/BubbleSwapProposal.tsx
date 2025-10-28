@@ -17,7 +17,10 @@ type BubbleSwapProposalProps = {
   time?: string
 } & Pick<BubbleBaseProps, 'className'>
 
-const buildOwnershipLabel = (book: Book, t: (key: string, options?: Record<string, unknown>) => string) => {
+const buildOwnershipLabel = (
+  book: Book,
+  t: (key: string, options?: Record<string, unknown>) => string
+) => {
   if (!book.ownership) return null
   if (book.ownership === 'mine') {
     return t('community.messages.bookBubble.mine', {
@@ -27,9 +30,11 @@ const buildOwnershipLabel = (book: Book, t: (key: string, options?: Record<strin
 
   return t('community.messages.bookBubble.theirs', {
     defaultValue: 'Libro de {{name}}',
-    name: book.ownerName ?? t('community.messages.bookBubble.otherUser', {
-      defaultValue: 'la otra persona',
-    }),
+    name:
+      book.ownerName ??
+      t('community.messages.bookBubble.otherUser', {
+        defaultValue: 'la otra persona',
+      }),
   })
 }
 

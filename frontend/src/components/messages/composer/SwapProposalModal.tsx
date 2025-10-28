@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useRef, useState } from 'react'
+import { FormEvent, RefObject, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Book, SwapProposalDetails } from '../Messages.types'
@@ -19,7 +19,6 @@ export const SwapProposalModal = ({
   open,
   myBooks,
   theirBooks,
-  counterpartName,
   onClose,
   onConfirm,
 }: SwapProposalModalProps) => {
@@ -69,7 +68,7 @@ export const SwapProposalModal = ({
         defaultValue: 'Cerrar',
       })}
       onClose={onClose}
-      initialFocusRef={offeredRef}
+      initialFocusRef={offeredRef as RefObject<HTMLElement>}
     >
       <form className={styles.form} onSubmit={handleSubmit}>
         <div className={styles.field}>
@@ -129,7 +128,8 @@ export const SwapProposalModal = ({
           </select>
           <p className={styles.helperText}>
             {t('community.messages.composer.swapModal.helper', {
-              defaultValue: 'Las propuestas se guardan en la conversación para que ambos las revisen.',
+              defaultValue:
+                'Las propuestas se guardan en la conversación para que ambos las revisen.',
             })}
           </p>
         </div>

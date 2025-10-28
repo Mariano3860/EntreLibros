@@ -1,3 +1,4 @@
+import { cx } from '@utils/cx'
 import {
   FormEvent,
   KeyboardEvent,
@@ -9,17 +10,11 @@ import {
 } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { cx } from '@utils/cx'
-
-import {
-  AgreementDetails,
-  Book,
-  SwapProposalDetails,
-} from './Messages.types'
 import { AgreementProposalModal } from './composer/AgreementProposalModal'
 import { AttachBookModal } from './composer/AttachBookModal'
 import { SwapProposalModal } from './composer/SwapProposalModal'
 import styles from './MessageComposer.module.scss'
+import { AgreementDetails, Book, SwapProposalDetails } from './Messages.types'
 
 type ActiveModal = 'book' | 'swap' | 'agreement' | null
 
@@ -33,6 +28,7 @@ type MessageComposerProps = {
   myBooks: Book[]
   theirBooks: Book[]
   counterpartName: string
+  conversationId: number
 }
 
 const EMOJIS = ['😀', '😁', '😂', '😍', '🤔', '👍', '🎉', '📚']
@@ -47,6 +43,7 @@ export const MessageComposer = ({
   myBooks,
   theirBooks,
   counterpartName,
+  conversationId,
 }: MessageComposerProps) => {
   const { t } = useTranslation()
   const textareaId = useId()
@@ -114,7 +111,7 @@ export const MessageComposer = ({
 
   const handleOpenModal = (
     type: Exclude<ActiveModal, null>,
-    triggerRef: RefObject<HTMLButtonElement>
+    triggerRef: RefObject<HTMLButtonElement | null>
   ) => {
     if (disabled) return
     modalTriggerRef.current = triggerRef.current
@@ -187,7 +184,7 @@ export const MessageComposer = ({
   useEffect(() => {
     closeEmojiPicker()
     setActiveModal(null)
-  }, [myBooks, theirBooks, counterpartName])
+  }, [conversationId])
 
   const hasDraft = draft.trim().length > 0
 
@@ -241,13 +238,10 @@ export const MessageComposer = ({
                     type="button"
                     className={styles.emojiButton}
                     onClick={() => handleEmojiSelect(emoji)}
-                    aria-label={t(
-                      'community.messages.composer.emoji.insert',
-                      {
-                        defaultValue: 'Insertar emoji {{emoji}}',
-                        emoji,
-                      }
-                    )}
+                    aria-label={t('community.messages.composer.emoji.insert', {
+                      defaultValue: 'Insertar emoji {{emoji}}',
+                      emoji,
+                    })}
                   >
                     {emoji}
                   </button>
@@ -263,7 +257,9 @@ export const MessageComposer = ({
                 className={styles.actionButton}
                 onClick={handleToggleEmoji}
                 aria-expanded={isEmojiOpen}
-                aria-controls={`${textareaId}-emoji-popover`}
+                aria-controls={
+                  isEmojiOpen ? `${textareaId}-emoji-popover` : undefined
+                }
                 disabled={disabled}
               >
                 {t('community.messages.composer.emoji.open', {

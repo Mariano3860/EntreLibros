@@ -74,7 +74,11 @@ export const ComposerModal = ({
               </p>
             ) : null}
           </div>
-          <button type="button" onClick={onClose} className={styles.closeButton}>
+          <button
+            type="button"
+            onClick={onClose}
+            className={styles.closeButton}
+          >
             {closeLabel}
           </button>
         </header>

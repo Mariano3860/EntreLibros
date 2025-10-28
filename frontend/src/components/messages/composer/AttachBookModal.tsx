@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useRef, useState } from 'react'
+import { FormEvent, RefObject, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Book } from '../Messages.types'
@@ -60,7 +60,7 @@ export const AttachBookModal = ({
         defaultValue: 'Cerrar',
       })}
       onClose={onClose}
-      initialFocusRef={selectRef}
+      initialFocusRef={selectRef as RefObject<HTMLElement>}
     >
       <form className={styles.form} onSubmit={handleSubmit}>
         <div className={styles.field}>
@@ -114,7 +114,8 @@ export const AttachBookModal = ({
           </select>
           <p className={styles.helperText}>
             {t('community.messages.composer.bookModal.helper', {
-              defaultValue: 'Podés añadir una nota opcional para darle contexto.',
+              defaultValue:
+                'Podés añadir una nota opcional para darle contexto.',
             })}
           </p>
         </div>

@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useRef, useState } from 'react'
+import { FormEvent, RefObject, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { AgreementDetails, Book } from '../Messages.types'
@@ -62,15 +62,14 @@ export const AgreementProposalModal = ({
   }
 
   const allBooks = [...myBooks, ...theirBooks]
-  const canSubmit =
-    Boolean(
-      meetingPoint.trim() &&
-        area.trim() &&
-        date.trim() &&
-        time.trim() &&
-        bookId &&
-        allBooks.some((book) => book.id === bookId)
-    )
+  const canSubmit = Boolean(
+    meetingPoint.trim() &&
+      area.trim() &&
+      date.trim() &&
+      time.trim() &&
+      bookId &&
+      allBooks.some((book) => book.id === bookId)
+  )
 
   return (
     <ComposerModal
@@ -86,7 +85,7 @@ export const AgreementProposalModal = ({
         defaultValue: 'Cerrar',
       })}
       onClose={onClose}
-      initialFocusRef={meetingPointRef}
+      initialFocusRef={meetingPointRef as RefObject<HTMLElement>}
     >
       <form className={styles.form} onSubmit={handleSubmit}>
         <div className={styles.field}>

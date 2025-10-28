@@ -3,7 +3,7 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgb(0 0 0 / 45%);
   display: grid;
   place-items: center;
   z-index: 1000;
@@ -11,11 +11,11 @@
 }
 
 .dialog {
-  width: min(420px, 100%);
+  width: max(500px, 60vw);
   background: var(--background-primary);
   color: var(--text-primary);
   border-radius: rem(16px);
-  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.24);
+  box-shadow: 0 18px 36px rgb(0 0 0 / 24%);
   display: flex;
   flex-direction: column;
   max-height: 95vh;

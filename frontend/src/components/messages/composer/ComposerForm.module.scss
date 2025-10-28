@@ -20,10 +20,9 @@
 .input,
 .select,
 .textarea {
-  width: 100%;
   border: 1px solid var(--border-color);
   border-radius: rem(10px);
-  padding: $spacing-2;
+  padding: $spacing-1;
   background: var(--background-primary);
   color: var(--text-primary);
   font: inherit;
@@ -56,7 +55,9 @@
   padding: 10px 18px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s ease, transform 0.04s ease;
+  transition:
+    background 0.15s ease,
+    transform 0.04s ease;
 }
 
 .buttonSecondary {

@@ -7,8 +7,8 @@ import { ReactComponent as InfoIcon } from '@src/assets/icons/info.svg'
 
 import { BubbleAgreementConfirmation } from './components/BubbleAgreement/BubbleAgreementConfirmation'
 import { BubbleAgreementProposal } from './components/BubbleAgreement/BubbleAgreementProposal'
-import { BubbleText } from './components/BubbleText/BubbleText'
 import { BubbleSwapProposal } from './components/BubbleSwap/BubbleSwapProposal'
+import { BubbleText } from './components/BubbleText/BubbleText'
 import { MessageComposer } from './MessageComposer'
 import styles from './Messages.module.scss'
 import {
@@ -25,9 +25,8 @@ const isTextMessage = (message: Message): message is TextMessage =>
 
 export const Messages = () => {
   const { t } = useTranslation()
-  const [conversations, setConversations] = useState<Conversation[]>(
-    mockConversations
-  )
+  const [conversations, setConversations] =
+    useState<Conversation[]>(mockConversations)
   const [selectedId, setSelectedId] = useState<number | null>(
     mockConversations[0]?.id ?? null
   )
@@ -66,7 +65,10 @@ export const Messages = () => {
     return [...staticMessages, ...liveMessages]
   }, [messages, currentUser, selected])
 
-  const appendMessageToConversation = (conversationId: number, message: Message) => {
+  const appendMessageToConversation = (
+    conversationId: number,
+    message: Message
+  ) => {
     setConversations((prev) =>
       prev.map((conv) =>
         conv.id === conversationId
@@ -151,7 +153,6 @@ export const Messages = () => {
       proposal,
     })
   }
-
 
   return (
     <div className={styles.wrapper}>
@@ -349,6 +350,7 @@ export const Messages = () => {
               myBooks={selected.myBooks}
               theirBooks={selected.theirBooks}
               counterpartName={selected.user.name}
+              conversationId={selected.id}
             />
           </div>
         ) : (

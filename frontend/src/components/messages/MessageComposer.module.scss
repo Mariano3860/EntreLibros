@@ -15,10 +15,10 @@
 }
 
 .textarea {
-  width: 100%;
-  min-height: rem(56px);
-  max-height: rem(180px);
-  padding: $spacing-2;
+  width: 92%;
+  //min-height: rem(56px);
+  //max-height: rem(180px);
+  padding: $spacing-1;
   border: 1px solid var(--border-color);
   border-radius: rem(16px);
   background: var(--background-primary);
@@ -42,6 +42,7 @@
   justify-content: space-between;
   align-items: center;
   margin-top: $spacing-1;
+  width: 95%;
 }
 
 .toolbarGroup {
@@ -53,7 +54,7 @@
 .actionButton {
   display: inline-flex;
   align-items: center;
-  gap: $spacing-1 / 2;
+  gap: calc($spacing-1 / 2);
   padding: 6px 12px;
   border-radius: 999px;
   border: 1px solid transparent;
@@ -61,7 +62,9 @@
   color: var(--text-secondary);
   cursor: pointer;
   font-size: $small-font-size;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
 
   &:hover {
     background: color-mix(in srgb, var(--background-card) 88%, #000 12%);
@@ -86,7 +89,9 @@
   border-radius: rem(10px);
   padding: 10px 16px;
   font-weight: 600;
-  transition: transform 0.04s ease, background 0.15s ease;
+  transition:
+    transform 0.04s ease,
+    background 0.15s ease;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -110,11 +115,11 @@
 .emojiPopover {
   position: absolute;
   bottom: calc(100% + $spacing-1);
-  right: 0;
+  right: rem(40px);
   background: var(--background-card);
   border: 1px solid var(--border-color);
   border-radius: rem(12px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 12px 30px rgb(0 0 0 / 18%);
   z-index: 20;
   overflow: hidden;
   max-width: min(320px, 90vw);
@@ -170,7 +175,7 @@
   padding: 0;
   margin: -1px;
   overflow: hidden;
-  clip: rect(0, 0, 0, 0);
+  clip-path: inset(0 0 0 0);
   white-space: nowrap;
   border: 0;
 }
