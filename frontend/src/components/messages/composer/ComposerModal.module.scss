@@ -1,0 +1,63 @@
+@import '@styles/variables';
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 45%);
+  display: grid;
+  place-items: center;
+  z-index: 1000;
+  padding: $spacing-2;
+}
+
+.dialog {
+  width: max(500px, 60vw);
+  background: var(--background-primary);
+  color: var(--text-primary);
+  border-radius: rem(16px);
+  box-shadow: 0 18px 36px rgb(0 0 0 / 24%);
+  display: flex;
+  flex-direction: column;
+  max-height: 95vh;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-1;
+  padding: $spacing-2;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.title {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.description {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.9rem;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.body {
+  padding: $spacing-2;
+  overflow-y: auto;
+}
+
+.body > * {
+  width: 100%;
+}

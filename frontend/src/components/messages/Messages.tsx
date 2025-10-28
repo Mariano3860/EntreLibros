@@ -3,18 +3,20 @@ import { useChatSocket } from '@hooks/socket/useChatSocket'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { ReactComponent as AttachIcon } from '@src/assets/icons/attachments.svg'
-import { ReactComponent as EmojiIcon } from '@src/assets/icons/emoji.svg'
 import { ReactComponent as InfoIcon } from '@src/assets/icons/info.svg'
 
 import { BubbleAgreementConfirmation } from './components/BubbleAgreement/BubbleAgreementConfirmation'
 import { BubbleAgreementProposal } from './components/BubbleAgreement/BubbleAgreementProposal'
+import { BubbleSwapProposal } from './components/BubbleSwap/BubbleSwapProposal'
 import { BubbleText } from './components/BubbleText/BubbleText'
+import { MessageComposer } from './MessageComposer'
 import styles from './Messages.module.scss'
 import {
+  AgreementDetails,
   Conversation,
   Message,
   MessageRole,
+  SwapProposalDetails,
   TextMessage,
 } from './Messages.types'
 
@@ -23,11 +25,11 @@ const isTextMessage = (message: Message): message is TextMessage =>
 
 export const Messages = () => {
   const { t } = useTranslation()
-  const [conversations] = useState<Conversation[]>(mockConversations)
+  const [conversations, setConversations] =
+    useState<Conversation[]>(mockConversations)
   const [selectedId, setSelectedId] = useState<number | null>(
     mockConversations[0]?.id ?? null
   )
-  const [text, setText] = useState('')
   const { messages, sendMessage, currentUser, isConnected, error } =
     useChatSocket()
 
@@ -43,6 +45,7 @@ export const Messages = () => {
     )
     const liveMessages = messages
       .filter((m) => m.channel === selected.user.name)
+      .filter((m) => m.user.id !== currentUser?.id)
       .map((m, idx) => {
         const role: MessageRole = m.user.id === currentUser?.id ? 'me' : 'them'
         const tone: Message['tone'] = role === 'me' ? 'primary' : 'neutral'
@@ -63,10 +66,93 @@ export const Messages = () => {
     return [...staticMessages, ...liveMessages]
   }, [messages, currentUser, selected])
 
-  const handleSend = () => {
-    if (!text.trim() || selectedId === null || !selected) return
-    sendMessage(text.trim(), selected.user.name)
-    setText('')
+  const appendMessageToConversation = (
+    conversationId: number,
+    message: Message
+  ) => {
+    setConversations((prev) =>
+      prev.map((conv) =>
+        conv.id === conversationId
+          ? { ...conv, messages: [...conv.messages, message] }
+          : conv
+      )
+    )
+  }
+
+  const createBaseMessage = (conversation: Conversation) => {
+    const maxId = conversation.messages.reduce(
+      (maxValue, msg) => Math.max(maxValue, msg.id),
+      0
+    )
+    const nextId = maxId + 1
+
+    return {
+      id: nextId,
+      role: 'me' as const,
+      tone: 'primary' as const,
+      time: new Date().toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+    }
+  }
+
+  const handleSendText = (draft: string) => {
+    if (!draft.trim() || !selected || selectedId === null) return
+
+    const baseMessage = createBaseMessage(selected)
+    const newMessage: TextMessage = {
+      ...baseMessage,
+      type: 'text',
+      text: draft.trim(),
+    }
+
+    appendMessageToConversation(selectedId, newMessage)
+    sendMessage(draft.trim(), selected.user.name)
+  }
+
+  const handleAttachBook = (bookId: string, note?: string) => {
+    if (!selected || selectedId === null) return
+
+    const book =
+      selected.myBooks.find((item) => item.id === bookId) ??
+      selected.theirBooks.find((item) => item.id === bookId)
+
+    if (!book) return
+
+    const baseMessage = createBaseMessage(selected)
+    const newMessage: Message = {
+      ...baseMessage,
+      type: 'bookCard',
+      book,
+      text: note?.trim() ? note.trim() : undefined,
+    }
+
+    appendMessageToConversation(selectedId, newMessage)
+  }
+
+  const handleSwapProposal = (details: SwapProposalDetails) => {
+    if (!selected || selectedId === null) return
+
+    const baseMessage = createBaseMessage(selected)
+
+    appendMessageToConversation(selectedId, {
+      ...baseMessage,
+      type: 'swapProposal',
+      swap: details,
+    })
+  }
+
+  const handleAgreementProposal = (proposal: AgreementDetails) => {
+    if (!selected || selectedId === null) return
+
+    const baseMessage = createBaseMessage(selected)
+
+    appendMessageToConversation(selectedId, {
+      ...baseMessage,
+      type: 'agreementProposal',
+      proposal,
+    })
   }
 
   return (
@@ -122,6 +208,16 @@ export const Messages = () => {
                         return t(
                           'community.messages.agreement.confirmation.title'
                         )
+                      }
+                      if (lastMsg.type === 'swapProposal') {
+                        return t('community.messages.swap.proposal.title', {
+                          defaultValue: 'Propuesta de intercambio',
+                        })
+                      }
+                      if (lastMsg.type === 'bookCard') {
+                        return t('community.messages.snippets.sharedBook', {
+                          defaultValue: 'Compartió un libro',
+                        })
                       }
                       if (isTextMessage(lastMsg)) {
                         if (lastMsg.book)
@@ -209,6 +305,18 @@ export const Messages = () => {
                   )
                 }
 
+                if (msg.type === 'swapProposal') {
+                  return (
+                    <BubbleSwapProposal
+                      key={msg.id}
+                      role={msg.role}
+                      tone={msg.tone}
+                      swap={msg.swap}
+                      time={msg.time}
+                    />
+                  )
+                }
+
                 if (msg.type === 'agreementConfirmation') {
                   return (
                     <BubbleAgreementConfirmation
@@ -226,51 +334,25 @@ export const Messages = () => {
                     key={msg.id}
                     role={msg.role}
                     tone={msg.tone}
-                    text={msg.text}
-                    book={msg.book}
+                    text={'text' in msg ? msg.text : undefined}
+                    book={'book' in msg ? msg.book : undefined}
                     time={msg.time}
                   />
                 )
               })}
             </div>
-            <div className={styles.inputArea}>
-              <div className={styles.inputWrapper}>
-                <input
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
-                  placeholder={t('community.messages.inputPlaceholder', {
-                    defaultValue: 'Escribe un mensaje...',
-                  })}
-                  disabled={!isConnected}
-                />
-                <div className={styles.inputIcons}>
-                  <button
-                    aria-label={t('community.messages.actions.attachments', {
-                      defaultValue: 'Adjuntar archivos',
-                    })}
-                  >
-                    <AttachIcon />
-                  </button>
-                  <button
-                    aria-label={t('community.messages.actions.emoji', {
-                      defaultValue: 'Abrir selector de emojis',
-                    })}
-                  >
-                    <EmojiIcon />
-                  </button>
-                </div>
-              </div>
-              <button
-                aria-label={t('community.messages.actions.send', {
-                  defaultValue: 'Enviar mensaje',
-                })}
-                onClick={handleSend}
-                className={styles.sendButton}
-                disabled={!isConnected}
-              >
-                ➤
-              </button>
-            </div>
+            <MessageComposer
+              className={styles.inputArea}
+              disabled={!isConnected}
+              onSendText={handleSendText}
+              onAttachBook={handleAttachBook}
+              onProposeSwap={handleSwapProposal}
+              onProposeAgreement={handleAgreementProposal}
+              myBooks={selected.myBooks}
+              theirBooks={selected.theirBooks}
+              counterpartName={selected.user.name}
+              conversationId={selected.id}
+            />
           </div>
         ) : (
           <div className={styles.placeholder}>

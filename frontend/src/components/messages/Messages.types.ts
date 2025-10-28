@@ -1,4 +1,5 @@
 export type Book = {
+  id?: string
   title: string
   author: string
   cover: string
@@ -48,10 +49,29 @@ export type AgreementConfirmationMessage = BaseMessage & {
   confirmedBy: string
 }
 
+export type BookCardMessage = BaseMessage & {
+  type: 'bookCard'
+  book: Book
+  text?: string
+}
+
+export type SwapProposalDetails = {
+  offered: Book
+  requested: Book
+  note?: string
+}
+
+export type SwapProposalMessage = BaseMessage & {
+  type: 'swapProposal'
+  swap: SwapProposalDetails
+}
+
 export type Message =
   | TextMessage
   | AgreementProposalMessage
   | AgreementConfirmationMessage
+  | BookCardMessage
+  | SwapProposalMessage
 
 export type Conversation = {
   id: number
@@ -63,4 +83,6 @@ export type Conversation = {
   }
   badges: ('unread' | 'book' | 'swap')[]
   messages: Message[]
+  myBooks: Book[]
+  theirBooks: Book[]
 }

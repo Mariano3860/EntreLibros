@@ -173,6 +173,7 @@ Feature 5.1 Mensajería 1:1
   - Actualización 2025-09-29: se ajustaron los mocks del chat al español y se corrigió el layout para que la barra de mensajes permanezca visible mientras el historial hace scroll.
   - Actualización 2025-09-30: se enriqueció la conversación mockeada con un flujo lógico de intercambio, se diferenciaron visualmente los libros propios vs. del interlocutor y se alinearon las insignias/acciones con la UI.
   - Actualización 2025-10-07: se añadieron pruebas unitarias de burbujas, pestañas y socket mockeado para garantizar traducciones, estados offline/online y envío de mensajes sin regresiones.
+  - Actualización 2025-11-19: se reemplazó la barra de entrada por un compositor accesible con selector de emojis y formularios para adjuntar libros, proponer intercambios y acordar encuentros; se actualizaron los tipos de mensajes, traducciones y pruebas RTL para cubrir los nuevos flujos.
 - [ ] S-5.2 Bloqueo/Reporte en conversación y ficha (Must, E1; BR-43)
   - Éxito: acción en ≤2 pasos.
 

@@ -1,0 +1,47 @@
+@import '@styles/variables';
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: color-mix(in srgb, var(--background-card) 92%, #000 8%);
+  border-radius: rem(10px);
+  padding: $spacing-1 $spacing-2;
+}
+
+.label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+}
+
+.bookTitle {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.bookAuthor {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.note {
+  padding: $spacing-1 $spacing-2;
+  border-left: 3px solid rgb(var(--primary-color-rgb));
+  background: color-mix(in srgb, var(--background-card) 88%, #000 12%);
+  border-radius: rem(10px);
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.time {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}

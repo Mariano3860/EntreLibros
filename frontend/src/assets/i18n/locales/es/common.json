@@ -406,6 +406,23 @@
     "messages": {
       "title": "Mensajes",
       "placeholder": "Lista de mensajes",
+      "status": {
+        "disconnected": "Desconectado",
+        "disconnectedError": "Desconectado: {{error}}",
+        "online": "En línea",
+        "lastSeen": "Última vez {{lastSeen}}",
+        "lastSeenFallback": "hace un momento"
+      },
+      "searchPlaceholder": "Buscar",
+      "searchAriaLabel": "Buscar conversaciones",
+      "actions": {
+        "profile": "Ver información del perfil"
+      },
+      "badges": {
+        "unread": "Sin leer",
+        "book": "Libro",
+        "swap": "Oferta de intercambio"
+      },
       "agreement": {
         "proposal": {
           "title": "Propuesta de acuerdo",
@@ -424,6 +441,66 @@
         "actions": {
           "confirm": "Confirmar",
           "suggestChange": "Proponer cambio"
+        }
+      },
+      "swap": {
+        "proposal": {
+          "title": "Propuesta de intercambio",
+          "ariaLabel": "Propuesta de intercambio: ofrecés {{offered}} por {{requested}}",
+          "offered": "Ofrecés",
+          "requested": "Querés recibir"
+        }
+      },
+      "composer": {
+        "textLabel": "Escribí tu mensaje",
+        "placeholder": "Escribí un mensaje...",
+        "send": "Enviar mensaje",
+        "cancel": "Cancelar",
+        "close": "Cerrar",
+        "emoji": {
+          "open": "Emoji",
+          "close": "Cerrar selector",
+          "insert": "Insertar emoji {{emoji}}"
+        },
+        "bookModal": {
+          "trigger": "Adjuntar libro",
+          "title": "Adjuntar libro",
+          "description": "Compartí una ficha de libro dentro de la conversación.",
+          "bookLabel": "Elegí un libro",
+          "helper": "Podés añadir una nota opcional para darle contexto.",
+          "noteLabel": "Nota (opcional)",
+          "submit": "Adjuntar",
+          "empty": "No hay libros disponibles",
+          "mine": "Mis libros",
+          "theirs": "Libros de {{name}}"
+        },
+        "swapModal": {
+          "trigger": "Proponer intercambio",
+          "title": "Propuesta de intercambio",
+          "description": "Elegí qué libro ofrecés y cuál te gustaría recibir a cambio.",
+          "offeredLabel": "Ofrecés",
+          "requestedLabel": "Querés recibir",
+          "noteLabel": "Mensaje adicional (opcional)",
+          "helper": "Las propuestas se guardan en la conversación para que ambos las revisen.",
+          "submit": "Enviar propuesta",
+          "noMine": "No tenés libros disponibles para intercambio.",
+          "noTheirs": "La otra persona no tiene libros publicados."
+        },
+        "agreementModal": {
+          "trigger": "Propuesta de acuerdo",
+          "title": "Propuesta de acuerdo",
+          "description": "Definí un punto de encuentro y horario para cerrar el intercambio.",
+          "meetingLabel": "Punto de encuentro",
+          "meetingPlaceholder": "Ej. Café de la plaza",
+          "areaLabel": "Zona o barrio",
+          "areaPlaceholder": "Ej. Nervión (Sevilla)",
+          "dateLabel": "Día sugerido",
+          "datePlaceholder": "Ej. Martes 12/03",
+          "timeLabel": "Horario",
+          "timePlaceholder": "Ej. 19:00",
+          "bookLabel": "Libro a intercambiar",
+          "noBooks": "No hay libros cargados en la conversación.",
+          "submit": "Enviar propuesta"
         }
       },
       "snippets": {

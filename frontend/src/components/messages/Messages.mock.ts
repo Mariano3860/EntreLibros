@@ -10,6 +10,16 @@ export const mockConversations: Conversation[] = [
     },
     badges: [],
     messages: [],
+    myBooks: [
+      {
+        id: 'bot-1',
+        title: 'La biblioteca secreta',
+        author: 'EntreLibros',
+        cover: 'https://covers.openlibrary.org/b/id/9259256-S.jpg',
+        ownership: 'mine',
+      },
+    ],
+    theirBooks: [],
   },
   {
     id: 1,
@@ -82,6 +92,40 @@ export const mockConversations: Conversation[] = [
         time: '4:42 PM',
       },
     ],
+    myBooks: [
+      {
+        id: 'me-1',
+        title: 'El nombre del viento',
+        author: 'Patrick Rothfuss',
+        cover: 'https://covers.openlibrary.org/b/id/9259256-S.jpg',
+        ownership: 'mine',
+      },
+      {
+        id: 'me-2',
+        title: 'La Comunidad del Anillo',
+        author: 'J.R.R. Tolkien',
+        cover: 'https://covers.openlibrary.org/b/id/8231856-S.jpg',
+        ownership: 'mine',
+      },
+    ],
+    theirBooks: [
+      {
+        id: 'samuel-1',
+        title: 'Crónica del pájaro que da cuerda al mundo',
+        author: 'Haruki Murakami',
+        cover: 'https://covers.openlibrary.org/b/id/240726-S.jpg',
+        ownership: 'theirs',
+        ownerName: 'Samuel',
+      },
+      {
+        id: 'samuel-2',
+        title: 'La ciudad y los perros',
+        author: 'Mario Vargas Llosa',
+        cover: 'https://covers.openlibrary.org/b/id/11153227-S.jpg',
+        ownership: 'theirs',
+        ownerName: 'Samuel',
+      },
+    ],
   },
   {
     id: 2,
@@ -98,6 +142,25 @@ export const mockConversations: Conversation[] = [
         role: 'them',
         text: '¡Genial, gracias!',
         time: '1:15 PM',
+      },
+    ],
+    myBooks: [
+      {
+        id: 'me-3',
+        title: 'Rayuela',
+        author: 'Julio Cortázar',
+        cover: 'https://covers.openlibrary.org/b/id/8101340-S.jpg',
+        ownership: 'mine',
+      },
+    ],
+    theirBooks: [
+      {
+        id: 'laura-1',
+        title: 'Middlesex',
+        author: 'Jeffrey Eugenides',
+        cover: 'https://covers.openlibrary.org/b/id/8371281-S.jpg',
+        ownership: 'theirs',
+        ownerName: 'Laura',
       },
     ],
   },
@@ -118,6 +181,25 @@ export const mockConversations: Conversation[] = [
         time: 'Yesterday',
       },
     ],
+    myBooks: [
+      {
+        id: 'me-4',
+        title: 'Dune',
+        author: 'Frank Herbert',
+        cover: 'https://covers.openlibrary.org/b/id/9251992-S.jpg',
+        ownership: 'mine',
+      },
+    ],
+    theirBooks: [
+      {
+        id: 'pablo-1',
+        title: 'Neuromante',
+        author: 'William Gibson',
+        cover: 'https://covers.openlibrary.org/b/id/9255402-S.jpg',
+        ownership: 'theirs',
+        ownerName: 'Pablo',
+      },
+    ],
   },
   {
     id: 4,
@@ -134,6 +216,25 @@ export const mockConversations: Conversation[] = [
         role: 'them',
         text: '¡Guau, suena como un gran libro!',
         time: 'Yesterday',
+      },
+    ],
+    myBooks: [
+      {
+        id: 'me-5',
+        title: 'Fahrenheit 451',
+        author: 'Ray Bradbury',
+        cover: 'https://covers.openlibrary.org/b/id/8081531-S.jpg',
+        ownership: 'mine',
+      },
+    ],
+    theirBooks: [
+      {
+        id: 'sophia-1',
+        title: 'La casa de los espíritus',
+        author: 'Isabel Allende',
+        cover: 'https://covers.openlibrary.org/b/id/8225269-S.jpg',
+        ownership: 'theirs',
+        ownerName: 'Sophia',
       },
     ],
   },
