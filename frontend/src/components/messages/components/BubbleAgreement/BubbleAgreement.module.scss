@@ -81,3 +81,17 @@
 .actionButtonSuggest:hover {
   background: color-mix(in srgb, var(--text-secondary) 16%, transparent 84%);
 }
+
+.actionButtonCancel {
+  border-color: color-mix(in srgb, var(--color-error) 45%, transparent 55%);
+  color: var(--color-error);
+}
+
+.actionButtonCancel:hover {
+  background: color-mix(in srgb, var(--color-error) 16%, transparent 84%);
+}
+
+.actionButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

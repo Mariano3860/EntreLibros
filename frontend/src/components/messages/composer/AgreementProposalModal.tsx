@@ -13,6 +13,10 @@ type AgreementProposalModalProps = {
   counterpartName: string
   onClose: () => void
   onConfirm: (details: AgreementDetails) => void
+  initialDetails?: AgreementDetails
+  titleOverride?: string
+  descriptionOverride?: string
+  submitLabelOverride?: string
 }
 
 export const AgreementProposalModal = ({
@@ -22,6 +26,10 @@ export const AgreementProposalModal = ({
   counterpartName,
   onClose,
   onConfirm,
+  initialDetails,
+  titleOverride,
+  descriptionOverride,
+  submitLabelOverride,
 }: AgreementProposalModalProps) => {
   const { t } = useTranslation()
   const meetingPointRef = useRef<HTMLInputElement>(null)
@@ -34,13 +42,18 @@ export const AgreementProposalModal = ({
   useEffect(() => {
     if (!open) return
 
-    setMeetingPoint('')
-    setArea('')
-    setDate('')
-    setTime('')
-    const fallbackBook = myBooks[0] ?? theirBooks[0]
+    setMeetingPoint(initialDetails?.meetingPoint ?? '')
+    setArea(initialDetails?.area ?? '')
+    setDate(initialDetails?.date ?? '')
+    setTime(initialDetails?.time ?? '')
+
+    const allBooks = [...myBooks, ...theirBooks]
+    const matchedBook = allBooks.find(
+      (book) => book.title === initialDetails?.bookTitle
+    )
+    const fallbackBook = matchedBook ?? allBooks[0]
     setBookId(fallbackBook?.id ?? '')
-  }, [open, myBooks, theirBooks])
+  }, [open, myBooks, theirBooks, initialDetails])
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -71,16 +84,30 @@ export const AgreementProposalModal = ({
       allBooks.some((book) => book.id === bookId)
   )
 
+  const title =
+    titleOverride ??
+    t('community.messages.composer.agreementModal.title', {
+      defaultValue: 'Propuesta de acuerdo',
+    })
+
+  const description =
+    descriptionOverride ??
+    t('community.messages.composer.agreementModal.description', {
+      defaultValue:
+        'Definí un punto de encuentro y horario para cerrar el intercambio.',
+    })
+
+  const submitLabel =
+    submitLabelOverride ??
+    t('community.messages.composer.agreementModal.submit', {
+      defaultValue: 'Enviar propuesta',
+    })
+
   return (
     <ComposerModal
       open={open}
-      title={t('community.messages.composer.agreementModal.title', {
-        defaultValue: 'Propuesta de acuerdo',
-      })}
-      description={t('community.messages.composer.agreementModal.description', {
-        defaultValue:
-          'Definí un punto de encuentro y horario para cerrar el intercambio.',
-      })}
+      title={title}
+      description={description}
       closeLabel={t('community.messages.composer.close', {
         defaultValue: 'Cerrar',
       })}
@@ -238,9 +265,7 @@ export const AgreementProposalModal = ({
             className={styles.buttonPrimary}
             disabled={!canSubmit}
           >
-            {t('community.messages.composer.agreementModal.submit', {
-              defaultValue: 'Enviar propuesta',
-            })}
+            {submitLabel}
           </button>
         </div>
       </form>

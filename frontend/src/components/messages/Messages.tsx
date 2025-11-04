@@ -1,14 +1,19 @@
+import { fetchBookAvailability } from '@api/community/messages'
 import { mockConversations } from '@components/messages/Messages.mock'
 import { useChatSocket } from '@hooks/socket/useChatSocket'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { ReactComponent as InfoIcon } from '@src/assets/icons/info.svg'
 
+import { BubbleAgreementCancellation } from './components/BubbleAgreement/BubbleAgreementCancellation'
+import { BubbleAgreementChange } from './components/BubbleAgreement/BubbleAgreementChange'
 import { BubbleAgreementConfirmation } from './components/BubbleAgreement/BubbleAgreementConfirmation'
 import { BubbleAgreementProposal } from './components/BubbleAgreement/BubbleAgreementProposal'
+import { ConfirmAgreementModal } from './components/BubbleAgreement/ConfirmAgreementModal'
 import { BubbleSwapProposal } from './components/BubbleSwap/BubbleSwapProposal'
 import { BubbleText } from './components/BubbleText/BubbleText'
+import { AgreementProposalModal } from './composer/AgreementProposalModal'
 import { MessageComposer } from './MessageComposer'
 import styles from './Messages.module.scss'
 import {
@@ -19,12 +24,40 @@ import {
   SwapProposalDetails,
   TextMessage,
 } from './Messages.types'
+import { AgreementVersion } from './Messages.types'
+import { AgreementStoreError, useAgreementStore } from './useAgreementStore'
 
 const isTextMessage = (message: Message): message is TextMessage =>
   message.type === undefined || message.type === 'text'
 
+type ConfirmationRequest =
+  | {
+      kind: 'confirm'
+      conversationId: number
+      version: number
+      details: AgreementDetails
+      source: 'proposal' | 'change'
+    }
+  | {
+      kind: 'cancel'
+      conversationId: number
+      version: number
+      details: AgreementDetails
+    }
+
+type ChangeModalState = {
+  open: boolean
+  conversationId: number | null
+  version: number | null
+  initialDetails?: AgreementDetails
+}
+
+const hasVersion = (
+  message: Message
+): message is Message & { version: number } => 'version' in message
+
 export const Messages = () => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [conversations, setConversations] =
     useState<Conversation[]>(mockConversations)
   const [selectedId, setSelectedId] = useState<number | null>(
@@ -33,7 +66,82 @@ export const Messages = () => {
   const { messages, sendMessage, currentUser, isConnected, error } =
     useChatSocket()
 
+  const { getVersion, proposeVersion, confirmVersion, cancelVersion } =
+    useAgreementStore(mockConversations)
+
+  const [changeModalState, setChangeModalState] = useState<ChangeModalState>({
+    open: false,
+    conversationId: null,
+    version: null,
+    initialDetails: undefined,
+  })
+  const [confirmationRequest, setConfirmationRequest] =
+    useState<ConfirmationRequest | null>(null)
+  const [confirmationError, setConfirmationError] = useState<string | null>(
+    null
+  )
+  const [agreementError, setAgreementError] = useState<string | null>(null)
+  const [isProcessingConfirmation, setIsProcessingConfirmation] =
+    useState(false)
+
   const selected = conversations.find((c) => c.id === selectedId)
+  const selfName =
+    currentUser?.name ??
+    t('community.messages.agreement.self', { defaultValue: 'Vos' })
+  const changeConversation =
+    changeModalState.conversationId !== null
+      ? conversations.find(
+          (conv) => conv.id === changeModalState.conversationId
+        )
+      : selected
+  const listFormatter = useMemo(
+    () =>
+      new Intl.ListFormat(i18n.language, {
+        style: 'long',
+        type: 'conjunction',
+      }),
+    [i18n.language]
+  )
+
+  const buildStatusLabel = useCallback(
+    (version?: AgreementVersion) => {
+      if (!version) return undefined
+
+      switch (version.status) {
+        case 'pending':
+          return t('community.messages.agreement.status.pending', {
+            defaultValue: 'Pendiente',
+          })
+        case 'confirmed': {
+          if (version.confirmedBy.length === 0) {
+            return t('community.messages.agreement.status.confirmed', {
+              defaultValue: 'Confirmado',
+            })
+          }
+          const names = listFormatter.format(version.confirmedBy)
+          return t('community.messages.agreement.status.confirmedBy', {
+            defaultValue: 'Confirmado por {{names}}',
+            names,
+          })
+        }
+        case 'fullyConfirmed':
+          return t('community.messages.agreement.status.both', {
+            defaultValue: 'Acuerdo confirmado por ambas partes',
+          })
+        case 'inactive':
+          return t('community.messages.agreement.status.inactive', {
+            defaultValue: 'Acuerdo inactivo',
+          })
+        case 'cancelled':
+          return t('community.messages.agreement.status.cancelled', {
+            defaultValue: 'Acuerdo cancelado',
+          })
+        default:
+          return undefined
+      }
+    },
+    [listFormatter, t]
+  )
 
   const mappedMessages: Message[] = useMemo(() => {
     if (!selected) return []
@@ -147,13 +255,332 @@ export const Messages = () => {
     if (!selected || selectedId === null) return
 
     const baseMessage = createBaseMessage(selected)
+    const version = proposeVersion(selectedId, proposal, selfName)
+    if (!version) return
 
     appendMessageToConversation(selectedId, {
       ...baseMessage,
       type: 'agreementProposal',
+      version: version.version,
       proposal,
     })
+    setAgreementError(null)
   }
+
+  const handleOpenChangeModal = useCallback(
+    (conversationId: number, versionNumber: number) => {
+      const version = getVersion(conversationId, versionNumber)
+      if (!version) {
+        const message = t('community.messages.agreement.errors.notFound', {
+          defaultValue: 'La versión seleccionada ya no está disponible.',
+        })
+        setAgreementError(message)
+        return
+      }
+
+      setAgreementError(null)
+      setChangeModalState({
+        open: true,
+        conversationId,
+        version: versionNumber,
+        initialDetails: version.details,
+      })
+    },
+    [getVersion, t]
+  )
+
+  const handleCloseChangeModal = useCallback(() => {
+    setChangeModalState({
+      open: false,
+      conversationId: null,
+      version: null,
+      initialDetails: undefined,
+    })
+  }, [])
+
+  const handleConfirmChange = (details: AgreementDetails) => {
+    if (!changeModalState.open || changeModalState.conversationId === null) {
+      return
+    }
+
+    const conversation = conversations.find(
+      (conv) => conv.id === changeModalState.conversationId
+    )
+    if (!conversation) return
+
+    const original = changeModalState.initialDetails
+    const hasChanges =
+      !original ||
+      original.meetingPoint !== details.meetingPoint ||
+      original.area !== details.area ||
+      original.date !== details.date ||
+      original.time !== details.time ||
+      original.bookTitle !== details.bookTitle
+
+    if (!hasChanges) {
+      setAgreementError(
+        t('community.messages.agreement.errors.noChanges', {
+          defaultValue: 'Debes modificar al menos un dato antes de enviar.',
+        })
+      )
+      return
+    }
+
+    const version = proposeVersion(conversation.id, details, selfName)
+    if (!version) return
+
+    const baseMessage = createBaseMessage(conversation)
+    appendMessageToConversation(conversation.id, {
+      ...baseMessage,
+      type: 'agreementChange',
+      version: version.version,
+      proposal: details,
+    })
+
+    setAgreementError(null)
+    handleCloseChangeModal()
+  }
+
+  const handleOpenConfirmDialog = useCallback(
+    (
+      conversationId: number,
+      versionNumber: number,
+      details: AgreementDetails,
+      source: 'proposal' | 'change'
+    ) => {
+      const version = getVersion(conversationId, versionNumber)
+      if (!version) {
+        const message = t('community.messages.agreement.errors.notFound', {
+          defaultValue: 'La versión seleccionada ya no está disponible.',
+        })
+        setAgreementError(message)
+        return
+      }
+
+      if (version.status === 'inactive') {
+        const message = t('community.messages.agreement.errors.inactive', {
+          defaultValue: 'La versión ya no está activa.',
+        })
+        setAgreementError(message)
+        return
+      }
+
+      if (version.status === 'cancelled') {
+        const message = t('community.messages.agreement.errors.cancelled', {
+          defaultValue: 'La versión ya fue cancelada.',
+        })
+        setAgreementError(message)
+        return
+      }
+
+      setAgreementError(null)
+      setConfirmationError(null)
+      setConfirmationRequest({
+        kind: 'confirm',
+        conversationId,
+        version: versionNumber,
+        details,
+        source,
+      })
+    },
+    [getVersion, t]
+  )
+
+  const handleOpenCancelDialog = useCallback(
+    (
+      conversationId: number,
+      versionNumber: number,
+      details: AgreementDetails
+    ) => {
+      const version = getVersion(conversationId, versionNumber)
+      if (!version) {
+        const message = t('community.messages.agreement.errors.notFound', {
+          defaultValue: 'La versión seleccionada ya no está disponible.',
+        })
+        setAgreementError(message)
+        return
+      }
+
+      if (version.status === 'inactive') {
+        const message = t('community.messages.agreement.errors.inactive', {
+          defaultValue: 'La versión ya no está activa.',
+        })
+        setAgreementError(message)
+        return
+      }
+
+      if (version.status === 'cancelled') {
+        const message = t('community.messages.agreement.errors.cancelled', {
+          defaultValue: 'La versión ya fue cancelada.',
+        })
+        setAgreementError(message)
+        return
+      }
+
+      setAgreementError(null)
+      setConfirmationError(null)
+      setConfirmationRequest({
+        kind: 'cancel',
+        conversationId,
+        version: versionNumber,
+        details,
+      })
+    },
+    [getVersion, t]
+  )
+
+  const handleCloseConfirmModal = useCallback(() => {
+    setConfirmationRequest(null)
+    setConfirmationError(null)
+    setIsProcessingConfirmation(false)
+    setAgreementError(null)
+  }, [])
+
+  const handleConfirmAction = useCallback(async () => {
+    if (!confirmationRequest) return
+
+    const conversation = conversations.find(
+      (conv) => conv.id === confirmationRequest.conversationId
+    )
+    if (!conversation) {
+      const message = t('community.messages.agreement.errors.notFound', {
+        defaultValue: 'La versión seleccionada ya no está disponible.',
+      })
+      setAgreementError(message)
+      setConfirmationError(message)
+      setConfirmationRequest(null)
+      return
+    }
+
+    setIsProcessingConfirmation(true)
+    try {
+      if (confirmationRequest.kind === 'confirm') {
+        const version = getVersion(
+          confirmationRequest.conversationId,
+          confirmationRequest.version
+        )
+        if (!version) {
+          const message = t('community.messages.agreement.errors.notFound', {
+            defaultValue: 'La versión seleccionada ya no está disponible.',
+          })
+          setAgreementError(message)
+          setConfirmationError(message)
+          setConfirmationRequest(null)
+          return
+        }
+
+        if (version.status === 'inactive') {
+          const message = t('community.messages.agreement.errors.inactive', {
+            defaultValue: 'La versión ya no está activa.',
+          })
+          setAgreementError(message)
+          setConfirmationError(message)
+          setConfirmationRequest(null)
+          return
+        }
+
+        if (version.status === 'cancelled') {
+          const message = t('community.messages.agreement.errors.cancelled', {
+            defaultValue: 'La versión ya fue cancelada.',
+          })
+          setAgreementError(message)
+          setConfirmationError(message)
+          setConfirmationRequest(null)
+          return
+        }
+
+        if (version.confirmedBy.includes(selfName)) {
+          setAgreementError(null)
+          setConfirmationError(null)
+          setConfirmationRequest(null)
+          return
+        }
+
+        const availability = await fetchBookAvailability(
+          confirmationRequest.details.bookTitle
+        )
+        if (!availability.available) {
+          const message = t('community.messages.agreement.errors.unavailable', {
+            defaultValue: 'El libro ya no está disponible para intercambio.',
+          })
+          setAgreementError(message)
+          setConfirmationError(message)
+          return
+        }
+
+        confirmVersion(
+          confirmationRequest.conversationId,
+          confirmationRequest.version,
+          selfName
+        )
+
+        const baseMessage = createBaseMessage(conversation)
+        appendMessageToConversation(conversation.id, {
+          ...baseMessage,
+          type: 'agreementConfirmation',
+          version: confirmationRequest.version,
+          agreement: confirmationRequest.details,
+          confirmedBy: selfName,
+        })
+        setAgreementError(null)
+        setConfirmationError(null)
+        setConfirmationRequest(null)
+        return
+      }
+
+      cancelVersion(
+        confirmationRequest.conversationId,
+        confirmationRequest.version,
+        selfName
+      )
+
+      const baseMessage = createBaseMessage(conversation)
+      appendMessageToConversation(conversation.id, {
+        ...baseMessage,
+        type: 'agreementCancellation',
+        version: confirmationRequest.version,
+        cancelledBy: selfName,
+        reason: t('community.messages.agreement.cancellation.defaultReason', {
+          defaultValue: 'El acuerdo fue cancelado.',
+        }),
+      })
+      setAgreementError(null)
+      setConfirmationError(null)
+      setConfirmationRequest(null)
+    } catch (err) {
+      let message = t('community.messages.agreement.errors.generic', {
+        defaultValue: 'Ocurrió un error al procesar la acción.',
+      })
+      if (err instanceof AgreementStoreError) {
+        if (err.code === 'version_inactive') {
+          message = t('community.messages.agreement.errors.inactive', {
+            defaultValue: 'La versión ya no está activa.',
+          })
+        } else if (err.code === 'version_cancelled') {
+          message = t('community.messages.agreement.errors.cancelled', {
+            defaultValue: 'La versión ya fue cancelada.',
+          })
+        } else if (err.code === 'version_not_found') {
+          message = t('community.messages.agreement.errors.notFound', {
+            defaultValue: 'No se encontró la versión seleccionada.',
+          })
+        }
+      }
+      setAgreementError(message)
+      setConfirmationError(message)
+    } finally {
+      setIsProcessingConfirmation(false)
+    }
+  }, [
+    appendMessageToConversation,
+    cancelVersion,
+    confirmationRequest,
+    confirmVersion,
+    conversations,
+    getVersion,
+    selfName,
+    t,
+  ])
 
   return (
     <div className={styles.wrapper}>
@@ -169,6 +596,11 @@ export const Messages = () => {
               })}
         </div>
       )}
+      {agreementError ? (
+        <div className={styles.agreementError} role="alert">
+          {agreementError}
+        </div>
+      ) : null}
       <div className={styles.content}>
         <aside className={styles.sidebar}>
           <div className={styles.sidebarHeader}>
@@ -204,9 +636,17 @@ export const Messages = () => {
                       if (lastMsg.type === 'agreementProposal') {
                         return t('community.messages.agreement.proposal.title')
                       }
+                      if (lastMsg.type === 'agreementChange') {
+                        return t('community.messages.agreement.change.title')
+                      }
                       if (lastMsg.type === 'agreementConfirmation') {
                         return t(
                           'community.messages.agreement.confirmation.title'
+                        )
+                      }
+                      if (lastMsg.type === 'agreementCancellation') {
+                        return t(
+                          'community.messages.agreement.cancellation.title'
                         )
                       }
                       if (lastMsg.type === 'swapProposal') {
@@ -294,13 +734,147 @@ export const Messages = () => {
             </header>
             <div className={styles.messages}>
               {mappedMessages.map((msg) => {
-                if (msg.type === 'agreementProposal') {
+                if (
+                  selected &&
+                  msg.type === 'agreementProposal' &&
+                  hasVersion(msg)
+                ) {
+                  const versionInfo = getVersion(selected.id, msg.version)
+                  const statusLabel = buildStatusLabel(versionInfo)
+                  const confirmDisabled =
+                    !versionInfo ||
+                    versionInfo.status === 'inactive' ||
+                    versionInfo.status === 'cancelled' ||
+                    versionInfo.status === 'fullyConfirmed' ||
+                    versionInfo.confirmedBy.includes(selfName)
+                  const changeDisabled =
+                    !versionInfo ||
+                    versionInfo.status === 'inactive' ||
+                    versionInfo.status === 'cancelled'
+                  const cancelDisabled =
+                    !versionInfo || versionInfo.status === 'cancelled'
+
                   return (
                     <BubbleAgreementProposal
                       key={msg.id}
                       role={msg.role}
                       proposal={msg.proposal}
                       time={msg.time}
+                      statusLabel={statusLabel}
+                      onSuggestChange={
+                        changeDisabled
+                          ? undefined
+                          : () =>
+                              handleOpenChangeModal(selected.id, msg.version)
+                      }
+                      onCancel={
+                        cancelDisabled
+                          ? undefined
+                          : () =>
+                              handleOpenCancelDialog(
+                                selected.id,
+                                msg.version,
+                                msg.proposal
+                              )
+                      }
+                      onConfirm={
+                        confirmDisabled
+                          ? undefined
+                          : () =>
+                              handleOpenConfirmDialog(
+                                selected.id,
+                                msg.version,
+                                msg.proposal,
+                                'proposal'
+                              )
+                      }
+                      confirmDisabled={confirmDisabled}
+                      changeDisabled={changeDisabled}
+                      cancelDisabled={cancelDisabled}
+                    />
+                  )
+                }
+
+                if (
+                  selected &&
+                  msg.type === 'agreementChange' &&
+                  hasVersion(msg)
+                ) {
+                  const versionInfo = getVersion(selected.id, msg.version)
+                  const statusLabel = buildStatusLabel(versionInfo)
+                  const confirmDisabled =
+                    !versionInfo ||
+                    versionInfo.status === 'inactive' ||
+                    versionInfo.status === 'cancelled' ||
+                    versionInfo.status === 'fullyConfirmed' ||
+                    versionInfo.confirmedBy.includes(selfName)
+                  const changeDisabled =
+                    !versionInfo || versionInfo.status === 'cancelled'
+                  const cancelDisabled =
+                    !versionInfo || versionInfo.status === 'cancelled'
+
+                  return (
+                    <BubbleAgreementChange
+                      key={msg.id}
+                      role={msg.role}
+                      proposal={msg.proposal}
+                      time={msg.time}
+                      statusLabel={statusLabel}
+                      onSuggestChange={
+                        changeDisabled
+                          ? undefined
+                          : () =>
+                              handleOpenChangeModal(selected.id, msg.version)
+                      }
+                      onCancel={
+                        cancelDisabled
+                          ? undefined
+                          : () =>
+                              handleOpenCancelDialog(
+                                selected.id,
+                                msg.version,
+                                msg.proposal
+                              )
+                      }
+                      onConfirm={
+                        confirmDisabled
+                          ? undefined
+                          : () =>
+                              handleOpenConfirmDialog(
+                                selected.id,
+                                msg.version,
+                                msg.proposal,
+                                'change'
+                              )
+                      }
+                      confirmDisabled={confirmDisabled}
+                      changeDisabled={changeDisabled}
+                      cancelDisabled={cancelDisabled}
+                    />
+                  )
+                }
+
+                if (
+                  selected &&
+                  msg.type === 'agreementCancellation' &&
+                  hasVersion(msg)
+                ) {
+                  const versionInfo = getVersion(selected.id, msg.version)
+                  const statusLabel = buildStatusLabel(versionInfo)
+
+                  return (
+                    <BubbleAgreementCancellation
+                      key={msg.id}
+                      role={msg.role}
+                      cancelledBy={msg.cancelledBy}
+                      reason={msg.reason}
+                      details={versionInfo?.details}
+                      time={msg.time}
+                      statusLabel={statusLabel}
+                      onProposeNew={() =>
+                        handleOpenChangeModal(selected.id, msg.version)
+                      }
+                      proposeNewDisabled={!versionInfo}
                     />
                   )
                 }
@@ -317,7 +891,13 @@ export const Messages = () => {
                   )
                 }
 
-                if (msg.type === 'agreementConfirmation') {
+                if (
+                  selected &&
+                  msg.type === 'agreementConfirmation' &&
+                  hasVersion(msg)
+                ) {
+                  const versionInfo = getVersion(selected.id, msg.version)
+                  const statusLabel = buildStatusLabel(versionInfo)
                   return (
                     <BubbleAgreementConfirmation
                       key={msg.id}
@@ -325,6 +905,7 @@ export const Messages = () => {
                       agreement={msg.agreement}
                       confirmedBy={msg.confirmedBy}
                       time={msg.time}
+                      statusLabel={statusLabel}
                     />
                   )
                 }
@@ -353,6 +934,81 @@ export const Messages = () => {
               counterpartName={selected.user.name}
               conversationId={selected.id}
             />
+            <AgreementProposalModal
+              open={changeModalState.open}
+              myBooks={changeConversation?.myBooks ?? selected.myBooks}
+              theirBooks={changeConversation?.theirBooks ?? selected.theirBooks}
+              counterpartName={
+                changeConversation?.user.name ?? selected.user.name
+              }
+              onClose={handleCloseChangeModal}
+              onConfirm={handleConfirmChange}
+              initialDetails={changeModalState.initialDetails}
+              titleOverride={t(
+                'community.messages.agreement.change.modalTitle',
+                {
+                  defaultValue: 'Proponer cambios',
+                }
+              )}
+              descriptionOverride={t(
+                'community.messages.agreement.change.modalDescription',
+                {
+                  defaultValue:
+                    'Ajustá la propuesta actualizando al menos un dato.',
+                }
+              )}
+              submitLabelOverride={t(
+                'community.messages.agreement.change.modalSubmit',
+                { defaultValue: 'Enviar cambios' }
+              )}
+            />
+            {confirmationRequest ? (
+              <ConfirmAgreementModal
+                open
+                title={
+                  confirmationRequest.kind === 'confirm'
+                    ? t('community.messages.agreement.confirmModal.title', {
+                        defaultValue: 'Confirmar acuerdo',
+                      })
+                    : t('community.messages.agreement.cancelModal.title', {
+                        defaultValue: 'Confirmar cancelación',
+                      })
+                }
+                description={
+                  confirmationRequest.kind === 'confirm'
+                    ? t(
+                        'community.messages.agreement.confirmModal.description',
+                        {
+                          defaultValue:
+                            'Revisá los datos antes de confirmar el acuerdo.',
+                        }
+                      )
+                    : t(
+                        'community.messages.agreement.cancelModal.description',
+                        {
+                          defaultValue:
+                            'Esta acción cancelará el acuerdo vigente.',
+                        }
+                      )
+                }
+                details={confirmationRequest.details}
+                onClose={handleCloseConfirmModal}
+                onConfirm={handleConfirmAction}
+                confirmLabel={
+                  confirmationRequest.kind === 'confirm'
+                    ? t('community.messages.agreement.actions.confirm')
+                    : t(
+                        'community.messages.agreement.cancellation.confirmAction',
+                        { defaultValue: 'Cancelar acuerdo' }
+                      )
+                }
+                cancelLabel={t('community.messages.composer.cancel', {
+                  defaultValue: 'Cancelar',
+                })}
+                errorMessage={confirmationError}
+                confirmDisabled={isProcessingConfirmation}
+              />
+            ) : null}
           </div>
         ) : (
           <div className={styles.placeholder}>

@@ -20,6 +20,9 @@ export const RELATIVE_API_ROUTES = {
     FEED: `/community/feed`,
     ACTIVITY: `/community/activity`,
     SUGGESTIONS: `/community/suggestions`,
+    MESSAGES: {
+      AVAILABILITY: `/community/messages/availability`,
+    },
     CORNERS: {
       NEARBY: `/community/corners/nearby`,
       MAP: `/community/corners/map`,

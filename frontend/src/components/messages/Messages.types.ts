@@ -25,6 +25,27 @@ export type AgreementDetails = {
   bookTitle: string
 }
 
+export type AgreementVersionStatus =
+  | 'pending'
+  | 'confirmed'
+  | 'fullyConfirmed'
+  | 'inactive'
+  | 'cancelled'
+
+export type AgreementVersionHistoryEntry = {
+  status: AgreementVersionStatus
+  changedAt: string
+  changedBy: string
+}
+
+export type AgreementVersion = {
+  version: number
+  details: AgreementDetails
+  status: AgreementVersionStatus
+  confirmedBy: string[]
+  history: AgreementVersionHistoryEntry[]
+}
+
 export type BaseMessage = {
   id: number
   role: MessageRole
@@ -38,12 +59,27 @@ export type TextMessage = BaseMessage & {
   book?: Book
 }
 
-export type AgreementProposalMessage = BaseMessage & {
+type AgreementMessageBase = BaseMessage & {
+  version: number
+}
+
+export type AgreementProposalMessage = AgreementMessageBase & {
   type: 'agreementProposal'
   proposal: AgreementDetails
 }
 
-export type AgreementConfirmationMessage = BaseMessage & {
+export type AgreementChangeMessage = AgreementMessageBase & {
+  type: 'agreementChange'
+  proposal: AgreementDetails
+}
+
+export type AgreementCancellationMessage = AgreementMessageBase & {
+  type: 'agreementCancellation'
+  cancelledBy: string
+  reason?: string
+}
+
+export type AgreementConfirmationMessage = AgreementMessageBase & {
   type: 'agreementConfirmation'
   agreement: AgreementDetails
   confirmedBy: string
@@ -70,6 +106,8 @@ export type Message =
   | TextMessage
   | AgreementProposalMessage
   | AgreementConfirmationMessage
+  | AgreementChangeMessage
+  | AgreementCancellationMessage
   | BookCardMessage
   | SwapProposalMessage
 
