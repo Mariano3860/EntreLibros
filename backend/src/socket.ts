@@ -1,6 +1,12 @@
 import type { Server } from 'socket.io';
 import jwt, { type Algorithm } from 'jsonwebtoken';
 import { findUserById } from './repositories/userRepository.js';
+import {
+  isConversationParticipant,
+  listConversations,
+  markConversationRead,
+  sendMessage,
+} from './repositories/messagingRepository.js';
 import { logger } from './utils/logger.js';
 import { generateReply } from './services/chatBot.js';
 
@@ -31,11 +37,30 @@ export interface ChatMessage {
 
 export interface ClientToServerEvents {
   message: (payload: { text: string; channel?: string }) => void;
+  'conversation:join': (payload: { conversationId: number }) => void;
+  'conversation:message': (payload: {
+    conversationId: number;
+    clientKey: string;
+    body: string;
+  }) => void;
+  'conversation:read': (payload: {
+    conversationId: number;
+    sequence: number;
+  }) => void;
 }
 
 export interface ServerToClientEvents {
   message: (msg: ChatMessage) => void;
   user: (user: ChatUser) => void;
+  'conversation:message': (msg: {
+    conversationId: number;
+    sequence: number;
+    senderId: number;
+    body: string;
+    clientKey: string;
+    createdAt: string;
+  }) => void;
+  'conversation:error': (payload: { message: string }) => void;
 }
 
 export type InterServerEvents = Record<string, never>;
@@ -76,6 +101,74 @@ export function setupWebsocket(
 
   io.on('connection', (socket) => {
     socket.emit('user', socket.data.user);
+    void listConversations(socket.data.user.id).then((conversations) => {
+      conversations.forEach((conversation) => {
+        socket.join(`conversation:${conversation.id}`);
+      });
+    });
+
+    socket.on('conversation:join', async ({ conversationId }) => {
+      if (
+        !(await isConversationParticipant(conversationId, socket.data.user.id))
+      ) {
+        socket.emit('conversation:error', {
+          message: 'messaging.errors.forbidden',
+        });
+        return;
+      }
+      await socket.join(`conversation:${conversationId}`);
+    });
+
+    socket.on('conversation:message', async (payload) => {
+      try {
+        const message = await sendMessage({
+          conversationId: payload.conversationId,
+          senderId: socket.data.user.id,
+          clientKey: payload.clientKey,
+          body: payload.body,
+        });
+        io.to(`conversation:${payload.conversationId}`).emit(
+          'conversation:message',
+          {
+            conversationId: message.conversationId,
+            sequence: message.sequence,
+            senderId: message.senderId,
+            body: message.body,
+            clientKey: message.clientKey,
+            createdAt: message.createdAt.toISOString(),
+          }
+        );
+      } catch (error) {
+        socket.emit('conversation:error', {
+          message:
+            error instanceof Error ? error.message : 'messaging.errors.failed',
+        });
+      }
+    });
+
+    socket.on('conversation:read', async ({ conversationId, sequence }) => {
+      if (
+        !(await isConversationParticipant(conversationId, socket.data.user.id))
+      ) {
+        socket.emit('conversation:error', {
+          message: 'messaging.errors.forbidden',
+        });
+        return;
+      }
+      try {
+        await markConversationRead(
+          conversationId,
+          socket.data.user.id,
+          sequence
+        );
+      } catch (error) {
+        socket.emit('conversation:error', {
+          message:
+            error instanceof Error ? error.message : 'messaging.errors.failed',
+        });
+      }
+    });
+
     socket.on('message', async ({ text, channel = 'general' }) => {
       const msg: ChatMessage = {
         text,
