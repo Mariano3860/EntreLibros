@@ -94,7 +94,7 @@ export async function ensureBotConversation(
   // and participant inserts visible atomically to the rest of the service.
   return withTransaction(async (client) => {
     const botResult = await client.query<{ id: number }>(
-      'SELECT id FROM users WHERE email = $1 AND role = \'bot\'',
+      "SELECT id FROM users WHERE email = $1 AND role = 'bot'",
       [BOT_EMAIL]
     );
     const botId = botResult.rows[0]?.id;
