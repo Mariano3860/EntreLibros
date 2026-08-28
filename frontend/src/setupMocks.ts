@@ -1,4 +1,4 @@
-const ENABLE_VALUES = ['true', '1', 'yes'] as const
+import { isPublicFlagEnabled } from '@utils/runtimeEnv'
 
 export interface EnableMockingOptions {
   useMocksEnv?: string | null
@@ -7,10 +7,7 @@ export interface EnableMockingOptions {
 export async function enableMocking(options: EnableMockingOptions = {}) {
   const useMocksEnv =
     options.useMocksEnv ?? import.meta.env?.PUBLIC_API_USE_MOCKS ?? undefined
-  const normalizedEnv = useMocksEnv?.toString().trim().toLowerCase()
-  const explicitlyEnabled = normalizedEnv
-    ? ENABLE_VALUES.includes(normalizedEnv as (typeof ENABLE_VALUES)[number])
-    : false
+  const explicitlyEnabled = isPublicFlagEnabled(useMocksEnv?.toString())
 
   if (!explicitlyEnabled) {
     return

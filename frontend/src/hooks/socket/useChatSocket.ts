@@ -1,6 +1,7 @@
 import { agreementQueryKeys } from '@api/agreements/agreements'
 import { messageQueryKeys } from '@api/messages/messages'
 import { useQueryClient } from '@tanstack/react-query'
+import { isApiMockMode } from '@utils/runtimeEnv'
 import { useCallback, useEffect, useState } from 'react'
 import { io, type Socket } from 'socket.io-client'
 
@@ -29,13 +30,14 @@ export interface AgreementUpdate {
 
 export const useChatSocket = () => {
   const queryClient = useQueryClient()
+  const mockMode = isApiMockMode()
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [socket, setSocket] = useState<Socket | null>(null)
   const [currentUser, setCurrentUser] = useState<{
     id: number
     name: string
   } | null>(null)
-  const [isConnected, setIsConnected] = useState(false)
+  const [isConnected, setIsConnected] = useState(mockMode)
   const [error, setError] = useState<string | null>(null)
   const [conversationMessages, setConversationMessages] = useState<
     ConversationMessage[]
@@ -45,6 +47,11 @@ export const useChatSocket = () => {
   )
 
   useEffect(() => {
+    if (mockMode) {
+      setIsConnected(true)
+      setError(null)
+      return
+    }
     const apiUrl = import.meta.env?.PUBLIC_API_BASE_URL || '/api'
     // Ensure we connect to the server origin without an API prefix to avoid
     // Socket.IO "Invalid namespace" errors in production environments.
@@ -96,7 +103,7 @@ export const useChatSocket = () => {
     return () => {
       s.disconnect()
     }
-  }, [queryClient])
+  }, [mockMode, queryClient])
 
   const sendMessage = useCallback(
     (text: string, channel?: string) => {

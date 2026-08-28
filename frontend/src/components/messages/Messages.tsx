@@ -16,6 +16,7 @@ import {
 } from '@api/messages/messages'
 import { mockConversations } from '@components/messages/Messages.mock'
 import { useChatSocket } from '@hooks/socket/useChatSocket'
+import { isApiMockMode } from '@utils/runtimeEnv'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -109,7 +110,8 @@ export const Messages = () => {
   const { t, i18n } = useTranslation()
   const useDemoConversations =
     import.meta.env?.MODE === 'test' ||
-    import.meta.env?.PUBLIC_DEMO_MODE === 'true'
+    import.meta.env?.PUBLIC_DEMO_MODE === 'true' ||
+    isApiMockMode()
   const [conversations, setConversations] = useState<Conversation[]>(
     useDemoConversations ? mockConversations : []
   )
