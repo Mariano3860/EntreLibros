@@ -14,6 +14,7 @@ import app from '../src/app.js';
 import { setupWebsocket } from '../src/socket.js';
 import jwt, { type Algorithm } from 'jsonwebtoken';
 import * as userRepo from '../src/repositories/userRepository.js';
+import * as messagingRepo from '../src/repositories/messagingRepository.js';
 
 let io: Server<
   ClientToServerEvents,
@@ -79,5 +80,78 @@ describe('websocket messaging', () => {
       });
       clientSocket.emit('message', { text: 'hello', channel: 'general' });
     });
+  });
+
+  test('delivers persisted messages only to authorized conversation rooms', async () => {
+    const memberships = new Map([
+      ['101:1', true],
+      ['101:2', true],
+      ['202:3', true],
+    ]);
+    vi.spyOn(messagingRepo, 'listConversations').mockResolvedValue([]);
+    vi.spyOn(messagingRepo, 'isConversationParticipant').mockImplementation(
+      async (conversationId, userId) =>
+        memberships.get(`${conversationId}:${userId}`) ?? false
+    );
+    vi.spyOn(messagingRepo, 'sendMessage').mockResolvedValue({
+      id: 1,
+      conversationId: 101,
+      senderId: 1,
+      sequence: 1,
+      clientKey: 'room-key',
+      body: 'private',
+      attachmentMetadata: null,
+      createdAt: new Date(),
+    });
+
+    const address = httpServer.address() as AddressInfo;
+    const tokenFor = (id: number) =>
+      jwt.sign({ id }, process.env.JWT_SECRET!, { algorithm: 'HS256' });
+    vi.mocked(userRepo.findUserById).mockImplementation(async (id) => ({
+      id,
+      name: `User ${id}`,
+      email: `user-${id}@example.com`,
+      password: '',
+      role: 'user',
+      language: 'en',
+      location: null,
+      searchRadius: null,
+    }));
+
+    const authorized = Client(`http://localhost:${address.port}`, {
+      extraHeaders: { cookie: `sessionToken=${tokenFor(2)}` },
+    });
+    const outsider = Client(`http://localhost:${address.port}`, {
+      extraHeaders: { cookie: `sessionToken=${tokenFor(3)}` },
+    });
+    await Promise.all([
+      new Promise<void>((resolve) => authorized.on('connect', () => resolve())),
+      new Promise<void>((resolve) => outsider.on('connect', () => resolve())),
+    ]);
+
+    authorized.emit('conversation:join', { conversationId: 101 });
+    const received = new Promise<void>((resolve) => {
+      authorized.once('conversation:message', (message) => {
+        expect(message.body).toBe('private');
+        expect(message.conversationId).toBe(101);
+        resolve();
+      });
+    });
+    let outsiderReceived = false;
+    outsider.once('conversation:message', () => {
+      outsiderReceived = true;
+    });
+    clientSocket.emit('conversation:join', { conversationId: 101 });
+    await new Promise((resolve) => setTimeout(resolve, 30));
+    clientSocket.emit('conversation:message', {
+      conversationId: 101,
+      clientKey: 'room-key',
+      body: 'private',
+    });
+    await received;
+    await new Promise((resolve) => setTimeout(resolve, 30));
+    expect(outsiderReceived).toBe(false);
+    authorized.close();
+    outsider.close();
   });
 });
