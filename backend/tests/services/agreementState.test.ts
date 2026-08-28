@@ -25,11 +25,19 @@ describe('agreement state machine', () => {
   });
 
   test('rejects invalid transitions', () => {
-    expect(() => transitionAgreement('cancelled', 'confirm')).toThrow(
-      new AgreementStateError('invalid_transition')
-    );
-    expect(() => transitionAgreement('confirmed', 'cancel', 'late')).toThrow(
-      new AgreementStateError('invalid_transition')
-    );
+    const invalidTransitions = [
+      ['partially_confirmed', 'complete'],
+      ['confirmed', 'confirm'],
+      ['confirmed', 'cancel'],
+      ['confirmed', 'reject'],
+      ['cancelled', 'confirm'],
+      ['rejected', 'confirm'],
+      ['completed', 'cancel'],
+    ] as const;
+    for (const [state, command] of invalidTransitions) {
+      expect(() => transitionAgreement(state, command, 'late')).toThrow(
+        new AgreementStateError('invalid_transition')
+      );
+    }
   });
 });

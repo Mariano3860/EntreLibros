@@ -128,9 +128,12 @@ export async function commandAgreement(input: {
 }): Promise<AgreementSnapshot> {
   return withTransaction(async (client) => {
     const current = await client.query<AgreementRow>(
-      `${AGREEMENT_SELECT}
+      `SELECT a.id, a.conversation_id, a.proposer_id, a.participant_id,
+              a.state, a.current_version, v.details, '{}'::integer[] AS acceptances
+       FROM exchange_agreements a
+       JOIN exchange_agreement_versions v
+         ON v.agreement_id = a.id AND v.version = a.current_version
        WHERE a.id = $1 AND (a.proposer_id = $2 OR a.participant_id = $2)
-       GROUP BY a.id, v.details
        FOR UPDATE OF a`,
       [input.id, input.actorId]
     );
@@ -139,6 +142,12 @@ export async function commandAgreement(input: {
     if (row.current_version !== input.expectedVersion) {
       throw new Error('agreements.errors.conflict');
     }
+    const acceptanceResult = await client.query<{ user_id: number }>(
+      `SELECT user_id FROM exchange_agreement_acceptances
+       WHERE agreement_id = $1 AND version = $2`,
+      [input.id, row.current_version]
+    );
+    row.acceptances = acceptanceResult.rows.map((item) => item.user_id);
     const nextState = transitionAgreement(
       row.state,
       input.command,
@@ -162,6 +171,19 @@ export async function commandAgreement(input: {
         JSON.stringify(row.details),
       ]
     );
+    if (input.command === 'confirm') {
+      const acceptances = [
+        ...new Set([...(row.acceptances ?? []), input.actorId]),
+      ];
+      for (const userId of acceptances) {
+        await client.query(
+          `INSERT INTO exchange_agreement_acceptances
+           (agreement_id, version, user_id)
+           VALUES ($1, $2, $3)`,
+          [input.id, nextVersion, userId]
+        );
+      }
+    }
     await client.query(
       `INSERT INTO agreement_events (agreement_id, version, actor_id, event_type, reason)
        VALUES ($1, $2, $3, $4, $5)`,
