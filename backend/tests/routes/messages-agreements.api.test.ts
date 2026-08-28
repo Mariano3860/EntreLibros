@@ -37,6 +37,33 @@ async function registerAndLogin(name: string) {
 }
 
 describe('messaging and agreements API', () => {
+  test('returns localized validation and authorization errors', async () => {
+    await request(app)
+      .get('/api/messages')
+      .expect(401)
+      .expect(({ body }) => {
+        expect(body.message).toBe('auth.errors.unauthorized');
+      });
+
+    const first = await registerAndLogin('validation-user');
+    await request(app)
+      .get('/api/messages/1/messages?limit=101')
+      .set('Cookie', first.cookie)
+      .expect(422)
+      .expect(({ body }) => {
+        expect(body.message).toBe('messaging.errors.invalid_pagination');
+      });
+
+    await request(app)
+      .post('/api/messages/conversations')
+      .set('Cookie', first.cookie)
+      .send({ participantId: 'not-a-number' })
+      .expect(422)
+      .expect(({ body }) => {
+        expect(body.message).toBe('messaging.errors.participant_required');
+      });
+  });
+
   test('persists a private message, supports idempotent retry and history', async () => {
     const first = await registerAndLogin('message-a');
     const second = await registerAndLogin('message-b');
@@ -70,6 +97,11 @@ describe('messaging and agreements API', () => {
         expect(body.messages).toHaveLength(1);
         expect(body.nextAfter).toBe(1);
       });
+    await request(app)
+      .patch(`/api/messages/${conversationId}/read`)
+      .set('Cookie', second.cookie)
+      .send({ sequence: 1 })
+      .expect(204);
     await request(app)
       .get(`/api/messages/${conversationId}/messages`)
       .set('Cookie', outsider.cookie)
