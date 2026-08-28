@@ -2,6 +2,7 @@ import 'dotenv/config';
 import { migrate } from 'postgres-migrations';
 import { fileURLToPath } from 'url';
 import path from 'path';
+import { verifyPostgresPreflight } from './preflight.js';
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
@@ -16,17 +17,23 @@ const migrationsDir = path.join(
   'migrations'
 );
 
-migrate(
-  {
-    database: url.pathname.slice(1),
-    user: url.username,
-    password: url.password,
-    host: url.hostname,
-    port: Number(url.port),
-    ensureDatabaseExists: true,
-  },
-  migrationsDir
-).catch((err) => {
-  console.error(err);
+async function run() {
+  await verifyPostgresPreflight(connectionString);
+  await migrate(
+    {
+      database: url.pathname.slice(1),
+      user: url.username,
+      password: url.password,
+      host: url.hostname,
+      port: Number(url.port) || 5432,
+      ensureDatabaseExists: true,
+    },
+    migrationsDir
+  );
+  console.log('Migrations completed successfully.');
+}
+
+run().catch((err) => {
+  console.error(err.message || err);
   process.exit(1);
 });

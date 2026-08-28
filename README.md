@@ -25,9 +25,10 @@ El backend enviará una respuesta automática en el mismo canal usando el usuari
    ```
 2. **Configurar variables de entorno**
    - Copiar `backend/.env.example` a `backend/.env` y ajustar `DATABASE_URL`.
-   - (Opcional) Copiar `backend/.env.test.example` a `backend/.env.test` para las pruebas. Este archivo se genera automáticamente si no existe.
-   - Revisar `frontend/.env.example` para configurar el frontend.
-3. **Levantar PostGIS con Docker**
+   - Copiar `frontend/.env.example` a `frontend/.env` si deseas personalizar la URL de la API.
+   - Revisar `.env.development.example` y `.env.production.example` para despliegues con Docker Compose.
+   - **Nota sobre credenciales**: Distingue entre credenciales de infraestructura (`DATABASE_URL`, `POSTGRES_PASSWORD`), secreto JWT (`JWT_SECRET`) y las contraseñas de usuario creadas al registrarte en la aplicación.
+3. **Levantar PostGIS con Docker y Preflight**
    ```bash
    docker compose -f docker-compose.postgis.yml up -d
    ```
@@ -35,11 +36,12 @@ El backend enviará una respuesta automática en el mismo canal usando el usuari
    ```bash
    docker compose -f docker-compose.postgis.yml down
    ```
-4. **Preparar base de datos y migraciones**
+4. **Preparar base de datos y migraciones (con preflight)**
    ```bash
    npm run migrate
    ```
-   Crea la base definida en `backend/.env` y aplica las migraciones.
+   El migrador ejecuta automáticamente un script de preflight (`backend/scripts/preflight.js`) que verifica la conectividad de la base de datos y la extensión **PostGIS** antes de aplicar las migraciones.
+
 5. **Levantar servidores**
    ```bash
    npm run dev:backend   # backend
