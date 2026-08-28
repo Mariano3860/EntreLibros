@@ -1,7 +1,11 @@
 import { fetchBookAvailability } from '@api/community/messages'
+import {
+  fetchConversations,
+  type ApiConversation,
+} from '@api/messages/messages'
 import { mockConversations } from '@components/messages/Messages.mock'
 import { useChatSocket } from '@hooks/socket/useChatSocket'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { ReactComponent as InfoIcon } from '@src/assets/icons/info.svg'
@@ -56,18 +60,55 @@ const hasVersion = (
   message: Message
 ): message is Message & { version: number } => 'version' in message
 
+function toConversation(item: ApiConversation): Conversation {
+  return {
+    id: item.id,
+    user: {
+      name: `Conversación ${item.id}`,
+      avatar: '',
+      online: false,
+    },
+    badges: [],
+    messages: [],
+    myBooks: [],
+    theirBooks: [],
+  }
+}
+
 export const Messages = () => {
   const { t, i18n } = useTranslation()
-  const [conversations, setConversations] =
-    useState<Conversation[]>(mockConversations)
+  const useDemoConversations =
+    import.meta.env.MODE === 'test' ||
+    import.meta.env.PUBLIC_DEMO_MODE === 'true'
+  const [conversations, setConversations] = useState<Conversation[]>(
+    useDemoConversations ? mockConversations : []
+  )
   const [selectedId, setSelectedId] = useState<number | null>(
-    mockConversations[0]?.id ?? null
+    useDemoConversations ? (mockConversations[0]?.id ?? null) : null
   )
   const { messages, sendMessage, currentUser, isConnected, error } =
     useChatSocket()
 
   const { getVersion, proposeVersion, confirmVersion, cancelVersion } =
-    useAgreementStore(mockConversations)
+    useAgreementStore(conversations)
+
+  useEffect(() => {
+    if (useDemoConversations) return
+    let active = true
+    void fetchConversations()
+      .then((items) => {
+        if (!active) return
+        const next = items.map(toConversation)
+        setConversations(next)
+        setSelectedId(next[0]?.id ?? null)
+      })
+      .catch(() => {
+        if (active) setConversations([])
+      })
+    return () => {
+      active = false
+    }
+  }, [useDemoConversations])
 
   const [changeModalState, setChangeModalState] = useState<ChangeModalState>({
     open: false,
