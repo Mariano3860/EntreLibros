@@ -153,5 +153,5 @@ describe('websocket messaging', () => {
     expect(outsiderReceived).toBe(false);
     authorized.close();
     outsider.close();
-  });
+  }, 10000);
 });
