@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { io, type Socket } from 'socket.io-client'
+import { agreementQueryKeys } from '@api/agreements/agreements'
+import { messageQueryKeys } from '@api/messages/messages'
 
 export interface ChatMessage {
   text: string
@@ -17,7 +20,15 @@ export interface ConversationMessage {
   createdAt: string
 }
 
+export interface AgreementUpdate {
+  agreementId: number
+  conversationId: number
+  state: string
+  currentVersion: number
+}
+
 export const useChatSocket = () => {
+  const queryClient = useQueryClient()
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [socket, setSocket] = useState<Socket | null>(null)
   const [currentUser, setCurrentUser] = useState<{
@@ -29,6 +40,9 @@ export const useChatSocket = () => {
   const [conversationMessages, setConversationMessages] = useState<
     ConversationMessage[]
   >([])
+  const [agreementUpdates, setAgreementUpdates] = useState<AgreementUpdate[]>(
+    []
+  )
 
   useEffect(() => {
     const apiUrl = import.meta.env.PUBLIC_API_BASE_URL || '/api'
@@ -42,6 +56,9 @@ export const useChatSocket = () => {
       setMessages((prev) => [...prev, msg])
     })
     s.on('conversation:message', (msg: ConversationMessage) => {
+      void queryClient.invalidateQueries({
+        queryKey: messageQueryKeys.history(msg.conversationId),
+      })
       setConversationMessages((prev) => {
         const duplicate = prev.some(
           (item) =>
@@ -50,6 +67,20 @@ export const useChatSocket = () => {
         )
         return duplicate ? prev : [...prev, msg]
       })
+    })
+    s.on('agreement:updated', (update: AgreementUpdate) => {
+      void queryClient.invalidateQueries({
+        queryKey: agreementQueryKeys.detail(update.agreementId),
+      })
+      setAgreementUpdates((prev) =>
+        prev.some(
+          (item) =>
+            item.agreementId === update.agreementId &&
+            item.currentVersion === update.currentVersion
+        )
+          ? prev
+          : [...prev, update]
+      )
     })
     s.on('connect', () => {
       setIsConnected(true)
@@ -90,6 +121,7 @@ export const useChatSocket = () => {
   return {
     messages,
     conversationMessages,
+    agreementUpdates,
     sendMessage,
     sendConversationMessage,
     currentUser,

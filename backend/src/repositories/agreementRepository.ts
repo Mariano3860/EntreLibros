@@ -1,4 +1,5 @@
 import { query, withTransaction } from '../db.js';
+import { EventEmitter } from 'node:events';
 import {
   transitionAgreement,
   type AgreementCommand,
@@ -31,6 +32,8 @@ export interface AgreementHistoryEntry {
   details: AgreementDetails;
   createdAt: Date;
 }
+
+export const agreementEvents = new EventEmitter();
 
 interface AgreementRow {
   id: number;
@@ -101,7 +104,7 @@ export async function createAgreement(input: {
   participantId: number;
   details: AgreementDetails;
 }): Promise<AgreementSnapshot> {
-  return withTransaction(async (client) => {
+  const agreement = await withTransaction(async (client) => {
     const conversation = await client.query<{ user_id: number }>(
       `SELECT user_id FROM conversation_participants
        WHERE conversation_id = $1 ORDER BY user_id`,
@@ -140,6 +143,8 @@ export async function createAgreement(input: {
     );
     return mapRow(rows[0]);
   });
+  agreementEvents.emit('committed', agreement);
+  return agreement;
 }
 
 export async function commandAgreement(input: {
@@ -149,7 +154,7 @@ export async function commandAgreement(input: {
   command: AgreementCommand;
   reason?: string;
 }): Promise<AgreementSnapshot> {
-  return withTransaction(async (client) => {
+  const agreement = await withTransaction(async (client) => {
     const current = await client.query<AgreementRow>(
       `SELECT a.id, a.conversation_id, a.proposer_id, a.participant_id,
               a.state, a.current_version, v.details, '{}'::integer[] AS acceptances
@@ -224,4 +229,6 @@ export async function commandAgreement(input: {
     );
     return mapRow(rows[0]);
   });
+  agreementEvents.emit('committed', agreement);
+  return agreement;
 }

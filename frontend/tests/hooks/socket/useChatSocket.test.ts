@@ -1,5 +1,7 @@
 import { useChatSocket } from '@hooks/socket/useChatSocket'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { renderHook, act } from '@testing-library/react'
+import { createElement, type PropsWithChildren } from 'react'
 import { describe, expect, test, vi } from 'vitest'
 
 const { emit, io, listeners } = vi.hoisted(() => {
@@ -21,8 +23,11 @@ vi.mock('socket.io-client', () => ({
 }))
 
 describe('useChatSocket', () => {
+  const wrapper = ({ children }: PropsWithChildren) =>
+    createElement(QueryClientProvider, { client: new QueryClient() }, children)
+
   test('uses the current origin when the API base is not configured', () => {
-    renderHook(() => useChatSocket())
+    renderHook(() => useChatSocket(), { wrapper })
 
     expect(io).toHaveBeenCalledWith('http://localhost:3000', {
       withCredentials: true,
@@ -30,7 +35,7 @@ describe('useChatSocket', () => {
   })
 
   test('handles incoming and outgoing messages', () => {
-    const { result } = renderHook(() => useChatSocket())
+    const { result } = renderHook(() => useChatSocket(), { wrapper })
     act(() => {
       listeners['user']({ id: 1, name: 'Me' })
       listeners['message']({
@@ -57,7 +62,7 @@ describe('useChatSocket', () => {
   })
 
   test('sets error on connect_error', () => {
-    const { result } = renderHook(() => useChatSocket())
+    const { result } = renderHook(() => useChatSocket(), { wrapper })
     act(() => {
       listeners['connect_error'](new Error('fail'))
     })
@@ -66,7 +71,7 @@ describe('useChatSocket', () => {
   })
 
   test('handles connect event', () => {
-    const { result } = renderHook(() => useChatSocket())
+    const { result } = renderHook(() => useChatSocket(), { wrapper })
     act(() => {
       listeners['connect']()
     })
@@ -75,7 +80,7 @@ describe('useChatSocket', () => {
   })
 
   test('handles disconnect event', () => {
-    const { result } = renderHook(() => useChatSocket())
+    const { result } = renderHook(() => useChatSocket(), { wrapper })
     // First connect
     act(() => {
       listeners['connect']()

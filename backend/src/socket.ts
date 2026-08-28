@@ -9,6 +9,7 @@ import {
 } from './repositories/messagingRepository.js';
 import { logger } from './utils/logger.js';
 import { generateReply } from './services/chatBot.js';
+import { agreementEvents, type AgreementSnapshot } from './repositories/agreementRepository.js';
 
 function parseCookies(header?: string): Record<string, string> {
   if (!header) return {};
@@ -60,6 +61,12 @@ export interface ServerToClientEvents {
     clientKey: string;
     createdAt: string;
   }) => void;
+  'agreement:updated': (msg: {
+    agreementId: number;
+    conversationId: number;
+    state: AgreementSnapshot['state'];
+    currentVersion: number;
+  }) => void;
   'conversation:error': (payload: { message: string }) => void;
 }
 
@@ -77,6 +84,15 @@ export function setupWebsocket(
     SocketData
   >
 ) {
+  agreementEvents.on('committed', (agreement: AgreementSnapshot) => {
+    io.to(`conversation:${agreement.conversationId}`).emit('agreement:updated', {
+      agreementId: agreement.id,
+      conversationId: agreement.conversationId,
+      state: agreement.state,
+      currentVersion: agreement.currentVersion,
+    });
+  });
+
   io.use(async (socket, next) => {
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) return next(new Error('auth.errors.unauthorized'));
@@ -101,11 +117,18 @@ export function setupWebsocket(
 
   io.on('connection', (socket) => {
     socket.emit('user', socket.data.user);
-    void listConversations(socket.data.user.id).then((conversations) => {
-      conversations.forEach((conversation) => {
-        socket.join(`conversation:${conversation.id}`);
+    void listConversations(socket.data.user.id)
+      .then((conversations) => {
+        conversations.forEach((conversation) => {
+          void socket.join(`conversation:${conversation.id}`);
+        });
+      })
+      .catch((error) => {
+        logger.error('Socket conversation initialization failed', {
+          userId: socket.data.user.id,
+          message: error instanceof Error ? error.message : String(error),
+        });
       });
-    });
 
     socket.on('conversation:join', async ({ conversationId }) => {
       if (
