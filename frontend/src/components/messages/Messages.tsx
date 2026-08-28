@@ -1,4 +1,7 @@
 import {
+  commandAgreement,
+  counterProposeAgreement,
+  createAgreement,
   fetchAgreement,
   fetchAgreementHistory,
   type AgreementSnapshot,
@@ -71,6 +74,7 @@ const hasVersion = (
 function toConversation(item: ApiConversation): Conversation {
   return {
     id: item.id,
+    participantIds: item.participantIds,
     agreementId: item.agreementId,
     user: {
       name: `Conversación ${item.id}`,
@@ -119,6 +123,7 @@ export const Messages = () => {
   const {
     messages,
     conversationMessages,
+    agreementUpdates,
     joinConversation,
     sendMessage,
     currentUser,
@@ -204,7 +209,7 @@ export const Messages = () => {
     return () => {
       active = false
     }
-  }, [selected?.agreementId, useDemoConversations])
+  }, [agreementUpdates, selected?.agreementId, useDemoConversations])
 
   const [changeModalState, setChangeModalState] = useState<ChangeModalState>({
     open: false,
@@ -277,6 +282,42 @@ export const Messages = () => {
       }
     },
     [listFormatter, t]
+  )
+
+  const getVersionForDisplay = useCallback(
+    (
+      conversationId: number,
+      versionNumber: number
+    ): AgreementVersion | undefined => {
+      const localVersion = getVersion(conversationId, versionNumber)
+      if (localVersion) return localVersion
+      if (
+        !serverAgreement ||
+        selected?.id !== conversationId ||
+        serverAgreement.currentVersion !== versionNumber
+      ) {
+        return undefined
+      }
+      const status: AgreementVersion['status'] =
+        serverAgreement.state === 'proposed'
+          ? 'pending'
+          : serverAgreement.state === 'partially_confirmed'
+            ? 'confirmed'
+            : serverAgreement.state === 'confirmed'
+              ? 'fullyConfirmed'
+              : serverAgreement.state === 'cancelled' ||
+                  serverAgreement.state === 'rejected'
+                ? 'cancelled'
+                : 'inactive'
+      return {
+        version: serverAgreement.currentVersion,
+        details: serverAgreement.details,
+        status,
+        confirmedBy: serverAgreement.acceptances.map(String),
+        history: [],
+      }
+    },
+    [getVersion, selected?.id, serverAgreement]
   )
 
   const mappedMessages: Message[] = useMemo(() => {
@@ -437,6 +478,45 @@ export const Messages = () => {
   const handleAgreementProposal = (proposal: AgreementDetails) => {
     if (!selected || selectedId === null) return
 
+    if (!useDemoConversations) {
+      const participantId = selected.participantIds?.find(
+        (id) => id !== currentUser?.id
+      )
+      if (!participantId) {
+        setAgreementError(
+          t('community.messages.agreement.errors.notFound', {
+            defaultValue: 'No se encontró la otra parte del acuerdo.',
+          })
+        )
+        return
+      }
+      void createAgreement({
+        conversationId: selected.id,
+        participantId,
+        details: proposal,
+      })
+        .then((agreement) => {
+          setServerAgreement(agreement)
+          setConversations((items) =>
+            items.map((item) =>
+              item.id === selected.id
+                ? { ...item, agreementId: agreement.id }
+                : item
+            )
+          )
+          return fetchAgreementHistory(agreement.id)
+        })
+        .then((history) => setServerAgreementHistory(history))
+        .catch(() =>
+          setAgreementError(
+            t('community.messages.agreement.errors.generic', {
+              defaultValue: 'No se pudo crear el acuerdo.',
+            })
+          )
+        )
+      return
+    }
+
     const baseMessage = createBaseMessage(selected)
     const version = proposeVersion(selectedId, proposal, selfName)
     if (!version) return
@@ -452,7 +532,7 @@ export const Messages = () => {
 
   const handleOpenChangeModal = useCallback(
     (conversationId: number, versionNumber: number) => {
-      const version = getVersion(conversationId, versionNumber)
+      const version = getVersionForDisplay(conversationId, versionNumber)
       if (!version) {
         const message = t('community.messages.agreement.errors.notFound', {
           defaultValue: 'La versión seleccionada ya no está disponible.',
@@ -469,7 +549,7 @@ export const Messages = () => {
         initialDetails: version.details,
       })
     },
-    [getVersion, t]
+    [getVersionForDisplay, t]
   )
 
   const handleCloseChangeModal = useCallback(() => {
@@ -509,6 +589,41 @@ export const Messages = () => {
       return
     }
 
+    if (!useDemoConversations && conversation.agreementId) {
+      void counterProposeAgreement({
+        agreementId: conversation.agreementId,
+        expectedVersion: serverAgreement?.currentVersion ?? 1,
+        details,
+      })
+        .then((agreement) => {
+          setServerAgreement(agreement)
+          return fetchAgreementHistory(agreement.id)
+        })
+        .then((history) => {
+          setServerAgreementHistory(history)
+          setAgreementError(null)
+          handleCloseChangeModal()
+        })
+        .catch((error: unknown) => {
+          const status = (error as { response?: { status?: number } }).response
+            ?.status
+          setAgreementError(
+            t(
+              status === 409
+                ? 'community.messages.agreement.errors.conflict'
+                : 'community.messages.agreement.errors.generic',
+              {
+                defaultValue:
+                  status === 409
+                    ? 'El acuerdo cambió. Actualizá la vista e intentá de nuevo.'
+                    : 'No se pudo enviar la contrapropuesta.',
+              }
+            )
+          )
+        })
+      return
+    }
+
     const version = proposeVersion(conversation.id, details, selfName)
     if (!version) return
 
@@ -531,7 +646,7 @@ export const Messages = () => {
       details: AgreementDetails,
       source: 'proposal' | 'change'
     ) => {
-      const version = getVersion(conversationId, versionNumber)
+      const version = getVersionForDisplay(conversationId, versionNumber)
       if (!version) {
         const message = t('community.messages.agreement.errors.notFound', {
           defaultValue: 'La versión seleccionada ya no está disponible.',
@@ -566,7 +681,7 @@ export const Messages = () => {
         source,
       })
     },
-    [getVersion, t]
+    [getVersionForDisplay, t]
   )
 
   const handleOpenCancelDialog = useCallback(
@@ -575,7 +690,7 @@ export const Messages = () => {
       versionNumber: number,
       details: AgreementDetails
     ) => {
-      const version = getVersion(conversationId, versionNumber)
+      const version = getVersionForDisplay(conversationId, versionNumber)
       if (!version) {
         const message = t('community.messages.agreement.errors.notFound', {
           defaultValue: 'La versión seleccionada ya no está disponible.',
@@ -609,7 +724,7 @@ export const Messages = () => {
         details,
       })
     },
-    [getVersion, t]
+    [getVersionForDisplay, t]
   )
 
   const handleCloseConfirmModal = useCallback(() => {
@@ -637,8 +752,28 @@ export const Messages = () => {
 
     setIsProcessingConfirmation(true)
     try {
+      if (!useDemoConversations && conversation.agreementId) {
+        const agreement = await commandAgreement({
+          agreementId: conversation.agreementId,
+          command:
+            confirmationRequest.kind === 'confirm' ? 'confirm' : 'cancel',
+          expectedVersion: serverAgreement?.currentVersion ?? 1,
+          reason:
+            confirmationRequest.kind === 'cancel'
+              ? t('community.messages.agreement.cancellation.defaultReason', {
+                  defaultValue: 'El acuerdo fue cancelado.',
+                })
+              : undefined,
+        })
+        setServerAgreement(agreement)
+        setServerAgreementHistory(await fetchAgreementHistory(agreement.id))
+        setAgreementError(null)
+        setConfirmationError(null)
+        setConfirmationRequest(null)
+        return
+      }
       if (confirmationRequest.kind === 'confirm') {
-        const version = getVersion(
+        const version = getVersionForDisplay(
           confirmationRequest.conversationId,
           confirmationRequest.version
         )
@@ -731,6 +866,20 @@ export const Messages = () => {
       setConfirmationError(null)
       setConfirmationRequest(null)
     } catch (err) {
+      const response = (
+        err as {
+          response?: {
+            status?: number
+            data?: { agreement?: AgreementSnapshot }
+          }
+        }
+      ).response
+      if (response?.status === 409 && response.data?.agreement) {
+        setServerAgreement(response.data.agreement)
+        void fetchAgreementHistory(response.data.agreement.id).then(
+          setServerAgreementHistory
+        )
+      }
       let message = t('community.messages.agreement.errors.generic', {
         defaultValue: 'Ocurrió un error al procesar la acción.',
       })
@@ -749,6 +898,12 @@ export const Messages = () => {
           })
         }
       }
+      if (response?.status === 409) {
+        message = t('community.messages.agreement.errors.conflict', {
+          defaultValue:
+            'El acuerdo cambió. Revisá la versión actual antes de reintentar.',
+        })
+      }
       setAgreementError(message)
       setConfirmationError(message)
     } finally {
@@ -760,9 +915,11 @@ export const Messages = () => {
     confirmationRequest,
     confirmVersion,
     conversations,
-    getVersion,
+    getVersionForDisplay,
+    serverAgreement,
     selfName,
     t,
+    useDemoConversations,
   ])
 
   return (
@@ -973,7 +1130,10 @@ export const Messages = () => {
                   msg.type === 'agreementProposal' &&
                   hasVersion(msg)
                 ) {
-                  const versionInfo = getVersion(selected.id, msg.version)
+                  const versionInfo = getVersionForDisplay(
+                    selected.id,
+                    msg.version
+                  )
                   const statusLabel = buildStatusLabel(versionInfo)
                   const confirmDisabled =
                     !versionInfo ||
@@ -1034,7 +1194,10 @@ export const Messages = () => {
                   msg.type === 'agreementChange' &&
                   hasVersion(msg)
                 ) {
-                  const versionInfo = getVersion(selected.id, msg.version)
+                  const versionInfo = getVersionForDisplay(
+                    selected.id,
+                    msg.version
+                  )
                   const statusLabel = buildStatusLabel(versionInfo)
                   const confirmDisabled =
                     !versionInfo ||
@@ -1093,7 +1256,10 @@ export const Messages = () => {
                   msg.type === 'agreementCancellation' &&
                   hasVersion(msg)
                 ) {
-                  const versionInfo = getVersion(selected.id, msg.version)
+                  const versionInfo = getVersionForDisplay(
+                    selected.id,
+                    msg.version
+                  )
                   const statusLabel = buildStatusLabel(versionInfo)
 
                   return (
@@ -1130,7 +1296,10 @@ export const Messages = () => {
                   msg.type === 'agreementConfirmation' &&
                   hasVersion(msg)
                 ) {
-                  const versionInfo = getVersion(selected.id, msg.version)
+                  const versionInfo = getVersionForDisplay(
+                    selected.id,
+                    msg.version
+                  )
                   const statusLabel = buildStatusLabel(versionInfo)
                   return (
                     <BubbleAgreementConfirmation

@@ -212,17 +212,26 @@ docker run --rm -v 'C:\REPOS\EntreLibros:/workspace:ro' -w /workspace node:22.19
 
 On 2026-08-28, migration execution was verified twice against the preserved
 `entrelibros_test` schema and against the isolated
-`entrelibros_recovery_verify_20260828` database. Both runs completed with
-13 migration records, including migrations 010 through 013, and PostGIS 3.4.3.
+`entrelibros_recovery_verify_20260828` database. The PR branch now includes
+migrations 010 through 014, including conversation/agreement persistence,
+listing reservations and bilateral user blocks. The real-service E2E flow was
+run against PostgreSQL/PostGIS with mocks disabled and covered two users,
+cursor recovery, counterproposal, stale conflict, bilateral confirmation and
+cancellation.
 The earlier anonymized backup restore above remains the preserved-schema
 baseline; the new migrations are append-only and were then applied to the
 current test schema without changing existing rows.
 
-The local backend suite passed with 24 files and 96 tests. The frontend suite
-passed with coverage enabled. Remote PR checks for head `902a083` passed for
+The local backend suite passed with 27 files and 103 tests. The frontend suite
+passed with coverage enabled. Remote PR checks for head `8aa3f10` passed for
 both backend and frontend, and the final diff review found only messaging,
 agreements, their tests, documentation and the explicitly related coverage
 threshold change.
+
+The browser-control surface was unavailable in this environment, so a browser
+E2E run could not be claimed. The service-level E2E evidence above is separate
+from that limitation; the existing frontend suite remains the automated UI
+evidence.
 
 No runtime dependency was changed by the PR #138 recovery commits. The audit
 reported 21 pre-existing production findings (15 high, 6 moderate, 0 critical)
