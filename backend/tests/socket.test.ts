@@ -129,7 +129,11 @@ describe('websocket messaging', () => {
       new Promise<void>((resolve) => outsider.on('connect', () => resolve())),
     ]);
 
-    authorized.emit('conversation:join', { conversationId: 101 });
+    await new Promise<void>((resolve, reject) => {
+      authorized.emit('conversation:join', { conversationId: 101 }, (joined) =>
+        joined ? resolve() : reject(new Error('authorized join rejected'))
+      );
+    });
     const received = new Promise<void>((resolve) => {
       authorized.once('conversation:message', (message) => {
         expect(message.body).toBe('private');
@@ -141,9 +145,19 @@ describe('websocket messaging', () => {
     outsider.once('conversation:message', () => {
       outsiderReceived = true;
     });
-    outsider.emit('conversation:join', { conversationId: 202 });
-    clientSocket.emit('conversation:join', { conversationId: 101 });
-    await new Promise((resolve) => setTimeout(resolve, 30));
+    await new Promise<void>((resolve, reject) => {
+      outsider.emit('conversation:join', { conversationId: 202 }, (joined) =>
+        joined ? resolve() : reject(new Error('second room join rejected'))
+      );
+    });
+    await new Promise<void>((resolve, reject) => {
+      clientSocket.emit(
+        'conversation:join',
+        { conversationId: 101 },
+        (joined) =>
+          joined ? resolve() : reject(new Error('first room join rejected'))
+      );
+    });
     clientSocket.emit('conversation:message', {
       conversationId: 101,
       clientKey: 'room-key',

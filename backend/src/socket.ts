@@ -41,7 +41,10 @@ export interface ChatMessage {
 
 export interface ClientToServerEvents {
   message: (payload: { text: string; channel?: string }) => void;
-  'conversation:join': (payload: { conversationId: number }) => void;
+  'conversation:join': (
+    payload: { conversationId: number },
+    acknowledge?: (joined: boolean) => void
+  ) => void;
   'conversation:message': (payload: {
     conversationId: number;
     clientKey: string;
@@ -136,16 +139,18 @@ export function setupWebsocket(
         });
       });
 
-    socket.on('conversation:join', async ({ conversationId }) => {
+    socket.on('conversation:join', async ({ conversationId }, acknowledge) => {
       if (
         !(await isConversationParticipant(conversationId, socket.data.user.id))
       ) {
+        acknowledge?.(false);
         socket.emit('conversation:error', {
           message: 'messaging.errors.forbidden',
         });
         return;
       }
       await socket.join(`conversation:${conversationId}`);
+      acknowledge?.(true);
     });
 
     socket.on('conversation:message', async (payload) => {
