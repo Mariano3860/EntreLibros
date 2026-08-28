@@ -1,7 +1,10 @@
 import { fetchBookAvailability } from '@api/community/messages'
 import {
   fetchConversations,
+  fetchMessageHistory,
+  sendPersistedMessage,
   type ApiConversation,
+  type ApiMessage,
 } from '@api/messages/messages'
 import { mockConversations } from '@components/messages/Messages.mock'
 import { useChatSocket } from '@hooks/socket/useChatSocket'
@@ -75,6 +78,23 @@ function toConversation(item: ApiConversation): Conversation {
   }
 }
 
+function toTextMessage(
+  message: ApiMessage,
+  currentUserId?: number
+): TextMessage {
+  return {
+    id: message.id,
+    role: message.senderId === currentUserId ? 'me' : 'them',
+    tone: message.senderId === currentUserId ? 'primary' : 'neutral',
+    type: 'text',
+    text: message.body,
+    time: new Date(message.createdAt).toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    }),
+  }
+}
+
 export const Messages = () => {
   const { t, i18n } = useTranslation()
   const useDemoConversations =
@@ -86,8 +106,15 @@ export const Messages = () => {
   const [selectedId, setSelectedId] = useState<number | null>(
     useDemoConversations ? (mockConversations[0]?.id ?? null) : null
   )
-  const { messages, sendMessage, currentUser, isConnected, error } =
-    useChatSocket()
+  const {
+    messages,
+    conversationMessages,
+    sendMessage,
+    currentUser,
+    isConnected,
+    error,
+  } = useChatSocket()
+  const [serverMessages, setServerMessages] = useState<ApiMessage[]>([])
 
   const { getVersion, proposeVersion, confirmVersion, cancelVersion } =
     useAgreementStore(conversations)
@@ -109,6 +136,22 @@ export const Messages = () => {
       active = false
     }
   }, [useDemoConversations])
+
+  useEffect(() => {
+    if (useDemoConversations || selectedId === null) return
+    let active = true
+    setServerMessages([])
+    void fetchMessageHistory(selectedId)
+      .then((page) => {
+        if (active) setServerMessages(page.messages)
+      })
+      .catch(() => {
+        if (active) setServerMessages([])
+      })
+    return () => {
+      active = false
+    }
+  }, [selectedId, useDemoConversations])
 
   const [changeModalState, setChangeModalState] = useState<ChangeModalState>({
     open: false,
@@ -187,6 +230,36 @@ export const Messages = () => {
   const mappedMessages: Message[] = useMemo(() => {
     if (!selected) return []
 
+    if (!useDemoConversations) {
+      const persisted = serverMessages.map((message) =>
+        toTextMessage(message, currentUser?.id)
+      )
+      const live = conversationMessages
+        .filter((message) => message.conversationId === selected.id)
+        .filter(
+          (message) =>
+            !serverMessages.some(
+              (stored) => stored.sequence === message.sequence
+            )
+        )
+        .map((message) =>
+          toTextMessage(
+            {
+              id: message.sequence,
+              conversationId: message.conversationId,
+              senderId: message.senderId,
+              sequence: message.sequence,
+              clientKey: message.clientKey,
+              body: message.body,
+              attachmentMetadata: null,
+              createdAt: message.createdAt,
+            },
+            currentUser?.id
+          )
+        )
+      return [...persisted, ...live]
+    }
+
     const staticMessages: Message[] = selected.messages ?? []
     const maxStaticId = staticMessages.reduce(
       (maxId, message) => Math.max(maxId, message.id),
@@ -213,7 +286,14 @@ export const Messages = () => {
       })
 
     return [...staticMessages, ...liveMessages]
-  }, [messages, currentUser, selected])
+  }, [
+    conversationMessages,
+    currentUser,
+    messages,
+    selected,
+    serverMessages,
+    useDemoConversations,
+  ])
 
   const appendMessageToConversation = (
     conversationId: number,
@@ -256,8 +336,18 @@ export const Messages = () => {
       text: draft.trim(),
     }
 
-    appendMessageToConversation(selectedId, newMessage)
-    sendMessage(draft.trim(), selected.user.name)
+    if (useDemoConversations) {
+      appendMessageToConversation(selectedId, newMessage)
+      sendMessage(draft.trim(), selected.user.name)
+      return
+    }
+
+    const clientKey = `${selectedId}-${Date.now()}-${Math.random()}`
+    void sendPersistedMessage({
+      conversationId: selectedId,
+      clientKey,
+      body: draft.trim(),
+    }).then((message) => setServerMessages((prev) => [...prev, message]))
   }
 
   const handleAttachBook = (bookId: string, note?: string) => {
