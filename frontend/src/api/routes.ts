@@ -29,6 +29,17 @@ export const RELATIVE_API_ROUTES = {
       CREATE: `/community/corners`,
     },
   },
+  MESSAGES: {
+    CONVERSATIONS: `/messages`,
+    CREATE_CONVERSATION: `/messages/conversations`,
+    HISTORY: (conversationId: number) => `/messages/${conversationId}/messages`,
+    READ: (conversationId: number) => `/messages/${conversationId}/read`,
+  },
+  AGREEMENTS: {
+    GET: (agreementId: number) => `/agreements/${agreementId}`,
+    CREATE: `/agreements`,
+    COMMAND: (agreementId: number) => `/agreements/${agreementId}/commands`,
+  },
   LANGUAGE: {
     UPDATE: `/user/language`,
   },
