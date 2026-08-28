@@ -20,7 +20,7 @@ services:
     image: ${DOCKERHUB_USER}/entrelibros-frontend:prod
     env_file: .env.production
     ports:
-      - "3000:3000"
+      - "3000:80"
     depends_on:
       - backend
 volumes:
