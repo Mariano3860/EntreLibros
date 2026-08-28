@@ -1,46 +1,65 @@
 # AGENTS
 
-Estas instrucciones aplican a todo el repositorio.
+Estas instrucciones aplican a todo el repositorio. Si existe otro `AGENTS.md` en el directorio del archivo que vas a modificar, se aplican también sus reglas y las más cercanas al archivo tienen precedencia.
+
+## Fuentes de verdad y alcance
+
+- El código, `package.json`, configuraciones, migraciones y workflows describen el comportamiento implementado.
+- El `README.md` raíz es la puerta de entrada para instalar y ejecutar el monorepo.
+- Los README locales explican el trabajo dentro de cada paquete.
+- `docs/` contiene arquitectura, operación, estado actual, decisiones y procedimientos.
+- `openspec/changes/` contiene el plan de cambios en curso; no reemplaza la documentación operativa.
+- Cuando una implementación cambia rutas, variables, migraciones o flujos, actualiza también el README o documento correspondiente y `docs/backlog.md`.
 
 ## Flujo de trabajo
-1. Realiza tus cambios en la rama actual (no crees nuevas ramas).
-2. Si trabajas solo en **backend**, ejecuta los tests correspondientes:
-   ```bash
-   npm run test:backend
-   ```
-   Si trabajas solo en **frontend**, ejecuta:
-   ```bash
-   npm run test:frontend
-   ```
-3. Antes de commitear y crear la PR, corre las verificaciones generales:
-   ```bash
-   npm run test:backend
-   npm run test:frontend
-   npm run format:backend
-   npm run format:frontend
-   ```
-4. Actualiza el backlog de documentación antes de abrir la PR:
-   - Revisa `docs/backlog.md` y comprueba si ya existe una entrada para la funcionalidad.
-   - Si existe, marca la fila como `Hecho` y describe brevemente lo realizado.
-   - Si solo está parcialmente implementada, actualiza la descripción y crea una nueva fila para lo pendiente.
-   - Si no existe, agrega una nueva entrada manteniendo el estilo y evitando duplicados.
-5. Verifica que el árbol de trabajo esté limpio con `git status --short`.
-6. Si algún comando falla, corrige los errores y vuelve a ejecutar.
 
-## Estilo y herramientas
-- Usa `rg` para buscar en el código en lugar de `grep` o `ls -R`.
-- Los archivos se formatean automáticamente con Prettier; evita editar el formato manualmente.
-- Los mensajes de commit deben ser claros, en tiempo presente y concisos.
-- Evita usar el tipo `any`; utiliza tipos explícitos o `unknown` cuando sea necesario.
+1. Trabaja en la rama actual salvo que el usuario pida explícitamente una rama nueva.
+2. No hagas merge de Pull Requests. El merge final lo realiza el usuario.
+3. Antes de cambiar código, revisa los `AGENTS.md` aplicables, `git status --short` y el OpenSpec asociado.
+4. Usa `rg` para buscar y `apply_patch` para editar archivos. No uses comandos destructivos como `git reset --hard` o `git checkout --`.
+5. Mantén los cambios acotados, explica los TODOs y no agregues secretos ni credenciales.
 
-## AGENTS anidados
-Si modificas archivos dentro de un directorio que contenga su propio `AGENTS.md`, respeta las instrucciones adicionales de ese archivo.
+## Comandos canónicos
 
-## Permisos y Restricciones
-- El agente tiene autorización para realizar cambios, ejecutar tests, formatear código, commitear y crear Pull Requests.
-- **Queda estrictamente prohibido que el agente realice el merge de cualquier Pull Request (PR).** El merge debe ser realizado exclusivamente por el usuario.
+Requiere Node `>=22.19.0 <23` y npm. Desde la raíz:
 
-## En caso de duda
-- Prefiere código simple y legible.
-- Si añades TODOs, explícalos claramente.
-- Ejecuta siempre los comandos de verificación indicados antes de solicitar un PR.
+```bash
+npm install
+npm run dev
+npm run test:backend
+npm run test:frontend
+npm run format:backend
+npm run format:frontend
+npm run typecheck:backend
+npm run typecheck:frontend
+npm run build:backend
+npm run build:frontend
+npm run migrate
+npm run complete-check
+```
+
+`npm run migrate` necesita PostgreSQL accesible mediante el entorno del backend. Las migraciones son acumulativas y no deben editarse después de aplicadas; agrega una nueva para corregir el esquema.
+
+## Tipos de verificación
+
+- Backend: Vitest ejecuta pruebas unitarias, de integración y de servicio según el paquete.
+- Frontend: Vitest/Testing Library prueba componentes y flujos con MSW; no es una prueba de navegador real.
+- E2E de servicio: comprueba HTTP, Socket.IO y persistencia con servicios levantados.
+- E2E de navegador: valida manualmente la aplicación en un navegador, cookies, proxy, caché y variables públicas. Sigue `docs/recovery-baseline.md`.
+
+Si modificas solo backend o frontend, ejecuta su suite; antes de entregar cambios ejecuta las verificaciones generales indicadas arriba y corrige cualquier fallo.
+
+## Documentación
+
+Al terminar una funcionalidad, verifica rutas, variables `PUBLIC_*`, comandos, migraciones, eventos Socket.IO, capturas o instrucciones manuales y enlaces relativos. Actualiza el backlog sin duplicar entradas. Si el cambio tiene alcance o decisiones relevantes, registra el estado en `docs/estado-actual.md`, el destino en `docs/roadmap.md` y el procedimiento en `docs/guia-documentacion.md`.
+
+## Estilo
+
+- Prettier, ESLint y Stylelint son las herramientas de formato y lint.
+- Evita `any`; usa tipos explícitos o `unknown`.
+- Los errores que llegan al frontend deben ser claves de i18n cuando atraviesan la API.
+- Los mensajes de commit deben ser claros, concisos y en tiempo presente.
+
+## Estado final
+
+Antes de entregar, ejecuta `git diff --check`, valida el OpenSpec, revisa el diff manualmente y confirma `git status --short`. No solicites merge: el usuario conserva esa responsabilidad.
