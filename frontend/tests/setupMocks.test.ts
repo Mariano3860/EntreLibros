@@ -37,6 +37,21 @@ describe('enableMocking', () => {
     expect(document.documentElement.dataset.apiMode).toBe('mock')
   })
 
+  test('does not signal mock mode when worker startup fails', async () => {
+    const worker = {
+      start: vi.fn().mockRejectedValue(new Error('start failed')),
+    }
+
+    vi.doMock('@mocks/browser', () => ({ worker }))
+
+    const { enableMocking } = await import('@src/setupMocks')
+
+    await expect(enableMocking({ useMocksEnv: 'true' })).rejects.toThrow(
+      'start failed'
+    )
+    expect(document.documentElement.dataset.apiMode).toBeUndefined()
+  })
+
   test('polyfills ProgressEvent before starting the worker', async () => {
     const originalProgressEvent = globalThis.ProgressEvent
     // @ts-expect-error - emulate environment without ProgressEvent

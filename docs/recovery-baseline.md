@@ -106,9 +106,10 @@ publishes PostgreSQL on host port 5432. It reports PostgreSQL 16.4 and PostGIS
 `migrations` table has ten records including row `0`, which creates the
 migration table itself.
 
-A custom-format backup was exported to:
+A custom-format backup was exported to the temporary directory configured by
+PowerShell:
 
-`C:\Users\rojo-\AppData\Local\Temp\EntreLibros-Recovery\entrelibros-20260828.dump`
+`$env:TEMP\EntreLibros-Recovery\entrelibros-20260828.dump`
 
 SHA-256:
 `4CD59F56722D4CA052DC1CE7B63F5A1FE7EE46A9E57C9C2BE97AF30D419D93E4`.
@@ -140,10 +141,13 @@ PostGIS 3.4.3.
 ```powershell
 docker exec entrelibros-db-1 pg_dump -U postgres -d entrelibros -Fc -f /tmp/entrelibros-20260828.dump
 docker exec entrelibros-db-1 sha256sum /tmp/entrelibros-20260828.dump
-docker cp entrelibros-db-1:/tmp/entrelibros-20260828.dump 'C:\Users\rojo-\AppData\Local\Temp\EntreLibros-Recovery\entrelibros-20260828.dump'
+$dumpDir = Join-Path $env:TEMP 'EntreLibros-Recovery'
+$dumpPath = Join-Path $dumpDir 'entrelibros-20260828.dump'
+New-Item -ItemType Directory -Force -Path $dumpDir | Out-Null
+docker cp entrelibros-db-1:/tmp/entrelibros-20260828.dump $dumpPath
 docker volume create entrelibros_recovery_verify_20260828
 docker run -d --name entrelibros-recovery-verify-20260828 --network none -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_DB=entrelibros_restore_verify -v entrelibros_recovery_verify_20260828:/var/lib/postgresql/data postgis/postgis:16-3.4
-docker cp 'C:\Users\rojo-\AppData\Local\Temp\EntreLibros-Recovery\entrelibros-20260828.dump' entrelibros-recovery-verify-20260828:/tmp/entrelibros-20260828.dump
+docker cp $dumpPath entrelibros-recovery-verify-20260828:/tmp/entrelibros-20260828.dump
 docker exec entrelibros-recovery-verify-20260828 pg_restore -U postgres -d entrelibros_restore_verify --no-owner --no-privileges --exit-on-error /tmp/entrelibros-20260828.dump
 docker inspect entrelibros-db-1 --format 'source ports={{json .NetworkSettings.Ports}} mounts={{range .Mounts}}{{.Name}}:{{.Destination}} {{end}}'
 docker inspect entrelibros-recovery-verify-20260828 --format 'restore network={{.HostConfig.NetworkMode}} ports={{json .NetworkSettings.Ports}} mounts={{range .Mounts}}{{.Name}}:{{.Destination}} {{end}}'
@@ -154,7 +158,7 @@ docker exec entrelibros-db-1 psql -U postgres -d entrelibros -c 'TABLE migration
 docker exec entrelibros-recovery-verify-20260828 psql -U postgres -d entrelibros_restore_verify -c 'TABLE migrations;'
 docker exec entrelibros-db-1 psql -U postgres -d entrelibros -Atc "SELECT extversion FROM pg_extension WHERE extname='postgis'"
 docker exec entrelibros-recovery-verify-20260828 psql -U postgres -d entrelibros_restore_verify -Atc "SELECT extversion FROM pg_extension WHERE extname='postgis'"
-Get-FileHash -Algorithm SHA256 -LiteralPath 'C:\Users\rojo-\AppData\Local\Temp\EntreLibros-Recovery\entrelibros-20260828.dump'
+Get-FileHash -Algorithm SHA256 -LiteralPath $dumpPath
 ```
 
 ## Production dependency audit

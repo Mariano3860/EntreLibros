@@ -3,7 +3,8 @@ import { pluginReact } from '@rsbuild/plugin-react'
 import { pluginSass } from '@rsbuild/plugin-sass'
 import { pluginSvgr } from '@rsbuild/plugin-svgr'
 
-export const backendProxyTarget = 'http://localhost:4000'
+export const backendProxyTarget =
+  process.env.BACKEND_PROXY_TARGET || 'http://localhost:4000'
 
 export const backendProxy = {
   '/api': {

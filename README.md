@@ -51,7 +51,8 @@ El backend enviará una respuesta automática en el mismo canal usando el usuari
    ```
    El frontend usa `/api` en el mismo origen por defecto. Solo define
    `PUBLIC_API_BASE_URL` para un backend en otro origen y conserva siempre el
-   sufijo `/api`, por ejemplo `http://localhost:4000/api`.
+   sufijo `/api`, por ejemplo `http://localhost:4000/api`. REST y Socket.IO
+   usan ese mismo origen; en desarrollo, Rsbuild los redirige al backend local.
 
 Luego de iniciar el backend, puedes visitar `http://localhost:4000/api-docs` para ver la documentación interactiva de la API generada con Swagger.
 
@@ -96,11 +97,11 @@ services:
       - db
 
   frontend:
-    build: ./frontend
-    environment:
-      PUBLIC_API_BASE_URL: /api
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
     ports:
-      - "3000:3000"
+      - "3000:80"
     depends_on:
       - backend
 ```
@@ -203,7 +204,9 @@ Principales variables:
   `/api`; un override cross-origin debe incluir el prefijo, por ejemplo
   `http://localhost:4000/api`.
 - `PUBLIC_API_USE_MOCKS`: habilita MSW solo cuando vale `true`; el valor normal
-  de desarrollo y producción es `false`.
+  de desarrollo y producción es `false`. También se aceptan `1` y `yes`.
+- `BACKEND_PROXY_TARGET`: destino opcional del proxy de Rsbuild para desarrollo.
+  Por defecto es `http://localhost:4000`.
 - `OPENAPI_SERVER_ORIGIN`: origen público usado por Swagger, sin ruta de API,
   por ejemplo `http://localhost:4000`. Los paths del contrato ya empiezan por
   `/api`.

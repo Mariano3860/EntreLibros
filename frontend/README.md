@@ -26,10 +26,10 @@ npm run dev
 ```
 
 El servidor se iniciará en `http://localhost:3000`. De forma predeterminada
-consume `/api` en el mismo origen y no habilita MSW. Para un backend en otro
-origen, crea `.env.local` con
+consume `/api` y Socket.IO en el mismo origen y no habilita MSW. Para un backend
+en otro origen, crea `.env.local` con
 `PUBLIC_API_BASE_URL=http://localhost:4000/api`. Los mocks solo se activan de
-forma explícita con `PUBLIC_API_USE_MOCKS=true`.
+forma explícita con `PUBLIC_API_USE_MOCKS=true`, `1` o `yes`.
 
 ---
 
@@ -79,7 +79,9 @@ Las variables se pueden definir en archivos `.env.*`:
 
 - `PUBLIC_API_BASE_URL`: base de API; usa `/api` por defecto y conserva ese
   prefijo en overrides cross-origin.
-- `PUBLIC_API_USE_MOCKS`: activa MSW solo con `true`.
+- `PUBLIC_API_USE_MOCKS`: activa MSW con `true`, `1` o `yes`.
+- `BACKEND_PROXY_TARGET`: destino opcional del proxy de desarrollo; por defecto
+  es `http://localhost:4000`.
 - `PUBLIC_MSW_FORCE_AUTH`: controla la sesión simulada (`auto`, `logged-in`,
   `logged-out`) cuando MSW está activo.
 

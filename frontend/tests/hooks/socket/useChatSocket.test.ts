@@ -2,20 +2,33 @@ import { useChatSocket } from '@hooks/socket/useChatSocket'
 import { renderHook, act } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
-const listeners: Record<string, (...args: unknown[]) => void> = {}
-const emit = vi.fn()
-
-vi.mock('socket.io-client', () => ({
-  io: () => ({
+const { emit, io, listeners } = vi.hoisted(() => {
+  const listeners: Record<string, (...args: unknown[]) => void> = {}
+  const emit = vi.fn()
+  const io = vi.fn(() => ({
     on: (event: string, cb: (args: unknown) => void) => {
       listeners[event] = cb
     },
     emit,
     disconnect: vi.fn(),
-  }),
+  }))
+
+  return { emit, io, listeners }
+})
+
+vi.mock('socket.io-client', () => ({
+  io,
 }))
 
 describe('useChatSocket', () => {
+  test('uses the current origin when the API base is not configured', () => {
+    renderHook(() => useChatSocket())
+
+    expect(io).toHaveBeenCalledWith('http://localhost:3000', {
+      withCredentials: true,
+    })
+  })
+
   test('handles incoming and outgoing messages', () => {
     const { result } = renderHook(() => useChatSocket())
     act(() => {

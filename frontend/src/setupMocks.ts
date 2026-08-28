@@ -29,6 +29,8 @@ export async function enableMocking(options: EnableMockingOptions = {}) {
   }
 
   const { worker } = await import('@mocks/browser')
+  delete document.documentElement.dataset.apiMode
+  const startResult = await worker.start({ onUnhandledRequest: 'error' })
   document.documentElement.dataset.apiMode = 'mock'
-  return worker.start({ onUnhandledRequest: 'error' })
+  return startResult
 }

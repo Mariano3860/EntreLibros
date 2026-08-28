@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest'
+import { afterEach, describe, expect, test, vi } from 'vitest'
 
 import config, { backendProxy, backendProxyTarget } from '../rsbuild.config'
 
@@ -16,5 +16,21 @@ describe('Rsbuild backend proxy', () => {
         ws: true,
       },
     })
+  })
+
+  test('uses the configured backend proxy target when provided', async () => {
+    vi.resetModules()
+    vi.stubEnv('BACKEND_PROXY_TARGET', 'http://localhost:4100')
+
+    const { backendProxyTarget: configuredTarget } = await import(
+      '../rsbuild.config'
+    )
+
+    expect(configuredTarget).toBe('http://localhost:4100')
+  })
+
+  afterEach(() => {
+    vi.unstubAllEnvs()
+    vi.resetModules()
   })
 })
