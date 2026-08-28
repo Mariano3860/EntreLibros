@@ -1,38 +1,18 @@
-import { resolvedApiBaseUrl } from '@src/api/axios'
-
 const ENABLE_VALUES = ['true', '1', 'yes'] as const
-const DISABLE_VALUES = ['false', '0', 'no'] as const
 
 export interface EnableMockingOptions {
-  nodeEnv?: string | null
   useMocksEnv?: string | null
-  apiBaseUrl?: string | null
 }
 
 export async function enableMocking(options: EnableMockingOptions = {}) {
-  const runtimeEnv = options.nodeEnv ?? process.env.NODE_ENV ?? ''
   const useMocksEnv =
     options.useMocksEnv ?? import.meta.env.PUBLIC_API_USE_MOCKS ?? undefined
   const normalizedEnv = useMocksEnv?.toString().trim().toLowerCase()
   const explicitlyEnabled = normalizedEnv
     ? ENABLE_VALUES.includes(normalizedEnv as (typeof ENABLE_VALUES)[number])
     : false
-  const explicitlyDisabled = normalizedEnv
-    ? DISABLE_VALUES.includes(normalizedEnv as (typeof DISABLE_VALUES)[number])
-    : false
-  const baseUrl = options.apiBaseUrl ?? resolvedApiBaseUrl
-  const hasAbsoluteBase = /^https?:\/\//.test(baseUrl ?? '')
-  const isMockableEnv = runtimeEnv === 'development' || runtimeEnv === 'test'
 
-  if (explicitlyDisabled) {
-    return
-  }
-
-  if (!explicitlyEnabled && hasAbsoluteBase && runtimeEnv === 'production') {
-    return
-  }
-
-  if (!isMockableEnv && !explicitlyEnabled) {
+  if (!explicitlyEnabled) {
     return
   }
 
@@ -49,5 +29,8 @@ export async function enableMocking(options: EnableMockingOptions = {}) {
   }
 
   const { worker } = await import('@mocks/browser')
-  return worker.start({ onUnhandledRequest: 'bypass' })
+  delete document.documentElement.dataset.apiMode
+  const startResult = await worker.start({ onUnhandledRequest: 'error' })
+  document.documentElement.dataset.apiMode = 'mock'
+  return startResult
 }

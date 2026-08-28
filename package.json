@@ -2,7 +2,7 @@
   "name": "entrelibros",
   "private": true,
   "engines": {
-    "node": ">=20 <24"
+    "node": ">=22.19.0 <23"
   },
   "workspaces": [
     "frontend",

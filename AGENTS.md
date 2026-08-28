@@ -36,6 +36,10 @@ Estas instrucciones aplican a todo el repositorio.
 ## AGENTS anidados
 Si modificas archivos dentro de un directorio que contenga su propio `AGENTS.md`, respeta las instrucciones adicionales de ese archivo.
 
+## Permisos y Restricciones
+- El agente tiene autorización para realizar cambios, ejecutar tests, formatear código, commitear y crear Pull Requests.
+- **Queda estrictamente prohibido que el agente realice el merge de cualquier Pull Request (PR).** El merge debe ser realizado exclusivamente por el usuario.
+
 ## En caso de duda
 - Prefiere código simple y legible.
 - Si añades TODOs, explícalos claramente.

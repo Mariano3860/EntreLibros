@@ -25,9 +25,10 @@ El backend enviará una respuesta automática en el mismo canal usando el usuari
    ```
 2. **Configurar variables de entorno**
    - Copiar `backend/.env.example` a `backend/.env` y ajustar `DATABASE_URL`.
-   - (Opcional) Copiar `backend/.env.test.example` a `backend/.env.test` para las pruebas. Este archivo se genera automáticamente si no existe.
-   - Revisar `frontend/.env.example` para configurar el frontend.
-3. **Levantar PostGIS con Docker**
+   - Copiar `frontend/.env.example` a `frontend/.env` si deseas personalizar la URL de la API.
+   - Revisar `.env.development.example` y `.env.production.example` para despliegues con Docker Compose.
+   - **Nota sobre credenciales**: Distingue entre credenciales de infraestructura (`DATABASE_URL`, `POSTGRES_PASSWORD`), secreto JWT (`JWT_SECRET`) y las contraseñas de usuario creadas al registrarte en la aplicación.
+3. **Levantar PostGIS con Docker y Preflight**
    ```bash
    docker compose -f docker-compose.postgis.yml up -d
    ```
@@ -35,11 +36,12 @@ El backend enviará una respuesta automática en el mismo canal usando el usuari
    ```bash
    docker compose -f docker-compose.postgis.yml down
    ```
-4. **Preparar base de datos y migraciones**
+4. **Preparar base de datos y migraciones (con preflight)**
    ```bash
    npm run migrate
    ```
-   Crea la base definida en `backend/.env` y aplica las migraciones.
+   El migrador ejecuta automáticamente un script de preflight (`backend/scripts/preflight.js`) que verifica la conectividad de la base de datos y la extensión **PostGIS** antes de aplicar las migraciones.
+
 5. **Levantar servidores**
    ```bash
    npm run dev:backend   # backend
@@ -47,7 +49,10 @@ El backend enviará una respuesta automática en el mismo canal usando el usuari
    # o para levantar ambos en paralelo:
    npm run dev
    ```
-   El frontend obtiene la URL del backend desde `PUBLIC_API_BASE_URL`.
+   El frontend usa `/api` en el mismo origen por defecto. Solo define
+   `PUBLIC_API_BASE_URL` para un backend en otro origen y conserva siempre el
+   sufijo `/api`, por ejemplo `http://localhost:4000/api`. REST y Socket.IO
+   usan ese mismo origen; en desarrollo, Rsbuild los redirige al backend local.
 
 Luego de iniciar el backend, puedes visitar `http://localhost:4000/api-docs` para ver la documentación interactiva de la API generada con Swagger.
 
@@ -92,11 +97,11 @@ services:
       - db
 
   frontend:
-    build: ./frontend
-    environment:
-      PUBLIC_API_BASE_URL: http://localhost:4000
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
     ports:
-      - "3000:3000"
+      - "3000:80"
     depends_on:
       - backend
 ```
@@ -116,7 +121,7 @@ Para cada entorno crea un archivo de variables en la raíz del proyecto:
 - `.env.production` para producción
 - `.env.development` para desarrollo
 
-Estos archivos no se versionan (revisa `.env.production.example` y `.env.development.example` como guía) e incluyen valores como `DOCKERHUB_USER`, `JWT_SECRET`, `POSTGRES_PASSWORD`, `DATABASE_URL`, `FRONTEND_URL` y `PUBLIC_API_BASE_URL`.
+Estos archivos no se versionan (revisa `.env.production.example` y `.env.development.example` como guía) e incluyen valores como `DOCKERHUB_USER`, `JWT_SECRET`, `POSTGRES_PASSWORD`, `DATABASE_URL`, `FRONTEND_URL`, `OPENAPI_SERVER_ORIGIN` y `PUBLIC_API_BASE_URL`.
 
 Ejemplos de Docker Compose:
 
@@ -195,6 +200,14 @@ Principales variables:
 - `DATABASE_URL`: Cadena de conexión de PostGIS utilizada por el backend. Ejemplo: `postgres://postgres:postgres@localhost:5432/entrelibros`.
 - `JWT_SECRET`: clave secreta para firmar y verificar tokens JWT.
 - `FRONTEND_URL`: URL del frontend que el backend permite para CORS. Ejemplo: `http://localhost:3000`.
-- `PUBLIC_API_BASE_URL`: URL del backend que el frontend consulta. Ejemplo: `http://localhost:4000`.
-- `API_BASE_URL`: URL base de la API utilizada en la documentación de Swagger (opcional, por defecto `http://localhost:4000` o `http://localhost:<PORT>`).
+- `PUBLIC_API_BASE_URL`: base de la API para el navegador. Por defecto es
+  `/api`; un override cross-origin debe incluir el prefijo, por ejemplo
+  `http://localhost:4000/api`.
+- `PUBLIC_API_USE_MOCKS`: habilita MSW solo cuando vale `true`; el valor normal
+  de desarrollo y producción es `false`. También se aceptan `1` y `yes`.
+- `BACKEND_PROXY_TARGET`: destino opcional del proxy de Rsbuild para desarrollo.
+  Por defecto es `http://localhost:4000`.
+- `OPENAPI_SERVER_ORIGIN`: origen público usado por Swagger, sin ruta de API,
+  por ejemplo `http://localhost:4000`. Los paths del contrato ya empiezan por
+  `/api`.
 - `PORT`: Puerto en el que se expone el backend (opcional, por defecto `4000`). Ejemplo: `4000`.

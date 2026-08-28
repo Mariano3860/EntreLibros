@@ -6,7 +6,7 @@ Aplicación web en **React 19 + TypeScript** para la plataforma colaborativa de 
 
 ## 🚀 Requisitos
 
-- [Node.js](https://nodejs.org/) 20 o superior
+- [Node.js](https://nodejs.org/) 22.19.0
 - [npm](https://www.npmjs.com/) (incluido con Node)
 
 ---
@@ -18,14 +18,18 @@ git clone https://github.com/tu-usuario/entreLibros_frontend.git
 cd entreLibros_frontend
 npm install
 
-# variables de entorno (opcional)
-cp .env.development.local .env.local
+# variables de entorno (opcional; /api y mocks desactivados son los defaults)
+cp .env.example .env.local
 
 # levantar el servidor de desarrollo
 npm run dev
 ```
 
-El servidor se iniciará en `http://localhost:3000`. De forma predeterminada utiliza **MSW** para simular la API. Para que el frontend consuma el backend real del repositorio, crea un archivo `.env.local` con `PUBLIC_API_BASE_URL=http://localhost:4000`.
+El servidor se iniciará en `http://localhost:3000`. De forma predeterminada
+consume `/api` y Socket.IO en el mismo origen y no habilita MSW. Para un backend
+en otro origen, crea `.env.local` con
+`PUBLIC_API_BASE_URL=http://localhost:4000/api`. Los mocks solo se activan de
+forma explícita con `PUBLIC_API_USE_MOCKS=true`, `1` o `yes`.
 
 ---
 
@@ -73,9 +77,13 @@ entreLibros_frontend/
 
 Las variables se pueden definir en archivos `.env.*`:
 
-- `PUBLIC_API_BASE_URL`: URL base del backend.
-- `PUBLIC_MSW_FORCE_AUTH`: controla si MSW fuerza autenticación (`auto`, `on`, `off`).
-- `API_BASE_URL`: URL de la API para builds de producción.
+- `PUBLIC_API_BASE_URL`: base de API; usa `/api` por defecto y conserva ese
+  prefijo en overrides cross-origin.
+- `PUBLIC_API_USE_MOCKS`: activa MSW con `true`, `1` o `yes`.
+- `BACKEND_PROXY_TARGET`: destino opcional del proxy de desarrollo; por defecto
+  es `http://localhost:4000`.
+- `PUBLIC_MSW_FORCE_AUTH`: controla la sesión simulada (`auto`, `logged-in`,
+  `logged-out`) cuando MSW está activo.
 
 ---
 
