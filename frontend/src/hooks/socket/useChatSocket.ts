@@ -107,11 +107,28 @@ export const useChatSocket = () => {
 
   const sendMessage = useCallback(
     (text: string, channel?: string) => {
+      if (mockMode) {
+        if (channel !== 'Bot' && !/^@bot\b/i.test(text)) return
+        const cleanText = text.replace(/^@bot\s*/i, '').trim()
+        const reply = /^(hola|hello)/i.test(cleanText)
+          ? '¡Hola! Soy el bot de EntreLibros.'
+          : `Recibí tu mensaje: ${cleanText}`
+        setMessages((prev) => [
+          ...prev,
+          {
+            text: reply,
+            user: { id: 0, name: 'Bot' },
+            timestamp: new Date().toISOString(),
+            channel: channel ?? 'Bot',
+          },
+        ])
+        return
+      }
       if (socket) {
         socket.emit('message', { text, channel })
       }
     },
-    [socket]
+    [mockMode, socket]
   )
 
   const sendConversationMessage = useCallback(
