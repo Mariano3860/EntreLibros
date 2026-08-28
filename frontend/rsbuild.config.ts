@@ -2,9 +2,16 @@ import { defineConfig, loadEnv } from '@rsbuild/core'
 import { pluginReact } from '@rsbuild/plugin-react'
 import { pluginSass } from '@rsbuild/plugin-sass'
 import { pluginSvgr } from '@rsbuild/plugin-svgr'
+import { basename, dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const frontendRoot = fileURLToPath(new URL('.', import.meta.url))
+const configDirectory = import.meta.url.startsWith('file:')
+  ? dirname(fileURLToPath(import.meta.url))
+  : process.cwd()
+const frontendRoot =
+  basename(configDirectory) === 'frontend'
+    ? configDirectory
+    : resolve(configDirectory, 'frontend')
 const frontendEnv = loadEnv({
   cwd: frontendRoot,
   mode: process.env.NODE_ENV || 'development',

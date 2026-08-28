@@ -4,6 +4,8 @@ import type { PoolClient } from 'pg';
 import { pool, setTestClient } from '../../src/db.js';
 import {
   createConversation,
+  ensureBotConversation,
+  listConversations,
   listMessages,
   sendMessage,
 } from '../../src/repositories/messagingRepository.js';
@@ -32,6 +34,31 @@ async function createUser(suffix: string): Promise<number> {
 }
 
 describe('messagingRepository', () => {
+  test('creates one persisted bot conversation and exposes its history', async () => {
+    const userId = await createUser('bot-owner');
+
+    const first = await ensureBotConversation(userId);
+    const second = await ensureBotConversation(userId);
+
+    expect(second.id).toBe(first.id);
+    expect(first.isBot).toBe(true);
+
+    const message = await sendMessage({
+      conversationId: first.id,
+      senderId: userId,
+      clientKey: 'bot-check-1',
+      body: 'Hola bot',
+    });
+    await expect(listMessages(first.id, userId)).resolves.toMatchObject([
+      { id: message.id, body: 'Hola bot' },
+    ]);
+    await expect(listConversations(userId)).resolves.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: first.id, isBot: true }),
+      ])
+    );
+  });
+
   test('orders messages and returns the same row for an idempotent retry', async () => {
     const firstUser = await createUser('one');
     const secondUser = await createUser('two');

@@ -75,6 +75,7 @@ const hasVersion = (
 function toConversation(item: ApiConversation): Conversation {
   return {
     id: item.id,
+    isBot: item.isBot,
     participantIds: item.participantIds,
     agreementId: item.agreementId,
     user: {
@@ -128,6 +129,7 @@ export const Messages = () => {
     agreementUpdates,
     joinConversation,
     sendMessage,
+    sendConversationMessage,
     currentUser,
     isConnected,
     error,
@@ -151,7 +153,7 @@ export const Messages = () => {
     void fetchConversations()
       .then((items) => {
         if (!active) return
-        const next = [mockConversations[0], ...items.map(toConversation)]
+        const next = items.map(toConversation)
         setConversations(next)
         setSelectedId(next[0]?.id ?? null)
       })
@@ -172,8 +174,7 @@ export const Messages = () => {
   const isBotConversation = selected?.isBot === true
 
   useEffect(() => {
-    if (useDemoConversations || isBotConversation || selectedId === null)
-      return
+    if (useDemoConversations || selectedId === null) return
     let active = true
     setServerMessages([])
     void fetchMessageHistory(selectedId)
@@ -340,7 +341,7 @@ export const Messages = () => {
   const mappedMessages: Message[] = useMemo(() => {
     if (!selected) return []
 
-    if (!useDemoConversations && !isBotConversation) {
+    if (!useDemoConversations) {
       const persisted = serverMessages.map((message) =>
         toTextMessage(message, currentUser?.id)
       )
@@ -448,6 +449,11 @@ export const Messages = () => {
     }
 
     if (useDemoConversations || isBotConversation) {
+      if (isBotConversation && !useDemoConversations) {
+        const clientKey = `${selectedId}-${Date.now()}-${Math.random()}`
+        sendConversationMessage(selectedId, clientKey, draft.trim())
+        return
+      }
       appendMessageToConversation(selectedId, newMessage)
       sendMessage(draft.trim(), selected.user.name)
       return
