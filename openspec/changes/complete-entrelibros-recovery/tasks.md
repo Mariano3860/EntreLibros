@@ -20,11 +20,11 @@
 
 ## 3. PR #138 recovery and scope control
 
-- [ ] 3.1 Fetch the latest PR #138 head, base, checks, reviews and all unresolved threads; verify each review thread is mapped to a code change and regression test or an explicit documented response.
-- [ ] 3.2 Make the existing PR #138 branch current without creating a speculative branch and integrate the latest remote main while preserving PR history; verify the PR remains open against main and contains no accidental unrelated files.
-- [ ] 3.3 Reproduce the stale agreement confirm/cancel state reported in review and add a failing frontend regression test; verify the test fails on the current PR head for the reviewed reason.
-- [ ] 3.4 Inventory every mock, local-only store transition and missing backend contract in the PR diff; verify the inventory covers conversation initialization, agreement versions, confirm, cancel, reconnect and errors.
-- [ ] 3.5 Publish the final PR #138 scope in its description as private messaging prerequisites plus versioned agreements; verify environment, general dependency and production changes remain outside the PR.
+- [x] 3.1 Fetch the latest PR #138 head, base, checks, reviews and all unresolved threads; verify each review thread is mapped to a code change and regression test or an explicit documented response.
+- [x] 3.2 Make the existing PR #138 branch current without creating a speculative branch and integrate the latest remote main while preserving PR history; verify the PR remains open against main and contains no accidental unrelated files.
+- [x] 3.3 Reproduce the stale agreement confirm/cancel state reported in review and add a failing frontend regression test; verify the test fails on the current PR head for the reviewed reason.
+- [x] 3.4 Inventory every mock, local-only store transition and missing backend contract in the PR diff; verify the inventory covers conversation initialization, agreement versions, confirm, cancel, reconnect and errors.
+- [x] 3.5 Publish the final PR #138 scope in its description as private messaging prerequisites plus versioned agreements; verify environment, general dependency and production changes remain outside the PR.
 
 ## 4. Persistent private messaging for PR #138
 

@@ -104,6 +104,16 @@ backend routes/migrations, environment changes, general dependency upgrades or
 production deployment work. Those are explicitly deferred to the subsequent
 sections of `complete-entrelibros-recovery` and must not be added to #138.
 
+The scope inventory for the reviewed paths is:
+
+| Area | Current PR state | Follow-up boundary |
+| --- | --- | --- |
+| Conversation initialization | `Messages.tsx` initializes the current mock conversation list locally | Server conversation listing belongs to section 6 |
+| Agreement versions | `useAgreementStore` keeps proposal history and active version in client state | Immutable persisted versions belong to section 5 |
+| Confirm and cancel | Client-only transitions now use atomic functional updates; cancellation text stays in the message model | Authenticated commands and concurrency belong to section 5 |
+| Reconnect | Existing Socket.IO chat path remains a transport/mock concern; no agreement recovery cursor exists | Persisted replay belongs to sections 4 and 6 |
+| Errors | Current UI maps local store errors to i18n keys; no backend error contract is present | REST/OpenAPI error contracts belong to sections 4–6 |
+
 The latest [CI Frontend run](https://github.com/Mariano3860/EntreLibros/actions/runs/19077745239)
 completed with failure in the `quality` job. The Dependabot auto-merge check was
 skipped. GitHub no longer retains the failed job log: requesting it on
