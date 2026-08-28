@@ -85,6 +85,25 @@ Six review threads remain unresolved:
 | `frontend/src/components/messages/Messages.tsx` | Duplicate agreement lookup | [discussion](https://github.com/Mariano3860/EntreLibros/pull/138#discussion_r2491522221) |
 | `frontend/src/components/messages/useAgreementStore.ts` | P1 concurrent updates must derive from `prev` | [discussion](https://github.com/Mariano3860/EntreLibros/pull/138#discussion_r2491534939) |
 
+### PR #138 recovery inventory (2026-08-28)
+
+The current PR diff is limited to the agreement workflow in the frontend:
+version types, the local agreement store, proposal/confirmation/cancellation
+bubbles and modals, message rendering, the mocked book-availability check and
+Spanish/English labels. The review fixes are mapped as follows:
+
+| Review finding | Code change | Regression evidence |
+| --- | --- | --- |
+| Confirmation/cancellation used a stale closure | Functional state updaters derive from `prev[conversationId]` | `frontend/tests/hooks/useAgreementStore.test.ts`: queued confirmations and cancellations |
+| Unused cancellation reason | Removed the unused store parameter; the rendered message remains responsible for its display reason | Frontend typecheck plus existing cancellation rendering path |
+| Redundant memoization | Return `agreements` directly from the hook | Frontend typecheck |
+| Duplicate agreement lookup | The action path keeps one lookup for the selected conversation/version before appending the event | Frontend typecheck and PR diff review |
+
+The PR still does not contain persistent conversations, messages or agreements,
+backend routes/migrations, environment changes, general dependency upgrades or
+production deployment work. Those are explicitly deferred to the subsequent
+sections of `complete-entrelibros-recovery` and must not be added to #138.
+
 The latest [CI Frontend run](https://github.com/Mariano3860/EntreLibros/actions/runs/19077745239)
 completed with failure in the `quality` job. The Dependabot auto-merge check was
 skipped. GitHub no longer retains the failed job log: requesting it on

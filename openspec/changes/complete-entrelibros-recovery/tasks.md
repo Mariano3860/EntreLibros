@@ -15,8 +15,8 @@
 - [x] 2.6 Make development and test database preparation idempotent and document preserved-volume behavior; verify migrations succeed twice against both `entrelibros` and `entrelibros_test` without reapplying history.
 - [x] 2.7 Update README/runbooks with clean-clone setup, Docker/PostGIS lifecycle, registration, local infrastructure credentials and the distinction between JWT secrets and user passwords; verify a clean-shell walkthrough reaches frontend, backend, Swagger and registration.
 - [x] 2.8 Add runtime-foundation regression tests and run backend/frontend typecheck, lint, stylelint, format checks, tests and builds; verify all repository-required commands pass.
-- [ ] 2.9 Push the runtime-foundation delivery and prepare its PR with evidence, migration impact and rollback notes; verify CI and review are green, notify the user that manual merge is required, and do not merge it.
-- [ ] 2.10 After the user confirms the runtime PR merge, update the local current branch from remote main and rerun the clean-clone smoke; verify the merged commit contains no PR #138 feature work.
+- [x] 2.9 Push the runtime-foundation delivery and prepare its PR with evidence, migration impact and rollback notes; verify CI and review are green, notify the user that manual merge is required, and do not merge it.
+- [x] 2.10 After the user confirms the runtime PR merge, update the local current branch from remote main and rerun the clean-clone smoke; verify the merged commit contains no PR #138 feature work.
 
 ## 3. PR #138 recovery and scope control
 

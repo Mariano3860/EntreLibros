@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useState } from 'react'
 
 import type {
   AgreementDetails,
@@ -260,54 +260,64 @@ export const useAgreementStore = (conversations: Conversation[]) => {
 
   const confirmVersion = useCallback(
     (conversationId: number, versionNumber: number, actor: string) => {
-      const conversationState = getConversationState(conversationId)
-      const targetVersion = conversationState.versions.find(
-        (version) => version.version === versionNumber
-      )
-
-      if (!targetVersion) {
-        throw new AgreementStoreError('Version not found', 'version_not_found')
-      }
-
-      if (targetVersion.status === 'inactive') {
-        throw new AgreementStoreError('Version is inactive', 'version_inactive')
-      }
-
-      if (targetVersion.status === 'cancelled') {
-        throw new AgreementStoreError(
-          'Version is cancelled',
-          'version_cancelled'
-        )
-      }
-
-      if (targetVersion.confirmedBy.includes(actor)) {
-        return targetVersion
-      }
-
-      const timestamp = new Date().toISOString()
-      const confirmedBy = [...targetVersion.confirmedBy, actor]
-      const status: AgreementVersionStatus =
-        confirmedBy.length >= 2 ? 'fullyConfirmed' : 'confirmed'
-
-      const updatedVersion: AgreementVersion = {
-        ...targetVersion,
-        confirmedBy,
-        status,
-        history: [
-          ...cloneHistory(targetVersion.history),
-          {
-            status,
-            changedAt: timestamp,
-            changedBy: actor,
-          },
-        ],
-      }
+      let result: AgreementVersion | null = null
+      let error: AgreementStoreError | null = null
 
       setAgreements((prev) => {
-        const prevState = getConversationState(conversationId)
+        const prevState = prev[conversationId] ?? {
+          versions: [],
+          activeVersion: undefined,
+        }
+        const targetVersion = prevState.versions.find(
+          (version) => version.version === versionNumber
+        )
+
+        if (!targetVersion) {
+          error = new AgreementStoreError(
+            'Version not found',
+            'version_not_found'
+          )
+          return prev
+        }
+
+        if (targetVersion.status === 'inactive') {
+          error = new AgreementStoreError(
+            'Version is inactive',
+            'version_inactive'
+          )
+          return prev
+        }
+
+        if (targetVersion.status === 'cancelled') {
+          error = new AgreementStoreError(
+            'Version is cancelled',
+            'version_cancelled'
+          )
+          return prev
+        }
+
+        if (targetVersion.confirmedBy.includes(actor)) {
+          result = targetVersion
+          return prev
+        }
+
+        const timestamp = new Date().toISOString()
+        const confirmedBy = [...targetVersion.confirmedBy, actor]
+        const status: AgreementVersionStatus =
+          confirmedBy.length >= 2 ? 'fullyConfirmed' : 'confirmed'
+        const updatedVersion: AgreementVersion = {
+          ...targetVersion,
+          confirmedBy,
+          status,
+          history: [
+            ...cloneHistory(targetVersion.history),
+            { status, changedAt: timestamp, changedBy: actor },
+          ],
+        }
         const versions = prevState.versions.map((version) =>
           version.version === versionNumber ? updatedVersion : version
         )
+        result = updatedVersion
 
         return {
           ...prev,
@@ -321,52 +331,56 @@ export const useAgreementStore = (conversations: Conversation[]) => {
         }
       })
 
-      return updatedVersion
+      if (error) throw error
+      return result
     },
-    [getConversationState]
+    []
   )
 
   const cancelVersion = useCallback(
-    (
-      conversationId: number,
-      versionNumber: number,
-      actor: string,
-      reason?: string
-    ) => {
-      void reason
-      const conversationState = getConversationState(conversationId)
-      const targetVersion = conversationState.versions.find(
-        (version) => version.version === versionNumber
-      )
-
-      if (!targetVersion) {
-        throw new AgreementStoreError('Version not found', 'version_not_found')
-      }
-
-      if (targetVersion.status === 'cancelled') {
-        return targetVersion
-      }
-
-      const timestamp = new Date().toISOString()
-
-      const updatedVersion: AgreementVersion = {
-        ...targetVersion,
-        status: 'cancelled',
-        history: [
-          ...cloneHistory(targetVersion.history),
-          {
-            status: 'cancelled',
-            changedAt: timestamp,
-            changedBy: actor,
-          },
-        ],
-      }
+    (conversationId: number, versionNumber: number, actor: string) => {
+      let result: AgreementVersion | null = null
+      let error: AgreementStoreError | null = null
 
       setAgreements((prev) => {
-        const prevState = getConversationState(conversationId)
+        const prevState = prev[conversationId] ?? {
+          versions: [],
+          activeVersion: undefined,
+        }
+        const targetVersion = prevState.versions.find(
+          (version) => version.version === versionNumber
+        )
+
+        if (!targetVersion) {
+          error = new AgreementStoreError(
+            'Version not found',
+            'version_not_found'
+          )
+          return prev
+        }
+
+        if (targetVersion.status === 'cancelled') {
+          result = targetVersion
+          return prev
+        }
+
+        const timestamp = new Date().toISOString()
+        const updatedVersion: AgreementVersion = {
+          ...targetVersion,
+          status: 'cancelled',
+          history: [
+            ...cloneHistory(targetVersion.history),
+            {
+              status: 'cancelled',
+              changedAt: timestamp,
+              changedBy: actor,
+            },
+          ],
+        }
         const versions = prevState.versions.map((version) =>
           version.version === versionNumber ? updatedVersion : version
         )
+        result = updatedVersion
 
         const activeVersion =
           prevState.activeVersion?.version === versionNumber
@@ -382,15 +396,14 @@ export const useAgreementStore = (conversations: Conversation[]) => {
         }
       })
 
-      return updatedVersion
+      if (error) throw error
+      return result
     },
-    [getConversationState]
+    []
   )
 
-  const allVersions = useMemo(() => agreements, [agreements])
-
   return {
-    agreements: allVersions,
+    agreements,
     getConversationState,
     getVersion,
     proposeVersion,

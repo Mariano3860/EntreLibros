@@ -37,8 +37,8 @@ describe('useAgreementStore', () => {
       firstVersion = result.current.proposeVersion(1, details, 'Alice')
     })
     expect(firstVersion).not.toBeNull()
-    expect(firstVersion!.version).toBe(1)
-    expect(firstVersion!.status).toBe('pending')
+    expect(result.current.getVersion(1, 1)?.version).toBe(1)
+    expect(result.current.getVersion(1, 1)?.status).toBe('pending')
 
     act(() => {
       result.current.proposeVersion(
@@ -66,16 +66,16 @@ describe('useAgreementStore', () => {
     })
 
     act(() => {
-      const first = result.current.confirmVersion(1, 1, 'Alice')
-      expect(first.status).toBe('confirmed')
-      expect(first.confirmedBy).toContain('Alice')
+      result.current.confirmVersion(1, 1, 'Alice')
     })
+    expect(result.current.getVersion(1, 1)?.status).toBe('confirmed')
+    expect(result.current.getVersion(1, 1)?.confirmedBy).toContain('Alice')
 
     act(() => {
-      const second = result.current.confirmVersion(1, 1, 'Bob')
-      expect(second.status).toBe('fullyConfirmed')
-      expect(second.confirmedBy).toEqual(['Alice', 'Bob'])
+      result.current.confirmVersion(1, 1, 'Bob')
     })
+    expect(result.current.getVersion(1, 1)?.status).toBe('fullyConfirmed')
+    expect(result.current.getVersion(1, 1)?.confirmedBy).toEqual(['Alice', 'Bob'])
   })
 
   it('keeps confirmation idempotent for the same user', () => {
@@ -87,9 +87,9 @@ describe('useAgreementStore', () => {
 
     act(() => {
       result.current.confirmVersion(1, 1, 'Alice')
-      const repeated = result.current.confirmVersion(1, 1, 'Alice')
-      expect(repeated.confirmedBy).toEqual(['Alice'])
+      result.current.confirmVersion(1, 1, 'Alice')
     })
+    expect(result.current.getVersion(1, 1)?.confirmedBy).toEqual(['Alice'])
   })
 
   it('marks a version as cancelled', () => {
@@ -100,8 +100,36 @@ describe('useAgreementStore', () => {
     })
 
     act(() => {
-      const cancelled = result.current.cancelVersion(1, 1, 'Alice')
-      expect(cancelled.status).toBe('cancelled')
+      result.current.cancelVersion(1, 1, 'Alice')
     })
+    expect(result.current.getVersion(1, 1)?.status).toBe('cancelled')
+  })
+
+  it('keeps both actors when confirmations are queued before a render', () => {
+    const { result } = renderHook(() => useAgreementStore([baseConversation]))
+
+    act(() => {
+      result.current.proposeVersion(1, details, 'Alice')
+      result.current.confirmVersion(1, 1, 'Alice')
+      result.current.confirmVersion(1, 1, 'Bob')
+    })
+
+    const version = result.current.getVersion(1, 1)
+    expect(version?.confirmedBy).toEqual(['Alice', 'Bob'])
+    expect(version?.status).toBe('fullyConfirmed')
+  })
+
+  it('keeps the first cancellation when cancellation requests are queued', () => {
+    const { result } = renderHook(() => useAgreementStore([baseConversation]))
+
+    act(() => {
+      result.current.proposeVersion(1, details, 'Alice')
+      result.current.cancelVersion(1, 1, 'Alice')
+      result.current.cancelVersion(1, 1, 'Bob')
+    })
+
+    const version = result.current.getVersion(1, 1)
+    expect(version?.status).toBe('cancelled')
+    expect(version?.history.at(-1)?.changedBy).toBe('Alice')
   })
 })
