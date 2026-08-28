@@ -281,7 +281,7 @@ Trazabilidad de PRs (referencias clave; lista completa se añadirá como anexo)
 - Geolocalización: #84
 - Mensajería/UI/Chatbot: #78, #55, #79
 - Normalización de libros: #87
-- Scripts/Workflows/CI/Docs: #85, #60, #58, #63, #62, #73, #72, #70, #67
+- Scripts/Workflows/CI/Docs: #85, #60, #58, #63, #62, #73, #72, #70, #67, #140 (Hecho: runtime Node 22, contratos same-origin, proxy API/Socket.IO, MSW opt-in y runbook de recuperación reproducible)
 
 Cómo mantener este backlog
 

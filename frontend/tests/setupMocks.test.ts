@@ -3,6 +3,7 @@ import { afterEach, describe, expect, test, vi } from 'vitest'
 afterEach(() => {
   vi.resetModules()
   vi.clearAllMocks()
+  delete document.documentElement.dataset.apiMode
 })
 
 describe('enableMocking', () => {
@@ -14,15 +15,14 @@ describe('enableMocking', () => {
     const { enableMocking } = await import('@src/setupMocks')
 
     await enableMocking({
-      nodeEnv: 'development',
       useMocksEnv: 'no',
-      apiBaseUrl: '/api',
     })
 
     expect(worker.start).not.toHaveBeenCalled()
+    expect(document.documentElement.dataset.apiMode).toBeUndefined()
   })
 
-  test('starts worker when explicitly enabled even in production with absolute base', async () => {
+  test('starts an isolated worker only when mocks are explicitly enabled', async () => {
     const worker = { start: vi.fn() }
 
     vi.doMock('@mocks/browser', () => ({ worker }))
@@ -30,12 +30,26 @@ describe('enableMocking', () => {
     const { enableMocking } = await import('@src/setupMocks')
 
     await enableMocking({
-      nodeEnv: 'production',
       useMocksEnv: 'true',
-      apiBaseUrl: 'https://example.com/api',
     })
 
-    expect(worker.start).toHaveBeenCalledWith({ onUnhandledRequest: 'bypass' })
+    expect(worker.start).toHaveBeenCalledWith({ onUnhandledRequest: 'error' })
+    expect(document.documentElement.dataset.apiMode).toBe('mock')
+  })
+
+  test('does not signal mock mode when worker startup fails', async () => {
+    const worker = {
+      start: vi.fn().mockRejectedValue(new Error('start failed')),
+    }
+
+    vi.doMock('@mocks/browser', () => ({ worker }))
+
+    const { enableMocking } = await import('@src/setupMocks')
+
+    await expect(enableMocking({ useMocksEnv: 'true' })).rejects.toThrow(
+      'start failed'
+    )
+    expect(document.documentElement.dataset.apiMode).toBeUndefined()
   })
 
   test('polyfills ProgressEvent before starting the worker', async () => {
@@ -48,10 +62,10 @@ describe('enableMocking', () => {
 
     const { enableMocking } = await import('@src/setupMocks')
 
-    await enableMocking({ nodeEnv: 'development', apiBaseUrl: '/api' })
+    await enableMocking({ useMocksEnv: 'yes' })
 
     expect(typeof globalThis.ProgressEvent).toBe('function')
-    expect(worker.start).toHaveBeenCalledWith({ onUnhandledRequest: 'bypass' })
+    expect(worker.start).toHaveBeenCalledWith({ onUnhandledRequest: 'error' })
 
     if (originalProgressEvent) {
       globalThis.ProgressEvent = originalProgressEvent
@@ -61,47 +75,28 @@ describe('enableMocking', () => {
     }
   })
 
-  test('skips worker in production when using absolute base without explicit enable', async () => {
+  test('skips worker by default', async () => {
     const worker = { start: vi.fn() }
 
     vi.doMock('@mocks/browser', () => ({ worker }))
 
     const { enableMocking } = await import('@src/setupMocks')
 
-    await enableMocking({
-      nodeEnv: 'production',
-      useMocksEnv: undefined,
-      apiBaseUrl: 'https://example.com/api',
-    })
+    await enableMocking()
 
     expect(worker.start).not.toHaveBeenCalled()
+    expect(document.documentElement.dataset.apiMode).toBeUndefined()
   })
 
-  test('skips worker in production when using relative base without explicit enable', async () => {
+  test('skips worker for unrecognized values', async () => {
     const worker = { start: vi.fn() }
 
     vi.doMock('@mocks/browser', () => ({ worker }))
 
     const { enableMocking } = await import('@src/setupMocks')
 
-    await enableMocking({
-      nodeEnv: 'production',
-      useMocksEnv: undefined,
-      apiBaseUrl: '/api',
-    })
+    await enableMocking({ useMocksEnv: 'auto' })
 
     expect(worker.start).not.toHaveBeenCalled()
-  })
-
-  test('starts worker automatically in development when not explicitly configured', async () => {
-    const worker = { start: vi.fn() }
-
-    vi.doMock('@mocks/browser', () => ({ worker }))
-
-    const { enableMocking } = await import('@src/setupMocks')
-
-    await enableMocking({ nodeEnv: 'development', apiBaseUrl: '/api' })
-
-    expect(worker.start).toHaveBeenCalledWith({ onUnhandledRequest: 'bypass' })
   })
 })

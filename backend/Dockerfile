@@ -1,11 +1,11 @@
-FROM node:24-alpine AS build
+FROM node:22.19.0-alpine AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY backend ./backend
 RUN npm ci --workspace=backend
 RUN npm run build -w backend
 
-FROM node:24-alpine
+FROM node:22.19.0-alpine
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY backend/package.json ./backend/package.json
