@@ -4,6 +4,7 @@ import {
   commandAgreement,
   createAgreement,
   getAgreement,
+  getAgreementHistory,
   type AgreementDetails,
 } from '../repositories/agreementRepository.js';
 import type { AgreementCommand } from '../services/agreementState.js';
@@ -57,12 +58,10 @@ router.get('/:id', async (req: AuthenticatedRequest, res) => {
       .json({ error: 'Unauthorized', message: 'auth.errors.unauthorized' });
   const agreementId = id(req.params.id);
   if (!agreementId)
-    return res
-      .status(422)
-      .json({
-        error: 'ValidationError',
-        message: 'agreements.errors.id_required',
-      });
+    return res.status(422).json({
+      error: 'ValidationError',
+      message: 'agreements.errors.id_required',
+    });
   try {
     const agreement = await getAgreement(agreementId, req.user.id);
     if (!agreement)
@@ -70,6 +69,35 @@ router.get('/:id', async (req: AuthenticatedRequest, res) => {
         .status(404)
         .json({ error: 'NotFound', message: 'agreements.errors.not_found' });
     return res.json({ agreement });
+  } catch (error) {
+    const response = failure(error);
+    return res.status(response.status).json(response.body);
+  }
+});
+
+router.get('/:id/history', async (req: AuthenticatedRequest, res) => {
+  if (!req.user) {
+    return res
+      .status(401)
+      .json({ error: 'Unauthorized', message: 'auth.errors.unauthorized' });
+  }
+  const agreementId = id(req.params.id);
+  if (!agreementId) {
+    return res
+      .status(422)
+      .json({
+        error: 'ValidationError',
+        message: 'agreements.errors.id_required',
+      });
+  }
+  try {
+    const history = await getAgreementHistory(agreementId, req.user.id);
+    if (history.length === 0) {
+      return res
+        .status(404)
+        .json({ error: 'NotFound', message: 'agreements.errors.not_found' });
+    }
+    return res.json({ history });
   } catch (error) {
     const response = failure(error);
     return res.status(response.status).json(response.body);
@@ -88,12 +116,10 @@ router.post('/', async (req: AuthenticatedRequest, res) => {
     typeof body.participantId === 'number' ? body.participantId : null;
   const agreementDetails = details(body.details);
   if (!conversationId || !participantId || !agreementDetails) {
-    return res
-      .status(422)
-      .json({
-        error: 'ValidationError',
-        message: 'agreements.errors.invalid_proposal',
-      });
+    return res.status(422).json({
+      error: 'ValidationError',
+      message: 'agreements.errors.invalid_proposal',
+    });
   }
   try {
     const agreement = await createAgreement({
@@ -126,12 +152,10 @@ router.post('/:id/commands', async (req: AuthenticatedRequest, res) => {
     !Number.isInteger(expectedVersion) ||
     expectedVersion < 1
   ) {
-    return res
-      .status(422)
-      .json({
-        error: 'ValidationError',
-        message: 'agreements.errors.invalid_command',
-      });
+    return res.status(422).json({
+      error: 'ValidationError',
+      message: 'agreements.errors.invalid_command',
+    });
   }
   try {
     const agreement = await commandAgreement({

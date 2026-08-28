@@ -24,6 +24,14 @@ export interface AgreementSnapshot {
   acceptances: number[];
 }
 
+export interface AgreementHistoryEntry {
+  version: number;
+  actorId: number;
+  state: AgreementState;
+  details: AgreementDetails;
+  createdAt: Date;
+}
+
 interface AgreementRow {
   id: number;
   conversation_id: number;
@@ -70,6 +78,21 @@ export async function getAgreement(
     [id, userId]
   );
   return rows[0] ? mapRow(rows[0]) : null;
+}
+
+export async function getAgreementHistory(
+  id: number,
+  userId: number
+): Promise<AgreementHistoryEntry[]> {
+  const { rows } = await query<AgreementHistoryEntry>(
+    `SELECT v.version, v.actor_id AS "actorId", v.state, v.details, v.created_at AS "createdAt"
+     FROM exchange_agreement_versions v
+     JOIN exchange_agreements a ON a.id = v.agreement_id
+     WHERE v.agreement_id = $1 AND (a.proposer_id = $2 OR a.participant_id = $2)
+     ORDER BY v.version ASC`,
+    [id, userId]
+  );
+  return rows;
 }
 
 export async function createAgreement(input: {
