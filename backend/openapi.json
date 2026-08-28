@@ -14,15 +14,25 @@
       "get": {
         "summary": "List the authenticated user's conversations",
         "tags": ["Messaging"],
-        "security": [{ "cookieAuth": [] }],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Conversation summaries",
             "content": {
-              "application/json": { "schema": { "type": "object" } }
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
             }
           },
-          "401": { "$ref": "#/components/responses/Unauthorized" }
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
         }
       }
     },
@@ -30,7 +40,11 @@
       "post": {
         "summary": "Create a private conversation",
         "tags": ["Messaging"],
-        "security": [{ "cookieAuth": [] }],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -39,16 +53,25 @@
                 "type": "object",
                 "required": ["participantId"],
                 "properties": {
-                  "participantId": { "type": "integer", "minimum": 1 }
+                  "participantId": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
                 }
               }
             }
           }
         },
         "responses": {
-          "201": { "description": "Conversation created" },
-          "401": { "$ref": "#/components/responses/Unauthorized" },
-          "422": { "description": "Localized validation error" }
+          "201": {
+            "description": "Conversation created"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "description": "Localized validation error"
+          }
         }
       }
     },
@@ -56,42 +79,69 @@
       "get": {
         "summary": "Read authorized conversation history",
         "tags": ["Messaging"],
-        "security": [{ "cookieAuth": [] }],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "conversationId",
             "in": "path",
             "required": true,
-            "schema": { "type": "integer" }
+            "schema": {
+              "type": "integer"
+            }
           },
           {
             "name": "after",
             "in": "query",
-            "schema": { "type": "integer", "minimum": 0 }
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
           },
           {
             "name": "limit",
             "in": "query",
-            "schema": { "type": "integer", "minimum": 1, "maximum": 100 }
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
           }
         ],
         "responses": {
-          "200": { "description": "Ordered message page" },
-          "401": { "$ref": "#/components/responses/Unauthorized" },
-          "403": { "description": "Localized authorization error" },
-          "422": { "description": "Localized pagination error" }
+          "200": {
+            "description": "Ordered message page"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "description": "Localized authorization error"
+          },
+          "422": {
+            "description": "Localized pagination error"
+          }
         }
       },
       "post": {
         "summary": "Persist an idempotent conversation message",
         "tags": ["Messaging"],
-        "security": [{ "cookieAuth": [] }],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "conversationId",
             "in": "path",
             "required": true,
-            "schema": { "type": "integer" }
+            "schema": {
+              "type": "integer"
+            }
           }
         ],
         "requestBody": {
@@ -102,19 +152,33 @@
                 "type": "object",
                 "required": ["clientKey", "body"],
                 "properties": {
-                  "clientKey": { "type": "string" },
-                  "body": { "type": "string" },
-                  "attachmentMetadata": { "type": "object" }
+                  "clientKey": {
+                    "type": "string"
+                  },
+                  "body": {
+                    "type": "string"
+                  },
+                  "attachmentMetadata": {
+                    "type": "object"
+                  }
                 }
               }
             }
           }
         },
         "responses": {
-          "201": { "description": "Persisted message" },
-          "401": { "$ref": "#/components/responses/Unauthorized" },
-          "403": { "description": "Localized authorization error" },
-          "422": { "description": "Localized validation error" }
+          "201": {
+            "description": "Persisted message"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "description": "Localized authorization error"
+          },
+          "422": {
+            "description": "Localized validation error"
+          }
         }
       }
     },
@@ -122,20 +186,34 @@
       "patch": {
         "summary": "Advance the authenticated participant read cursor",
         "tags": ["Messaging"],
-        "security": [{ "cookieAuth": [] }],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "conversationId",
             "in": "path",
             "required": true,
-            "schema": { "type": "integer" }
+            "schema": {
+              "type": "integer"
+            }
           }
         ],
         "responses": {
-          "204": { "description": "Read cursor updated" },
-          "401": { "$ref": "#/components/responses/Unauthorized" },
-          "403": { "description": "Localized authorization error" },
-          "422": { "description": "Localized sequence error" }
+          "204": {
+            "description": "Read cursor updated"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "description": "Localized authorization error"
+          },
+          "422": {
+            "description": "Localized sequence error"
+          }
         }
       }
     },
@@ -143,11 +221,21 @@
       "post": {
         "summary": "Create a versioned exchange proposal",
         "tags": ["Agreements"],
-        "security": [{ "cookieAuth": [] }],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
         "responses": {
-          "201": { "description": "Agreement at version 1" },
-          "401": { "$ref": "#/components/responses/Unauthorized" },
-          "422": { "description": "Localized proposal validation error" }
+          "201": {
+            "description": "Agreement at version 1"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "description": "Localized proposal validation error"
+          }
         }
       }
     },
@@ -155,19 +243,31 @@
       "get": {
         "summary": "Read immutable agreement versions",
         "tags": ["Agreements"],
-        "security": [{ "cookieAuth": [] }],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "schema": { "type": "integer" }
+            "schema": {
+              "type": "integer"
+            }
           }
         ],
         "responses": {
-          "200": { "description": "Version history ordered by version" },
-          "401": { "$ref": "#/components/responses/Unauthorized" },
-          "404": { "description": "Not found or unauthorized" }
+          "200": {
+            "description": "Version history ordered by version"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "description": "Not found or unauthorized"
+          }
         }
       }
     },
@@ -175,13 +275,19 @@
       "post": {
         "summary": "Apply an optimistic versioned agreement command",
         "tags": ["Agreements"],
-        "security": [{ "cookieAuth": [] }],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "schema": { "type": "integer" }
+            "schema": {
+              "type": "integer"
+            }
           }
         ],
         "requestBody": {
@@ -196,20 +302,31 @@
                     "type": "string",
                     "enum": ["confirm", "cancel", "reject", "complete"]
                   },
-                  "expectedVersion": { "type": "integer", "minimum": 1 },
-                  "reason": { "type": "string" }
+                  "expectedVersion": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
                 }
               }
             }
           }
         },
         "responses": {
-          "200": { "description": "New agreement version" },
-          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "200": {
+            "description": "New agreement version"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
           "409": {
             "description": "Stale expectedVersion with current agreement"
           },
-          "422": { "description": "Localized transition validation error" }
+          "422": {
+            "description": "Localized transition validation error"
+          }
         }
       }
     },

@@ -83,12 +83,10 @@ router.get('/:id/history', async (req: AuthenticatedRequest, res) => {
   }
   const agreementId = id(req.params.id);
   if (!agreementId) {
-    return res
-      .status(422)
-      .json({
-        error: 'ValidationError',
-        message: 'agreements.errors.id_required',
-      });
+    return res.status(422).json({
+      error: 'ValidationError',
+      message: 'agreements.errors.id_required',
+    });
   }
   try {
     const history = await getAgreementHistory(agreementId, req.user.id);

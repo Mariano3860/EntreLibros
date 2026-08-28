@@ -9,7 +9,10 @@ import {
 } from './repositories/messagingRepository.js';
 import { logger } from './utils/logger.js';
 import { generateReply } from './services/chatBot.js';
-import { agreementEvents, type AgreementSnapshot } from './repositories/agreementRepository.js';
+import {
+  agreementEvents,
+  type AgreementSnapshot,
+} from './repositories/agreementRepository.js';
 
 function parseCookies(header?: string): Record<string, string> {
   if (!header) return {};
@@ -85,12 +88,15 @@ export function setupWebsocket(
   >
 ) {
   agreementEvents.on('committed', (agreement: AgreementSnapshot) => {
-    io.to(`conversation:${agreement.conversationId}`).emit('agreement:updated', {
-      agreementId: agreement.id,
-      conversationId: agreement.conversationId,
-      state: agreement.state,
-      currentVersion: agreement.currentVersion,
-    });
+    io.to(`conversation:${agreement.conversationId}`).emit(
+      'agreement:updated',
+      {
+        agreementId: agreement.id,
+        conversationId: agreement.conversationId,
+        state: agreement.state,
+        currentVersion: agreement.currentVersion,
+      }
+    );
   });
 
   io.use(async (socket, next) => {
