@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { authenticate, type AuthenticatedRequest } from '../middleware/auth.js';
 import {
   commandAgreement,
+  counterProposeAgreement,
   createAgreement,
   getAgreement,
   getAgreementHistory,
@@ -149,6 +150,46 @@ router.post('/', async (req: AuthenticatedRequest, res) => {
     return res.status(201).json({ agreement });
   } catch (error) {
     const response = failure(error);
+    return res.status(response.status).json(response.body);
+  }
+});
+
+router.post('/:id/versions', async (req: AuthenticatedRequest, res) => {
+  if (!req.user) {
+    return res
+      .status(401)
+      .json({ error: 'Unauthorized', message: 'auth.errors.unauthorized' });
+  }
+  const agreementId = id(req.params.id);
+  const body = asBody(req.body);
+  const expectedVersion = body.expectedVersion;
+  const agreementDetails = details(body.details);
+  if (
+    !agreementId ||
+    typeof expectedVersion !== 'number' ||
+    !Number.isInteger(expectedVersion) ||
+    expectedVersion < 1 ||
+    !agreementDetails
+  ) {
+    return res.status(422).json({
+      error: 'ValidationError',
+      message: 'agreements.errors.invalid_proposal',
+    });
+  }
+  try {
+    const agreement = await counterProposeAgreement({
+      id: agreementId,
+      actorId: req.user.id,
+      expectedVersion,
+      details: agreementDetails,
+    });
+    return res.status(201).json({ agreement });
+  } catch (error) {
+    const response = failure(error);
+    if (response.status === 409) {
+      const current = await getAgreement(agreementId, req.user.id);
+      return res.status(409).json({ ...response.body, agreement: current });
+    }
     return res.status(response.status).json(response.body);
   }
 });

@@ -118,12 +118,20 @@ export const useChatSocket = () => {
     [socket]
   )
 
+  const joinConversation = useCallback(
+    (conversationId: number, after = 0) => {
+      socket?.emit('conversation:join', { conversationId, after })
+    },
+    [socket]
+  )
+
   return {
     messages,
     conversationMessages,
     agreementUpdates,
     sendMessage,
     sendConversationMessage,
+    joinConversation,
     currentUser,
     isConnected,
     error,

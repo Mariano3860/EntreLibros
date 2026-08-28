@@ -61,6 +61,32 @@ describe('useChatSocket', () => {
     })
   })
 
+  test('deduplicates conversation messages and agreement updates', () => {
+    const { result } = renderHook(() => useChatSocket(), { wrapper })
+    const message = {
+      conversationId: 9,
+      sequence: 2,
+      senderId: 4,
+      body: 'missed message',
+      clientKey: 'cursor-2',
+      createdAt: '2026-08-28T00:00:00.000Z',
+    }
+    const update = {
+      agreementId: 3,
+      conversationId: 9,
+      state: 'partially_confirmed',
+      currentVersion: 2,
+    }
+    act(() => {
+      listeners['conversation:message'](message)
+      listeners['conversation:message'](message)
+      listeners['agreement:updated'](update)
+      listeners['agreement:updated'](update)
+    })
+    expect(result.current.conversationMessages).toEqual([message])
+    expect(result.current.agreementUpdates).toEqual([update])
+  })
+
   test('sets error on connect_error', () => {
     const { result } = renderHook(() => useChatSocket(), { wrapper })
     act(() => {

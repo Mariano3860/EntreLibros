@@ -3,6 +3,7 @@ import { query, withTransaction, type DbClient } from '../db.js';
 export interface ConversationSummary {
   id: number;
   participantIds: number[];
+  agreementId: number | null;
   lastMessageSequence: number;
   updatedAt: Date;
 }
@@ -28,6 +29,7 @@ export interface PersistedMessage {
 interface ConversationRow {
   id: number;
   participant_ids: number[];
+  agreement_id: number | null;
   last_message_sequence: string;
   updated_at: Date;
 }
@@ -47,6 +49,7 @@ function mapConversation(row: ConversationRow): ConversationSummary {
   return {
     id: Number(row.id),
     participantIds: row.participant_ids.map(Number),
+    agreementId: row.agreement_id === null ? null : Number(row.agreement_id),
     lastMessageSequence: Number(row.last_message_sequence),
     updatedAt: row.updated_at,
   };
@@ -68,10 +71,12 @@ function mapMessage(row: MessageRow): PersistedMessage {
 const CONVERSATION_SELECT = `
   SELECT c.id,
          ARRAY_AGG(cp.user_id ORDER BY cp.user_id) AS participant_ids,
+         MAX(a.id) AS agreement_id,
          c.last_message_sequence,
          c.updated_at
   FROM conversations c
   JOIN conversation_participants cp ON cp.conversation_id = c.id
+  LEFT JOIN exchange_agreements a ON a.conversation_id = c.id
 `;
 
 export async function isConversationParticipant(
@@ -88,6 +93,21 @@ export async function isConversationParticipant(
   return rows[0]?.exists ?? false;
 }
 
+export async function areUsersBlocked(
+  firstUserId: number,
+  secondUserId: number
+): Promise<boolean> {
+  const { rows } = await query<{ blocked: boolean }>(
+    `SELECT EXISTS (
+       SELECT 1 FROM user_blocks
+       WHERE (blocker_id = $1 AND blocked_id = $2)
+          OR (blocker_id = $2 AND blocked_id = $1)
+     ) AS blocked`,
+    [firstUserId, secondUserId]
+  );
+  return rows[0]?.blocked ?? false;
+}
+
 export async function createConversation(
   participantIds: number[]
 ): Promise<ConversationSummary> {
@@ -97,6 +117,17 @@ export async function createConversation(
   }
 
   return withTransaction(async (client) => {
+    const blocked = await client.query<{ blocked: boolean }>(
+      `SELECT EXISTS (
+         SELECT 1 FROM user_blocks
+         WHERE (blocker_id = $1 AND blocked_id = $2)
+            OR (blocker_id = $2 AND blocked_id = $1)
+       ) AS blocked`,
+      [uniqueIds[0], uniqueIds[1]]
+    );
+    if (blocked.rows[0]?.blocked) {
+      throw new Error('messaging.errors.forbidden');
+    }
     const conversationResult = await client.query<{ id: number }>(
       'INSERT INTO conversations DEFAULT VALUES RETURNING id'
     );

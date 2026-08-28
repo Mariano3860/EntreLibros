@@ -1,5 +1,6 @@
 import { query, withTransaction } from '../db.js';
 import { EventEmitter } from 'node:events';
+import { areUsersBlocked } from './messagingRepository.js';
 import {
   transitionAgreement,
   type AgreementCommand,
@@ -111,6 +112,9 @@ export async function createAgreement(input: {
   details: AgreementDetails;
   listingIds?: number[];
 }): Promise<AgreementSnapshot> {
+  if (await areUsersBlocked(input.proposerId, input.participantId)) {
+    throw new Error('agreements.errors.forbidden');
+  }
   const agreement = await withTransaction(async (client) => {
     const conversation = await client.query<{ user_id: number }>(
       `SELECT user_id FROM conversation_participants
@@ -193,11 +197,9 @@ export async function commandAgreement(input: {
   const agreement = await withTransaction(async (client) => {
     const current = await client.query<AgreementRow>(
       `SELECT a.id, a.conversation_id, a.proposer_id, a.participant_id,
-              a.state, a.current_version, v.details,
+              a.state, a.current_version,
               '{}'::integer[] AS acceptances, '{}'::integer[] AS listing_ids
        FROM exchange_agreements a
-       JOIN exchange_agreement_versions v
-         ON v.agreement_id = a.id AND v.version = a.current_version
        WHERE a.id = $1 AND (a.proposer_id = $2 OR a.participant_id = $2)
        FOR UPDATE OF a`,
       [input.id, input.actorId]
@@ -207,6 +209,13 @@ export async function commandAgreement(input: {
     if (row.current_version !== input.expectedVersion) {
       throw new Error('agreements.errors.conflict');
     }
+    const version = await client.query<{ details: AgreementDetails }>(
+      `SELECT details FROM exchange_agreement_versions
+       WHERE agreement_id = $1 AND version = $2`,
+      [input.id, row.current_version]
+    );
+    if (!version.rows[0]) throw new Error('agreements.errors.not_found');
+    row.details = version.rows[0].details;
     const acceptanceResult = await client.query<{ user_id: number }>(
       `SELECT user_id FROM exchange_agreement_acceptances
        WHERE agreement_id = $1 AND version = $2`,
@@ -296,6 +305,71 @@ export async function commandAgreement(input: {
         input.command,
         input.reason ?? null,
       ]
+    );
+    const { rows } = await client.query<AgreementRow>(
+      `${AGREEMENT_SELECT} WHERE a.id = $1 GROUP BY a.id, v.details`,
+      [input.id]
+    );
+    return mapRow(rows[0]);
+  });
+  agreementEvents.emit('committed', agreement);
+  return agreement;
+}
+
+export async function counterProposeAgreement(input: {
+  id: number;
+  actorId: number;
+  expectedVersion: number;
+  details: AgreementDetails;
+}): Promise<AgreementSnapshot> {
+  const agreement = await withTransaction(async (client) => {
+    const current = await client.query<AgreementRow>(
+      `SELECT a.id, a.conversation_id, a.proposer_id, a.participant_id,
+              a.state, a.current_version,
+              '{}'::integer[] AS acceptances, '{}'::integer[] AS listing_ids
+       FROM exchange_agreements a
+       WHERE a.id = $1 AND (a.proposer_id = $2 OR a.participant_id = $2)
+       FOR UPDATE OF a`,
+      [input.id, input.actorId]
+    );
+    const row = current.rows[0];
+    if (!row) throw new Error('agreements.errors.forbidden');
+    if (row.current_version !== input.expectedVersion) {
+      throw new Error('agreements.errors.conflict');
+    }
+    const version = await client.query<{ details: AgreementDetails }>(
+      `SELECT details FROM exchange_agreement_versions
+       WHERE agreement_id = $1 AND version = $2`,
+      [input.id, row.current_version]
+    );
+    if (!version.rows[0]) throw new Error('agreements.errors.not_found');
+    row.details = version.rows[0].details;
+    const nextVersion = row.current_version + 1;
+    await client.query(
+      `UPDATE exchange_agreements
+       SET state = 'proposed', current_version = $2, updated_at = NOW()
+       WHERE id = $1`,
+      [input.id, nextVersion]
+    );
+    await client.query(
+      `INSERT INTO exchange_agreement_versions
+       (agreement_id, version, actor_id, state, details)
+       VALUES ($1, $2, $3, 'proposed', $4)`,
+      [input.id, nextVersion, input.actorId, JSON.stringify(input.details)]
+    );
+    await client.query(
+      `INSERT INTO exchange_agreement_items
+       (agreement_id, version, listing_id, owner_id)
+       SELECT agreement_id, $2, listing_id, owner_id
+       FROM exchange_agreement_items
+       WHERE agreement_id = $1 AND version = $3`,
+      [input.id, nextVersion, row.current_version]
+    );
+    await client.query(
+      `INSERT INTO agreement_events
+       (agreement_id, version, actor_id, event_type)
+       VALUES ($1, $2, $3, 'counterproposal')`,
+      [input.id, nextVersion, input.actorId]
     );
     const { rows } = await client.query<AgreementRow>(
       `${AGREEMENT_SELECT} WHERE a.id = $1 GROUP BY a.id, v.details`,

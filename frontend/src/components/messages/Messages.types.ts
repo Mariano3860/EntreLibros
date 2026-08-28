@@ -113,6 +113,7 @@ export type Message =
 
 export type Conversation = {
   id: number
+  agreementId?: number | null
   user: {
     name: string
     avatar: string

@@ -5,6 +5,7 @@ import {
   isConversationParticipant,
   listConversations,
   markConversationRead,
+  listMessages,
   sendMessage,
 } from './repositories/messagingRepository.js';
 import { logger } from './utils/logger.js';
@@ -42,7 +43,7 @@ export interface ChatMessage {
 export interface ClientToServerEvents {
   message: (payload: { text: string; channel?: string }) => void;
   'conversation:join': (
-    payload: { conversationId: number },
+    payload: { conversationId: number; after?: number },
     acknowledge?: (joined: boolean) => void
   ) => void;
   'conversation:message': (payload: {
@@ -139,19 +140,44 @@ export function setupWebsocket(
         });
       });
 
-    socket.on('conversation:join', async ({ conversationId }, acknowledge) => {
-      if (
-        !(await isConversationParticipant(conversationId, socket.data.user.id))
-      ) {
-        acknowledge?.(false);
-        socket.emit('conversation:error', {
-          message: 'messaging.errors.forbidden',
-        });
-        return;
+    socket.on(
+      'conversation:join',
+      async ({ conversationId, after }, acknowledge) => {
+        if (
+          !(await isConversationParticipant(
+            conversationId,
+            socket.data.user.id
+          ))
+        ) {
+          acknowledge?.(false);
+          socket.emit('conversation:error', {
+            message: 'messaging.errors.forbidden',
+          });
+          return;
+        }
+        await socket.join(`conversation:${conversationId}`);
+        if (after !== undefined) {
+          const missed = await listMessages(
+            conversationId,
+            socket.data.user.id,
+            {
+              after,
+            }
+          );
+          missed.forEach((message) => {
+            socket.emit('conversation:message', {
+              conversationId: message.conversationId,
+              sequence: message.sequence,
+              senderId: message.senderId,
+              body: message.body,
+              clientKey: message.clientKey,
+              createdAt: message.createdAt.toISOString(),
+            });
+          });
+        }
+        acknowledge?.(true);
       }
-      await socket.join(`conversation:${conversationId}`);
-      acknowledge?.(true);
-    });
+    );
 
     socket.on('conversation:message', async (payload) => {
       try {

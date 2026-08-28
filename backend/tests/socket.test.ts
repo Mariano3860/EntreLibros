@@ -104,6 +104,18 @@ describe('websocket messaging', () => {
       attachmentMetadata: null,
       createdAt: new Date(),
     });
+    vi.spyOn(messagingRepo, 'listMessages').mockResolvedValue([
+      {
+        id: 2,
+        conversationId: 101,
+        senderId: 1,
+        sequence: 2,
+        clientKey: 'missed-2',
+        body: 'missed',
+        attachmentMetadata: null,
+        createdAt: new Date(),
+      },
+    ]);
 
     const address = httpServer.address() as AddressInfo;
     const tokenFor = (id: number) =>
@@ -130,11 +142,22 @@ describe('websocket messaging', () => {
       new Promise<void>((resolve) => outsider.on('connect', () => resolve())),
     ]);
 
+    const synced = new Promise<void>((resolve) => {
+      authorized.once('conversation:message', (message) => {
+        expect(message.sequence).toBe(2);
+        expect(message.body).toBe('missed');
+        resolve();
+      });
+    });
     await new Promise<void>((resolve, reject) => {
-      authorized.emit('conversation:join', { conversationId: 101 }, (joined) =>
-        joined ? resolve() : reject(new Error('authorized join rejected'))
+      authorized.emit(
+        'conversation:join',
+        { conversationId: 101, after: 1 },
+        (joined) =>
+          joined ? resolve() : reject(new Error('authorized join rejected'))
       );
     });
+    await synced;
     const received = new Promise<void>((resolve) => {
       authorized.once('conversation:message', (message) => {
         expect(message.body).toBe('private');

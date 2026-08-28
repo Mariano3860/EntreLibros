@@ -4,6 +4,7 @@ import { RELATIVE_API_ROUTES } from '../routes'
 export type ApiConversation = {
   id: number
   participantIds: number[]
+  agreementId: number | null
   lastMessageSequence: number
   updatedAt: string
 }

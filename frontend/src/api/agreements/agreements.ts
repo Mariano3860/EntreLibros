@@ -26,6 +26,15 @@ export type AgreementSnapshot = {
   acceptances: number[]
 }
 
+export type AgreementHistoryEntry = {
+  agreementId: number
+  version: number
+  actorId: number
+  state: AgreementSnapshot['state']
+  details: AgreementDetails
+  createdAt: string
+}
+
 export const agreementQueryKeys = {
   all: ['agreements'] as const,
   detail: (agreementId: number) =>
@@ -54,6 +63,15 @@ export async function fetchAgreement(
   return response.data.agreement
 }
 
+export async function fetchAgreementHistory(
+  agreementId: number
+): Promise<AgreementHistoryEntry[]> {
+  const response = await apiClient.get<{ history: AgreementHistoryEntry[] }>(
+    RELATIVE_API_ROUTES.AGREEMENTS.HISTORY(agreementId)
+  )
+  return response.data.history
+}
+
 export async function commandAgreement(input: {
   agreementId: number
   command: 'confirm' | 'cancel' | 'reject' | 'complete'
@@ -62,6 +80,18 @@ export async function commandAgreement(input: {
 }): Promise<AgreementSnapshot> {
   const response = await apiClient.post<{ agreement: AgreementSnapshot }>(
     RELATIVE_API_ROUTES.AGREEMENTS.COMMAND(input.agreementId),
+    input
+  )
+  return response.data.agreement
+}
+
+export async function counterProposeAgreement(input: {
+  agreementId: number
+  expectedVersion: number
+  details: AgreementDetails
+}): Promise<AgreementSnapshot> {
+  const response = await apiClient.post<{ agreement: AgreementSnapshot }>(
+    RELATIVE_API_ROUTES.AGREEMENTS.VERSION(input.agreementId),
     input
   )
   return response.data.agreement

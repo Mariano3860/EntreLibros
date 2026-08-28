@@ -37,7 +37,9 @@ export const RELATIVE_API_ROUTES = {
   },
   AGREEMENTS: {
     GET: (agreementId: number) => `/agreements/${agreementId}`,
+    HISTORY: (agreementId: number) => `/agreements/${agreementId}/history`,
     CREATE: `/agreements`,
+    VERSION: (agreementId: number) => `/agreements/${agreementId}/versions`,
     COMMAND: (agreementId: number) => `/agreements/${agreementId}/commands`,
   },
   LANGUAGE: {

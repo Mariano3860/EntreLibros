@@ -158,4 +158,82 @@ describe('messaging and agreements API', () => {
       .expect(200)
       .expect(({ body }) => expect(body.history).toHaveLength(2));
   });
+
+  test('rejects non-members and unavailable listings with localized errors', async () => {
+    const first = await registerAndLogin('listing-a');
+    const second = await registerAndLogin('listing-b');
+    const outsider = await registerAndLogin('listing-outsider');
+    const conversation = await request(app)
+      .post('/api/messages/conversations')
+      .set('Cookie', first.cookie)
+      .send({ participantId: second.id })
+      .expect(201);
+    const conversationId = conversation.body.conversation.id as number;
+    const book = await client.query<{ id: number }>(
+      'INSERT INTO books (title) VALUES ($1) RETURNING id',
+      ['Unavailable']
+    );
+    const listing = await client.query<{ id: number }>(
+      `INSERT INTO book_listings (user_id, book_id, type, status)
+       VALUES ($1, $2, 'offer', 'reserved') RETURNING id`,
+      [first.id, book.rows[0].id]
+    );
+
+    await request(app)
+      .post('/api/agreements')
+      .set('Cookie', first.cookie)
+      .send({
+        conversationId,
+        participantId: outsider.id,
+        details: {
+          meetingPoint: 'Biblioteca',
+          area: 'Centro',
+          date: '2026-09-01',
+          time: '18:00',
+          bookTitle: 'Unavailable',
+        },
+      })
+      .expect(422)
+      .expect(({ body }) =>
+        expect(body.message).toBe('agreements.errors.participants_invalid')
+      );
+
+    await request(app)
+      .post('/api/agreements')
+      .set('Cookie', first.cookie)
+      .send({
+        conversationId,
+        participantId: second.id,
+        listingIds: [listing.rows[0].id],
+        details: {
+          meetingPoint: 'Biblioteca',
+          area: 'Centro',
+          date: '2026-09-01',
+          time: '18:00',
+          bookTitle: 'Unavailable',
+        },
+      })
+      .expect(422)
+      .expect(({ body }) =>
+        expect(body.message).toBe('agreements.errors.listing_unavailable')
+      );
+  });
+
+  test('rejects new conversations and agreements for blocked participants', async () => {
+    const first = await registerAndLogin('blocked-a');
+    const second = await registerAndLogin('blocked-b');
+    await client.query(
+      'INSERT INTO user_blocks (blocker_id, blocked_id) VALUES ($1, $2)',
+      [first.id, second.id]
+    );
+
+    await request(app)
+      .post('/api/messages/conversations')
+      .set('Cookie', first.cookie)
+      .send({ participantId: second.id })
+      .expect(403)
+      .expect(({ body }) =>
+        expect(body.message).toBe('messaging.errors.forbidden')
+      );
+  });
 });

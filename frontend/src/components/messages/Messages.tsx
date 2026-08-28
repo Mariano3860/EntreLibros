@@ -1,5 +1,10 @@
 import { fetchBookAvailability } from '@api/community/messages'
 import {
+  fetchAgreement,
+  fetchAgreementHistory,
+  type AgreementSnapshot,
+} from '@api/agreements/agreements'
+import {
   fetchConversations,
   fetchMessageHistory,
   sendPersistedMessage,
@@ -66,6 +71,7 @@ const hasVersion = (
 function toConversation(item: ApiConversation): Conversation {
   return {
     id: item.id,
+    agreementId: item.agreementId,
     user: {
       name: `Conversación ${item.id}`,
       avatar: '',
@@ -109,12 +115,19 @@ export const Messages = () => {
   const {
     messages,
     conversationMessages,
+    joinConversation,
     sendMessage,
     currentUser,
     isConnected,
     error,
   } = useChatSocket()
   const [serverMessages, setServerMessages] = useState<ApiMessage[]>([])
+  const [serverAgreement, setServerAgreement] =
+    useState<AgreementSnapshot | null>(null)
+  const [serverAgreementHistory, setServerAgreementHistory] = useState<
+    Awaited<ReturnType<typeof fetchAgreementHistory>>
+  >([])
+  const selected = conversations.find((c) => c.id === selectedId)
 
   const { getVersion, proposeVersion, confirmVersion, cancelVersion } =
     useAgreementStore(conversations)
@@ -143,7 +156,10 @@ export const Messages = () => {
     setServerMessages([])
     void fetchMessageHistory(selectedId)
       .then((page) => {
-        if (active) setServerMessages(page.messages)
+        if (active) {
+          setServerMessages(page.messages)
+          joinConversation(selectedId, page.nextAfter)
+        }
       })
       .catch(() => {
         if (active) setServerMessages([])
@@ -151,7 +167,33 @@ export const Messages = () => {
     return () => {
       active = false
     }
-  }, [selectedId, useDemoConversations])
+  }, [isConnected, joinConversation, selectedId, useDemoConversations])
+
+  useEffect(() => {
+    if (useDemoConversations || !selected?.agreementId) {
+      setServerAgreement(null)
+      setServerAgreementHistory([])
+      return
+    }
+    let active = true
+    void Promise.all([
+      fetchAgreement(selected.agreementId),
+      fetchAgreementHistory(selected.agreementId),
+    ])
+      .then(([agreement, history]) => {
+        if (!active) return
+        setServerAgreement(agreement)
+        setServerAgreementHistory(history)
+      })
+      .catch(() => {
+        if (!active) return
+        setServerAgreement(null)
+        setServerAgreementHistory([])
+      })
+    return () => {
+      active = false
+    }
+  }, [selected?.agreementId, useDemoConversations])
 
   const [changeModalState, setChangeModalState] = useState<ChangeModalState>({
     open: false,
@@ -168,7 +210,6 @@ export const Messages = () => {
   const [isProcessingConfirmation, setIsProcessingConfirmation] =
     useState(false)
 
-  const selected = conversations.find((c) => c.id === selectedId)
   const selfName =
     currentUser?.name ??
     t('community.messages.agreement.self', { defaultValue: 'Vos' })
@@ -864,6 +905,24 @@ export const Messages = () => {
               </div>
             </header>
             <div className={styles.messages}>
+              {serverAgreement ? (
+                <div role="status" aria-live="polite">
+                  {t('community.messages.agreement.serverState', {
+                    defaultValue: 'Estado del acuerdo: {{state}} (versión {{version}})',
+                    state: serverAgreement.state,
+                    version: serverAgreement.currentVersion,
+                  })}
+                  {serverAgreementHistory.length > 1 ? (
+                    <span>
+                      {' '}
+                      {t('community.messages.agreement.historyCount', {
+                        defaultValue: '{{count}} versiones registradas',
+                        count: serverAgreementHistory.length,
+                      })}
+                    </span>
+                  ) : null}
+                </div>
+              ) : null}
               {mappedMessages.map((msg) => {
                 if (
                   selected &&

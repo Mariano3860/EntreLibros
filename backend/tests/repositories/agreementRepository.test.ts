@@ -4,6 +4,7 @@ import type { PoolClient } from 'pg';
 import { pool, setTestClient } from '../../src/db.js';
 import {
   commandAgreement,
+  counterProposeAgreement,
   createAgreement,
   getAgreementHistory,
 } from '../../src/repositories/agreementRepository.js';
@@ -140,5 +141,30 @@ describe('agreementRepository', () => {
       'available',
       'available',
     ]);
+  });
+
+  test('creates immutable counterproposal versions with the acting participant', async () => {
+    const proposer = await user('counter-proposer');
+    const participant = await user('counter-participant');
+    const conversation = await createConversation([proposer, participant]);
+    const agreement = await createAgreement({
+      conversationId: conversation.id,
+      proposerId: proposer,
+      participantId: participant,
+      details,
+    });
+    const counter = await counterProposeAgreement({
+      id: agreement.id,
+      actorId: participant,
+      expectedVersion: agreement.currentVersion,
+      details: { ...details, time: '19:00' },
+    });
+    expect(counter.currentVersion).toBe(2);
+    expect(counter.details.time).toBe('19:00');
+    const history = await getAgreementHistory(agreement.id, participant);
+    expect(history.map((entry) => entry.version)).toEqual([1, 2]);
+    expect(history[0]?.actorId).toBe(proposer);
+    expect(history[0]?.details.time).toBe('18:00');
+    expect(history[1]?.actorId).toBe(participant);
   });
 });

@@ -271,6 +271,42 @@
         }
       }
     },
+    "/api/agreements/{id}/versions": {
+      "post": {
+        "summary": "Create an immutable counterproposal version",
+        "tags": ["Agreements"],
+        "security": [{ "cookieAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "minimum": 1 }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["expectedVersion", "details"],
+                "properties": {
+                  "expectedVersion": { "type": "integer", "minimum": 1 },
+                  "details": { "$ref": "#/components/schemas/AgreementDetails" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "New immutable proposal version" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "409": { "description": "Stale expectedVersion with current agreement" },
+          "422": { "description": "Localized proposal validation error" }
+        }
+      }
+    },
     "/api/agreements/{id}/commands": {
       "post": {
         "summary": "Apply an optimistic versioned agreement command",
@@ -2332,6 +2368,17 @@
       }
     },
     "schemas": {
+      "AgreementDetails": {
+        "type": "object",
+        "properties": {
+          "meetingPoint": { "type": "string" },
+          "area": { "type": "string" },
+          "date": { "type": "string" },
+          "time": { "type": "string" },
+          "bookTitle": { "type": "string" }
+        },
+        "required": ["meetingPoint", "area", "date", "time", "bookTitle"]
+      },
       "CommunityStats": {
         "type": "object",
         "properties": {
