@@ -96,7 +96,7 @@ export const useChatSocket = () => {
     return () => {
       s.disconnect()
     }
-  }, [])
+  }, [queryClient])
 
   const sendMessage = useCallback(
     (text: string, channel?: string) => {

@@ -1,9 +1,9 @@
-import { fetchBookAvailability } from '@api/community/messages'
 import {
   fetchAgreement,
   fetchAgreementHistory,
   type AgreementSnapshot,
 } from '@api/agreements/agreements'
+import { fetchBookAvailability } from '@api/community/messages'
 import {
   fetchConversations,
   fetchMessageHistory,
@@ -109,6 +109,10 @@ export const Messages = () => {
   const [conversations, setConversations] = useState<Conversation[]>(
     useDemoConversations ? mockConversations : []
   )
+  const [isLoadingConversations, setIsLoadingConversations] =
+    useState(!useDemoConversations)
+  const [conversationError, setConversationError] = useState(false)
+  const [conversationReloadKey, setConversationReloadKey] = useState(0)
   const [selectedId, setSelectedId] = useState<number | null>(
     useDemoConversations ? (mockConversations[0]?.id ?? null) : null
   )
@@ -135,6 +139,8 @@ export const Messages = () => {
   useEffect(() => {
     if (useDemoConversations) return
     let active = true
+    setIsLoadingConversations(true)
+    setConversationError(false)
     void fetchConversations()
       .then((items) => {
         if (!active) return
@@ -143,12 +149,17 @@ export const Messages = () => {
         setSelectedId(next[0]?.id ?? null)
       })
       .catch(() => {
-        if (active) setConversations([])
+        if (!active) return
+        setConversations([])
+        setConversationError(true)
+      })
+      .finally(() => {
+        if (active) setIsLoadingConversations(false)
       })
     return () => {
       active = false
     }
-  }, [useDemoConversations])
+  }, [conversationReloadKey, useDemoConversations])
 
   useEffect(() => {
     if (useDemoConversations || selectedId === null) return
@@ -336,18 +347,18 @@ export const Messages = () => {
     useDemoConversations,
   ])
 
-  const appendMessageToConversation = (
-    conversationId: number,
-    message: Message
-  ) => {
-    setConversations((prev) =>
-      prev.map((conv) =>
-        conv.id === conversationId
-          ? { ...conv, messages: [...conv.messages, message] }
-          : conv
+  const appendMessageToConversation = useCallback(
+    (conversationId: number, message: Message) => {
+      setConversations((prev) =>
+        prev.map((conv) =>
+          conv.id === conversationId
+            ? { ...conv, messages: [...conv.messages, message] }
+            : conv
+        )
       )
-    )
-  }
+    },
+    []
+  )
 
   const createBaseMessage = (conversation: Conversation) => {
     const maxId = conversation.messages.reduce(
@@ -788,85 +799,117 @@ export const Messages = () => {
             />
           </div>
           <ul className={styles.conversationList}>
-            {conversations.map((conv) => (
-              <li
-                key={conv.id}
-                className={`${styles.conversationItem} ${selectedId === conv.id ? styles.conversationItemActive : ''}`}
-                onClick={() => setSelectedId(conv.id)}
-              >
-                <img
-                  src={conv.user.avatar}
-                  alt={conv.user.name}
-                  className={styles.avatar}
-                />
-                <div className={styles.conversationInfo}>
-                  <span className={styles.name}>{conv.user.name}</span>
-                  <span className={styles.snippet}>
-                    {(() => {
-                      const lastMsg = conv.messages[conv.messages.length - 1]
-                      if (!lastMsg) return ''
-                      if (lastMsg.type === 'agreementProposal') {
-                        return t('community.messages.agreement.proposal.title')
-                      }
-                      if (lastMsg.type === 'agreementChange') {
-                        return t('community.messages.agreement.change.title')
-                      }
-                      if (lastMsg.type === 'agreementConfirmation') {
-                        return t(
-                          'community.messages.agreement.confirmation.title'
-                        )
-                      }
-                      if (lastMsg.type === 'agreementCancellation') {
-                        return t(
-                          'community.messages.agreement.cancellation.title'
-                        )
-                      }
-                      if (lastMsg.type === 'swapProposal') {
-                        return t('community.messages.swap.proposal.title', {
-                          defaultValue: 'Propuesta de intercambio',
-                        })
-                      }
-                      if (lastMsg.type === 'bookCard') {
-                        return t('community.messages.snippets.sharedBook', {
-                          defaultValue: 'Compartió un libro',
-                        })
-                      }
-                      if (isTextMessage(lastMsg)) {
-                        if (lastMsg.book)
+            {isLoadingConversations ? (
+              <li role="status">
+                {t('community.messages.status.loading', {
+                  defaultValue: 'Cargando conversaciones…',
+                })}
+              </li>
+            ) : conversationError ? (
+              <li role="alert">
+                <span>
+                  {t('community.messages.status.loadError', {
+                    defaultValue: 'No se pudieron cargar las conversaciones.',
+                  })}
+                </span>{' '}
+                <button
+                  type="button"
+                  onClick={() => setConversationReloadKey((key) => key + 1)}
+                >
+                  {t('community.messages.status.retry', {
+                    defaultValue: 'Reintentar',
+                  })}
+                </button>
+              </li>
+            ) : conversations.length === 0 ? (
+              <li role="status">
+                {t('community.messages.status.empty', {
+                  defaultValue: 'No hay conversaciones todavía.',
+                })}
+              </li>
+            ) : (
+              conversations.map((conv) => (
+                <li
+                  key={conv.id}
+                  className={`${styles.conversationItem} ${selectedId === conv.id ? styles.conversationItemActive : ''}`}
+                  onClick={() => setSelectedId(conv.id)}
+                >
+                  <img
+                    src={conv.user.avatar}
+                    alt={conv.user.name}
+                    className={styles.avatar}
+                  />
+                  <div className={styles.conversationInfo}>
+                    <span className={styles.name}>{conv.user.name}</span>
+                    <span className={styles.snippet}>
+                      {(() => {
+                        const lastMsg = conv.messages[conv.messages.length - 1]
+                        if (!lastMsg) return ''
+                        if (lastMsg.type === 'agreementProposal') {
+                          return t(
+                            'community.messages.agreement.proposal.title'
+                          )
+                        }
+                        if (lastMsg.type === 'agreementChange') {
+                          return t('community.messages.agreement.change.title')
+                        }
+                        if (lastMsg.type === 'agreementConfirmation') {
+                          return t(
+                            'community.messages.agreement.confirmation.title'
+                          )
+                        }
+                        if (lastMsg.type === 'agreementCancellation') {
+                          return t(
+                            'community.messages.agreement.cancellation.title'
+                          )
+                        }
+                        if (lastMsg.type === 'swapProposal') {
+                          return t('community.messages.swap.proposal.title', {
+                            defaultValue: 'Propuesta de intercambio',
+                          })
+                        }
+                        if (lastMsg.type === 'bookCard') {
                           return t('community.messages.snippets.sharedBook', {
                             defaultValue: 'Compartió un libro',
                           })
-                        if (lastMsg.text) return lastMsg.text
-                      }
-                      return ''
-                    })()}
-                  </span>
-                </div>
-                <div className={styles.badges}>
-                  {conv.badges.includes('unread') && (
-                    <span className={`${styles.badge} ${styles.badgeUnread}`}>
-                      {t('community.messages.badges.unread', {
-                        defaultValue: 'Sin leer',
-                      })}
+                        }
+                        if (isTextMessage(lastMsg)) {
+                          if (lastMsg.book)
+                            return t('community.messages.snippets.sharedBook', {
+                              defaultValue: 'Compartió un libro',
+                            })
+                          if (lastMsg.text) return lastMsg.text
+                        }
+                        return ''
+                      })()}
                     </span>
-                  )}
-                  {conv.badges.includes('book') && (
-                    <span className={`${styles.badge} ${styles.badgeBook}`}>
-                      {t('community.messages.badges.book', {
-                        defaultValue: 'Libro',
-                      })}
-                    </span>
-                  )}
-                  {conv.badges.includes('swap') && (
-                    <span className={`${styles.badge} ${styles.badgeSwap}`}>
-                      {t('community.messages.badges.swap', {
-                        defaultValue: 'Oferta de intercambio',
-                      })}
-                    </span>
-                  )}
-                </div>
-              </li>
-            ))}
+                  </div>
+                  <div className={styles.badges}>
+                    {conv.badges.includes('unread') && (
+                      <span className={`${styles.badge} ${styles.badgeUnread}`}>
+                        {t('community.messages.badges.unread', {
+                          defaultValue: 'Sin leer',
+                        })}
+                      </span>
+                    )}
+                    {conv.badges.includes('book') && (
+                      <span className={`${styles.badge} ${styles.badgeBook}`}>
+                        {t('community.messages.badges.book', {
+                          defaultValue: 'Libro',
+                        })}
+                      </span>
+                    )}
+                    {conv.badges.includes('swap') && (
+                      <span className={`${styles.badge} ${styles.badgeSwap}`}>
+                        {t('community.messages.badges.swap', {
+                          defaultValue: 'Oferta de intercambio',
+                        })}
+                      </span>
+                    )}
+                  </div>
+                </li>
+              ))
+            )}
           </ul>
         </aside>
         {selected ? (
@@ -908,7 +951,8 @@ export const Messages = () => {
               {serverAgreement ? (
                 <div role="status" aria-live="polite">
                   {t('community.messages.agreement.serverState', {
-                    defaultValue: 'Estado del acuerdo: {{state}} (versión {{version}})',
+                    defaultValue:
+                      'Estado del acuerdo: {{state}} (versión {{version}})',
                     state: serverAgreement.state,
                     version: serverAgreement.currentVersion,
                   })}
