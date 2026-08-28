@@ -28,8 +28,8 @@
 
 ## 4. Persistent private messaging for PR #138
 
-- [ ] 4.1 Add incremental migrations for conversations, participants, messages, idempotency/sequence fields, read state and attachment metadata; verify migration from empty and current schemas plus all required foreign keys and indexes.
-- [ ] 4.2 Implement typed repositories and services for conversation membership, paginated history, message persistence and read state without `any`; verify repository tests cover unauthorized access, ordering and duplicate client keys.
+- [x] 4.1 Add incremental migrations for conversations, participants, messages, idempotency/sequence fields, read state and attachment metadata; verify migration from empty and current schemas plus all required foreign keys and indexes.
+- [x] 4.2 Implement typed repositories and services for conversation membership, paginated history, message persistence and read state without `any`; verify repository tests cover unauthorized access, ordering and duplicate client keys.
 - [ ] 4.3 Add authenticated REST contracts for listing conversations, reading history, sending messages and marking reads; verify API tests cover success, validation, 401, 403, pagination and i18n error keys.
 - [ ] 4.4 Replace Socket.IO global broadcasts with authorized conversation rooms and persist-before-emit behavior; verify two-conversation socket tests prove that third parties receive no message or metadata.
 - [ ] 4.5 Add reconnect/cursor handling so clients can recover missed persisted messages; verify an integration test disconnects, writes messages and receives the exact missing ordered set after reconnect.
@@ -38,8 +38,8 @@
 
 ## 5. Versioned agreements backend for PR #138
 
-- [ ] 5.1 Add incremental migrations for agreements, immutable versions/items, participant acceptances and agreement events; verify constraints prevent invalid participants, duplicate version numbers and orphaned listing references.
-- [ ] 5.2 Implement the agreement state machine and authorization policy independently of HTTP handlers; verify unit tests cover every allowed and forbidden transition.
+- [x] 5.1 Add incremental migrations for agreements, immutable versions/items, participant acceptances and agreement events; verify constraints prevent invalid participants, duplicate version numbers and orphaned listing references.
+- [x] 5.2 Implement the agreement state machine and authorization policy independently of HTTP handlers; verify unit tests cover every allowed and forbidden transition.
 - [ ] 5.3 Implement optimistic concurrency using expected version checks; verify simultaneous confirm/cancel requests produce one committed transition and one conflict carrying the current state.
 - [ ] 5.4 Implement proposal and counterproposal services that create complete immutable versions; verify history tests reconstruct each version and actor without mutation of prior rows.
 - [ ] 5.5 Implement atomic bilateral acceptance and listing reservation; verify transaction tests prevent double reservation and roll back all changes on any validation failure.
@@ -50,8 +50,8 @@
 
 ## 6. PR #138 frontend completion
 
-- [ ] 6.1 Add typed messaging/agreement API clients and TanStack Query keys around server resources; verify client tests cover serialization, pagination and conflict parsing without `any`.
-- [ ] 6.2 Replace `mockConversations` initialization with authenticated server queries while retaining fixtures only in tests/demo mode; verify a production build contains no automatic mock conversation bootstrap.
+- [x] 6.1 Add typed messaging/agreement API clients and TanStack Query keys around server resources; verify client tests cover serialization, pagination and conflict parsing without `any`.
+- [x] 6.2 Replace `mockConversations` initialization with authenticated server queries while retaining fixtures only in tests/demo mode; verify a production build contains no automatic mock conversation bootstrap.
 - [ ] 6.3 Integrate Socket.IO events as query invalidations/refetch triggers rather than a second source of truth; verify reconnect and duplicate-event tests preserve one ordered message/agreement state.
 - [ ] 6.4 Refactor the agreement store so confirm/cancel handlers read the current server version at execution time; verify the previously failing stale-closure regression test passes.
 - [ ] 6.5 Render proposal history, pending bilateral acceptance, conflicts, cancellation reasons and completed state from server data; verify component tests cover both participants and all terminal states.
