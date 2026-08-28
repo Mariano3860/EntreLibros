@@ -1,7 +1,14 @@
-import { defineConfig } from '@rsbuild/core'
+import { defineConfig, loadEnv } from '@rsbuild/core'
 import { pluginReact } from '@rsbuild/plugin-react'
 import { pluginSass } from '@rsbuild/plugin-sass'
 import { pluginSvgr } from '@rsbuild/plugin-svgr'
+import { fileURLToPath } from 'node:url'
+
+const frontendRoot = fileURLToPath(new URL('.', import.meta.url))
+const frontendEnv = loadEnv({
+  cwd: frontendRoot,
+  mode: process.env.NODE_ENV || 'development',
+})
 
 export const backendProxyTarget =
   process.env.BACKEND_PROXY_TARGET || 'http://localhost:4000'
@@ -33,6 +40,10 @@ export default defineConfig({
     template: './public/index.html',
     mountId: 'root',
     outputStructure: 'flat',
+  },
+
+  source: {
+    define: frontendEnv.publicVars,
   },
 
   output: {
