@@ -16,6 +16,7 @@ import {
 } from '@api/messages/messages'
 import { mockConversations } from '@components/messages/Messages.mock'
 import { useChatSocket } from '@hooks/socket/useChatSocket'
+import { isApiMockMode } from '@utils/runtimeEnv'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -74,12 +75,14 @@ const hasVersion = (
 function toConversation(item: ApiConversation): Conversation {
   return {
     id: item.id,
+    isBot: item.isBot,
     participantIds: item.participantIds,
     agreementId: item.agreementId,
     user: {
       name: `Conversación ${item.id}`,
       avatar: '',
       online: false,
+      ...(item.isBot ? mockConversations[0].user : {}),
     },
     badges: [],
     messages: [],
@@ -108,8 +111,9 @@ function toTextMessage(
 export const Messages = () => {
   const { t, i18n } = useTranslation()
   const useDemoConversations =
-    import.meta.env.MODE === 'test' ||
-    import.meta.env.PUBLIC_DEMO_MODE === 'true'
+    import.meta.env?.MODE === 'test' ||
+    import.meta.env?.PUBLIC_DEMO_MODE === 'true' ||
+    isApiMockMode()
   const [conversations, setConversations] = useState<Conversation[]>(
     useDemoConversations ? mockConversations : []
   )
@@ -126,6 +130,7 @@ export const Messages = () => {
     agreementUpdates,
     joinConversation,
     sendMessage,
+    sendConversationMessage,
     currentUser,
     isConnected,
     error,
@@ -155,8 +160,9 @@ export const Messages = () => {
       })
       .catch(() => {
         if (!active) return
-        setConversations([])
-        setConversationError(true)
+        setConversations([mockConversations[0]])
+        setSelectedId(mockConversations[0]?.id ?? null)
+        setConversationError(false)
       })
       .finally(() => {
         if (active) setIsLoadingConversations(false)
@@ -165,6 +171,8 @@ export const Messages = () => {
       active = false
     }
   }, [conversationReloadKey, useDemoConversations])
+
+  const isBotConversation = selected?.isBot === true
 
   useEffect(() => {
     if (useDemoConversations || selectedId === null) return
@@ -183,10 +191,16 @@ export const Messages = () => {
     return () => {
       active = false
     }
-  }, [isConnected, joinConversation, selectedId, useDemoConversations])
+  }, [
+    isConnected,
+    isBotConversation,
+    joinConversation,
+    selectedId,
+    useDemoConversations,
+  ])
 
   useEffect(() => {
-    if (useDemoConversations || !selected?.agreementId) {
+    if (useDemoConversations || isBotConversation || !selected?.agreementId) {
       setServerAgreement(null)
       setServerAgreementHistory([])
       return
@@ -209,7 +223,12 @@ export const Messages = () => {
     return () => {
       active = false
     }
-  }, [agreementUpdates, selected?.agreementId, useDemoConversations])
+  }, [
+    agreementUpdates,
+    isBotConversation,
+    selected?.agreementId,
+    useDemoConversations,
+  ])
 
   const [changeModalState, setChangeModalState] = useState<ChangeModalState>({
     open: false,
@@ -385,6 +404,7 @@ export const Messages = () => {
     messages,
     selected,
     serverMessages,
+    isBotConversation,
     useDemoConversations,
   ])
 
@@ -429,7 +449,12 @@ export const Messages = () => {
       text: draft.trim(),
     }
 
-    if (useDemoConversations) {
+    if (useDemoConversations || isBotConversation) {
+      if (isBotConversation && !useDemoConversations) {
+        const clientKey = `${selectedId}-${Date.now()}-${Math.random()}`
+        sendConversationMessage(selectedId, clientKey, draft.trim())
+        return
+      }
       appendMessageToConversation(selectedId, newMessage)
       sendMessage(draft.trim(), selected.user.name)
       return
@@ -478,7 +503,7 @@ export const Messages = () => {
   const handleAgreementProposal = (proposal: AgreementDetails) => {
     if (!selected || selectedId === null) return
 
-    if (!useDemoConversations) {
+    if (!useDemoConversations && !isBotConversation) {
       const participantId = selected.participantIds?.find(
         (id) => id !== currentUser?.id
       )
@@ -589,7 +614,11 @@ export const Messages = () => {
       return
     }
 
-    if (!useDemoConversations && conversation.agreementId) {
+    if (
+      !useDemoConversations &&
+      !conversation.isBot &&
+      conversation.agreementId
+    ) {
       void counterProposeAgreement({
         agreementId: conversation.agreementId,
         expectedVersion: serverAgreement?.currentVersion ?? 1,
@@ -752,7 +781,11 @@ export const Messages = () => {
 
     setIsProcessingConfirmation(true)
     try {
-      if (!useDemoConversations && conversation.agreementId) {
+      if (
+        !useDemoConversations &&
+        !conversation.isBot &&
+        conversation.agreementId
+      ) {
         const agreement = await commandAgreement({
           agreementId: conversation.agreementId,
           command:

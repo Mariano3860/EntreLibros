@@ -2,6 +2,7 @@ import { query, withTransaction, type DbClient } from '../db.js';
 
 export interface ConversationSummary {
   id: number;
+  isBot: boolean;
   participantIds: number[];
   agreementId: number | null;
   lastMessageSequence: number;
@@ -28,6 +29,7 @@ export interface PersistedMessage {
 
 interface ConversationRow {
   id: number;
+  is_bot: boolean;
   participant_ids: number[];
   agreement_id: number | null;
   last_message_sequence: string;
@@ -48,6 +50,7 @@ interface MessageRow {
 function mapConversation(row: ConversationRow): ConversationSummary {
   return {
     id: Number(row.id),
+    isBot: row.is_bot,
     participantIds: row.participant_ids.map(Number),
     agreementId: row.agreement_id === null ? null : Number(row.agreement_id),
     lastMessageSequence: Number(row.last_message_sequence),
@@ -71,13 +74,83 @@ function mapMessage(row: MessageRow): PersistedMessage {
 const CONVERSATION_SELECT = `
   SELECT c.id,
          ARRAY_AGG(cp.user_id ORDER BY cp.user_id) AS participant_ids,
+         BOOL_OR(participant_user.role = 'bot') AS is_bot,
          MAX(a.id) AS agreement_id,
          c.last_message_sequence,
          c.updated_at
   FROM conversations c
   JOIN conversation_participants cp ON cp.conversation_id = c.id
+  JOIN users participant_user ON participant_user.id = cp.user_id
   LEFT JOIN exchange_agreements a ON a.conversation_id = c.id
 `;
+
+const BOT_EMAIL = 'bot@entrelibros.local';
+
+export async function ensureBotConversation(
+  userId: number
+): Promise<ConversationSummary> {
+  return withTransaction(async (client) => {
+    const botResult = await client.query<{ id: number }>(
+      'SELECT id FROM users WHERE email = $1 AND role = \'bot\'',
+      [BOT_EMAIL]
+    );
+    const botId = botResult.rows[0]?.id;
+    if (!botId) throw new Error('messaging.errors.bot_not_configured');
+
+    await client.query('SELECT pg_advisory_xact_lock($1, $2)', [userId, botId]);
+    const existing = await client.query<ConversationRow>(
+      `${CONVERSATION_SELECT}
+       WHERE EXISTS (
+         SELECT 1 FROM conversation_participants mine
+         WHERE mine.conversation_id = c.id AND mine.user_id = $1
+       )
+       AND EXISTS (
+         SELECT 1 FROM conversation_participants bot_member
+         WHERE bot_member.conversation_id = c.id AND bot_member.user_id = $2
+       )
+       GROUP BY c.id
+       HAVING COUNT(cp.user_id) = 2
+       LIMIT 1`,
+      [userId, botId]
+    );
+    if (existing.rows[0]) return mapConversation(existing.rows[0]);
+
+    const conversation = await client.query<{ id: number }>(
+      'INSERT INTO conversations DEFAULT VALUES RETURNING id'
+    );
+    const conversationId = conversation.rows[0].id;
+    await client.query(
+      `INSERT INTO conversation_participants (conversation_id, user_id)
+       VALUES ($1, $2), ($1, $3)`,
+      [conversationId, userId, botId]
+    );
+    const created = await client.query<ConversationRow>(
+      `${CONVERSATION_SELECT}
+       WHERE c.id = $1
+       GROUP BY c.id`,
+      [conversationId]
+    );
+    return mapConversation(created.rows[0]);
+  });
+}
+
+export async function findBotIdForConversation(
+  conversationId: number,
+  userId: number
+): Promise<number | null> {
+  const { rows } = await query<{ id: number }>(
+    `SELECT bot.id
+     FROM conversation_participants bot_member
+     JOIN users bot ON bot.id = bot_member.user_id AND bot.role = 'bot'
+     WHERE bot_member.conversation_id = $1
+       AND EXISTS (
+         SELECT 1 FROM conversation_participants member
+         WHERE member.conversation_id = $1 AND member.user_id = $2
+       )`,
+    [conversationId, userId]
+  );
+  return rows[0]?.id ?? null;
+}
 
 export async function isConversationParticipant(
   conversationId: number,
@@ -150,6 +223,7 @@ export async function createConversation(
 export async function listConversations(
   userId: number
 ): Promise<ConversationSummary[]> {
+  await ensureBotConversation(userId);
   const { rows } = await query<ConversationRow>(
     `${CONVERSATION_SELECT}
      WHERE EXISTS (
@@ -157,7 +231,7 @@ export async function listConversations(
        WHERE mine.conversation_id = c.id AND mine.user_id = $1
      )
      GROUP BY c.id
-     ORDER BY c.updated_at DESC`,
+     ORDER BY is_bot DESC, c.updated_at DESC`,
     [userId]
   );
   return rows.map(mapConversation);

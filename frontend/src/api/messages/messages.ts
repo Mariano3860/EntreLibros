@@ -3,6 +3,7 @@ import { RELATIVE_API_ROUTES } from '../routes'
 
 export type ApiConversation = {
   id: number
+  isBot: boolean
   participantIds: number[]
   agreementId: number | null
   lastMessageSequence: number

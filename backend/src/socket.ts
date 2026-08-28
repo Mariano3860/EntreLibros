@@ -7,6 +7,7 @@ import {
   markConversationRead,
   listMessages,
   sendMessage,
+  findBotIdForConversation,
 } from './repositories/messagingRepository.js';
 import { logger } from './utils/logger.js';
 import { generateReply } from './services/chatBot.js';
@@ -198,6 +199,30 @@ export function setupWebsocket(
             createdAt: message.createdAt.toISOString(),
           }
         );
+        const botId = await findBotIdForConversation(
+          payload.conversationId,
+          socket.data.user.id
+        );
+        if (botId) {
+          const reply = await generateReply(payload.body);
+          const botMessage = await sendMessage({
+            conversationId: payload.conversationId,
+            senderId: botId,
+            clientKey: `bot-reply-${message.id}`,
+            body: reply,
+          });
+          io.to(`conversation:${payload.conversationId}`).emit(
+            'conversation:message',
+            {
+              conversationId: botMessage.conversationId,
+              sequence: botMessage.sequence,
+              senderId: botMessage.senderId,
+              body: botMessage.body,
+              clientKey: botMessage.clientKey,
+              createdAt: botMessage.createdAt.toISOString(),
+            }
+          );
+        }
       } catch (error) {
         socket.emit('conversation:error', {
           message:

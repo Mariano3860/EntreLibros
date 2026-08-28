@@ -1,7 +1,21 @@
-import { defineConfig } from '@rsbuild/core'
+import { defineConfig, loadEnv } from '@rsbuild/core'
 import { pluginReact } from '@rsbuild/plugin-react'
 import { pluginSass } from '@rsbuild/plugin-sass'
 import { pluginSvgr } from '@rsbuild/plugin-svgr'
+import { basename, dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const configDirectory = import.meta.url.startsWith('file:')
+  ? dirname(fileURLToPath(import.meta.url))
+  : process.cwd()
+const frontendRoot =
+  basename(configDirectory) === 'frontend'
+    ? configDirectory
+    : resolve(configDirectory, 'frontend')
+const frontendEnv = loadEnv({
+  cwd: frontendRoot,
+  mode: process.env.NODE_ENV || 'development',
+})
 
 export const backendProxyTarget =
   process.env.BACKEND_PROXY_TARGET || 'http://localhost:4000'
@@ -33,6 +47,10 @@ export default defineConfig({
     template: './public/index.html',
     mountId: 'root',
     outputStructure: 'flat',
+  },
+
+  source: {
+    define: frontendEnv.publicVars,
   },
 
   output: {
