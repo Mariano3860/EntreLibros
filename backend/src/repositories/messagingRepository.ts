@@ -89,6 +89,9 @@ const BOT_EMAIL = 'bot@entrelibros.local';
 export async function ensureBotConversation(
   userId: number
 ): Promise<ConversationSummary> {
+  // Serialize creation per user/bot pair so concurrent page loads cannot
+  // create duplicate conversations. The transaction also makes the lookup
+  // and participant inserts visible atomically to the rest of the service.
   return withTransaction(async (client) => {
     const botResult = await client.query<{ id: number }>(
       'SELECT id FROM users WHERE email = $1 AND role = \'bot\'',

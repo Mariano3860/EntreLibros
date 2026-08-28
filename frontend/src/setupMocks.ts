@@ -5,6 +5,8 @@ export interface EnableMockingOptions {
 }
 
 export async function enableMocking(options: EnableMockingOptions = {}) {
+  // PUBLIC_* values are injected by Rsbuild at startup, so changing .env
+  // requires restarting dev or rebuilding before this decision can change.
   const useMocksEnv =
     options.useMocksEnv ?? import.meta.env?.PUBLIC_API_USE_MOCKS ?? undefined
   const explicitlyEnabled = isPublicFlagEnabled(useMocksEnv?.toString())

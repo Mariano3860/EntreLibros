@@ -2,6 +2,8 @@
 
 Última actualización: 2025-09-27
 
+> **Actualización técnica 2026-08-29:** la recuperación de mensajería incorporó el bot persistente mediante la migración `015_seed_messaging_bot.sql`, conversación idempotente por usuario, historial recargable y guía de diagnóstico. La mensajería mock sigue siendo útil para UI, pero no prueba persistencia real.
+
 Resumen ejecutivo
 EntreLibros conecta lectores mediante Rincones de Libros (RdL), publicaciones de ejemplares y acuerdos entre pares, priorizando privacidad por diseño y operación comunitaria. Este backlog ordena el trabajo en épicas, features y stories, con foco en el valor de negocio y en resultados observables. El estado actual refleja avances ya logrados (auth básica, mensajería, geolocalización, normalización de libros, scripts/CI), y alinea los pendientes críticos (RdL, descubrimiento, moderación, métricas y notificaciones) para alcanzar un MVP robusto.
 
@@ -183,7 +185,7 @@ Feature 5.2 Acuerdos
   - Éxito: registra acuerdo y dispara recordatorio.
   - Actualización 2025-09-28: se incorporaron las burbujas de Propuesta y Confirmación dentro del chat, con i18n ES/EN, respeto de tema claro/oscuro y sin exponer direcciones exactas; resta conectar la lógica persistente/notificaciones.
   - Actualización 2025-11-20: se modeló el versionado del acuerdo con cambios/cancelaciones accesibles, validación de disponibilidad mockeada y modal de confirmación inclusivo; se añadió un store dedicado, nuevas burbujas y pruebas (store + componentes) que cubren doble confirmación, cambios de versión, cancelación e idempotencia.
-  - Actualización 2026-08-28: se añadieron persistencia PostgreSQL de conversaciones/mensajes, historial versionado de acuerdos, contrapropuestas inmutables, comandos REST autenticados, conflictos optimistic-lock, reservas atómicas con liberación, salas Socket.IO autorizadas, eventos post-commit y bloqueo bilateral para nuevas conversaciones/acuerdos; quedan pendientes las notificaciones y el registro post-encuentro.
+  - Actualización 2026-08-29: además de lo anterior, se agregó el bot persistente con conversación por usuario, respuesta echo guardada antes de emitir por Socket.IO y carga del historial al reabrir; quedan pendientes las notificaciones y el registro post-encuentro.
 - [ ] S-5.4 Registro post-encuentro (“se concretó / no se concretó”) (Should, E2; BR-42)
   - Éxito: alimenta métricas sin exponer datos personales.
 

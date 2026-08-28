@@ -1,5 +1,7 @@
 # EntreLibros recovery baseline
 
+> **Nota de vigencia (2026-08-29):** este documento conserva la línea base histórica de la recuperación y de PR #138. Para el comportamiento actual consulta [`estado-actual.md`](estado-actual.md), [`arquitectura.md`](arquitectura.md) y [`troubleshooting.md`](troubleshooting.md). La semilla del bot y la persistencia de su conversación pertenecen a una etapa posterior.
+
 Captured on 2026-08-28 at 13:14 CEST for the OpenSpec change
 `complete-entrelibros-recovery`. Commands are written for PowerShell from the
 repository root unless noted otherwise.

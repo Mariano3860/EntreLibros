@@ -1,50 +1,50 @@
 ## 1. Auditoría y fuentes de verdad
 
-- [ ] 1.1 Inventariar todos los `AGENTS.md`, README, archivos `docs/`, comentarios relevantes y artefactos OpenSpec, clasificando audiencia, autoridad, fecha y duplicaciones; verificar el inventario con `rg --files`.
-- [ ] 1.2 Comparar cada afirmación operativa con `package.json`, scripts, configuración Rsbuild/Vitest, Dockerfiles, workflows, migraciones y código; registrar contradicciones y pendientes en un checklist auditable.
-- [ ] 1.3 Definir en la documentación la precedencia entre instrucciones raíz, agentes anidados, README, docs y OpenSpec; verificar que no existan reglas contradictorias.
+- [x] 1.1 Inventariar AGENTS, README, docs, comentarios y OpenSpec con `rg`.
+- [x] 1.2 Comparar afirmaciones operativas con manifests, configuración, migraciones, workflows y código; registrar contradicciones.
+- [x] 1.3 Definir la precedencia entre agentes, README, docs y OpenSpec.
 
 ## 2. Instrucciones para agentes
 
-- [ ] 2.1 Actualizar `AGENTS.md` raíz con comandos reales, ramas/merge, límites de autoridad, uso de herramientas, validaciones y manejo de cambios documentales; verificarlo contra los scripts disponibles.
-- [ ] 2.2 Revisar y actualizar `backend/AGENTS.md` y crear instrucciones locales solo donde aporten reglas específicas para backend, migraciones, tests o base de datos; verificar que sean aditivas y no contradictorias.
-- [ ] 2.3 Crear o actualizar instrucciones locales para `frontend/`, `docs/` y `scripts/` cuando corresponda, incluyendo formato, pruebas, ownership y criterios de calidad; verificar cobertura de cada área con `rg --files -g 'AGENTS.md'`.
-- [ ] 2.4 Documentar en los agentes el protocolo de mantener backlog, OpenSpec, comentarios y runbooks sincronizados; verificar que cada regla sea accionable y tenga un comando o evidencia asociada.
+- [x] 2.1 Actualizar `AGENTS.md` raíz con comandos, ramas, merge, herramientas y validaciones.
+- [x] 2.2 Actualizar `backend/AGENTS.md` con reglas de backend, migraciones, tests y base de datos.
+- [x] 2.3 Crear instrucciones locales para `frontend/`, `docs/` y `scripts/`.
+- [x] 2.4 Documentar sincronización de backlog, OpenSpec, comentarios y runbooks.
 
 ## 3. README y onboarding
 
-- [ ] 3.1 Actualizar `README.md` raíz con arquitectura, prerrequisitos, instalación, variables de entorno, ejecución local, Docker, migraciones, tests, builds y enlaces a documentación; verificar cada comando en los manifests.
-- [ ] 3.2 Actualizar `frontend/README.md` con Rsbuild, carga de `.env*`, `PUBLIC_API_BASE_URL`, `PUBLIC_API_USE_MOCKS`, MSW, modo demo, troubleshooting de cache/service worker y verificación de `/messages`; verificar ejemplos contra `rsbuild.config.ts` y `setupMocks.ts`.
-- [ ] 3.3 Crear o actualizar `backend/README.md` con Express, PostgreSQL/PostGIS, `DATABASE_URL`, migraciones append-only, auth, Socket.IO, bot, tests y diagnóstico de errores 500; verificar rutas y scripts contra el backend.
-- [ ] 3.4 Actualizar `scripts/README.md` y documentación de automatización con los comandos soportados y sus dependencias; verificar que no se documenten comandos inexistentes.
+- [x] 3.1 Actualizar `README.md` raíz con instalación, variables, ejecución, migraciones, tests y enlaces.
+- [x] 3.2 Actualizar `frontend/README.md` con Rsbuild, variables públicas, MSW, bot y diagnóstico.
+- [x] 3.3 Crear `backend/README.md` con API, PostgreSQL, migraciones, auth, Socket.IO y bot.
+- [x] 3.4 Actualizar `scripts/README.md` con comandos soportados, dependencias y límites.
 
 ## 4. Documentación técnica y operativa
 
-- [ ] 4.1 Actualizar `docs/arquitectura.md` con límites frontend/backend, proxy, REST, Socket.IO, MSW y persistencia; verificar diagramas y nombres contra el código.
-- [ ] 4.2 Actualizar `docs/base_de_datos.md` con el esquema real y las migraciones 010–015, bot, conversaciones, mensajes, acuerdos, bloqueos e invariantes; verificar tablas y columnas contra `backend/migrations/`.
-- [ ] 4.3 Ampliar o crear documentación de mensajería que explique conversación normal, cursor/reconexión, autorización de rooms, persistencia antes de emitir, bot y carga de historial; verificar flujo con tests existentes.
-- [ ] 4.4 Actualizar `docs/recovery-baseline.md` para separar hechos históricos de estado actual, incluir commits/PR #138, migraciones, bot, mocks y límites de browser E2E; verificar fechas, hashes y conteos contra git y suites.
-- [ ] 4.5 Documentar el procedimiento de diagnóstico: pantalla vacía, `GET /api/messages` 500, migraciones faltantes, MSW no activo, cache del bundle, Socket.IO y cookies; verificar que cada síntoma tenga causa, comando y resultado esperado.
-- [ ] 4.6 Revisar `docs/messaging-bubbles.md` y documentos relacionados para corregir nombres, estados, acuerdos y enlaces; verificar que no describan fixtures como persistencia real.
+- [x] 4.1 Actualizar `docs/arquitectura.md` con límites frontend/backend, proxy, REST, Socket.IO, MSW y persistencia.
+- [x] 4.2 Actualizar `docs/base_de_datos.md` con migraciones 010–015, bot, mensajes, acuerdos y bloqueos.
+- [x] 4.3 Ampliar `docs/messaging-bubbles.md` con flujo, reconexión, persistencia antes de emitir, bot e historial.
+- [x] 4.4 Actualizar `docs/recovery-baseline.md` para separar historia de estado actual.
+- [x] 4.5 Crear `docs/troubleshooting.md` para pantalla vacía, 500, migraciones, MSW, caché, Socket.IO y cookies.
+- [x] 4.6 Revisar nombres, estados, acuerdos y enlaces de mensajería.
 
 ## 5. Estado, backlog y roadmap
 
-- [ ] 5.1 Actualizar `docs/backlog.md` con el estado real de mensajería, acuerdos, bot, mocks, recovery, browser E2E y pendientes de producto; verificar que no haya duplicados ni estados incompatibles.
-- [ ] 5.2 Crear o consolidar un documento de estado actual del sistema con capacidades terminadas, limitaciones conocidas, evidencia de tests y frontera manual de merge/deploy; verificar enlaces desde los README.
-- [ ] 5.3 Crear o consolidar un roadmap de próximos pasos priorizado, separando deuda técnica, producto, seguridad, operación, observabilidad y E2E; verificar que cada pendiente tenga alcance y criterio de cierre.
-- [ ] 5.4 Añadir una guía de cómo actualizar documentación después de cambios de código, migraciones, APIs o workflows; verificar que esté enlazada desde `AGENTS.md`.
+- [x] 5.1 Actualizar `docs/backlog.md` con el estado real de mensajería y bot.
+- [x] 5.2 Crear `docs/estado-actual.md` con capacidades, límites y evidencia.
+- [x] 5.3 Crear `docs/roadmap.md` con próximos pasos priorizados.
+- [x] 5.4 Crear `docs/guia-documentacion.md` y enlazarla desde los agentes/README.
 
 ## 6. Comentarios de código y ejemplos
 
-- [ ] 6.1 Añadir comentarios selectivos en persistencia/concurrencia de mensajería, acuerdos, bot y migraciones para explicar invariantes y decisiones no obvias; verificar que no repitan literalmente la implementación.
-- [ ] 6.2 Documentar en código la frontera entre mocks/demo, servicio real, Socket.IO legacy y conversación persistida; verificar que los comentarios coincidan con tests y configuración.
-- [ ] 6.3 Revisar comentarios, nombres y ejemplos de variables de entorno para eliminar referencias obsoletas o ambiguas; verificar con `rg` que no queden nombres antiguos.
+- [x] 6.1 Añadir comentarios selectivos sobre concurrencia, persistencia y bot.
+- [x] 6.2 Documentar la frontera entre mock, servicio real, Socket.IO legacy y conversación persistida.
+- [x] 6.3 Revisar comentarios y ejemplos de variables de entorno obsoletos o ambiguos.
 
 ## 7. Validación y entrega documental
 
-- [ ] 7.1 Ejecutar validación de formato Markdown/Prettier y corregir errores; verificar con los comandos de formato del repositorio.
-- [ ] 7.2 Verificar enlaces internos, referencias a archivos, comandos, rutas, nombres de migración y variables; entregar un reporte de referencias rotas y comprobar que las correcciones queden aplicadas.
-- [ ] 7.3 Ejecutar `openspec validate refresh-repository-documentation --type change --strict --no-interactive` y verificar que el cambio documental sea válido con `skip_specs: true`.
-- [ ] 7.4 Revisar el diff completo por audiencia y hacer una lectura manual de consistencia; verificar que no se hayan modificado runtime, APIs, dependencias ni datos.
-- [ ] 7.5 Actualizar el backlog y el índice de documentación como última operación; verificar enlaces de navegación y estado final.
-- [ ] 7.6 Crear commits incrementales por área documental, comprobar `git status --short` limpio y entregar resumen de archivos, decisiones, limitaciones y próximos pasos; no realizar merge.
+- [ ] 7.1 Ejecutar formato Markdown/Prettier y corregir errores.
+- [ ] 7.2 Verificar enlaces, archivos, comandos, rutas, migraciones y variables; reportar referencias rotas.
+- [ ] 7.3 Ejecutar validación estricta de OpenSpec.
+- [ ] 7.4 Revisar el diff completo y confirmar que no haya cambios runtime/API/dependencias/datos accidentales.
+- [ ] 7.5 Actualizar backlog e índice como última operación.
+- [ ] 7.6 Crear commits incrementales, confirmar status limpio y no hacer merge.
