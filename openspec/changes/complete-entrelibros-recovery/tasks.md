@@ -30,11 +30,11 @@
 
 - [x] 4.1 Add incremental migrations for conversations, participants, messages, idempotency/sequence fields, read state and attachment metadata; verify migration from empty and current schemas plus all required foreign keys and indexes.
 - [x] 4.2 Implement typed repositories and services for conversation membership, paginated history, message persistence and read state without `any`; verify repository tests cover unauthorized access, ordering and duplicate client keys.
-- [ ] 4.3 Add authenticated REST contracts for listing conversations, reading history, sending messages and marking reads; verify API tests cover success, validation, 401, 403, pagination and i18n error keys.
-- [ ] 4.4 Replace Socket.IO global broadcasts with authorized conversation rooms and persist-before-emit behavior; verify two-conversation socket tests prove that third parties receive no message or metadata.
+- [x] 4.3 Add authenticated REST contracts for listing conversations, reading history, sending messages and marking reads; verify API tests cover success, validation, 401, 403, pagination and i18n error keys.
+- [x] 4.4 Replace Socket.IO global broadcasts with authorized conversation rooms and persist-before-emit behavior; verify two-conversation socket tests prove that third parties receive no message or metadata.
 - [ ] 4.5 Add reconnect/cursor handling so clients can recover missed persisted messages; verify an integration test disconnects, writes messages and receives the exact missing ordered set after reconnect.
-- [ ] 4.6 Introduce an attachment-storage interface with deterministic test implementation and validation of type, size and membership; verify invalid uploads are rejected and stored metadata never contains base64 payloads.
-- [ ] 4.7 Update OpenAPI and backend-facing i18n keys for messaging routes and events; verify contract checks match runtime responses.
+- [x] 4.6 Introduce an attachment-storage interface with deterministic test implementation and validation of type, size and membership; verify invalid uploads are rejected and stored metadata never contains base64 payloads.
+- [x] 4.7 Update OpenAPI and backend-facing i18n keys for messaging routes and events; verify contract checks match runtime responses.
 
 ## 5. Versioned agreements backend for PR #138
 
@@ -52,8 +52,8 @@
 
 - [x] 6.1 Add typed messaging/agreement API clients and TanStack Query keys around server resources; verify client tests cover serialization, pagination and conflict parsing without `any`.
 - [x] 6.2 Replace `mockConversations` initialization with authenticated server queries while retaining fixtures only in tests/demo mode; verify a production build contains no automatic mock conversation bootstrap.
-- [ ] 6.3 Integrate Socket.IO events as query invalidations/refetch triggers rather than a second source of truth; verify reconnect and duplicate-event tests preserve one ordered message/agreement state.
-- [ ] 6.4 Refactor the agreement store so confirm/cancel handlers read the current server version at execution time; verify the previously failing stale-closure regression test passes.
+- [x] 6.3 Integrate Socket.IO events as query invalidations/refetch triggers rather than a second source of truth; verify reconnect and duplicate-event tests preserve one ordered message/agreement state.
+- [x] 6.4 Refactor the agreement store so confirm/cancel handlers read the current server version at execution time; verify the previously failing stale-closure regression test passes.
 - [ ] 6.5 Render proposal history, pending bilateral acceptance, conflicts, cancellation reasons and completed state from server data; verify component tests cover both participants and all terminal states.
 - [ ] 6.6 Add loading, empty, retry, authorization and conflict-recovery UI with translated messages; verify Spanish and configured alternate locale tests render keys without raw backend text.
 - [ ] 6.7 Validate keyboard navigation, focus restoration and accessible labels for message composer and agreement dialogs; verify automated accessibility checks and keyboard interaction tests pass.

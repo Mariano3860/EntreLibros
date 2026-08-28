@@ -183,6 +183,7 @@ Feature 5.2 Acuerdos
   - Éxito: registra acuerdo y dispara recordatorio.
   - Actualización 2025-09-28: se incorporaron las burbujas de Propuesta y Confirmación dentro del chat, con i18n ES/EN, respeto de tema claro/oscuro y sin exponer direcciones exactas; resta conectar la lógica persistente/notificaciones.
   - Actualización 2025-11-20: se modeló el versionado del acuerdo con cambios/cancelaciones accesibles, validación de disponibilidad mockeada y modal de confirmación inclusivo; se añadió un store dedicado, nuevas burbujas y pruebas (store + componentes) que cubren doble confirmación, cambios de versión, cancelación e idempotencia.
+  - Actualización 2026-08-28: se añadieron persistencia PostgreSQL de conversaciones/mensajes, historial versionado de acuerdos, comandos REST autenticados, conflictos optimistic-lock, salas Socket.IO autorizadas y eventos post-commit; quedan pendientes la reserva atómica de publicaciones y notificaciones.
 - [ ] S-5.4 Registro post-encuentro (“se concretó / no se concretó”) (Should, E2; BR-42)
   - Éxito: alimenta métricas sin exponer datos personales.
 

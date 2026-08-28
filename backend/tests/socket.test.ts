@@ -141,6 +141,7 @@ describe('websocket messaging', () => {
     outsider.once('conversation:message', () => {
       outsiderReceived = true;
     });
+    outsider.emit('conversation:join', { conversationId: 202 });
     clientSocket.emit('conversation:join', { conversationId: 101 });
     await new Promise((resolve) => setTimeout(resolve, 30));
     clientSocket.emit('conversation:message', {
