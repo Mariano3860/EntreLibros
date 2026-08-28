@@ -75,7 +75,10 @@ describe('useAgreementStore', () => {
       result.current.confirmVersion(1, 1, 'Bob')
     })
     expect(result.current.getVersion(1, 1)?.status).toBe('fullyConfirmed')
-    expect(result.current.getVersion(1, 1)?.confirmedBy).toEqual(['Alice', 'Bob'])
+    expect(result.current.getVersion(1, 1)?.confirmedBy).toEqual([
+      'Alice',
+      'Bob',
+    ])
   })
 
   it('keeps confirmation idempotent for the same user', () => {
