@@ -44,6 +44,10 @@ function asAttachmentMetadata(value: unknown): MessageAttachment | null {
   };
 }
 
+function hasAttachmentMetadata(value: unknown): boolean {
+  return value !== undefined && value !== null;
+}
+
 function errorResponse(error: unknown) {
   const key =
     error instanceof Error ? error.message : 'messaging.errors.failed';
@@ -107,12 +111,10 @@ router.get(
     }
     const conversationId = asPositiveInteger(req.params.conversationId);
     if (!conversationId) {
-      return res
-        .status(422)
-        .json({
-          error: 'ValidationError',
-          message: 'messaging.errors.conversation_required',
-        });
+      return res.status(422).json({
+        error: 'ValidationError',
+        message: 'messaging.errors.conversation_required',
+      });
     }
     const after = req.query.after ? Number(req.query.after) : undefined;
     const limit = req.query.limit ? Number(req.query.limit) : undefined;
@@ -121,12 +123,10 @@ router.get(
       (limit !== undefined &&
         (!Number.isInteger(limit) || limit < 1 || limit > 100))
     ) {
-      return res
-        .status(422)
-        .json({
-          error: 'ValidationError',
-          message: 'messaging.errors.invalid_pagination',
-        });
+      return res.status(422).json({
+        error: 'ValidationError',
+        message: 'messaging.errors.invalid_pagination',
+      });
     }
     try {
       const messages = await listMessages(conversationId, req.user.id, {
@@ -159,12 +159,17 @@ router.post(
       typeof body.clientKey !== 'string' ||
       typeof body.body !== 'string'
     ) {
-      return res
-        .status(422)
-        .json({
-          error: 'ValidationError',
-          message: 'messaging.errors.invalid_message',
-        });
+      return res.status(422).json({
+        error: 'ValidationError',
+        message: 'messaging.errors.invalid_message',
+      });
+    }
+    const attachmentMetadata = asAttachmentMetadata(body.attachmentMetadata);
+    if (hasAttachmentMetadata(body.attachmentMetadata) && !attachmentMetadata) {
+      return res.status(422).json({
+        error: 'ValidationError',
+        message: 'messaging.errors.invalid_attachment',
+      });
     }
     try {
       const message = await sendMessage({
@@ -172,7 +177,7 @@ router.post(
         senderId: req.user.id,
         clientKey: body.clientKey,
         body: body.body,
-        attachmentMetadata: asAttachmentMetadata(body.attachmentMetadata),
+        attachmentMetadata,
       });
       return res.status(201).json({ message });
     } catch (error) {
@@ -199,12 +204,10 @@ router.patch(
       !Number.isInteger(sequence) ||
       sequence < 0
     ) {
-      return res
-        .status(422)
-        .json({
-          error: 'ValidationError',
-          message: 'messaging.errors.invalid_sequence',
-        });
+      return res.status(422).json({
+        error: 'ValidationError',
+        message: 'messaging.errors.invalid_sequence',
+      });
     }
     try {
       if (!(await isConversationParticipant(conversationId, req.user.id))) {
