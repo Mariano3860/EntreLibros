@@ -42,9 +42,9 @@
 
 ## 7. Validación y entrega documental
 
-- [ ] 7.1 Ejecutar formato Markdown/Prettier y corregir errores.
-- [ ] 7.2 Verificar enlaces, archivos, comandos, rutas, migraciones y variables; reportar referencias rotas.
-- [ ] 7.3 Ejecutar validación estricta de OpenSpec.
-- [ ] 7.4 Revisar el diff completo y confirmar que no haya cambios runtime/API/dependencias/datos accidentales.
-- [ ] 7.5 Actualizar backlog e índice como última operación.
-- [ ] 7.6 Crear commits incrementales, confirmar status limpio y no hacer merge.
+- [x] 7.1 Ejecutar formato Markdown/Prettier y corregir errores.
+- [x] 7.2 Verificar enlaces, archivos, comandos, rutas, migraciones y variables; reportar referencias rotas.
+- [x] 7.3 Ejecutar validación estricta de OpenSpec.
+- [x] 7.4 Revisar el diff completo y confirmar que no haya cambios runtime/API/dependencias/datos accidentales.
+- [x] 7.5 Actualizar backlog e índice como última operación.
+- [x] 7.6 Crear commits incrementales, confirmar status limpio y no hacer merge.

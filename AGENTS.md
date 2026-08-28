@@ -30,10 +30,10 @@ npm run test:backend
 npm run test:frontend
 npm run format:backend
 npm run format:frontend
-npm run typecheck:backend
-npm run typecheck:frontend
-npm run build:backend
-npm run build:frontend
+npm run typecheck -w backend
+npm run typecheck -w frontend
+npm run build -w backend
+npm run build -w frontend
 npm run migrate
 npm run complete-check
 ```

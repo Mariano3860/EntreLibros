@@ -29,10 +29,10 @@ Las migraciones están en `backend/migrations/` y se ejecutan en orden. Son appe
 
 ```bash
 npm run test:backend
-npm run typecheck:backend
-npm run lint:backend
+npm run typecheck -w backend
+npm run lint -w backend
 npm run format:backend
-npm run build:backend
+npm run build -w backend
 npm run openapi -w backend
 ```
 

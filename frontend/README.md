@@ -43,7 +43,7 @@ En modo real, `/messages` necesita sesión, backend, migraciones y `GET /api/mes
 
 ```bash
 npm run test:frontend
-npm run typecheck:frontend
+npm run typecheck -w frontend
 npm run format:frontend
 npm run complete-check:frontend
 ```

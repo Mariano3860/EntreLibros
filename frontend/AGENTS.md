@@ -12,9 +12,9 @@ Comandos desde la raíz:
 
 ```bash
 npm run test:frontend
-npm run typecheck:frontend
-npm run lint:frontend
-npm run stylelint:frontend
+npm run typecheck -w frontend
+npm run lint -w frontend
+npm run stylelint -w frontend
 npm run format:frontend
-npm run build:frontend
+npm run build -w frontend
 ```
