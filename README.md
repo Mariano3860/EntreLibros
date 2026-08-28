@@ -51,6 +51,7 @@ Las pruebas frontend son Vitest/Testing Library con MSW; las pruebas de servicio
 - [`backend/README.md`](backend/README.md): API, base de datos, migraciones y backend.
 - [`frontend/README.md`](frontend/README.md): desarrollo web, mock mode y troubleshooting del cliente.
 - [`docs/arquitectura.md`](docs/arquitectura.md): arquitectura actual y límites históricos.
+- [`docs/README.md`](docs/README.md): índice completo de documentación.
 - [`docs/base_de_datos.md`](docs/base_de_datos.md): modelo y migraciones.
 - [`docs/messaging-bubbles.md`](docs/messaging-bubbles.md): UI y contrato de mensajes.
 - [`docs/estado-actual.md`](docs/estado-actual.md): estado verificable del producto.
