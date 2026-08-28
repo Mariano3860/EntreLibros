@@ -45,14 +45,14 @@ interface AgreementRow {
 
 function mapRow(row: AgreementRow): AgreementSnapshot {
   return {
-    id: row.id,
-    conversationId: row.conversation_id,
-    proposerId: row.proposer_id,
-    participantId: row.participant_id,
+    id: Number(row.id),
+    conversationId: Number(row.conversation_id),
+    proposerId: Number(row.proposer_id),
+    participantId: Number(row.participant_id),
     state: row.state,
     currentVersion: row.current_version,
     details: row.details,
-    acceptances: row.acceptances ?? [],
+    acceptances: (row.acceptances ?? []).map(Number),
   };
 }
 

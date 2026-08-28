@@ -45,8 +45,8 @@ interface MessageRow {
 
 function mapConversation(row: ConversationRow): ConversationSummary {
   return {
-    id: row.id,
-    participantIds: row.participant_ids,
+    id: Number(row.id),
+    participantIds: row.participant_ids.map(Number),
     lastMessageSequence: Number(row.last_message_sequence),
     updatedAt: row.updated_at,
   };
@@ -54,9 +54,9 @@ function mapConversation(row: ConversationRow): ConversationSummary {
 
 function mapMessage(row: MessageRow): PersistedMessage {
   return {
-    id: row.id,
-    conversationId: row.conversation_id,
-    senderId: row.sender_id,
+    id: Number(row.id),
+    conversationId: Number(row.conversation_id),
+    senderId: Number(row.sender_id),
     sequence: Number(row.sequence),
     clientKey: row.client_key,
     body: row.body,
@@ -232,13 +232,12 @@ export async function markConversationRead(
   if (!Number.isInteger(sequence) || sequence < 0) {
     throw new Error('messaging.errors.invalid_sequence');
   }
-  const result = await query(
+  await query(
     `UPDATE conversation_participants
      SET last_read_sequence = GREATEST(last_read_sequence, $3)
      WHERE conversation_id = $1 AND user_id = $2`,
     [conversationId, userId, sequence]
   );
-  if (result.rows === undefined) return;
 }
 
 export async function withMessagingClient<T>(
