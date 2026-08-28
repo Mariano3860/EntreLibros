@@ -39,6 +39,19 @@ function details(value: unknown): AgreementDetails | null {
   };
 }
 
+function listingIds(value: unknown): number[] | null {
+  if (value === undefined) return [];
+  if (!Array.isArray(value) || value.length > 2) return null;
+  const ids = value.map((item) =>
+    typeof item === 'number' && Number.isSafeInteger(item) && item > 0
+      ? item
+      : null
+  );
+  return ids.every((item): item is number => item !== null)
+    ? [...new Set(ids)]
+    : null;
+}
+
 function failure(error: unknown) {
   const message =
     error instanceof Error ? error.message : 'agreements.errors.failed';
@@ -113,7 +126,13 @@ router.post('/', async (req: AuthenticatedRequest, res) => {
   const participantId =
     typeof body.participantId === 'number' ? body.participantId : null;
   const agreementDetails = details(body.details);
-  if (!conversationId || !participantId || !agreementDetails) {
+  const agreementListingIds = listingIds(body.listingIds);
+  if (
+    !conversationId ||
+    !participantId ||
+    !agreementDetails ||
+    agreementListingIds === null
+  ) {
     return res.status(422).json({
       error: 'ValidationError',
       message: 'agreements.errors.invalid_proposal',
@@ -125,6 +144,7 @@ router.post('/', async (req: AuthenticatedRequest, res) => {
       proposerId: req.user.id,
       participantId,
       details: agreementDetails,
+      listingIds: agreementListingIds,
     });
     return res.status(201).json({ agreement });
   } catch (error) {

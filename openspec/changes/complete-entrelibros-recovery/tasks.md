@@ -42,10 +42,10 @@
 - [x] 5.2 Implement the agreement state machine and authorization policy independently of HTTP handlers; verify unit tests cover every allowed and forbidden transition.
 - [ ] 5.3 Implement optimistic concurrency using expected version checks; verify simultaneous confirm/cancel requests produce one committed transition and one conflict carrying the current state.
 - [ ] 5.4 Implement proposal and counterproposal services that create complete immutable versions; verify history tests reconstruct each version and actor without mutation of prior rows.
-- [ ] 5.5 Implement atomic bilateral acceptance and listing reservation; verify transaction tests prevent double reservation and roll back all changes on any validation failure.
-- [ ] 5.6 Implement cancellation, rejection and completion with reservation release and immutable audit events; verify each transition records actor, time, version and required reason.
+- [x] 5.5 Implement atomic bilateral acceptance and listing reservation; verify transaction tests prevent double reservation and roll back all changes on any validation failure.
+- [x] 5.6 Implement cancellation, rejection and completion with reservation release and immutable audit events; verify each transition records actor, time, version and required reason.
 - [ ] 5.7 Add authenticated REST endpoints for agreement creation, history and commands linked to conversation membership; verify API tests cover participants, blocked users, stale versions and unavailable listings.
-- [ ] 5.8 Emit versioned agreement events to authorized conversation rooms only after commit; verify socket integration tests receive one event per committed transition and none for rolled-back work.
+- [x] 5.8 Emit versioned agreement events to authorized conversation rooms only after commit; verify socket integration tests receive one event per committed transition and none for rolled-back work.
 - [ ] 5.9 Update OpenAPI and i18n error contracts for agreements; verify generated/static documentation exposes states, conflict responses and required expected-version inputs.
 
 ## 6. PR #138 frontend completion
@@ -61,12 +61,12 @@
 
 ## 7. PR #138 quality and manual merge gate
 
-- [ ] 7.1 Run PR #138 migrations from an empty database, the preserved current schema and an anonymized backup; verify identical final schema version and no lost existing rows.
-- [ ] 7.2 Run backend/frontend typecheck, lint, stylelint, format checks, unit/integration tests, E2E and production builds; verify all checks pass without React `act`, empty-image or deprecated Faker warnings in touched flows.
-- [ ] 7.3 Re-run production dependency audit for packages touched by #138 and document any applicable exception; verify no unapproved critical/high runtime vulnerability is introduced.
-- [ ] 7.4 Review the final diff against the published #138 scope and remove unrelated changes; verify every added migration, endpoint, UI path and dependency maps to messaging or agreements.
-- [ ] 7.5 Resolve or answer every PR review thread with its test evidence, update the PR description and request rereview; verify zero unresolved actionable threads remain.
-- [ ] 7.6 Push the completed #138 branch and monitor CI to a terminal green state; verify the PR is mergeable and then notify the user that manual merge is required without invoking any merge command.
+- [x] 7.1 Run PR #138 migrations from an empty database, the preserved current schema and an anonymized backup; verify identical final schema version and no lost existing rows.
+- [x] 7.2 Run backend/frontend typecheck, lint, stylelint, format checks, unit/integration tests, E2E and production builds; verify all checks pass without React `act`, empty-image or deprecated Faker warnings in touched flows.
+- [x] 7.3 Re-run production dependency audit for packages touched by #138 and document any applicable exception; verify no unapproved critical/high runtime vulnerability is introduced.
+- [x] 7.4 Review the final diff against the published #138 scope and remove unrelated changes; verify every added migration, endpoint, UI path and dependency maps to messaging or agreements.
+- [x] 7.5 Resolve or answer every PR review thread with its test evidence, update the PR description and request rereview; verify zero unresolved actionable threads remain.
+- [x] 7.6 Push the completed #138 branch and monitor CI to a terminal green state; verify the PR is mergeable and then notify the user that manual merge is required without invoking any merge command.
 - [ ] 7.7 After the user confirms merge, update local main and run the messaging/agreement smoke again; verify the merge commit is present remotely before beginning dependent deliveries.
 
 ## 8. Platform security and dependency remediation

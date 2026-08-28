@@ -208,6 +208,27 @@ task 8.1 must triage runtime applicability before upgrades or exceptions.
 docker run --rm -v 'C:\REPOS\EntreLibros:/workspace:ro' -w /workspace node:22.19.0-bookworm-slim npm audit --omit=dev --json
 ```
 
+## PR #138 migration and quality evidence
+
+On 2026-08-28, migration execution was verified twice against the preserved
+`entrelibros_test` schema and against the isolated
+`entrelibros_recovery_verify_20260828` database. Both runs completed with
+13 migration records, including migrations 010 through 013, and PostGIS 3.4.3.
+The earlier anonymized backup restore above remains the preserved-schema
+baseline; the new migrations are append-only and were then applied to the
+current test schema without changing existing rows.
+
+The local backend suite passed with 24 files and 96 tests. The frontend suite
+passed with coverage enabled. Remote PR checks for head `902a083` passed for
+both backend and frontend, and the final diff review found only messaging,
+agreements, their tests, documentation and the explicitly related coverage
+threshold change.
+
+No runtime dependency was changed by the PR #138 recovery commits. The audit
+reported 21 pre-existing production findings (15 high, 6 moderate, 0 critical)
+with fixes available; they are recorded as an explicit follow-up for task 8.1,
+not silently accepted as resolved by this PR.
+
 ## Delivery checkpoints
 
 | Checkpoint | Entry criteria | Exit evidence | Merge authority |

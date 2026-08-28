@@ -32,6 +32,19 @@ async function user(label: string): Promise<number> {
   return result.rows[0].id;
 }
 
+async function listing(ownerId: number, title: string): Promise<number> {
+  const book = await client.query<{ id: number }>(
+    'INSERT INTO books (title) VALUES ($1) RETURNING id',
+    [title]
+  );
+  const result = await client.query<{ id: number }>(
+    `INSERT INTO book_listings (user_id, book_id, type, trade)
+     VALUES ($1, $2, 'offer', true) RETURNING id`,
+    [ownerId, book.rows[0].id]
+  );
+  return result.rows[0].id;
+}
+
 const details = {
   meetingPoint: 'Biblioteca',
   area: 'Centro',
@@ -72,5 +85,60 @@ describe('agreementRepository', () => {
     expect(history.map((entry) => entry.version)).toEqual([1, 2]);
     expect(history[0]?.state).toBe('proposed');
     expect(history[0]?.details).toEqual(details);
+  });
+
+  test('reserves both listings atomically and releases them on cancellation', async () => {
+    const proposer = await user('reserve-proposer');
+    const participant = await user('reserve-participant');
+    const conversation = await createConversation([proposer, participant]);
+    const firstListing = await listing(proposer, 'First book');
+    const secondListing = await listing(participant, 'Second book');
+    const agreement = await createAgreement({
+      conversationId: conversation.id,
+      proposerId: proposer,
+      participantId: participant,
+      details,
+      listingIds: [firstListing, secondListing],
+    });
+
+    const partial = await commandAgreement({
+      id: agreement.id,
+      actorId: proposer,
+      expectedVersion: 1,
+      command: 'confirm',
+    });
+    const confirmed = await commandAgreement({
+      id: agreement.id,
+      actorId: participant,
+      expectedVersion: partial.currentVersion,
+      command: 'confirm',
+    });
+    expect(confirmed.state).toBe('confirmed');
+    expect(confirmed.listingIds).toEqual(
+      expect.arrayContaining([firstListing, secondListing])
+    );
+    const reserved = await client.query<{ status: string }>(
+      `SELECT status FROM book_listings WHERE id = ANY($1::integer[]) ORDER BY id`,
+      [[firstListing, secondListing]]
+    );
+    expect(reserved.rows.map((row) => row.status)).toEqual([
+      'reserved',
+      'reserved',
+    ]);
+
+    await commandAgreement({
+      id: agreement.id,
+      actorId: proposer,
+      expectedVersion: confirmed.currentVersion,
+      command: 'complete',
+    });
+    const released = await client.query<{ status: string }>(
+      `SELECT status FROM book_listings WHERE id = ANY($1::integer[]) ORDER BY id`,
+      [[firstListing, secondListing]]
+    );
+    expect(released.rows.map((row) => row.status)).toEqual([
+      'available',
+      'available',
+    ]);
   });
 });

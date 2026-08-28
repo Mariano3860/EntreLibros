@@ -23,6 +23,7 @@ export interface AgreementSnapshot {
   currentVersion: number;
   details: AgreementDetails;
   acceptances: number[];
+  listingIds: number[];
 }
 
 export interface AgreementHistoryEntry {
@@ -44,6 +45,7 @@ interface AgreementRow {
   current_version: number;
   details: AgreementDetails;
   acceptances: number[];
+  listing_ids: number[];
 }
 
 function mapRow(row: AgreementRow): AgreementSnapshot {
@@ -56,18 +58,22 @@ function mapRow(row: AgreementRow): AgreementSnapshot {
     currentVersion: row.current_version,
     details: row.details,
     acceptances: (row.acceptances ?? []).map(Number),
+    listingIds: (row.listing_ids ?? []).map(Number),
   };
 }
 
 const AGREEMENT_SELECT = `
   SELECT a.id, a.conversation_id, a.proposer_id, a.participant_id,
          a.state, a.current_version, v.details,
-         COALESCE(ARRAY_AGG(ac.user_id) FILTER (WHERE ac.user_id IS NOT NULL), '{}') AS acceptances
+         COALESCE(ARRAY_AGG(DISTINCT ac.user_id) FILTER (WHERE ac.user_id IS NOT NULL), '{}') AS acceptances,
+         COALESCE(ARRAY_AGG(DISTINCT ai.listing_id) FILTER (WHERE ai.listing_id IS NOT NULL), '{}') AS listing_ids
   FROM exchange_agreements a
   JOIN exchange_agreement_versions v
     ON v.agreement_id = a.id AND v.version = a.current_version
   LEFT JOIN exchange_agreement_acceptances ac
     ON ac.agreement_id = a.id AND ac.version = a.current_version
+  LEFT JOIN exchange_agreement_items ai
+    ON ai.agreement_id = a.id AND ai.version = a.current_version
 `;
 
 export async function getAgreement(
@@ -103,6 +109,7 @@ export async function createAgreement(input: {
   proposerId: number;
   participantId: number;
   details: AgreementDetails;
+  listingIds?: number[];
 }): Promise<AgreementSnapshot> {
   const agreement = await withTransaction(async (client) => {
     const conversation = await client.query<{ user_id: number }>(
@@ -119,6 +126,27 @@ export async function createAgreement(input: {
     ) {
       throw new Error('agreements.errors.participants_invalid');
     }
+    const listingIds = [...new Set(input.listingIds ?? [])];
+    if (listingIds.length > 2) {
+      throw new Error('agreements.errors.listings_invalid');
+    }
+    const listings = listingIds.length
+      ? await client.query<{ id: number; user_id: number; status: string }>(
+          `SELECT id, user_id, status FROM book_listings
+           WHERE id = ANY($1::integer[]) FOR UPDATE`,
+          [listingIds]
+        )
+      : { rows: [] };
+    if (
+      listings.rows.length !== listingIds.length ||
+      listings.rows.some(
+        (listing) =>
+          listing.status !== 'available' ||
+          ![input.proposerId, input.participantId].includes(listing.user_id)
+      )
+    ) {
+      throw new Error('agreements.errors.listing_unavailable');
+    }
     const agreementResult = await client.query<{ id: number }>(
       `INSERT INTO exchange_agreements
        (conversation_id, proposer_id, participant_id)
@@ -132,6 +160,14 @@ export async function createAgreement(input: {
        VALUES ($1, 1, $2, $3)`,
       [id, input.proposerId, JSON.stringify(input.details)]
     );
+    for (const listing of listings.rows) {
+      await client.query(
+        `INSERT INTO exchange_agreement_items
+         (agreement_id, version, listing_id, owner_id)
+         VALUES ($1, 1, $2, $3)`,
+        [id, listing.id, listing.user_id]
+      );
+    }
     await client.query(
       `INSERT INTO agreement_events (agreement_id, version, actor_id, event_type)
        VALUES ($1, 1, $2, 'proposal')`,
@@ -157,7 +193,8 @@ export async function commandAgreement(input: {
   const agreement = await withTransaction(async (client) => {
     const current = await client.query<AgreementRow>(
       `SELECT a.id, a.conversation_id, a.proposer_id, a.participant_id,
-              a.state, a.current_version, v.details, '{}'::integer[] AS acceptances
+              a.state, a.current_version, v.details,
+              '{}'::integer[] AS acceptances, '{}'::integer[] AS listing_ids
        FROM exchange_agreements a
        JOIN exchange_agreement_versions v
          ON v.agreement_id = a.id AND v.version = a.current_version
@@ -199,6 +236,14 @@ export async function commandAgreement(input: {
         JSON.stringify(row.details),
       ]
     );
+    await client.query(
+      `INSERT INTO exchange_agreement_items
+       (agreement_id, version, listing_id, owner_id)
+       SELECT agreement_id, $2, listing_id, owner_id
+       FROM exchange_agreement_items
+       WHERE agreement_id = $1 AND version = $3`,
+      [input.id, nextVersion, row.current_version]
+    );
     if (input.command === 'confirm') {
       const acceptances = [
         ...new Set([...(row.acceptances ?? []), input.actorId]),
@@ -211,6 +256,35 @@ export async function commandAgreement(input: {
           [input.id, nextVersion, userId]
         );
       }
+    }
+    if (nextState === 'confirmed') {
+      const reserved = await client.query(
+        `UPDATE book_listings
+         SET status = 'reserved', exchange_agreement_id = $1, updated_at = NOW()
+         WHERE id IN (
+           SELECT listing_id FROM exchange_agreement_items
+           WHERE agreement_id = $1 AND version = $2
+         ) AND status = 'available' AND exchange_agreement_id IS NULL`,
+        [input.id, nextVersion]
+      );
+      const items = await client.query<{ count: string }>(
+        `SELECT COUNT(*)::text AS count FROM exchange_agreement_items
+         WHERE agreement_id = $1 AND version = $2`,
+        [input.id, nextVersion]
+      );
+      if (
+        Number(reserved.rowCount ?? 0) !== Number(items.rows[0]?.count ?? 0)
+      ) {
+        throw new Error('agreements.errors.listing_unavailable');
+      }
+    }
+    if (['cancelled', 'rejected', 'completed'].includes(nextState)) {
+      await client.query(
+        `UPDATE book_listings
+         SET status = 'available', exchange_agreement_id = NULL, updated_at = NOW()
+         WHERE exchange_agreement_id = $1`,
+        [input.id]
+      );
     }
     await client.query(
       `INSERT INTO agreement_events (agreement_id, version, actor_id, event_type, reason)

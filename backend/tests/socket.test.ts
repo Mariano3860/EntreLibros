@@ -15,6 +15,7 @@ import { setupWebsocket } from '../src/socket.js';
 import jwt, { type Algorithm } from 'jsonwebtoken';
 import * as userRepo from '../src/repositories/userRepository.js';
 import * as messagingRepo from '../src/repositories/messagingRepository.js';
+import { agreementEvents } from '../src/repositories/agreementRepository.js';
 
 let io: Server<
   ClientToServerEvents,
@@ -142,6 +143,17 @@ describe('websocket messaging', () => {
       });
     });
     let outsiderReceived = false;
+    const agreementReceived = new Promise<void>((resolve) => {
+      authorized.once('agreement:updated', (update) => {
+        expect(update.agreementId).toBe(7);
+        expect(update.currentVersion).toBe(2);
+        resolve();
+      });
+    });
+    let outsiderAgreementReceived = false;
+    outsider.once('agreement:updated', () => {
+      outsiderAgreementReceived = true;
+    });
     outsider.once('conversation:message', () => {
       outsiderReceived = true;
     });
@@ -158,6 +170,26 @@ describe('websocket messaging', () => {
           joined ? resolve() : reject(new Error('first room join rejected'))
       );
     });
+    agreementEvents.emit('committed', {
+      id: 7,
+      conversationId: 101,
+      proposerId: 1,
+      participantId: 2,
+      state: 'partially_confirmed',
+      currentVersion: 2,
+      details: {
+        meetingPoint: 'Library',
+        area: 'Center',
+        date: '2026-09-01',
+        time: '18:00',
+        bookTitle: 'Dune',
+      },
+      acceptances: [1],
+      listingIds: [],
+    });
+    await agreementReceived;
+    await new Promise((resolve) => setTimeout(resolve, 30));
+    expect(outsiderAgreementReceived).toBe(false);
     clientSocket.emit('conversation:message', {
       conversationId: 101,
       clientKey: 'room-key',
