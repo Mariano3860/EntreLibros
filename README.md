@@ -47,7 +47,9 @@ El backend enviará una respuesta automática en el mismo canal usando el usuari
    # o para levantar ambos en paralelo:
    npm run dev
    ```
-   El frontend obtiene la URL del backend desde `PUBLIC_API_BASE_URL`.
+   El frontend usa `/api` en el mismo origen por defecto. Solo define
+   `PUBLIC_API_BASE_URL` para un backend en otro origen y conserva siempre el
+   sufijo `/api`, por ejemplo `http://localhost:4000/api`.
 
 Luego de iniciar el backend, puedes visitar `http://localhost:4000/api-docs` para ver la documentación interactiva de la API generada con Swagger.
 
@@ -94,7 +96,7 @@ services:
   frontend:
     build: ./frontend
     environment:
-      PUBLIC_API_BASE_URL: http://localhost:4000
+      PUBLIC_API_BASE_URL: /api
     ports:
       - "3000:3000"
     depends_on:
@@ -116,7 +118,7 @@ Para cada entorno crea un archivo de variables en la raíz del proyecto:
 - `.env.production` para producción
 - `.env.development` para desarrollo
 
-Estos archivos no se versionan (revisa `.env.production.example` y `.env.development.example` como guía) e incluyen valores como `DOCKERHUB_USER`, `JWT_SECRET`, `POSTGRES_PASSWORD`, `DATABASE_URL`, `FRONTEND_URL` y `PUBLIC_API_BASE_URL`.
+Estos archivos no se versionan (revisa `.env.production.example` y `.env.development.example` como guía) e incluyen valores como `DOCKERHUB_USER`, `JWT_SECRET`, `POSTGRES_PASSWORD`, `DATABASE_URL`, `FRONTEND_URL`, `OPENAPI_SERVER_ORIGIN` y `PUBLIC_API_BASE_URL`.
 
 Ejemplos de Docker Compose:
 
@@ -195,6 +197,12 @@ Principales variables:
 - `DATABASE_URL`: Cadena de conexión de PostGIS utilizada por el backend. Ejemplo: `postgres://postgres:postgres@localhost:5432/entrelibros`.
 - `JWT_SECRET`: clave secreta para firmar y verificar tokens JWT.
 - `FRONTEND_URL`: URL del frontend que el backend permite para CORS. Ejemplo: `http://localhost:3000`.
-- `PUBLIC_API_BASE_URL`: URL del backend que el frontend consulta. Ejemplo: `http://localhost:4000`.
-- `API_BASE_URL`: URL base de la API utilizada en la documentación de Swagger (opcional, por defecto `http://localhost:4000` o `http://localhost:<PORT>`).
+- `PUBLIC_API_BASE_URL`: base de la API para el navegador. Por defecto es
+  `/api`; un override cross-origin debe incluir el prefijo, por ejemplo
+  `http://localhost:4000/api`.
+- `PUBLIC_API_USE_MOCKS`: habilita MSW solo cuando vale `true`; el valor normal
+  de desarrollo y producción es `false`.
+- `OPENAPI_SERVER_ORIGIN`: origen público usado por Swagger, sin ruta de API,
+  por ejemplo `http://localhost:4000`. Los paths del contrato ya empiezan por
+  `/api`.
 - `PORT`: Puerto en el que se expone el backend (opcional, por defecto `4000`). Ejemplo: `4000`.

@@ -3,6 +3,20 @@ import { pluginReact } from '@rsbuild/plugin-react'
 import { pluginSass } from '@rsbuild/plugin-sass'
 import { pluginSvgr } from '@rsbuild/plugin-svgr'
 
+export const backendProxyTarget = 'http://localhost:4000'
+
+export const backendProxy = {
+  '/api': {
+    target: backendProxyTarget,
+    changeOrigin: true,
+  },
+  '/socket.io': {
+    target: backendProxyTarget,
+    changeOrigin: true,
+    ws: true,
+  },
+}
+
 export default defineConfig({
   plugins: [
     pluginReact(),
@@ -63,6 +77,7 @@ export default defineConfig({
     open: true, // Auto-opens browser
     base: '/', // Base path
     historyApiFallback: true, // Enable Single Page Applications (SPA)
+    proxy: backendProxy,
   },
 
   performance: {

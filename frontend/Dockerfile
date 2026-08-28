@@ -1,4 +1,4 @@
-FROM node:24-alpine AS builder
+FROM node:22.19.0-alpine AS builder
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY backend/package.json backend/
@@ -10,4 +10,3 @@ RUN npm run build -w frontend
 FROM nginx:alpine
 COPY --from=builder /app/frontend/dist /usr/share/nginx/html
 CMD ["nginx", "-g", "daemon off;"]
-
