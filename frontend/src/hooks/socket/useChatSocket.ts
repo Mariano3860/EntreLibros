@@ -45,7 +45,7 @@ export const useChatSocket = () => {
   )
 
   useEffect(() => {
-    const apiUrl = import.meta.env.PUBLIC_API_BASE_URL || '/api'
+    const apiUrl = import.meta.env?.PUBLIC_API_BASE_URL || '/api'
     // Ensure we connect to the server origin without an API prefix to avoid
     // Socket.IO "Invalid namespace" errors in production environments.
     const { origin } = new URL(apiUrl, window.location.origin)

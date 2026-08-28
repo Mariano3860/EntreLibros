@@ -6,7 +6,7 @@ export interface EnableMockingOptions {
 
 export async function enableMocking(options: EnableMockingOptions = {}) {
   const useMocksEnv =
-    options.useMocksEnv ?? import.meta.env.PUBLIC_API_USE_MOCKS ?? undefined
+    options.useMocksEnv ?? import.meta.env?.PUBLIC_API_USE_MOCKS ?? undefined
   const normalizedEnv = useMocksEnv?.toString().trim().toLowerCase()
   const explicitlyEnabled = normalizedEnv
     ? ENABLE_VALUES.includes(normalizedEnv as (typeof ENABLE_VALUES)[number])

@@ -108,8 +108,8 @@ function toTextMessage(
 export const Messages = () => {
   const { t, i18n } = useTranslation()
   const useDemoConversations =
-    import.meta.env.MODE === 'test' ||
-    import.meta.env.PUBLIC_DEMO_MODE === 'true'
+    import.meta.env?.MODE === 'test' ||
+    import.meta.env?.PUBLIC_DEMO_MODE === 'true'
   const [conversations, setConversations] = useState<Conversation[]>(
     useDemoConversations ? mockConversations : []
   )
