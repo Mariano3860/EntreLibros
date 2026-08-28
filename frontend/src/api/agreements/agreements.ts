@@ -32,6 +32,19 @@ export const agreementQueryKeys = {
     [...agreementQueryKeys.all, agreementId] as const,
 }
 
+export async function createAgreement(input: {
+  conversationId: number
+  participantId: number
+  details: AgreementDetails
+  listingIds?: number[]
+}): Promise<AgreementSnapshot> {
+  const response = await apiClient.post<{ agreement: AgreementSnapshot }>(
+    RELATIVE_API_ROUTES.AGREEMENTS.CREATE,
+    input
+  )
+  return response.data.agreement
+}
+
 export async function fetchAgreement(
   agreementId: number
 ): Promise<AgreementSnapshot> {
