@@ -82,6 +82,7 @@ function toConversation(item: ApiConversation): Conversation {
       name: `Conversación ${item.id}`,
       avatar: '',
       online: false,
+      ...(item.isBot ? mockConversations[0].user : {}),
     },
     badges: [],
     messages: [],
