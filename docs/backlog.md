@@ -182,6 +182,8 @@ Feature 5.2 Acuerdos
 - [~] S-5.3 Confirmación de acuerdo (lugar RdL/espacio público, horario) (Must, E1; BR-41)
   - Éxito: registra acuerdo y dispara recordatorio.
   - Actualización 2025-09-28: se incorporaron las burbujas de Propuesta y Confirmación dentro del chat, con i18n ES/EN, respeto de tema claro/oscuro y sin exponer direcciones exactas; resta conectar la lógica persistente/notificaciones.
+  - Actualización 2025-11-20: se modeló el versionado del acuerdo con cambios/cancelaciones accesibles, validación de disponibilidad mockeada y modal de confirmación inclusivo; se añadió un store dedicado, nuevas burbujas y pruebas (store + componentes) que cubren doble confirmación, cambios de versión, cancelación e idempotencia.
+  - Actualización 2026-08-28: se añadieron persistencia PostgreSQL de conversaciones/mensajes, historial versionado de acuerdos, contrapropuestas inmutables, comandos REST autenticados, conflictos optimistic-lock, reservas atómicas con liberación, salas Socket.IO autorizadas, eventos post-commit y bloqueo bilateral para nuevas conversaciones/acuerdos; quedan pendientes las notificaciones y el registro post-encuentro.
 - [ ] S-5.4 Registro post-encuentro (“se concretó / no se concretó”) (Should, E2; BR-42)
   - Éxito: alimenta métricas sin exponer datos personales.
 

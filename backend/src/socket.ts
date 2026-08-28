@@ -1,8 +1,19 @@
 import type { Server } from 'socket.io';
 import jwt, { type Algorithm } from 'jsonwebtoken';
 import { findUserById } from './repositories/userRepository.js';
+import {
+  isConversationParticipant,
+  listConversations,
+  markConversationRead,
+  listMessages,
+  sendMessage,
+} from './repositories/messagingRepository.js';
 import { logger } from './utils/logger.js';
 import { generateReply } from './services/chatBot.js';
+import {
+  agreementEvents,
+  type AgreementSnapshot,
+} from './repositories/agreementRepository.js';
 
 function parseCookies(header?: string): Record<string, string> {
   if (!header) return {};
@@ -31,11 +42,39 @@ export interface ChatMessage {
 
 export interface ClientToServerEvents {
   message: (payload: { text: string; channel?: string }) => void;
+  'conversation:join': (
+    payload: { conversationId: number; after?: number },
+    acknowledge?: (joined: boolean) => void
+  ) => void;
+  'conversation:message': (payload: {
+    conversationId: number;
+    clientKey: string;
+    body: string;
+  }) => void;
+  'conversation:read': (payload: {
+    conversationId: number;
+    sequence: number;
+  }) => void;
 }
 
 export interface ServerToClientEvents {
   message: (msg: ChatMessage) => void;
   user: (user: ChatUser) => void;
+  'conversation:message': (msg: {
+    conversationId: number;
+    sequence: number;
+    senderId: number;
+    body: string;
+    clientKey: string;
+    createdAt: string;
+  }) => void;
+  'agreement:updated': (msg: {
+    agreementId: number;
+    conversationId: number;
+    state: AgreementSnapshot['state'];
+    currentVersion: number;
+  }) => void;
+  'conversation:error': (payload: { message: string }) => void;
 }
 
 export type InterServerEvents = Record<string, never>;
@@ -52,6 +91,18 @@ export function setupWebsocket(
     SocketData
   >
 ) {
+  agreementEvents.on('committed', (agreement: AgreementSnapshot) => {
+    io.to(`conversation:${agreement.conversationId}`).emit(
+      'agreement:updated',
+      {
+        agreementId: agreement.id,
+        conversationId: agreement.conversationId,
+        state: agreement.state,
+        currentVersion: agreement.currentVersion,
+      }
+    );
+  });
+
   io.use(async (socket, next) => {
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) return next(new Error('auth.errors.unauthorized'));
@@ -76,6 +127,108 @@ export function setupWebsocket(
 
   io.on('connection', (socket) => {
     socket.emit('user', socket.data.user);
+    void listConversations(socket.data.user.id)
+      .then((conversations) => {
+        conversations.forEach((conversation) => {
+          void socket.join(`conversation:${conversation.id}`);
+        });
+      })
+      .catch((error) => {
+        logger.error('Socket conversation initialization failed', {
+          userId: socket.data.user.id,
+          message: error instanceof Error ? error.message : String(error),
+        });
+      });
+
+    socket.on(
+      'conversation:join',
+      async ({ conversationId, after }, acknowledge) => {
+        if (
+          !(await isConversationParticipant(
+            conversationId,
+            socket.data.user.id
+          ))
+        ) {
+          acknowledge?.(false);
+          socket.emit('conversation:error', {
+            message: 'messaging.errors.forbidden',
+          });
+          return;
+        }
+        await socket.join(`conversation:${conversationId}`);
+        if (after !== undefined) {
+          const missed = await listMessages(
+            conversationId,
+            socket.data.user.id,
+            {
+              after,
+            }
+          );
+          missed.forEach((message) => {
+            socket.emit('conversation:message', {
+              conversationId: message.conversationId,
+              sequence: message.sequence,
+              senderId: message.senderId,
+              body: message.body,
+              clientKey: message.clientKey,
+              createdAt: message.createdAt.toISOString(),
+            });
+          });
+        }
+        acknowledge?.(true);
+      }
+    );
+
+    socket.on('conversation:message', async (payload) => {
+      try {
+        const message = await sendMessage({
+          conversationId: payload.conversationId,
+          senderId: socket.data.user.id,
+          clientKey: payload.clientKey,
+          body: payload.body,
+        });
+        io.to(`conversation:${payload.conversationId}`).emit(
+          'conversation:message',
+          {
+            conversationId: message.conversationId,
+            sequence: message.sequence,
+            senderId: message.senderId,
+            body: message.body,
+            clientKey: message.clientKey,
+            createdAt: message.createdAt.toISOString(),
+          }
+        );
+      } catch (error) {
+        socket.emit('conversation:error', {
+          message:
+            error instanceof Error ? error.message : 'messaging.errors.failed',
+        });
+      }
+    });
+
+    socket.on('conversation:read', async ({ conversationId, sequence }) => {
+      if (
+        !(await isConversationParticipant(conversationId, socket.data.user.id))
+      ) {
+        socket.emit('conversation:error', {
+          message: 'messaging.errors.forbidden',
+        });
+        return;
+      }
+      try {
+        await markConversationRead(
+          conversationId,
+          socket.data.user.id,
+          sequence
+        );
+      } catch (error) {
+        socket.emit('conversation:error', {
+          message:
+            error instanceof Error ? error.message : 'messaging.errors.failed',
+        });
+      }
+    });
+
     socket.on('message', async ({ text, channel = 'general' }) => {
       const msg: ChatMessage = {
         text,

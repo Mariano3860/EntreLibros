@@ -20,11 +20,27 @@ export const RELATIVE_API_ROUTES = {
     FEED: `/community/feed`,
     ACTIVITY: `/community/activity`,
     SUGGESTIONS: `/community/suggestions`,
+    MESSAGES: {
+      AVAILABILITY: `/community/messages/availability`,
+    },
     CORNERS: {
       NEARBY: `/community/corners/nearby`,
       MAP: `/community/corners/map`,
       CREATE: `/community/corners`,
     },
+  },
+  MESSAGES: {
+    CONVERSATIONS: `/messages`,
+    CREATE_CONVERSATION: `/messages/conversations`,
+    HISTORY: (conversationId: number) => `/messages/${conversationId}/messages`,
+    READ: (conversationId: number) => `/messages/${conversationId}/read`,
+  },
+  AGREEMENTS: {
+    GET: (agreementId: number) => `/agreements/${agreementId}`,
+    HISTORY: (agreementId: number) => `/agreements/${agreementId}/history`,
+    CREATE: `/agreements`,
+    VERSION: (agreementId: number) => `/agreements/${agreementId}/versions`,
+    COMMAND: (agreementId: number) => `/agreements/${agreementId}/commands`,
   },
   LANGUAGE: {
     UPDATE: `/user/language`,

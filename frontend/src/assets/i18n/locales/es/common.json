@@ -440,8 +440,50 @@
         },
         "actions": {
           "confirm": "Confirmar",
-          "suggestChange": "Proponer cambio"
-        }
+          "suggestChange": "Proponer cambio",
+          "cancel": "Cancelar acuerdo"
+        },
+        "status": {
+          "pending": "Pendiente",
+          "confirmed": "Confirmado",
+          "confirmedBy": "Confirmado por {{names}}",
+          "both": "Acuerdo confirmado por ambas partes",
+          "inactive": "Acuerdo inactivo",
+          "cancelled": "Acuerdo cancelado"
+        },
+        "change": {
+          "title": "Cambio propuesto",
+          "ariaLabel": "Propuesta de cambio: {{meetingPoint}}, {{date}} a las {{time}} para el libro {{book}}",
+          "modalTitle": "Proponer cambios",
+          "modalDescription": "Ajustá la propuesta actualizando al menos un dato.",
+          "modalSubmit": "Enviar cambios"
+        },
+        "cancellation": {
+          "title": "Acuerdo cancelado",
+          "ariaLabel": "Acuerdo cancelado por {{name}} para el libro {{book}}",
+          "by": "Cancelado por {{name}}",
+          "reason": "Motivo: {{reason}}",
+          "proposeNew": "Proponer un nuevo acuerdo",
+          "defaultReason": "La persona canceló el acuerdo.",
+          "confirmAction": "Cancelar acuerdo"
+        },
+        "confirmModal": {
+          "title": "Confirmar acuerdo",
+          "description": "Revisá los datos antes de confirmar el acuerdo."
+        },
+        "cancelModal": {
+          "title": "Confirmar cancelación",
+          "description": "Esta acción cancelará el acuerdo vigente."
+        },
+        "errors": {
+          "notFound": "La versión seleccionada ya no está disponible.",
+          "inactive": "La versión ya no está activa.",
+          "cancelled": "La versión ya fue cancelada.",
+          "unavailable": "El libro ya no está disponible para intercambio.",
+          "generic": "Ocurrió un error al procesar la acción.",
+          "noChanges": "Debes modificar al menos un dato antes de enviar."
+        },
+        "self": "Vos"
       },
       "swap": {
         "proposal": {

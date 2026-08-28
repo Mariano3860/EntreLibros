@@ -85,6 +85,35 @@ Six review threads remain unresolved:
 | `frontend/src/components/messages/Messages.tsx` | Duplicate agreement lookup | [discussion](https://github.com/Mariano3860/EntreLibros/pull/138#discussion_r2491522221) |
 | `frontend/src/components/messages/useAgreementStore.ts` | P1 concurrent updates must derive from `prev` | [discussion](https://github.com/Mariano3860/EntreLibros/pull/138#discussion_r2491534939) |
 
+### PR #138 recovery inventory (2026-08-28)
+
+The current PR diff is limited to the agreement workflow in the frontend:
+version types, the local agreement store, proposal/confirmation/cancellation
+bubbles and modals, message rendering, the mocked book-availability check and
+Spanish/English labels. The review fixes are mapped as follows:
+
+| Review finding | Code change | Regression evidence |
+| --- | --- | --- |
+| Confirmation/cancellation used a stale closure | Functional state updaters derive from `prev[conversationId]` | `frontend/tests/hooks/useAgreementStore.test.ts`: queued confirmations and cancellations |
+| Unused cancellation reason | Removed the unused store parameter; the rendered message remains responsible for its display reason | Frontend typecheck plus existing cancellation rendering path |
+| Redundant memoization | Return `agreements` directly from the hook | Frontend typecheck |
+| Duplicate agreement lookup | The action path keeps one lookup for the selected conversation/version before appending the event | Frontend typecheck and PR diff review |
+
+The PR still does not contain persistent conversations, messages or agreements,
+backend routes/migrations, environment changes, general dependency upgrades or
+production deployment work. Those are explicitly deferred to the subsequent
+sections of `complete-entrelibros-recovery` and must not be added to #138.
+
+The scope inventory for the reviewed paths is:
+
+| Area | Current PR state | Follow-up boundary |
+| --- | --- | --- |
+| Conversation initialization | `Messages.tsx` initializes the current mock conversation list locally | Server conversation listing belongs to section 6 |
+| Agreement versions | `useAgreementStore` keeps proposal history and active version in client state | Immutable persisted versions belong to section 5 |
+| Confirm and cancel | Client-only transitions now use atomic functional updates; cancellation text stays in the message model | Authenticated commands and concurrency belong to section 5 |
+| Reconnect | Existing Socket.IO chat path remains a transport/mock concern; no agreement recovery cursor exists | Persisted replay belongs to sections 4 and 6 |
+| Errors | Current UI maps local store errors to i18n keys; no backend error contract is present | REST/OpenAPI error contracts belong to sections 4–6 |
+
 The latest [CI Frontend run](https://github.com/Mariano3860/EntreLibros/actions/runs/19077745239)
 completed with failure in the `quality` job. The Dependabot auto-merge check was
 skipped. GitHub no longer retains the failed job log: requesting it on
@@ -178,6 +207,36 @@ task 8.1 must triage runtime applicability before upgrades or exceptions.
 ```powershell
 docker run --rm -v 'C:\REPOS\EntreLibros:/workspace:ro' -w /workspace node:22.19.0-bookworm-slim npm audit --omit=dev --json
 ```
+
+## PR #138 migration and quality evidence
+
+On 2026-08-28, migration execution was verified twice against the preserved
+`entrelibros_test` schema and against the isolated
+`entrelibros_recovery_verify_20260828` database. The PR branch now includes
+migrations 010 through 014, including conversation/agreement persistence,
+listing reservations and bilateral user blocks. The real-service E2E flow was
+run against PostgreSQL/PostGIS with mocks disabled and covered two users,
+cursor recovery, counterproposal, stale conflict, bilateral confirmation and
+cancellation.
+The earlier anonymized backup restore above remains the preserved-schema
+baseline; the new migrations are append-only and were then applied to the
+current test schema without changing existing rows.
+
+The local backend suite passed with 27 files and 103 tests. The frontend suite
+passed with coverage enabled. Remote PR checks for head `8aa3f10` passed for
+both backend and frontend, and the final diff review found only messaging,
+agreements, their tests, documentation and the explicitly related coverage
+threshold change.
+
+The browser-control surface was unavailable in this environment, so a browser
+E2E run could not be claimed. The service-level E2E evidence above is separate
+from that limitation; the existing frontend suite remains the automated UI
+evidence.
+
+No runtime dependency was changed by the PR #138 recovery commits. The audit
+reported 21 pre-existing production findings (15 high, 6 moderate, 0 critical)
+with fixes available; they are recorded as an explicit follow-up for task 8.1,
+not silently accepted as resolved by this PR.
 
 ## Delivery checkpoints
 

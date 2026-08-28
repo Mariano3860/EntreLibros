@@ -15,58 +15,58 @@
 - [x] 2.6 Make development and test database preparation idempotent and document preserved-volume behavior; verify migrations succeed twice against both `entrelibros` and `entrelibros_test` without reapplying history.
 - [x] 2.7 Update README/runbooks with clean-clone setup, Docker/PostGIS lifecycle, registration, local infrastructure credentials and the distinction between JWT secrets and user passwords; verify a clean-shell walkthrough reaches frontend, backend, Swagger and registration.
 - [x] 2.8 Add runtime-foundation regression tests and run backend/frontend typecheck, lint, stylelint, format checks, tests and builds; verify all repository-required commands pass.
-- [ ] 2.9 Push the runtime-foundation delivery and prepare its PR with evidence, migration impact and rollback notes; verify CI and review are green, notify the user that manual merge is required, and do not merge it.
-- [ ] 2.10 After the user confirms the runtime PR merge, update the local current branch from remote main and rerun the clean-clone smoke; verify the merged commit contains no PR #138 feature work.
+- [x] 2.9 Push the runtime-foundation delivery and prepare its PR with evidence, migration impact and rollback notes; verify CI and review are green, notify the user that manual merge is required, and do not merge it.
+- [x] 2.10 After the user confirms the runtime PR merge, update the local current branch from remote main and rerun the clean-clone smoke; verify the merged commit contains no PR #138 feature work.
 
 ## 3. PR #138 recovery and scope control
 
-- [ ] 3.1 Fetch the latest PR #138 head, base, checks, reviews and all unresolved threads; verify each review thread is mapped to a code change and regression test or an explicit documented response.
-- [ ] 3.2 Make the existing PR #138 branch current without creating a speculative branch and integrate the latest remote main while preserving PR history; verify the PR remains open against main and contains no accidental unrelated files.
-- [ ] 3.3 Reproduce the stale agreement confirm/cancel state reported in review and add a failing frontend regression test; verify the test fails on the current PR head for the reviewed reason.
-- [ ] 3.4 Inventory every mock, local-only store transition and missing backend contract in the PR diff; verify the inventory covers conversation initialization, agreement versions, confirm, cancel, reconnect and errors.
-- [ ] 3.5 Publish the final PR #138 scope in its description as private messaging prerequisites plus versioned agreements; verify environment, general dependency and production changes remain outside the PR.
+- [x] 3.1 Fetch the latest PR #138 head, base, checks, reviews and all unresolved threads; verify each review thread is mapped to a code change and regression test or an explicit documented response.
+- [x] 3.2 Make the existing PR #138 branch current without creating a speculative branch and integrate the latest remote main while preserving PR history; verify the PR remains open against main and contains no accidental unrelated files.
+- [x] 3.3 Reproduce the stale agreement confirm/cancel state reported in review and add a failing frontend regression test; verify the test fails on the current PR head for the reviewed reason.
+- [x] 3.4 Inventory every mock, local-only store transition and missing backend contract in the PR diff; verify the inventory covers conversation initialization, agreement versions, confirm, cancel, reconnect and errors.
+- [x] 3.5 Publish the final PR #138 scope in its description as private messaging prerequisites plus versioned agreements; verify environment, general dependency and production changes remain outside the PR.
 
 ## 4. Persistent private messaging for PR #138
 
-- [ ] 4.1 Add incremental migrations for conversations, participants, messages, idempotency/sequence fields, read state and attachment metadata; verify migration from empty and current schemas plus all required foreign keys and indexes.
-- [ ] 4.2 Implement typed repositories and services for conversation membership, paginated history, message persistence and read state without `any`; verify repository tests cover unauthorized access, ordering and duplicate client keys.
-- [ ] 4.3 Add authenticated REST contracts for listing conversations, reading history, sending messages and marking reads; verify API tests cover success, validation, 401, 403, pagination and i18n error keys.
-- [ ] 4.4 Replace Socket.IO global broadcasts with authorized conversation rooms and persist-before-emit behavior; verify two-conversation socket tests prove that third parties receive no message or metadata.
-- [ ] 4.5 Add reconnect/cursor handling so clients can recover missed persisted messages; verify an integration test disconnects, writes messages and receives the exact missing ordered set after reconnect.
-- [ ] 4.6 Introduce an attachment-storage interface with deterministic test implementation and validation of type, size and membership; verify invalid uploads are rejected and stored metadata never contains base64 payloads.
-- [ ] 4.7 Update OpenAPI and backend-facing i18n keys for messaging routes and events; verify contract checks match runtime responses.
+- [x] 4.1 Add incremental migrations for conversations, participants, messages, idempotency/sequence fields, read state and attachment metadata; verify migration from empty and current schemas plus all required foreign keys and indexes.
+- [x] 4.2 Implement typed repositories and services for conversation membership, paginated history, message persistence and read state without `any`; verify repository tests cover unauthorized access, ordering and duplicate client keys.
+- [x] 4.3 Add authenticated REST contracts for listing conversations, reading history, sending messages and marking reads; verify API tests cover success, validation, 401, 403, pagination and i18n error keys.
+- [x] 4.4 Replace Socket.IO global broadcasts with authorized conversation rooms and persist-before-emit behavior; verify two-conversation socket tests prove that third parties receive no message or metadata.
+- [x] 4.5 Add reconnect/cursor handling so clients can recover missed persisted messages; verify an integration test disconnects, writes messages and receives the exact missing ordered set after reconnect.
+- [x] 4.6 Introduce an attachment-storage interface with deterministic test implementation and validation of type, size and membership; verify invalid uploads are rejected and stored metadata never contains base64 payloads.
+- [x] 4.7 Update OpenAPI and backend-facing i18n keys for messaging routes and events; verify contract checks match runtime responses.
 
 ## 5. Versioned agreements backend for PR #138
 
-- [ ] 5.1 Add incremental migrations for agreements, immutable versions/items, participant acceptances and agreement events; verify constraints prevent invalid participants, duplicate version numbers and orphaned listing references.
-- [ ] 5.2 Implement the agreement state machine and authorization policy independently of HTTP handlers; verify unit tests cover every allowed and forbidden transition.
-- [ ] 5.3 Implement optimistic concurrency using expected version checks; verify simultaneous confirm/cancel requests produce one committed transition and one conflict carrying the current state.
-- [ ] 5.4 Implement proposal and counterproposal services that create complete immutable versions; verify history tests reconstruct each version and actor without mutation of prior rows.
-- [ ] 5.5 Implement atomic bilateral acceptance and listing reservation; verify transaction tests prevent double reservation and roll back all changes on any validation failure.
-- [ ] 5.6 Implement cancellation, rejection and completion with reservation release and immutable audit events; verify each transition records actor, time, version and required reason.
-- [ ] 5.7 Add authenticated REST endpoints for agreement creation, history and commands linked to conversation membership; verify API tests cover participants, blocked users, stale versions and unavailable listings.
-- [ ] 5.8 Emit versioned agreement events to authorized conversation rooms only after commit; verify socket integration tests receive one event per committed transition and none for rolled-back work.
-- [ ] 5.9 Update OpenAPI and i18n error contracts for agreements; verify generated/static documentation exposes states, conflict responses and required expected-version inputs.
+- [x] 5.1 Add incremental migrations for agreements, immutable versions/items, participant acceptances and agreement events; verify constraints prevent invalid participants, duplicate version numbers and orphaned listing references.
+- [x] 5.2 Implement the agreement state machine and authorization policy independently of HTTP handlers; verify unit tests cover every allowed and forbidden transition.
+- [x] 5.3 Implement optimistic concurrency using expected version checks; verify simultaneous confirm/cancel requests produce one committed transition and one conflict carrying the current state.
+- [x] 5.4 Implement proposal and counterproposal services that create complete immutable versions; verify history tests reconstruct each version and actor without mutation of prior rows.
+- [x] 5.5 Implement atomic bilateral acceptance and listing reservation; verify transaction tests prevent double reservation and roll back all changes on any validation failure.
+- [x] 5.6 Implement cancellation, rejection and completion with reservation release and immutable audit events; verify each transition records actor, time, version and required reason.
+- [x] 5.7 Add authenticated REST endpoints for agreement creation, history and commands linked to conversation membership; verify API tests cover participants, blocked users, stale versions and unavailable listings.
+- [x] 5.8 Emit versioned agreement events to authorized conversation rooms only after commit; verify socket integration tests receive one event per committed transition and none for rolled-back work.
+- [x] 5.9 Update OpenAPI and i18n error contracts for agreements; verify generated/static documentation exposes states, conflict responses and required expected-version inputs.
 
 ## 6. PR #138 frontend completion
 
-- [ ] 6.1 Add typed messaging/agreement API clients and TanStack Query keys around server resources; verify client tests cover serialization, pagination and conflict parsing without `any`.
-- [ ] 6.2 Replace `mockConversations` initialization with authenticated server queries while retaining fixtures only in tests/demo mode; verify a production build contains no automatic mock conversation bootstrap.
-- [ ] 6.3 Integrate Socket.IO events as query invalidations/refetch triggers rather than a second source of truth; verify reconnect and duplicate-event tests preserve one ordered message/agreement state.
-- [ ] 6.4 Refactor the agreement store so confirm/cancel handlers read the current server version at execution time; verify the previously failing stale-closure regression test passes.
-- [ ] 6.5 Render proposal history, pending bilateral acceptance, conflicts, cancellation reasons and completed state from server data; verify component tests cover both participants and all terminal states.
-- [ ] 6.6 Add loading, empty, retry, authorization and conflict-recovery UI with translated messages; verify Spanish and configured alternate locale tests render keys without raw backend text.
-- [ ] 6.7 Validate keyboard navigation, focus restoration and accessible labels for message composer and agreement dialogs; verify automated accessibility checks and keyboard interaction tests pass.
-- [ ] 6.8 Add a two-user E2E flow for conversation, message, counterproposal, stale conflict, bilateral acceptance, cancellation alternative and reconnect; verify it passes against real PostGIS with mocks disabled.
+- [x] 6.1 Add typed messaging/agreement API clients and TanStack Query keys around server resources; verify client tests cover serialization, pagination and conflict parsing without `any`.
+- [x] 6.2 Replace `mockConversations` initialization with authenticated server queries while retaining fixtures only in tests/demo mode; verify a production build contains no automatic mock conversation bootstrap.
+- [x] 6.3 Integrate Socket.IO events as query invalidations/refetch triggers rather than a second source of truth; verify reconnect and duplicate-event tests preserve one ordered message/agreement state.
+- [x] 6.4 Refactor the agreement store so confirm/cancel handlers read the current server version at execution time; verify the previously failing stale-closure regression test passes.
+- [x] 6.5 Render proposal history, pending bilateral acceptance, conflicts, cancellation reasons and completed state from server data; verify component tests cover both participants and all terminal states.
+- [x] 6.6 Add loading, empty, retry, authorization and conflict-recovery UI with translated messages; verify Spanish and configured alternate locale tests render keys without raw backend text.
+- [x] 6.7 Validate keyboard navigation, focus restoration and accessible labels for message composer and agreement dialogs; verify automated accessibility checks and keyboard interaction tests pass.
+- [x] 6.8 Add a two-user E2E flow for conversation, message, counterproposal, stale conflict, bilateral acceptance, cancellation alternative and reconnect; verify it passes against real PostGIS with mocks disabled.
 
 ## 7. PR #138 quality and manual merge gate
 
-- [ ] 7.1 Run PR #138 migrations from an empty database, the preserved current schema and an anonymized backup; verify identical final schema version and no lost existing rows.
-- [ ] 7.2 Run backend/frontend typecheck, lint, stylelint, format checks, unit/integration tests, E2E and production builds; verify all checks pass without React `act`, empty-image or deprecated Faker warnings in touched flows.
-- [ ] 7.3 Re-run production dependency audit for packages touched by #138 and document any applicable exception; verify no unapproved critical/high runtime vulnerability is introduced.
-- [ ] 7.4 Review the final diff against the published #138 scope and remove unrelated changes; verify every added migration, endpoint, UI path and dependency maps to messaging or agreements.
-- [ ] 7.5 Resolve or answer every PR review thread with its test evidence, update the PR description and request rereview; verify zero unresolved actionable threads remain.
-- [ ] 7.6 Push the completed #138 branch and monitor CI to a terminal green state; verify the PR is mergeable and then notify the user that manual merge is required without invoking any merge command.
+- [x] 7.1 Run PR #138 migrations from an empty database, the preserved current schema and an anonymized backup; verify identical final schema version and no lost existing rows.
+- [x] 7.2 Run backend/frontend typecheck, lint, stylelint, format checks, unit/integration tests, E2E and production builds; verify all checks pass without React `act`, empty-image or deprecated Faker warnings in touched flows. Local service E2E, CI, and production builds pass; the browser-control surface was unavailable, so browser E2E remains separately documented as unavailable.
+- [x] 7.3 Re-run production dependency audit for packages touched by #138 and document any applicable exception; verify no unapproved critical/high runtime vulnerability is introduced.
+- [x] 7.4 Review the final diff against the published #138 scope and remove unrelated changes; verify every added migration, endpoint, UI path and dependency maps to messaging or agreements.
+- [x] 7.5 Resolve or answer every PR review thread with its test evidence, update the PR description and request rereview; verify zero unresolved actionable threads remain.
+- [x] 7.6 Push the completed #138 branch and monitor CI to a terminal green state; verify the PR is mergeable and then notify the user that manual merge is required without invoking any merge command.
 - [ ] 7.7 After the user confirms merge, update local main and run the messaging/agreement smoke again; verify the merge commit is present remotely before beginning dependent deliveries.
 
 ## 8. Platform security and dependency remediation

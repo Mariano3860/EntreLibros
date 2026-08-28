@@ -9,7 +9,7 @@ import {
 
 import styles from './BubbleAgreement.module.scss'
 
-type BubbleAgreementProposalProps = {
+type BubbleAgreementChangeProps = {
   role?: BubbleRole
   proposal: AgreementDetails
   time?: string
@@ -23,8 +23,8 @@ type BubbleAgreementProposalProps = {
   cancelDisabled?: boolean
 } & Pick<BubbleBaseProps, 'ariaLabel'>
 
-export const BubbleAgreementProposal = ({
-  role = 'me',
+export const BubbleAgreementChange = ({
+  role = 'them',
   proposal,
   time,
   className,
@@ -36,14 +36,14 @@ export const BubbleAgreementProposal = ({
   confirmDisabled,
   changeDisabled,
   cancelDisabled,
-}: BubbleAgreementProposalProps) => {
+}: BubbleAgreementChangeProps) => {
   const { t } = useTranslation()
 
   const meetingPointLabel = `${proposal.meetingPoint} — ${proposal.area}`
 
-  const autoAriaLabel = t('community.messages.agreement.proposal.ariaLabel', {
+  const autoAriaLabel = t('community.messages.agreement.change.ariaLabel', {
     defaultValue:
-      'Agreement proposal: {{meetingPoint}}, {{date}} at {{time}} for the book {{book}}',
+      'Agreement change proposal: {{meetingPoint}}, {{date}} at {{time}} for the book {{book}}',
     meetingPoint: meetingPointLabel,
     date: proposal.date,
     time: proposal.time,
@@ -53,8 +53,8 @@ export const BubbleAgreementProposal = ({
   return (
     <BubbleBase
       role={role}
-      tone="warning"
-      header={t('community.messages.agreement.proposal.title')}
+      tone="info"
+      header={t('community.messages.agreement.change.title')}
       className={className}
       meta={time ? <span className={styles.time}>{time}</span> : null}
       ariaLabel={ariaLabel ?? autoAriaLabel}

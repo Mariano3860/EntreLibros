@@ -15,6 +15,7 @@ type BubbleAgreementConfirmationProps = {
   confirmedBy: string
   time?: string
   className?: string
+  statusLabel?: string
 } & Pick<BubbleBaseProps, 'ariaLabel'>
 
 export const BubbleAgreementConfirmation = ({
@@ -24,6 +25,7 @@ export const BubbleAgreementConfirmation = ({
   time,
   className,
   ariaLabel,
+  statusLabel,
 }: BubbleAgreementConfirmationProps) => {
   const { t } = useTranslation()
 
@@ -53,9 +55,11 @@ export const BubbleAgreementConfirmation = ({
     >
       <div className={styles.summary}>
         <p className={styles.statusLine}>
-          {t('community.messages.agreement.confirmation.status', {
-            name: confirmedBy,
-          })}
+          {statusLabel
+            ? statusLabel
+            : t('community.messages.agreement.confirmation.status', {
+                name: confirmedBy,
+              })}
         </p>
         <div className={styles.summaryItem}>
           <span className={styles.label}>

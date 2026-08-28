@@ -8,6 +8,8 @@ import userRouter from './routes/user.js';
 import mapRouter from './routes/map.js';
 import communityRouter from './routes/community.js';
 import contactRouter from './routes/contact.js';
+import messagesRouter from './routes/messages.js';
+import agreementsRouter from './routes/agreements.js';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './config/swagger.js';
 
@@ -35,6 +37,8 @@ app.use('/api/user', userRouter);
 app.use('/api/map', mapRouter);
 app.use('/api/community', communityRouter);
 app.use('/api/contact', contactRouter);
+app.use('/api/messages', messagesRouter);
+app.use('/api/agreements', agreementsRouter);
 
 // TODO(api-alignment): montar rutas para `/api/books/mine` y `/api/community/*`
 // cuando el backend cubra las necesidades del frontend y dejemos de depender de

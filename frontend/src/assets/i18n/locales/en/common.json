@@ -440,8 +440,50 @@
         },
         "actions": {
           "confirm": "Confirm",
-          "suggestChange": "Suggest change"
-        }
+          "suggestChange": "Suggest change",
+          "cancel": "Cancel agreement"
+        },
+        "status": {
+          "pending": "Pending",
+          "confirmed": "Confirmed",
+          "confirmedBy": "Confirmed by {{names}}",
+          "both": "Agreement confirmed by both",
+          "inactive": "Inactive agreement",
+          "cancelled": "Agreement cancelled"
+        },
+        "change": {
+          "title": "Change proposed",
+          "ariaLabel": "Change proposal: {{meetingPoint}}, {{date}} at {{time}} for the book {{book}}",
+          "modalTitle": "Suggest changes",
+          "modalDescription": "Update at least one field before sending.",
+          "modalSubmit": "Send changes"
+        },
+        "cancellation": {
+          "title": "Agreement cancelled",
+          "ariaLabel": "Agreement cancelled by {{name}} for the book {{book}}",
+          "by": "Cancelled by {{name}}",
+          "reason": "Reason: {{reason}}",
+          "proposeNew": "Suggest a new agreement",
+          "defaultReason": "The agreement was cancelled.",
+          "confirmAction": "Cancel agreement"
+        },
+        "confirmModal": {
+          "title": "Confirm agreement",
+          "description": "Review the details before confirming the agreement."
+        },
+        "cancelModal": {
+          "title": "Confirm cancellation",
+          "description": "This action will cancel the active agreement."
+        },
+        "errors": {
+          "notFound": "The selected version is no longer available.",
+          "inactive": "The version is no longer active.",
+          "cancelled": "The version has already been cancelled.",
+          "unavailable": "The book is no longer available for exchange.",
+          "generic": "Something went wrong while processing the action.",
+          "noChanges": "Change at least one field before sending."
+        },
+        "self": "You"
       },
       "swap": {
         "proposal": {

@@ -68,6 +68,7 @@ export const mockConversations: Conversation[] = [
         id: 4,
         role: 'me',
         type: 'agreementProposal',
+        version: 1,
         proposal: {
           meetingPoint: 'Rincón Parque Central',
           area: 'Nervión (Sevilla)',
@@ -81,6 +82,7 @@ export const mockConversations: Conversation[] = [
         id: 5,
         role: 'them',
         type: 'agreementConfirmation',
+        version: 1,
         agreement: {
           meetingPoint: 'Rincón Parque Central',
           area: 'Nervión (Sevilla)',
@@ -90,6 +92,29 @@ export const mockConversations: Conversation[] = [
         },
         confirmedBy: 'Samuel',
         time: '4:42 PM',
+      },
+      {
+        id: 6,
+        role: 'them',
+        type: 'agreementChange',
+        version: 2,
+        proposal: {
+          meetingPoint: 'Café Luz de Luna',
+          area: 'Centro (Sevilla)',
+          date: 'miércoles',
+          time: '18:30',
+          bookTitle: 'El nombre del viento',
+        },
+        time: '4:55 PM',
+      },
+      {
+        id: 7,
+        role: 'me',
+        type: 'agreementCancellation',
+        version: 2,
+        cancelledBy: 'Lucía',
+        reason: 'El libro ya no está disponible',
+        time: '5:05 PM',
       },
     ],
     myBooks: [
