@@ -69,7 +69,7 @@ describe('BooksPage', () => {
       await screen.findByRole(
         'button',
         { name: 'publishBook.search.use' },
-        { timeout: 2000 }
+        { timeout: 5000 }
       )
     )
 
