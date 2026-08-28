@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useState } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
-import { io, type Socket } from 'socket.io-client'
 import { agreementQueryKeys } from '@api/agreements/agreements'
 import { messageQueryKeys } from '@api/messages/messages'
+import { useQueryClient } from '@tanstack/react-query'
+import { useCallback, useEffect, useState } from 'react'
+import { io, type Socket } from 'socket.io-client'
 
 export interface ChatMessage {
   text: string
