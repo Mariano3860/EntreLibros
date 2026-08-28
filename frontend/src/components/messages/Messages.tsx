@@ -151,14 +151,15 @@ export const Messages = () => {
     void fetchConversations()
       .then((items) => {
         if (!active) return
-        const next = items.map(toConversation)
+        const next = [mockConversations[0], ...items.map(toConversation)]
         setConversations(next)
         setSelectedId(next[0]?.id ?? null)
       })
       .catch(() => {
         if (!active) return
-        setConversations([])
-        setConversationError(true)
+        setConversations([mockConversations[0]])
+        setSelectedId(mockConversations[0]?.id ?? null)
+        setConversationError(false)
       })
       .finally(() => {
         if (active) setIsLoadingConversations(false)
@@ -168,8 +169,11 @@ export const Messages = () => {
     }
   }, [conversationReloadKey, useDemoConversations])
 
+  const isBotConversation = selected?.isBot === true
+
   useEffect(() => {
-    if (useDemoConversations || selectedId === null) return
+    if (useDemoConversations || isBotConversation || selectedId === null)
+      return
     let active = true
     setServerMessages([])
     void fetchMessageHistory(selectedId)
@@ -185,10 +189,16 @@ export const Messages = () => {
     return () => {
       active = false
     }
-  }, [isConnected, joinConversation, selectedId, useDemoConversations])
+  }, [
+    isConnected,
+    isBotConversation,
+    joinConversation,
+    selectedId,
+    useDemoConversations,
+  ])
 
   useEffect(() => {
-    if (useDemoConversations || !selected?.agreementId) {
+    if (useDemoConversations || isBotConversation || !selected?.agreementId) {
       setServerAgreement(null)
       setServerAgreementHistory([])
       return
@@ -211,7 +221,12 @@ export const Messages = () => {
     return () => {
       active = false
     }
-  }, [agreementUpdates, selected?.agreementId, useDemoConversations])
+  }, [
+    agreementUpdates,
+    isBotConversation,
+    selected?.agreementId,
+    useDemoConversations,
+  ])
 
   const [changeModalState, setChangeModalState] = useState<ChangeModalState>({
     open: false,
@@ -325,7 +340,7 @@ export const Messages = () => {
   const mappedMessages: Message[] = useMemo(() => {
     if (!selected) return []
 
-    if (!useDemoConversations) {
+    if (!useDemoConversations && !isBotConversation) {
       const persisted = serverMessages.map((message) =>
         toTextMessage(message, currentUser?.id)
       )
@@ -387,6 +402,7 @@ export const Messages = () => {
     messages,
     selected,
     serverMessages,
+    isBotConversation,
     useDemoConversations,
   ])
 
@@ -431,7 +447,7 @@ export const Messages = () => {
       text: draft.trim(),
     }
 
-    if (useDemoConversations) {
+    if (useDemoConversations || isBotConversation) {
       appendMessageToConversation(selectedId, newMessage)
       sendMessage(draft.trim(), selected.user.name)
       return
@@ -480,7 +496,7 @@ export const Messages = () => {
   const handleAgreementProposal = (proposal: AgreementDetails) => {
     if (!selected || selectedId === null) return
 
-    if (!useDemoConversations) {
+    if (!useDemoConversations && !isBotConversation) {
       const participantId = selected.participantIds?.find(
         (id) => id !== currentUser?.id
       )
@@ -591,7 +607,11 @@ export const Messages = () => {
       return
     }
 
-    if (!useDemoConversations && conversation.agreementId) {
+    if (
+      !useDemoConversations &&
+      !conversation.isBot &&
+      conversation.agreementId
+    ) {
       void counterProposeAgreement({
         agreementId: conversation.agreementId,
         expectedVersion: serverAgreement?.currentVersion ?? 1,
@@ -754,7 +774,11 @@ export const Messages = () => {
 
     setIsProcessingConfirmation(true)
     try {
-      if (!useDemoConversations && conversation.agreementId) {
+      if (
+        !useDemoConversations &&
+        !conversation.isBot &&
+        conversation.agreementId
+      ) {
         const agreement = await commandAgreement({
           agreementId: conversation.agreementId,
           command:

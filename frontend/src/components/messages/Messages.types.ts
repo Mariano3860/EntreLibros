@@ -113,6 +113,7 @@ export type Message =
 
 export type Conversation = {
   id: number
+  isBot?: boolean
   participantIds?: number[]
   agreementId?: number | null
   user: {
