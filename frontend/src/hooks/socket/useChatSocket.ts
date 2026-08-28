@@ -8,6 +8,15 @@ export interface ChatMessage {
   channel: string
 }
 
+export interface ConversationMessage {
+  conversationId: number
+  sequence: number
+  senderId: number
+  body: string
+  clientKey: string
+  createdAt: string
+}
+
 export const useChatSocket = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [socket, setSocket] = useState<Socket | null>(null)
@@ -17,6 +26,9 @@ export const useChatSocket = () => {
   } | null>(null)
   const [isConnected, setIsConnected] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [conversationMessages, setConversationMessages] = useState<
+    ConversationMessage[]
+  >([])
 
   useEffect(() => {
     const apiUrl = import.meta.env.PUBLIC_API_BASE_URL || '/api'
@@ -28,6 +40,16 @@ export const useChatSocket = () => {
     s.on('user', (u: { id: number; name: string }) => setCurrentUser(u))
     s.on('message', (msg: ChatMessage) => {
       setMessages((prev) => [...prev, msg])
+    })
+    s.on('conversation:message', (msg: ConversationMessage) => {
+      setConversationMessages((prev) => {
+        const duplicate = prev.some(
+          (item) =>
+            item.conversationId === msg.conversationId &&
+            item.sequence === msg.sequence
+        )
+        return duplicate ? prev : [...prev, msg]
+      })
     })
     s.on('connect', () => {
       setIsConnected(true)
@@ -54,5 +76,24 @@ export const useChatSocket = () => {
     [socket]
   )
 
-  return { messages, sendMessage, currentUser, isConnected, error }
+  const sendConversationMessage = useCallback(
+    (conversationId: number, clientKey: string, body: string) => {
+      socket?.emit('conversation:message', {
+        conversationId,
+        clientKey,
+        body,
+      })
+    },
+    [socket]
+  )
+
+  return {
+    messages,
+    conversationMessages,
+    sendMessage,
+    sendConversationMessage,
+    currentUser,
+    isConnected,
+    error,
+  }
 }
