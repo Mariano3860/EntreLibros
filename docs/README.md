@@ -11,5 +11,7 @@
 - [`roadmap.md`](roadmap.md): próximos pasos de producto y deuda técnica.
 - [`backlog.md`](backlog.md): pendientes y trazabilidad de producto.
 - [`guia-documentacion.md`](guia-documentacion.md): protocolo para mantener los documentos sincronizados.
+- [`security-runbook.md`](security-runbook.md): configuración y comprobaciones operativas de seguridad MVP.
+- [`threat-model.md`](threat-model.md): activos, amenazas cubiertas y riesgos residuales del MVP.
 
 Las instrucciones de contribución están en [`../AGENTS.md`](../AGENTS.md); las de cada área están en sus respectivos `AGENTS.md`.
