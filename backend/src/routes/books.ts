@@ -163,17 +163,27 @@ router.post(
   }
 );
 
-router.post('/:id/verify', async (req, res) => {
-  const id = Number(req.params.id);
-  const book = await verifyBook(id);
-  if (!book) {
-    return res.status(404).json({
-      error: 'NotFound',
-      message: 'books.errors.not_found',
-    });
+router.post(
+  '/:id/verify',
+  authenticate,
+  async (req: AuthenticatedRequest, res) => {
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'Unauthorized',
+        message: 'auth.errors.unauthorized',
+      });
+    }
+    const id = Number(req.params.id);
+    const book = await verifyBook(id);
+    if (!book) {
+      return res.status(404).json({
+        error: 'NotFound',
+        message: 'books.errors.not_found',
+      });
+    }
+    return res.json(book);
   }
-  res.json(book);
-});
+);
 
 router.get('/:id', async (req, res) => {
   const id = Number(req.params.id);

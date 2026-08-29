@@ -2145,6 +2145,11 @@
       "post": {
         "summary": "Verify a book",
         "tags": ["Books"],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
         "parameters": [
           {
             "name": "id",
@@ -2442,6 +2447,11 @@
       "post": {
         "summary": "Publish a new community corner",
         "tags": ["Community"],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -2508,7 +2518,7 @@
       "cookieAuth": {
         "type": "apiKey",
         "in": "cookie",
-        "name": "token"
+        "name": "sessionToken"
       }
     },
     "responses": {

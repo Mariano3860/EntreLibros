@@ -1,5 +1,5 @@
 import { describe, expect, test, vi } from 'vitest';
-import { logger } from '../../src/utils/logger.js';
+import { logger, redactLogMeta } from '../../src/utils/logger.js';
 
 describe('logger utility', () => {
   test('logs info messages with and without metadata', () => {
@@ -16,6 +16,18 @@ describe('logger utility', () => {
     });
 
     consoleSpy.mockRestore();
+  });
+
+  test('redacts credentials and personal data from metadata', () => {
+    expect(
+      redactLogMeta({
+        email: 'alice@example.com',
+        nested: { password: 'secret', requestId: 'safe-id' },
+      })
+    ).toEqual({
+      email: '[REDACTED]',
+      nested: { password: '[REDACTED]', requestId: 'safe-id' },
+    });
   });
 
   test('logs error messages with and without metadata', () => {

@@ -13,6 +13,7 @@ import {
   publishCorner,
   type PublishCornerPayload,
 } from '../services/communityCorners.js';
+import { authenticate, type AuthenticatedRequest } from '../middleware/auth.js';
 
 const router = Router();
 
@@ -85,23 +86,34 @@ router.get('/corners/map', async (_req, res) => {
   }
 });
 
-router.post('/corners', async (req, res) => {
-  try {
-    const payload = req.body as PublishCornerPayload;
-    const created = await publishCorner(payload);
-    return res.status(201).json(created);
-  } catch (error) {
-    if (error instanceof CornerValidationError) {
-      return res.status(422).json({ errors: error.errors });
+router.post(
+  '/corners',
+  authenticate,
+  async (req: AuthenticatedRequest, res) => {
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'Unauthorized',
+        message: 'auth.errors.unauthorized',
+      });
     }
 
-    console.error('Failed to publish corner', error);
-    return res.status(500).json({
-      error: 'CornerCreationFailed',
-      message: 'community.corners.errors.create_failed',
-    });
+    try {
+      const payload = req.body as PublishCornerPayload;
+      const created = await publishCorner(payload);
+      return res.status(201).json(created);
+    } catch (error) {
+      if (error instanceof CornerValidationError) {
+        return res.status(422).json({ errors: error.errors });
+      }
+
+      console.error('Failed to publish corner', error);
+      return res.status(500).json({
+        error: 'CornerCreationFailed',
+        message: 'community.corners.errors.create_failed',
+      });
+    }
   }
-});
+);
 
 router.get('/stats', (_req, res) => {
   const stats = getCommunityStats();
