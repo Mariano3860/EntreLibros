@@ -1,7 +1,10 @@
 import { query } from '../db.js';
 import bcrypt from 'bcryptjs';
 import { DEFAULT_USER_LANGUAGE, DEFAULT_USER_ROLE } from '../constants.js';
-import type { ProfileInterest, ProfileCity } from '../constants/profileCatalog.js';
+import type {
+  ProfileInterest,
+  ProfileCity,
+} from '../constants/profileCatalog.js';
 
 interface UserRow {
   id: number;

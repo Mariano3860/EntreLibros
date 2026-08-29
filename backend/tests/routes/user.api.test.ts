@@ -195,7 +195,9 @@ describe('user profile API', () => {
   });
 
   test('rejects unknown interests and neighborhoods from another city', async () => {
-    const cookie = await createLoggedInUser('invalid-profile-location@example.com');
+    const cookie = await createLoggedInUser(
+      'invalid-profile-location@example.com'
+    );
 
     await request(app)
       .patch('/api/user/profile')
@@ -211,7 +213,9 @@ describe('user profile API', () => {
   });
 
   test('sanitizes public location at private, city and neighborhood levels', async () => {
-    const cookie = await createLoggedInUser('public-profile-location@example.com');
+    const cookie = await createLoggedInUser(
+      'public-profile-location@example.com'
+    );
     const user = await findUserByEmail('public-profile-location@example.com');
     expect(user).not.toBeNull();
 

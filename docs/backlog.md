@@ -1,6 +1,6 @@
 # Backlog de Producto (Business) — EntreLibros
 
-Última actualización: 2025-09-27
+Última actualización: 2026-08-30
 
 > **Actualización técnica 2026-08-29:** la recuperación de mensajería incorporó el bot persistente mediante la migración `015_seed_messaging_bot.sql`, conversación idempotente por usuario, historial recargable y guía de diagnóstico. La mensajería mock sigue siendo útil para UI, pero no prueba persistencia real.
 
@@ -69,9 +69,9 @@ Feature 1.1 Cuenta y acceso
 
 Feature 1.2 Perfil y privacidad
 
-- [x] S-1.4 Perfil editable (alias, descripción y zona) (Must, E1; BR-02)
-  - Actualización 2026-08-29: el perfil autenticado permite editar alias, descripción, idioma y granularidad pública de ubicación; los perfiles públicos no exponen correo ni contraseña.
-  - Éxito: al menos 3 intereses; barrio/ciudad obligatorio.
+- [x] S-1.4 Perfil editable (alias, descripción, intereses y zona) (Must, E1; BR-02)
+  - Actualización 2026-08-30: el perfil autenticado permite editar alias, descripción, idioma, intereses predefinidos, ciudad y barrio opcional; la relación ciudad-barrio se valida en backend y los perfiles existentes conservan valores vacíos hasta completarse.
+  - Éxito: se recomiendan al menos 3 intereses sin bloquear el guardado; la ciudad es obligatoria al completar la zona; la zona pública respeta privacidad.
 - [x] S-1.5 Privacidad por diseño (Must, E1; BR-04)
   - Actualización 2026-08-29: se añadieron visibilidad pública/privada, redondeo de coordenadas y validaciones de imágenes.
   - Éxito: no se expone calle/altura; auditoría interna.
@@ -259,7 +259,7 @@ Feature 10.1 Participación y soporte
 
 Matriz de estado actual (resumen)
 
-- EP-1 Identidad y Perfil: [x]/[~]/[ ] → Hecho/Parcial en auth e idioma; perfil e intereses pendientes.
+- EP-1 Identidad y Perfil: [x]/[~]/[ ] → Auth y perfil editable implementados; español neutro y reputación siguen pendientes.
 - EP-2 RdL: [ ] → Alta, estados, verificación, actividad y granularidad: pendientes.
 - EP-3 Publicaciones: [~]/[ ] → Normalización por ISBN parcial; publicación y filtros pendientes.
 - EP-4 Descubrimiento: [~]/[ ] → Geolocalización base hecha; mapa+lista y afinidad pendientes.

@@ -239,7 +239,11 @@ router.patch(
         updates.neighborhood = null;
       } else {
         const city = (updates.city ?? req.user.city) as ProfileCity | null;
-        if (!city || !isProfileCity(city) || !isProfileNeighborhood(city, req.body.neighborhood)) {
+        if (
+          !city ||
+          !isProfileCity(city) ||
+          !isProfileNeighborhood(city, req.body.neighborhood)
+        ) {
           return res.status(400).json({
             error: 'InvalidFields',
             message: 'user.errors.invalid_profile',
