@@ -1,4 +1,7 @@
-import { useNotifications } from '@hooks/api/useNotifications'
+import {
+  useNotificationPreference,
+  useNotifications,
+} from '@hooks/api/useNotifications'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -22,6 +25,13 @@ type MessageGroup = {
   latestCreatedAt: string
 }
 
+type AgreementNotification = {
+  id: number
+  conversationId: number
+  label: string
+  createdAt: string
+}
+
 export const NotificationBell = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -29,6 +39,9 @@ export const NotificationBell = () => {
   const [isOpen, setIsOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const { data: notifications = [], markRead } = useNotifications({
+    enabled: isAuthenticated,
+  })
+  const { data: inAppEnabled = true } = useNotificationPreference({
     enabled: isAuthenticated,
   })
 
@@ -79,6 +92,37 @@ export const NotificationBell = () => {
     )
   }, [t, unreadMessageNotifications])
 
+  const agreementNotifications = useMemo<AgreementNotification[]>(
+    () =>
+      notifications
+        .filter(
+          (notification) =>
+            notification.kind === 'agreement' && !notification.readAt
+        )
+        .flatMap((notification) => {
+          const conversationId = Number(notification.data.conversationId)
+          if (!Number.isSafeInteger(conversationId) || conversationId <= 0) {
+            return []
+          }
+          const name =
+            typeof notification.data.participantName === 'string'
+              ? notification.data.participantName
+              : t('notifications.agreement.personFallback')
+          return [
+            {
+              id: notification.id,
+              conversationId,
+              label: t('notifications.agreement.confirmedWith', { name }),
+              createdAt: notification.createdAt,
+            },
+          ]
+        }),
+    [notifications, t]
+  )
+
+  const unreadCount =
+    unreadMessageNotifications.length + agreementNotifications.length
+
   useEffect(() => {
     if (!isOpen) return
     const handlePointerDown = (event: PointerEvent) => {
@@ -100,7 +144,12 @@ export const NotificationBell = () => {
     }
   }, [isOpen])
 
-  if (!isAuthenticated || messageGroups.length === 0) return null
+  if (
+    !isAuthenticated ||
+    !inAppEnabled ||
+    (messageGroups.length === 0 && agreementNotifications.length === 0)
+  )
+    return null
 
   const openConversation = (group: MessageGroup) => {
     group.notifications.forEach((notification) =>
@@ -118,7 +167,7 @@ export const NotificationBell = () => {
         aria-expanded={isOpen}
         aria-controls="notification-list"
         aria-label={t('notifications.open', {
-          count: unreadMessageNotifications.length,
+          count: unreadCount,
         })}
         onClick={() => setIsOpen((current) => !current)}
       >
@@ -151,6 +200,22 @@ export const NotificationBell = () => {
                       count: group.notifications.length,
                       name: group.senderName,
                     })}
+              </button>
+            ))}
+            {agreementNotifications.map((notification) => (
+              <button
+                key={notification.id}
+                className={styles.item}
+                type="button"
+                onClick={() => {
+                  markRead.mutate(notification.id)
+                  setIsOpen(false)
+                  navigate('/messages', {
+                    state: { conversationId: notification.conversationId },
+                  })
+                }}
+              >
+                {notification.label}
               </button>
             ))}
           </div>

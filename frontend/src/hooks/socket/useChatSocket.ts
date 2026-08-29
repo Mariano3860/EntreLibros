@@ -78,6 +78,7 @@ export const useChatSocket = () => {
       })
     })
     s.on('agreement:updated', (update: AgreementUpdate) => {
+      void queryClient.invalidateQueries({ queryKey: notificationKeys.all })
       void queryClient.invalidateQueries({
         queryKey: agreementQueryKeys.detail(update.agreementId),
       })

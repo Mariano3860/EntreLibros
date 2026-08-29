@@ -1,5 +1,6 @@
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { useAuth } from '@contexts/auth/AuthContext'
+import { useNotificationPreference } from '@hooks/api/useNotifications'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -23,6 +24,9 @@ export const ProfilePage = () => {
   const profileQuery = useQuery({
     queryKey: profileQueryKey,
     queryFn: fetchProfile,
+    enabled: isAuthenticated,
+  })
+  const notificationPreference = useNotificationPreference({
     enabled: isAuthenticated,
   })
   const [form, setForm] = useState<UpdateProfileRequest | null>(null)
@@ -100,6 +104,17 @@ export const ProfilePage = () => {
               <option value="es">{t('language.es')}</option>
               <option value="en">{t('language.en')}</option>
             </select>
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={notificationPreference.data ?? true}
+              disabled={notificationPreference.update.isPending}
+              onChange={(event) =>
+                notificationPreference.update.mutate(event.target.checked)
+              }
+            />
+            {t('profile.inAppNotifications')}
           </label>
           <label>
             {t('profile.visibility')}

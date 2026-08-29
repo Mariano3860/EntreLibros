@@ -106,6 +106,7 @@ describe('messaging and agreements API', () => {
         expect(body.notifications).toHaveLength(1);
         expect(body.notifications[0].kind).toBe('message');
         expect(body.notifications[0].data.conversationId).toBe(conversationId);
+        expect(body.notifications[0].data.senderName).toBe('message-a');
       });
     await request(app)
       .patch(`/api/messages/${conversationId}/read`)

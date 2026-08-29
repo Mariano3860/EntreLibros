@@ -12,18 +12,18 @@
 
 ## 2. Puerta de merge de la primera fase
 
-- [ ] 2.1 Verificar que la primera PR esté publicada, que su rama de destino sea la rama acordada por el usuario y que no se haya realizado ningún merge desde el agente; continuar solo después de la confirmación del usuario de que la PR fue fusionada.
+- [x] 2.1 Verificar que la primera PR esté publicada, que su rama de destino sea la rama acordada por el usuario y que no se haya realizado ningún merge desde el agente; continuar solo después de la confirmación del usuario de que la PR fue fusionada.
 
 ## 3. Segunda fase: acuerdos y preferencia in-app
 
-- [ ] 3.1 Después de la confirmación del merge de la primera fase, crear explícitamente la rama `feature/in-app-agreement-notifications` desde la rama actualizada y verificar que el trabajo no se realiza sobre `main`.
-- [ ] 3.2 Integrar en la ventana existente los avisos individuales de acuerdos confirmados, usando el nombre público o alias y el destino de la conversación; verificar que convivan correctamente con grupos de mensajes.
-- [ ] 3.3 Conectar la preferencia general de notificaciones in-app con la visibilidad de la campanita y los avisos, incorporando un control visible solo si el flujo existente de perfil permite alojarlo sin crear una nueva sección; verificar activación y desactivación.
-- [ ] 3.4 Completar la actualización en tiempo real para mensajes y acuerdos, invalidando o actualizando la consulta persistida sin duplicar eventos; verificar reconexión, entrega repetida y actualización del contador.
-- [ ] 3.5 Verificar que cancelar o cerrar la ventana no marque avisos como leídos y que activar un aviso marque únicamente las notificaciones que representa antes de abrir la conversación.
+- [x] 3.1 Después de la confirmación del merge de la primera fase, crear explícitamente la rama `feature/in-app-agreement-notifications` desde la rama actualizada y verificar que el trabajo no se realiza sobre `main`.
+- [x] 3.2 Integrar en la ventana existente los avisos individuales de acuerdos confirmados, usando el nombre público o alias y el destino de la conversación; verificar que convivan correctamente con grupos de mensajes.
+- [x] 3.3 Conectar la preferencia general de notificaciones in-app con la visibilidad de la campanita y los avisos, incorporando un control visible solo si el flujo existente de perfil permite alojarlo sin crear una nueva sección; verificar activación y desactivación.
+- [x] 3.4 Completar la actualización en tiempo real para mensajes y acuerdos, invalidando o actualizando la consulta persistida sin duplicar eventos; verificar reconexión, entrega repetida y actualización del contador.
+- [x] 3.5 Verificar que cancelar o cerrar la ventana no marque avisos como leídos y que activar un aviso marque únicamente las notificaciones que representa antes de abrir la conversación.
 
 ## 4. Verificación y entrega de la segunda fase
 
-- [ ] 4.1 Ejecutar las pruebas de frontend y backend afectadas, los typechecks, los formateadores y la validación de OpenSpec; corregir todos los errores reales y registrar cualquier warning preexistente.
-- [ ] 4.2 Realizar la comprobación manual con mensajes nuevos, varios mensajes de una conversación, conversaciones distintas, acuerdos confirmados, preferencia desactivada y recarga de la aplicación.
+- [x] 4.1 Ejecutar las pruebas de frontend y backend afectadas, los typechecks, los formateadores y la validación de OpenSpec; corregir todos los errores reales y registrar cualquier warning preexistente.
+- [x] 4.2 Realizar la comprobación manual con mensajes nuevos, varios mensajes de una conversación, conversaciones distintas, acuerdos confirmados, preferencia desactivada y recarga de la aplicación.
 - [ ] 4.3 Hacer commits claros y concisos en `feature/in-app-agreement-notifications`, crear una PR con descripción en español en formato GitHub y detener el trabajo para que el usuario realice el merge final.
