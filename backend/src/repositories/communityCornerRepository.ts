@@ -38,6 +38,7 @@ export interface CreateCommunityCornerInput {
   address: CommunityCornerAddress;
   coordinates: CommunityCornerCoordinates;
   photo: CommunityCornerPhoto;
+  ownerId: number;
 }
 
 export interface CommunityCornerMetrics {
@@ -64,6 +65,7 @@ export interface CommunityCornerEntity {
   activityLabel: string | null;
   metrics: CommunityCornerMetrics;
   distanceKm: number | null;
+  ownerId: number | null;
 }
 
 interface CommunityCornerRow {
@@ -90,6 +92,7 @@ interface CommunityCornerRow {
   weekly_exchanges: number | null;
   last_activity_at: Date | string | null;
   distance_meters?: string | number | null;
+  owner_id: number | null;
 }
 
 const BASE_FIELDS = `
@@ -104,6 +107,7 @@ const BASE_FIELDS = `
     c.status,
     c.draft,
     c.consent,
+    c.owner_id,
     c.visibility_preference,
     c.address_street,
     c.address_number,
@@ -213,6 +217,7 @@ const mapRowToEntity = (row: CommunityCornerRow): CommunityCornerEntity => {
         ? Number(row.distance_meters)
         : null
     ),
+    ownerId: row.owner_id === null ? null : Number(row.owner_id),
   };
 };
 
@@ -275,10 +280,12 @@ export async function createCorner(
         status,
         draft,
         consent,
+        owner_id,
         location
       ) VALUES (
         $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,
-        ST_SetSRID(ST_MakePoint($16, $17), 4326)::geography
+        $16,
+        ST_SetSRID(ST_MakePoint($17, $18), 4326)::geography
       )`,
       [
         cornerId,
@@ -296,6 +303,7 @@ export async function createCorner(
         input.status,
         input.draft,
         input.consent,
+        input.ownerId,
         input.coordinates.longitude,
         input.coordinates.latitude,
       ]
@@ -326,6 +334,37 @@ export async function createCorner(
 
     return created;
   });
+}
+
+export async function updateCorner(
+  id: string,
+  ownerId: number,
+  input: Partial<Pick<CreateCommunityCornerInput, 'name' | 'rules' | 'schedule' | 'status' | 'visibilityPreference'>>
+): Promise<CommunityCornerEntity | null> {
+  const fields: string[] = [];
+  const values: Array<string | number | null> = [id, ownerId];
+  const updates: Array<[string, string | null | undefined]> = [
+    ['name', input.name],
+    ['rules', input.rules],
+    ['schedule', input.schedule],
+    ['status', input.status],
+    ['visibility_preference', input.visibilityPreference],
+  ];
+  for (const [column, value] of updates) {
+    if (value !== undefined) {
+      fields.push(`${column} = $${values.length + 1}`);
+      values.push(value);
+    }
+  }
+  if (fields.length === 0) return findCornerById(id);
+  fields.push('updated_at = NOW()');
+  const result = await query<{ id: string }>(
+    `UPDATE community_corners SET ${fields.join(', ')}
+     WHERE id = $1 AND owner_id = $2
+     RETURNING id`,
+    values
+  );
+  return result.rows.length === 0 ? null : findCornerById(id);
 }
 
 export interface NearbyCornersQuery {

@@ -2,6 +2,7 @@ import {
   createCorner,
   listCornersForMap,
   listCornersNear,
+  updateCorner,
   type CommunityCornerEntity,
   type CommunityCornerStatus,
   type CommunityCornerVisibilityPreference,
@@ -56,6 +57,14 @@ export interface PublishCornerResponse {
   imageUrl: string;
   status: PublishCornerStatus;
   locationSummary: string;
+}
+
+export interface UpdateCornerPayload {
+  name?: string;
+  rules?: string | null;
+  schedule?: string | null;
+  status?: PublishCornerStatus;
+  visibilityPreference?: PublishCornerVisibilityPreference;
 }
 
 export interface CommunityCornerSummaryDto {
@@ -362,7 +371,8 @@ export const getCornersMap = async (): Promise<CommunityCornerMapDto> => {
 };
 
 export const publishCorner = async (
-  payload: PublishCornerPayload
+  payload: PublishCornerPayload,
+  ownerId: number
 ): Promise<PublishCornerResponse> => {
   const validated = validatePayload(payload);
 
@@ -381,6 +391,7 @@ export const publishCorner = async (
     address: validated.location.address,
     coordinates: validated.location.coordinates,
     photo: validated.photo,
+    ownerId,
   });
 
   return {
@@ -390,4 +401,26 @@ export const publishCorner = async (
     status: created.status,
     locationSummary: created.locationSummary,
   };
+};
+
+export const editCorner = async (
+  id: string,
+  ownerId: number,
+  payload: UpdateCornerPayload
+): Promise<CommunityCornerEntity | null> => {
+  if (payload.status !== undefined && !allowedStatuses.includes(payload.status)) {
+    throw new CornerValidationError({ status: ERROR_MESSAGES.status });
+  }
+  if (payload.visibilityPreference !== undefined && !allowedVisibilities.includes(payload.visibilityPreference)) {
+    throw new CornerValidationError({ visibility: ERROR_MESSAGES.visibility });
+  }
+  const name = payload.name === undefined ? undefined : normalizeString(payload.name);
+  if (name === '') throw new CornerValidationError({ name: ERROR_MESSAGES.name });
+  return updateCorner(id, ownerId, {
+    name,
+    rules: payload.rules === undefined ? undefined : normalizeString(payload.rules) || null,
+    schedule: payload.schedule === undefined ? undefined : normalizeString(payload.schedule) || null,
+    status: payload.status,
+    visibilityPreference: payload.visibilityPreference,
+  });
 };
