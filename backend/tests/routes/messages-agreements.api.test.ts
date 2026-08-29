@@ -97,6 +97,16 @@ describe('messaging and agreements API', () => {
         expect(body.messages).toHaveLength(1);
         expect(body.nextAfter).toBe(1);
       });
+
+    await request(app)
+      .get('/api/notifications')
+      .set('Cookie', second.cookie)
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body.notifications).toHaveLength(1);
+        expect(body.notifications[0].kind).toBe('message');
+        expect(body.notifications[0].data.conversationId).toBe(conversationId);
+      });
     await request(app)
       .patch(`/api/messages/${conversationId}/read`)
       .set('Cookie', second.cookie)
