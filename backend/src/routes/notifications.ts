@@ -25,12 +25,10 @@ router.patch('/:id/read', async (req: AuthenticatedRequest, res) => {
       .json({ error: 'Unauthorized', message: 'auth.errors.unauthorized' });
   const id = Number(req.params.id);
   if (!Number.isSafeInteger(id) || id < 1)
-    return res
-      .status(422)
-      .json({
-        error: 'ValidationError',
-        message: 'notifications.errors.id_required',
-      });
+    return res.status(422).json({
+      error: 'ValidationError',
+      message: 'notifications.errors.id_required',
+    });
   const updated = await markNotificationRead(id, req.user.id);
   if (!updated)
     return res
@@ -51,12 +49,10 @@ router.get('/preferences', async (req: AuthenticatedRequest, res) => {
 
 router.patch('/preferences', async (req: AuthenticatedRequest, res) => {
   if (!req.user || typeof req.body?.inAppEnabled !== 'boolean')
-    return res
-      .status(422)
-      .json({
-        error: 'ValidationError',
-        message: 'notifications.errors.preference_invalid',
-      });
+    return res.status(422).json({
+      error: 'ValidationError',
+      message: 'notifications.errors.preference_invalid',
+    });
   await setNotificationPreference(req.user.id, req.body.inAppEnabled);
   return res.json({ inAppEnabled: req.body.inAppEnabled });
 });
