@@ -15,9 +15,10 @@ import {
   type ApiMessage,
 } from '@api/messages/messages'
 import { mockConversations } from '@components/messages/Messages.mock'
+import { useNotifications } from '@hooks/api/useNotifications'
 import { useChatSocket } from '@hooks/socket/useChatSocket'
 import { isApiMockMode } from '@utils/runtimeEnv'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { ReactComponent as InfoIcon } from '@src/assets/icons/info.svg'
@@ -73,17 +74,20 @@ const hasVersion = (
 ): message is Message & { version: number } => 'version' in message
 
 function toConversation(item: ApiConversation): Conversation {
+  const fallbackUser = item.isBot
+    ? mockConversations[0].user
+    : {
+        name: item.participantName ?? `Conversación ${item.id}`,
+        avatar: '/logo.svg',
+        online: false,
+      }
+
   return {
     id: item.id,
     isBot: item.isBot,
     participantIds: item.participantIds,
     agreementId: item.agreementId,
-    user: {
-      name: `Conversación ${item.id}`,
-      avatar: '',
-      online: false,
-      ...(item.isBot ? mockConversations[0].user : {}),
-    },
+    user: fallbackUser,
     badges: [],
     messages: [],
     myBooks: [],
@@ -124,6 +128,10 @@ export const Messages = () => {
   const [selectedId, setSelectedId] = useState<number | null>(
     useDemoConversations ? (mockConversations[0]?.id ?? null) : null
   )
+  const markedNotificationIds = useRef(new Set<number>())
+  const { data: notifications = [], markRead } = useNotifications({
+    enabled: !useDemoConversations,
+  })
   const {
     messages,
     conversationMessages,
@@ -198,6 +206,23 @@ export const Messages = () => {
     selectedId,
     useDemoConversations,
   ])
+
+  useEffect(() => {
+    if (useDemoConversations || selectedId === null) return
+
+    notifications
+      .filter(
+        (notification) =>
+          notification.kind === 'message' &&
+          notification.entityId === String(selectedId) &&
+          !notification.readAt &&
+          !markedNotificationIds.current.has(notification.id)
+      )
+      .forEach((notification) => {
+        markedNotificationIds.current.add(notification.id)
+        markRead.mutate(notification.id)
+      })
+  }, [markRead, notifications, selectedId, useDemoConversations])
 
   useEffect(() => {
     if (useDemoConversations || isBotConversation || !selected?.agreementId) {

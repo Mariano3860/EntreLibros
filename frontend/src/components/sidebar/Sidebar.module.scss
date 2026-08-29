@@ -42,6 +42,7 @@
 }
 
 .navLink {
+  position: relative;
   display: flex;
   align-items: center;
   padding: 1rem;
@@ -140,6 +141,17 @@
   text-overflow: ellipsis;
   min-width: max-content;
   flex-grow: 0;
+}
+
+.unreadDot {
+  position: absolute;
+  top: rem(14px);
+  left: rem(31px);
+  display: block;
+  width: rem(7px);
+  height: rem(7px);
+  background: var(--color-error);
+  border-radius: 50%;
 }
 
 .sidebar:hover .label,

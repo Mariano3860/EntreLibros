@@ -2,6 +2,8 @@ import { SidebarLanguageSwitcher } from '@components/sidebar/buttons/SidebarLang
 import { SidebarLoginButton } from '@components/sidebar/buttons/SidebarLoginButton'
 import { SidebarThemeButton } from '@components/sidebar/buttons/SidebarThemeButton'
 import { NavItem } from '@components/sidebar/Sidebar.types'
+import { useAuth } from '@contexts/auth/AuthContext'
+import { useNotifications } from '@hooks/api/useNotifications'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
@@ -20,6 +22,13 @@ import styles from './Sidebar.module.scss'
 export const Sidebar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { t } = useTranslation()
+  const { isAuthenticated } = useAuth()
+  const { data: notifications = [] } = useNotifications({
+    enabled: isAuthenticated,
+  })
+  const hasUnreadMessages = notifications.some(
+    (notification) => notification.kind === 'message' && !notification.readAt
+  )
 
   const navItems: NavItem[] = [
     {
@@ -88,6 +97,12 @@ export const Sidebar = () => {
               >
                 <IconComponent className={styles.icon} />
                 <span className={styles.label}>{item.label}</span>
+                {item.path === `/${HOME_URLS.MESSAGES}` && hasUnreadMessages ? (
+                  <span
+                    className={styles.unreadDot}
+                    aria-label={t('community.messages.badges.unread')}
+                  />
+                ) : null}
               </NavLink>
             )
           })}

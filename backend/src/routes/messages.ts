@@ -9,6 +9,7 @@ import {
   sendMessage,
   type MessageAttachment,
 } from '../repositories/messagingRepository.js';
+import { notifyMessageRecipients } from '../services/notifications.js';
 
 const router = Router();
 
@@ -178,6 +179,11 @@ router.post(
         clientKey: body.clientKey,
         body: body.body,
         attachmentMetadata,
+      });
+      await notifyMessageRecipients({
+        messageId: message.id,
+        conversationId,
+        senderId: req.user.id,
       });
       return res.status(201).json({ message });
     } catch (error) {

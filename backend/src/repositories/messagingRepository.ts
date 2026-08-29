@@ -7,6 +7,7 @@ export interface ConversationSummary {
   agreementId: number | null;
   lastMessageSequence: number;
   updatedAt: Date;
+  participantName: string | null;
 }
 
 export interface MessageAttachment {
@@ -34,6 +35,7 @@ interface ConversationRow {
   agreement_id: number | null;
   last_message_sequence: string;
   updated_at: Date;
+  participant_name?: string | null;
 }
 
 interface MessageRow {
@@ -55,6 +57,7 @@ function mapConversation(row: ConversationRow): ConversationSummary {
     agreementId: row.agreement_id === null ? null : Number(row.agreement_id),
     lastMessageSequence: Number(row.last_message_sequence),
     updatedAt: row.updated_at,
+    participantName: row.participant_name ?? null,
   };
 }
 
@@ -237,7 +240,26 @@ export async function listConversations(
      ORDER BY is_bot DESC, c.updated_at DESC`,
     [userId]
   );
-  return rows.map(mapConversation);
+  const conversations = rows.map(mapConversation);
+  if (conversations.length === 0) return conversations;
+  const names = await query<{ conversation_id: number; name: string }>(
+    `SELECT cp.conversation_id, u.name
+     FROM conversation_participants cp
+     JOIN users u ON u.id = cp.user_id
+     WHERE cp.conversation_id = ANY($1::bigint[]) AND cp.user_id <> $2
+     ORDER BY cp.conversation_id, cp.user_id`,
+    [conversations.map((conversation) => conversation.id), userId]
+  );
+  const nameByConversation = new Map<number, string>();
+  for (const row of names.rows) {
+    if (!nameByConversation.has(Number(row.conversation_id))) {
+      nameByConversation.set(Number(row.conversation_id), row.name);
+    }
+  }
+  return conversations.map((conversation) => ({
+    ...conversation,
+    participantName: nameByConversation.get(conversation.id) ?? null,
+  }));
 }
 
 export async function listMessages(

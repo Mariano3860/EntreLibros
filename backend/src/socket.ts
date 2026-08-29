@@ -11,6 +11,7 @@ import {
 } from './repositories/messagingRepository.js';
 import { logger } from './utils/logger.js';
 import { generateReply } from './services/chatBot.js';
+import { notifyMessageRecipients } from './services/notifications.js';
 import {
   agreementEvents,
   type AgreementSnapshot,
@@ -188,6 +189,11 @@ export function setupWebsocket(
           clientKey: payload.clientKey,
           body: payload.body,
         });
+        await notifyMessageRecipients({
+          messageId: message.id,
+          conversationId: message.conversationId,
+          senderId: message.senderId,
+        });
         io.to(`conversation:${payload.conversationId}`).emit(
           'conversation:message',
           {
@@ -212,6 +218,11 @@ export function setupWebsocket(
             senderId: botId,
             clientKey: `bot-reply-${message.id}`,
             body: reply,
+          });
+          await notifyMessageRecipients({
+            messageId: botMessage.id,
+            conversationId: botMessage.conversationId,
+            senderId: botMessage.senderId,
           });
           io.to(`conversation:${payload.conversationId}`).emit(
             'conversation:message',
