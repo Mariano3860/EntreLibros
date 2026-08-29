@@ -10,7 +10,7 @@
 
 - **Rincones de Libros:** completada la propiedad por usuario, la edición autenticada del propietario, los estados activo/en pausa y la compatibilidad segura con Rincones históricos sin propietario.
 - **Mapa:** completados los límites de coordenadas y distancia, la consulta acotada y la proyección pública de coordenadas redondeadas. La interfaz conserva estados de carga, error y vacío.
-- **Notificaciones in-app:** completada la persistencia mínima, la preferencia esencial de activación, la deduplicación de eventos de mensajes/acuerdos y el centro accesible en `/notifications`.
+- **Notificaciones in-app:** completada la persistencia mínima, la preferencia esencial de activación, la deduplicación de eventos de mensajes/acuerdos y un punto rojo accesible integrado en “Mensajes”. No existe una ruta `/notifications`.
 - **Pendiente:** no queda implementación funcional dentro de esta OpenSpec. Moderación, denuncias, reputación, email y preferencias avanzadas requieren una OpenSpec posterior.
 
 Resumen ejecutivo

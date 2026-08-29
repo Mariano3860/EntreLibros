@@ -5,6 +5,8 @@ import { NavItem } from '@components/sidebar/Sidebar.types'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
+import { useAuth } from '@contexts/auth/AuthContext'
+import { useNotifications } from '@hooks/api/useNotifications'
 
 import { ReactComponent as Books } from '@src/assets/icons/books.svg'
 import { ReactComponent as Community } from '@src/assets/icons/community.svg'
@@ -20,6 +22,13 @@ import styles from './Sidebar.module.scss'
 export const Sidebar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { t } = useTranslation()
+  const { isAuthenticated } = useAuth()
+  const { data: notifications = [] } = useNotifications({
+    enabled: isAuthenticated,
+  })
+  const hasUnreadMessages = notifications.some(
+    (notification) => notification.kind === 'message' && !notification.readAt
+  )
 
   const navItems: NavItem[] = [
     {
@@ -46,11 +55,6 @@ export const Sidebar = () => {
       path: `/${HOME_URLS.MESSAGES}`,
       icon: Messages,
       label: t('pages.messages'),
-    },
-    {
-      path: `/${HOME_URLS.NOTIFICATIONS}`,
-      icon: Messages,
-      label: t('notifications.title'),
     },
     {
       path: `/${HOME_URLS.STATS}`,
@@ -92,7 +96,16 @@ export const Sidebar = () => {
                 }
               >
                 <IconComponent className={styles.icon} />
-                <span className={styles.label}>{item.label}</span>
+                <span className={styles.label}>
+                  {item.label}
+                  {item.path === `/${HOME_URLS.MESSAGES}` &&
+                  hasUnreadMessages ? (
+                    <span
+                      className={styles.unreadDot}
+                      aria-label={t('community.messages.badges.unread')}
+                    />
+                  ) : null}
+                </span>
               </NavLink>
             )
           })}

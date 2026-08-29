@@ -1,7 +1,6 @@
 import React from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
-import { NotificationCenter } from '@src/components/notifications/NotificationCenter'
 import { HOME_URLS } from '@src/constants/constants'
 import { BooksPage } from '@src/pages/books/BooksPage'
 import { CommunityFeedPage } from '@src/pages/community/CommunityFeedPage'
@@ -32,10 +31,6 @@ const AppRoutes = () => {
         />
         <Route path={`/${HOME_URLS.MAP}`} element={<MapPage />} />
         <Route path={`/${HOME_URLS.MESSAGES}`} element={<MessagesPage />} />
-        <Route
-          path={`/${HOME_URLS.NOTIFICATIONS}`}
-          element={<NotificationCenter />}
-        />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path={`/${HOME_URLS.STATS}`} element={<StatsPage />} />
         <Route path={`/${HOME_URLS.CONTACT}`} element={<ContactPage />} />

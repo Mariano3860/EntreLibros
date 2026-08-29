@@ -142,6 +142,16 @@
   flex-grow: 0;
 }
 
+.unreadDot {
+  display: inline-block;
+  width: rem(7px);
+  height: rem(7px);
+  margin-left: $spacing-1;
+  vertical-align: middle;
+  background: var(--color-error);
+  border-radius: 50%;
+}
+
 .sidebar:hover .label,
 .sidebar.open .label {
   opacity: 1;

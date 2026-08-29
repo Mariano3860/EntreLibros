@@ -106,7 +106,7 @@
 
 - [x] 11.1 [MVP] Añadir persistencia mínima para notificaciones in-app y preferencias esenciales.
 - [x] 11.3 [MVP] Implementar notificaciones persistentes e idempotentes activadas por mensajes y acuerdos.
-- [x] 11.4 [MVP] Añadir un centro básico de notificaciones con estados traducidos y accesibles.
+- [x] 11.4 [MVP] Mostrar un indicador accesible de mensajes nuevos integrado en la navegación de Mensajes; el centro separado queda fuera del alcance.
 
 ## 12. Validación final del MVP
 

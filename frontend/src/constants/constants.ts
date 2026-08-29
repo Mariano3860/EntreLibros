@@ -7,7 +7,6 @@ export const HOME_URLS = {
   BOOKS: 'books',
   COMMUNITY: 'community',
   MESSAGES: 'messages',
-  NOTIFICATIONS: 'notifications',
   STATS: 'stats',
   CONTACT: 'contact',
   MAP: 'map',
