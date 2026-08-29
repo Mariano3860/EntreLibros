@@ -27,4 +27,5 @@
   - La matriz automatizada está cubierta por las pruebas de API y frontend. La comprobación visual queda pendiente porque no hay navegador disponible en el entorno del agente.
 - [x] 4.3 Confirmar que no se agregaron recomendaciones, geolocalización ni exposición de dirección exacta fuera del alcance.
 - [x] 4.4 Actualizar `docs/backlog.md` y la documentación de estado del MVP con el alcance implementado y sus límites.
-- [ ] 4.5 Crear una rama explícita para la implementación, hacer commits incrementales y abrir una PR en español sin realizar el merge desde el agente.
+- [x] 4.5 Crear una rama explícita para la implementación, hacer commits incrementales y abrir una PR en español sin realizar el merge desde el agente.
+  - Rama: `feature/profile-interests-location`. PR: #151. El merge queda a cargo del usuario.
