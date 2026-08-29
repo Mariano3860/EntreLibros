@@ -1,4 +1,5 @@
 import express from 'express';
+import { randomUUID } from 'node:crypto';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
@@ -17,6 +18,12 @@ import { csrfProtection, getFrontendUrl } from './security.js';
 const app = express();
 
 app.use(helmet());
+app.use((req, res, next) => {
+  const requestId = randomUUID();
+  req.headers['x-request-id'] = requestId;
+  res.setHeader('X-Request-Id', requestId);
+  next();
+});
 const frontendUrl = getFrontendUrl();
 app.use(
   cors({
@@ -31,7 +38,11 @@ app.use(
     limit: process.env.API_JSON_LIMIT || '10mb',
   })
 );
-app.use(morgan('dev'));
+app.use(
+  morgan(
+    ':method :url :status :res[content-length] - :response-time ms request=:req[x-request-id]'
+  )
+);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
