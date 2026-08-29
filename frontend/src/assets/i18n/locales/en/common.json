@@ -820,12 +820,16 @@
   },
   "notifications": {
     "title": "Notifications",
+    "open": "Open notifications ({{count}} pending)",
     "loading": "Loading notifications...",
     "error": "Notifications could not be loaded.",
     "empty": "You have no new notifications.",
     "markRead": "Mark as read",
     "message": {
       "title": "New message",
+      "from": "New message from {{name}}",
+      "multipleFrom": "{{count}} new messages from {{name}}",
+      "senderFallback": "a user",
       "body": "You received a message in a conversation."
     },
     "agreement": {

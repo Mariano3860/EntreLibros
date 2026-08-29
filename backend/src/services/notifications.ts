@@ -10,9 +10,11 @@ export async function notifyMessageRecipients(input: {
   conversationId: number;
   senderId: number;
 }): Promise<void> {
-  const { rows } = await query<{ user_id: number }>(
-    `SELECT user_id FROM conversation_participants
-     WHERE conversation_id = $1 AND user_id <> $2`,
+  const { rows } = await query<{ user_id: number; sender_name: string }>(
+    `SELECT recipient.user_id, sender.name AS sender_name
+     FROM conversation_participants recipient
+     JOIN users sender ON sender.id = $2
+     WHERE recipient.conversation_id = $1 AND recipient.user_id <> $2`,
     [input.conversationId, input.senderId]
   );
   await Promise.all(
@@ -23,7 +25,10 @@ export async function notifyMessageRecipients(input: {
         entityId: String(input.conversationId),
         titleKey: 'notifications.message.title',
         bodyKey: 'notifications.message.body',
-        data: { conversationId: input.conversationId },
+        data: {
+          conversationId: input.conversationId,
+          senderName: row.sender_name,
+        },
         idempotencyKey: `message:${input.messageId}:${row.user_id}`,
       })
     )

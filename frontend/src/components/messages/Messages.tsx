@@ -20,6 +20,7 @@ import { useChatSocket } from '@hooks/socket/useChatSocket'
 import { isApiMockMode } from '@utils/runtimeEnv'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useLocation } from 'react-router-dom'
 
 import { ReactComponent as InfoIcon } from '@src/assets/icons/info.svg'
 
@@ -114,6 +115,7 @@ function toTextMessage(
 
 export const Messages = () => {
   const { t, i18n } = useTranslation()
+  const location = useLocation()
   const useDemoConversations =
     import.meta.env?.MODE === 'test' ||
     import.meta.env?.PUBLIC_DEMO_MODE === 'true' ||
@@ -164,7 +166,17 @@ export const Messages = () => {
         if (!active) return
         const next = items.map(toConversation)
         setConversations(next)
-        setSelectedId(next[0]?.id ?? null)
+        const requestedConversationId = (
+          location.state as { conversationId?: unknown } | null
+        )?.conversationId
+        const requestedId =
+          typeof requestedConversationId === 'number' &&
+          next.some(
+            (conversation) => conversation.id === requestedConversationId
+          )
+            ? requestedConversationId
+            : null
+        setSelectedId(requestedId ?? next[0]?.id ?? null)
       })
       .catch(() => {
         if (!active) return
@@ -178,7 +190,7 @@ export const Messages = () => {
     return () => {
       active = false
     }
-  }, [conversationReloadKey, useDemoConversations])
+  }, [conversationReloadKey, location.state, useDemoConversations])
 
   const isBotConversation = selected?.isBot === true
 
