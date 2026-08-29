@@ -39,7 +39,7 @@ Las pruebas se ejecutan con **Vitest** y **Testing Library**. Para ejecutar toda
 npm test
 ```
 
-## Estilos y theming
+## Estilos y temas
 
 Los estilos se escriben en archivos SCSS con módulos. El tema (claro u oscuro) se controla mediante contextos de React y variables CSS.
 

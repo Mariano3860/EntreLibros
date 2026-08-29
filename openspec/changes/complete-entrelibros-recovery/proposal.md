@@ -1,4 +1,4 @@
-## Why
+## Por qué
 
 EntreLibros tiene un núcleo funcional que compila y pasa sus pruebas, pero hoy no ofrece un camino reproducible desde un clon limpio hasta un despliegue seguro: la configuración local entra en conflicto, producción no está cableada correctamente y varias capacidades visibles todavía dependen de mocks o estado sólo del cliente. Este cambio convierte el estado actual y el trabajo abierto de la PR #138 en un programa verificable para terminar un MVP desplegable, mantenible y documentado.
 
@@ -8,7 +8,7 @@ El MVP se rige por la versión local del TFG `TFG ULTIMA VERSION - ROJO - MARIAN
 
 Las tareas de esta OpenSpec se limitan a `MVP` y `SOPORTE MVP`. Las expansiones `POST-MVP` se retiran del listado ejecutable, permanecen registradas en el roadmap/backlog y requerirán una OpenSpec propia antes de implementarse. Cada tarea implementada debe explicar su relación con una capacidad del TFG, incluir comentarios cuando la decisión no sea obvia y aportar una verificación reproducible.
 
-## What Changes
+## Qué cambia
 
 - Establecer un único flujo de desarrollo reproducible para Node.js, PostgreSQL/PostGIS, migraciones, variables de entorno, frontend y backend, incluyendo detección clara de conflictos de puertos y servicios locales.
 - **BREAKING**: normalizar los contratos de configuración y despliegue (`PUBLIC_API_BASE_URL`, URLs con `/api`, puertos, `NODE_ENV`, nombres de secretos y versión de Node), eliminando variantes contradictorias.
@@ -23,9 +23,9 @@ Las tareas de esta OpenSpec se limitan a `MVP` y `SOPORTE MVP`. Las expansiones 
 - Añadir observabilidad, retención de datos, copias/restauración, métricas operativas, pruebas de integración/E2E y documentación de recuperación, desarrollo, producción y credenciales.
 - Reconciliar `docs/backlog.md`, OpenAPI y OpenSpec con el comportamiento entregado; clasificar onboarding, alianzas, donaciones y otras expansiones como trabajo posterior cuando no bloqueen el MVP.
 
-## Capabilities
+## Capacidades
 
-### New Capabilities
+### Capacidades nuevas
 
 - `development-runtime`: Arranque local determinista, configuración, migraciones, datos de prueba, diagnóstico de puertos y documentación de credenciales.
 - `production-delivery` [SOPORTE MVP]: Build, configuración, despliegue mínimo, healthchecks, migraciones, secretos, backup/restore y rollback.
@@ -38,11 +38,11 @@ Las tareas de esta OpenSpec se limitan a `MVP` y `SOPORTE MVP`. Las expansiones 
 - `trust-safety-notifications` [MVP parcial]: Notificaciones in-app básicas de mensajes y acuerdos; denuncias, moderación y flujos posteriores quedan diferidos.
 - `operational-quality`: Contratos OpenAPI, pruebas, observabilidad, métricas, retención, runbooks y coherencia del backlog.
 
-### Modified Capabilities
+### Capacidades modificadas
 
 No existen especificaciones base en `openspec/specs`; todas las capacidades anteriores se introducen como contratos nuevos para describir y completar el comportamiento existente.
 
-## Impact
+## Impacto
 
 - Afecta a frontend React/Rsbuild, backend Express/Socket.IO, PostgreSQL/PostGIS, migraciones, OpenAPI, Docker/Compose/nginx, CI, dependencias y documentación.
 - Introduce cambios de esquema para perfiles, conversaciones, mensajes, acuerdos/versiones, notificaciones, denuncias, moderación y auditoría; las migraciones deberán ser incrementales y reversibles mediante restauración verificada.

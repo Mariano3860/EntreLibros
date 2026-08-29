@@ -1,10 +1,10 @@
-## Why
+## Por qué
 
 La documentación del repositorio quedó desalineada después de los cambios de recuperación de PR #138, la persistencia de mensajería/acuerdos, el bot persistido y la configuración de mocks con Rsbuild. Hay instrucciones, README y documentos técnicos que describen estados anteriores, omiten decisiones operativas importantes o no explican cómo verificar el sistema actual.
 
 Este cambio establece una base documental única y mantenible para que colaboradores y agentes puedan entender cómo ejecutar, probar, depurar y continuar el proyecto sin depender del historial del chat.
 
-## What Changes
+## Qué cambia
 
 - Auditar y actualizar `AGENTS.md` y los `AGENTS.md` anidados para reflejar el flujo real de trabajo, límites de autoridad, comandos, convenciones y zonas de responsabilidad.
 - Revisar los README raíz, frontend, backend y scripts: instalación, variables de entorno, desarrollo, migraciones, tests, builds, despliegue y troubleshooting.
@@ -15,17 +15,17 @@ Este cambio establece una base documental única y mantenible para que colaborad
 - Documentar el roadmap: qué está terminado, qué queda pendiente y cómo validar cada área.
 - Incorporar una revisión final de enlaces, comandos, rutas, nombres de variables, ejemplos y consistencia entre documentos.
 
-## Capabilities
+## Capacidades
 
-### New Capabilities
+### Capacidades nuevas
 
 <!-- No se introducen capacidades funcionales. Este cambio es documental y usa skip_specs: true. -->
 
-### Modified Capabilities
+### Capacidades modificadas
 
 <!-- No se modifican requisitos funcionales. -->
 
-## Impact
+## Impacto
 
 - Archivos de instrucciones del repositorio y agentes anidados.
 - `README.md`, `frontend/README.md`, `backend/README.md` si existe o debe incorporarse, y `scripts/README.md`.

@@ -1,10 +1,10 @@
-## Context
+## Contexto
 
 El repositorio es un monorepo con frontend React/Rsbuild, backend Node/Express/PostgreSQL/PostGIS y workflows OpenSpec. La documentación se encuentra repartida entre instrucciones raíz y anidadas, README, `docs/`, comentarios inline y artefactos de cambios. El recovery reciente añadió migraciones, mensajería persistida, acuerdos versionados, Socket.IO, MSW opt-in, un bot persistido y nuevos límites de verificación, pero varios documentos todavía reflejan estados históricos.
 
-## Goals / Non-Goals
+## Objetivos y exclusiones
 
-**Goals:**
+**Objetivos:**
 
 - Crear una fuente documental coherente sobre cómo trabajar, ejecutar, probar, desplegar y diagnosticar el repositorio.
 - Separar claramente estado actual, decisiones históricas, pendientes y roadmap.
@@ -12,14 +12,14 @@ El repositorio es un monorepo con frontend React/Rsbuild, backend Node/Express/P
 - Documentar los flujos reales de mensajería, acuerdos, bot, migraciones, mocks, E2E y recovery.
 - Verificar ejemplos, comandos, enlaces internos, nombres de archivos y afirmaciones técnicas contra el código.
 
-**Non-Goals:**
+**Exclusiones:**
 
 - Cambiar comportamiento ejecutable, APIs, esquema de base de datos o dependencias.
 - Reescribir toda la documentación histórica si puede conservarse como contexto, aunque sí se marcará como histórica y se corregirán contradicciones.
 - Sustituir OpenSpec por otra herramienta de planificación.
 - Prometer browser E2E cuando el entorno o el repositorio solo ofrecen pruebas de servicio, integración o RTL.
 
-## Decisions
+## Decisiones
 
 - **Inventario primero:** clasificar archivos por audiencia y autoridad antes de editar para evitar duplicar reglas. `AGENTS.md` gobernará el trabajo; README explicará onboarding; `docs/` contendrá arquitectura, operación y decisiones; OpenSpec conservará el plan del cambio.
 - **Documentar hechos verificables:** cada comando, ruta, variable, migración y estado se contrastará con scripts, package manifests, configuración, tests o git. Las limitaciones se expresarán explícitamente.
@@ -29,7 +29,7 @@ El repositorio es un monorepo con frontend React/Rsbuild, backend Node/Express/P
 - **Validación documental automatizable:** incluir comandos o scripts de comprobación cuando sean baratos y fiables (enlaces locales, referencias a archivos, comandos declarados y formato), complementados por una revisión manual de exactitud.
 - **Sin cambios funcionales:** la implementación deberá limitarse a Markdown, AGENTS y comentarios; si la auditoría revela una corrección de código necesaria, se registrará como pendiente separada y no se incorporará silenciosamente.
 
-## Risks / Trade-offs
+## Riesgos y compromisos
 
 - [La documentación puede volver a quedar obsoleta] → enlazar cada área con sus comandos/tests y añadir una checklist de actualización a los agentes.
 - [Demasiados agentes pueden crear conflicto] → mantener pocos archivos, declarar precedencia y usar instrucciones locales solo para diferencias reales.
@@ -37,7 +37,7 @@ El repositorio es un monorepo con frontend React/Rsbuild, backend Node/Express/P
 - [Los comandos dependen de Windows, Docker o variables locales] → documentar prerrequisitos, variantes PowerShell/bash y fallos esperables sin incluir secretos.
 - [La revisión puede descubrir cambios fuera del alcance documental] → registrar esos hallazgos como pendientes y no modificar runtime en este cambio.
 
-## Migration Plan
+## Plan de migración
 
 1. Auditar el repositorio y producir un mapa de documentación y contradicciones.
 2. Actualizar instrucciones, README y documentos técnicos por grupos revisables.
@@ -47,6 +47,6 @@ El repositorio es un monorepo con frontend React/Rsbuild, backend Node/Express/P
 
 No hay migración de datos ni rollback de runtime. El rollback consiste en revertir los commits documentales individuales; los commits se mantendrán separados por área.
 
-## Open Questions
+## Preguntas abiertas
 
 No quedan preguntas que cambien el alcance o el enfoque. Durante la auditoría se podrán decidir nombres concretos de archivos nuevos siempre que respeten esta estructura y no creen duplicados.
