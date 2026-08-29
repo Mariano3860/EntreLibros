@@ -1,8 +1,8 @@
 ## 1. Preparación y contrato existente
 
-- [ ] 1.1 Revisar el esquema actual de usuarios, perfiles, ubicación y proyección pública; documentar qué campos o relaciones pueden reutilizarse.
-- [ ] 1.2 Revisar el formulario de perfil, sus tipos, servicios y traducciones para definir los puntos de integración sin crear una pantalla nueva.
-- [ ] 1.3 Definir y documentar el catálogo inicial breve de intereses de libros y el catálogo territorial de ciudades/barrios compatible con el MVP.
+- [x] 1.1 Revisar el esquema actual de usuarios, perfiles, ubicación y proyección pública; documentar qué campos o relaciones pueden reutilizarse.
+- [x] 1.2 Revisar el formulario de perfil, sus tipos, servicios y traducciones para definir los puntos de integración sin crear una pantalla nueva.
+- [x] 1.3 Definir y documentar el catálogo inicial breve de intereses de libros y el catálogo territorial de ciudades/barrios compatible con el MVP.
 
 ## 2. Persistencia y API
 

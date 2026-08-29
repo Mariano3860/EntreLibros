@@ -24,6 +24,38 @@ La motivación y el alcance funcional están en `proposal.md`; los comportamient
 
 ## Decisions
 
+### Contrato inspeccionado
+
+- `users` ya contiene la identidad, el idioma, la ubicación exacta PostGIS y
+  `location_visibility`; esos datos seguirán teniendo responsabilidades
+  separadas.
+- El perfil autenticado se lee desde `GET /api/user/profile` y se actualiza
+  mediante `PATCH /api/user/profile`. La página existente de perfil será el
+  único formulario de edición.
+- La proyección pública se genera en `findPublicProfileById` y actualmente
+  redondea coordenadas. Para esta capacidad se agregará la zona general a esa
+  proyección según la visibilidad, pero las coordenadas exactas no se
+  incorporarán a la respuesta pública de perfil.
+- El mapa y los datos de demostración ya usan las ciudades Buenos Aires y La
+  Plata, y barrios como Palermo, Chacarita, Villa Crespo, Caballito, Almagro y
+  Tolosa. Es la referencia territorial existente que se reutiliza en el
+  formulario.
+
+### Catálogo inicial del MVP
+
+Los valores persistidos son claves estables; sus etiquetas se traducen en el
+frontend.
+
+- Intereses: `fiction`, `fantasy`, `science-fiction`, `history`, `romance`,
+  `children`, `essay` y `poetry`.
+- Buenos Aires: Palermo, Chacarita, Villa Crespo, Caballito, Almagro,
+  Parque Patricios, Barracas y Colegiales.
+- La Plata: Tolosa.
+
+La lista es deliberadamente breve y estática. No se agregará una pantalla de
+administración ni se permitirá texto libre. Un barrio vacío es válido; una
+ciudad desconocida o una combinación ciudad-barrio no incluida será inválida.
+
 ### 1. Catálogo predefinido de intereses
 
 Los intereses se representarán con valores estables del producto y etiquetas traducibles. Esto evita variaciones de texto libre y permite que futuras búsquedas o afinidades trabajen con valores comparables.
@@ -50,7 +82,12 @@ Alternativa descartada: crear una segunda preferencia específica para intereses
 
 ### 5. Persistencia compatible con el esquema actual
 
-Durante la implementación se inspeccionará el modelo existente. Si no existen campos equivalentes, los intereses podrán requerir una tabla relacionada y la zona general columnas explícitas o una entidad territorial simple. La migración deberá ser aditiva y conservar perfiles existentes con valores vacíos o derivados de forma segura.
+Como no existen campos equivalentes, se agregará una migración append-only con
+`interests TEXT[] NOT NULL DEFAULT '{}'`, `city TEXT` y `neighborhood TEXT`.
+La lista de intereses se valida contra el catálogo estable y la relación
+ciudad-barrio contra el catálogo territorial del backend. Los perfiles
+existentes conservarán intereses vacíos y zona nula hasta que el usuario la
+complete; no se derivará una ciudad a partir de coordenadas.
 
 La decisión final de columnas, tablas y nombres pertenece a la implementación y debe respetar el contrato de esta OpenSpec.
 
