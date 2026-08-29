@@ -97,11 +97,19 @@ router.get('/', async (req, res) => {
 
   const bbox: MapBoundingBox = { north, south, east, west };
   if (
-    north < -90 || north > 90 || south < -90 || south > 90 ||
-    east < -180 || east > 180 || west < -180 || west > 180 ||
+    north < -90 ||
+    north > 90 ||
+    south < -90 ||
+    south > 90 ||
+    east < -180 ||
+    east > 180 ||
+    west < -180 ||
+    west > 180 ||
     north <= south
   ) {
-    return res.status(400).json({ error: 'BadRequest', message: 'map.errors.bbox_invalid' });
+    return res
+      .status(400)
+      .json({ error: 'BadRequest', message: 'map.errors.bbox_invalid' });
   }
 
   const searchRaw = req.query.search;
@@ -122,7 +130,9 @@ router.get('/', async (req, res) => {
   const distanceParam = parseNumberParam(req.query.distanceKm);
   const distanceKm = distanceParam ?? 0;
   if (distanceKm < 0 || distanceKm > 100) {
-    return res.status(400).json({ error: 'BadRequest', message: 'map.errors.distance_invalid' });
+    return res
+      .status(400)
+      .json({ error: 'BadRequest', message: 'map.errors.distance_invalid' });
   }
   const openNow = parseBooleanParam(req.query.openNow, false);
   const recentActivity = parseBooleanParam(req.query.recentActivity, true);

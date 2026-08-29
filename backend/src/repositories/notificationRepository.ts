@@ -35,7 +35,9 @@ const mapRow = (row: NotificationRow): NotificationItem => ({
   createdAt: row.created_at.toISOString(),
 });
 
-export async function listNotifications(userId: number): Promise<NotificationItem[]> {
+export async function listNotifications(
+  userId: number
+): Promise<NotificationItem[]> {
   const { rows } = await query<NotificationRow>(
     `SELECT id, kind, entity_id, title_key, body_key, data, read_at, created_at
      FROM notifications WHERE recipient_id = $1
@@ -45,7 +47,10 @@ export async function listNotifications(userId: number): Promise<NotificationIte
   return rows.map(mapRow);
 }
 
-export async function markNotificationRead(id: number, userId: number): Promise<boolean> {
+export async function markNotificationRead(
+  id: number,
+  userId: number
+): Promise<boolean> {
   const result = await query<{ id: number }>(
     `UPDATE notifications SET read_at = COALESCE(read_at, NOW())
      WHERE id = $1 AND recipient_id = $2 RETURNING id`,
@@ -54,7 +59,9 @@ export async function markNotificationRead(id: number, userId: number): Promise<
   return result.rows.length > 0;
 }
 
-export async function getNotificationPreference(userId: number): Promise<boolean> {
+export async function getNotificationPreference(
+  userId: number
+): Promise<boolean> {
   const { rows } = await query<{ in_app_enabled: boolean }>(
     `SELECT in_app_enabled FROM notification_preferences WHERE user_id = $1`,
     [userId]
@@ -62,7 +69,10 @@ export async function getNotificationPreference(userId: number): Promise<boolean
   return rows[0]?.in_app_enabled ?? true;
 }
 
-export async function setNotificationPreference(userId: number, enabled: boolean): Promise<void> {
+export async function setNotificationPreference(
+  userId: number,
+  enabled: boolean
+): Promise<void> {
   await query(
     `INSERT INTO notification_preferences (user_id, in_app_enabled)
      VALUES ($1, $2)

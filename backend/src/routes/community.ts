@@ -117,17 +117,40 @@ router.post(
   }
 );
 
-router.patch('/corners/:id', authenticate, async (req: AuthenticatedRequest, res) => {
-  if (!req.user) return res.status(401).json({ error: 'Unauthorized', message: 'auth.errors.unauthorized' });
-  try {
-    const updated = await editCorner(req.params.id, req.user.id, req.body as UpdateCornerPayload);
-    if (!updated) return res.status(404).json({ error: 'NotFound', message: 'community.corners.errors.not_found' });
-    return res.json(updated);
-  } catch (error) {
-    if (error instanceof CornerValidationError) return res.status(422).json({ errors: error.errors });
-    return res.status(500).json({ error: 'CornerUpdateFailed', message: 'community.corners.errors.update_failed' });
+router.patch(
+  '/corners/:id',
+  authenticate,
+  async (req: AuthenticatedRequest, res) => {
+    if (!req.user)
+      return res
+        .status(401)
+        .json({ error: 'Unauthorized', message: 'auth.errors.unauthorized' });
+    try {
+      const updated = await editCorner(
+        req.params.id,
+        req.user.id,
+        req.body as UpdateCornerPayload
+      );
+      if (!updated)
+        return res
+          .status(404)
+          .json({
+            error: 'NotFound',
+            message: 'community.corners.errors.not_found',
+          });
+      return res.json(updated);
+    } catch (error) {
+      if (error instanceof CornerValidationError)
+        return res.status(422).json({ errors: error.errors });
+      return res
+        .status(500)
+        .json({
+          error: 'CornerUpdateFailed',
+          message: 'community.corners.errors.update_failed',
+        });
+    }
   }
-});
+);
 
 router.get('/stats', (_req, res) => {
   const stats = getCommunityStats();

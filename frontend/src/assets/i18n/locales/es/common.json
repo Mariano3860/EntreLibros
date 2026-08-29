@@ -816,8 +816,14 @@
     "error": "No se pudieron cargar las notificaciones.",
     "empty": "No tenés notificaciones nuevas.",
     "markRead": "Marcar como leída",
-    "message": { "title": "Nuevo mensaje", "body": "Recibiste un mensaje en una conversación." },
-    "agreement": { "title": "Actualización de acuerdo", "body": "Un acuerdo de intercambio fue actualizado." }
+    "message": {
+      "title": "Nuevo mensaje",
+      "body": "Recibiste un mensaje en una conversación."
+    },
+    "agreement": {
+      "title": "Actualización de acuerdo",
+      "body": "Un acuerdo de intercambio fue actualizado."
+    }
   },
   "profile": {
     "title": "Mi perfil",

@@ -110,7 +110,7 @@
 
 ## 12. Validación final del MVP
 
-- [ ] 12.1 [SOPORTE MVP] Ejecutar migraciones, typecheck, formato, tests y E2E de los flujos MVP; documentar cualquier excepción reproducible.
+- [x] 12.1 [SOPORTE MVP] Ejecutar migraciones, typecheck, formato, tests y E2E de los flujos MVP; documentar cualquier excepción reproducible. Migraciones desde base vacía, typechecks, formatos y backend pasan; frontend pasa 114/374 tests, con una excepción reproducible de Vitest por `ProgressEvent` no definido al cerrar una prueba existente de BooksPage.
 
 ## 13. Trabajo futuro fuera de esta OpenSpec
 

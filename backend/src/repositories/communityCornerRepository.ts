@@ -339,7 +339,12 @@ export async function createCorner(
 export async function updateCorner(
   id: string,
   ownerId: number,
-  input: Partial<Pick<CreateCommunityCornerInput, 'name' | 'rules' | 'schedule' | 'status' | 'visibilityPreference'>>
+  input: Partial<
+    Pick<
+      CreateCommunityCornerInput,
+      'name' | 'rules' | 'schedule' | 'status' | 'visibilityPreference'
+    >
+  >
 ): Promise<CommunityCornerEntity | null> {
   const fields: string[] = [];
   const values: Array<string | number | null> = [id, ownerId];

@@ -408,18 +408,32 @@ export const editCorner = async (
   ownerId: number,
   payload: UpdateCornerPayload
 ): Promise<CommunityCornerEntity | null> => {
-  if (payload.status !== undefined && !allowedStatuses.includes(payload.status)) {
+  if (
+    payload.status !== undefined &&
+    !allowedStatuses.includes(payload.status)
+  ) {
     throw new CornerValidationError({ status: ERROR_MESSAGES.status });
   }
-  if (payload.visibilityPreference !== undefined && !allowedVisibilities.includes(payload.visibilityPreference)) {
+  if (
+    payload.visibilityPreference !== undefined &&
+    !allowedVisibilities.includes(payload.visibilityPreference)
+  ) {
     throw new CornerValidationError({ visibility: ERROR_MESSAGES.visibility });
   }
-  const name = payload.name === undefined ? undefined : normalizeString(payload.name);
-  if (name === '') throw new CornerValidationError({ name: ERROR_MESSAGES.name });
+  const name =
+    payload.name === undefined ? undefined : normalizeString(payload.name);
+  if (name === '')
+    throw new CornerValidationError({ name: ERROR_MESSAGES.name });
   return updateCorner(id, ownerId, {
     name,
-    rules: payload.rules === undefined ? undefined : normalizeString(payload.rules) || null,
-    schedule: payload.schedule === undefined ? undefined : normalizeString(payload.schedule) || null,
+    rules:
+      payload.rules === undefined
+        ? undefined
+        : normalizeString(payload.rules) || null,
+    schedule:
+      payload.schedule === undefined
+        ? undefined
+        : normalizeString(payload.schedule) || null,
     status: payload.status,
     visibilityPreference: payload.visibilityPreference,
   });

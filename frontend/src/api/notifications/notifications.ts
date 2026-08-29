@@ -15,7 +15,9 @@ export type ApiNotification = {
 export const notificationKeys = { all: ['notifications'] as const }
 
 export async function fetchNotifications(): Promise<ApiNotification[]> {
-  const response = await apiClient.get<{ notifications: ApiNotification[] }>(RELATIVE_API_ROUTES.NOTIFICATIONS.LIST)
+  const response = await apiClient.get<{ notifications: ApiNotification[] }>(
+    RELATIVE_API_ROUTES.NOTIFICATIONS.LIST
+  )
   return response.data.notifications
 }
 
