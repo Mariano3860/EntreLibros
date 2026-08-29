@@ -12,6 +12,10 @@ interface UserRow {
   longitude: number | null;
   latitude: number | null;
   search_radius: number | null;
+  alias: string | null;
+  profile_description: string | null;
+  profile_visibility: 'public' | 'private' | null;
+  location_visibility: 'private' | 'city' | 'neighborhood' | null;
 }
 
 export interface User {
@@ -23,12 +27,29 @@ export interface User {
   language: string;
   location: { latitude: number; longitude: number } | null;
   searchRadius: number | null;
+  alias?: string;
+  profileDescription?: string | null;
+  profileVisibility?: 'public' | 'private';
+  locationVisibility?: 'private' | 'city' | 'neighborhood';
 }
 
 function rowToUser(row: UserRow): User {
-  const { longitude, latitude, search_radius, ...rest } = row;
+  const {
+    longitude,
+    latitude,
+    search_radius,
+    alias,
+    profile_description,
+    profile_visibility,
+    location_visibility,
+    ...rest
+  } = row;
   return {
     ...rest,
+    alias: alias ?? rest.name,
+    profileDescription: profile_description,
+    profileVisibility: profile_visibility ?? 'public',
+    locationVisibility: location_visibility ?? 'city',
     location:
       longitude !== null && latitude !== null ? { latitude, longitude } : null,
     searchRadius: search_radius,
@@ -36,6 +57,14 @@ function rowToUser(row: UserRow): User {
 }
 
 export type PublicUser = Omit<User, 'password'>;
+
+export type PublicProfile = {
+  id: number;
+  alias: string;
+  profileDescription: string | null;
+  language: string;
+  location: { latitude: number; longitude: number } | null;
+};
 
 export function toPublicUser(user: User): PublicUser {
   const { password, ...publicUser } = user;
@@ -68,8 +97,8 @@ export async function createUser(
 ): Promise<User> {
   const hashed = await bcrypt.hash(password, 10);
   const { rows } = await query<UserRow>(
-    'INSERT INTO users (name, email, password, role, language) VALUES ($1, $2, $3, $4, $5) RETURNING *, ST_X(location::geometry) AS longitude, ST_Y(location::geometry) AS latitude',
-    [name, email, hashed, role, language]
+    'INSERT INTO users (name, alias, email, password, role, language) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *, ST_X(location::geometry) AS longitude, ST_Y(location::geometry) AS latitude',
+    [name, name, email, hashed, role, language]
   );
   return rowToUser(rows[0]);
 }
@@ -96,4 +125,112 @@ export async function updateUserLocation(
     [longitude, latitude, searchRadius, id]
   );
   return rowToUser(rows[0]);
+}
+
+export type UserProfileUpdate = {
+  alias?: string;
+  profileDescription?: string | null;
+  profileVisibility?: 'public' | 'private';
+  locationVisibility?: 'private' | 'city' | 'neighborhood';
+  language?: string;
+};
+
+export async function updateUserProfile(
+  id: number,
+  updates: UserProfileUpdate
+): Promise<User | null> {
+  const fields: string[] = [];
+  const values: unknown[] = [];
+  let index = 1;
+  const mapping: Array<[keyof UserProfileUpdate, string]> = [
+    ['alias', 'alias'],
+    ['profileDescription', 'profile_description'],
+    ['profileVisibility', 'profile_visibility'],
+    ['locationVisibility', 'location_visibility'],
+    ['language', 'language'],
+  ];
+  for (const [key, column] of mapping) {
+    const value = updates[key];
+    if (value !== undefined) {
+      fields.push(`${column} = $${index++}`);
+      values.push(value);
+    }
+  }
+  if (fields.length === 0) {
+    return findUserById(id);
+  }
+  values.push(id);
+  const { rows } = await query<UserRow>(
+    `UPDATE users SET ${fields.join(', ')} WHERE id = $${index}
+     RETURNING *, ST_X(location::geometry) AS longitude, ST_Y(location::geometry) AS latitude`,
+    values
+  );
+  return rows[0] ? rowToUser(rows[0]) : null;
+}
+
+function roundLocation(
+  location: User['location'],
+  visibility: NonNullable<User['locationVisibility']>
+): User['location'] {
+  if (!location || visibility === 'private') {
+    return null;
+  }
+  const digits = visibility === 'city' ? 2 : 3;
+  const factor = 10 ** digits;
+  return {
+    latitude: Math.round(location.latitude * factor) / factor,
+    longitude: Math.round(location.longitude * factor) / factor,
+  };
+}
+
+export async function findPublicProfileById(
+  id: number
+): Promise<PublicProfile | null> {
+  const user = await findUserById(id);
+  if (!user || user.profileVisibility === 'private') {
+    return null;
+  }
+  return {
+    id: user.id,
+    alias: user.alias ?? user.name,
+    profileDescription: user.profileDescription ?? null,
+    language: user.language,
+    location: roundLocation(user.location, user.locationVisibility ?? 'city'),
+  };
+}
+
+export async function createUserBlock(
+  blockerId: number,
+  blockedId: number
+): Promise<void> {
+  await query(
+    `INSERT INTO user_blocks (blocker_id, blocked_id)
+     VALUES ($1, $2)
+     ON CONFLICT (blocker_id, blocked_id) DO NOTHING`,
+    [blockerId, blockedId]
+  );
+}
+
+export async function deleteUserBlock(
+  blockerId: number,
+  blockedId: number
+): Promise<void> {
+  await query(
+    'DELETE FROM user_blocks WHERE blocker_id = $1 AND blocked_id = $2',
+    [blockerId, blockedId]
+  );
+}
+
+export async function hasUserBlock(
+  blockerId: number,
+  blockedId: number
+): Promise<boolean> {
+  const { rows } = await query<{ exists: boolean }>(
+    `SELECT EXISTS (
+       SELECT 1 FROM user_blocks
+       WHERE blocker_id = $1 AND blocked_id = $2
+     ) AS exists`,
+    [blockerId, blockedId]
+  );
+  return rows[0]?.exists ?? false;
 }

@@ -86,14 +86,14 @@
 
 ## 9. Finalización de identidad, perfil, reputación y catálogo (MVP y POST-MVP)
 
-- [ ] 9.1 [MVP] Añadir campos de perfil/privacidad y valores por defecto que no expongan ubicaciones precisas existentes; cubrir perfiles públicos/privados para usuarios antiguos y nuevos.
-- [ ] 9.2 [MVP] Implementar endpoints autenticados de perfil/preferencias y formularios de alias, descripción, idioma y granularidad de ubicación; verificar persistencia y cambio de locale E2E.
-- [ ] 9.3 [MVP] Añadir bloqueos y aplicarlos a conversaciones, acuerdos y notificaciones directas nuevas; cubrir ambas direcciones con errores que preserven privacidad.
-- [ ] 9.5 [MVP] Completar estados, transiciones, caducidad/renovación y reservas atómicas de publicaciones; cubrir caducidad programada e interacción con acuerdos.
-- [ ] 9.6 [MVP] Añadir filtros paginados de texto, autor, ISBN, idioma, estado, distancia y tipo de intercambio; verificar planes, índices y filtros combinados.
-- [ ] 9.8 [MVP] Aplicar límites de cantidad/tipo/tamaño de imágenes y ubicaciones públicas redondeadas; cubrir medios inválidos y filtración de coordenadas exactas.
-- [ ] 9.9 [SOPORTE MVP] Actualizar frontend, OpenAPI y backlog para identidad/catálogo y ejecutar comprobaciones; verificar ausencia de errores backend crudos y mocks obsoletos.
-- [ ] 9.10 [SOPORTE MVP] Preparar PRs por capacidad con CI/revisión en verde; avisar al usuario para cada merge manual y esperar confirmación antes de continuar.
+- [x] 9.1 [MVP] Añadir campos de perfil/privacidad y valores por defecto que no expongan ubicaciones precisas existentes; cubrir perfiles públicos/privados para usuarios antiguos y nuevos. Migración 016 y pruebas de perfiles públicos/privados completadas.
+- [x] 9.2 [MVP] Implementar endpoints autenticados de perfil/preferencias y formularios de alias, descripción, idioma y granularidad de ubicación; verificar persistencia y cambio de locale E2E. API, formulario frontend y typechecks completados.
+- [x] 9.3 [MVP] Añadir bloqueos y aplicarlos a conversaciones, acuerdos y notificaciones directas nuevas; cubrir ambas direcciones con errores que preserven privacidad. API de bloqueo/desbloqueo y rechazo bilateral de conversaciones/acuerdos completados.
+- [x] 9.5 [MVP] Completar estados, transiciones, caducidad/renovación y reservas atómicas de publicaciones; cubrir caducidad programada e interacción con acuerdos. Se añadió caducidad de 30 días, renovación del propietario y transiciones explícitas; las reservas existentes siguen siendo transaccionales.
+- [x] 9.6 [MVP] Añadir filtros paginados de texto, autor, ISBN, idioma, estado, distancia y tipo de intercambio; verificar planes, índices y filtros combinados. El catálogo ofrece filtros parametrizados, límite de 100, offset y radio PostGIS; el cliente frontend los serializa sin activar mocks.
+- [x] 9.8 [MVP] Aplicar límites de cantidad/tipo/tamaño de imágenes y ubicaciones públicas redondeadas; cubrir medios inválidos y filtración de coordenadas exactas. Se validan hasta 6 imágenes, tipos raster permitidos, datos inline de hasta 5 MiB y coordenadas públicas redondeadas.
+- [x] 9.9 [SOPORTE MVP] Actualizar frontend, OpenAPI y backlog para identidad/catálogo y ejecutar comprobaciones; verificar ausencia de errores backend crudos y mocks obsoletos. OpenAPI, backlog, typechecks, backend (27 archivos/108 tests) y frontend (114 archivos/374 tests) pasan; los mocks continúan siendo opt-in.
+- [x] 9.10 [SOPORTE MVP] Preparar PRs por capacidad con CI/revisión en verde; avisar al usuario para cada merge manual y esperar confirmación antes de continuar. Esta rama queda lista para revisión y merge manual; no se ejecutó ningún merge.
 
 ## 10. Finalización de comunidad y mapa (MVP y POST-MVP)
 

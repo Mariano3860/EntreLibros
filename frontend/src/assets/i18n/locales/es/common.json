@@ -809,5 +809,25 @@
       "validation": "Verificá los datos ingresados",
       "unknown": "Ocurrió un error inesperado"
     }
+  },
+  "profile": {
+    "title": "Mi perfil",
+    "language": "Idioma",
+    "description": "Controlá qué información compartís y cómo se muestra tu ubicación.",
+    "loading": "Cargando tu perfil...",
+    "error": "No se pudo cargar tu perfil.",
+    "alias": "Alias público",
+    "about": "Descripción",
+    "visibility": "Visibilidad del perfil",
+    "public": "Público",
+    "private": "Privado",
+    "locationVisibility": "Precisión de la ubicación pública",
+    "locationPrivate": "No mostrar ubicación",
+    "locationCity": "Ciudad aproximada",
+    "locationNeighborhood": "Barrio aproximado",
+    "save": "Guardar cambios",
+    "saving": "Guardando...",
+    "saved": "Perfil actualizado.",
+    "saveError": "No se pudieron guardar los cambios."
   }
 }

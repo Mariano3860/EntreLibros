@@ -4,9 +4,27 @@ import { RELATIVE_API_ROUTES } from '@src/api/routes'
 import { ApiBook } from './books.types'
 import { PublishBookPayload, PublishBookResponse } from './publishBook.types'
 
-export const fetchBooks = async (): Promise<ApiBook[]> => {
+export type BookCatalogFilters = {
+  q?: string
+  author?: string
+  isbn?: string
+  language?: string
+  status?: string
+  type?: 'offer' | 'want'
+  limit?: number
+  offset?: number
+}
+
+export const fetchBooks = async (
+  filters: BookCatalogFilters = {}
+): Promise<ApiBook[]> => {
+  const params = new URLSearchParams()
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== '') params.set(key, String(value))
+  })
+  const suffix = params.toString() ? `?${params.toString()}` : ''
   const response = await apiClient.get<ApiBook[]>(
-    RELATIVE_API_ROUTES.BOOKS.LIST
+    `${RELATIVE_API_ROUTES.BOOKS.LIST}${suffix}`
   )
 
   if (!Array.isArray(response.data)) {

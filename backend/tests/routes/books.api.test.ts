@@ -250,6 +250,25 @@ describe('books API listing projections', () => {
     });
   });
 
+  test('filters public listings and excludes expired entries', async () => {
+    const userId = await insertUser({ name: 'Buscador' });
+    const bookId = await insertBook();
+    const activeId = await insertListing({ userId, bookId });
+    const expiredId = await insertListing({ userId, bookId });
+    await client.query(
+      "UPDATE book_listings SET expires_at = NOW() - INTERVAL '1 day' WHERE id = $1",
+      [expiredId]
+    );
+
+    const res = await request(app)
+      .get('/api/books')
+      .query({ q: 'Libro', author: 'Autor', language: 'es', limit: 1 });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveLength(1);
+    expect(res.body[0].id).toBe(String(activeId));
+  });
+
   test('translates internal statuses for owner listings', async () => {
     const userId = await insertUser({ name: 'Owner' });
     const bookId = await insertBook();
