@@ -73,7 +73,7 @@
 - [x] 7.4 Review the final diff against the published #138 scope and remove unrelated changes; verify every added migration, endpoint, UI path and dependency maps to messaging or agreements.
 - [x] 7.5 Resolve or answer every PR review thread with its test evidence, update the PR description and request rereview; verify zero unresolved actionable threads remain.
 - [x] 7.6 Push the completed #138 branch and monitor CI to a terminal green state; verify the PR is mergeable and then notify the user that manual merge is required without invoking any merge command.
-- [ ] 7.7 After the user confirms merge, update local main and run the messaging/agreement smoke again; verify the merge commit is present remotely before beginning dependent deliveries.
+- [x] 7.7 After the user confirms merge, update local main and run the messaging/agreement smoke again; verify the merge commit is present remotely before beginning dependent deliveries. Verified PR #138 merged as `9dd6e6b`; local `main` fast-forwarded to `bcf1528`; isolated 15-migration smoke E2E passed.
 
 ## 8. Platform security and dependency remediation (MVP and POST-MVP)
 
