@@ -73,17 +73,20 @@ const hasVersion = (
 ): message is Message & { version: number } => 'version' in message
 
 function toConversation(item: ApiConversation): Conversation {
+  const fallbackUser = item.isBot
+    ? mockConversations[0].user
+    : {
+        name: item.participantName ?? `Conversación ${item.id}`,
+        avatar: '/logo.svg',
+        online: false,
+      }
+
   return {
     id: item.id,
     isBot: item.isBot,
     participantIds: item.participantIds,
     agreementId: item.agreementId,
-    user: {
-      name: `Conversación ${item.id}`,
-      avatar: '',
-      online: false,
-      ...(item.isBot ? mockConversations[0].user : {}),
-    },
+    user: fallbackUser,
     badges: [],
     messages: [],
     myBooks: [],

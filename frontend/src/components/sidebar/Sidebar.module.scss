@@ -42,6 +42,7 @@
 }
 
 .navLink {
+  position: relative;
   display: flex;
   align-items: center;
   padding: 1rem;
@@ -143,11 +144,12 @@
 }
 
 .unreadDot {
-  display: inline-block;
+  position: absolute;
+  top: rem(14px);
+  left: rem(31px);
+  display: block;
   width: rem(7px);
   height: rem(7px);
-  margin-left: $spacing-1;
-  vertical-align: middle;
   background: var(--color-error);
   border-radius: 50%;
 }

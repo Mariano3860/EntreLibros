@@ -2,11 +2,11 @@ import { SidebarLanguageSwitcher } from '@components/sidebar/buttons/SidebarLang
 import { SidebarLoginButton } from '@components/sidebar/buttons/SidebarLoginButton'
 import { SidebarThemeButton } from '@components/sidebar/buttons/SidebarThemeButton'
 import { NavItem } from '@components/sidebar/Sidebar.types'
+import { useAuth } from '@contexts/auth/AuthContext'
+import { useNotifications } from '@hooks/api/useNotifications'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
-import { useAuth } from '@contexts/auth/AuthContext'
-import { useNotifications } from '@hooks/api/useNotifications'
 
 import { ReactComponent as Books } from '@src/assets/icons/books.svg'
 import { ReactComponent as Community } from '@src/assets/icons/community.svg'
@@ -96,16 +96,13 @@ export const Sidebar = () => {
                 }
               >
                 <IconComponent className={styles.icon} />
-                <span className={styles.label}>
-                  {item.label}
-                  {item.path === `/${HOME_URLS.MESSAGES}` &&
-                  hasUnreadMessages ? (
-                    <span
-                      className={styles.unreadDot}
-                      aria-label={t('community.messages.badges.unread')}
-                    />
-                  ) : null}
-                </span>
+                <span className={styles.label}>{item.label}</span>
+                {item.path === `/${HOME_URLS.MESSAGES}` && hasUnreadMessages ? (
+                  <span
+                    className={styles.unreadDot}
+                    aria-label={t('community.messages.badges.unread')}
+                  />
+                ) : null}
               </NavLink>
             )
           })}

@@ -8,6 +8,7 @@ export type ApiConversation = {
   agreementId: number | null
   lastMessageSequence: number
   updatedAt: string
+  participantName: string | null
 }
 
 export type ApiMessage = {
