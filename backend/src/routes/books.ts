@@ -261,6 +261,8 @@ const ALLOWED_IMAGE_SOURCES: readonly PublicationImageUpdate['source'][] = [
   'cover',
   'upload',
 ];
+const MAX_PUBLICATION_IMAGES = 6;
+const MAX_INLINE_IMAGE_BYTES = 5 * 1024 * 1024;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
@@ -272,6 +274,17 @@ function optionalString(value: unknown): string | null {
   }
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : null;
+}
+
+function isValidImageUrl(value: string): boolean {
+  if (/^https?:\/\/[^\s]+$/i.test(value)) return true;
+  const match = value.match(/^data:(image\/(?:jpeg|png|webp));base64,([a-z0-9+/=]+)$/i);
+  if (!match) return false;
+  return Math.floor((match[2].length * 3) / 4) <= MAX_INLINE_IMAGE_BYTES;
+}
+
+function hasValidImageCount(images: unknown[]): boolean {
+  return images.length <= MAX_PUBLICATION_IMAGES;
 }
 
 async function getOptionalViewerId(req: Request): Promise<number | undefined> {
@@ -449,13 +462,16 @@ function validatePublicationUpdate(
     if (!Array.isArray(body.images)) {
       return invalidUpdateError();
     }
+    if (!hasValidImageCount(body.images)) {
+      return invalidUpdateError();
+    }
     const images: PublicationImageUpdate[] = [];
     for (const entry of body.images) {
       if (!isRecord(entry)) {
         return invalidUpdateError();
       }
       const url = optionalString(entry.url);
-      if (!url) {
+      if (!url || !isValidImageUrl(url)) {
         return invalidUpdateError();
       }
       const sourceRaw = typeof entry.source === 'string' ? entry.source : '';
@@ -743,6 +759,15 @@ function validatePublishRequest(
         },
       };
     }
+    if (!hasValidImageCount(imagesRaw)) {
+      return {
+        status: 400,
+        error: {
+          error: 'InvalidFields',
+          message: 'books.errors.invalid_image',
+        },
+      };
+    }
     for (const entry of imagesRaw) {
       if (!isRecord(entry)) {
         return {
@@ -754,7 +779,7 @@ function validatePublishRequest(
         };
       }
       const url = optionalString(entry.url);
-      if (!url) {
+      if (!url || !isValidImageUrl(url)) {
         return {
           status: 400,
           error: {

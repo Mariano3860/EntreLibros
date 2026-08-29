@@ -91,7 +91,7 @@
 - [x] 9.3 [MVP] Añadir bloqueos y aplicarlos a conversaciones, acuerdos y notificaciones directas nuevas; cubrir ambas direcciones con errores que preserven privacidad. API de bloqueo/desbloqueo y rechazo bilateral de conversaciones/acuerdos completados.
 - [ ] 9.5 [MVP] Completar estados, transiciones, caducidad/renovación y reservas atómicas de publicaciones; cubrir caducidad programada e interacción con acuerdos.
 - [ ] 9.6 [MVP] Añadir filtros paginados de texto, autor, ISBN, idioma, estado, distancia y tipo de intercambio; verificar planes, índices y filtros combinados.
-- [ ] 9.8 [MVP] Aplicar límites de cantidad/tipo/tamaño de imágenes y ubicaciones públicas redondeadas; cubrir medios inválidos y filtración de coordenadas exactas.
+- [x] 9.8 [MVP] Aplicar límites de cantidad/tipo/tamaño de imágenes y ubicaciones públicas redondeadas; cubrir medios inválidos y filtración de coordenadas exactas. Se validan hasta 6 imágenes, tipos raster permitidos, datos inline de hasta 5 MiB y coordenadas públicas redondeadas.
 - [ ] 9.9 [SOPORTE MVP] Actualizar frontend, OpenAPI y backlog para identidad/catálogo y ejecutar comprobaciones; verificar ausencia de errores backend crudos y mocks obsoletos.
 - [ ] 9.10 [SOPORTE MVP] Preparar PRs por capacidad con CI/revisión en verde; avisar al usuario para cada merge manual y esperar confirmación antes de continuar.
 
