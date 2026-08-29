@@ -26,4 +26,4 @@
 
 - [x] 4.1 Ejecutar las pruebas de frontend y backend afectadas, los typechecks, los formateadores y la validación de OpenSpec; corregir todos los errores reales y registrar cualquier warning preexistente.
 - [x] 4.2 Realizar la comprobación manual con mensajes nuevos, varios mensajes de una conversación, conversaciones distintas, acuerdos confirmados, preferencia desactivada y recarga de la aplicación.
-- [ ] 4.3 Hacer commits claros y concisos en `feature/in-app-agreement-notifications`, crear una PR con descripción en español en formato GitHub y detener el trabajo para que el usuario realice el merge final.
+- [x] 4.3 Hacer commits claros y concisos en `feature/in-app-agreement-notifications`, crear una PR con descripción en español en formato GitHub y detener el trabajo para que el usuario realice el merge final.
