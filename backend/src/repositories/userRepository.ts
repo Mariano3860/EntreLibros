@@ -198,3 +198,39 @@ export async function findPublicProfileById(
     location: roundLocation(user.location, user.locationVisibility ?? 'city'),
   };
 }
+
+export async function createUserBlock(
+  blockerId: number,
+  blockedId: number
+): Promise<void> {
+  await query(
+    `INSERT INTO user_blocks (blocker_id, blocked_id)
+     VALUES ($1, $2)
+     ON CONFLICT (blocker_id, blocked_id) DO NOTHING`,
+    [blockerId, blockedId]
+  );
+}
+
+export async function deleteUserBlock(
+  blockerId: number,
+  blockedId: number
+): Promise<void> {
+  await query(
+    'DELETE FROM user_blocks WHERE blocker_id = $1 AND blocked_id = $2',
+    [blockerId, blockedId]
+  );
+}
+
+export async function hasUserBlock(
+  blockerId: number,
+  blockedId: number
+): Promise<boolean> {
+  const { rows } = await query<{ exists: boolean }>(
+    `SELECT EXISTS (
+       SELECT 1 FROM user_blocks
+       WHERE blocker_id = $1 AND blocked_id = $2
+     ) AS exists`,
+    [blockerId, blockedId]
+  );
+  return rows[0]?.exists ?? false;
+}

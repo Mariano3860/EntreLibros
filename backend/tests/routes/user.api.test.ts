@@ -153,3 +153,98 @@ describe('user profile API', () => {
     await request(app).get(`/api/user/profile/${user!.id}`).expect(404);
   });
 });
+
+describe('user block API', () => {
+  test('blocks and unblocks another user without exposing the relationship', async () => {
+    await request(app)
+      .post('/api/auth/register')
+      .send({
+        name: 'Blocker',
+        email: 'blocker@example.com',
+        password: 'Str0ng!Pass1',
+      })
+      .expect(201);
+    await request(app)
+      .post('/api/auth/register')
+      .send({
+        name: 'Blocked',
+        email: 'blocked@example.com',
+        password: 'Str0ng!Pass1',
+      })
+      .expect(201);
+
+    const loginRes = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'blocker@example.com', password: 'Str0ng!Pass1' })
+      .expect(200);
+    const cookie = loginRes.headers['set-cookie'][0];
+    const blocker = await findUserByEmail('blocker@example.com');
+    const blocked = await findUserByEmail('blocked@example.com');
+    expect(blocker).not.toBeNull();
+    expect(blocked).not.toBeNull();
+
+    await request(app)
+      .get(`/api/user/blocks/${blocked!.id}`)
+      .set('Cookie', cookie)
+      .expect(200)
+      .expect(({ body }) => expect(body).toEqual({ blocked: false }));
+
+    await request(app)
+      .put(`/api/user/blocks/${blocked!.id}`)
+      .set('Cookie', cookie)
+      .expect(204);
+    await request(app)
+      .get(`/api/user/blocks/${blocked!.id}`)
+      .set('Cookie', cookie)
+      .expect(200)
+      .expect(({ body }) => expect(body).toEqual({ blocked: true }));
+
+    await request(app)
+      .post('/api/messages/conversations')
+      .set('Cookie', cookie)
+      .send({ participantId: blocked!.id })
+      .expect(403)
+      .expect(({ body }) =>
+        expect(body.message).toBe('messaging.errors.forbidden')
+      );
+
+    await request(app)
+      .delete(`/api/user/blocks/${blocked!.id}`)
+      .set('Cookie', cookie)
+      .expect(204);
+    await request(app)
+      .get(`/api/user/blocks/${blocked!.id}`)
+      .set('Cookie', cookie)
+      .expect(200)
+      .expect(({ body }) => expect(body).toEqual({ blocked: false }));
+  });
+
+  test('does not allow blocking oneself or a missing user', async () => {
+    await request(app)
+      .post('/api/auth/register')
+      .send({
+        name: 'Solo',
+        email: 'solo@example.com',
+        password: 'Str0ng!Pass1',
+      })
+      .expect(201);
+    const loginRes = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'solo@example.com', password: 'Str0ng!Pass1' })
+      .expect(200);
+    const cookie = loginRes.headers['set-cookie'][0];
+    const user = await findUserByEmail('solo@example.com');
+
+    await request(app)
+      .put(`/api/user/blocks/${user!.id}`)
+      .set('Cookie', cookie)
+      .expect(404)
+      .expect(({ body }) =>
+        expect(body.message).toBe('user.errors.block_target_not_found')
+      );
+    await request(app)
+      .put('/api/user/blocks/999999')
+      .set('Cookie', cookie)
+      .expect(404);
+  });
+});

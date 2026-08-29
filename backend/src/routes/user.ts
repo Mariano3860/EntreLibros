@@ -1,7 +1,11 @@
-import { Router } from 'express';
+import { Router, type Response } from 'express';
 import { authenticate, type AuthenticatedRequest } from '../middleware/auth.js';
 import {
+  createUserBlock,
+  deleteUserBlock,
   findPublicProfileById,
+  findUserById,
+  hasUserBlock,
   updateUserLanguage,
   updateUserProfile,
   type UserProfileUpdate,
@@ -21,6 +25,19 @@ function optionalText(value: unknown, maxLength: number): string | null {
   if (typeof value !== 'string') return null;
   const text = value.trim();
   return text.length > 0 && text.length <= maxLength ? text : null;
+}
+
+function blockTargetId(value: string | undefined): number | null {
+  if (!value || !/^\d+$/.test(value)) return null;
+  const parsed = Number(value);
+  return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : null;
+}
+
+function invalidBlockTarget(res: Response) {
+  return res.status(404).json({
+    error: 'NotFound',
+    message: 'user.errors.block_target_not_found',
+  });
 }
 
 router.get('/profile', authenticate, (req: AuthenticatedRequest, res) => {
@@ -50,6 +67,70 @@ router.get('/profile/:id', async (req, res) => {
   }
   return res.json(profile);
 });
+
+router.put(
+  '/blocks/:id',
+  authenticate,
+  async (req: AuthenticatedRequest, res) => {
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'Unauthorized',
+        message: 'user.errors.unauthenticated',
+      });
+    }
+    const blockedId = blockTargetId(req.params.id);
+    if (!blockedId || blockedId === req.user.id) {
+      return invalidBlockTarget(res);
+    }
+    const target = await findUserById(blockedId);
+    if (!target || target.role === 'bot') {
+      return invalidBlockTarget(res);
+    }
+    await createUserBlock(req.user.id, blockedId);
+    return res.status(204).send();
+  }
+);
+
+router.delete(
+  '/blocks/:id',
+  authenticate,
+  async (req: AuthenticatedRequest, res) => {
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'Unauthorized',
+        message: 'user.errors.unauthenticated',
+      });
+    }
+    const blockedId = blockTargetId(req.params.id);
+    if (!blockedId || blockedId === req.user.id) {
+      return invalidBlockTarget(res);
+    }
+    await deleteUserBlock(req.user.id, blockedId);
+    return res.status(204).send();
+  }
+);
+
+router.get(
+  '/blocks/:id',
+  authenticate,
+  async (req: AuthenticatedRequest, res) => {
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'Unauthorized',
+        message: 'user.errors.unauthenticated',
+      });
+    }
+    const blockedId = blockTargetId(req.params.id);
+    if (!blockedId || blockedId === req.user.id) {
+      return invalidBlockTarget(res);
+    }
+    const target = await findUserById(blockedId);
+    if (!target || target.role === 'bot') {
+      return invalidBlockTarget(res);
+    }
+    return res.json({ blocked: await hasUserBlock(req.user.id, blockedId) });
+  }
+);
 
 router.patch(
   '/profile',
