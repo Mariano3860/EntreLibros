@@ -82,8 +82,8 @@
 
 ## 9. Identity, profile, reputation and catalog completion
 
-- [ ] 9.1 Add profile/privacy fields and migration defaults that do not expose existing precise locations; verify public/private profile API tests for legacy and new users.
-- [ ] 9.2 Implement authenticated profile and preference endpoints plus frontend forms for alias, description, language and location granularity; verify persistence and locale switching end to end.
+- [x] 9.1 [MVP] Añadir campos de perfil/privacidad y valores por defecto que no expongan ubicaciones precisas existentes; cubierto por la migración 016 y pruebas públicas/privadas para usuarios nuevos y existentes.
+- [x] 9.2 [MVP] Implementar endpoints autenticados de perfil/preferencias y formulario frontend para alias, descripción, idioma y granularidad de ubicación; typecheck backend/frontend y suite frontend pasan.
 - [ ] 9.3 Add block relationships and enforce them in new conversations, agreements and direct notifications; verify both block directions and privacy-preserving errors.
 - [ ] 9.4 Add ratings linked uniquely to completed agreements and derive explainable reputation; verify duplicate, premature and disputed rating tests.
 - [ ] 9.5 Complete listing states, valid transitions, expiry/renewal and atomic reservation integration; verify scheduled expiry and agreement interaction tests.

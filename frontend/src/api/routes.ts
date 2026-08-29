@@ -6,6 +6,10 @@ export const RELATIVE_API_ROUTES = {
     ME: `/auth/me`,
     REGISTER: `/auth/register`,
   },
+  USER: {
+    PROFILE: `/user/profile`,
+    PUBLIC_PROFILE: (id: number) => `/user/profile/${id}`,
+  },
   CONTACT_FORM: {
     SUBMIT: `/contact/submit`,
   },

@@ -817,5 +817,25 @@
       "validation": "Please check the entered data",
       "unknown": "An unexpected error occurred"
     }
+  },
+  "profile": {
+    "title": "My profile",
+    "language": "Language",
+    "description": "Control what you share and how your location is shown.",
+    "loading": "Loading your profile...",
+    "error": "Your profile could not be loaded.",
+    "alias": "Public alias",
+    "about": "Description",
+    "visibility": "Profile visibility",
+    "public": "Public",
+    "private": "Private",
+    "locationVisibility": "Public location precision",
+    "locationPrivate": "Do not show location",
+    "locationCity": "Approximate city",
+    "locationNeighborhood": "Approximate neighborhood",
+    "save": "Save changes",
+    "saving": "Saving...",
+    "saved": "Profile updated.",
+    "saveError": "The changes could not be saved."
   }
 }

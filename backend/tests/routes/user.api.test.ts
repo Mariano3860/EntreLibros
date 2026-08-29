@@ -3,6 +3,10 @@ import { beforeEach, afterEach, describe, expect, test } from 'vitest';
 import app from '../../src/app.js';
 import { pool, setTestClient } from '../../src/db.js';
 import type { PoolClient } from 'pg';
+import {
+  findUserByEmail,
+  updateUserLocation,
+} from '../../src/repositories/userRepository.js';
 
 let client: PoolClient;
 
@@ -72,5 +76,80 @@ describe('user language API', () => {
       .set('Cookie', cookie)
       .send({})
       .expect(400);
+  });
+});
+
+describe('user profile API', () => {
+  test('updates an authenticated profile and hides private fields publicly', async () => {
+    await request(app)
+      .post('/api/auth/register')
+      .send({
+        name: 'Alice Legacy',
+        email: 'profile@example.com',
+        password: 'Str0ng!Pass1',
+      })
+      .expect(201);
+    const loginRes = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'profile@example.com', password: 'Str0ng!Pass1' })
+      .expect(200);
+    const cookie = loginRes.headers['set-cookie'][0];
+    const user = await findUserByEmail('profile@example.com');
+    expect(user).not.toBeNull();
+    await updateUserLocation(user!.id, -58.3816, -34.6037, 10);
+
+    const update = await request(app)
+      .patch('/api/user/profile')
+      .set('Cookie', cookie)
+      .send({
+        alias: 'Alice Lectora',
+        description: 'Intercambio libros de ficción.',
+        profileVisibility: 'public',
+        locationVisibility: 'city',
+      })
+      .expect(200);
+    expect(update.body.alias).toBe('Alice Lectora');
+    expect(update.body.profileDescription).toBe(
+      'Intercambio libros de ficción.'
+    );
+
+    const publicProfile = await request(app)
+      .get(`/api/user/profile/${user!.id}`)
+      .expect(200);
+    expect(publicProfile.body).toMatchObject({
+      id: user!.id,
+      alias: 'Alice Lectora',
+      profileDescription: 'Intercambio libros de ficción.',
+      location: { latitude: -34.6, longitude: -58.38 },
+    });
+    expect(publicProfile.body.email).toBeUndefined();
+    expect(publicProfile.body.password).toBeUndefined();
+  });
+
+  test('does not expose a private profile', async () => {
+    await request(app)
+      .post('/api/auth/register')
+      .send({
+        name: 'Private User',
+        email: 'private-profile@example.com',
+        password: 'Str0ng!Pass1',
+      })
+      .expect(201);
+    const loginRes = await request(app)
+      .post('/api/auth/login')
+      .send({
+        email: 'private-profile@example.com',
+        password: 'Str0ng!Pass1',
+      })
+      .expect(200);
+    const cookie = loginRes.headers['set-cookie'][0];
+    const user = await findUserByEmail('private-profile@example.com');
+    await request(app)
+      .patch('/api/user/profile')
+      .set('Cookie', cookie)
+      .send({ profileVisibility: 'private' })
+      .expect(200);
+
+    await request(app).get(`/api/user/profile/${user!.id}`).expect(404);
   });
 });
