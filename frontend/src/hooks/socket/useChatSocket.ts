@@ -1,5 +1,6 @@
 import { agreementQueryKeys } from '@api/agreements/agreements'
 import { messageQueryKeys } from '@api/messages/messages'
+import { notificationKeys } from '@api/notifications/notifications'
 import { useQueryClient } from '@tanstack/react-query'
 import { isApiMockMode } from '@utils/runtimeEnv'
 import { useCallback, useEffect, useState } from 'react'
@@ -63,6 +64,7 @@ export const useChatSocket = () => {
       setMessages((prev) => [...prev, msg])
     })
     s.on('conversation:message', (msg: ConversationMessage) => {
+      void queryClient.invalidateQueries({ queryKey: notificationKeys.all })
       void queryClient.invalidateQueries({
         queryKey: messageQueryKeys.history(msg.conversationId),
       })

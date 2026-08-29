@@ -1,6 +1,7 @@
 import { cx } from '@utils/cx'
 import { Outlet } from 'react-router-dom'
 
+import { NotificationBell } from '../../notifications/NotificationBell'
 import { Sidebar } from '../../sidebar/Sidebar'
 
 import styles from './BaseLayout.module.scss'
@@ -21,6 +22,7 @@ export const BaseLayout = ({
   return (
     <div className={containerClass} {...(id ? { id: `${id}-container` } : {})}>
       <Sidebar />
+      <NotificationBell />
       <main {...(id ? { id: `${id}-content` } : {})} className={mainClass}>
         {children || <Outlet />}
       </main>
