@@ -22,9 +22,13 @@ const migrationsDir = path.join(
 );
 
 const hashMigration = (fileName, source) =>
-  crypto.createHash('sha1').update(fileName + source, 'utf8').digest('hex');
+  crypto
+    .createHash('sha1')
+    .update(fileName + source, 'utf8')
+    .digest('hex');
 
-const migrationName = (fileName) => fileName.replace(/^\d+_/, '').replace(/\.sql$/, '');
+const migrationName = (fileName) =>
+  fileName.replace(/^\d+_/, '').replace(/\.sql$/, '');
 
 async function run() {
   await verifyPostgresPreflight(connectionString);
@@ -54,7 +58,10 @@ async function run() {
     const files = await fs.readdir(migrationsDir);
     await Promise.all(
       files.map(async (file) => {
-        const source = await fs.readFile(path.join(migrationsDir, file), 'utf8');
+        const source = await fs.readFile(
+          path.join(migrationsDir, file),
+          'utf8'
+        );
         const lineFeedSource = source.replaceAll(
           String.fromCharCode(13, 10),
           String.fromCharCode(10)
