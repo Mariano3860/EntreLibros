@@ -78,7 +78,7 @@
 ## 8. Platform security and dependency remediation (MVP and POST-MVP)
 
 - [x] 8.1 [SOPORTE MVP] Triage all production audit findings by reachable runtime path and upgrade direct dependencies in small compatible groups; verify each group passes full tests and leaves no unapproved critical/high applicable finding. Updated six direct runtime dependencies plus compatible transitive patches; `npm audit --omit=dev` reports 0 vulnerabilities, and the isolated backend suite passes 27 files/104 tests.
-- [ ] 8.2 [MVP] Protect community-corner creation, book verification and every mutable route with authentication plus owner/role policies; verify anonymous and unauthorized API tests return i18n 401/403 errors with no data changes.
+- [x] 8.2 [MVP] Protect community-corner creation, book verification and every mutable route with authentication plus owner/role policies; verify anonymous and unauthorized API tests return i18n 401/403 errors with no data changes. Added authentication to corner creation and book verification; anonymous corner creation is covered with a no-row-change assertion, and the backend suite passes 27 files/105 tests on an isolated database.
 - [ ] 8.3 [SOPORTE MVP] Add production cookie, CORS and CSRF configuration with fail-closed validation; verify same-origin requests work and cross-origin/invalid-token mutations are rejected.
 - [ ] 8.5 [SOPORTE MVP] Add security headers, request correlation and centralized secret/PII redaction; verify logs from forced failures contain correlation but no passwords, tokens, cookies or exact private location.
 - [ ] 8.7 [SOPORTE MVP] Update OpenAPI, threat notes and security runbook, then run all repository checks; verify the security delivery is ready for review.

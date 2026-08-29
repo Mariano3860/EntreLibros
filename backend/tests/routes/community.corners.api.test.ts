@@ -1,6 +1,7 @@
 import request from 'supertest';
 import { beforeEach, afterEach, describe, expect, test } from 'vitest';
 import type { PoolClient } from 'pg';
+import jwt, { type Algorithm } from 'jsonwebtoken';
 
 import app from '../../src/app.js';
 import { pool, setTestClient } from '../../src/db.js';
@@ -10,6 +11,26 @@ import {
 } from '../../src/repositories/communityCornerRepository.js';
 
 let client: PoolClient;
+
+const insertUser = async (): Promise<number> => {
+  const { rows } = await client.query(
+    "INSERT INTO users (name, email, password, role) VALUES ('Corner User', $1, 'hash', 'user') RETURNING id",
+    [`corner-${Math.random().toString(36).slice(2)}@example.com`]
+  );
+  return rows[0].id as number;
+};
+
+const buildAuthCookie = (userId: number): string => {
+  const algorithm = (process.env.JWT_ALGORITHM || 'HS256') as Algorithm;
+  const token = jwt.sign(
+    { id: userId },
+    process.env.JWT_SECRET || 'testsecret',
+    {
+      algorithm,
+    }
+  );
+  return `sessionToken=${token}`;
+};
 
 const BASE_CORNER_INPUT: CreateCommunityCornerInput = {
   id: '11111111-2222-3333-4444-555555555555',
@@ -52,7 +73,28 @@ afterEach(async () => {
 });
 
 describe('community corners API', () => {
+  test('rejects anonymous corner creation without changing data', async () => {
+    const before = await client.query(
+      'SELECT COUNT(*)::int AS count FROM community_corners'
+    );
+
+    const response = await request(app)
+      .post('/api/community/corners')
+      .send({})
+      .expect(401);
+
+    expect(response.body).toEqual({
+      error: 'Unauthorized',
+      message: 'auth.errors.unauthorized',
+    });
+    const after = await client.query(
+      'SELECT COUNT(*)::int AS count FROM community_corners'
+    );
+    expect(after.rows[0].count).toBe(before.rows[0].count);
+  });
+
   test('creates a corner and returns publish response', async () => {
+    const userId = await insertUser();
     const payload = {
       name: 'Rincón Nueva Dirección',
       scope: 'public',
@@ -77,6 +119,7 @@ describe('community corners API', () => {
 
     const response = await request(app)
       .post('/api/community/corners')
+      .set('Cookie', buildAuthCookie(userId))
       .send(payload)
       .expect(201);
 
@@ -100,8 +143,10 @@ describe('community corners API', () => {
   });
 
   test('returns validation errors when payload is incomplete', async () => {
+    const userId = await insertUser();
     const response = await request(app)
       .post('/api/community/corners')
+      .set('Cookie', buildAuthCookie(userId))
       .send({
         scope: 'public',
         hostAlias: '',
