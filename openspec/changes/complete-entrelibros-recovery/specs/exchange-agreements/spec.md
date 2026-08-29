@@ -1,5 +1,7 @@
 ## Purpose
 
+> MVP scope: agreement proposal, place/time, confirmation, cancellation and auditable version state needed to coordinate an exchange.
+
 Define acuerdos de intercambio persistentes y versionados para negociar, aceptar, cancelar y completar encuentros sin estados contradictorios entre participantes.
 
 ## ADDED Requirements

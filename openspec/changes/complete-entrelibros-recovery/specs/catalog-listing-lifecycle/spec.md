@@ -1,5 +1,7 @@
 ## Purpose
 
+> MVP scope: publications, minimum bibliographic metadata, search, proximity, safe images and lifecycle needed by the TFG.
+
 Define un catálogo y ciclo de publicaciones consistente, buscable y seguro desde la creación de un libro hasta el cierre o caducidad de su disponibilidad.
 
 ## ADDED Requirements

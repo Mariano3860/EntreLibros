@@ -1,5 +1,7 @@
 ## Purpose
 
+> MVP scope: registration, session, profile and privacy. Password recovery, ratings/reputation and other enrichment are POST-MVP unless separately approved.
+
 Define el ciclo de vida completo de la identidad, el perfil y la reputación para que los usuarios controlen su cuenta y compartan sólo la información necesaria.
 
 ## ADDED Requirements

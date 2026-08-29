@@ -1,5 +1,7 @@
 ## Purpose
 
+> MVP support scope: API contracts, checks, safe logs, documentation and merge gates. Retention/export is POST-MVP.
+
 Define garantías operativas y de calidad que mantengan contratos, pruebas, observabilidad, datos y documentación sincronizados con el comportamiento entregado.
 
 ## ADDED Requirements

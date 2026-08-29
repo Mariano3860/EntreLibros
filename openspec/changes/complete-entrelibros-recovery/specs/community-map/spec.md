@@ -1,5 +1,7 @@
 ## Purpose
 
+> MVP scope: book corners, map, ownership basics, bounded queries and privacy. Community feeds, suggestions, aggregates and moderation are POST-MVP.
+
 Define experiencias comunitarias y geográficas basadas en datos persistentes, con privacidad, moderación, paginación y tiempos de respuesta operables.
 
 ## ADDED Requirements

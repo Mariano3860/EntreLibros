@@ -1,5 +1,7 @@
 ## Purpose
 
+> MVP scope: basic in-app notifications for messages and agreements. Reports, moderation workflow and post-exchange ratings are POST-MVP.
+
 Define mecanismos de confianza, seguridad y comunicación para prevenir abuso, gestionar incidentes y acompañar a los usuarios durante todo el intercambio.
 
 ## ADDED Requirements

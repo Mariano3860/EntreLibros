@@ -1,5 +1,7 @@
 ## Purpose
 
+> MVP support scope: authentication, authorization, session/origin protections, validation and safe errors. Advanced abuse controls may be POST-MVP.
+
 Establece controles de seguridad transversales para proteger cuentas, datos, endpoints y operación frente a accesos indebidos, abuso y dependencias vulnerables.
 
 ## ADDED Requirements

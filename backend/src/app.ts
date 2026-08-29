@@ -1,4 +1,5 @@
 import express from 'express';
+import { randomUUID } from 'node:crypto';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
@@ -12,18 +13,36 @@ import messagesRouter from './routes/messages.js';
 import agreementsRouter from './routes/agreements.js';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './config/swagger.js';
+import { csrfProtection, getFrontendUrl } from './security.js';
 
 const app = express();
 
 app.use(helmet());
-const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-app.use(cors({ origin: frontendUrl, credentials: true }));
+app.use((req, res, next) => {
+  const requestId = randomUUID();
+  req.headers['x-request-id'] = requestId;
+  res.setHeader('X-Request-Id', requestId);
+  next();
+});
+const frontendUrl = getFrontendUrl();
+app.use(
+  cors({
+    origin: (origin, callback) =>
+      callback(null, !origin || origin === frontendUrl),
+    credentials: true,
+  })
+);
+app.use((req, res, next) => csrfProtection(frontendUrl, req, res, next));
 app.use(
   express.json({
     limit: process.env.API_JSON_LIMIT || '10mb',
   })
 );
-app.use(morgan('dev'));
+app.use(
+  morgan(
+    ':method :url :status :res[content-length] - :response-time ms request=:req[x-request-id]'
+  )
+);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 

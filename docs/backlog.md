@@ -4,6 +4,8 @@
 
 > **Actualización técnica 2026-08-29:** la recuperación de mensajería incorporó el bot persistente mediante la migración `015_seed_messaging_bot.sql`, conversación idempotente por usuario, historial recargable y guía de diagnóstico. La mensajería mock sigue siendo útil para UI, pero no prueba persistencia real.
 
+> Las expansiones de confianza avanzada, reputación, moderación, métricas, integraciones de proveedores y retención de datos quedan fuera de `complete-entrelibros-recovery`. Se mantienen como trabajo futuro en [`roadmap.md`](roadmap.md) y requieren una OpenSpec propia; no son faltantes del MVP del TFG.
+
 Resumen ejecutivo
 EntreLibros conecta lectores mediante Rincones de Libros (RdL), publicaciones de ejemplares y acuerdos entre pares, priorizando privacidad por diseño y operación comunitaria. Este backlog ordena el trabajo en épicas, features y stories, con foco en el valor de negocio y en resultados observables. El estado actual refleja avances ya logrados (auth básica, mensajería, geolocalización, normalización de libros, scripts/CI), y alinea los pendientes críticos (RdL, descubrimiento, moderación, métricas y notificaciones) para alcanzar un MVP robusto.
 

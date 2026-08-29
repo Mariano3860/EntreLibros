@@ -14,6 +14,24 @@ The database covers users, books, listings, images, community corners and contac
 - Make local, CI and production execution use the same contracts for versions, routing, migrations, security and health.
 - Keep migrations incremental, protect existing local data and make rollback possible through tested restoration.
 
+### Scope guardrail from the TFG
+
+The functional MVP is bounded by the local final TFG. Its minimum demonstrable flow is: account/profile and location privacy; community book corners on a map; offered/wanted book listings with normalized minimum metadata; search by filters and proximity; private 1:1 messaging; an exchange agreement with place, time, confirmation and in-app reminder; and basic in-app notifications. Technical work is included only when it enables, protects, tests or deploys that flow.
+
+Pending work is classified as follows:
+
+| Classification | Rule | Examples |
+| --- | --- | --- |
+| MVP | Required to demonstrate a TFG capability; implement next when dependencies allow. | Profile/privacy, corners/map, listings/search, messaging, agreements, basic notifications. |
+| MVP support | Not a user feature, but required to run or explain the MVP safely. | Migrations, auth policy, same-origin routing, tests, CI, minimal production configuration, backup verification and documentation. |
+| Post-MVP | Valuable expansion removed from this change; it requires its own approved OpenSpec. | Ratings/reputation, reports/moderation workflow, advanced metrics, retention/export, provider selection, advanced observability and growth features. |
+
+The task list is the execution gate. This change contains no executable `POST-MVP` tasks. The deferred capabilities remain in the roadmap/backlog only; a future OpenSpec must document their purpose, user value, TFG relationship, acceptance evidence and bounded delivery before implementation.
+
+### Deferred capabilities
+
+The following capabilities are intentionally outside this change: advanced rate limiting, password recovery, ratings/reputation, moderator workflows and reports, community aggregates/suggestions, provider selection and malware scanning, advanced observability, retention/export/anonymization, growth initiatives, and post-exchange dispute workflows. They are not missing MVP work.
+
 **Non-Goals:**
 
 - Splitting the system into microservices or adopting event streaming infrastructure.
@@ -30,7 +48,7 @@ The OpenSpec change is a master program, but implementation will be split into i
 
 1. **Runtime foundation:** normalize Node 22, configuration, dev proxy, PostGIS preflight and deterministic migrations on the current main delivery. The user merges it manually.
 2. **PR #138 rescue:** update the existing PR branch from the newly merged main, resolve every review thread, and complete private messaging plus agreement persistence as one vertical slice. Push updates to the same PR so its review history is preserved. The user performs the merge only after all gates pass.
-3. **Security and product completion:** deliver identity/profile, catalog, community, trust, notifications and dependency remediation in small capability-oriented PRs.
+3. **MVP completion first:** deliver identity/profile, catalog, map/community essentials, private messaging, agreements and basic notifications in small capability-oriented PRs. Keep trust expansions and other post-MVP work explicitly deferred.
 4. **Production and operations:** land deployment, backup/restore, observability, E2E and runbooks after the product data model is stable.
 
 At every PR boundary the agent stops after verification, reports remaining review/CI state and tells the user when manual merge is the next action. Work resumes only after the user has made the intended target branch current or the existing PR branch is available; the agent does not create speculative branches.

@@ -222,7 +222,11 @@ describe('books API legacy endpoints', () => {
   });
 
   test('returns not found when verifying missing book', async () => {
-    const res = await request(app).post('/api/books/123/verify').expect(404);
+    const userId = await insertUser({ name: 'Verifier' });
+    const res = await request(app)
+      .post('/api/books/123/verify')
+      .set('Cookie', buildAuthCookie(userId))
+      .expect(404);
     expect(res.body).toEqual({
       error: 'NotFound',
       message: 'books.errors.not_found',
