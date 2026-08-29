@@ -132,22 +132,18 @@ router.patch(
         req.body as UpdateCornerPayload
       );
       if (!updated)
-        return res
-          .status(404)
-          .json({
-            error: 'NotFound',
-            message: 'community.corners.errors.not_found',
-          });
+        return res.status(404).json({
+          error: 'NotFound',
+          message: 'community.corners.errors.not_found',
+        });
       return res.json(updated);
     } catch (error) {
       if (error instanceof CornerValidationError)
         return res.status(422).json({ errors: error.errors });
-      return res
-        .status(500)
-        .json({
-          error: 'CornerUpdateFailed',
-          message: 'community.corners.errors.update_failed',
-        });
+      return res.status(500).json({
+        error: 'CornerUpdateFailed',
+        message: 'community.corners.errors.update_failed',
+      });
     }
   }
 );

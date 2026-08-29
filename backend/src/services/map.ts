@@ -234,7 +234,10 @@ const buildCornerPin = (
   };
 
   if (coordinates.approximate) {
-    basePin.referencePointLabel = corner.locationSummary;
+    // Never reuse the exact street/number in a public map label.
+    basePin.referencePointLabel = corner.address.postalCode
+      ? `CP ${corner.address.postalCode}`
+      : DEFAULT_BARRIO;
   }
 
   return basePin;
