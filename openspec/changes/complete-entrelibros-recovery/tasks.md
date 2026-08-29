@@ -1,141 +1,141 @@
-> ## Scope gate (mandatory)
+> ## Puerta de alcance (obligatoria)
 >
-> The local final TFG is the minimum product contract. Implement only tasks tagged `MVP` or `SOPORTE MVP` during this delivery. Do not implement or check off `POST-MVP` tasks without a later explicit authorization that explains their user value and relation to the TFG. Every implemented task needs a short purpose note, comments for non-obvious decisions and reproducible evidence.
+> El TFG final local es el contrato mínimo del producto. Durante esta entrega implementa solo tareas etiquetadas como `MVP` o `SOPORTE MVP`. No implementes ni marques tareas `POST-MVP` sin autorización posterior explícita que explique su valor para el usuario y su relación con el TFG. Toda tarea implementada necesita una breve nota de propósito, comentarios para decisiones no obvias y evidencia reproducible.
 >
-> MVP capabilities: account/profile/privacy, book corners and map, offered/wanted listings with minimum bibliographic data, search/proximity, private messaging, exchange agreements with place/time/confirmation/reminder, and basic in-app notifications.
+> Capacidades del MVP: cuenta/perfil/privacidad, rincones de libros y mapa, publicaciones ofrecidas/buscadas con datos bibliográficos mínimos, búsqueda/cercanía, mensajería privada, acuerdos de intercambio con lugar/horario/confirmación/recordatorio y notificaciones in-app básicas.
 
-## 1. Baseline and delivery controls
+## 1. Línea base y controles de entrega
 
-- [x] 1.1 Capture the current local/remote commits, working-tree anomalies, open PR #138 metadata, unresolved review threads, CI state, schema versions and production dependency audit in a recovery note; verify every finding has a command or link that can be rerun.
-- [x] 1.2 Export a local database backup and restore it into an isolated verification database; verify row counts, migration history and PostGIS availability match the source without deleting the original volume.
-- [x] 1.3 Add explicit delivery checkpoints for runtime foundation, PR #138, product/security and production work; verify each checkpoint states that the agent prepares the PR and the user alone performs the merge.
-- [x] 1.4 Normalize the pre-existing line-ending/index anomaly in an isolated reviewed change or document why no file rewrite is needed; verify `git diff`, blob hashes and `git status --short` are unambiguous before feature edits.
+- [x] 1.1 Capturar commits locales/remotos, anomalías del árbol, metadatos de la PR #138, hilos sin resolver, estado de CI, versiones de esquema y auditoría de dependencias en una nota de recuperación; verificar que cada hallazgo tenga un comando o enlace reproducible.
+- [x] 1.2 Exportar un backup local y restaurarlo en una base aislada; verificar cantidades de filas, historial de migraciones y disponibilidad de PostGIS sin eliminar el volumen original.
+- [x] 1.3 Añadir checkpoints explícitos para runtime, PR #138, producto/seguridad y producción; verificar que indiquen que el agente prepara la PR y el usuario hace el merge.
+- [x] 1.4 Normalizar la anomalía preexistente de saltos de línea/índice en un cambio aislado, o documentar por qué no hace falta reescribir archivos; verificar diff, hashes de blobs y estado limpio antes de tocar funcionalidades.
 
-## 2. Runtime foundation delivery
+## 2. Entrega de la base de runtime
 
-- [x] 2.1 Align `.nvmrc`, package engines, CI and both Dockerfiles on Node 22; verify local and container builds report an admitted engine with no `EBADENGINE` warning.
-- [x] 2.2 Consolidate frontend/backend environment examples and remove contradictory development/production variable names; verify every documented API URL either uses same-origin `/api` or includes the `/api` prefix.
-- [x] 2.3 Configure Rsbuild to proxy `/api` and `/socket.io` to the local backend while keeping mocks opt-in; verify the default development bundle reaches backend health and a deliberate mock run stays isolated.
-- [x] 2.4 Derive frontend REST and Socket.IO origins from the same configuration contract; verify local same-origin mode and an explicit cross-origin test both connect correctly.
-- [x] 2.5 Implement a non-destructive PostgreSQL/PostGIS preflight that reports host address, database, port, extension and conflicting listener; verify it rejects the previously reproduced Windows PostgreSQL conflict before migrations run.
-- [x] 2.6 Make development and test database preparation idempotent and document preserved-volume behavior; verify migrations succeed twice against both `entrelibros` and `entrelibros_test` without reapplying history.
-- [x] 2.7 Update README/runbooks with clean-clone setup, Docker/PostGIS lifecycle, registration, local infrastructure credentials and the distinction between JWT secrets and user passwords; verify a clean-shell walkthrough reaches frontend, backend, Swagger and registration.
-- [x] 2.8 Add runtime-foundation regression tests and run backend/frontend typecheck, lint, stylelint, format checks, tests and builds; verify all repository-required commands pass.
-- [x] 2.9 Push the runtime-foundation delivery and prepare its PR with evidence, migration impact and rollback notes; verify CI and review are green, notify the user that manual merge is required, and do not merge it.
-- [x] 2.10 After the user confirms the runtime PR merge, update the local current branch from remote main and rerun the clean-clone smoke; verify the merged commit contains no PR #138 feature work.
+- [x] 2.1 Alinear `.nvmrc`, engines, CI y Dockerfiles en Node 22; verificar builds locales y de contenedor sin avisos `EBADENGINE`.
+- [x] 2.2 Consolidar ejemplos de entorno de frontend/backend y eliminar nombres contradictorios; verificar que toda URL documentada use `/api` same-origin o incluya el prefijo `/api`.
+- [x] 2.3 Configurar el proxy de Rsbuild para `/api` y `/socket.io`, manteniendo los mocks opt-in; verificar el backend por defecto y una ejecución mock aislada.
+- [x] 2.4 Derivar REST y Socket.IO de un contrato común de configuración; verificar el modo local same-origin y un test cross-origin explícito.
+- [x] 2.5 Implementar un preflight no destructivo de PostgreSQL/PostGIS que informe host, base, puerto, extensión y listener en conflicto; verificar que rechace el conflicto reproducido en Windows.
+- [x] 2.6 Hacer idempotente la preparación de bases de desarrollo y test; verificar dos ejecuciones de migraciones en `entrelibros` y `entrelibros_test` sin repetir historial.
+- [x] 2.7 Actualizar README y runbooks con instalación desde clon limpio, ciclo Docker/PostGIS, registro, credenciales locales y diferencia entre secretos JWT y contraseñas; verificar el recorrido hasta frontend, backend, Swagger y registro.
+- [x] 2.8 Añadir regresiones de runtime y ejecutar typecheck, lint, stylelint, formato, tests y builds de backend/frontend; verificar todos los comandos requeridos.
+- [x] 2.9 Hacer push de runtime y preparar su PR con evidencia, impacto de migraciones y rollback; verificar CI/revisión, avisar que el merge es manual y no hacerlo.
+- [x] 2.10 Cuando el usuario confirme el merge de runtime, actualizar la rama desde main y repetir el smoke de clon limpio; verificar que no incluya funcionalidades de la PR #138.
 
-## 3. PR #138 recovery and scope control
+## 3. Recuperación de la PR #138 y control de alcance
 
-- [x] 3.1 Fetch the latest PR #138 head, base, checks, reviews and all unresolved threads; verify each review thread is mapped to a code change and regression test or an explicit documented response.
-- [x] 3.2 Make the existing PR #138 branch current without creating a speculative branch and integrate the latest remote main while preserving PR history; verify the PR remains open against main and contains no accidental unrelated files.
-- [x] 3.3 Reproduce the stale agreement confirm/cancel state reported in review and add a failing frontend regression test; verify the test fails on the current PR head for the reviewed reason.
-- [x] 3.4 Inventory every mock, local-only store transition and missing backend contract in the PR diff; verify the inventory covers conversation initialization, agreement versions, confirm, cancel, reconnect and errors.
-- [x] 3.5 Publish the final PR #138 scope in its description as private messaging prerequisites plus versioned agreements; verify environment, general dependency and production changes remain outside the PR.
+- [x] 3.1 Obtener head, base, checks, revisiones e hilos de la PR #138; verificar que cada hilo se relacione con un cambio y una regresión, o con una respuesta documentada.
+- [x] 3.2 Actualizar la rama existente de #138 e integrar main preservando su historial; verificar que siga abierta contra main y sin archivos ajenos.
+- [x] 3.3 Reproducir el estado obsoleto de confirmar/cancelar y añadir un test frontend que falle por esa causa.
+- [x] 3.4 Inventariar mocks, transiciones locales y contratos backend faltantes del diff; incluir inicialización de conversaciones, versiones, confirmar, cancelar, reconectar y errores.
+- [x] 3.5 Publicar el alcance final de #138 como prerrequisitos de mensajería y acuerdos versionados; mantener fuera entorno, dependencias generales y producción.
 
-## 4. Persistent private messaging for PR #138
+## 4. Mensajería privada persistente para la PR #138
 
-- [x] 4.1 Add incremental migrations for conversations, participants, messages, idempotency/sequence fields, read state and attachment metadata; verify migration from empty and current schemas plus all required foreign keys and indexes.
-- [x] 4.2 Implement typed repositories and services for conversation membership, paginated history, message persistence and read state without `any`; verify repository tests cover unauthorized access, ordering and duplicate client keys.
-- [x] 4.3 Add authenticated REST contracts for listing conversations, reading history, sending messages and marking reads; verify API tests cover success, validation, 401, 403, pagination and i18n error keys.
-- [x] 4.4 Replace Socket.IO global broadcasts with authorized conversation rooms and persist-before-emit behavior; verify two-conversation socket tests prove that third parties receive no message or metadata.
-- [x] 4.5 Add reconnect/cursor handling so clients can recover missed persisted messages; verify an integration test disconnects, writes messages and receives the exact missing ordered set after reconnect.
-- [x] 4.6 Introduce an attachment-storage interface with deterministic test implementation and validation of type, size and membership; verify invalid uploads are rejected and stored metadata never contains base64 payloads.
-- [x] 4.7 Update OpenAPI and backend-facing i18n keys for messaging routes and events; verify contract checks match runtime responses.
+- [x] 4.1 Añadir migraciones para conversaciones, participantes, mensajes, idempotencia/secuencia, lectura y metadatos de adjuntos; verificar esquemas vacío y actual, claves foráneas e índices.
+- [x] 4.2 Implementar repositorios y servicios tipados para pertenencia, historial paginado, persistencia y lectura sin `any`; cubrir acceso no autorizado, orden y claves duplicadas.
+- [x] 4.3 Añadir contratos REST autenticados para listar conversaciones, consultar historial, enviar mensajes y marcar lecturas; cubrir éxito, validación, 401, 403, paginación y claves i18n.
+- [x] 4.4 Sustituir broadcasts globales de Socket.IO por salas autorizadas y persistencia antes de emitir; verificar que terceros no reciban mensaje ni metadatos.
+- [x] 4.5 Añadir recuperación por cursor tras reconexión; verificar que se reciba exactamente el conjunto ordenado de mensajes faltantes.
+- [x] 4.6 Incorporar interfaz de almacenamiento de adjuntos con implementación determinista de test y validaciones de tipo, tamaño y pertenencia; impedir payloads base64 en metadatos.
+- [x] 4.7 Actualizar OpenAPI y claves i18n de mensajería; verificar que el contrato coincida con las respuestas reales.
 
-## 5. Versioned agreements backend for PR #138
+## 5. Backend de acuerdos versionados para la PR #138
 
-- [x] 5.1 Add incremental migrations for agreements, immutable versions/items, participant acceptances and agreement events; verify constraints prevent invalid participants, duplicate version numbers and orphaned listing references.
-- [x] 5.2 Implement the agreement state machine and authorization policy independently of HTTP handlers; verify unit tests cover every allowed and forbidden transition.
-- [x] 5.3 Implement optimistic concurrency using expected version checks; verify simultaneous confirm/cancel requests produce one committed transition and one conflict carrying the current state.
-- [x] 5.4 Implement proposal and counterproposal services that create complete immutable versions; verify history tests reconstruct each version and actor without mutation of prior rows.
-- [x] 5.5 Implement atomic bilateral acceptance and listing reservation; verify transaction tests prevent double reservation and roll back all changes on any validation failure.
-- [x] 5.6 Implement cancellation, rejection and completion with reservation release and immutable audit events; verify each transition records actor, time, version and required reason.
-- [x] 5.7 Add authenticated REST endpoints for agreement creation, history and commands linked to conversation membership; verify API tests cover participants, blocked users, stale versions and unavailable listings.
-- [x] 5.8 Emit versioned agreement events to authorized conversation rooms only after commit; verify socket integration tests receive one event per committed transition and none for rolled-back work.
-- [x] 5.9 Update OpenAPI and i18n error contracts for agreements; verify generated/static documentation exposes states, conflict responses and required expected-version inputs.
+- [x] 5.1 Añadir migraciones para acuerdos, versiones/ítems inmutables, aceptaciones y eventos; impedir participantes inválidos, versiones duplicadas y referencias huérfanas.
+- [x] 5.2 Implementar máquina de estados y autorización fuera de los handlers HTTP; cubrir cada transición permitida y prohibida.
+- [x] 5.3 Implementar concurrencia optimista con versión esperada; verificar una transición confirmada y un conflicto con estado actual ante solicitudes simultáneas.
+- [x] 5.4 Implementar propuestas y contrapropuestas como versiones completas inmutables; reconstruir historial y actor sin mutar filas previas.
+- [x] 5.5 Implementar aceptación bilateral atómica y reserva de publicaciones; impedir doble reserva y revertir todos los cambios ante cualquier fallo.
+- [x] 5.6 Implementar cancelación, rechazo y finalización con liberación de reservas y auditoría inmutable; registrar actor, momento, versión y motivo.
+- [x] 5.7 Añadir endpoints autenticados de acuerdos vinculados a la pertenencia de la conversación; cubrir participantes, bloqueos, versiones obsoletas y publicaciones no disponibles.
+- [x] 5.8 Emitir eventos versionados solo a salas autorizadas y después del commit; verificar un evento por transición confirmada y ninguno si hay rollback.
+- [x] 5.9 Actualizar OpenAPI y contratos de errores i18n; documentar estados, conflictos y versiones esperadas.
 
-## 6. PR #138 frontend completion
+## 6. Finalización del frontend de la PR #138
 
-- [x] 6.1 Add typed messaging/agreement API clients and TanStack Query keys around server resources; verify client tests cover serialization, pagination and conflict parsing without `any`.
-- [x] 6.2 Replace `mockConversations` initialization with authenticated server queries while retaining fixtures only in tests/demo mode; verify a production build contains no automatic mock conversation bootstrap.
-- [x] 6.3 Integrate Socket.IO events as query invalidations/refetch triggers rather than a second source of truth; verify reconnect and duplicate-event tests preserve one ordered message/agreement state.
-- [x] 6.4 Refactor the agreement store so confirm/cancel handlers read the current server version at execution time; verify the previously failing stale-closure regression test passes.
-- [x] 6.5 Render proposal history, pending bilateral acceptance, conflicts, cancellation reasons and completed state from server data; verify component tests cover both participants and all terminal states.
-- [x] 6.6 Add loading, empty, retry, authorization and conflict-recovery UI with translated messages; verify Spanish and configured alternate locale tests render keys without raw backend text.
-- [x] 6.7 Validate keyboard navigation, focus restoration and accessible labels for message composer and agreement dialogs; verify automated accessibility checks and keyboard interaction tests pass.
-- [x] 6.8 Add a two-user E2E flow for conversation, message, counterproposal, stale conflict, bilateral acceptance, cancellation alternative and reconnect; verify it passes against real PostGIS with mocks disabled.
+- [x] 6.1 Añadir clientes API tipados y claves TanStack Query para mensajes/acuerdos; cubrir serialización, paginación y conflictos sin `any`.
+- [x] 6.2 Sustituir la inicialización de `mockConversations` por consultas autenticadas; conservar fixtures solo en tests/demo y verificar que producción no arranque mocks.
+- [x] 6.3 Integrar eventos Socket.IO como invalidaciones/refetch y no como segunda fuente de verdad; cubrir reconexión y eventos duplicados.
+- [x] 6.4 Hacer que confirmar/cancelar lea la versión vigente del servidor al ejecutarse; verificar la regresión de cierres obsoletos.
+- [x] 6.5 Renderizar historial, aceptación bilateral, conflictos, motivos de cancelación y estados finales desde el servidor; cubrir participantes y estados terminales.
+- [x] 6.6 Añadir estados de carga, vacío, reintento, autorización y recuperación de conflictos con mensajes traducidos; cubrir español y locale alternativo.
+- [x] 6.7 Validar navegación por teclado, foco y etiquetas accesibles del compositor y diálogos; cubrir accesibilidad e interacción de teclado.
+- [x] 6.8 Añadir E2E de dos usuarios para conversación, mensaje, contrapropuesta, conflicto obsoleto, aceptación bilateral, cancelación y reconexión contra PostGIS real con mocks desactivados.
 
-## 7. PR #138 quality and manual merge gate
+## 7. Calidad de la PR #138 y puerta de merge manual
 
-- [x] 7.1 Run PR #138 migrations from an empty database, the preserved current schema and an anonymized backup; verify identical final schema version and no lost existing rows.
-- [x] 7.2 Run backend/frontend typecheck, lint, stylelint, format checks, unit/integration tests, E2E and production builds; verify all checks pass without React `act`, empty-image or deprecated Faker warnings in touched flows. Local service E2E, CI, and production builds pass; the browser-control surface was unavailable, so browser E2E remains separately documented as unavailable.
-- [x] 7.3 Re-run production dependency audit for packages touched by #138 and document any applicable exception; verify no unapproved critical/high runtime vulnerability is introduced.
-- [x] 7.4 Review the final diff against the published #138 scope and remove unrelated changes; verify every added migration, endpoint, UI path and dependency maps to messaging or agreements.
-- [x] 7.5 Resolve or answer every PR review thread with its test evidence, update the PR description and request rereview; verify zero unresolved actionable threads remain.
-- [x] 7.6 Push the completed #138 branch and monitor CI to a terminal green state; verify the PR is mergeable and then notify the user that manual merge is required without invoking any merge command.
-- [x] 7.7 After the user confirms merge, update local main and run the messaging/agreement smoke again; verify the merge commit is present remotely before beginning dependent deliveries. Verified PR #138 merged as `9dd6e6b`; local `main` fast-forwarded to `bcf1528`; isolated 15-migration smoke E2E passed.
+- [x] 7.1 Ejecutar migraciones desde base vacía, esquema preservado y backup anonimizado; verificar versión final idéntica y ausencia de pérdida de filas.
+- [x] 7.2 Ejecutar typecheck, lint, stylelint, formato, tests, E2E y builds de producción; verificar los flujos tocados sin avisos React `act`, imágenes vacías ni Faker obsoleto. El E2E de servicio, CI y builds pasan; el control de navegador no estaba disponible y el E2E de navegador queda documentado como no disponible.
+- [x] 7.3 Repetir auditoría de dependencias de producción para paquetes tocados por #138 y documentar excepciones; verificar que no aparezca una vulnerabilidad runtime alta/crítica no aprobada.
+- [x] 7.4 Revisar el diff final contra el alcance publicado de #138 y retirar cambios ajenos; relacionar cada migración, endpoint, UI y dependencia con mensajería o acuerdos.
+- [x] 7.5 Resolver o contestar cada hilo de revisión con evidencia, actualizar la descripción y pedir nueva revisión; verificar cero hilos accionables sin resolver.
+- [x] 7.6 Hacer push de #138 y monitorizar CI hasta estado verde; verificar que sea integrable y avisar al usuario para el merge manual sin ejecutar ningún comando de merge.
+- [x] 7.7 Cuando el usuario confirme el merge, actualizar main y repetir el smoke de mensajería/acuerdos; verificar el commit remoto antes de iniciar entregas dependientes. PR #138 verificada como mergeada en `9dd6e6b`; main local avanzó hasta `bcf1528` y el smoke aislado de 15 migraciones pasó.
 
-## 8. Platform security and dependency remediation (MVP and POST-MVP)
+## 8. Seguridad de plataforma y corrección de dependencias (MVP y POST-MVP)
 
-- [x] 8.1 [SOPORTE MVP] Triage all production audit findings by reachable runtime path and upgrade direct dependencies in small compatible groups; verify each group passes full tests and leaves no unapproved critical/high applicable finding. Updated six direct runtime dependencies plus compatible transitive patches; `npm audit --omit=dev` reports 0 vulnerabilities, and the isolated backend suite passes 27 files/104 tests.
-- [x] 8.2 [MVP] Protect community-corner creation, book verification and every mutable route with authentication plus owner/role policies; verify anonymous and unauthorized API tests return i18n 401/403 errors with no data changes. Added authentication to corner creation and book verification; anonymous corner creation is covered with a no-row-change assertion, and the backend suite passes 27 files/105 tests on an isolated database.
-- [x] 8.3 [SOPORTE MVP] Add production cookie, CORS and CSRF configuration with fail-closed validation; verify same-origin requests work and cross-origin/invalid-token mutations are rejected. Production now requires a valid `FRONTEND_URL`, uses an exact CORS allowlist, and rejects cross-origin mutations with a localized 403; security tests and the isolated backend suite pass (28 files/108 tests).
-- [x] 8.5 [SOPORTE MVP] Add security headers, request correlation and centralized secret/PII redaction; verify logs from forced failures contain correlation but no passwords, tokens, cookies or exact private location. Requests now receive `X-Request-Id`, Morgan correlates access logs, and logger metadata redacts credentials/PII recursively; typecheck and isolated backend validation pass (28 files/109 tests).
-- [x] 8.7 [SOPORTE MVP] Update OpenAPI, threat notes and security runbook, then run all repository checks; verify the security delivery is ready for review. OpenAPI now identifies the `sessionToken` cookie and protected MVP mutations; threat/runbook docs cover the controls and residual risks; OpenSpec validation, backend typecheck, backend 28/109 tests and frontend 114/374 tests pass.
-- [x] 8.8 [SOPORTE MVP] Prepare the security PR and wait for green CI/review; notify the user when manual merge is required and do not merge it. Security commits are isolated on `recovery/complete-entrelibros-mvp`; required checks pass locally, and the PR is ready for CI/review. Manual merge remains with the user.
+- [x] 8.1 [SOPORTE MVP] Clasificar hallazgos de auditoría por ruta runtime y actualizar dependencias directas en grupos compatibles; verificar que no queden vulnerabilidades aplicables altas/críticas sin aprobar. Se actualizaron seis dependencias directas y parches transitivos; `npm audit --omit=dev` informa 0 vulnerabilidades y el backend aislado pasa 27 archivos/104 tests.
+- [x] 8.2 [MVP] Proteger creación de rincones, verificación de libros y rutas mutables con autenticación y políticas de propietario/rol; cubrir 401/403 i18n y ausencia de cambios de datos. El backend aislado pasa 27 archivos/105 tests.
+- [x] 8.3 [SOPORTE MVP] Añadir cookies, CORS y CSRF de producción con validación fail-closed; verificar same-origin y rechazo de mutaciones cross-origin o con token inválido. La configuración exige `FRONTEND_URL`, usa allowlist exacta y responde 403 localizado.
+- [x] 8.5 [SOPORTE MVP] Añadir headers de seguridad, correlación de requests y redacción centralizada de secretos/PII; verificar correlación sin contraseñas, tokens, cookies ni ubicación privada exacta. El backend pasa 28 archivos/109 tests.
+- [x] 8.7 [SOPORTE MVP] Actualizar OpenAPI, notas de amenazas y runbook de seguridad, y ejecutar comprobaciones; verificar que la entrega quede lista para revisión. OpenSpec, typecheck backend, 28/109 tests backend y 114/374 frontend pasan.
+- [x] 8.8 [SOPORTE MVP] Preparar la PR de seguridad y esperar CI/revisión en verde; avisar al usuario cuando se requiera merge manual y no hacerlo. Los commits están aislados en `security/entrelibros-mvp-hardening`; las comprobaciones pasan localmente.
 
-## 9. Identity, profile, reputation and catalog completion (MVP and POST-MVP)
+## 9. Finalización de identidad, perfil, reputación y catálogo (MVP y POST-MVP)
 
-- [ ] 9.1 [MVP] Add profile/privacy fields and migration defaults that do not expose existing precise locations; verify public/private profile API tests for legacy and new users.
-- [ ] 9.2 [MVP] Implement authenticated profile and preference endpoints plus frontend forms for alias, description, language and location granularity; verify persistence and locale switching end to end.
-- [ ] 9.3 [MVP] Add block relationships and enforce them in new conversations, agreements and direct notifications; verify both block directions and privacy-preserving errors.
-- [ ] 9.5 [MVP] Complete listing states, valid transitions, expiry/renewal and atomic reservation integration; verify scheduled expiry and agreement interaction tests.
-- [ ] 9.6 [MVP] Add paginated catalog filters for text, author, ISBN, language, status, distance and exchange type; verify query plans/indexes and combined-filter API/frontend tests.
-- [ ] 9.8 [MVP] Enforce image count/type/size and privacy-rounded public locations; verify invalid media and exact-coordinate leakage tests.
-- [ ] 9.9 [SOPORTE MVP] Update frontend flows, OpenAPI and backlog for identity/catalog scope and run full checks; verify the delivery has no raw backend errors or stale mock paths.
-- [ ] 9.10 [SOPORTE MVP] Prepare capability-oriented PRs with green CI and review; at each boundary notify the user to merge manually and wait for confirmation before dependent work.
+- [ ] 9.1 [MVP] Añadir campos de perfil/privacidad y valores por defecto que no expongan ubicaciones precisas existentes; cubrir perfiles públicos/privados para usuarios antiguos y nuevos.
+- [ ] 9.2 [MVP] Implementar endpoints autenticados de perfil/preferencias y formularios de alias, descripción, idioma y granularidad de ubicación; verificar persistencia y cambio de locale E2E.
+- [ ] 9.3 [MVP] Añadir bloqueos y aplicarlos a conversaciones, acuerdos y notificaciones directas nuevas; cubrir ambas direcciones con errores que preserven privacidad.
+- [ ] 9.5 [MVP] Completar estados, transiciones, caducidad/renovación y reservas atómicas de publicaciones; cubrir caducidad programada e interacción con acuerdos.
+- [ ] 9.6 [MVP] Añadir filtros paginados de texto, autor, ISBN, idioma, estado, distancia y tipo de intercambio; verificar planes, índices y filtros combinados.
+- [ ] 9.8 [MVP] Aplicar límites de cantidad/tipo/tamaño de imágenes y ubicaciones públicas redondeadas; cubrir medios inválidos y filtración de coordenadas exactas.
+- [ ] 9.9 [SOPORTE MVP] Actualizar frontend, OpenAPI y backlog para identidad/catálogo y ejecutar comprobaciones; verificar ausencia de errores backend crudos y mocks obsoletos.
+- [ ] 9.10 [SOPORTE MVP] Preparar PRs por capacidad con CI/revisión en verde; avisar al usuario para cada merge manual y esperar confirmación antes de continuar.
 
-## 10. Community and map completion (MVP and POST-MVP)
+## 10. Finalización de comunidad y mapa (MVP y POST-MVP)
 
-- [ ] 10.1 [MVP] Add owner and lifecycle status to community corners with safe legacy defaults; defer moderation metadata to POST-MVP.
-- [ ] 10.2 [MVP] Require authentication for corner proposals and implement owner edit transitions; defer moderator workflows to POST-MVP.
-- [ ] 10.4 [SOPORTE MVP] Add pagination, maximum radius/page size and field projection to nearby/map endpoints; verify the reproduced multi-megabyte response falls below the documented budget.
-- [ ] 10.5 [MVP] Enforce bounding boxes, spatial indexes and privacy-rounded coordinates; verify query plans and tests exclude out-of-bounds/private locations.
-- [ ] 10.6 [MVP] Update community frontend for pagination, loading/error/empty states and visible corner lifecycle; defer moderated visibility to POST-MVP.
-- [ ] 10.7 [SOPORTE MVP] Update OpenAPI/backlog and run performance plus full repository checks; verify the community delivery is ready for review.
-- [ ] 10.8 [SOPORTE MVP] Prepare the community PR with green CI/review and notify the user when manual merge is required; do not merge it.
+- [ ] 10.1 [MVP] Añadir propietario y estado de ciclo de vida a rincones con valores seguros para datos antiguos; diferir metadatos de moderación al POST-MVP.
+- [ ] 10.2 [MVP] Exigir autenticación para propuestas de rincones e implementar edición del propietario; diferir moderación al POST-MVP.
+- [ ] 10.4 [SOPORTE MVP] Añadir paginación, radio/página máximos y proyección de campos; verificar que el payload quede debajo del presupuesto documentado.
+- [ ] 10.5 [MVP] Aplicar bounding boxes, índices espaciales y coordenadas redondeadas; verificar planes y exclusión de ubicaciones privadas o fuera de límites.
+- [ ] 10.6 [MVP] Actualizar frontend comunitario con paginación, estados de carga/error/vacío y ciclo visible; diferir visibilidad moderada al POST-MVP.
+- [ ] 10.7 [SOPORTE MVP] Actualizar OpenAPI/backlog y ejecutar rendimiento y comprobaciones generales; verificar que comunidad quede lista para revisión.
+- [ ] 10.8 [SOPORTE MVP] Preparar la PR de comunidad con CI/revisión en verde y avisar al usuario para el merge manual; no hacer merge.
 
-## 11. Trust, safety and notifications (MVP and POST-MVP)
+## 11. Confianza, seguridad y notificaciones (MVP y POST-MVP)
 
-- [ ] 11.1 [MVP] Add migrations for in-app notifications and notification preferences only; defer reports, moderation actions and post-exchange outcomes.
-- [ ] 11.3 [MVP] Implement idempotent persistent notifications triggered by messaging and agreements; defer moderation-triggered notifications.
-- [ ] 11.4 [MVP] Add notification center and preferences UI with translated accessible states for messages and agreements.
-- [ ] 11.7 [SOPORTE MVP] Update OpenAPI, notification runbook and backlog, then run full checks; defer moderation/incident documentation to POST-MVP.
-- [ ] 11.8 [SOPORTE MVP] Prepare the notifications PR with green CI/review and notify the user when manual merge is required; do not merge it.
+- [ ] 11.1 [MVP] Añadir migraciones solo para notificaciones in-app y preferencias; diferir denuncias, moderación y resultados posteriores al intercambio.
+- [ ] 11.3 [MVP] Implementar notificaciones persistentes e idempotentes activadas por mensajes y acuerdos; diferir las activadas por moderación.
+- [ ] 11.4 [MVP] Añadir centro de notificaciones y preferencias con estados accesibles traducidos para mensajes y acuerdos.
+- [ ] 11.7 [SOPORTE MVP] Actualizar OpenAPI, runbook de notificaciones y backlog, y ejecutar comprobaciones; diferir documentación de moderación/incidentes al POST-MVP.
+- [ ] 11.8 [SOPORTE MVP] Preparar la PR de notificaciones con CI/revisión en verde y avisar al usuario para el merge manual; no hacer merge.
 
-## 12. Production delivery and operations (MVP support and POST-MVP)
+## 12. Entrega y operación en producción (soporte MVP y POST-MVP)
 
-- [ ] 12.1 [SOPORTE MVP] Rebuild backend/frontend Dockerfiles on Node 22 with deterministic dependency layers and non-root runtime where applicable; verify images build from a clean cache and pass container smoke tests.
-- [ ] 12.2 [SOPORTE MVP] Add nginx SPA fallback plus `/api` and `/socket.io` proxy configuration; verify deep links, cookies and websocket upgrade.
-- [ ] 12.3 [SOPORTE MVP] Replace missing/contradictory Compose environment contracts with validated examples and explicit `NODE_ENV=production`; verify `docker compose config` succeeds without placeholder warnings.
-- [ ] 12.4 [SOPORTE MVP] Add one-shot migration service, database/backend healthchecks and readiness ordering; verify a fresh stack becomes healthy.
-- [ ] 12.5 [SOPORTE MVP] Remove public database exposure in production and configure secrets as external inputs with no defaults; verify missing secrets fail closed.
-- [ ] 12.7 [SOPORTE MVP] Implement and document encrypted backup, restore verification and application rollback; verify a staging restore and failed-release rollback drill.
-- [ ] 12.9 [MVP] Run production E2E for registration, profile, publication, map, messaging, agreement, notification and logout; defer report flow to POST-MVP.
-- [ ] 12.10 [SOPORTE MVP] Prepare the production PR and deployment evidence with green CI/review; notify the user when manual merge/deployment approval is required and perform neither action automatically.
+- [ ] 12.1 [SOPORTE MVP] Reconstruir Dockerfiles en Node 22 con capas deterministas y runtime sin root cuando corresponda; verificar builds limpios y smoke de contenedor.
+- [ ] 12.2 [SOPORTE MVP] Añadir fallback SPA de nginx y proxy de `/api` y `/socket.io`; verificar deep links, cookies y upgrade de WebSocket.
+- [ ] 12.3 [SOPORTE MVP] Reemplazar contratos Compose ausentes o contradictorios por ejemplos validados y `NODE_ENV=production`; verificar `docker compose config` sin placeholders.
+- [ ] 12.4 [SOPORTE MVP] Añadir servicio one-shot de migraciones, healthchecks y orden de readiness; verificar que un stack nuevo quede saludable.
+- [ ] 12.5 [SOPORTE MVP] Quitar exposición pública de la base en producción y usar secretos externos sin defaults; verificar fallo cerrado ante secretos ausentes.
+- [ ] 12.7 [SOPORTE MVP] Implementar y documentar backup cifrado, verificación de restauración y rollback; verificar restauración de staging y simulacro de release fallida.
+- [ ] 12.9 [MVP] Ejecutar E2E de producción para registro, perfil, publicación, mapa, mensajería, acuerdo, notificación y logout; diferir denuncias al POST-MVP.
+- [ ] 12.10 [SOPORTE MVP] Preparar PR de producción y evidencia de despliegue con CI/revisión en verde; avisar para aprobación manual y no hacer merge ni despliegue automáticamente.
 
-## 13. Data lifecycle, quality and documentation closure (MVP support and POST-MVP)
+## 13. Ciclo de vida de datos, calidad y cierre documental (soporte MVP y POST-MVP)
 
-- [ ] 13.1 [SOPORTE MVP] Add OpenAPI drift/contract checks to CI and document every public route, security scheme, websocket event and i18n error key used by the MVP.
-- [ ] 13.2 [SOPORTE MVP] Add migration CI paths for empty, previous and preserved schemas plus PostGIS; verify every migration is append-only and repeat execution is safe.
-- [ ] 13.3 [SOPORTE MVP] Eliminate existing React `act`, empty image source and deprecated Faker warnings in touched MVP flows.
-- [ ] 13.5 [SOPORTE MVP] Reconcile `docs/backlog.md` row by row with implemented capabilities, separating partial and post-MVP work without duplicates.
-- [ ] 13.6 [SOPORTE MVP] Rewrite development, production, credentials, backup/restore and PR/release runbooks; defer incident operations beyond the MVP unless required by deployment.
-- [ ] 13.7 [SOPORTE MVP] Run strict OpenSpec validation, repository checks, dependency audit, E2E and MVP production smoke; defer image scanning and non-MVP flows.
-- [ ] 13.8 [SOPORTE MVP] Produce a readiness report mapping MVP requirements to tests and delivered PRs, including accepted exceptions and owners.
+- [ ] 13.1 [SOPORTE MVP] Añadir checks de drift/contrato OpenAPI a CI y documentar rutas públicas, esquemas de seguridad, eventos WebSocket y claves i18n del MVP.
+- [ ] 13.2 [SOPORTE MVP] Añadir rutas CI de migración para esquemas vacío, anterior y preservado más PostGIS; verificar append-only y ejecución repetible.
+- [ ] 13.3 [SOPORTE MVP] Eliminar avisos existentes de React `act`, imágenes vacías y Faker obsoleto en flujos MVP tocados.
+- [ ] 13.5 [SOPORTE MVP] Reconciliar fila por fila `docs/backlog.md` con capacidades implementadas, separando parciales y POST-MVP sin duplicados.
+- [ ] 13.6 [SOPORTE MVP] Reescribir runbooks de desarrollo, producción, credenciales, backup/restauración y PR/release; diferir operación de incidentes fuera del MVP salvo necesidad de despliegue.
+- [ ] 13.7 [SOPORTE MVP] Ejecutar validación estricta de OpenSpec, comprobaciones, auditoría, E2E y smoke de producción MVP; diferir escaneo de imágenes y flujos no MVP.
+- [ ] 13.8 [SOPORTE MVP] Elaborar informe de preparación que relacione requisitos MVP con tests y PRs entregadas, incluyendo excepciones aceptadas y responsables.
 
-## 14. Post-MVP roadmap and OpenSpec closure (explicitly deferred)
+## 14. Roadmap POST-MVP y cierre de OpenSpec (diferido explícitamente)
 
-- [ ] 14.2 [SOPORTE MVP] Confirm every MVP checkbox and requirement against merged code and deployed behavior; incomplete work remains unchecked and blocks archival.
-- [ ] 14.3 [SOPORTE MVP] Sync completed delta specs to main specs only after their deliveries are merged; no unmerged requirement is promoted.
-- [ ] 14.4 [SOPORTE MVP] Archive `complete-entrelibros-recovery` only after all required MVP PRs were manually merged by the user and final validation passes.
+- [ ] 14.2 [SOPORTE MVP] Confirmar cada checkbox y requisito MVP contra código mergeado y comportamiento desplegado; lo incompleto permanece sin marcar y bloquea el archivo.
+- [ ] 14.3 [SOPORTE MVP] Sincronizar specs delta con specs principales solo después de mergear las entregas; no promover requisitos sin merge.
+- [ ] 14.4 [SOPORTE MVP] Archivar `complete-entrelibros-recovery` solo cuando el usuario haya mergeado manualmente todas las PRs MVP y pase la validación final.

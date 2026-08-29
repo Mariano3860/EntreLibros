@@ -1,4 +1,4 @@
-# Runbook de seguridad MVP
+# Manual operativo de seguridad del MVP
 
 Este documento describe los controles operativos que deben comprobarse antes de
 usar el backend fuera de desarrollo. El alcance es el MVP del TFG: sesión,

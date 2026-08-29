@@ -1,4 +1,4 @@
-# Troubleshooting
+# Solución de problemas
 
 ## `/messages` vacío o muestra error
 

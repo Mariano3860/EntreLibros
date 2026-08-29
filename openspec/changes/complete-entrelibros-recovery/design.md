@@ -1,159 +1,155 @@
-## Context
+# Diseño de la recuperación de EntreLibros
 
-See `proposal.md` for motivation and `specs/*/spec.md` for behavioral contracts. The current repository is a TypeScript modular monolith with React/Rsbuild, Express/Socket.IO and PostgreSQL/PostGIS. Static checks, builds and both test suites pass when Node 22 reaches the correct PostGIS instance, but local configuration can route Node to a different PostgreSQL service and the development frontend resolves `/api` without a proxy. Production Compose references missing environment files and remote images, exposes nginx on the wrong container port, and cannot inject frontend variables after build.
+## Contexto
 
-The database covers users, books, listings, images, community corners and contact messages. It has no persistent model for conversations, messages, agreements, notifications, reports or moderation. Community aggregates and messaging still use mocks, while the open PR #138 adds an agreement workflow mainly in client state and has unresolved review feedback. Repository instructions require work on the current branch, complete verification, backlog updates and no automatic branch creation. The user additionally requires that an agent never merge a PR.
+Consulta `proposal.md` para la motivación y `specs/*/spec.md` para los contratos de comportamiento. El repositorio es un monolito modular TypeScript con React/Rsbuild, Express/Socket.IO y PostgreSQL/PostGIS. Las comprobaciones estáticas, las compilaciones y las suites de pruebas pasan cuando Node 22 apunta a la instancia correcta de PostGIS; la configuración local puede dirigir Node a otro servicio PostgreSQL y el frontend de desarrollo resuelve `/api` sin proxy. El Compose de producción referencia archivos de entorno inexistentes e imágenes remotas, expone nginx en el puerto incorrecto y no puede inyectar variables del frontend después de la compilación.
 
-## Goals / Non-Goals
+La base de datos contiene usuarios, libros, publicaciones, imágenes, rincones comunitarios y mensajes de contacto. No tenía modelos persistentes para conversaciones, mensajes, acuerdos, notificaciones, denuncias ni moderación. Los agregados comunitarios y la mensajería todavía usan mocks, mientras que la PR #138 incorpora principalmente en el estado del cliente un flujo de acuerdos con observaciones pendientes. Las instrucciones del repositorio exigen trabajar en la rama actual, verificar todo, actualizar el backlog y no crear ramas automáticamente. Además, el usuario exige que el agente nunca haga merge de una PR.
 
-**Goals:**
+## Objetivos y exclusiones
 
-- Convert the repository into a production-ready MVP through reviewable deliveries with explicit dependency and human-merge gates.
-- Preserve the current modular-monolith architecture while making PostgreSQL the source of truth for product state.
-- Finish PR #138 as a coherent vertical slice for private messaging and versioned exchange agreements rather than leaving a polished mock.
-- Make local, CI and production execution use the same contracts for versions, routing, migrations, security and health.
-- Keep migrations incremental, protect existing local data and make rollback possible through tested restoration.
+**Objetivos:**
 
-### Scope guardrail from the TFG
+- Convertir el repositorio en un MVP desplegable mediante entregas revisables, con dependencias y puertas de aprobación humana explícitas.
+- Conservar la arquitectura de monolito modular y hacer que PostgreSQL sea la fuente de verdad del estado del producto.
+- Completar la PR #138 como una entrega vertical coherente de mensajería privada y acuerdos de intercambio versionados, en lugar de dejar un mock pulido.
+- Usar los mismos contratos de versiones, rutas, migraciones, seguridad y salud en desarrollo local, CI y producción.
+- Mantener las migraciones incrementales, proteger los datos locales existentes y hacer posible la recuperación mediante restauraciones verificadas.
 
-The functional MVP is bounded by the local final TFG. Its minimum demonstrable flow is: account/profile and location privacy; community book corners on a map; offered/wanted book listings with normalized minimum metadata; search by filters and proximity; private 1:1 messaging; an exchange agreement with place, time, confirmation and in-app reminder; and basic in-app notifications. Technical work is included only when it enables, protects, tests or deploys that flow.
+### Límite de alcance definido por el TFG
 
-Pending work is classified as follows:
+El MVP funcional está delimitado por el TFG final local. Su flujo mínimo demostrable es: cuenta, perfil y privacidad de ubicación; rincones comunitarios de libros en un mapa; publicaciones de libros ofrecidos o buscados con metadatos mínimos normalizados; búsqueda por filtros y cercanía; mensajería privada 1:1; acuerdo de intercambio con lugar, horario, confirmación y recordatorio dentro de la aplicación; y notificaciones in-app básicas. El trabajo técnico solo se incluye cuando habilita, protege, prueba o despliega ese flujo.
 
-| Classification | Rule | Examples |
+| Clasificación | Regla | Ejemplos |
 | --- | --- | --- |
-| MVP | Required to demonstrate a TFG capability; implement next when dependencies allow. | Profile/privacy, corners/map, listings/search, messaging, agreements, basic notifications. |
-| MVP support | Not a user feature, but required to run or explain the MVP safely. | Migrations, auth policy, same-origin routing, tests, CI, minimal production configuration, backup verification and documentation. |
-| Post-MVP | Valuable expansion removed from this change; it requires its own approved OpenSpec. | Ratings/reputation, reports/moderation workflow, advanced metrics, retention/export, provider selection, advanced observability and growth features. |
+| MVP | Necesario para demostrar una capacidad del TFG; se implementa cuando sus dependencias lo permiten. | Perfil y privacidad, rincones/mapa, publicaciones/búsqueda, mensajería, acuerdos y notificaciones básicas. |
+| Soporte MVP | No es una funcionalidad de usuario, pero permite ejecutar o explicar el MVP de forma segura. | Migraciones, autenticación, rutas same-origin, tests, CI, configuración mínima de producción, backup/restauración y documentación. |
+| POST-MVP | Es una ampliación valiosa retirada de este cambio; necesita su propia OpenSpec aprobada. | Reputación, denuncias/moderación, métricas avanzadas, retención/exportación, elección de proveedores, observabilidad avanzada y crecimiento. |
 
-The task list is the execution gate. This change contains no executable `POST-MVP` tasks. The deferred capabilities remain in the roadmap/backlog only; a future OpenSpec must document their purpose, user value, TFG relationship, acceptance evidence and bounded delivery before implementation.
+La lista de tareas es la puerta de ejecución. Este cambio no contiene tareas ejecutables `POST-MVP`. Las capacidades diferidas solo permanecen en el roadmap/backlog; una OpenSpec futura deberá explicar su propósito, valor para el usuario, relación con el TFG, evidencia de aceptación y entrega acotada antes de implementarlas.
 
-### Deferred capabilities
+### Capacidades diferidas
 
-The following capabilities are intentionally outside this change: advanced rate limiting, password recovery, ratings/reputation, moderator workflows and reports, community aggregates/suggestions, provider selection and malware scanning, advanced observability, retention/export/anonymization, growth initiatives, and post-exchange dispute workflows. They are not missing MVP work.
+Quedan fuera de este cambio: rate limiting avanzado, recuperación de contraseña, reputación, flujos de moderación y denuncias, agregados y sugerencias comunitarias, selección de proveedores y escaneo de malware, observabilidad avanzada, retención/exportación/anonimización, iniciativas de crecimiento y disputas posteriores al intercambio. No son trabajo MVP faltante.
 
-**Non-Goals:**
+**Exclusiones:**
 
-- Splitting the system into microservices or adopting event streaming infrastructure.
-- Recovering plaintext passwords or shipping default production credentials.
-- Automatically merging PR #138 or any later PR.
-- Putting unrelated environment, dependency and deployment work into PR #138.
-- Treating alliances, donations, native mobile applications or growth experiments as blockers for the production MVP.
+- Dividir el sistema en microservicios o adoptar infraestructura de eventos distribuida.
+- Recuperar contraseñas en texto plano o publicar credenciales de producción predeterminadas.
+- Hacer merge automático de la PR #138 o de cualquier PR posterior.
+- Incluir en la PR #138 cambios no relacionados de entorno, dependencias o despliegue.
+- Tratar alianzas, donaciones, aplicaciones móviles nativas o experimentos de crecimiento como bloqueantes del MVP.
 
-## Decisions
+## Decisiones
 
-### 1. Deliver in gated slices and preserve PR #138
+### 1. Entregas con puertas de control y conservación de la PR #138
 
-The OpenSpec change is a master program, but implementation will be split into independently reviewable deliveries:
+La OpenSpec es un programa maestro, pero la implementación se divide en entregas revisables:
 
-1. **Runtime foundation:** normalize Node 22, configuration, dev proxy, PostGIS preflight and deterministic migrations on the current main delivery. The user merges it manually.
-2. **PR #138 rescue:** update the existing PR branch from the newly merged main, resolve every review thread, and complete private messaging plus agreement persistence as one vertical slice. Push updates to the same PR so its review history is preserved. The user performs the merge only after all gates pass.
-3. **MVP completion first:** deliver identity/profile, catalog, map/community essentials, private messaging, agreements and basic notifications in small capability-oriented PRs. Keep trust expansions and other post-MVP work explicitly deferred.
-4. **Production and operations:** land deployment, backup/restore, observability, E2E and runbooks after the product data model is stable.
+1. **Base de runtime:** normalizar Node 22, configuración, proxy de desarrollo, preflight de PostGIS y migraciones deterministas. El usuario hace el merge manual.
+2. **Recuperación de la PR #138:** actualizar la rama existente desde main, resolver cada hilo de revisión y completar mensajería privada más persistencia de acuerdos como una entrega vertical. La PR conserva su historial y el usuario decide el merge.
+3. **Completar primero el MVP:** entregar identidad/perfil, catálogo, mapa/comunidad, mensajería, acuerdos y notificaciones básicas en PRs pequeñas orientadas a capacidades. Las ampliaciones de confianza y el resto del POST-MVP quedan diferidos.
+4. **Producción y operación:** incorporar despliegue, backup/restauración, observabilidad, E2E y runbooks cuando el modelo de datos esté estable.
 
-At every PR boundary the agent stops after verification, reports remaining review/CI state and tells the user when manual merge is the next action. Work resumes only after the user has made the intended target branch current or the existing PR branch is available; the agent does not create speculative branches.
+En cada límite de PR, el agente se detiene después de verificar, informa el estado restante de revisión/CI y comunica cuándo la siguiente acción es el merge manual. El trabajo continúa solo cuando el usuario dejó actualizada la rama objetivo o la rama existente de la PR está disponible; el agente no crea ramas especulativas.
 
-Alternative considered: cherry-pick the #138 commit onto a new branch. Rejected because it would discard the existing PR conversation and make the six unresolved review threads harder to audit. Alternative considered: add every recovery fix to #138. Rejected because it would make review and rollback unsafe.
+No se eligió hacer cherry-pick de #138 a una rama nueva porque perdería la conversación existente de la PR y dificultaría auditar sus hilos. Tampoco se agregan todas las correcciones de recuperación a #138, porque haría inseguras la revisión y la reversión.
 
-### 2. Keep a modular monolith with explicit domain boundaries
+### 2. Monolito modular con límites de dominio explícitos
 
-Backend modules will remain in one deployable process but will separate route validation, application services, repositories and authorization policies for identity, catalog, community, messaging, agreements and trust/safety. PostgreSQL remains the transactional source of truth; Socket.IO is transport, not storage.
+Los módulos del backend permanecen en un único proceso desplegable, pero separan validación de rutas, servicios de aplicación, repositorios y políticas de autorización para identidad, catálogo, comunidad, mensajería, acuerdos y confianza/seguridad. PostgreSQL sigue siendo la fuente transaccional de verdad; Socket.IO es transporte, no almacenamiento.
 
-Alternative considered: microservices for chat and notifications. Rejected because current scale and team context do not justify distributed transactions, additional deployment surfaces or eventual-consistency complexity.
+No se adoptan microservicios para chat y notificaciones porque la escala y el contexto actual no justifican transacciones distribuidas, más superficies de despliegue ni complejidad de consistencia eventual.
 
-### 3. Use same-origin browser routing in every environment
+### 3. Rutas del navegador same-origin en todos los entornos
 
-Browser clients will use relative `/api` and `/socket.io` paths by default. Rsbuild will proxy these paths to the local backend in development, while nginx will proxy them to the backend service in production. `PUBLIC_API_BASE_URL` remains only as a documented opt-in for explicitly cross-origin environments and is validated at build time. Socket configuration derives from the same origin unless overridden intentionally.
+El cliente usa por defecto rutas relativas `/api` y `/socket.io`. Rsbuild proxifica esas rutas al backend local durante el desarrollo y nginx las proxifica al servicio backend en producción. `PUBLIC_API_BASE_URL` queda como opción documentada para entornos explícitamente cross-origin y se valida durante la compilación. Socket.IO deriva del mismo origen salvo sobrescritura intencional.
 
-This removes the conflict between `.env`, `.env.local`, `.env.development.local` and `.env.production`, and avoids pretending that runtime environment variables can change an already-built static bundle.
+Esto elimina el conflicto entre `.env`, `.env.local`, `.env.development.local` y `.env.production`, y evita suponer que las variables de runtime pueden cambiar un bundle estático ya construido.
 
-Alternative considered: embed an absolute backend URL into every build. Rejected because it creates one bundle per environment and leaves Socket.IO, cookies and CORS easier to misconfigure.
+### 4. Node 22 como versión única de herramientas y contenedores
 
-### 4. Standardize toolchain and containers on Node 22
+Node 22 es la única versión de `.nvmrc`, engines de los paquetes, CI y Dockerfiles. Docker Compose construye por defecto imágenes versionadas desde el commit checkout; se permiten sobrescrituras de imágenes de registro para el despliegue. nginx expone internamente el puerto 80 y lo mapea al puerto público configurado. PostgreSQL no se publica en producción.
 
-Node 22 is the single version for `.nvmrc`, package engines, CI and both Dockerfiles. Docker Compose builds versioned images from the checked-out commit by default; registry image overrides are allowed for deployment. The nginx container exposes port 80 internally, mapped to the configured public port. PostgreSQL is not published publicly in production.
+No se migra inmediatamente a Node 24 porque el repositorio declara `<24`, las pruebas verificadas corrieron en 22 y el cambio no aporta valor de producto. Una actualización posterior puede aislarse.
 
-Alternative considered: move everything immediately to Node 24. Rejected because the repository currently declares `<24`, all verified tests ran on 22 and the migration adds no product value. A later upgrade can be isolated.
+### 5. Preflight explícito y job de migraciones
 
-### 5. Add an explicit preflight and migration job
+El arranque local verifica dirección del servidor, nombre de base, cantidad de migraciones y disponibilidad de PostGIS antes de migrar. Debe identificar conflictos de puertos en lugar de escribir silenciosamente en otra base de `localhost`. Las bases de desarrollo y test permanecen separadas.
 
-The local start workflow will verify the server address, database name, migration count and PostGIS availability before running migrations. It must identify port conflicts rather than silently writing to another `localhost` database. Development and test databases remain separate.
+Producción usa un job de migración de una sola ejecución protegido por un advisory lock. La disponibilidad del backend depende de la conectividad de base y de la versión de esquema esperada. Las migraciones son append-only después del merge; las correcciones usan una migración nueva.
 
-Production uses a one-shot migration job guarded by an advisory lock. Backend readiness depends on successful database connectivity and expected schema version. Migration files are append-only after merge; corrections use a new migration.
+### 6. Persistencia transaccional de mensajería y acuerdos
 
-Alternative considered: run migrations in every backend replica at startup. Rejected because it complicates concurrency and makes application readiness ambiguous.
+La entrega vertical de #138 incorpora estos registros lógicos:
 
-### 6. Persist messaging and agreements transactionally
+- `conversations` y `conversation_participants` para pertenencia y ciclo de vida.
+- `messages` con clave de idempotencia del cliente, secuencia estable y metadatos de lectura; los adjuntos referencian una abstracción de almacenamiento.
+- `exchange_agreements` para el estado actual y la versión optimista.
+- `exchange_agreement_versions`, sus ítems y condiciones para propuestas inmutables.
+- `agreement_events` para actor, transición, momento y motivo.
 
-The #138 vertical slice introduces these logical records:
+La aceptación bloquea el acuerdo actual y las publicaciones relevantes en una transacción, valida la versión esperada, registra la aceptación de ambas partes y reserva las publicaciones atómicamente. La cancelación libera reservas cuando corresponde. Los conflictos de API devuelven la representación actual para que el cliente reemplace el estado obsoleto. Los stores del frontend contienen snapshots del servidor y estado transitorio de UI; `mockConversations` no puede inicializar producción.
 
-- `conversations` and `conversation_participants` for membership and lifecycle.
-- `messages` with a client idempotency key, stable sequence and read metadata; attachments reference a storage abstraction.
-- `exchange_agreements` for current state and optimistic version.
-- `exchange_agreement_versions` plus version items/conditions for immutable proposals.
-- `agreement_events` for actor, transition, timestamp and reason.
+No se conservan acuerdos solo en estado local porque los clientes concurrentes, las reconexiones y las disputas necesitan el historial completo de versiones.
 
-Agreement acceptance locks the current agreement and relevant listings in one transaction, validates the expected version, records both-party acceptance and reserves listings atomically. Cancellation releases reservations when allowed. API conflicts return the current representation so the client replaces stale state instead of confirming or cancelling an outdated closure. Frontend stores contain server snapshots and transient UI only; `mockConversations` cannot initialize production state.
+### 7. Persistir primero y publicar realtime después
 
-Alternative considered: keep agreements in local state and persist only the final result. Rejected because concurrent clients, reconnects and disputes require the complete version history.
+Los endpoints REST manejan historial y comandos. Tras una transacción exitosa, Socket.IO emite un evento con id y versión del recurso a una sala cuya pertenencia autoriza el servidor. Los clientes invalidan o vuelven a consultar las queries autoritativas. Una persistencia fallida no emite eventos de éxito. La reconexión usa historial paginado y cursores de secuencia.
 
-### 7. Persist first, publish realtime second
+No se conserva `io.emit` global filtrado por cliente porque filtra metadatos y no puede garantizar la privacidad de la conversación.
 
-REST endpoints handle history and commands. After a successful transaction, Socket.IO emits an event carrying resource id and version to a room whose membership is authorized server-side. Clients invalidate/refetch authoritative queries. Failed persistence emits no success event. Reconnection uses paginated history and sequence cursors.
+### 8. Vistas comunitarias derivadas de consultas acotadas
 
-Alternative considered: retain `io.emit` and filter in clients. Rejected because it leaks metadata and cannot enforce conversation privacy.
+Las estadísticas, feed, actividad y sugerencias comunitarias se derivan de tablas persistentes o agregados actualizables. Los endpoints de mapa y cercanía exigen límites o radio, imponen tamaños máximos de página, seleccionan solo los campos necesarios y exponen ubicaciones redondeadas por privacidad. Las métricas de payload grande y consultas lentas son comprobaciones de release. Los mocks estáticos solo quedan disponibles para tests aislados del frontend o un modo demo habilitado explícitamente.
 
-### 8. Derive community views from bounded queries
+### 9. Políticas centralizadas de identidad, autorización y confianza
 
-Community stats, feed, activity and suggestions will be derived from persistent tables or refreshable aggregates. Map and nearby endpoints require bounds/radius, enforce maximum page sizes, select only required fields and expose privacy-rounded locations. Large payload and slow-query metrics become release checks. Static mocks remain available only to isolated frontend tests or an explicitly enabled demo mode.
+El middleware de autenticación establece la identidad; las políticas de dominio deciden acceso por propiedad, participación o moderación. Las rutas mutables de comunidad y verificación quedan protegidas. Cookies, CORS y CSRF de producción siguen los valores same-origin. Los rate limits distinguen operaciones anónimas, autenticadas y costosas. La recuperación de contraseña usa hashes de un solo uso con vencimiento y respuestas públicas neutras.
 
-### 9. Centralize identity, authorization and trust policies
+Las denuncias, acciones de moderación, notificaciones, valoraciones y bloqueos son persistentes. Un bloqueo impide nuevas interacciones directas y conserva la evidencia necesaria para denuncias existentes. Los errores públicos del backend son claves de i18n según las instrucciones del repositorio.
 
-Authentication middleware establishes identity; domain policies decide ownership, participant or moderator access. Mutable community and verification routes become protected. Production cookies, CORS and CSRF follow same-origin defaults. Rate limits distinguish anonymous, authenticated and expensive operations. Password recovery uses expiring one-time hashes and neutral public responses.
+### 10. Abstracción de entrega externa y archivos
 
-Reports, moderation actions, notifications, ratings and block relationships are persistent. A block policy prevents new direct interactions while retaining evidence required for existing reports. User-facing backend errors are i18n keys as required by repository instructions.
+El email y el almacenamiento de adjuntos usan interfaces estrechas de proveedor. Los tests usan proveedores fake deterministas; el desarrollo local puede usar filesystem o captura; la configuración de producción elige un proveedor administrado. La base guarda metadatos y referencias, no payloads base64.
 
-### 10. Abstract external delivery and file services
+No se elige ahora un proveedor cloud concreto porque el destino de despliegue aún no está seleccionado y esa decisión no cambia los contratos de comportamiento.
 
-Email delivery and attachment storage use narrow provider interfaces. Tests use deterministic in-memory/fake providers; local development may use a filesystem or capture service; production configuration chooses a managed provider. The database stores metadata and references, not base64 payloads.
+### 11. Calidad y documentación como parte de cada entrega
 
-Alternative considered: commit to a cloud vendor now. Rejected because the deployment target is not selected and provider choice does not change the behavioral specs.
+Cada entrega actualiza migraciones, OpenAPI, tests de backend/frontend, cobertura E2E relevante y `docs/backlog.md`. CI ejecuta typecheck, lint, formato, tests, validación estricta de OpenSpec, migraciones desde esquema vacío y anterior, auditoría de dependencias y smoke tests de imágenes de producción. Los avisos React de los tests existentes se consideran defectos.
 
-### 11. Make quality and documentation part of each delivery
+Los endpoints operativos separan liveness de readiness. Los logs estructurados usan ids de correlación y ocultan datos sensibles. Las métricas registran error, latencia y tamaño de respuesta por ruta normalizada. La retención y los simulacros de restauración se documentan antes de declarar la preparación para producción.
 
-Every delivery updates migrations, OpenAPI, backend/frontend tests, relevant E2E coverage and `docs/backlog.md` together. CI runs typecheck, lint, formatting checks, backend/frontend tests, strict OpenSpec validation, migration tests from empty and previous schemas, dependency audit and production image smoke tests. React warnings in existing tests are treated as defects, not ignored output.
+## Riesgos y compromisos
 
-Operational endpoints expose liveness separately from readiness. Structured logs use correlation ids and redact sensitive fields. Metrics track error rate, latency and response size by normalized route. Retention and restore drills are documented before production readiness is declared.
+- **El cambio maestro es grande:** ejecutar capacidades por partes con puertas de PR explícitas; una sola parte aprobada no permite marcar completo el cambio general.
+- **La PR #138 pasa de flujo cliente a entrega vertical:** limitarla a los prerrequisitos de mensajería/acuerdos, documentar migraciones y resolver cada hilo antes de pedir otra revisión.
+- **Las migraciones pueden afectar datos antiguos:** probar desde vacío, esquema actual y snapshot anonimizado; hacer backup y verificar restauración antes de producción.
+- **Las actualizaciones de dependencias pueden introducir regresiones:** actualizar dependencias directas en grupos pequeños, conservar lockfile determinista y ejecutar tests de contrato/E2E tras cada grupo.
+- **El routing same-origin difiere de ejemplos con URL absoluta:** ofrecer una sobrescritura compatible, actualizar todos los ejemplos y validar configuraciones contradictorias.
+- **La entrega realtime puede competir con transacciones:** emitir solo después del commit, incluir versiones y exigir que el cliente vuelva a consultar el estado autoritativo.
+- **Moderación y retención dependen de decisiones de política:** usar valores conservadores, conservar auditoría separada y documentar configuración en lugar de suposiciones hard-coded.
+- **Los proveedores externos no están decididos:** usar interfaces y bloquear la preparación de producción hasta pasar pruebas de éxito y fallo.
+- **Los metadatos antiguos de saltos de línea pueden ocultar un árbol limpio:** normalizar atributos en un cambio aislado y revisado, verificando igualdad de blobs antes de modificar archivos reportados.
 
-## Risks / Trade-offs
+## Plan de migración
 
-- **[Master change is large]** → Execute capability slices with explicit PR gates; never mark the overall change complete because one slice passed.
-- **[PR #138 expands from client workflow to a vertical slice]** → Keep its scope limited to messaging/agreement prerequisites, document the added migrations and resolve every existing thread before requesting rereview.
-- **[Migrations can affect preserved ten-month-old data]** → Test from empty, current and anonymized snapshot schemas; take a backup and verify restore before production rollout.
-- **[Dependency upgrades can introduce behavioral regressions]** → Update direct dependencies in small groups, preserve lockfile determinism and run contract/E2E tests after each group.
-- **[Same-origin routing differs from current absolute URL examples]** → Provide a compatibility override, update every example at once and add startup/build validation for contradictory settings.
-- **[Realtime delivery can race with transactions]** → Emit only after commit, include versions and require clients to refetch authoritative state.
-- **[Moderation and retention rules depend on policy decisions]** → Ship conservative defaults, retain audit records separately and document values as configuration rather than hard-coded assumptions.
-- **[External providers are undecided]** → Use provider interfaces and block production readiness until the chosen providers pass smoke and failure-path tests.
-- **[Old Git line-ending metadata obscures a clean tree]** → Normalize repository attributes in an isolated reviewed change and verify blob equality before touching reported files.
+1. Capturar baseline: commits remotos/locales, hilos de la PR #138, versión de esquema, auditoría, tests, imágenes y verificación de backup/restauración.
+2. Entregar runtime y documentación en una PR separada; detenerse y avisar al usuario para que haga el merge.
+3. Tras el merge del usuario, actualizar la rama existente de #138 desde main sin perder historial. Agregar migraciones de mensajería/acuerdos, contratos backend, integración frontend y correcciones de revisión.
+4. Verificar #138 desde bases vacías/actuales, dos clientes concurrentes, reconexiones y conflictos de versión. Hacer push, pedir nueva revisión y detenerse cuando solo quede el merge humano.
+5. Después del merge de #138, entregar seguridad y capacidades restantes por dependencia, usando migraciones aditivas y respuestas compatibles.
+6. Construir Compose/nginx de producción, migraciones one-shot, healthchecks, secretos, backup/restauración y observabilidad. Ejecutar smoke de staging y simulacro de rollback.
+7. Reconciliar OpenAPI, backlog y OpenSpec; archivar solo cuando todos los requisitos y tareas estén verificados.
 
-## Migration Plan
+El rollback usa las imágenes inmutables anteriores junto con un punto de restauración verificado cuando una migración no es compatible hacia atrás. Después de aceptar datos en producción se prefieren migraciones forward-fix; no se ejecutan down-migrations destructivas automáticamente.
 
-1. Capture baseline: remote/local commits, PR #138 threads, schema version, dependency audit, tests, images and a database backup/restore check.
-2. Land runtime foundation and documentation through a separate PR; stop and notify the user to merge it.
-3. After the user merges, update the existing #138 branch from main without discarding its history. Add messaging/agreement migrations, backend contracts, frontend integration and review fixes.
-4. Verify #138 from empty/current databases, two concurrent clients, reconnects and stale-version conflicts. Push, request rereview and stop when human merge is the only remaining action.
-5. After the user merges #138, deliver security and remaining product capabilities in dependency order, using additive migrations and compatibility responses where needed.
-6. Build production Compose/nginx, one-shot migrations, healthchecks, secrets, backup/restore and observability. Run a staging smoke and rollback drill.
-7. Reconcile OpenAPI, backlog and OpenSpec; archive only when all capability requirements and tasks are verified.
+## Preguntas abiertas
 
-Rollback uses the prior immutable application images plus a verified database restore point when a migration is not backward compatible. Forward-fix migrations are preferred after data has been accepted in production; destructive down-migrations are not run automatically.
+- ¿Qué plataforma de hosting y gestor de secretos se usará primero?
+- ¿Qué proveedor de email enviará recuperación y notificaciones?
+- ¿Qué proveedor de object storage y escaneo de malware alojará adjuntos?
+- ¿Qué retención y roles de moderación exige la jurisdicción inicial?
 
-## Open Questions
-
-- Which hosting platform and secrets manager will be used for the first production environment?
-- Which email provider will send recovery and notification messages?
-- Which object-storage provider and malware-scanning service will hold message/listing attachments?
-- What retention periods and moderator roles are required by the initial operating jurisdiction?
-
-These choices are isolated behind configuration or provider interfaces and can be selected before the production-delivery slice without changing the domain contracts or preceding task order.
+Estas decisiones quedan aisladas tras configuración o interfaces de proveedor y pueden tomarse antes de la entrega de producción sin cambiar los contratos de dominio ni el orden de tareas.

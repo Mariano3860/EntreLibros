@@ -1,24 +1,24 @@
-# EntreLibros recovery baseline
+# Línea base de recuperación de EntreLibros
 
 > **Nota de vigencia (2026-08-29):** este documento conserva la línea base histórica de la recuperación y de PR #138. Para el comportamiento actual consulta [`estado-actual.md`](estado-actual.md), [`arquitectura.md`](arquitectura.md) y [`troubleshooting.md`](troubleshooting.md). La semilla del bot y la persistencia de su conversación pertenecen a una etapa posterior.
 
-Captured on 2026-08-28 at 13:14 CEST for the OpenSpec change
-`complete-entrelibros-recovery`. Commands are written for PowerShell from the
-repository root unless noted otherwise.
+Capturada el 2026-08-28 a las 13:14 CEST para el cambio OpenSpec
+`complete-entrelibros-recovery`. Los comandos están escritos para PowerShell
+desde la raíz del repositorio, salvo que se indique lo contrario.
 
-## Git baseline
+## Línea base de Git
 
-| Item | Captured value |
+| Elemento | Valor capturado |
 | --- | --- |
-| Current branch | `main` |
-| Local `HEAD` | `f87df5d1f97f122878ceeb105bb973681536457a` |
-| Locally cached `origin/main` | `f87df5d1f97f122878ceeb105bb973681536457a` |
-| Current remote `main` | `c06a37ea45f2aa1b19c98f88d43a79bb3a6eea34` |
-| PR #138 head | `5dc3bf397ff51e9c4280b6fbf3667f7d04d53944` |
-| PR #138 base snapshot | `f87df5d1f97f122878ceeb105bb973681536457a` |
+| Rama actual | `main` |
+| `HEAD` local | `f87df5d1f97f122878ceeb105bb973681536457a` |
+| `origin/main` en caché local | `f87df5d1f97f122878ceeb105bb973681536457a` |
+| `main` remoto actual | `c06a37ea45f2aa1b19c98f88d43a79bb3a6eea34` |
+| HEAD de la PR #138 | `5dc3bf397ff51e9c4280b6fbf3667f7d04d53944` |
+| Snapshot base de la PR #138 | `f87df5d1f97f122878ceeb105bb973681536457a` |
 
-The local branch is behind the remote. No fetch, merge, rebase, checkout or
-branch creation was performed while capturing this baseline.
+La rama local estaba atrasada respecto del remoto. Durante la captura no se
+ejecutaron fetch, merge, rebase, checkout ni creación de ramas.
 
 ```powershell
 git log -1 --format='local_head=%H%nlocal_subject=%s%nlocal_date=%cI'
@@ -26,17 +26,18 @@ git branch -avv
 git ls-remote origin refs/heads/main refs/pull/138/head
 ```
 
-The worktree contains the staged OpenSpec change and its installed local skill
-files. Seven backend paths initially appeared as unstaged modifications even
-though `git diff` was empty. This was a stale line-ending/stat entry in the
-index: the index recorded older CRLF-sized worktree files while the current LF
-files were byte-for-byte equal to `HEAD`.
+El árbol de trabajo contenía el cambio OpenSpec preparado y sus skills locales.
+Siete rutas del backend aparecían inicialmente como modificadas sin stage,
+aunque `git diff` estaba vacío. Era una entrada obsoleta de saltos de línea y
+estadísticas en el índice: el índice registraba archivos CRLF antiguos, pero
+los archivos LF actuales eran idénticos byte a byte a `HEAD`.
 
-For every affected path, `HEAD`, index, raw worktree and Git-filtered worktree
-resolved to the same blob. The paths were added explicitly after this check,
-which refreshed only their index metadata. Both the staged and unstaged diffs
-for those paths remain empty, and `git status --short` now lists only the
-intentional recovery/OpenSpec additions. No backend file was rewritten.
+Para cada ruta afectada, `HEAD`, el índice, el árbol sin filtros y el árbol
+filtrado por Git resolvían al mismo blob. Después se agregaron explícitamente
+esas rutas para refrescar solo los metadatos del índice. Los diffs preparado y
+no preparado siguen vacíos, y `git status --short` muestra únicamente las
+adiciones intencionales de recuperación/OpenSpec. No se reescribió ningún
+archivo del backend.
 
 Affected paths:
 
@@ -69,14 +70,15 @@ git diff --cached --exit-code -- $paths
 git status --short
 ```
 
-## PR #138 and CI
+## PR #138 y CI
 
 [PR #138, "Implement agreement version workflow"](https://github.com/Mariano3860/EntreLibros/pull/138)
-is open and not a draft. GitHub reports it as mergeable but blocked. It targets
-`main` from `feature/expand-messages.types.ts-for-agreementversion`, has one
-commit and has no approving review decision.
+está abierta y no es un borrador. GitHub la informa como integrable pero
+bloqueada. Apunta a `main` desde
+`feature/expand-messages.types.ts-for-agreementversion`, tiene un commit y no
+cuenta con una aprobación de revisión.
 
-Six review threads remain unresolved:
+Quedaban seis hilos de revisión sin resolver:
 
 | Path | Finding | Thread |
 | --- | --- | --- |
@@ -87,28 +89,30 @@ Six review threads remain unresolved:
 | `frontend/src/components/messages/Messages.tsx` | Duplicate agreement lookup | [discussion](https://github.com/Mariano3860/EntreLibros/pull/138#discussion_r2491522221) |
 | `frontend/src/components/messages/useAgreementStore.ts` | P1 concurrent updates must derive from `prev` | [discussion](https://github.com/Mariano3860/EntreLibros/pull/138#discussion_r2491534939) |
 
-### PR #138 recovery inventory (2026-08-28)
+### Inventario de recuperación de la PR #138 (2026-08-28)
 
-The current PR diff is limited to the agreement workflow in the frontend:
-version types, the local agreement store, proposal/confirmation/cancellation
-bubbles and modals, message rendering, the mocked book-availability check and
-Spanish/English labels. The review fixes are mapped as follows:
+El diff de la PR estaba limitado al flujo de acuerdos del frontend: tipos de
+versión, store local de acuerdos, burbujas y modales de propuesta,
+confirmación y cancelación, renderizado de mensajes, comprobación mock de
+disponibilidad de libros y etiquetas en español/inglés. Las correcciones de
+revisión se relacionaban así:
 
-| Review finding | Code change | Regression evidence |
+| Hallazgo de revisión | Cambio de código | Evidencia de regresión |
 | --- | --- | --- |
 | Confirmation/cancellation used a stale closure | Functional state updaters derive from `prev[conversationId]` | `frontend/tests/hooks/useAgreementStore.test.ts`: queued confirmations and cancellations |
 | Unused cancellation reason | Removed the unused store parameter; the rendered message remains responsible for its display reason | Frontend typecheck plus existing cancellation rendering path |
 | Redundant memoization | Return `agreements` directly from the hook | Frontend typecheck |
 | Duplicate agreement lookup | The action path keeps one lookup for the selected conversation/version before appending the event | Frontend typecheck and PR diff review |
 
-The PR still does not contain persistent conversations, messages or agreements,
-backend routes/migrations, environment changes, general dependency upgrades or
-production deployment work. Those are explicitly deferred to the subsequent
-sections of `complete-entrelibros-recovery` and must not be added to #138.
+La PR todavía no contiene conversaciones, mensajes ni acuerdos persistentes,
+rutas/migraciones de backend, cambios de entorno, actualizaciones generales de
+dependencias ni trabajo de despliegue de producción. Todo eso se difiere
+explícitamente a las secciones posteriores de
+`complete-entrelibros-recovery` y no debe agregarse a #138.
 
-The scope inventory for the reviewed paths is:
+El inventario de alcance de las rutas revisadas es:
 
-| Area | Current PR state | Follow-up boundary |
+| Área | Estado actual de la PR | Límite del seguimiento |
 | --- | --- | --- |
 | Conversation initialization | `Messages.tsx` initializes the current mock conversation list locally | Server conversation listing belongs to section 6 |
 | Agreement versions | `useAgreementStore` keeps proposal history and active version in client state | Immutable persisted versions belong to section 5 |
@@ -116,11 +120,11 @@ The scope inventory for the reviewed paths is:
 | Reconnect | Existing Socket.IO chat path remains a transport/mock concern; no agreement recovery cursor exists | Persisted replay belongs to sections 4 and 6 |
 | Errors | Current UI maps local store errors to i18n keys; no backend error contract is present | REST/OpenAPI error contracts belong to sections 4–6 |
 
-The latest [CI Frontend run](https://github.com/Mariano3860/EntreLibros/actions/runs/19077745239)
-completed with failure in the `quality` job. The Dependabot auto-merge check was
-skipped. GitHub no longer retains the failed job log: requesting it on
-2026-08-28 returned HTTP 410, so the precise historical failing assertion must
-be reproduced on the PR branch rather than inferred.
+La última [ejecución de CI del frontend](https://github.com/Mariano3860/EntreLibros/actions/runs/19077745239)
+terminó con fallo en el job `quality`. La comprobación de auto-merge de
+Dependabot fue omitida. GitHub ya no conserva el log del job fallido: al
+solicitarlo el 2026-08-28 devolvió HTTP 410, por lo que la aserción histórica
+exacta debía reproducirse en la rama de la PR, no inferirse.
 
 ```powershell
 gh pr view 138 --repo Mariano3860/EntreLibros --json number,title,state,url,isDraft,baseRefName,baseRefOid,headRefName,headRefOid,author,mergeable,mergeStateStatus,reviewDecision,statusCheckRollup,updatedAt,commits,reviews
@@ -129,15 +133,15 @@ gh run view 19077745239 --repo Mariano3860/EntreLibros --json databaseId,name,di
 gh run view 19077745239 --repo Mariano3860/EntreLibros --log-failed
 ```
 
-## Database schema and restore verification
+## Esquema de base de datos y verificación de restauración
 
-The source container `entrelibros-db-1` uses volume `entrelibros_db_data` and
-publishes PostgreSQL on host port 5432. It reports PostgreSQL 16.4 and PostGIS
-3.4.3. Database `entrelibros` contains migrations `001` through `009`; the
-`migrations` table has ten records including row `0`, which creates the
-migration table itself.
+El contenedor fuente `entrelibros-db-1` usa el volumen
+`entrelibros_db_data` y publica PostgreSQL en el puerto 5432 del host. Informa
+PostgreSQL 16.4 y PostGIS 3.4.3. La base `entrelibros` contiene las
+migraciones `001` a `009`; la tabla `migrations` tiene diez registros,
+incluida la fila `0`, que crea la propia tabla de migraciones.
 
-A custom-format backup was exported to the temporary directory configured by
+Se exportó un backup en formato custom al directorio temporal configurado por
 PowerShell:
 
 `$env:TEMP\EntreLibros-Recovery\entrelibros-20260828.dump`
@@ -145,15 +149,15 @@ PowerShell:
 SHA-256:
 `4CD59F56722D4CA052DC1CE7B63F5A1FE7EE46A9E57C9C2BE97AF30D419D93E4`.
 
-The dump was restored with `pg_restore --exit-on-error` into database
-`entrelibros_restore_verify` in container
-`entrelibros-recovery-verify-20260828`. That container uses the distinct volume
-`entrelibros_recovery_verify_20260828`, network mode `none`, and publishes no
-ports. The source container and volume were not stopped, recreated or deleted.
+El dump se restauró con `pg_restore --exit-on-error` en la base
+`entrelibros_restore_verify`, dentro del contenedor
+`entrelibros-recovery-verify-20260828`. Ese contenedor usa el volumen separado
+`entrelibros_recovery_verify_20260828`, modo de red `none` y no publica puertos.
+El contenedor y el volumen fuente no se detuvieron, recrearon ni eliminaron.
 
-Exact source and restored row counts match:
+Las cantidades exactas de filas de origen y restauración coinciden:
 
-| Table | Rows |
+| Tabla | Filas |
 | --- | ---: |
 | `book_listing_images` | 4 |
 | `book_listings` | 4 |
@@ -166,7 +170,7 @@ Exact source and restored row counts match:
 | `spatial_ref_sys` | 8500 |
 | `users` | 4 |
 
-All ten migration IDs, names and hashes match, and both databases report
+Los diez IDs, nombres y hashes de migración coinciden, y ambas bases informan
 PostGIS 3.4.3.
 
 ```powershell
@@ -192,62 +196,65 @@ docker exec entrelibros-recovery-verify-20260828 psql -U postgres -d entrelibros
 Get-FileHash -Algorithm SHA256 -LiteralPath $dumpPath
 ```
 
-## Production dependency audit
+## Auditoría de dependencias de producción
 
-`npm audit --omit=dev --json`, run from the root lockfile with Node 22.19.0 on
-2026-08-28, reports 21 production vulnerabilities: 15 high, 6 moderate, 0 low
-and 0 critical. All currently report a fix as available.
+`npm audit --omit=dev --json`, ejecutado sobre el lockfile raíz con Node
+22.19.0 el 2026-08-28, informó 21 vulnerabilidades de producción: 15 altas,
+6 moderadas, 0 bajas y 0 críticas. Todas indicaban que había una corrección
+disponible.
 
-Direct affected packages are `axios` (high), `express` (high), `lodash`
-(high), `morgan` (moderate), `react-router-dom` (high) and `validator` (high).
-Transitive affected packages are `body-parser`, `brace-expansion`, `engine.io`,
+Los paquetes directos afectados eran `axios` (alta), `express` (alta),
+`lodash` (alta), `morgan` (moderada), `react-router-dom` (alta) y `validator`
+(alta). Los transitivos eran `body-parser`, `brace-expansion`, `engine.io`,
 `engine.io-client`, `follow-redirects`, `form-data`, `js-yaml`, `jws`,
 `minimatch`, `path-to-regexp`, `qs`, `react-router`, `socket.io-adapter`,
-`socket.io-parser` and `ws`. This is an inventory, not a reachability analysis;
-task 8.1 must triage runtime applicability before upgrades or exceptions.
+`socket.io-parser` y `ws`. Esto es un inventario, no un análisis de alcance;
+la tarea 8.1 debía clasificar la aplicabilidad en runtime antes de actualizar
+o aceptar excepciones.
 
 ```powershell
 docker run --rm -v 'C:\REPOS\EntreLibros:/workspace:ro' -w /workspace node:22.19.0-bookworm-slim npm audit --omit=dev --json
 ```
 
-## PR #138 migration and quality evidence
+## Evidencia de migraciones y calidad de la PR #138
 
-On 2026-08-28, migration execution was verified twice against the preserved
-`entrelibros_test` schema and against the isolated
-`entrelibros_recovery_verify_20260828` database. The PR branch now includes
-migrations 010 through 014, including conversation/agreement persistence,
-listing reservations and bilateral user blocks. The real-service E2E flow was
-run against PostgreSQL/PostGIS with mocks disabled and covered two users,
-cursor recovery, counterproposal, stale conflict, bilateral confirmation and
-cancellation.
-The earlier anonymized backup restore above remains the preserved-schema
-baseline; the new migrations are append-only and were then applied to the
-current test schema without changing existing rows.
+El 2026-08-28 la ejecución de migraciones se verificó dos veces contra el
+esquema preservado `entrelibros_test` y contra la base aislada
+`entrelibros_recovery_verify_20260828`. La rama de la PR incluye las
+migraciones 010 a 014, con persistencia de conversaciones/acuerdos, reservas
+de publicaciones y bloqueos bilaterales. El flujo E2E contra el servicio real
+se ejecutó sobre PostgreSQL/PostGIS con mocks desactivados y cubrió dos
+usuarios, recuperación por cursor, contrapropuesta, conflicto obsoleto,
+confirmación bilateral y cancelación.
+La restauración anonimizada anterior sigue siendo la línea base del esquema
+preservado; las migraciones nuevas son append-only y se aplicaron al esquema
+de test actual sin cambiar filas existentes.
 
-The local backend suite passed with 27 files and 103 tests. The frontend suite
-passed with coverage enabled. Remote PR checks for head `8aa3f10` passed for
-both backend and frontend, and the final diff review found only messaging,
-agreements, their tests, documentation and the explicitly related coverage
-threshold change.
+La suite local del backend pasó con 27 archivos y 103 tests. La suite del
+frontend pasó con cobertura habilitada. Las comprobaciones remotas de la PR
+para el head `8aa3f10` pasaron tanto en backend como en frontend, y la revisión
+final del diff encontró únicamente mensajería, acuerdos, sus tests,
+documentación y el cambio de umbral de cobertura relacionado explícitamente.
 
-The browser-control surface was unavailable in this environment, so a browser
-E2E run could not be claimed. The service-level E2E evidence above is separate
-from that limitation; the existing frontend suite remains the automated UI
-evidence.
+La superficie de control del navegador no estaba disponible en ese entorno,
+por lo que no podía afirmarse una ejecución E2E de navegador. La evidencia E2E
+de servicio anterior es independiente de esa limitación; la suite existente
+del frontend sigue siendo la evidencia automatizada de UI.
 
-No runtime dependency was changed by the PR #138 recovery commits. The audit
-reported 21 pre-existing production findings (15 high, 6 moderate, 0 critical)
-with fixes available; they are recorded as an explicit follow-up for task 8.1,
-not silently accepted as resolved by this PR.
+Los commits de recuperación de la PR #138 no cambiaron dependencias de runtime.
+La auditoría informó 21 hallazgos de producción preexistentes (15 altos, 6
+moderados, 0 críticos) con correcciones disponibles; quedaron registrados como
+seguimiento explícito de la tarea 8.1 y no se aceptaron silenciosamente como
+resueltos por esta PR.
 
-## Delivery checkpoints
+## Puertas de entrega
 
-| Checkpoint | Entry criteria | Exit evidence | Merge authority |
+| Puerta | Criterios de entrada | Evidencia de salida | Autoridad para merge |
 | --- | --- | --- | --- |
-| Runtime foundation | Baseline and restore are verified; work remains isolated from PR #138 | Node/configuration/proxy/PostGIS/migration tasks and repository checks pass; agent prepares the PR and reports rollback evidence | The user alone performs the merge; the agent waits for confirmation |
-| PR #138 recovery | The user confirms runtime foundation is merged and the existing PR branch is current | Review threads are mapped and resolved, messaging/agreement persistence passes migrations, concurrency, reconnect, E2E and CI; agent updates the existing PR | The user alone performs the merge; the agent waits for confirmation |
-| Product and security | The user confirms PR #138 is merged | Capability-oriented PRs pass authorization, dependency, contract, migration and full repository gates; agent prepares each PR separately | The user alone performs every merge; the agent waits at each dependent boundary |
-| Production and operations | Product/security data models and providers are stable | Images, routing, secrets, migration job, health, backup/restore, rollback, observability and production E2E pass; agent prepares deployment evidence | The user alone approves and performs merge/deployment; the agent performs neither automatically |
+| Base de runtime | Baseline y restauración verificados; el trabajo sigue aislado de la PR #138 | Pasan Node/configuración/proxy/PostGIS/migraciones y las comprobaciones del repositorio; el agente prepara la PR e informa rollback | Solo el usuario hace el merge; el agente espera confirmación |
+| Recuperación de la PR #138 | El usuario confirma que la base de runtime está mergeada y la rama existente está actualizada | Hilos mapeados y resueltos; persistencia pasa migraciones, concurrencia, reconexión, E2E y CI; el agente actualiza la PR existente | Solo el usuario hace el merge; el agente espera confirmación |
+| Producto y seguridad | El usuario confirma el merge de la PR #138 | PRs por capacidad pasan autorización, dependencias, contratos, migraciones y puertas generales; el agente prepara cada PR | Solo el usuario hace cada merge; el agente espera en cada límite |
+| Producción y operación | Modelos y proveedores de producto/seguridad estables | Pasan imágenes, rutas, secretos, migraciones, salud, backup/restauración, rollback, observabilidad y E2E de producción | Solo el usuario aprueba y hace merge/despliegue; el agente no lo hace automáticamente |
 
-These checkpoints are controlling delivery gates. A green local check does not
-authorize the agent to merge a pull request or deploy a release.
+Estas puertas controlan la entrega. Una comprobación local en verde no autoriza
+al agente a hacer merge de una PR ni a desplegar una versión.
