@@ -1,5 +1,7 @@
 ## Purpose
 
+> MVP support scope: reproducible local/CI runtime and migrations required to run and demonstrate the TFG.
+
 Define un entorno local determinista y diagnosticable para que cualquier colaborador pueda ejecutar EntreLibros desde un clon limpio sin depender de estado oculto de la máquina.
 
 ## ADDED Requirements

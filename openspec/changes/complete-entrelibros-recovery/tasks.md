@@ -1,3 +1,9 @@
+> ## Scope gate (mandatory)
+>
+> The local final TFG is the minimum product contract. Implement only tasks tagged `MVP` or `SOPORTE MVP` during this delivery. Do not implement or check off `POST-MVP` tasks without a later explicit authorization that explains their user value and relation to the TFG. Every implemented task needs a short purpose note, comments for non-obvious decisions and reproducible evidence.
+>
+> MVP capabilities: account/profile/privacy, book corners and map, offered/wanted listings with minimum bibliographic data, search/proximity, private messaging, exchange agreements with place/time/confirmation/reminder, and basic in-app notifications.
+
 ## 1. Baseline and delivery controls
 
 - [x] 1.1 Capture the current local/remote commits, working-tree anomalies, open PR #138 metadata, unresolved review threads, CI state, schema versions and production dependency audit in a recovery note; verify every finding has a command or link that can be rerun.
@@ -69,79 +75,79 @@
 - [x] 7.6 Push the completed #138 branch and monitor CI to a terminal green state; verify the PR is mergeable and then notify the user that manual merge is required without invoking any merge command.
 - [ ] 7.7 After the user confirms merge, update local main and run the messaging/agreement smoke again; verify the merge commit is present remotely before beginning dependent deliveries.
 
-## 8. Platform security and dependency remediation
+## 8. Platform security and dependency remediation (MVP and POST-MVP)
 
-- [ ] 8.1 Triage all production audit findings by reachable runtime path and upgrade direct dependencies in small compatible groups; verify each group passes full tests and leaves no unapproved critical/high applicable finding.
-- [ ] 8.2 Protect community-corner creation, book verification and every mutable route with authentication plus owner/role policies; verify anonymous and unauthorized API tests return i18n 401/403 errors with no data changes.
-- [ ] 8.3 Add production cookie, CORS and CSRF configuration with fail-closed validation; verify same-origin requests work and cross-origin/invalid-token mutations are rejected.
-- [ ] 8.4 Add differentiated rate limits and payload/query complexity limits to auth, contact, corners, search, map and attachments; verify threshold and reset behavior with deterministic tests.
-- [ ] 8.5 Add security headers, request correlation and centralized secret/PII redaction; verify logs from forced failures contain correlation but no passwords, tokens, cookies or exact private location.
-- [ ] 8.6 Implement one-time expiring password recovery with neutral account-enumeration responses and a fake email provider; verify replay, expiration and unknown-address tests.
-- [ ] 8.7 Update OpenAPI, threat notes and security runbook, then run all repository checks; verify the security delivery is ready for review.
-- [ ] 8.8 Prepare the security PR and wait for green CI/review; notify the user when manual merge is required and do not merge it.
+- [ ] 8.1 [SOPORTE MVP] Triage all production audit findings by reachable runtime path and upgrade direct dependencies in small compatible groups; verify each group passes full tests and leaves no unapproved critical/high applicable finding.
+- [ ] 8.2 [MVP] Protect community-corner creation, book verification and every mutable route with authentication plus owner/role policies; verify anonymous and unauthorized API tests return i18n 401/403 errors with no data changes.
+- [ ] 8.3 [SOPORTE MVP] Add production cookie, CORS and CSRF configuration with fail-closed validation; verify same-origin requests work and cross-origin/invalid-token mutations are rejected.
+- [ ] 8.4 [POST-MVP] Add differentiated rate limits and payload/query complexity limits to auth, contact, corners, search, map and attachments; verify threshold and reset behavior with deterministic tests.
+- [ ] 8.5 [SOPORTE MVP] Add security headers, request correlation and centralized secret/PII redaction; verify logs from forced failures contain correlation but no passwords, tokens, cookies or exact private location.
+- [ ] 8.6 [POST-MVP] Implement one-time expiring password recovery with neutral account-enumeration responses and a fake email provider; verify replay, expiration and unknown-address tests.
+- [ ] 8.7 [SOPORTE MVP] Update OpenAPI, threat notes and security runbook, then run all repository checks; verify the security delivery is ready for review.
+- [ ] 8.8 [SOPORTE MVP] Prepare the security PR and wait for green CI/review; notify the user when manual merge is required and do not merge it.
 
-## 9. Identity, profile, reputation and catalog completion
+## 9. Identity, profile, reputation and catalog completion (MVP and POST-MVP)
 
-- [ ] 9.1 Add profile/privacy fields and migration defaults that do not expose existing precise locations; verify public/private profile API tests for legacy and new users.
-- [ ] 9.2 Implement authenticated profile and preference endpoints plus frontend forms for alias, description, language and location granularity; verify persistence and locale switching end to end.
-- [ ] 9.3 Add block relationships and enforce them in new conversations, agreements and direct notifications; verify both block directions and privacy-preserving errors.
-- [ ] 9.4 Add ratings linked uniquely to completed agreements and derive explainable reputation; verify duplicate, premature and disputed rating tests.
-- [ ] 9.5 Complete listing states, valid transitions, expiry/renewal and atomic reservation integration; verify scheduled expiry and agreement interaction tests.
-- [ ] 9.6 Add paginated catalog filters for text, author, ISBN, language, status, distance and exchange type; verify query plans/indexes and combined-filter API/frontend tests.
-- [ ] 9.7 Restrict book verification to authorized roles with verifier audit metadata; verify role and OpenAPI contract tests.
-- [ ] 9.8 Enforce image count/type/size and privacy-rounded public locations; verify invalid media and exact-coordinate leakage tests.
-- [ ] 9.9 Update frontend flows, OpenAPI and backlog for identity/catalog scope and run full checks; verify the delivery has no raw backend errors or stale mock paths.
-- [ ] 9.10 Prepare capability-oriented PRs with green CI and review; at each boundary notify the user to merge manually and wait for confirmation before dependent work.
+- [ ] 9.1 [MVP] Add profile/privacy fields and migration defaults that do not expose existing precise locations; verify public/private profile API tests for legacy and new users.
+- [ ] 9.2 [MVP] Implement authenticated profile and preference endpoints plus frontend forms for alias, description, language and location granularity; verify persistence and locale switching end to end.
+- [ ] 9.3 [MVP] Add block relationships and enforce them in new conversations, agreements and direct notifications; verify both block directions and privacy-preserving errors.
+- [ ] 9.4 [POST-MVP] Add ratings linked uniquely to completed agreements and derive explainable reputation; verify duplicate, premature and disputed rating tests.
+- [ ] 9.5 [MVP] Complete listing states, valid transitions, expiry/renewal and atomic reservation integration; verify scheduled expiry and agreement interaction tests.
+- [ ] 9.6 [MVP] Add paginated catalog filters for text, author, ISBN, language, status, distance and exchange type; verify query plans/indexes and combined-filter API/frontend tests.
+- [ ] 9.7 [POST-MVP] Restrict book verification to authorized roles with verifier audit metadata; verify role and OpenAPI contract tests.
+- [ ] 9.8 [MVP] Enforce image count/type/size and privacy-rounded public locations; verify invalid media and exact-coordinate leakage tests.
+- [ ] 9.9 [SOPORTE MVP] Update frontend flows, OpenAPI and backlog for identity/catalog scope and run full checks; verify the delivery has no raw backend errors or stale mock paths.
+- [ ] 9.10 [SOPORTE MVP] Prepare capability-oriented PRs with green CI and review; at each boundary notify the user to merge manually and wait for confirmation before dependent work.
 
-## 10. Community and map completion
+## 10. Community and map completion (MVP and POST-MVP)
 
-- [ ] 10.1 Add owner, lifecycle status and moderation metadata to community corners with safe legacy defaults; verify migration and visibility tests.
-- [ ] 10.2 Require authentication for corner proposals and implement owner/moderator edit transitions; verify unauthorized and state-machine API tests.
-- [ ] 10.3 Replace community stats, feed, activity and suggestions mocks with persistent bounded queries or refreshable aggregates; verify fixture-free integration tests reflect committed data.
-- [ ] 10.4 Add pagination, maximum radius/page size and field projection to nearby/map/community endpoints; verify the reproduced multi-megabyte response falls below the documented budget.
-- [ ] 10.5 Enforce bounding boxes, spatial indexes and privacy-rounded coordinates; verify query plans and tests exclude out-of-bounds/private locations.
-- [ ] 10.6 Update community frontend for pagination, loading/error/empty states and moderated visibility; verify tests run with mocks disabled against backend contracts.
-- [ ] 10.7 Update OpenAPI/backlog and run performance plus full repository checks; verify the community delivery is ready for review.
-- [ ] 10.8 Prepare the community PR with green CI/review and notify the user when manual merge is required; do not merge it.
+- [ ] 10.1 [MVP] Add owner and lifecycle status to community corners with safe legacy defaults; defer moderation metadata to POST-MVP.
+- [ ] 10.2 [MVP] Require authentication for corner proposals and implement owner edit transitions; defer moderator workflows to POST-MVP.
+- [ ] 10.3 [POST-MVP] Replace community stats, feed, activity and suggestions mocks with persistent bounded queries or refreshable aggregates; verify fixture-free integration tests reflect committed data.
+- [ ] 10.4 [SOPORTE MVP] Add pagination, maximum radius/page size and field projection to nearby/map endpoints; verify the reproduced multi-megabyte response falls below the documented budget.
+- [ ] 10.5 [MVP] Enforce bounding boxes, spatial indexes and privacy-rounded coordinates; verify query plans and tests exclude out-of-bounds/private locations.
+- [ ] 10.6 [MVP] Update community frontend for pagination, loading/error/empty states and visible corner lifecycle; defer moderated visibility to POST-MVP.
+- [ ] 10.7 [SOPORTE MVP] Update OpenAPI/backlog and run performance plus full repository checks; verify the community delivery is ready for review.
+- [ ] 10.8 [SOPORTE MVP] Prepare the community PR with green CI/review and notify the user when manual merge is required; do not merge it.
 
-## 11. Trust, safety and notifications
+## 11. Trust, safety and notifications (MVP and POST-MVP)
 
-- [ ] 11.1 Add migrations for reports, moderation actions, notifications, notification preferences and post-exchange outcomes; verify constraints, indexes and legacy migration paths.
-- [ ] 11.2 Implement report submission and restricted moderation case APIs with immutable decisions; verify reporter privacy and moderator-role tests.
-- [ ] 11.3 Implement idempotent persistent notifications triggered by messaging, agreements and moderation; verify one notification per domain event and correct read state.
-- [ ] 11.4 Add notification center and preferences UI with translated accessible states; verify user preferences suppress only optional delivery, not mandatory safety events.
-- [ ] 11.5 Add private meeting-safety guidance and participant-only agreement details; verify third-party access and location-leakage tests.
-- [ ] 11.6 Implement post-exchange confirmation, discrepant-outcome review and rating handoff; verify reputation remains pending during disputes.
-- [ ] 11.7 Update OpenAPI, moderation/incident runbooks and backlog, then run full checks; verify the trust delivery is reviewable.
-- [ ] 11.8 Prepare the trust/notifications PR with green CI/review and notify the user when manual merge is required; do not merge it.
+- [ ] 11.1 [MVP] Add migrations for in-app notifications and notification preferences only; defer reports, moderation actions and post-exchange outcomes.
+- [ ] 11.2 [POST-MVP] Implement report submission and restricted moderation case APIs with immutable decisions; verify reporter privacy and moderator-role tests.
+- [ ] 11.3 [MVP] Implement idempotent persistent notifications triggered by messaging and agreements; defer moderation-triggered notifications.
+- [ ] 11.4 [MVP] Add notification center and preferences UI with translated accessible states for messages and agreements.
+- [ ] 11.5 [POST-MVP] Add private meeting-safety guidance and participant-only agreement details; verify third-party access and location-leakage tests.
+- [ ] 11.6 [POST-MVP] Implement post-exchange confirmation, discrepant-outcome review and rating handoff; verify reputation remains pending during disputes.
+- [ ] 11.7 [SOPORTE MVP] Update OpenAPI, notification runbook and backlog, then run full checks; defer moderation/incident documentation to POST-MVP.
+- [ ] 11.8 [SOPORTE MVP] Prepare the notifications PR with green CI/review and notify the user when manual merge is required; do not merge it.
 
-## 12. Production delivery and operations
+## 12. Production delivery and operations (MVP support and POST-MVP)
 
-- [ ] 12.1 Rebuild backend/frontend Dockerfiles on Node 22 with deterministic dependency layers and non-root runtime where applicable; verify images build from a clean cache and pass container smoke tests.
-- [ ] 12.2 Add nginx SPA fallback plus `/api` and `/socket.io` proxy configuration, mapping public port 3000 to container port 80 only for local preview; verify deep links, cookies and websocket upgrade.
-- [ ] 12.3 Replace missing/contradictory Compose environment contracts with validated examples, local builds and explicit `NODE_ENV=production`; verify `docker compose config` succeeds without placeholder interpolation warnings.
-- [ ] 12.4 Add one-shot migration service, database/backend healthchecks and readiness ordering; verify a fresh stack becomes healthy and a failed migration prevents backend readiness.
-- [ ] 12.5 Remove public database exposure in production and configure secrets as external inputs with no defaults; verify a missing secret fails closed and rendered Compose output does not contain secret values.
-- [ ] 12.6 Select and configure production email, object storage and malware-scanning providers behind the existing interfaces; verify provider smoke and failure-path tests in staging.
-- [ ] 12.7 Implement and document encrypted backup, restore verification and application rollback; verify a staging restore and failed-release rollback drill.
-- [ ] 12.8 Add production liveness/readiness, structured logs, correlation, latency/error/response-size metrics and alerts; verify dashboards detect a forced backend failure and oversized response without exposing PII.
-- [ ] 12.9 Run production E2E for registration, profile, publication, map, messaging, agreement, notification, report and logout; verify all flows use real services with mocks disabled.
-- [ ] 12.10 Prepare the production PR and deployment evidence with green CI/review; notify the user when manual merge/deployment approval is required and perform neither action automatically.
+- [ ] 12.1 [SOPORTE MVP] Rebuild backend/frontend Dockerfiles on Node 22 with deterministic dependency layers and non-root runtime where applicable; verify images build from a clean cache and pass container smoke tests.
+- [ ] 12.2 [SOPORTE MVP] Add nginx SPA fallback plus `/api` and `/socket.io` proxy configuration; verify deep links, cookies and websocket upgrade.
+- [ ] 12.3 [SOPORTE MVP] Replace missing/contradictory Compose environment contracts with validated examples and explicit `NODE_ENV=production`; verify `docker compose config` succeeds without placeholder warnings.
+- [ ] 12.4 [SOPORTE MVP] Add one-shot migration service, database/backend healthchecks and readiness ordering; verify a fresh stack becomes healthy.
+- [ ] 12.5 [SOPORTE MVP] Remove public database exposure in production and configure secrets as external inputs with no defaults; verify missing secrets fail closed.
+- [ ] 12.6 [POST-MVP] Select and configure production email, object storage and malware-scanning providers behind the existing interfaces.
+- [ ] 12.7 [SOPORTE MVP] Implement and document encrypted backup, restore verification and application rollback; verify a staging restore and failed-release rollback drill.
+- [ ] 12.8 [POST-MVP] Add production liveness/readiness, structured logs, correlation, metrics and alerts.
+- [ ] 12.9 [MVP] Run production E2E for registration, profile, publication, map, messaging, agreement, notification and logout; defer report flow to POST-MVP.
+- [ ] 12.10 [SOPORTE MVP] Prepare the production PR and deployment evidence with green CI/review; notify the user when manual merge/deployment approval is required and perform neither action automatically.
 
-## 13. Data lifecycle, quality and documentation closure
+## 13. Data lifecycle, quality and documentation closure (MVP support and POST-MVP)
 
-- [ ] 13.1 Add OpenAPI drift/contract checks to CI and document every public route, security scheme, websocket event and i18n error key; verify intentional contract changes cannot pass without updates.
-- [ ] 13.2 Add migration CI paths for empty, previous and preserved schemas plus PostGIS; verify every migration is append-only and repeat execution is safe.
-- [ ] 13.3 Eliminate existing React `act`, empty image source and deprecated Faker warnings; verify frontend tests finish without those warnings.
-- [ ] 13.4 Define and implement configured retention, export and deletion/anonymization for accounts, contact, messages, agreements, reports and audits; verify policy boundary and legal-hold tests.
-- [ ] 13.5 Reconcile `docs/backlog.md` row by row with implemented capabilities, separating partial and post-MVP work without duplicates; verify every changed feature has one authoritative status.
-- [ ] 13.6 Rewrite development, production, credentials, backup/restore, incident and PR/release runbooks; verify clean-clone and staging drills follow the documents exactly.
-- [ ] 13.7 Run strict OpenSpec validation, all repository-required checks, dependency audit, image scan, E2E and production smoke; verify no failed gate or undocumented applicable high/critical issue remains.
-- [ ] 13.8 Produce a final readiness report mapping every spec requirement to tests and delivered PRs; verify the report explicitly lists any accepted exception, owner and expiry.
+- [ ] 13.1 [SOPORTE MVP] Add OpenAPI drift/contract checks to CI and document every public route, security scheme, websocket event and i18n error key used by the MVP.
+- [ ] 13.2 [SOPORTE MVP] Add migration CI paths for empty, previous and preserved schemas plus PostGIS; verify every migration is append-only and repeat execution is safe.
+- [ ] 13.3 [SOPORTE MVP] Eliminate existing React `act`, empty image source and deprecated Faker warnings in touched MVP flows.
+- [ ] 13.4 [POST-MVP] Define and implement configured retention, export and deletion/anonymization for accounts, contact, messages, agreements, reports and audits.
+- [ ] 13.5 [SOPORTE MVP] Reconcile `docs/backlog.md` row by row with implemented capabilities, separating partial and post-MVP work without duplicates.
+- [ ] 13.6 [SOPORTE MVP] Rewrite development, production, credentials, backup/restore and PR/release runbooks; defer incident operations beyond the MVP unless required by deployment.
+- [ ] 13.7 [SOPORTE MVP] Run strict OpenSpec validation, repository checks, dependency audit, E2E and MVP production smoke; defer image scanning and non-MVP flows.
+- [ ] 13.8 [SOPORTE MVP] Produce a readiness report mapping MVP requirements to tests and delivered PRs, including accepted exceptions and owners.
 
-## 14. Post-MVP roadmap and OpenSpec closure
+## 14. Post-MVP roadmap and OpenSpec closure (explicitly deferred)
 
-- [ ] 14.1 Reassess onboarding, alliances, donations and growth ideas against production evidence; verify each retained initiative has a separate bounded OpenSpec proposal instead of entering the recovery diff.
-- [ ] 14.2 Confirm every checkbox and requirement in this change against merged code and deployed behavior; verify incomplete work remains unchecked and blocks archival.
-- [ ] 14.3 Sync completed delta specs to main specs only after their deliveries are merged; verify main specs match deployed behavior and no unmerged requirement is promoted.
-- [ ] 14.4 Archive `complete-entrelibros-recovery` only after all required PRs were manually merged by the user and final validation passes; verify archive status and preserve the readiness report.
+- [ ] 14.1 [POST-MVP] Reassess onboarding, alliances, donations and growth ideas against production evidence; each retained initiative needs a separate bounded OpenSpec proposal.
+- [ ] 14.2 [SOPORTE MVP] Confirm every MVP checkbox and requirement against merged code and deployed behavior; incomplete work remains unchecked and blocks archival.
+- [ ] 14.3 [SOPORTE MVP] Sync completed delta specs to main specs only after their deliveries are merged; no unmerged requirement is promoted.
+- [ ] 14.4 [SOPORTE MVP] Archive `complete-entrelibros-recovery` only after all required MVP PRs were manually merged by the user and final validation passes.

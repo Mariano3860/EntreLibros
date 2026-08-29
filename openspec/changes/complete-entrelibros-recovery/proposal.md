@@ -2,6 +2,12 @@
 
 EntreLibros tiene un núcleo funcional que compila y pasa sus pruebas, pero hoy no ofrece un camino reproducible desde un clon limpio hasta un despliegue seguro: la configuración local entra en conflicto, producción no está cableada correctamente y varias capacidades visibles todavía dependen de mocks o estado sólo del cliente. Este cambio convierte el estado actual y el trabajo abierto de la PR #138 en un programa verificable para terminar un MVP desplegable, mantenible y documentado.
 
+## MVP del TFG y control de alcance
+
+El MVP se rige por la versión local del TFG `TFG ULTIMA VERSION - ROJO - MARIANO.pdf`. El trabajo no puede quitar ninguna de estas capacidades: autenticación y perfil básico con privacidad; Rincones de Libros con alta/edición, foto, mapa y ubicación aproximada; publicaciones `ofrezco`/`busco` con ficha bibliográfica e ISBN opcional; búsqueda con filtros y cercanía; mensajería 1:1; acuerdos con lugar, horario, confirmación y recordatorio; y notificaciones in-app básicas.
+
+Las tareas se clasifican como `MVP`, `SOPORTE MVP` o `POST-MVP`. Una tarea `POST-MVP` queda documentada para el futuro, pero no se implementa ni se marca completa sin una autorización explícita posterior. Cada tarea implementada debe explicar su relación con una capacidad del TFG, incluir comentarios cuando la decisión no sea obvia y aportar una verificación reproducible.
+
 ## What Changes
 
 - Establecer un único flujo de desarrollo reproducible para Node.js, PostgreSQL/PostGIS, migraciones, variables de entorno, frontend y backend, incluyendo detección clara de conflictos de puertos y servicios locales.

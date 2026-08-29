@@ -1,5 +1,7 @@
 ## Purpose
 
+> MVP scope: private persisted 1:1 messaging, history, read state, reconnect and controlled attachments.
+
 Define mensajería privada y persistente para que las partes de un intercambio puedan conversar con aislamiento, historial y entrega en tiempo real confiable.
 
 ## ADDED Requirements

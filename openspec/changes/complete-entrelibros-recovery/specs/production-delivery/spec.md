@@ -1,5 +1,7 @@
 ## Purpose
 
+> MVP support scope: reproducible build, routing, secrets, migrations, health and rollback. Provider selection and advanced observability are POST-MVP.
+
 Define un proceso de entrega reproducible y verificable que permita desplegar EntreLibros con configuración segura, migraciones controladas y recuperación operativa.
 
 ## ADDED Requirements
