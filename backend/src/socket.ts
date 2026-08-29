@@ -204,6 +204,8 @@ export function setupWebsocket(
           socket.data.user.id
         );
         if (botId) {
+          // Keep the bot reply on the same persisted path as user messages;
+          // emit only after sendMessage succeeds so reloads cannot lose it.
           const reply = await generateReply(payload.body);
           const botMessage = await sendMessage({
             conversationId: payload.conversationId,

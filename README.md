@@ -1,213 +1,65 @@
-# EntreLibros Monorepo
+# EntreLibros
 
-Este repositorio contiene el frontend y backend del proyecto EntreLibros.
+EntreLibros es una plataforma web para descubrir, compartir, reseñar e intercambiar libros físicos. El repositorio contiene el frontend React/Rsbuild y el backend TypeScript/Express con PostgreSQL/PostGIS y Socket.IO.
 
-## Chat Bot
+## Inicio rápido
 
-El sistema incluye un bot de chat básico. Para hablarle:
-
-- Abre el chat **Bot** en la vista de mensajes (es la primera opción y se selecciona por defecto).
-- También puedes mencionar al bot escribiendo `@bot` al inicio de un mensaje.
-
-El backend enviará una respuesta automática en el mismo canal usando el usuario `{ id: 0, name: 'Bot' }`.
-
-### Guía rápida para testers
-
-1. Inicia el backend y el frontend con `npm run dev`.
-2. Abre la página de mensajes y verifica que el chat **Bot** esté seleccionado.
-3. Envía un mensaje y confirma que el bot responde de inmediato.
-
-## Desarrollo sin Docker
-
-1. **Instalar dependencias**
-   ```bash
-   npm install
-   ```
-2. **Configurar variables de entorno**
-   - Copiar `backend/.env.example` a `backend/.env` y ajustar `DATABASE_URL`.
-   - Copiar `frontend/.env.example` a `frontend/.env` si deseas personalizar la URL de la API.
-   - Revisar `.env.development.example` y `.env.production.example` para despliegues con Docker Compose.
-   - **Nota sobre credenciales**: Distingue entre credenciales de infraestructura (`DATABASE_URL`, `POSTGRES_PASSWORD`), secreto JWT (`JWT_SECRET`) y las contraseñas de usuario creadas al registrarte en la aplicación.
-3. **Levantar PostGIS con Docker y Preflight**
-   ```bash
-   docker compose -f docker-compose.postgis.yml up -d
-   ```
-   Para detenerlo:
-   ```bash
-   docker compose -f docker-compose.postgis.yml down
-   ```
-4. **Preparar base de datos y migraciones (con preflight)**
-   ```bash
-   npm run migrate
-   ```
-   El migrador ejecuta automáticamente un script de preflight (`backend/scripts/preflight.js`) que verifica la conectividad de la base de datos y la extensión **PostGIS** antes de aplicar las migraciones.
-
-5. **Levantar servidores**
-   ```bash
-   npm run dev:backend   # backend
-   npm run dev:frontend  # frontend
-   # o para levantar ambos en paralelo:
-   npm run dev
-   ```
-   El frontend usa `/api` en el mismo origen por defecto. Solo define
-   `PUBLIC_API_BASE_URL` para un backend en otro origen y conserva siempre el
-   sufijo `/api`, por ejemplo `http://localhost:4000/api`. REST y Socket.IO
-   usan ese mismo origen; en desarrollo, Rsbuild los redirige al backend local.
-
-Luego de iniciar el backend, puedes visitar `http://localhost:4000/api-docs` para ver la documentación interactiva de la API generada con Swagger.
-
-## Modo producción local
-
-Para probar el sistema completo en modo producción:
+Requisitos: Node `>=22.19.0 <23`, npm y PostgreSQL para el modo real.
 
 ```bash
-npm run prod
+npm install
+npm run migrate
+npm run dev
 ```
 
-Esto compila el frontend y backend y levanta ambos servidores usando los builds resultantes.
+El frontend de desarrollo corre normalmente en `http://localhost:3000` y el backend en `http://localhost:4000`. Rsbuild proxifica `/api` y `/socket.io` al backend. Para levantar dependencias locales puede usarse `docker compose up -d` según el compose disponible en el repositorio.
 
-## Desarrollo con Docker Compose
+## Configuración del frontend
 
-El proyecto puede ejecutarse con [Docker Compose](https://docs.docker.com/compose/) para levantar base de datos, backend y frontend con un solo comando.
+Las variables públicas se leen durante dev/build y deben comenzar con `PUBLIC_`. Copia el ejemplo disponible en `frontend/` si necesitas uno local y reinicia Rsbuild después de cambiarlo.
 
-1. Copiar los archivos de entorno como se describe en la sección anterior.
-2. Crear un archivo `docker-compose.yml` como el siguiente:
-
-```yaml
-version: "3.8"
-services:
-  db:
-    image: postgis/postgis:16-3.4
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: entrelibros
-
-  backend:
-    build: ./backend
-    environment:
-      DATABASE_URL: postgres://postgres:postgres@db:5432/entrelibros
-      FRONTEND_URL: http://localhost:3000
-      JWT_SECRET: devsecret
-    ports:
-      - "4000:4000"
-    depends_on:
-      - db
-
-  frontend:
-    build:
-      context: .
-      dockerfile: frontend/Dockerfile
-    ports:
-      - "3000:80"
-    depends_on:
-      - backend
+```env
+PUBLIC_API_USE_MOCKS=true
 ```
 
-3. Ejecutar los servicios:
+Con `true`, los handlers MSW/mock cubren los flujos compatibles y no se debe esperar persistencia real. Con `false` u omitida, la aplicación usa la API y Socket.IO reales. El modo resuelto se refleja en `document.documentElement.dataset.apiMode`; si devuelve `undefined`, el bundle no recibió la variable o no se reinició el servidor.
 
-```bash
-docker-compose up --build
-```
+## Mensajería y bot
 
-Esto expondrá el backend en `http://localhost:4000`, el frontend en `http://localhost:3000` y PostGIS en `localhost:5432`.
-
-## Entornos de producción y desarrollo
-
-Para cada entorno crea un archivo de variables en la raíz del proyecto:
-
-- `.env.production` para producción
-- `.env.development` para desarrollo
-
-Estos archivos no se versionan (revisa `.env.production.example` y `.env.development.example` como guía) e incluyen valores como `DOCKERHUB_USER`, `JWT_SECRET`, `POSTGRES_PASSWORD`, `DATABASE_URL`, `FRONTEND_URL`, `OPENAPI_SERVER_ORIGIN` y `PUBLIC_API_BASE_URL`.
-
-Ejemplos de Docker Compose:
-
-```yaml
-# docker-compose.production.yml
-version: "3.8"
-services:
-  backend:
-    image: ${DOCKERHUB_USER}/entrelibros-backend:prod
-    env_file: .env.production
-  frontend:
-    image: ${DOCKERHUB_USER}/entrelibros-frontend:prod
-    env_file: .env.production
-  db:
-    image: postgis/postgis:16-3.4
-    env_file: .env.production
-```
-
-```yaml
-# docker-compose.development.yml
-version: "3.8"
-services:
-  backend:
-    image: ${DOCKERHUB_USER}/entrelibros-backend:dev
-    env_file: .env.development
-  frontend:
-    image: ${DOCKERHUB_USER}/entrelibros-frontend:dev
-    env_file: .env.development
-  db:
-    image: postgis/postgis:16-3.4
-    env_file: .env.development
-```
-
-Para levantar cada entorno:
-
-```bash
-docker compose --env-file .env.production -f docker-compose.production.yml up -d
-docker compose --env-file .env.development -f docker-compose.development.yml up -d
-```
-
-## Tests
-
-```bash
-npm test               # ejecuta backend y frontend
-npm run test:backend   # prepara DB + pruebas backend
-npm run test:frontend  # pruebas frontend
-```
-
-Las pruebas del backend ejecutan las migraciones antes de correr y cada test usa una transacción con rollback para no dejar datos residuales.
-
-## Migraciones
-
-Para ejecutar manualmente las migraciones del backend:
+La mensajería real requiere sesión autenticada, migraciones aplicadas y backend activo. La migración `015_seed_messaging_bot.sql` crea el usuario bot persistente; cada usuario obtiene una conversación con identidad “Bot” de forma idempotente. Los mensajes del bot se guardan antes de emitirse por Socket.IO y se cargan al volver a abrir la conversación. El canal global legacy también existe para compatibilidad, pero no representa la conversación persistida.
 
 ```bash
 npm run migrate
 ```
 
-## CI
+Si `/messages` aparece vacío, comprueba el modo mock, la consola del navegador, `GET /api/messages`, cookies de sesión, conexión Socket.IO y el estado de las migraciones. La guía completa está en [`docs/recovery-baseline.md`](docs/recovery-baseline.md) y [`docs/troubleshooting.md`](docs/troubleshooting.md).
 
-Los pull requests ejecutan un flujo de CI que:
+## Verificación
 
-1. Instala dependencias.
-2. Instala y levanta Postgres.
-3. Crea una base de datos de pruebas y corre las migraciones.
-4. Ejecuta `npm test`.
+```bash
+npm run test:backend
+npm run test:frontend
+npm run format:backend
+npm run format:frontend
+npm run complete-check
+```
 
-El flujo falla si falta una migración o si las pruebas dejan datos sin limpiar.
+Las pruebas frontend son Vitest/Testing Library con MSW; las pruebas de servicio backend validan HTTP, Socket.IO y persistencia cuando corresponde. Una comprobación en navegador sigue siendo necesaria para proxy, cookies, caché y variables públicas.
 
-## Variables de entorno
+## Mapa del repositorio
 
-No se deben commitear credenciales reales. Usa `backend/.env.example` y `frontend/.env.example` como guía y provee valores reales mediante variables de entorno del entorno de ejecución o del runner de CI.
+- [`backend/README.md`](backend/README.md): API, base de datos, migraciones y backend.
+- [`frontend/README.md`](frontend/README.md): desarrollo web, mock mode y troubleshooting del cliente.
+- [`docs/arquitectura.md`](docs/arquitectura.md): arquitectura actual y límites históricos.
+- [`docs/README.md`](docs/README.md): índice completo de documentación.
+- [`docs/base_de_datos.md`](docs/base_de_datos.md): modelo y migraciones.
+- [`docs/messaging-bubbles.md`](docs/messaging-bubbles.md): UI y contrato de mensajes.
+- [`docs/estado-actual.md`](docs/estado-actual.md): estado verificable del producto.
+- [`docs/roadmap.md`](docs/roadmap.md): dirección posterior a la recuperación.
+- [`docs/guia-documentacion.md`](docs/guia-documentacion.md): cómo mantener la documentación sincronizada.
+- [`docs/backlog.md`](docs/backlog.md): pendientes y trazabilidad.
+- [`openspec/`](openspec/): propuestas y planes de cambios.
 
-Principales variables:
+## Flujo de contribución
 
-- `DATABASE_URL`: Cadena de conexión de PostGIS utilizada por el backend. Ejemplo: `postgres://postgres:postgres@localhost:5432/entrelibros`.
-- `JWT_SECRET`: clave secreta para firmar y verificar tokens JWT.
-- `FRONTEND_URL`: URL del frontend que el backend permite para CORS. Ejemplo: `http://localhost:3000`.
-- `PUBLIC_API_BASE_URL`: base de la API para el navegador. Por defecto es
-  `/api`; un override cross-origin debe incluir el prefijo, por ejemplo
-  `http://localhost:4000/api`.
-- `PUBLIC_API_USE_MOCKS`: habilita MSW solo cuando vale `true`; el valor normal
-  de desarrollo y producción es `false`. También se aceptan `1` y `yes`.
-- `BACKEND_PROXY_TARGET`: destino opcional del proxy de Rsbuild para desarrollo.
-  Por defecto es `http://localhost:4000`.
-- `OPENAPI_SERVER_ORIGIN`: origen público usado por Swagger, sin ruta de API,
-  por ejemplo `http://localhost:4000`. Los paths del contrato ya empiezan por
-  `/api`.
-- `PORT`: Puerto en el que se expone el backend (opcional, por defecto `4000`). Ejemplo: `4000`.
+Trabaja en una rama, ejecuta las verificaciones, actualiza documentación/backlog y revisa `git diff --check`. El merge de una PR lo realiza el responsable del repositorio.

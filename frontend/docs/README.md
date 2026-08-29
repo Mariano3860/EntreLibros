@@ -1,11 +1,9 @@
-# Documentación de EntreLibros Frontend
+# Documentación del frontend
 
-Este directorio reúne la documentación técnica del frontend de **EntreLibros**.
+La documentación técnica transversal vive en [`../../docs/`](../../docs/). Estos enlaces son la entrada recomendada:
 
-## Índice
-
-- [Arquitectura del proyecto](architecture.md): descripción de la estructura, dependencias y decisiones de diseño.
-- [Llamadas al backend](backend-calls.md): especificación detallada de los endpoints previstos para el backend.
-- [/map feature overview](map.md): notas de uso de la vista territorial, eventos y mocks disponibles.
-
-Cada documento está escrito en **Markdown** para facilitar su lectura y mantenimiento.
+- [`arquitectura.md`](../../docs/arquitectura.md): límites entre navegador, frontend, API y Socket.IO.
+- [`messaging-bubbles.md`](../../docs/messaging-bubbles.md): estados visuales y contrato de burbujas.
+- [`troubleshooting.md`](../../docs/troubleshooting.md): diagnóstico de mocks, `/messages`, cookies y WebSocket.
+- [`estado-actual.md`](../../docs/estado-actual.md): capacidades comprobadas y límites conocidos.
+- [`guia-documentacion.md`](../../docs/guia-documentacion.md): cómo actualizar estos documentos.

@@ -1,50 +1,15 @@
-# Scripts de Documentación
+# Scripts del repositorio
 
-Este directorio contiene scripts automatizados para mantener la documentación del proyecto actualizada.
+Los scripts auxiliares se ejecutan desde la raíz y no forman parte del runtime de la aplicación.
 
-## update-backlog-prs.js
+## `update-backlog-prs.js`
 
-Script que actualiza automáticamente la sección de "PRs mergeadas" en `docs/backlog.md` extrayendo información de la API de GitHub.
-
-### Uso
+Actualiza la sección de PRs mergeadas de `docs/backlog.md` usando la API de GitHub. Revisa el diff antes de conservar el resultado: las secciones manuales deben mantenerse y el script no debe ejecutarse con un token impreso en consola.
 
 ```bash
-# Configurar token de GitHub (opcional, para evitar rate limits)
-export GITHUB_TOKEN=tu_token_aqui
-
-# Ejecutar el script
-node scripts/update-backlog-prs.js
+GITHUB_TOKEN=tu_token node scripts/update-backlog-prs.js
 ```
 
-### Funcionalidades
+El token es opcional, pero GitHub aplica límites más bajos sin autenticación. Verifica las dependencias reales del script antes de usarlo; la documentación no asume que `@octokit/rest` esté instalado si no aparece en `package.json`.
 
-- Extrae todas las PRs mergeadas del repositorio
-- Categoriza automáticamente por tipo (feat, fix, docs, etc.)
-- Formatea la información en tabla Markdown
-- Actualiza el archivo `docs/backlog.md` preservando el resto del contenido
-
-### Requisitos
-
-- Node.js 16+
-- Dependencia `@octokit/rest` (ya incluida en el proyecto)
-- Token de GitHub (opcional pero recomendado)
-
-### Integración con workflows
-
-Este script puede ser integrado en un workflow de CI/CD para mantener la documentación siempre actualizada:
-
-```yaml
-- name: Update backlog with merged PRs
-  run: |
-    npm ci
-    node scripts/update-backlog-prs.js
-  env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-```
-
-## Futuras mejoras
-
-- Script para generar changelog automático
-- Análisis de cobertura de tests y actualización de métricas
-- Validación automática de documentación vs código real
-- Generación de métricas de desarrollo (PRs por tipo, velocidad, etc.)
+Los scripts de build, migración y OpenAPI pertenecen al paquete backend y se documentan en [`../backend/README.md`](../backend/README.md). Para cambios de scripts actualiza también [`AGENTS.md`](AGENTS.md) y ejecuta `git diff --check`.

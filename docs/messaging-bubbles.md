@@ -1,21 +1,22 @@
-# Burbujas de acuerdos en el chat
+# Mensajería: interfaz y contrato
 
-Esta sección resume las tarjetas disponibles dentro del wrapper de mensajes para acompañar el cierre de intercambios.
+## Burbujas
 
-## Propuesta de acuerdo
+La UI distingue mensajes propios y recibidos mediante el autor, no mediante el texto. Un mensaje enviado puede estar en estado pendiente, confirmado o fallido; los estados visuales deben seguir las traducciones existentes y no inventar errores visibles.
 
-- **Objetivo:** permitir que la persona que inicia el acuerdo proponga punto de encuentro (RdL o espacio público), barrio/ciudad, día y horario, junto con el libro involucrado.
-- **Cuándo usarla:** cuando una de las partes envía una propuesta concreta para encontrarse.
-- **Interfaz:** se muestra con tono de advertencia (warning/secondary) y ofrece dos acciones: confirmar o proponer cambio. Ambos textos están traducidos vía `community.messages.agreement.actions`.
+## Flujo real
 
-## Confirmación de acuerdo
+1. El cliente carga conversaciones con `GET /api/messages`.
+2. El usuario abre una conversación y se une a su sala Socket.IO.
+3. `conversation:message` se valida y persiste en backend.
+4. El servidor emite el mensaje confirmado.
+5. La respuesta del bot se persiste antes de emitirla.
+6. Tras reconectar, el cliente vuelve a cargar historial y reconcilia mensajes pendientes usando su clave de cliente.
 
-- **Objetivo:** dejar asentado que la otra persona confirmó la propuesta con los mismos datos clave.
-- **Cuándo usarla:** cuando la contraparte acepta la propuesta y confirma el encuentro.
-- **Interfaz:** utiliza el tono de éxito (success/primary) y refuerza quién confirmó el acuerdo.
+## Bot
 
-## Consideraciones transversales
+El bot persistente aparece con identidad “Bot”, no como “Conversación 1”. La migración `015_seed_messaging_bot.sql` crea su usuario y el repositorio garantiza una conversación por usuario. El canal global legacy puede responder con el identificador histórico `0`, pero no es el flujo persistido.
 
-- **i18n:** todos los labels y acciones se resuelven mediante `community.messages.agreement.*`, disponibles en ES/EN.
-- **Tema:** ambas burbujas heredan forma, espaciado y sombras del wrapper, respetando light/dark y tokens `primary`/`secondary`.
-- **Privacidad:** solo se expone barrio/ciudad y nombre del RdL o espacio público, nunca direcciones exactas.
+## Modo mock
+
+Con `PUBLIC_API_USE_MOCKS=true`, MSW sirve respuestas de demostración y el bot mock puede responder para verificar la UI. Ese modo no demuestra persistencia PostgreSQL. Para validar almacenamiento, usa `false`, ejecuta migraciones y comprueba `GET /api/messages` después de recargar.
