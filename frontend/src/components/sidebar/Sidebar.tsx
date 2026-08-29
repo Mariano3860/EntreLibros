@@ -48,6 +48,11 @@ export const Sidebar = () => {
       label: t('pages.messages'),
     },
     {
+      path: `/${HOME_URLS.NOTIFICATIONS}`,
+      icon: Messages,
+      label: t('notifications.title'),
+    },
+    {
       path: `/${HOME_URLS.STATS}`,
       icon: Stats,
       label: t('pages.stats'),

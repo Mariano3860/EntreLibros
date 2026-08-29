@@ -818,6 +818,15 @@
       "unknown": "An unexpected error occurred"
     }
   },
+  "notifications": {
+    "title": "Notifications",
+    "loading": "Loading notifications...",
+    "error": "Notifications could not be loaded.",
+    "empty": "You have no new notifications.",
+    "markRead": "Mark as read",
+    "message": { "title": "New message", "body": "You received a message in a conversation." },
+    "agreement": { "title": "Agreement update", "body": "An exchange agreement was updated." }
+  },
   "profile": {
     "title": "My profile",
     "language": "Language",

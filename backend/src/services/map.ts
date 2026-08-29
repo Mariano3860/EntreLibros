@@ -187,7 +187,13 @@ const getDisplayCoordinates = (
   const { latitude, longitude } = corner.coordinates;
 
   if (corner.visibilityPreference !== 'approximate') {
-    return { lat: latitude, lon: longitude, approximate: false };
+    // Public map pins are rounded even when the owner chose exact logistics.
+    // The exact address remains available only in the owner-controlled flow.
+    return {
+      lat: Math.round(latitude * 1000) / 1000,
+      lon: Math.round(longitude * 1000) / 1000,
+      approximate: true,
+    };
   }
 
   const { latFactor, lonFactor } = deriveOffsetFromId(corner.id);

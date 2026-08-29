@@ -46,6 +46,11 @@ export const RELATIVE_API_ROUTES = {
     VERSION: (agreementId: number) => `/agreements/${agreementId}/versions`,
     COMMAND: (agreementId: number) => `/agreements/${agreementId}/commands`,
   },
+  NOTIFICATIONS: {
+    LIST: `/notifications`,
+    READ: (id: number) => `/notifications/${id}/read`,
+    PREFERENCES: `/notifications/preferences`,
+  },
   LANGUAGE: {
     UPDATE: `/user/language`,
   },

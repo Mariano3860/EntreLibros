@@ -9,6 +9,7 @@ import { HomePage } from '@src/pages/home/HomePage'
 import LoginPage from '@src/pages/login/LoginPage'
 import { MapPage } from '@src/pages/map/MapPage'
 import { MessagesPage } from '@src/pages/messages/MessagesPage'
+import { NotificationCenter } from '@src/components/notifications/NotificationCenter'
 import { ProfilePage } from '@src/pages/profile/ProfilePage'
 import RegisterPage from '@src/pages/register/RegisterPage'
 import { StatsPage } from '@src/pages/stats/StatsPage'
@@ -31,6 +32,7 @@ const AppRoutes = () => {
         />
         <Route path={`/${HOME_URLS.MAP}`} element={<MapPage />} />
         <Route path={`/${HOME_URLS.MESSAGES}`} element={<MessagesPage />} />
+        <Route path={`/${HOME_URLS.NOTIFICATIONS}`} element={<NotificationCenter />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path={`/${HOME_URLS.STATS}`} element={<StatsPage />} />
         <Route path={`/${HOME_URLS.CONTACT}`} element={<ContactPage />} />

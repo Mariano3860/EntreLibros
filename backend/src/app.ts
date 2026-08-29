@@ -14,8 +14,11 @@ import agreementsRouter from './routes/agreements.js';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './config/swagger.js';
 import { csrfProtection, getFrontendUrl } from './security.js';
+import notificationsRouter from './routes/notifications.js';
+import { registerNotificationEvents } from './services/notifications.js';
 
 const app = express();
+registerNotificationEvents();
 
 app.use(helmet());
 app.use((req, res, next) => {
@@ -58,6 +61,7 @@ app.use('/api/community', communityRouter);
 app.use('/api/contact', contactRouter);
 app.use('/api/messages', messagesRouter);
 app.use('/api/agreements', agreementsRouter);
+app.use('/api/notifications', notificationsRouter);
 
 // TODO(api-alignment): montar rutas para `/api/books/mine` y `/api/community/*`
 // cuando el backend cubra las necesidades del frontend y dejemos de depender de

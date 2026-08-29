@@ -97,16 +97,16 @@
 
 ## 10. Finalización de comunidad y mapa (MVP)
 
-- [ ] 10.1 [MVP] Añadir propietario y estado de ciclo de vida básico a Rincones de Libros, con valores seguros para datos antiguos.
-- [ ] 10.2 [MVP] Exigir autenticación para propuestas de Rincones de Libros e implementar la edición del propietario.
-- [ ] 10.5 [MVP] Aplicar límites geográficos, privacidad y coordenadas públicas redondeadas en el mapa.
-- [ ] 10.6 [MVP] Actualizar la interfaz comunitaria con mapa/listado coherentes y estados de carga, error y vacío.
+- [x] 10.1 [MVP] Añadir propietario y estado de ciclo de vida básico a Rincones de Libros, con valores seguros para datos antiguos.
+- [x] 10.2 [MVP] Exigir autenticación para propuestas de Rincones de Libros e implementar la edición del propietario.
+- [x] 10.5 [MVP] Aplicar límites geográficos, privacidad y coordenadas públicas redondeadas en el mapa.
+- [x] 10.6 [MVP] Actualizar la interfaz comunitaria con mapa/listado coherentes y estados de carga, error y vacío.
 
 ## 11. Notificaciones in-app (MVP)
 
-- [ ] 11.1 [MVP] Añadir persistencia mínima para notificaciones in-app y preferencias esenciales.
-- [ ] 11.3 [MVP] Implementar notificaciones persistentes e idempotentes activadas por mensajes y acuerdos.
-- [ ] 11.4 [MVP] Añadir un centro básico de notificaciones con estados traducidos y accesibles.
+- [x] 11.1 [MVP] Añadir persistencia mínima para notificaciones in-app y preferencias esenciales.
+- [x] 11.3 [MVP] Implementar notificaciones persistentes e idempotentes activadas por mensajes y acuerdos.
+- [x] 11.4 [MVP] Añadir un centro básico de notificaciones con estados traducidos y accesibles.
 
 ## 12. Validación final del MVP
 
