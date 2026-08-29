@@ -24,9 +24,13 @@ Pending work is classified as follows:
 | --- | --- | --- |
 | MVP | Required to demonstrate a TFG capability; implement next when dependencies allow. | Profile/privacy, corners/map, listings/search, messaging, agreements, basic notifications. |
 | MVP support | Not a user feature, but required to run or explain the MVP safely. | Migrations, auth policy, same-origin routing, tests, CI, minimal production configuration, backup verification and documentation. |
-| Post-MVP | Valuable expansion that must not enter the MVP delivery without a new explicit decision. | Ratings/reputation, reports/moderation workflow, advanced metrics, retention/export, provider selection, advanced observability and growth features. |
+| Post-MVP | Valuable expansion removed from this change; it requires its own approved OpenSpec. | Ratings/reputation, reports/moderation workflow, advanced metrics, retention/export, provider selection, advanced observability and growth features. |
 
-The task list is the execution gate. An agent MUST NOT implement or check off a `POST-MVP` task merely because a corresponding capability spec exists. It must first document the purpose, user value, TFG relationship, acceptance evidence and bounded delivery in a separately approved decision.
+The task list is the execution gate. This change contains no executable `POST-MVP` tasks. The deferred capabilities remain in the roadmap/backlog only; a future OpenSpec must document their purpose, user value, TFG relationship, acceptance evidence and bounded delivery before implementation.
+
+### Deferred capabilities
+
+The following capabilities are intentionally outside this change: advanced rate limiting, password recovery, ratings/reputation, moderator workflows and reports, community aggregates/suggestions, provider selection and malware scanning, advanced observability, retention/export/anonymization, growth initiatives, and post-exchange dispute workflows. They are not missing MVP work.
 
 **Non-Goals:**
 

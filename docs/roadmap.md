@@ -2,6 +2,15 @@
 
 Este roadmap separa la recuperación terminada de las siguientes decisiones de producto.
 
+## Trabajo diferido fuera de `complete-entrelibros-recovery`
+
+Estas ideas se conservan como dirección futura, no como tareas pendientes del MVP. Cada una deberá tener una OpenSpec propia antes de implementarse:
+
+- `post-mvp-trust-safety`: denuncias, moderación, reputación, ratings y flujo posterior al intercambio.
+- `post-mvp-platform-hardening`: rate limiting avanzado, recuperación de contraseña, observabilidad y retención/exportación de datos.
+- `post-mvp-production-integrations`: proveedores reales de email/storage, malware scanning y operaciones avanzadas.
+- `post-mvp-community-insights`: estadísticas persistentes, sugerencias y crecimiento comunitario.
+
 ## Próximo
 
 - Añadir una prueba automatizada de navegador para login, `/messages`, bot persistido y recarga.
