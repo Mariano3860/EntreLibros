@@ -95,47 +95,23 @@
 - [x] 9.9 [SOPORTE MVP] Actualizar frontend, OpenAPI y backlog para identidad/catálogo y ejecutar comprobaciones; verificar ausencia de errores backend crudos y mocks obsoletos. OpenAPI, backlog, typechecks, backend (27 archivos/108 tests) y frontend (114 archivos/374 tests) pasan; los mocks continúan siendo opt-in.
 - [x] 9.10 [SOPORTE MVP] Preparar PRs por capacidad con CI/revisión en verde; avisar al usuario para cada merge manual y esperar confirmación antes de continuar. Esta rama queda lista para revisión y merge manual; no se ejecutó ningún merge.
 
-## 10. Finalización de comunidad y mapa (MVP y POST-MVP)
+## 10. Finalización de comunidad y mapa (MVP)
 
-- [ ] 10.1 [MVP] Añadir propietario y estado de ciclo de vida a rincones con valores seguros para datos antiguos; diferir metadatos de moderación al POST-MVP.
-- [ ] 10.2 [MVP] Exigir autenticación para propuestas de rincones e implementar edición del propietario; diferir moderación al POST-MVP.
-- [ ] 10.4 [SOPORTE MVP] Añadir paginación, radio/página máximos y proyección de campos; verificar que el payload quede debajo del presupuesto documentado.
-- [ ] 10.5 [MVP] Aplicar bounding boxes, índices espaciales y coordenadas redondeadas; verificar planes y exclusión de ubicaciones privadas o fuera de límites.
-- [ ] 10.6 [MVP] Actualizar frontend comunitario con paginación, estados de carga/error/vacío y ciclo visible; diferir visibilidad moderada al POST-MVP.
-- [ ] 10.7 [SOPORTE MVP] Actualizar OpenAPI/backlog y ejecutar rendimiento y comprobaciones generales; verificar que comunidad quede lista para revisión.
-- [ ] 10.8 [SOPORTE MVP] Preparar la PR de comunidad con CI/revisión en verde y avisar al usuario para el merge manual; no hacer merge.
+- [ ] 10.1 [MVP] Añadir propietario y estado de ciclo de vida básico a Rincones de Libros, con valores seguros para datos antiguos.
+- [ ] 10.2 [MVP] Exigir autenticación para propuestas de Rincones de Libros e implementar la edición del propietario.
+- [ ] 10.5 [MVP] Aplicar límites geográficos, privacidad y coordenadas públicas redondeadas en el mapa.
+- [ ] 10.6 [MVP] Actualizar la interfaz comunitaria con mapa/listado coherentes y estados de carga, error y vacío.
 
-## 11. Confianza, seguridad y notificaciones (MVP y POST-MVP)
+## 11. Notificaciones in-app (MVP)
 
-- [ ] 11.1 [MVP] Añadir migraciones solo para notificaciones in-app y preferencias; diferir denuncias, moderación y resultados posteriores al intercambio.
-- [ ] 11.3 [MVP] Implementar notificaciones persistentes e idempotentes activadas por mensajes y acuerdos; diferir las activadas por moderación.
-- [ ] 11.4 [MVP] Añadir centro de notificaciones y preferencias con estados accesibles traducidos para mensajes y acuerdos.
-- [ ] 11.7 [SOPORTE MVP] Actualizar OpenAPI, runbook de notificaciones y backlog, y ejecutar comprobaciones; diferir documentación de moderación/incidentes al POST-MVP.
-- [ ] 11.8 [SOPORTE MVP] Preparar la PR de notificaciones con CI/revisión en verde y avisar al usuario para el merge manual; no hacer merge.
+- [ ] 11.1 [MVP] Añadir persistencia mínima para notificaciones in-app y preferencias esenciales.
+- [ ] 11.3 [MVP] Implementar notificaciones persistentes e idempotentes activadas por mensajes y acuerdos.
+- [ ] 11.4 [MVP] Añadir un centro básico de notificaciones con estados traducidos y accesibles.
 
-## 12. Entrega y operación en producción (soporte MVP y POST-MVP)
+## 12. Validación final del MVP
 
-- [ ] 12.1 [SOPORTE MVP] Reconstruir Dockerfiles en Node 22 con capas deterministas y runtime sin root cuando corresponda; verificar builds limpios y smoke de contenedor.
-- [ ] 12.2 [SOPORTE MVP] Añadir fallback SPA de nginx y proxy de `/api` y `/socket.io`; verificar deep links, cookies y upgrade de WebSocket.
-- [ ] 12.3 [SOPORTE MVP] Reemplazar contratos Compose ausentes o contradictorios por ejemplos validados y `NODE_ENV=production`; verificar `docker compose config` sin placeholders.
-- [ ] 12.4 [SOPORTE MVP] Añadir servicio one-shot de migraciones, healthchecks y orden de readiness; verificar que un stack nuevo quede saludable.
-- [ ] 12.5 [SOPORTE MVP] Quitar exposición pública de la base en producción y usar secretos externos sin defaults; verificar fallo cerrado ante secretos ausentes.
-- [ ] 12.7 [SOPORTE MVP] Implementar y documentar backup cifrado, verificación de restauración y rollback; verificar restauración de staging y simulacro de release fallida.
-- [ ] 12.9 [MVP] Ejecutar E2E de producción para registro, perfil, publicación, mapa, mensajería, acuerdo, notificación y logout; diferir denuncias al POST-MVP.
-- [ ] 12.10 [SOPORTE MVP] Preparar PR de producción y evidencia de despliegue con CI/revisión en verde; avisar para aprobación manual y no hacer merge ni despliegue automáticamente.
+- [ ] 12.1 [SOPORTE MVP] Ejecutar migraciones, typecheck, formato, tests y E2E de los flujos MVP; documentar cualquier excepción reproducible.
 
-## 13. Ciclo de vida de datos, calidad y cierre documental (soporte MVP y POST-MVP)
+## 13. Trabajo futuro fuera de esta OpenSpec
 
-- [ ] 13.1 [SOPORTE MVP] Añadir checks de drift/contrato OpenAPI a CI y documentar rutas públicas, esquemas de seguridad, eventos WebSocket y claves i18n del MVP.
-- [ ] 13.2 [SOPORTE MVP] Añadir rutas CI de migración para esquemas vacío, anterior y preservado más PostGIS; verificar append-only y ejecución repetible.
-- [ ] 13.3 [SOPORTE MVP] Eliminar avisos existentes de React `act`, imágenes vacías y Faker obsoleto en flujos MVP tocados.
-- [ ] 13.5 [SOPORTE MVP] Reconciliar fila por fila `docs/backlog.md` con capacidades implementadas, separando parciales y POST-MVP sin duplicados.
-- [ ] 13.6 [SOPORTE MVP] Reescribir runbooks de desarrollo, producción, credenciales, backup/restauración y PR/release; diferir operación de incidentes fuera del MVP salvo necesidad de despliegue.
-- [ ] 13.7 [SOPORTE MVP] Ejecutar validación estricta de OpenSpec, comprobaciones, auditoría, E2E y smoke de producción MVP; diferir escaneo de imágenes y flujos no MVP.
-- [ ] 13.8 [SOPORTE MVP] Elaborar informe de preparación que relacione requisitos MVP con tests y PRs entregadas, incluyendo excepciones aceptadas y responsables.
-
-## 14. Roadmap POST-MVP y cierre de OpenSpec (diferido explícitamente)
-
-- [ ] 14.2 [SOPORTE MVP] Confirmar cada checkbox y requisito MVP contra código mergeado y comportamiento desplegado; lo incompleto permanece sin marcar y bloquea el archivo.
-- [ ] 14.3 [SOPORTE MVP] Sincronizar specs delta con specs principales solo después de mergear las entregas; no promover requisitos sin merge.
-- [ ] 14.4 [SOPORTE MVP] Archivar `complete-entrelibros-recovery` solo cuando el usuario haya mergeado manualmente todas las PRs MVP y pase la validación final.
+Las funcionalidades no incluidas en las secciones anteriores quedan para una nueva OpenSpec posterior, sin agregar tareas de implementación aquí.
