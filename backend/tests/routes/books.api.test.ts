@@ -252,7 +252,7 @@ describe('books API listing projections', () => {
     const activeId = await insertListing({ userId, bookId });
     const expiredId = await insertListing({ userId, bookId });
     await client.query(
-      'UPDATE book_listings SET expires_at = NOW() - INTERVAL \'1 day\' WHERE id = $1',
+      "UPDATE book_listings SET expires_at = NOW() - INTERVAL '1 day' WHERE id = $1",
       [expiredId]
     );
 

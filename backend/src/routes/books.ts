@@ -135,29 +135,33 @@ router.get('/mine', authenticate, async (req: AuthenticatedRequest, res) => {
   res.json(listings.map(toUserBookListing));
 });
 
-router.post('/:id/renew', authenticate, async (req: AuthenticatedRequest, res) => {
-  if (!req.user) {
-    return res.status(401).json({
-      error: 'Unauthorized',
-      message: 'auth.errors.unauthorized',
-    });
+router.post(
+  '/:id/renew',
+  authenticate,
+  async (req: AuthenticatedRequest, res) => {
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'Unauthorized',
+        message: 'auth.errors.unauthorized',
+      });
+    }
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id) || id <= 0) {
+      return res.status(404).json({
+        error: 'NotFound',
+        message: 'books.errors.not_found',
+      });
+    }
+    const listing = await renewBookListing(id, req.user.id);
+    if (!listing) {
+      return res.status(404).json({
+        error: 'NotFound',
+        message: 'books.errors.not_found',
+      });
+    }
+    return res.json(toUserBookListing(listing));
   }
-  const id = Number(req.params.id);
-  if (!Number.isInteger(id) || id <= 0) {
-    return res.status(404).json({
-      error: 'NotFound',
-      message: 'books.errors.not_found',
-    });
-  }
-  const listing = await renewBookListing(id, req.user.id);
-  if (!listing) {
-    return res.status(404).json({
-      error: 'NotFound',
-      message: 'books.errors.not_found',
-    });
-  }
-  return res.json(toUserBookListing(listing));
-});
+);
 
 router.post('/:id/verify', async (req, res) => {
   const id = Number(req.params.id);
@@ -341,21 +345,26 @@ function parseCatalogFilters(
   if (
     filters.limit !== undefined &&
     (!Number.isInteger(filters.limit) || filters.limit < 1)
-  ) return null;
+  )
+    return null;
   if (
     filters.offset !== undefined &&
     (!Number.isInteger(filters.offset) || filters.offset < 0)
-  ) return null;
-  if (
-    filters.type !== undefined &&
-    !ALLOWED_TYPES.includes(filters.type)
-  ) return null;
+  )
+    return null;
+  if (filters.type !== undefined && !ALLOWED_TYPES.includes(filters.type))
+    return null;
   if (
     filters.status !== undefined &&
     !ALLOWED_PUBLICATION_STATUSES.includes(filters.status as PublicationStatus)
-  ) return null;
+  )
+    return null;
   const coordinates = [filters.latitude, filters.longitude, filters.radiusKm];
-  if (coordinates.some((value) => value !== undefined) && coordinates.some((value) => value === undefined)) return null;
+  if (
+    coordinates.some((value) => value !== undefined) &&
+    coordinates.some((value) => value === undefined)
+  )
+    return null;
   if (filters.radiusKm !== undefined && filters.radiusKm <= 0) return null;
   return filters;
 }
@@ -370,7 +379,9 @@ function optionalString(value: unknown): string | null {
 
 function isValidImageUrl(value: string): boolean {
   if (/^https?:\/\/[^\s]+$/i.test(value)) return true;
-  const match = value.match(/^data:(image\/(?:jpeg|png|webp));base64,([a-z0-9+/=]+)$/i);
+  const match = value.match(
+    /^data:(image\/(?:jpeg|png|webp));base64,([a-z0-9+/=]+)$/i
+  );
   if (!match) return false;
   return Math.floor((match[2].length * 3) / 4) <= MAX_INLINE_IMAGE_BYTES;
 }
