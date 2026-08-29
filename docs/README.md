@@ -10,6 +10,7 @@
 - [`estado-actual.md`](estado-actual.md): capacidades verificadas y límites conocidos.
 - [`roadmap.md`](roadmap.md): próximos pasos de producto y deuda técnica.
 - [`backlog.md`](backlog.md): pendientes y trazabilidad de producto.
+- [`mvp-estado-alcance-y-definiciones.md`](mvp-estado-alcance-y-definiciones.md): estado funcional de las historias del MVP, prioridades y decisiones pendientes antes de crear una nueva OpenSpec.
 - [`guia-documentacion.md`](guia-documentacion.md): protocolo para mantener los documentos sincronizados.
 - [`security-runbook.md`](security-runbook.md): configuración y comprobaciones operativas de seguridad MVP.
 - [`threat-model.md`](threat-model.md): activos, amenazas cubiertas y riesgos residuales del MVP.
