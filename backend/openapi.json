@@ -10,6 +10,44 @@
     }
   ],
   "paths": {
+    "/api/user/profile": {
+      "get": {
+        "summary": "Obtener el perfil autenticado",
+        "tags": ["User"],
+        "security": [{ "cookieAuth": [] }],
+        "responses": { "200": { "description": "Perfil del usuario" }, "401": { "$ref": "#/components/responses/Unauthorized" } }
+      },
+      "patch": {
+        "summary": "Actualizar preferencias y privacidad del perfil",
+        "tags": ["User"],
+        "security": [{ "cookieAuth": [] }],
+        "responses": { "200": { "description": "Perfil actualizado" }, "400": { "description": "Datos inválidos" }, "401": { "$ref": "#/components/responses/Unauthorized" } }
+      }
+    },
+    "/api/user/profile/{id}": {
+      "get": {
+        "summary": "Consultar un perfil público",
+        "tags": ["User"],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "Perfil público" }, "404": { "description": "Perfil no disponible" } }
+      }
+    },
+    "/api/user/blocks/{id}": {
+      "get": { "summary": "Consultar un bloqueo", "tags": ["User"], "security": [{ "cookieAuth": [] }], "responses": { "200": { "description": "Estado del bloqueo" } } },
+      "put": { "summary": "Bloquear un usuario", "tags": ["User"], "security": [{ "cookieAuth": [] }], "responses": { "204": { "description": "Bloqueo creado" }, "404": { "description": "Usuario no disponible" } } },
+      "delete": { "summary": "Desbloquear un usuario", "tags": ["User"], "security": [{ "cookieAuth": [] }], "responses": { "204": { "description": "Bloqueo eliminado" } } }
+    },
+    "/api/books": {
+      "get": {
+        "summary": "Listar publicaciones públicas con filtros y paginación",
+        "tags": ["Books"],
+        "parameters": [{ "name": "q", "in": "query", "schema": { "type": "string" } }, { "name": "author", "in": "query", "schema": { "type": "string" } }, { "name": "isbn", "in": "query", "schema": { "type": "string" } }, { "name": "language", "in": "query", "schema": { "type": "string" } }, { "name": "type", "in": "query", "schema": { "enum": ["offer", "want"] } }, { "name": "limit", "in": "query", "schema": { "type": "integer", "maximum": 100 } }, { "name": "offset", "in": "query", "schema": { "type": "integer", "minimum": 0 } }],
+        "responses": { "200": { "description": "Publicaciones públicas" }, "400": { "description": "Filtros inválidos" } }
+      }
+    },
+    "/api/books/{id}/renew": {
+      "post": { "summary": "Renovar una publicación propia", "tags": ["Books"], "security": [{ "cookieAuth": [] }], "responses": { "200": { "description": "Publicación renovada" }, "404": { "description": "Publicación no encontrada" } } }
+    },
     "/api/messages": {
       "get": {
         "summary": "List the authenticated user's conversations",

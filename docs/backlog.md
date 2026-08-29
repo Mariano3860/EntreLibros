@@ -60,9 +60,11 @@ Feature 1.1 Cuenta y acceso
 
 Feature 1.2 Perfil y privacidad
 
-- [ ] S-1.4 Perfil editable (intereses y zona) (Must, E1; BR-02)
+- [x] S-1.4 Perfil editable (alias, descripción y zona) (Must, E1; BR-02)
+  - Actualización 2026-08-29: el perfil autenticado permite editar alias, descripción, idioma y granularidad pública de ubicación; los perfiles públicos no exponen correo ni contraseña.
   - Éxito: al menos 3 intereses; barrio/ciudad obligatorio.
-- [~] S-1.5 Privacidad por diseño (Must, E1; BR-04)
+- [x] S-1.5 Privacidad por diseño (Must, E1; BR-04)
+  - Actualización 2026-08-29: se añadieron visibilidad pública/privada, redondeo de coordenadas y validaciones de imágenes.
   - Éxito: no se expone calle/altura; auditoría interna.
 - [ ] S-1.6 Reputación liviana (Should, E2; BR-03)
   - Éxito: 2+ señales visibles tras intercambio/actividad.
@@ -118,9 +120,11 @@ Feature 3.1 Publicación y calidad del dato
 
 Feature 3.2 Búsquedas y ciclo de vida
 
-- [ ] S-3.4 Búsquedas y filtros (distancia, género/tema, estado, ofrezco/busco) (Must, E1; BR-21)
+- [x] S-3.4 Búsquedas y filtros (texto, autor, ISBN, idioma, estado, distancia y ofrezco/busco) (Must, E1; BR-21)
+  - Actualización 2026-08-29: `/api/books` admite filtros parametrizados, radio PostGIS y paginación limitada; el cliente los serializa sin activar mocks.
   - Éxito: resultados <2s con filtros básicos.
-- [ ] S-3.5 Vencimiento/renovación de publicaciones (Should, E2; BR-23)
+- [x] S-3.5 Vencimiento/renovación de publicaciones (Should, E2; BR-23)
+  - Actualización 2026-08-29: las publicaciones caducan a los 30 días, dejan de aparecer en el catálogo y el propietario puede renovarlas.
   - Éxito: aviso previo; reducción de obsoletas.
 - [x] S-3.6 Documentar diagrama de clases del modelo de datos (Mermaid) (Should, E1; DOC-01)
   - Éxito: diagrama actualizado en `docs/base_de_datos.md`, visible en GitHub y alineado con entidades principales.

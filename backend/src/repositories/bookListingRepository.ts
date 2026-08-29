@@ -299,10 +299,11 @@ function normalizeNewBook(b: NewBook) {
 
 async function fetchBookListings(
   whereClause: string,
-  params: unknown[]
+  params: unknown[],
+  orderClause = 'ORDER BY p.created_at DESC'
 ): Promise<BookListing[]> {
   const { rows } = await query<BookListingRow>(
-    `${BOOK_LISTING_SELECT} ${whereClause} ORDER BY p.created_at DESC`,
+    `${BOOK_LISTING_SELECT} ${whereClause} ${orderClause}`,
     params
   );
   return rows.map(mapRow);
@@ -734,8 +735,8 @@ export async function listPublicBookListings(
   params.push(limit, offset);
   return fetchBookListings(
     `JOIN users u ON u.id = p.user_id
-     WHERE ${conditions.join(' AND ')}
-     LIMIT $${params.length - 1} OFFSET $${params.length}`,
-    params
+     WHERE ${conditions.join(' AND ')}`,
+    params,
+    `ORDER BY p.created_at DESC LIMIT $${params.length - 1} OFFSET $${params.length}`
   );
 }
