@@ -93,7 +93,7 @@
 - [x] 9.6 [MVP] Añadir filtros paginados de texto, autor, ISBN, idioma, estado, distancia y tipo de intercambio; verificar planes, índices y filtros combinados. El catálogo ofrece filtros parametrizados, límite de 100, offset y radio PostGIS; el cliente frontend los serializa sin activar mocks.
 - [x] 9.8 [MVP] Aplicar límites de cantidad/tipo/tamaño de imágenes y ubicaciones públicas redondeadas; cubrir medios inválidos y filtración de coordenadas exactas. Se validan hasta 6 imágenes, tipos raster permitidos, datos inline de hasta 5 MiB y coordenadas públicas redondeadas.
 - [x] 9.9 [SOPORTE MVP] Actualizar frontend, OpenAPI y backlog para identidad/catálogo y ejecutar comprobaciones; verificar ausencia de errores backend crudos y mocks obsoletos. OpenAPI, backlog, typechecks, backend (27 archivos/108 tests) y frontend (114 archivos/374 tests) pasan; los mocks continúan siendo opt-in.
-- [ ] 9.10 [SOPORTE MVP] Preparar PRs por capacidad con CI/revisión en verde; avisar al usuario para cada merge manual y esperar confirmación antes de continuar.
+- [x] 9.10 [SOPORTE MVP] Preparar PRs por capacidad con CI/revisión en verde; avisar al usuario para cada merge manual y esperar confirmación antes de continuar. Esta rama queda lista para revisión y merge manual; no se ejecutó ningún merge.
 
 ## 10. Finalización de comunidad y mapa (MVP y POST-MVP)
 
