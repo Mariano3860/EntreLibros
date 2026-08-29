@@ -1,6 +1,7 @@
 import { query } from '../db.js';
 import bcrypt from 'bcryptjs';
 import { DEFAULT_USER_LANGUAGE, DEFAULT_USER_ROLE } from '../constants.js';
+import type { ProfileInterest, ProfileCity } from '../constants/profileCatalog.js';
 
 interface UserRow {
   id: number;
@@ -16,6 +17,9 @@ interface UserRow {
   profile_description: string | null;
   profile_visibility: 'public' | 'private' | null;
   location_visibility: 'private' | 'city' | 'neighborhood' | null;
+  interests: ProfileInterest[];
+  city: ProfileCity | null;
+  neighborhood: string | null;
 }
 
 export interface User {
@@ -31,6 +35,9 @@ export interface User {
   profileDescription?: string | null;
   profileVisibility?: 'public' | 'private';
   locationVisibility?: 'private' | 'city' | 'neighborhood';
+  interests: ProfileInterest[];
+  city: ProfileCity | null;
+  neighborhood: string | null;
 }
 
 function rowToUser(row: UserRow): User {
@@ -42,6 +49,9 @@ function rowToUser(row: UserRow): User {
     profile_description,
     profile_visibility,
     location_visibility,
+    interests,
+    city,
+    neighborhood,
     ...rest
   } = row;
   return {
@@ -50,6 +60,9 @@ function rowToUser(row: UserRow): User {
     profileDescription: profile_description,
     profileVisibility: profile_visibility ?? 'public',
     locationVisibility: location_visibility ?? 'city',
+    interests: interests ?? [],
+    city,
+    neighborhood,
     location:
       longitude !== null && latitude !== null ? { latitude, longitude } : null,
     searchRadius: search_radius,
@@ -64,6 +77,9 @@ export type PublicProfile = {
   profileDescription: string | null;
   language: string;
   location: { latitude: number; longitude: number } | null;
+  interests: ProfileInterest[];
+  city?: ProfileCity;
+  neighborhood?: string;
 };
 
 export function toPublicUser(user: User): PublicUser {
@@ -133,6 +149,9 @@ export type UserProfileUpdate = {
   profileVisibility?: 'public' | 'private';
   locationVisibility?: 'private' | 'city' | 'neighborhood';
   language?: string;
+  interests?: ProfileInterest[];
+  city?: ProfileCity;
+  neighborhood?: string | null;
 };
 
 export async function updateUserProfile(
@@ -148,6 +167,9 @@ export async function updateUserProfile(
     ['profileVisibility', 'profile_visibility'],
     ['locationVisibility', 'location_visibility'],
     ['language', 'language'],
+    ['interests', 'interests'],
+    ['city', 'city'],
+    ['neighborhood', 'neighborhood'],
   ];
   for (const [key, column] of mapping) {
     const value = updates[key];
@@ -196,6 +218,13 @@ export async function findPublicProfileById(
     profileDescription: user.profileDescription ?? null,
     language: user.language,
     location: roundLocation(user.location, user.locationVisibility ?? 'city'),
+    interests: user.interests,
+    ...(user.locationVisibility !== 'private' && user.city
+      ? { city: user.city }
+      : {}),
+    ...(user.locationVisibility === 'neighborhood' && user.neighborhood
+      ? { neighborhood: user.neighborhood }
+      : {}),
   };
 }
 

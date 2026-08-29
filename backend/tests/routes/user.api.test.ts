@@ -80,6 +80,18 @@ describe('user language API', () => {
 });
 
 describe('user profile API', () => {
+  async function createLoggedInUser(email: string) {
+    await request(app)
+      .post('/api/auth/register')
+      .send({ name: 'Profile User', email, password: 'Str0ng!Pass1' })
+      .expect(201);
+    const loginRes = await request(app)
+      .post('/api/auth/login')
+      .send({ email, password: 'Str0ng!Pass1' })
+      .expect(200);
+    return loginRes.headers['set-cookie'][0];
+  }
+
   test('updates an authenticated profile and hides private fields publicly', async () => {
     await request(app)
       .post('/api/auth/register')
@@ -151,6 +163,92 @@ describe('user profile API', () => {
       .expect(200);
 
     await request(app).get(`/api/user/profile/${user!.id}`).expect(404);
+  });
+
+  test('persists interests and a valid city-neighborhood pair', async () => {
+    const cookie = await createLoggedInUser('profile-location@example.com');
+
+    const update = await request(app)
+      .patch('/api/user/profile')
+      .set('Cookie', cookie)
+      .send({
+        interests: ['fiction', 'history', 'poetry'],
+        city: 'Buenos Aires',
+        neighborhood: 'Palermo',
+        locationVisibility: 'neighborhood',
+      })
+      .expect(200);
+
+    expect(update.body.interests).toEqual(['fiction', 'history', 'poetry']);
+    expect(update.body.city).toBe('Buenos Aires');
+    expect(update.body.neighborhood).toBe('Palermo');
+
+    const profile = await request(app)
+      .get('/api/user/profile')
+      .set('Cookie', cookie)
+      .expect(200);
+    expect(profile.body).toMatchObject({
+      interests: ['fiction', 'history', 'poetry'],
+      city: 'Buenos Aires',
+      neighborhood: 'Palermo',
+    });
+  });
+
+  test('rejects unknown interests and neighborhoods from another city', async () => {
+    const cookie = await createLoggedInUser('invalid-profile-location@example.com');
+
+    await request(app)
+      .patch('/api/user/profile')
+      .set('Cookie', cookie)
+      .send({ interests: ['free-text'] })
+      .expect(400);
+
+    await request(app)
+      .patch('/api/user/profile')
+      .set('Cookie', cookie)
+      .send({ city: 'La Plata', neighborhood: 'Palermo' })
+      .expect(400);
+  });
+
+  test('sanitizes public location at private, city and neighborhood levels', async () => {
+    const cookie = await createLoggedInUser('public-profile-location@example.com');
+    const user = await findUserByEmail('public-profile-location@example.com');
+    expect(user).not.toBeNull();
+
+    const update = async (locationVisibility: string) =>
+      request(app)
+        .patch('/api/user/profile')
+        .set('Cookie', cookie)
+        .send({
+          city: 'Buenos Aires',
+          neighborhood: 'Palermo',
+          interests: [],
+          locationVisibility,
+        })
+        .expect(200);
+
+    await update('private');
+    const privateProfile = await request(app)
+      .get(`/api/user/profile/${user!.id}`)
+      .expect(200);
+    expect(privateProfile.body.city).toBeUndefined();
+    expect(privateProfile.body.neighborhood).toBeUndefined();
+
+    await update('city');
+    const cityProfile = await request(app)
+      .get(`/api/user/profile/${user!.id}`)
+      .expect(200);
+    expect(cityProfile.body.city).toBe('Buenos Aires');
+    expect(cityProfile.body.neighborhood).toBeUndefined();
+
+    await update('neighborhood');
+    const neighborhoodProfile = await request(app)
+      .get(`/api/user/profile/${user!.id}`)
+      .expect(200);
+    expect(neighborhoodProfile.body.city).toBe('Buenos Aires');
+    expect(neighborhoodProfile.body.neighborhood).toBe('Palermo');
+    expect(neighborhoodProfile.body.email).toBeUndefined();
+    expect(neighborhoodProfile.body.password).toBeUndefined();
   });
 });
 

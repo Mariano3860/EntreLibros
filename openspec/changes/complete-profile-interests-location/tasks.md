@@ -6,11 +6,11 @@
 
 ## 2. Persistencia y API
 
-- [ ] 2.1 Diseñar la migración aditiva necesaria para intereses y zona general, incluyendo compatibilidad con usuarios existentes y sin almacenar dirección exacta.
-- [ ] 2.2 Implementar la persistencia de intereses, ciudad y barrio con validación de pertenencia ciudad-barrio.
-- [ ] 2.3 Ampliar lectura y actualización del perfil autenticado para cargar y guardar intereses y zona general.
-- [ ] 2.4 Actualizar la proyección pública para respetar ubicación privada, ciudad o barrio y excluir siempre datos exactos.
-- [ ] 2.5 Agregar pruebas de API para guardado, edición, valores inválidos, perfiles existentes y los tres niveles de visibilidad.
+- [x] 2.1 Diseñar la migración aditiva necesaria para intereses y zona general, incluyendo compatibilidad con usuarios existentes y sin almacenar dirección exacta.
+- [x] 2.2 Implementar la persistencia de intereses, ciudad y barrio con validación de pertenencia ciudad-barrio.
+- [x] 2.3 Ampliar lectura y actualización del perfil autenticado para cargar y guardar intereses y zona general.
+- [x] 2.4 Actualizar la proyección pública para respetar ubicación privada, ciudad o barrio y excluir siempre datos exactos.
+- [x] 2.5 Agregar pruebas de API para guardado, edición, valores inválidos, perfiles existentes y los tres niveles de visibilidad.
 
 ## 3. Formulario y presentación
 
