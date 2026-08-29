@@ -2,9 +2,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import {
   fetchNotifications,
+  fetchNotificationPreference,
   markNotificationRead,
   type ApiNotification,
   notificationKeys,
+  notificationPreferenceKeys,
+  updateNotificationPreference,
 } from '@src/api/notifications/notifications'
 
 export const useNotifications = (options?: { enabled?: boolean }) => {
@@ -42,4 +45,21 @@ export const useNotifications = (options?: { enabled?: boolean }) => {
     },
   })
   return { ...query, markRead }
+}
+
+export const useNotificationPreference = (options?: { enabled?: boolean }) => {
+  const client = useQueryClient()
+  const query = useQuery({
+    queryKey: notificationPreferenceKeys.all,
+    queryFn: fetchNotificationPreference,
+    enabled: options?.enabled ?? true,
+  })
+  const update = useMutation({
+    mutationFn: updateNotificationPreference,
+    onSuccess: (enabled) => {
+      client.setQueryData(notificationPreferenceKeys.all, enabled)
+      void client.invalidateQueries({ queryKey: notificationKeys.all })
+    },
+  })
+  return { ...query, update }
 }

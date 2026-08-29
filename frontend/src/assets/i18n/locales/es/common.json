@@ -826,12 +826,15 @@
     },
     "agreement": {
       "title": "Actualización de acuerdo",
+      "confirmedWith": "¡Bien! Cerraste el acuerdo con {{name}}",
+      "personFallback": "otro usuario",
       "body": "Un acuerdo de intercambio fue actualizado."
     }
   },
   "profile": {
     "title": "Mi perfil",
     "language": "Idioma",
+    "inAppNotifications": "Recibir notificaciones dentro de la aplicación",
     "description": "Controlá qué información compartís y cómo se muestra tu ubicación.",
     "loading": "Cargando tu perfil...",
     "error": "No se pudo cargar tu perfil.",

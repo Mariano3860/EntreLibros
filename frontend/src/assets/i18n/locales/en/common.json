@@ -834,12 +834,15 @@
     },
     "agreement": {
       "title": "Agreement update",
+      "confirmedWith": "Great! You confirmed the agreement with {{name}}",
+      "personFallback": "another user",
       "body": "An exchange agreement was updated."
     }
   },
   "profile": {
     "title": "My profile",
     "language": "Language",
+    "inAppNotifications": "Receive in-app notifications",
     "description": "Control what you share and how your location is shown.",
     "loading": "Loading your profile...",
     "error": "Your profile could not be loaded.",
