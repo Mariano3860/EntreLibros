@@ -1,4 +1,4 @@
-## /map feature overview
+## Resumen de la funcionalidad `/map`
 
 La ruta `/map` funciona como hub territorial para descubrir Rincones de Libros, publicaciones cercanas y señales de actividad. El mock se apoya en `msw` y genera datos deterministas a partir de la semilla `2048`. El panel lateral permanece como bloque placeholder hasta definir el detalle definitivo.
 

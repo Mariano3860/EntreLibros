@@ -4,7 +4,7 @@ Define un entorno local determinista y diagnosticable para que cualquier colabor
 
 ## ADDED Requirements
 
-### Requirement: Toolchain reproducible
+### Requirement: Herramientas reproducibles
 El proyecto SHALL declarar y utilizar una única versión compatible de Node.js y SHALL instalar dependencias de forma determinista desde el lockfile.
 
 #### Scenario: Preparación desde un clon limpio
