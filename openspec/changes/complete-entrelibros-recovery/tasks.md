@@ -86,9 +86,9 @@
 
 ## 9. Finalización de identidad, perfil, reputación y catálogo (MVP y POST-MVP)
 
-- [ ] 9.1 [MVP] Añadir campos de perfil/privacidad y valores por defecto que no expongan ubicaciones precisas existentes; cubrir perfiles públicos/privados para usuarios antiguos y nuevos.
-- [ ] 9.2 [MVP] Implementar endpoints autenticados de perfil/preferencias y formularios de alias, descripción, idioma y granularidad de ubicación; verificar persistencia y cambio de locale E2E.
-- [ ] 9.3 [MVP] Añadir bloqueos y aplicarlos a conversaciones, acuerdos y notificaciones directas nuevas; cubrir ambas direcciones con errores que preserven privacidad.
+- [x] 9.1 [MVP] Añadir campos de perfil/privacidad y valores por defecto que no expongan ubicaciones precisas existentes; cubrir perfiles públicos/privados para usuarios antiguos y nuevos. Migración 016 y pruebas de perfiles públicos/privados completadas.
+- [x] 9.2 [MVP] Implementar endpoints autenticados de perfil/preferencias y formularios de alias, descripción, idioma y granularidad de ubicación; verificar persistencia y cambio de locale E2E. API, formulario frontend y typechecks completados.
+- [x] 9.3 [MVP] Añadir bloqueos y aplicarlos a conversaciones, acuerdos y notificaciones directas nuevas; cubrir ambas direcciones con errores que preserven privacidad. API de bloqueo/desbloqueo y rechazo bilateral de conversaciones/acuerdos completados.
 - [ ] 9.5 [MVP] Completar estados, transiciones, caducidad/renovación y reservas atómicas de publicaciones; cubrir caducidad programada e interacción con acuerdos.
 - [ ] 9.6 [MVP] Añadir filtros paginados de texto, autor, ISBN, idioma, estado, distancia y tipo de intercambio; verificar planes, índices y filtros combinados.
 - [ ] 9.8 [MVP] Aplicar límites de cantidad/tipo/tamaño de imágenes y ubicaciones públicas redondeadas; cubrir medios inválidos y filtración de coordenadas exactas.
