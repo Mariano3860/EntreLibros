@@ -53,6 +53,7 @@ export interface BookListing {
   };
   createdAt: Date;
   updatedAt: Date;
+  expiresAt: Date | null;
   images: BookListingImage[];
 }
 
@@ -97,6 +98,7 @@ interface BookListingRow {
   primary_image_url: string | null;
   created_at: Date;
   updated_at: Date;
+  expires_at: Date | null;
 }
 
 interface BookListingImageRow {
@@ -197,6 +199,7 @@ const BOOK_LISTING_SELECT = `
     p.corner_id,
     p.created_at,
     p.updated_at,
+    p.expires_at,
     b.title,
     b.author,
     b.publisher,
@@ -261,6 +264,7 @@ function mapRow(row: BookListingRow): BookListing {
     },
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+    expiresAt: row.expires_at,
     images: [],
   };
 }
@@ -655,9 +659,83 @@ export async function listUserBookListings(
   return fetchBookListings('WHERE p.user_id = $1', [userId]);
 }
 
-export async function listPublicBookListings(): Promise<BookListing[]> {
+export async function renewBookListing(
+  id: number,
+  userId: number
+): Promise<BookListing | null> {
+  return withTransaction(async (client) => {
+    const result = await client.query<{ id: number }>(
+      `UPDATE book_listings
+       SET status = 'available', is_draft = false,
+           expires_at = NOW() + INTERVAL '30 days', updated_at = NOW()
+       WHERE id = $1 AND user_id = $2
+       RETURNING id`,
+      [id, userId]
+    );
+    if (!result.rows[0]) return null;
+    return fetchBookListingByIdWithClient(client, id);
+  });
+}
+
+export interface PublicBookListingFilters {
+  text?: string;
+  author?: string;
+  isbn?: string;
+  language?: string;
+  status?: BookListingStatus;
+  type?: BookListingType;
+  latitude?: number;
+  longitude?: number;
+  radiusKm?: number;
+  limit?: number;
+  offset?: number;
+}
+
+export async function listPublicBookListings(
+  filters: PublicBookListingFilters = {}
+): Promise<BookListing[]> {
+  const conditions = [
+    "p.availability = 'public'",
+    'p.is_draft = false',
+    "p.status NOT IN ('completed', 'sold', 'exchanged', 'inactive')",
+    '(p.expires_at IS NULL OR p.expires_at > NOW())',
+  ];
+  const params: unknown[] = [];
+  const add = (condition: string, value: unknown) => {
+    params.push(value);
+    conditions.push(condition.replace('?', `$${params.length}`));
+  };
+  if (filters.text) {
+    params.push(filters.text, filters.text);
+    conditions.push(
+      `(b.title ILIKE '%' || $${params.length - 1} || '%' OR b.author ILIKE '%' || $${params.length} || '%')`
+    );
+  }
+  if (filters.author) add("b.author ILIKE '%' || ? || '%'", filters.author);
+  if (filters.isbn) add('b.isbn = ?', filters.isbn);
+  if (filters.language) add('b.language = ?', filters.language);
+  if (filters.status) add('p.status = ?', filters.status);
+  if (filters.type) add('p.type = ?', filters.type);
+  if (
+    filters.latitude !== undefined &&
+    filters.longitude !== undefined &&
+    filters.radiusKm !== undefined
+  ) {
+    params.push(filters.longitude, filters.latitude, filters.radiusKm * 1000);
+    const lon = params.length - 2;
+    const lat = params.length - 1;
+    const radius = params.length;
+    conditions.push(
+      `u.location IS NOT NULL AND ST_DWithin(u.location, ST_SetSRID(ST_MakePoint($${lon}, $${lat}), 4326)::geography, $${radius})`
+    );
+  }
+  const limit = Math.min(Math.max(filters.limit ?? 50, 1), 100);
+  const offset = Math.max(filters.offset ?? 0, 0);
+  params.push(limit, offset);
   return fetchBookListings(
-    "WHERE p.status = 'available' AND p.availability = 'public' AND p.is_draft = false",
-    []
+    `JOIN users u ON u.id = p.user_id
+     WHERE ${conditions.join(' AND ')}
+     LIMIT $${params.length - 1} OFFSET $${params.length}`,
+    params
   );
 }

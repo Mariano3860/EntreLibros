@@ -4,12 +4,14 @@ import {
   createBookListing,
   listPublicBookListings,
   listUserBookListings,
+  renewBookListing,
   type BookListing,
   type BookListingDelivery,
   type BookListingCondition,
   type BookListingType,
   type BookListingAvailability,
   type BookListingShippingPayer,
+  type PublicBookListingFilters,
 } from '../repositories/bookListingRepository.js';
 import {
   searchBooksApiResults,
@@ -29,7 +31,14 @@ import {
 const router = Router();
 
 router.get('/', async (_req, res) => {
-  const listings = await listPublicBookListings();
+  const filters = parseCatalogFilters(_req.query);
+  if (!filters) {
+    return res.status(400).json({
+      error: 'InvalidFields',
+      message: 'books.errors.invalid_filters',
+    });
+  }
+  const listings = await listPublicBookListings(filters);
   res.json(listings.map(toPublicBookListing));
 });
 
@@ -126,6 +135,30 @@ router.get('/mine', authenticate, async (req: AuthenticatedRequest, res) => {
   res.json(listings.map(toUserBookListing));
 });
 
+router.post('/:id/renew', authenticate, async (req: AuthenticatedRequest, res) => {
+  if (!req.user) {
+    return res.status(401).json({
+      error: 'Unauthorized',
+      message: 'auth.errors.unauthorized',
+    });
+  }
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id) || id <= 0) {
+    return res.status(404).json({
+      error: 'NotFound',
+      message: 'books.errors.not_found',
+    });
+  }
+  const listing = await renewBookListing(id, req.user.id);
+  if (!listing) {
+    return res.status(404).json({
+      error: 'NotFound',
+      message: 'books.errors.not_found',
+    });
+  }
+  return res.json(toUserBookListing(listing));
+});
+
 router.post('/:id/verify', async (req, res) => {
   const id = Number(req.params.id);
   const book = await verifyBook(id);
@@ -193,6 +226,13 @@ router.put('/:id', authenticate, async (req: AuthenticatedRequest, res) => {
     return res.status(403).json({
       error: 'Forbidden',
       message: 'books.errors.not_owner',
+    });
+  }
+
+  if (result.kind === 'invalid_transition') {
+    return res.status(409).json({
+      error: 'Conflict',
+      message: 'books.errors.invalid_status_transition',
     });
   }
 
@@ -266,6 +306,58 @@ const MAX_INLINE_IMAGE_BYTES = 5 * 1024 * 1024;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
+}
+
+function queryText(value: unknown): string | undefined {
+  if (Array.isArray(value)) return queryText(value[0]);
+  if (typeof value !== 'string') return undefined;
+  const text = value.trim();
+  return text || undefined;
+}
+
+function queryNumber(value: unknown): number | undefined {
+  const text = queryText(value);
+  if (!text) return undefined;
+  const number = Number(text);
+  return Number.isFinite(number) ? number : undefined;
+}
+
+function parseCatalogFilters(
+  query: Request['query']
+): PublicBookListingFilters | null {
+  const filters: PublicBookListingFilters = {
+    text: queryText(query.q ?? query.text),
+    author: queryText(query.author),
+    isbn: queryText(query.isbn),
+    language: queryText(query.language),
+    type: queryText(query.type) as PublicBookListingFilters['type'],
+    status: queryText(query.status) as PublicBookListingFilters['status'],
+    limit: queryNumber(query.limit),
+    offset: queryNumber(query.offset),
+    latitude: queryNumber(query.latitude),
+    longitude: queryNumber(query.longitude),
+    radiusKm: queryNumber(query.radiusKm),
+  };
+  if (
+    filters.limit !== undefined &&
+    (!Number.isInteger(filters.limit) || filters.limit < 1)
+  ) return null;
+  if (
+    filters.offset !== undefined &&
+    (!Number.isInteger(filters.offset) || filters.offset < 0)
+  ) return null;
+  if (
+    filters.type !== undefined &&
+    !ALLOWED_TYPES.includes(filters.type)
+  ) return null;
+  if (
+    filters.status !== undefined &&
+    !ALLOWED_PUBLICATION_STATUSES.includes(filters.status as PublicationStatus)
+  ) return null;
+  const coordinates = [filters.latitude, filters.longitude, filters.radiusKm];
+  if (coordinates.some((value) => value !== undefined) && coordinates.some((value) => value === undefined)) return null;
+  if (filters.radiusKm !== undefined && filters.radiusKm <= 0) return null;
+  return filters;
 }
 
 function optionalString(value: unknown): string | null {

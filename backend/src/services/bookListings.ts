@@ -104,6 +104,7 @@ export interface PublicationUpdateInput {
 export type UpdatePublicationResult =
   | { kind: 'not_found' }
   | { kind: 'forbidden' }
+  | { kind: 'invalid_transition' }
   | { kind: 'updated'; publication: Publication };
 
 export async function getPublicationById(
@@ -136,6 +137,13 @@ export async function updatePublication(
     return { kind: 'forbidden' };
   }
 
+  if (
+    input.status !== undefined &&
+    !isValidStatusTransition(resolvePublicationStatus(listing), input.status)
+  ) {
+    return { kind: 'invalid_transition' };
+  }
+
   const persisted = buildPersistedUpdate(input);
   const updated = await updateBookListing(id, persisted);
   if (!updated) {
@@ -143,6 +151,22 @@ export async function updatePublication(
   }
 
   return { kind: 'updated', publication: toPublication(updated) };
+}
+
+function isValidStatusTransition(
+  current: PublicationStatus,
+  next: PublicationStatus
+): boolean {
+  if (current === next) return true;
+  const transitions: Record<PublicationStatus, readonly PublicationStatus[]> = {
+    draft: ['available'],
+    available: ['draft', 'reserved', 'completed', 'sold', 'exchanged'],
+    reserved: ['available', 'completed', 'sold', 'exchanged'],
+    completed: [],
+    sold: [],
+    exchanged: [],
+  };
+  return transitions[current].includes(next);
 }
 
 function canAccessListing(listing: BookListing, viewerId?: number) {
