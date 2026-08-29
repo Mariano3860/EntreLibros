@@ -36,9 +36,21 @@ export async function notifyMessageRecipients(input: {
 }
 
 async function notifyAgreement(agreement: AgreementSnapshot): Promise<void> {
+  if (agreement.state !== 'confirmed') return;
+
+  const participantIds = [agreement.proposerId, agreement.participantId];
+  const { rows } = await query<{ id: number; display_name: string }>(
+    `SELECT id, COALESCE(NULLIF(alias, ''), name) AS display_name
+     FROM users WHERE id = ANY($1::integer[])`,
+    [participantIds]
+  );
+  const names = new Map(rows.map((row) => [row.id, row.display_name]));
   await Promise.all(
-    [agreement.proposerId, agreement.participantId].map((recipientId) =>
-      createNotification({
+    participantIds.map((recipientId) => {
+      const otherParticipantId = participantIds.find(
+        (participantId) => participantId !== recipientId
+      );
+      return createNotification({
         recipientId,
         kind: 'agreement',
         entityId: String(agreement.id),
@@ -47,10 +59,12 @@ async function notifyAgreement(agreement: AgreementSnapshot): Promise<void> {
         data: {
           agreementId: agreement.id,
           conversationId: agreement.conversationId,
+          participantName:
+            names.get(otherParticipantId ?? recipientId) ?? 'un usuario',
         },
         idempotencyKey: `agreement:${agreement.id}:version:${agreement.currentVersion}:user:${recipientId}`,
-      })
-    )
+      });
+    })
   );
 }
 
