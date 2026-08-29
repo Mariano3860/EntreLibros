@@ -12,12 +12,20 @@ import messagesRouter from './routes/messages.js';
 import agreementsRouter from './routes/agreements.js';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './config/swagger.js';
+import { csrfProtection, getFrontendUrl } from './security.js';
 
 const app = express();
 
 app.use(helmet());
-const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-app.use(cors({ origin: frontendUrl, credentials: true }));
+const frontendUrl = getFrontendUrl();
+app.use(
+  cors({
+    origin: (origin, callback) =>
+      callback(null, !origin || origin === frontendUrl),
+    credentials: true,
+  })
+);
+app.use((req, res, next) => csrfProtection(frontendUrl, req, res, next));
 app.use(
   express.json({
     limit: process.env.API_JSON_LIMIT || '10mb',

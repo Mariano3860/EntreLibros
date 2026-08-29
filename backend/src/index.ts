@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import { logger } from './utils/logger.js';
+import { getFrontendUrl } from './security.js';
 
 if (process.env.NODE_ENV !== 'production') {
   const envFile = process.env.DOTENV_CONFIG_PATH
@@ -23,7 +24,7 @@ const { default: app } = await import('./app.js');
 const { setupWebsocket } = await import('./socket.js');
 
 const PORT = process.env.PORT || 4000;
-const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+const frontendUrl = getFrontendUrl();
 
 const httpServer = createServer(app);
 const io = new Server<
