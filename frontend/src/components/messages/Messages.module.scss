@@ -236,3 +236,9 @@
   color: var(--color-error);
   font-weight: $font-weight-medium;
 }
+
+.composerError {
+  margin: 0 $spacing-2 $spacing-1;
+  color: var(--color-error);
+  font-size: $small-font-size;
+}

@@ -17,6 +17,9 @@ type AgreementProposalModalProps = {
   titleOverride?: string
   descriptionOverride?: string
   submitLabelOverride?: string
+  booksLoading?: boolean
+  booksError?: boolean
+  onRetryBooks?: () => void
 }
 
 export const AgreementProposalModal = ({
@@ -30,6 +33,9 @@ export const AgreementProposalModal = ({
   titleOverride,
   descriptionOverride,
   submitLabelOverride,
+  booksLoading = false,
+  booksError = false,
+  onRetryBooks,
 }: AgreementProposalModalProps) => {
   const { t } = useTranslation()
   const meetingPointRef = useRef<HTMLInputElement>(null)
@@ -213,13 +219,17 @@ export const AgreementProposalModal = ({
             onChange={(event) => setBookId(event.target.value)}
             required
           >
-            {allBooks.length > 0 ? null : (
+            {booksLoading ? (
+              <option value="">
+                {t('community.messages.composer.agreementModal.loading')}
+              </option>
+            ) : booksError || allBooks.length === 0 ? (
               <option value="">
                 {t('community.messages.composer.agreementModal.noBooks', {
                   defaultValue: 'No hay libros cargados en la conversación.',
                 })}
               </option>
-            )}
+            ) : null}
             {myBooks.length > 0 ? (
               <optgroup
                 label={t('community.messages.composer.bookModal.mine', {
@@ -248,6 +258,17 @@ export const AgreementProposalModal = ({
               </optgroup>
             ) : null}
           </select>
+          {booksError && onRetryBooks ? (
+            <button
+              type="button"
+              className={styles.buttonSecondary}
+              onClick={onRetryBooks}
+            >
+              {t('community.messages.composer.retry', {
+                defaultValue: 'Reintentar',
+              })}
+            </button>
+          ) : null}
         </div>
 
         <div className={styles.actions}>
@@ -263,7 +284,7 @@ export const AgreementProposalModal = ({
           <button
             type="submit"
             className={styles.buttonPrimary}
-            disabled={!canSubmit}
+            disabled={booksLoading || booksError || !canSubmit}
           >
             {submitLabel}
           </button>

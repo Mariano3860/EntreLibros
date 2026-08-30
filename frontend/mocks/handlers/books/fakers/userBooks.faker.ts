@@ -76,8 +76,9 @@ const USER_BOOKS = [
 export const generateUserBooks = (seed?: number): ApiUserBook[] => {
   faker.seed(seed ?? 202)
   const [first, second, ...rest] = USER_BOOKS
-  const others = faker.helpers.arrayElements(rest, 3)
-  return [first, second, ...others].map((b) => ({
+  const [ownOnly, ...optionalBooks] = rest
+  const others = faker.helpers.arrayElements(optionalBooks, 2)
+  return [first, second, ownOnly, ...others].map((b) => ({
     ...b,
     id: faker.string.uuid(),
     coverUrl: b.isbn ? coverFromIsbn(b.isbn) : coverFromTitle(b.title),

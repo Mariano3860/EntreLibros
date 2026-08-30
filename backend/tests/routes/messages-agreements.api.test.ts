@@ -120,6 +120,86 @@ describe('messaging and agreements API', () => {
       .expect(({ body }) =>
         expect(body.message).toBe('messaging.errors.forbidden')
       );
+
+    const attached = await request(app)
+      .post(`/api/messages/${conversationId}/messages`)
+      .set('Cookie', first.cookie)
+      .send({
+        clientKey: 'book-attachment-1',
+        body: 'Te comparto este libro',
+        attachmentMetadata: {
+          key: 'book:123',
+          contentType: 'application/x-entrelibros-book',
+          size: 1,
+          kind: 'book',
+          bookId: '123',
+          title: 'Libro de prueba',
+          author: 'Autora',
+          coverUrl: '/cover.jpg',
+        },
+      })
+      .expect(201);
+    expect(attached.body.message.attachmentMetadata).toEqual(
+      expect.objectContaining({ kind: 'book', bookId: '123' })
+    );
+  });
+
+  test('returns eligible books for each conversation participant', async () => {
+    const first = await registerAndLogin('books-a');
+    const second = await registerAndLogin('books-b');
+    const outsider = await registerAndLogin('books-outsider');
+    const conversation = await request(app)
+      .post('/api/messages/conversations')
+      .set('Cookie', first.cookie)
+      .send({ participantId: second.id })
+      .expect(201);
+    const conversationId = conversation.body.conversation.id as number;
+    const firstBook = await client.query<{ id: number }>(
+      'INSERT INTO books (title) VALUES ($1) RETURNING id',
+      ['First book']
+    );
+    const secondBook = await client.query<{ id: number }>(
+      'INSERT INTO books (title) VALUES ($1) RETURNING id',
+      ['Second book']
+    );
+    const reservedBook = await client.query<{ id: number }>(
+      'INSERT INTO books (title) VALUES ($1) RETURNING id',
+      ['Reserved book']
+    );
+    await client.query(
+      `INSERT INTO book_listings (user_id, book_id, type, status)
+       VALUES ($1, $2, 'offer', 'available'),
+              ($3, $4, 'offer', 'available'),
+              ($3, $5, 'offer', 'reserved')`,
+      [
+        first.id,
+        firstBook.rows[0].id,
+        second.id,
+        secondBook.rows[0].id,
+        reservedBook.rows[0].id,
+      ]
+    );
+
+    await request(app)
+      .get(`/api/messages/${conversationId}/books`)
+      .set('Cookie', first.cookie)
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body.myBooks).toEqual([
+          expect.objectContaining({ title: 'First book' }),
+        ]);
+        expect(body.theirBooks).toEqual([
+          expect.objectContaining({ title: 'Second book' }),
+        ]);
+      });
+
+    await request(app)
+      .get(`/api/messages/${conversationId}/books`)
+      .set('Cookie', outsider.cookie)
+      .expect(403)
+      .expect(({ body }) =>
+        expect(body.message).toBe('messaging.errors.forbidden')
+      );
   });
 
   test('creates agreement history and returns a stale-version conflict', async () => {

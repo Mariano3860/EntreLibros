@@ -5,6 +5,7 @@ import { HouseCard } from './cards/HouseCard'
 import { PeopleCard } from './cards/PeopleCard'
 import { ReviewCard } from './cards/ReviewCard'
 import { SeekingCard } from './cards/SeekingCard'
+import { StoryCard } from './cards/StoryCard'
 import { SwapProposalCard } from './cards/SwapProposalCard'
 import type { FeedItem } from './FeedItem.types'
 
@@ -33,6 +34,8 @@ export const FeedList = ({ items }: Props) => {
             return <HouseCard key={item.id} item={item} />
           case 'person':
             return <PeopleCard key={item.id} item={item} />
+          case 'story':
+            return <StoryCard key={item.id} item={item} />
           default:
             return null
         }

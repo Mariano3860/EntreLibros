@@ -24,6 +24,9 @@ vi.mock('react-leaflet', () => {
       <div data-testid="leaflet-map">{children}</div>
     ),
     TileLayer: () => <div data-testid="tile-layer" />,
+    Marker: ({ children }: { children?: React.ReactNode }) => (
+      <div data-testid="user-location-marker">{children}</div>
+    ),
     CircleMarker: ({
       children,
       eventHandlers,
@@ -46,6 +49,8 @@ vi.mock('react-leaflet', () => {
     ),
     useMap: () => ({
       fitBounds: fitBoundsMock,
+      getZoom: () => 13,
+      setView: vi.fn(),
     }),
   }
 })
@@ -165,5 +170,25 @@ describe('MapCanvas', () => {
     )
 
     expect(screen.getByText('map.empty.description')).toBeInTheDocument()
+  })
+
+  test('renders a location pin over the approximate location area', () => {
+    renderWithProviders(
+      <MapCanvas
+        bbox={bbox}
+        corners={[]}
+        publications={[]}
+        activity={[]}
+        layers={{ corners: true, publications: true, activity: true }}
+        selectedPin={null}
+        onSelectPin={vi.fn()}
+        isLoading={false}
+        isFetching={false}
+        isEmpty={false}
+        userLocation={{ latitude: -34.6, longitude: -58.4 }}
+      />
+    )
+
+    expect(screen.getByTestId('user-location-marker')).toBeInTheDocument()
   })
 })

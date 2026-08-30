@@ -193,6 +193,38 @@ Devuelve los libros publicados por el usuario autenticado.
 ]
 ```
 
+### `GET /user/activity`
+
+Requiere sesión y devuelve la actividad persistida del usuario autenticado.
+Incluye publicaciones ofrecidas y publicaciones asociadas a acuerdos completados.
+
+```json
+[
+  {
+    "id": "listing:42",
+    "bookTitle": "Dune",
+    "action": "offered",
+    "coverUrl": "https://example.com/cover.jpg",
+    "timestamp": "2026-08-30T10:00:00.000Z"
+  }
+]
+```
+
+### `GET /messages/{conversationId}/books`
+
+Requiere sesión y pertenencia a la conversación. Devuelve por separado las
+publicaciones disponibles propias y las publicaciones públicas disponibles de
+la contraparte. `PUBLIC_API_USE_MOCKS=true` solo aplica a pruebas o demo explícita.
+
+```json
+{
+  "myBooks": [
+    { "id": "42", "title": "Dune", "author": "Frank Herbert", "coverUrl": "" }
+  ],
+  "theirBooks": []
+}
+```
+
 ## Comunidad
 
 ### `GET /community/stats`
@@ -241,6 +273,20 @@ Arreglo de elementos que varían según el campo `type` (`book`, `swap`, `sale`,
   }
 ]
 ```
+
+### `POST /community/stories`
+
+Crea una historia de Comunidad con texto, imagen opcional y una publicación propia vigente opcional.
+
+```json
+{
+  "body": "Recomendación de lectura",
+  "imageUrl": "data:image/jpeg;base64,...",
+  "bookListingId": "5"
+}
+```
+
+La respuesta `201` devuelve un elemento `story` compatible con `GET /community/feed`.
 
 ### `GET /community/activity`
 

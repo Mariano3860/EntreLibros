@@ -15,6 +15,11 @@ export interface MessageAttachment {
   contentType: string;
   size: number;
   name?: string;
+  kind?: 'book';
+  bookId?: string;
+  title?: string;
+  author?: string;
+  coverUrl?: string;
 }
 
 export interface PersistedMessage {
@@ -170,6 +175,29 @@ export async function isConversationParticipant(
     [conversationId, userId]
   );
   return rows[0]?.exists ?? false;
+}
+
+export async function listConversationParticipantIds(
+  conversationId: number,
+  userId: number
+): Promise<number[]> {
+  const { rows } = await query<{ user_id: number }>(
+    `SELECT user_id
+     FROM conversation_participants
+     WHERE conversation_id = $1
+       AND EXISTS (
+         SELECT 1
+         FROM conversation_participants membership
+         WHERE membership.conversation_id = $1
+           AND membership.user_id = $2
+       )
+     ORDER BY user_id`,
+    [conversationId, userId]
+  );
+  if (!rows.some((row) => Number(row.user_id) === userId)) {
+    throw new Error('messaging.errors.forbidden');
+  }
+  return rows.map((row) => Number(row.user_id));
 }
 
 export async function areUsersBlocked(

@@ -37,6 +37,12 @@ describe('BooksPage', () => {
     expect(await screen.findByText('Matisse en Bélgica')).toBeInTheDocument()
   })
 
+  test('includes own-only listings in the Todos tab', async () => {
+    renderWithProviders(<BooksPage />)
+
+    expect(await screen.findByText('El cuervo')).toBeInTheDocument()
+  })
+
   test('shows empty state when search yields no results', () => {
     renderWithProviders(<BooksPage />)
     fireEvent.change(
@@ -45,7 +51,7 @@ describe('BooksPage', () => {
         target: { value: 'zzzzz' },
       }
     )
-    expect(screen.getByText('booksPage.empty.mine')).toBeInTheDocument()
+    expect(screen.getByText('booksPage.empty.all')).toBeInTheDocument()
   })
 
   test('opens publish modal when navigating to /books/new', () => {

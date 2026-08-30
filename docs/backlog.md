@@ -6,6 +6,54 @@
 
 > Las expansiones de confianza avanzada, reputación, moderación, métricas, integraciones de proveedores y retención de datos quedan fuera de `complete-entrelibros-recovery`. Se mantienen como trabajo futuro en [`roadmap.md`](roadmap.md) y requieren una OpenSpec propia; no son faltantes del MVP del TFG.
 
+## Prioridad P0 — Brechas observadas en validación manual
+
+Registrado el 2026-08-30 a partir de una recorrida manual de la interfaz. Estos hallazgos tienen prioridad máxima porque afectan datos visibles, navegación y acciones principales. Se deben validar contra la API real y corregir antes de considerar cerrada la experiencia del MVP. Los mocks solo deben permanecer en pruebas o en un modo demo explícito.
+
+### Inicio y descubrimiento de libros
+
+- [x] **P0-01 — Catálogo real en inicio:** “Explorar libros” debe mostrar publicaciones visibles de todos los usuarios, no solo una parte de los libros del usuario autenticado ni datos incompletos.
+- [x] **P0-02 — Libros y actividad del usuario:** “Mis libros” debe cargar los libros reales del usuario autenticado. Si la sección también va a mostrar eventos como “ofreciste este libro” o “intercambiaste este libro”, evaluar renombrarla a “Mi actividad” y definir el modelo de eventos; no duplicar el acceso a libros propios que ya aparece en la parte superior.
+- [x] **P0-03 — Enlace “Ver todos” del inicio:** debe navegar al listado completo de libros y conservar el contexto de búsqueda/filtros cuando corresponda.
+- [x] **P0-04 — Entrada unificada al listado:** el “Ver todos” verde de la vista de libros no debe quedar inerte. Evaluar reemplazarlo por una primera columna/pestaña “Todos”, hacer que `/books` sea el listado completo (o redirija a una ruta canónica como `/books/all`) y mostrar “Todos” como selección activa al abrirlo.
+
+### Publicar un libro
+
+- [x] **P0-05 — Contraste en modo oscuro:** corregir colores de textos, campos, controles y estados del flujo de publicación que actualmente quedan negros o ilegibles sobre el fondo oscuro.
+
+### Comunidad
+
+- [x] **P0-06 — Imágenes de Rincones de Libros:** limitar correctamente imágenes verticales o largas dentro de su contenedor, reservando el espacio del título para que nunca lo cubran. Mantener el comportamiento correcto de las imágenes cuadradas.
+- [x] **P0-07 — Publicar desde Comunidad:** hacer funcional el botón “Publicar” de la esquina superior derecha, con navegación o apertura del flujo de publicación correspondiente.
+- [x] **P0-08 — Datos reales de comunidad:** reemplazar personas y publicaciones mockeadas por datos reales de la API/persistencia. Los fixtures deben quedar restringidos a pruebas o demo explícita y no presentarse como actividad real.
+- [x] **P0-09 — Mini mapa y controles:** corregir el fondo/capas para que el mini mapa no aparezca blanco, mostrar su contenido y hacer funcionales sus tres botones, incluyendo estados de carga, error y vacío.
+
+### Mapa y ubicación
+
+- [x] **P0-10 — Centro inicial contextual:** al abrir `/map`, intentar centrar el mapa en la ubicación del usuario con permiso. Mantener un fallback claro cuando no haya permiso o ubicación disponible; Buenos Aires no debe ser el centro por defecto de una sesión con ubicación conocida.
+- [x] **P0-11 — Indicador de ubicación propia:** mostrar un marcador o indicador de precisión aproximada que permita saber dónde está el usuario, respetando la política de privacidad y sin exponer una dirección exacta públicamente.
+- [x] **P0-12 — Filtro de distancia:** hacer operativo el control “hasta 25 km”, permitiendo moverlo por todo el rango hasta el extremo derecho, reflejando correctamente el relleno azul y aplicando el filtro a los resultados.
+
+### Mensajería e intercambios
+
+- [x] **P0-13 — Apertura del chat:** al entrar en una conversación, posicionar el historial en el mensaje más reciente, al final del contenido.
+- [x] **P0-14 — Adjuntar un libro:** “Adjuntar Libro” debe listar los libros reales del usuario autenticado y permitir seleccionar uno. Mostrar un estado vacío solo cuando el usuario no tenga libros y un estado de error si no se pudieron cargar.
+- [x] **P0-15 — Proponer un intercambio:** el selector de libros debe reutilizar los libros reales disponibles del usuario y reflejar correctamente las publicaciones que puede ofrecer o solicitar.
+
+### Sesión
+
+- [x] **P0-16 — Confirmación de logout:** mostrar un modal de confirmación antes de cerrar sesión, con acciones claras de cancelar y confirmar.
+- [x] **P0-17 — Superset del catálogo:** “Todos” une el catálogo público con los libros propios de la sesión, sin exponer publicaciones privadas ajenas.
+- [x] **P0-18 — Historias de Comunidad:** “Publicar” abre un compositor social persistido con texto, foto opcional y libro enlazado.
+- [x] **P0-19 — Mini mapa y mapa principal:** el mini mapa conserva sólo el acceso al mapa; `/map` recentra la vista con geolocalización autorizada, mantiene el mapa expandido y compacta el filtro de distancia.
+- [x] **P0-20 — Adjuntar libro persistido:** la selección del chat crea un mensaje con metadata de libro y se reconstruye como tarjeta al recargar.
+
+### Criterio transversal de cierre P0
+
+Cada punto debe verificarse en navegador con una sesión autenticada y mocks desactivados, comprobando la red y la persistencia cuando aplique. Ningún botón de acción principal debe quedar sin efecto, y los estados de datos vacíos deben distinguirse de fallos de carga o de fixtures de demostración.
+
+La validación automatizada y de servicio quedó completada. La recorrida visual con navegador real no pudo ejecutarse en este entorno porque no hay un navegador conectado; queda como paso manual antes del merge.
+
 ## Actualización del MVP: Rincones y notificaciones
 
 - **Rincones de Libros:** completada la propiedad por usuario, la edición autenticada del propietario, los estados activo/en pausa y la compatibilidad segura con Rincones históricos sin propietario.
@@ -145,7 +193,6 @@ Feature 3.2 Búsquedas y ciclo de vida
   - Éxito: los estados persistidos y expuestos distinguen publicaciones disponibles, reservadas, completadas, vendidas e intercambiadas.
   - Actualización 2025-11-16: se extendió el enum `publication_status`, se ajustaron las proyecciones de `/api/books`, `/api/books/mine` y `/api/books/:id` y se añadieron pruebas que validan la traducción entre estados internos y visibles.
   - Actualización 2025-11-18: el modal de detalle refleja los estados "Vendido" e "Intercambiado" con nuevas etiquetas y estilos, garantizando traducciones consistentes en ES/EN.
-
 
 EP-4 Descubrimiento y Navegación
 Feature 4.1 Mapa y listados

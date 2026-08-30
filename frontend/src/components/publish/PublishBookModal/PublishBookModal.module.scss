@@ -40,7 +40,7 @@
 .formGroup label {
   font-weight: 600;
   font-size: 0.9rem;
-  color: var(--neutral-700, #1d1d1d);
+  color: var(--text-primary);
 }
 
 .error {
@@ -50,7 +50,7 @@
 
 .toastInline {
   font-size: 0.85rem;
-  color: var(--neutral-500, #596070);
+  color: var(--text-secondary);
 }
 
 .checkboxGroup,
@@ -123,7 +123,7 @@
   padding: 12px;
   border-radius: 12px;
   border: 1px solid rgb(8 15 32 / 8%);
-  background: var(--neutral-50, #f8fafc);
+  background: var(--background-card);
 }
 
 .searchCover {
@@ -142,12 +142,12 @@
 
 .searchMeta strong {
   font-size: 0.95rem;
-  color: var(--neutral-800, #161a29);
+  color: var(--text-primary);
 }
 
 .searchMeta span {
   font-size: 0.85rem;
-  color: var(--neutral-500, #596070);
+  color: var(--text-secondary);
 }
 
 .searchButton {
@@ -165,19 +165,19 @@
 
 .switchLabel {
   font-size: 0.85rem;
-  color: var(--neutral-600, #3d4451);
+  color: var(--text-secondary);
 }
 
 .ghostButton {
   background: transparent;
-  color: var(--neutral-600, #3d4451);
+  color: var(--text-secondary);
   border: none;
   cursor: pointer;
   font-weight: 600;
 }
 
 .resumePrompt {
-  background: var(--surface-elevated, #fff);
+  background: var(--background-primary);
   border-radius: 16px;
   padding: 24px;
   box-shadow: 0 16px 40px rgb(8 15 32 / 20%);
@@ -209,8 +209,8 @@
 }
 
 .secondaryButton {
-  background: var(--neutral-100, #eef2f7);
-  color: var(--neutral-700, #1d1d1d);
+  background: var(--background-card);
+  color: var(--text-primary);
 }
 
 .primaryButton {

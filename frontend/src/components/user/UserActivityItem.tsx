@@ -6,7 +6,7 @@ import styles from './UserActivityItem.module.scss'
 
 type UserActivityItemProps = {
   bookTitle: string
-  action: 'added' | 'exchanged'
+  action: 'added' | 'offered' | 'exchanged'
   coverUrl: string
   timestamp: string // ISO 8601
 }
@@ -23,6 +23,7 @@ export const UserActivityItem = ({
 
   const actionText = {
     added: t('activity.added'),
+    offered: t('activity.offered'),
     exchanged: t('activity.exchanged'),
   }[action]
 

@@ -135,8 +135,15 @@ export async function createAgreement(input: {
       throw new Error('agreements.errors.listings_invalid');
     }
     const listings = listingIds.length
-      ? await client.query<{ id: number; user_id: number; status: string }>(
-          `SELECT id, user_id, status FROM book_listings
+      ? await client.query<{
+          id: number;
+          user_id: number;
+          status: string;
+          availability: string;
+          is_draft: boolean;
+        }>(
+          `SELECT id, user_id, status, availability, is_draft
+             FROM book_listings
            WHERE id = ANY($1::integer[]) FOR UPDATE`,
           [listingIds]
         )
@@ -146,6 +153,8 @@ export async function createAgreement(input: {
       listings.rows.some(
         (listing) =>
           listing.status !== 'available' ||
+          listing.availability !== 'public' ||
+          listing.is_draft ||
           ![input.proposerId, input.participantId].includes(listing.user_id)
       )
     ) {

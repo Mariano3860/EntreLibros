@@ -69,10 +69,16 @@ describe('CornersMiniMap', () => {
       screen.getByText('community.feed.cornersMap.footer')
     ).toBeInTheDocument()
 
-    const nearbyButton = screen.getByRole('button', {
-      name: 'community.feed.cornersMap.actions.nearby',
-    })
-    expect(nearbyButton).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', {
+        name: 'community.feed.cornersMap.actions.expand',
+      })
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', {
+        name: 'community.feed.cornersMap.actions.nearby',
+      })
+    ).not.toBeInTheDocument()
 
     const pins = Array.from(container.querySelectorAll(`.${styles.pin}`))
     expect(pins).toHaveLength(2)

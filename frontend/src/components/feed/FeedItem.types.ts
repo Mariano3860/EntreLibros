@@ -7,6 +7,7 @@ export type FeedItem =
   | EventItem
   | HouseItem
   | PersonItem
+  | StoryItem
 
 export type FeedBase = {
   id: string
@@ -91,4 +92,12 @@ export type PersonItem = FeedBase & {
   name: string
   match: number
   lastActivity: string
+}
+
+export type StoryItem = FeedBase & {
+  type: 'story'
+  title: string
+  body: string
+  image?: string
+  book?: { id: string; title: string; author: string; cover: string }
 }

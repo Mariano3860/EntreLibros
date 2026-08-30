@@ -7,6 +7,7 @@ import { publishBookHandler } from './books/publish.handler'
 import { publicationHandlers } from './books/publication.handler'
 import { searchBooksHandler } from './books/search.handler'
 import { userBooksHandler } from './books/userBooks.handler'
+import { userActivityHandler } from './user/activity.handler'
 import { activityHandler } from './community/activity.handler'
 import { communityStatsHandler } from './community/communityStats.handler'
 import { communityFeedHandler } from './community/feed.handler'
@@ -32,6 +33,7 @@ export const handlers = [
   searchBooksHandler,
   publishBookHandler,
   userBooksHandler,
+  userActivityHandler,
   ...publicationHandlers,
   contactFormHandler,
   userLanguageHandler,

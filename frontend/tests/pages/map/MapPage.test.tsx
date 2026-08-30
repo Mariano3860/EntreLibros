@@ -18,11 +18,13 @@ vi.mock('@src/components/map/MapCanvas/MapCanvas', () => {
       publications,
       layers,
       onSelectPin,
+      isEmpty,
     }: {
       corners: MapCornerPin[]
       publications: MapPublicationPin[]
       layers: { corners: boolean; publications: boolean }
       onSelectPin: (pin: MapPin) => void
+      isEmpty: boolean
     }) => {
       const visibleCorners = layers.corners ? corners : []
       const visiblePublications = layers.publications ? publications : []
@@ -51,6 +53,7 @@ vi.mock('@src/components/map/MapCanvas/MapCanvas', () => {
               Publication
             </button>
           ))}
+          {isEmpty ? <div>map.empty.description</div> : null}
         </div>
       )
     },
@@ -70,7 +73,7 @@ describe('MapPage', () => {
       await screen.findByPlaceholderText('map.search.placeholder')
     ).toBeInTheDocument()
     expect(screen.getByLabelText('map.filters.ariaLabel')).toBeInTheDocument()
-    expect(screen.getByTestId('map-detail-placeholder')).toBeInTheDocument()
+    expect(screen.getByTestId('mock-map')).toBeInTheDocument()
 
     await waitFor(() => {
       expect(getPinButtons().length).toBeGreaterThan(0)
@@ -252,7 +255,7 @@ describe('MapPage', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getByText('map.empty.title')).toBeInTheDocument()
+      expect(screen.getByText('map.empty.description')).toBeInTheDocument()
     })
   })
 })

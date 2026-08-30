@@ -2,7 +2,7 @@
   align-self: center;
   width: min(320px, 100%);
   border-radius: 16px;
-  background: var(--surface-elevated, #fff);
+  background: var(--background-primary);
   box-shadow: 0 16px 40px rgb(8 15 32 / 20%);
   padding: 24px;
   display: flex;
@@ -13,7 +13,7 @@
 .title {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--neutral-700, #1d1d1d);
+  color: var(--text-primary);
 }
 
 .row {
@@ -26,11 +26,11 @@
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--neutral-500, #596070);
+  color: var(--text-secondary);
 }
 
 .value {
   font-size: 0.95rem;
-  color: var(--neutral-800, #161a29);
+  color: var(--text-primary);
   overflow-wrap: anywhere;
 }

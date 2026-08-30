@@ -19,6 +19,15 @@
     "success": {
       "login": "Login successful!",
       "register": "Registration successful!"
+    },
+    "logout": {
+      "open": "Log out",
+      "login": "Log in",
+      "title": "Log out?",
+      "description": "You are about to leave your current session.",
+      "cancel": "Cancel",
+      "confirm": "Log out",
+      "confirming": "Logging out..."
     }
   },
   "theme": {
@@ -69,6 +78,10 @@
     "explore_books": "Explore books",
     "see_all": "See all",
     "my_books": "My books",
+    "my_activity": "My activity",
+    "activity_loading": "Loading your activity...",
+    "activity_error": "We couldn't load your activity.",
+    "activity_empty": "There is no activity to show yet.",
     "community_title": "Join the community",
     "community_subtitle": "Create your book house and start sharing books today",
     "explore_community": "Explore community",
@@ -81,6 +94,7 @@
   },
   "activity": {
     "added": "You added",
+    "offered": "You offered",
     "exchanged": "You exchanged",
     "cover_alt": "Cover of {{title}}"
   },
@@ -99,6 +113,7 @@
     "publish_button": "Publish a book",
     "recently_published": "Your new book",
     "tabs": {
+      "all": "All",
       "mine": "My books",
       "for_trade": "Available for trade",
       "seeking": "Seeking",
@@ -106,6 +121,7 @@
       "see_all": "See all"
     },
     "empty": {
+      "all": "We couldn't find published books yet.",
       "mine": "You haven't added books yet.",
       "trade": "You haven't listed books for trade yet.",
       "seeking": "No books in your wish list.",
@@ -513,11 +529,15 @@
           "noteLabel": "Note (optional)",
           "submit": "Attach",
           "empty": "No books available",
+          "loading": "Loading available books...",
+          "error": "Books could not be loaded.",
+          "sendError": "The book could not be attached. Try again.",
           "mine": "My books",
           "theirs": "{{name}}'s books"
         },
         "swapModal": {
           "trigger": "Propose swap",
+          "loading": "Loading available books...",
           "title": "Swap proposal",
           "description": "Choose which book you offer and which one you'd like in return.",
           "offeredLabel": "You offer",
@@ -541,6 +561,7 @@
           "timeLabel": "Time",
           "timePlaceholder": "e.g. 19:00",
           "bookLabel": "Book to exchange",
+          "loading": "Loading available books...",
           "noBooks": "No books are listed in this conversation.",
           "submit": "Send proposal"
         }
@@ -662,9 +683,25 @@
           "expand": "Open full map"
         }
       }
+    },
+    "story": {
+      "title": "Share a story",
+      "description": "Share something related to books and the community.",
+      "bodyLabel": "What do you want to share?",
+      "bodyPlaceholder": "Write a recommendation, idea or story...",
+      "bookLabel": "Link a book (optional)",
+      "bookNone": "Do not link a book",
+      "imageLabel": "Add a photo (optional)",
+      "cancel": "Cancel",
+      "publish": "Publish story",
+      "publishing": "Publishing...",
+      "error": "The story could not be published. Try again."
     }
   },
   "map": {
+    "location": {
+      "youAreHere": "Your approximate location"
+    },
     "search": {
       "placeholder": "Search by neighborhood, corner, title or ISBN",
       "zoneFallback": "Select a neighborhood or city"
@@ -837,6 +874,12 @@
       "confirmedWith": "Great! You confirmed the agreement with {{name}}",
       "personFallback": "another user",
       "body": "An exchange agreement was updated."
+    }
+  },
+  "user": {
+    "errors": {
+      "activity_query_failed": "Your activity could not be loaded.",
+      "unauthenticated": "You need to sign in."
     }
   },
   "profile": {

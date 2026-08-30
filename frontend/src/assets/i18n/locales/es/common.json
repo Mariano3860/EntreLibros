@@ -19,6 +19,15 @@
     "success": {
       "login": "¡Inicio de sesión exitoso!",
       "register": "¡Registro exitoso!"
+    },
+    "logout": {
+      "open": "Cerrar sesión",
+      "login": "Iniciar sesión",
+      "title": "¿Querés cerrar sesión?",
+      "description": "Vas a salir de tu sesión actual.",
+      "cancel": "Cancelar",
+      "confirm": "Cerrar sesión",
+      "confirming": "Cerrando sesión..."
     }
   },
   "theme": {
@@ -69,6 +78,10 @@
     "explore_books": "Explorar libros",
     "see_all": "Ver todos",
     "my_books": "Mis libros",
+    "my_activity": "Mi actividad",
+    "activity_loading": "Cargando tu actividad...",
+    "activity_error": "No pudimos cargar tu actividad.",
+    "activity_empty": "Todavía no hay actividad para mostrar.",
     "community_title": "Únete a la comunidad",
     "community_subtitle": "Crea tu casita y empieza a intercambiar libros hoy mismo",
     "explore_community": "Explorar comunidad",
@@ -81,6 +94,7 @@
   },
   "activity": {
     "added": "Ofreciste",
+    "offered": "Ofreciste",
     "exchanged": "Intercambiaste",
     "cover_alt": "Portada de {{title}}"
   },
@@ -99,6 +113,7 @@
     "publish_button": "Publicar un libro",
     "recently_published": "Tu nuevo libro",
     "tabs": {
+      "all": "Todos",
       "mine": "Mis libros",
       "for_trade": "Disponibles para intercambio",
       "seeking": "Buscando",
@@ -106,6 +121,7 @@
       "see_all": "Ver todos"
     },
     "empty": {
+      "all": "No encontramos libros publicados todavía.",
       "mine": "Aún no cargaste libros.",
       "trade": "Aún no publicaste libros para intercambio. Cargá el primero.",
       "seeking": "No hay libros en tu lista de deseos.",
@@ -513,11 +529,15 @@
           "noteLabel": "Nota (opcional)",
           "submit": "Adjuntar",
           "empty": "No hay libros disponibles",
+          "loading": "Cargando libros disponibles...",
+          "error": "No se pudieron cargar los libros.",
+          "sendError": "No se pudo adjuntar el libro. Intentá de nuevo.",
           "mine": "Mis libros",
           "theirs": "Libros de {{name}}"
         },
         "swapModal": {
           "trigger": "Proponer intercambio",
+          "loading": "Cargando libros disponibles...",
           "title": "Propuesta de intercambio",
           "description": "Elegí qué libro ofrecés y cuál te gustaría recibir a cambio.",
           "offeredLabel": "Ofrecés",
@@ -541,6 +561,7 @@
           "timeLabel": "Horario",
           "timePlaceholder": "Ej. 19:00",
           "bookLabel": "Libro a intercambiar",
+          "loading": "Cargando libros disponibles...",
           "noBooks": "No hay libros cargados en la conversación.",
           "submit": "Enviar propuesta"
         }
@@ -654,9 +675,25 @@
           "expand": "Abrir mapa completo"
         }
       }
+    },
+    "story": {
+      "title": "Compartir una historia",
+      "description": "Compartí algo relacionado con los libros y la comunidad.",
+      "bodyLabel": "¿Qué querés compartir?",
+      "bodyPlaceholder": "Escribí una recomendación, una idea o una historia...",
+      "bookLabel": "Enlazar un libro (opcional)",
+      "bookNone": "No enlazar un libro",
+      "imageLabel": "Agregar una foto (opcional)",
+      "cancel": "Cancelar",
+      "publish": "Publicar historia",
+      "publishing": "Publicando...",
+      "error": "No se pudo publicar la historia. Intentá de nuevo."
     }
   },
   "map": {
+    "location": {
+      "youAreHere": "Tu ubicación aproximada"
+    },
     "search": {
       "placeholder": "Buscar por barrio, rincón, título o ISBN",
       "zoneFallback": "Selecciona un barrio o ciudad"
@@ -829,6 +866,12 @@
       "confirmedWith": "¡Bien! Cerraste el acuerdo con {{name}}",
       "personFallback": "otro usuario",
       "body": "Un acuerdo de intercambio fue actualizado."
+    }
+  },
+  "user": {
+    "errors": {
+      "activity_query_failed": "No se pudo cargar tu actividad.",
+      "unauthenticated": "Necesitás iniciar sesión."
     }
   },
   "profile": {

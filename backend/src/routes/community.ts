@@ -1,11 +1,11 @@
 import { Router } from 'express';
 
 import {
-  getCommunityActivity,
-  getCommunityStats,
-  getCommunitySuggestions,
-} from '../services/communityStats.js';
-import { getCommunityFeed } from '../services/communityFeed.js';
+  getPersistedCommunityActivity,
+  getPersistedCommunityFeed,
+  getPersistedCommunityStats,
+  getPersistedCommunitySuggestions,
+} from '../services/communityPersistence.js';
 import {
   CornerValidationError,
   getCornersMap,
@@ -16,6 +16,7 @@ import {
   type UpdateCornerPayload,
 } from '../services/communityCorners.js';
 import { authenticate, type AuthenticatedRequest } from '../middleware/auth.js';
+import { createCommunityStory } from '../repositories/communityStoryRepository.js';
 
 const router = Router();
 
@@ -148,12 +149,20 @@ router.patch(
   }
 );
 
-router.get('/stats', (_req, res) => {
-  const stats = getCommunityStats();
-  res.json(stats);
+router.get('/stats', async (_req, res) => {
+  try {
+    const stats = await getPersistedCommunityStats();
+    return res.json(stats);
+  } catch (error) {
+    console.error('Failed to load persisted community stats', error);
+    return res.status(500).json({
+      error: 'CommunityStatsQueryFailed',
+      message: 'community.errors.query_failed',
+    });
+  }
 });
 
-router.get('/feed', (req, res) => {
+router.get('/feed', async (req, res) => {
   const rawPage = req.query.page;
   const rawSize = req.query.size;
 
@@ -173,18 +182,77 @@ router.get('/feed', (req, res) => {
   }
 
   const clampedSize = Math.min(size, 20);
-  const feed = getCommunityFeed({ page, size: clampedSize });
-  res.json(feed);
+  try {
+    const feed = await getPersistedCommunityFeed(page, clampedSize);
+    return res.json(feed);
+  } catch (error) {
+    console.error('Failed to load persisted community feed', error);
+    return res.status(500).json({
+      error: 'CommunityFeedQueryFailed',
+      message: 'community.errors.query_failed',
+    });
+  }
 });
 
-router.get('/activity', (_req, res) => {
-  const activity = getCommunityActivity();
-  res.json(activity);
+router.post(
+  '/stories',
+  authenticate,
+  async (req: AuthenticatedRequest, res) => {
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'Unauthorized',
+        message: 'auth.errors.unauthorized',
+      });
+    }
+    const body = req.body && typeof req.body === 'object' ? req.body : {};
+    try {
+      const story = await createCommunityStory({
+        userId: req.user.id,
+        body: typeof body.body === 'string' ? body.body : '',
+        imageUrl: typeof body.imageUrl === 'string' ? body.imageUrl : null,
+        bookListingId:
+          typeof body.bookListingId === 'string' ? body.bookListingId : null,
+      });
+      return res.status(201).json(story);
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'community.story.create_failed';
+      const status =
+        message === 'community.story.body_required' ||
+        message === 'community.story.book_invalid'
+          ? 422
+          : 500;
+      return res.status(status).json({ error: 'CommunityStoryError', message });
+    }
+  }
+);
+
+router.get('/activity', async (_req, res) => {
+  try {
+    const activity = await getPersistedCommunityActivity();
+    return res.json(activity);
+  } catch (error) {
+    console.error('Failed to load persisted community activity', error);
+    return res.status(500).json({
+      error: 'CommunityActivityQueryFailed',
+      message: 'community.errors.query_failed',
+    });
+  }
 });
 
-router.get('/suggestions', (_req, res) => {
-  const suggestions = getCommunitySuggestions();
-  res.json(suggestions);
+router.get('/suggestions', async (_req, res) => {
+  try {
+    const suggestions = await getPersistedCommunitySuggestions();
+    return res.json(suggestions);
+  } catch (error) {
+    console.error('Failed to load persisted community suggestions', error);
+    return res.status(500).json({
+      error: 'CommunitySuggestionsQueryFailed',
+      message: 'community.errors.query_failed',
+    });
+  }
 });
 
 export default router;

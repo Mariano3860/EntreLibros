@@ -1,4 +1,5 @@
 import type { MapLayerKey, MapLayerToggles } from '@api/map/map.types'
+import type { CSSProperties } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import styles from './FilterRail.module.scss'
@@ -40,6 +41,11 @@ export const FilterRail = ({
             max={25}
             step={1}
             value={distanceKm}
+            style={
+              {
+                '--range-progress': `${((distanceKm - 1) / 24) * 100}%`,
+              } as CSSProperties
+            }
             onChange={(event) => onDistanceChange(Number(event.target.value))}
             aria-valuetext={
               t('map.filters.distanceValue', { value: distanceKm }) ?? ''

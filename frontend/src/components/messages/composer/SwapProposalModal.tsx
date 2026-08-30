@@ -11,6 +11,9 @@ type SwapProposalModalProps = {
   myBooks: Book[]
   theirBooks: Book[]
   counterpartName: string
+  booksLoading?: boolean
+  booksError?: boolean
+  onRetryBooks?: () => void
   onClose: () => void
   onConfirm: (details: SwapProposalDetails) => void
 }
@@ -21,6 +24,9 @@ export const SwapProposalModal = ({
   theirBooks,
   onClose,
   onConfirm,
+  booksLoading = false,
+  booksError = false,
+  onRetryBooks,
 }: SwapProposalModalProps) => {
   const { t } = useTranslation()
   const offeredRef = useRef<HTMLSelectElement>(null)
@@ -85,13 +91,17 @@ export const SwapProposalModal = ({
             onChange={(event) => setOfferedId(event.target.value)}
             required
           >
-            {myBooks.length > 0 ? null : (
+            {booksLoading ? (
+              <option value="">
+                {t('community.messages.composer.swapModal.loading')}
+              </option>
+            ) : booksError || myBooks.length === 0 ? (
               <option value="">
                 {t('community.messages.composer.swapModal.noMine', {
                   defaultValue: 'No tenés libros disponibles para intercambio.',
                 })}
               </option>
-            )}
+            ) : null}
             {myBooks.map((book) => (
               <option key={book.id} value={book.id}>
                 {book.title}
@@ -113,13 +123,17 @@ export const SwapProposalModal = ({
             onChange={(event) => setRequestedId(event.target.value)}
             required
           >
-            {theirBooks.length > 0 ? null : (
+            {booksLoading ? (
+              <option value="">
+                {t('community.messages.composer.swapModal.loading')}
+              </option>
+            ) : booksError || theirBooks.length === 0 ? (
               <option value="">
                 {t('community.messages.composer.swapModal.noTheirs', {
                   defaultValue: 'La otra persona no tiene libros publicados.',
                 })}
               </option>
-            )}
+            ) : null}
             {theirBooks.map((book) => (
               <option key={book.id} value={book.id}>
                 {book.title}
@@ -132,6 +146,17 @@ export const SwapProposalModal = ({
                 'Las propuestas se guardan en la conversación para que ambos las revisen.',
             })}
           </p>
+          {booksError && onRetryBooks ? (
+            <button
+              type="button"
+              className={styles.buttonSecondary}
+              onClick={onRetryBooks}
+            >
+              {t('community.messages.composer.retry', {
+                defaultValue: 'Reintentar',
+              })}
+            </button>
+          ) : null}
         </div>
 
         <div className={styles.field}>
@@ -162,7 +187,7 @@ export const SwapProposalModal = ({
           <button
             type="submit"
             className={styles.buttonPrimary}
-            disabled={!canSubmit}
+            disabled={booksLoading || booksError || !canSubmit}
           >
             {t('community.messages.composer.swapModal.submit', {
               defaultValue: 'Enviar propuesta',

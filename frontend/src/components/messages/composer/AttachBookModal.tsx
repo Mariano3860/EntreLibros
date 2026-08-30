@@ -11,6 +11,9 @@ type AttachBookModalProps = {
   myBooks: Book[]
   theirBooks: Book[]
   counterpartName: string
+  booksLoading?: boolean
+  booksError?: boolean
+  onRetryBooks?: () => void
   onClose: () => void
   onConfirm: (bookId: string, note?: string) => void
 }
@@ -20,6 +23,9 @@ export const AttachBookModal = ({
   myBooks,
   theirBooks,
   counterpartName,
+  booksLoading = false,
+  booksError = false,
+  onRetryBooks,
   onClose,
   onConfirm,
 }: AttachBookModalProps) => {
@@ -77,7 +83,15 @@ export const AttachBookModal = ({
             onChange={(event) => setSelectedBookId(event.target.value)}
             required
           >
-            {hasBooks ? null : (
+            {booksLoading ? (
+              <option value="">
+                {t('community.messages.composer.bookModal.loading')}
+              </option>
+            ) : booksError ? (
+              <option value="">
+                {t('community.messages.composer.bookModal.error')}
+              </option>
+            ) : hasBooks ? null : (
               <option value="">
                 {t('community.messages.composer.bookModal.empty', {
                   defaultValue: 'No hay libros disponibles',
@@ -118,6 +132,17 @@ export const AttachBookModal = ({
                 'Podés añadir una nota opcional para darle contexto.',
             })}
           </p>
+          {booksError && onRetryBooks ? (
+            <button
+              type="button"
+              className={styles.buttonSecondary}
+              onClick={onRetryBooks}
+            >
+              {t('community.messages.composer.retry', {
+                defaultValue: 'Reintentar',
+              })}
+            </button>
+          ) : null}
         </div>
 
         <div className={styles.field}>
@@ -148,7 +173,7 @@ export const AttachBookModal = ({
           <button
             type="submit"
             className={styles.buttonPrimary}
-            disabled={!selectedBookId}
+            disabled={booksLoading || booksError || !selectedBookId}
           >
             {t('community.messages.composer.bookModal.submit', {
               defaultValue: 'Adjuntar',

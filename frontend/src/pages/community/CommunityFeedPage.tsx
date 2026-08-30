@@ -1,3 +1,4 @@
+import { CommunityStoryModal } from '@components/community/CommunityStoryModal'
 import { CornersStrip } from '@components/community/corners/CornersStrip'
 import { ActivityBar } from '@components/feed/ActivityBar'
 import { FeedFilters } from '@components/feed/FeedFilters'
@@ -6,10 +7,12 @@ import { filterItems } from '@components/feed/filterItems'
 import { RightPanel } from '@components/feed/RightPanel'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { LogoEntreLibros } from '@components/logo/LogoEntreLibros'
+import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useCommunityFeed } from '@src/hooks/api/useCommunityFeed'
+import { useUserBooks } from '@src/hooks/api/useUserBooks'
 
 import styles from './CommunityFeedPage.module.scss'
 
@@ -17,7 +20,10 @@ export const CommunityFeedPage = () => {
   const { t } = useTranslation()
   const [filter, setFilter] = useState('all')
   const [search, setSearch] = useState('')
+  const queryClient = useQueryClient()
+  const [isStoryOpen, setStoryOpen] = useState(false)
   const { data, fetchNextPage, hasNextPage } = useCommunityFeed()
+  const { data: userBooksData } = useUserBooks()
   const items = data?.pages.flat() ?? []
 
   const filtered = filterItems(items, filter).filter((item) => {
@@ -90,6 +96,7 @@ export const CommunityFeedPage = () => {
             <button
               className={styles.publishButton}
               aria-label={t('community.feed.cta.publish')}
+              onClick={() => setStoryOpen(true)}
             >
               {t('community.feed.cta.publish')}
             </button>
@@ -106,6 +113,15 @@ export const CommunityFeedPage = () => {
         </main>
         <RightPanel />
       </div>
+      <CommunityStoryModal
+        isOpen={isStoryOpen}
+        books={Array.isArray(userBooksData) ? userBooksData : []}
+        onClose={() => setStoryOpen(false)}
+        onPublished={() => {
+          setStoryOpen(false)
+          void queryClient.invalidateQueries({ queryKey: ['communityFeed'] })
+        }}
+      />
     </BaseLayout>
   )
 }

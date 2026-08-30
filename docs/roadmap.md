@@ -13,6 +13,9 @@ Estas ideas se conservan como dirección futura, no como tareas pendientes del M
 
 ## Próximo
 
+- Validar en navegador el bloque P0 de brechas observadas, implementado en `close-p0-product-experience-gaps` sobre la rama `p0-product-experience`.
+- Mantener separadas las superficies “Mis libros” y “Mi actividad”; `/books` es la ruta canónica y su primera pestaña es “Todos”.
+- Mantener “Todos” como superset de los libros propios de la sesión y usar historias persistidas como formato social de Comunidad.
 - Añadir una prueba automatizada de navegador para login, `/messages`, bot persistido y recarga.
 - Consolidar una única experiencia de mensajería y retirar gradualmente el canal global legacy.
 - Añadir observabilidad de errores de API, reconexiones y latencia de persistencia.

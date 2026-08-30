@@ -9,10 +9,12 @@ import {
 import { fetchBookAvailability } from '@api/community/messages'
 import {
   fetchConversations,
+  fetchConversationBooks,
   fetchMessageHistory,
   sendPersistedMessage,
   type ApiConversation,
   type ApiMessage,
+  type ConversationBook,
 } from '@api/messages/messages'
 import { mockConversations } from '@components/messages/Messages.mock'
 import { useNotifications } from '@hooks/api/useNotifications'
@@ -36,6 +38,7 @@ import { MessageComposer } from './MessageComposer'
 import styles from './Messages.module.scss'
 import {
   AgreementDetails,
+  Book,
   Conversation,
   Message,
   MessageRole,
@@ -100,16 +103,36 @@ function toTextMessage(
   message: ApiMessage,
   currentUserId?: number
 ): TextMessage {
+  const attachment = message.attachmentMetadata
+  const book =
+    attachment?.kind === 'book'
+      ? {
+          id: attachment.bookId,
+          title: attachment.title ?? '',
+          author: attachment.author ?? '',
+          cover: attachment.coverUrl ?? '',
+        }
+      : undefined
   return {
     id: message.id,
     role: message.senderId === currentUserId ? 'me' : 'them',
     tone: message.senderId === currentUserId ? 'primary' : 'neutral',
     type: 'text',
     text: message.body,
+    book,
     time: new Date(message.createdAt).toLocaleTimeString([], {
       hour: '2-digit',
       minute: '2-digit',
     }),
+  }
+}
+
+function toConversationBook(book: ConversationBook): Book {
+  return {
+    id: book.id,
+    title: book.title,
+    author: book.author,
+    cover: book.coverUrl,
   }
 }
 
@@ -146,6 +169,11 @@ export const Messages = () => {
     error,
   } = useChatSocket()
   const [serverMessages, setServerMessages] = useState<ApiMessage[]>([])
+  const [attachmentError, setAttachmentError] = useState(false)
+  const messagesRef = useRef<HTMLDivElement>(null)
+  const [conversationBooksStatus, setConversationBooksStatus] = useState<
+    'idle' | 'loading' | 'ready' | 'error'
+  >('idle')
   const [serverAgreement, setServerAgreement] =
     useState<AgreementSnapshot | null>(null)
   const [serverAgreementHistory, setServerAgreementHistory] = useState<
@@ -180,9 +208,9 @@ export const Messages = () => {
       })
       .catch(() => {
         if (!active) return
-        setConversations([mockConversations[0]])
-        setSelectedId(mockConversations[0]?.id ?? null)
-        setConversationError(false)
+        setConversations([])
+        setSelectedId(null)
+        setConversationError(true)
       })
       .finally(() => {
         if (active) setIsLoadingConversations(false)
@@ -218,6 +246,65 @@ export const Messages = () => {
     selectedId,
     useDemoConversations,
   ])
+
+  useEffect(() => {
+    if (useDemoConversations || selectedId === null) return
+    let active = true
+    setConversationBooksStatus('loading')
+    void fetchConversationBooks(selectedId)
+      .then((books) => {
+        if (!active) return
+        setConversationBooksStatus('ready')
+        setConversations((items) =>
+          items.map((conversation) =>
+            conversation.id === selectedId
+              ? {
+                  ...conversation,
+                  myBooks: books.myBooks.map(toConversationBook),
+                  theirBooks: books.theirBooks.map(toConversationBook),
+                }
+              : conversation
+          )
+        )
+      })
+      .catch(() => {
+        if (!active) return
+        setConversationBooksStatus('error')
+        setConversations((items) =>
+          items.map((conversation) =>
+            conversation.id === selectedId
+              ? { ...conversation, myBooks: [], theirBooks: [] }
+              : conversation
+          )
+        )
+      })
+    return () => {
+      active = false
+    }
+  }, [selectedId, useDemoConversations])
+
+  const retryConversationBooks = useCallback(() => {
+    setConversationBooksStatus('idle')
+    if (selectedId === null || useDemoConversations) return
+
+    setConversationBooksStatus('loading')
+    void fetchConversationBooks(selectedId)
+      .then((books) => {
+        setConversationBooksStatus('ready')
+        setConversations((items) =>
+          items.map((conversation) =>
+            conversation.id === selectedId
+              ? {
+                  ...conversation,
+                  myBooks: books.myBooks.map(toConversationBook),
+                  theirBooks: books.theirBooks.map(toConversationBook),
+                }
+              : conversation
+          )
+        )
+      })
+      .catch(() => setConversationBooksStatus('error'))
+  }, [selectedId, useDemoConversations])
 
   useEffect(() => {
     if (useDemoConversations || selectedId === null) return
@@ -441,9 +528,13 @@ export const Messages = () => {
     messages,
     selected,
     serverMessages,
-    isBotConversation,
     useDemoConversations,
   ])
+
+  useEffect(() => {
+    const container = messagesRef.current
+    if (container) container.scrollTop = container.scrollHeight
+  }, [mappedMessages.length, selectedId])
 
   const appendMessageToConversation = useCallback(
     (conversationId: number, message: Message) => {
@@ -514,15 +605,37 @@ export const Messages = () => {
 
     if (!book) return
 
-    const baseMessage = createBaseMessage(selected)
-    const newMessage: Message = {
-      ...baseMessage,
-      type: 'bookCard',
-      book,
-      text: note?.trim() ? note.trim() : undefined,
+    setAttachmentError(false)
+    if (useDemoConversations || isBotConversation) {
+      const baseMessage = createBaseMessage(selected)
+      appendMessageToConversation(selectedId, {
+        ...baseMessage,
+        type: 'bookCard',
+        book,
+        text: note?.trim() ? note.trim() : undefined,
+      })
+      return
     }
 
-    appendMessageToConversation(selectedId, newMessage)
+    const clientKey = `${selectedId}-${Date.now()}-${Math.random()}`
+    void sendPersistedMessage({
+      conversationId: selectedId,
+      clientKey,
+      body: note?.trim() || `Compartí ${book.title}`,
+      attachmentMetadata: {
+        key: `book:${book.id}`,
+        contentType: 'application/x-entrelibros-book',
+        size: 1,
+        name: book.title,
+        kind: 'book',
+        bookId: book.id ?? '',
+        title: book.title,
+        author: book.author,
+        coverUrl: book.cover,
+      },
+    })
+      .then((message) => setServerMessages((prev) => [...prev, message]))
+      .catch(() => setAttachmentError(true))
   }
 
   const handleSwapProposal = (details: SwapProposalDetails) => {
@@ -1174,7 +1287,7 @@ export const Messages = () => {
                 </button>
               </div>
             </header>
-            <div className={styles.messages}>
+            <div ref={messagesRef} className={styles.messages}>
               {serverAgreement ? (
                 <div role="status" aria-live="polite">
                   {t('community.messages.agreement.serverState', {
@@ -1406,7 +1519,18 @@ export const Messages = () => {
               theirBooks={selected.theirBooks}
               counterpartName={selected.user.name}
               conversationId={selected.id}
+              booksLoading={conversationBooksStatus === 'loading'}
+              booksError={conversationBooksStatus === 'error'}
+              onRetryBooks={retryConversationBooks}
             />
+            {attachmentError ? (
+              <p role="alert" className={styles.composerError}>
+                {t('community.messages.composer.bookModal.sendError', {
+                  defaultValue:
+                    'No se pudo adjuntar el libro. Intentá de nuevo.',
+                })}
+              </p>
+            ) : null}
             <AgreementProposalModal
               open={changeModalState.open}
               myBooks={changeConversation?.myBooks ?? selected.myBooks}
@@ -1434,6 +1558,9 @@ export const Messages = () => {
                 'community.messages.agreement.change.modalSubmit',
                 { defaultValue: 'Enviar cambios' }
               )}
+              booksLoading={conversationBooksStatus === 'loading'}
+              booksError={conversationBooksStatus === 'error'}
+              onRetryBooks={retryConversationBooks}
             />
             {confirmationRequest ? (
               <ConfirmAgreementModal

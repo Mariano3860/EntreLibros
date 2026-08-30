@@ -1,0 +1,49 @@
+@import '@styles/variables';
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1x5;
+}
+
+.form textarea,
+.form select,
+.form input {
+  color: var(--text-primary);
+  background: var(--background-primary);
+  border: 1px solid var(--border-color);
+  border-radius: rem(8px);
+  padding: $spacing-1x5;
+}
+
+.preview {
+  max-height: rem(220px);
+  max-width: 100%;
+  object-fit: contain;
+  border-radius: rem(8px);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-1x5;
+}
+
+.primary,
+.secondary {
+  border-radius: rem(8px);
+  padding: $spacing-1 $spacing-2;
+  cursor: pointer;
+}
+
+.primary {
+  color: #fff;
+  background: var(--primary-color);
+  border: 0;
+}
+
+.secondary {
+  color: var(--text-primary);
+  background: var(--background-card);
+  border: 1px solid var(--border-color);
+}
