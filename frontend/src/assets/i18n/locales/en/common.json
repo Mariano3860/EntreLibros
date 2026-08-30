@@ -841,6 +841,7 @@
   },
   "profile": {
     "title": "My profile",
+    "open": "My profile",
     "language": "Language",
     "inAppNotifications": "Receive in-app notifications",
     "description": "Control what you share and how your location is shown.",

@@ -833,6 +833,7 @@
   },
   "profile": {
     "title": "Mi perfil",
+    "open": "Mi perfil",
     "language": "Idioma",
     "inAppNotifications": "Recibir notificaciones dentro de la aplicación",
     "description": "Controlá qué información compartís y cómo se muestra tu ubicación.",
