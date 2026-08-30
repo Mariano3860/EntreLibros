@@ -1,139 +1,176 @@
 @import '@styles/variables';
 
-.homeWrapper {
+.hero {
+  position: relative;
+  min-height: 238px;
   display: flex;
-  flex-direction: column;
-  gap: $spacing-2;
-  padding: $spacing-1;
+  align-items: center;
+  padding: 36px 42px;
+  overflow: hidden;
+  border: 1px solid var(--prototype-border);
+  border-radius: var(--prototype-radius-lg);
+  background:
+    linear-gradient(
+      90deg,
+      rgb(5 20 29 / 95%) 0%,
+      rgb(5 20 29 / 79%) 45%,
+      rgb(5 20 29 / 14%) 75%
+    ),
+    url('../../../public/prototype/reading-room.svg') center / cover;
+  box-shadow: var(--prototype-shadow);
 }
 
-.hero {
-  text-align: center;
+.heroContent {
+  position: relative;
+  max-width: 510px;
 
   h1 {
-    font-size: $h1-font-size;
-    font-weight: $font-weight-bold;
-    margin-bottom: $spacing-2;
+    margin: 4px 0 10px;
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    line-height: 1.04;
+    letter-spacing: -0.045em;
+  }
 
-    @media (max-width: $breakpoint-mobile) {
-      font-size: $h3-font-size;
-    }
+  em {
+    color: var(--prototype-teal);
+    font-style: normal;
   }
 
   p {
-    color: var(--text-secondary);
-    margin-bottom: $spacing-3;
-    font-size: $h6-font-size;
-
-    @media (max-width: $breakpoint-mobile) {
-      font-size: $body-font-size;
-    }
+    margin: 0 0 20px;
+    color: #c2d0d5;
+    font-size: 14px;
   }
 }
 
-.ctaButton {
-  font-size: $h5-font-size;
-  background-color: var(--primary-color);
-  color: white;
-  padding: $spacing-1x5 $spacing-2x5;
-  border-radius: rem(8px);
-  font-weight: $font-weight-medium;
-  transition: background-color $transition-duration-fast;
-  margin-bottom: $spacing-1;
-
-  &:hover {
-    background-color: var(--primary-dark);
-  }
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin: 20px 0 25px;
 }
 
-.stats {
+.booksSection {
+  margin-bottom: 24px;
+}
+
+.bookRail {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.activityPanel {
+  padding: 17px 19px;
+}
+
+.live {
+  color: var(--prototype-teal);
+  font-size: 10px;
+}
+
+.activityList {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.activityList article {
   display: flex;
-  justify-content: center;
-  gap: $spacing-3;
-
-  .statCard {
-    background: var(--background-card);
-    padding: $spacing-1x5 $spacing-3;
-    border-radius: 8px;
-    box-shadow: $box-shadow-sm;
-    font-weight: $font-weight-medium;
-    font-size: $h6-font-size;
-    border: solid 1px var(--border-color-secondary);
-  }
-
-  @media (max-width: $breakpoint-mobile) {
-    flex-direction: column;
-    align-items: center;
-    gap: $spacing-2;
-  }
-}
-
-.section {
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-2;
-}
-
-.sectionHeader {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
-
-  h2 {
-    font-size: $h3-font-size;
-    font-weight: $font-weight-medium;
-  }
+  gap: 10px;
+  min-width: 0;
+  padding: 11px;
+  border: 1px solid rgb(255 255 255 / 5%);
+  border-radius: 11px;
+  background: rgb(3 17 25 / 24%);
 }
 
-.linkButton {
-  background: none;
-  border: none;
-  color: var(--primary-color);
-  font-weight: $font-weight-medium;
-  cursor: pointer;
-  font-size: $h5-font-size;
-
-  &:hover {
-    text-decoration: underline;
-  }
-}
-
-.bookList {
-  display: flex;
-  gap: $spacing-3;
+.activityList strong,
+.activityList small {
+  display: block;
   overflow: hidden;
-  padding: $spacing-1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
-  @media (max-width: $breakpoint-mobile) {
-    flex-direction: column;
-    gap: $spacing-2;
+.activityList strong {
+  font-size: 11px;
+}
+
+.activityList small {
+  margin-top: 3px;
+  color: var(--prototype-muted);
+  font-size: 9px;
+}
+
+.activityList button {
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  color: var(--prototype-muted);
+  cursor: pointer;
+}
+
+.activityIcon {
+  display: grid;
+  width: 31px;
+  height: 31px;
+  flex: 0 0 31px;
+  place-items: center;
+  border-radius: 9px;
+}
+
+.teal {
+  background: rgb(66 215 199 / 14%);
+  color: var(--prototype-teal);
+}
+
+.orange {
+  background: rgb(255 139 76 / 14%);
+  color: var(--prototype-orange);
+}
+
+.purple {
+  background: rgb(169 139 255 / 14%);
+  color: var(--prototype-purple);
+}
+
+@media (width <= 1100px) {
+  .bookRail {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .activityList {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: $breakpoint-tablet) {
+  .hero {
+    min-height: 290px;
+    padding: 30px 24px;
+    background-position: 60% center;
+  }
+
+  .kpiGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bookRail {
+    display: flex;
     overflow-x: auto;
+    scroll-snap-type: x mandatory;
+  }
+
+  .bookRail > * {
+    min-width: 190px;
+    scroll-snap-align: start;
   }
 }
 
-.activityFeed {
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-1;
-}
-
-.communitySection {
-  text-align: center;
-  background: var(--background-card);
-  padding: $spacing-4;
-  border-radius: 12px;
-  margin-top: $spacing-1;
-
-  h2 {
-    margin-bottom: $spacing-2;
-  }
-
-  p {
-    color: var(--text-secondary);
-    margin-bottom: $spacing-3;
-  }
-
-  @media (max-width: $breakpoint-mobile) {
-    padding: $spacing-3;
+@media (max-width: $breakpoint-mobile) {
+  .kpiGrid {
+    grid-template-columns: 1fr;
   }
 }

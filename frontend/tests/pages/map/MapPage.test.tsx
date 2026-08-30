@@ -1,261 +1,65 @@
-import { fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
-import type {
-  MapCornerPin,
-  MapPin,
-  MapPublicationPin,
-} from '@src/api/map/map.types'
+vi.mock('@src/api/auth/me.service', () => ({
+  fetchMe: vi.fn().mockRejectedValue(new Error('unauthenticated')),
+}))
+
 import { MapPage } from '@src/pages/map/MapPage'
-import * as analytics from '@src/utils/analytics'
 
 import { renderWithProviders } from '../../test-utils'
 
-vi.mock('@src/components/map/MapCanvas/MapCanvas', () => {
-  return {
-    MapCanvas: ({
-      corners,
-      publications,
-      layers,
-      onSelectPin,
-      isEmpty,
-    }: {
-      corners: MapCornerPin[]
-      publications: MapPublicationPin[]
-      layers: { corners: boolean; publications: boolean }
-      onSelectPin: (pin: MapPin) => void
-      isEmpty: boolean
-    }) => {
-      const visibleCorners = layers.corners ? corners : []
-      const visiblePublications = layers.publications ? publications : []
-
-      return (
-        <div data-testid="mock-map" role="presentation">
-          {visibleCorners.map((corner) => (
-            <button
-              key={`corner-${corner.id}`}
-              type="button"
-              aria-label={corner.name}
-              onClick={() => onSelectPin({ type: 'corner', data: corner })}
-            >
-              Corner
-            </button>
-          ))}
-          {visiblePublications.map((publication) => (
-            <button
-              key={`publication-${publication.id}`}
-              type="button"
-              aria-label={publication.title}
-              onClick={() =>
-                onSelectPin({ type: 'publication', data: publication })
-              }
-            >
-              Publication
-            </button>
-          ))}
-          {isEmpty ? <div>map.empty.description</div> : null}
-        </div>
-      )
-    },
-  }
-})
-
-const getPinButtons = () => {
-  const map = screen.getByTestId('mock-map')
-  return within(map).queryAllByRole('button') as HTMLButtonElement[]
-}
-
 describe('MapPage', () => {
-  test('renders search header, filters and map canvas', async () => {
-    renderWithProviders(<MapPage />)
-
-    expect(
-      await screen.findByPlaceholderText('map.search.placeholder')
-    ).toBeInTheDocument()
-    expect(screen.getByLabelText('map.filters.ariaLabel')).toBeInTheDocument()
-    expect(screen.getByTestId('mock-map')).toBeInTheDocument()
-
-    await waitFor(() => {
-      expect(getPinButtons().length).toBeGreaterThan(0)
-    })
-  })
-
-  test('toggling layers updates the number of visible pins', async () => {
-    renderWithProviders(<MapPage />)
-
-    await waitFor(() => {
-      expect(getPinButtons().length).toBeGreaterThan(0)
-    })
-
-    const cornersChip = screen.getByRole('button', {
-      name: 'map.filters.types.corners',
-    })
-    const publicationsChip = screen.getByRole('button', {
-      name: 'map.filters.types.publications',
-    })
-
-    fireEvent.click(cornersChip)
-    fireEvent.click(publicationsChip)
-
-    await waitFor(() => {
-      expect(getPinButtons().length).toBe(0)
-    })
-
-    fireEvent.click(cornersChip)
-
-    await waitFor(() => {
-      expect(getPinButtons().length).toBeGreaterThan(0)
-    })
-  })
-
-  test('handles geolocation denial, pin selection and fallback search', async () => {
-    const trackSpy = vi.spyOn(analytics, 'track').mockImplementation(() => {})
-    const geolocationDescriptor = Object.getOwnPropertyDescriptor(
-      navigator,
-      'geolocation'
+  test('requests location automatically and renders the expanded map', async () => {
+    const original = Object.getOwnPropertyDescriptor(navigator, 'geolocation')
+    const getCurrentPosition = vi.fn((success) =>
+      success({ coords: { latitude: -34.58, longitude: -58.42 } })
     )
-    const geolocationMock = {
-      getCurrentPosition: vi.fn((_success, error) => {
-        error?.(new Error('Permission denied'))
-      }),
-    }
-
     Object.defineProperty(navigator, 'geolocation', {
-      value: geolocationMock,
       configurable: true,
+      value: { getCurrentPosition },
     })
 
-    try {
-      renderWithProviders(<MapPage />)
-
-      await waitFor(() => {
-        expect(getPinButtons().length).toBeGreaterThan(0)
-      })
-
-      const [targetPin] = getPinButtons()
-      fireEvent.click(targetPin)
-
-      fireEvent.click(screen.getByLabelText('map.filters.locateMe'))
-
-      await waitFor(() => {
-        expect(geolocationMock.getCurrentPosition).toHaveBeenCalled()
-      })
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('map.status.locationDenied')
-        ).toBeInTheDocument()
-      })
-
-      const fallbackInput = screen.getByPlaceholderText(
-        'map.search.zoneFallback'
-      )
-      fireEvent.change(fallbackInput, { target: { value: 'Palermo' } })
-
-      expect(
-        await screen.findByPlaceholderText('map.search.placeholder')
-      ).toHaveValue('Palermo')
-
-      fireEvent.click(
-        screen.getByRole('button', { name: /map\.cta\.createCorner/ })
-      )
-
-      expect(trackSpy).toHaveBeenCalledWith(
-        'pin.opened',
-        expect.objectContaining({ type: expect.any(String) })
-      )
-      expect(trackSpy).toHaveBeenCalledWith('cta.create_corner_clicked')
-    } finally {
-      if (geolocationDescriptor) {
-        Object.defineProperty(navigator, 'geolocation', geolocationDescriptor)
-      } else {
-        Reflect.deleteProperty(navigator, 'geolocation')
-      }
-      trackSpy.mockRestore()
-    }
-  })
-
-  test('supports advanced filters and layout toggles', async () => {
-    const trackSpy = vi.spyOn(analytics, 'track').mockImplementation(() => {})
-
-    try {
-      renderWithProviders(<MapPage />)
-
-      await waitFor(() => {
-        expect(getPinButtons().length).toBeGreaterThan(0)
-      })
-
-      const railToggle = screen.getByRole('button', {
-        name: 'map.filters.hide',
-      })
-      expect(railToggle).toHaveAttribute('aria-pressed', 'true')
-
-      fireEvent.click(railToggle)
-      expect(railToggle).toHaveTextContent('map.filters.show')
-      expect(railToggle).toHaveAttribute('aria-pressed', 'false')
-
-      fireEvent.click(railToggle)
-      expect(railToggle).toHaveTextContent('map.filters.hide')
-      expect(railToggle).toHaveAttribute('aria-pressed', 'true')
-
-      fireEvent.change(screen.getByRole('slider'), { target: { value: '8' } })
-      await waitFor(() => {
-        expect(trackSpy).toHaveBeenCalledWith(
-          'map.filter_changed',
-          expect.objectContaining({ filter: 'distance', value: 8 })
-        )
-      })
-
-      fireEvent.click(
-        screen.getByRole('button', { name: 'map.filters.openNow' })
-      )
-      expect(trackSpy).toHaveBeenCalledWith(
-        'map.filter_changed',
-        expect.objectContaining({ filter: 'openNow' })
-      )
-
-      fireEvent.click(
-        screen.getByRole('button', { name: 'map.filters.recentActivity' })
-      )
-      expect(trackSpy).toHaveBeenCalledWith(
-        'map.filter_changed',
-        expect.objectContaining({ filter: 'recentActivity' })
-      )
-
-      fireEvent.click(
-        screen.getByRole('button', { name: 'map.filters.activity' })
-      )
-      expect(trackSpy).toHaveBeenCalledWith(
-        'map.filter_changed',
-        expect.objectContaining({ filter: 'layer', layer: 'activity' })
-      )
-    } finally {
-      trackSpy.mockRestore()
-    }
-  })
-
-  test('only shows the empty state when all visible datasets are empty', async () => {
     renderWithProviders(<MapPage />)
 
-    await waitFor(() => {
-      expect(getPinButtons().length).toBeGreaterThan(0)
+    await waitFor(() => expect(getCurrentPosition).toHaveBeenCalled())
+    expect(screen.getByRole('img', { name: /Mapa oscuro/ })).toBeVisible()
+    expect(
+      screen.getByRole('button', { name: 'Tu ubicación aproximada' })
+    ).toBeVisible()
+
+    if (original) Object.defineProperty(navigator, 'geolocation', original)
+    else Reflect.deleteProperty(navigator, 'geolocation')
+  })
+
+  test('changes distance, categories and selected corner', () => {
+    renderWithProviders(<MapPage />)
+
+    fireEvent.change(screen.getByRole('slider', { name: 'Distancia' }), {
+      target: { value: '7' },
     })
+    expect(screen.getByText('7 km')).toBeVisible()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Bibliotecas' }))
+    expect(screen.getByRole('button', { name: 'Bibliotecas' })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    )
 
     fireEvent.click(
-      screen.getByRole('button', { name: 'map.filters.types.corners' })
+      screen.getByRole('button', { name: 'Biblioteca de Palermo' })
     )
-    fireEvent.click(
-      screen.getByRole('button', { name: 'map.filters.types.publications' })
-    )
-    fireEvent.click(
-      screen.getByRole('button', { name: 'map.filters.activity' })
-    )
-    fireEvent.click(
-      screen.getByRole('button', { name: 'map.filters.recentActivity' })
-    )
+    expect(
+      screen.getByRole('heading', { name: 'Biblioteca de Palermo' })
+    ).toBeVisible()
+  })
 
-    await waitFor(() => {
-      expect(screen.getByText('map.empty.description')).toBeInTheDocument()
+  test('keeps Buenos Aires fallback when location is denied', async () => {
+    Object.defineProperty(navigator, 'geolocation', {
+      configurable: true,
+      value: { getCurrentPosition: vi.fn((_success, error) => error()) },
     })
+    renderWithProviders(<MapPage />)
+    expect(await screen.findByText(/Mostramos Buenos Aires/)).toBeVisible()
   })
 })

@@ -12,6 +12,6 @@ describe('useActivity', () => {
     )
     const { result } = renderHook(() => useActivity(), { wrapper })
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
-    expect(result.current.data).toHaveLength(10)
+    expect(result.current.data).toHaveLength(4)
   })
 })

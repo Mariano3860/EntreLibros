@@ -16,11 +16,11 @@ describe('useTheme', () => {
     const { result } = renderHook(() => useTheme(), {
       wrapper: ThemeProvider,
     })
-    expect(result.current.theme).toBe('light')
-    act(() => result.current.toggleTheme())
     expect(result.current.theme).toBe('dark')
     act(() => result.current.toggleTheme())
     expect(result.current.theme).toBe('light')
+    act(() => result.current.toggleTheme())
+    expect(result.current.theme).toBe('dark')
   })
 
   test('throws error when used outside ThemeProvider', () => {
@@ -33,7 +33,7 @@ describe('useTheme', () => {
     const { result } = renderHook(() => useThemeFromContext(), {
       wrapper: ThemeProvider,
     })
-    expect(result.current.theme).toBe('light')
+    expect(result.current.theme).toBe('dark')
   })
 
   test('useTheme from context throws without provider', () => {
@@ -47,7 +47,7 @@ describe('useTheme', () => {
       wrapper: ThemeProvider,
     })
     act(() => result.current.toggleTheme())
-    expect(window.localStorage.getItem('theme')).toBe('dark')
+    expect(window.localStorage.getItem('theme')).toBe('light')
   })
 
   test('initializes theme from localStorage', () => {

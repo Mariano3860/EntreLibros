@@ -13,6 +13,8 @@ Estas ideas se conservan como dirección futura, no como tareas pendientes del M
 
 ## Próximo
 
+- Crear una OpenSpec backend derivada de [`prototype-mock-contract.md`](prototype-mock-contract.md) para sustituir gradualmente el catálogo visual por agregados reales, conservando IDs, estados y jerarquía de pantalla.
+- Completar la aceptación por capturas 1440×900 de `recreate-ideal-prototype-ui` cuando haya un navegador conectado, antes de archivar el cambio.
 - Validar en navegador el bloque P0 de brechas observadas, implementado en `close-p0-product-experience-gaps` sobre la rama `p0-product-experience`.
 - Mantener separadas las superficies “Mis libros” y “Mi actividad”; `/books` es la ruta canónica y su primera pestaña es “Todos”.
 - Mantener “Todos” como superset de los libros propios de la sesión y usar historias persistidas como formato social de Comunidad.

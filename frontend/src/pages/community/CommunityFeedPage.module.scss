@@ -1,40 +1,375 @@
 @import '@styles/variables';
 
-.wrapper {
-  width: 100%;
-  max-width: 100vw;
-  padding-top: 0;
-  padding-left: 0;
-  box-sizing: border-box;
-  overflow-x: hidden;
-  display: flex;
-  justify-content: center;
-  gap: $spacing-5;
-}
-
-.main {
-  width: 100%;
-  max-width: 65vw;
-}
-
 .header {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
-  gap: $spacing-1;
-  margin-bottom: $spacing-2;
+  gap: 20px;
+  margin-bottom: 20px;
 }
 
-.publishButton {
-  background-color: var(--primary-color);
-  color: #fff;
-  border: none;
-  border-radius: rem(8px);
-  padding: $spacing-1 $spacing-2;
+.header h1 {
+  margin: 3px 0;
+  font-size: 31px;
+}
+
+.header p {
+  margin: 0;
+  color: var(--prototype-muted);
+  font-size: 13px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.78fr) minmax(260px, 0.9fr);
+  gap: 21px;
+}
+
+.main,
+.aside,
+.feed {
+  display: grid;
+  align-content: start;
+  gap: 15px;
+}
+
+.stories {
+  display: flex;
+  gap: 19px;
+  padding: 15px 18px;
+  overflow-x: auto;
+}
+
+.stories button {
+  display: grid;
+  flex: 0 0 67px;
+  justify-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--prototype-muted);
   cursor: pointer;
-  margin-top: $spacing-1;
+  font-size: 9px;
 }
 
-.loader {
-  height: 1px;
+.stories button:first-child {
+  color: var(--prototype-teal);
+}
+
+.storyNotice {
+  padding: 8px 12px;
+  border-radius: 9px;
+  background: rgb(66 215 199 / 10%);
+  color: var(--prototype-teal);
+  font-size: 11px;
+}
+
+.storyNotice button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-decoration: underline;
+}
+
+.composer {
+  padding: 14px 16px 11px;
+}
+
+.composerTop {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.composerTop > button {
+  flex: 1;
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid var(--prototype-border);
+  border-radius: 999px;
+  background: var(--prototype-surface-soft);
+  color: var(--prototype-muted);
+  text-align: left;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.composerActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 11px;
+  padding-top: 10px;
+  border-top: 1px solid var(--prototype-border);
+}
+
+.composerActions > button:not(:last-child) {
+  min-height: 30px;
+  padding: 0 8px;
+  border: 0;
+  background: transparent;
+  color: var(--prototype-muted);
+  cursor: pointer;
+  font-size: 9px;
+}
+
+.composerActions > button:last-child {
+  margin-left: auto;
+}
+
+.post {
+  padding: 15px;
+}
+
+.postHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.postHeader strong,
+.postHeader small {
+  display: block;
+}
+
+.postHeader strong {
+  font-size: 12px;
+}
+
+.postHeader small {
+  margin-top: 2px;
+  color: var(--prototype-muted);
+  font-size: 9px;
+}
+
+.postHeader button {
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  color: var(--prototype-muted);
+  cursor: pointer;
+}
+
+.post > p {
+  margin: 13px 0;
+  color: #d8e1e4;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.post img {
+  width: 100%;
+  max-height: 330px;
+  border-radius: 11px;
+  object-fit: cover;
+}
+
+.postStats,
+.postActions {
+  display: flex;
+  justify-content: space-between;
+  color: var(--prototype-muted);
+  font-size: 9px;
+}
+
+.postStats {
+  padding: 9px 2px;
+}
+
+.postActions {
+  border-top: 1px solid var(--prototype-border);
+}
+
+.postActions button {
+  flex: 1;
+  min-height: 34px;
+  border: 0;
+  background: transparent;
+  color: var(--prototype-muted);
+  cursor: pointer;
+  font-size: 10px;
+}
+
+.sidePanel {
+  padding: 15px;
+}
+
+.sidePanel h2 {
+  font-size: 14px;
+}
+
+.sidePanel > div:first-child button {
+  border: 0;
+  background: transparent;
+  color: var(--prototype-teal);
+  cursor: pointer;
+  font-size: 9px;
+}
+
+.cornerList {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.cornerList article,
+.suggestion {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.cornerList article > span {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 9px;
+  background: rgb(255 139 76 / 13%);
+  color: var(--prototype-orange);
+}
+
+.cornerList strong,
+.cornerList small,
+.suggestion strong,
+.suggestion small {
+  display: block;
+}
+
+.cornerList strong,
+.suggestion strong {
+  font-size: 10px;
+}
+
+.cornerList small,
+.suggestion small {
+  margin-top: 2px;
+  color: var(--prototype-muted);
+  font-size: 8px;
+}
+
+.suggestion {
+  padding: 9px 0;
+  border-bottom: 1px solid var(--prototype-border);
+}
+
+.suggestion:last-child {
+  border-bottom: 0;
+}
+
+.suggestion button {
+  margin-left: auto;
+  padding: 5px 8px;
+  border: 1px solid rgb(66 215 199 / 40%);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--prototype-teal);
+  cursor: pointer;
+  font-size: 9px;
+}
+
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgb(1 9 14 / 78%);
+  backdrop-filter: blur(8px);
+}
+
+.modal {
+  width: min(560px, 100%);
+  padding: 20px;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+}
+
+.modalHeader h2 {
+  margin: 0;
+  font-size: 19px;
+}
+
+.modalHeader button {
+  border: 0;
+  background: transparent;
+  color: white;
+  cursor: pointer;
+  font-size: 24px;
+}
+
+.modal form,
+.modal label {
+  display: grid;
+  gap: 12px;
+}
+
+.modal form {
+  margin-top: 17px;
+}
+
+.modal label {
+  color: var(--prototype-muted);
+  font-size: 11px;
+}
+
+.modal textarea {
+  min-height: 130px;
+  padding: 13px;
+  border: 1px solid var(--prototype-border);
+  border-radius: 11px;
+  outline: 0;
+  background: var(--prototype-surface-soft);
+  color: white;
+  resize: vertical;
+}
+
+.attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.attachments button {
+  padding: 7px 9px;
+  border: 1px solid var(--prototype-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--prototype-muted);
+  cursor: pointer;
+  font-size: 10px;
+}
+
+@media (width <= 1050px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .aside {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: $breakpoint-tablet) {
+  .header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .aside {
+    grid-template-columns: 1fr;
+  }
+
+  .composerActions {
+    overflow-x: auto;
+  }
+
+  .composerActions > button {
+    flex: 0 0 auto;
+  }
 }

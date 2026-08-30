@@ -12,6 +12,6 @@ describe('useBooks', () => {
     )
     const { result } = renderHook(() => useBooks(), { wrapper })
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
-    expect(result.current.data).toHaveLength(3)
+    expect(result.current.data).toHaveLength(5)
   })
 })

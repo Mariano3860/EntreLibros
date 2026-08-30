@@ -10,6 +10,7 @@ Fecha de referencia: 2026-08-30.
 - Bot persistente creado por migración, con conversación idempotente por usuario e historial recargable.
 - Modo MSW controlado por `PUBLIC_API_USE_MOCKS` en el bundle del frontend.
 - Pruebas Vitest frontend/backend y checks de tipo, lint, formato y build disponibles.
+- Reconstrucción visual de Inicio, Explorar, Comunidad, Mensajes, Mapa, Estadísticas, Perfil y Centro de ayuda basada en los prototipos de `Screens/Prototipo ideal`, con catálogo frontend determinista y fallbacks SVG locales.
 
 ## Límites conocidos
 
@@ -17,6 +18,7 @@ Fecha de referencia: 2026-08-30.
 - El modo público depende de variables de build; cambiar `.env` requiere reiniciar Rsbuild.
 - La verificación en navegador de cookies, proxy, caché y WebSocket debe hacerse aparte de Vitest.
 - El canal global legacy del bot existe por compatibilidad y no debe confundirse con su conversación persistida.
+- Las nuevas métricas, historias sociales, logros, FAQs y acciones del prototipo son estado MSW/en memoria; no prueban API ni persistencia. El contrato de transición está en [`prototype-mock-contract.md`](prototype-mock-contract.md).
 
 ## Hallazgos de validación manual
 

@@ -4,6 +4,8 @@
 
 > **Actualización técnica 2026-08-29:** la recuperación de mensajería incorporó el bot persistente mediante la migración `015_seed_messaging_bot.sql`, conversación idempotente por usuario, historial recargable y guía de diagnóstico. La mensajería mock sigue siendo útil para UI, pero no prueba persistencia real.
 
+> **Prototipo visual 2026-08-30:** `recreate-ideal-prototype-ui` reconstruye en el frontend las ocho pantallas de referencia con un catálogo MSW determinista. Es una validación visual/demo; la persistencia de historias sociales, estadísticas, perfil extendido y soporte queda para una OpenSpec backend posterior, según [`prototype-mock-contract.md`](prototype-mock-contract.md).
+
 > Las expansiones de confianza avanzada, reputación, moderación, métricas, integraciones de proveedores y retención de datos quedan fuera de `complete-entrelibros-recovery`. Se mantienen como trabajo futuro en [`roadmap.md`](roadmap.md) y requieren una OpenSpec propia; no son faltantes del MVP del TFG.
 
 ## Prioridad P0 — Brechas observadas en validación manual

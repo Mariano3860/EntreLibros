@@ -1,12 +1,11 @@
-import { faker } from '@faker-js/faker'
-
-import { SuggestionItem } from '@src/api/community/suggestions.types'
+import type { SuggestionItem } from '@src/api/community/suggestions.types'
+import { prototypeCatalog } from '@src/features/prototype/catalog'
 
 export const generateSuggestionItems = (seed = 456): SuggestionItem[] => {
-  faker.seed(seed)
-  return Array.from({ length: 5 }).map(() => ({
-    id: faker.string.uuid(),
-    user: faker.person.firstName(),
-    avatar: faker.image.avatar(),
+  void seed
+  return prototypeCatalog.stats.contributors.map((person) => ({
+    id: `suggestion-${person.name.toLowerCase()}`,
+    user: person.name,
+    avatar: '',
   }))
 }

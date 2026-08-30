@@ -6,6 +6,27 @@
 
 // Base Colors
 :root {
+  // Ideal prototype palette. Semantic variables below remain compatible with
+  // existing components while the prototype variables describe the new shell.
+  --prototype-canvas: #0b1d2a;
+  --prototype-sidebar: #081722;
+  --prototype-surface: #122a38;
+  --prototype-surface-raised: #173443;
+  --prototype-surface-soft: #102532;
+  --prototype-border: #294553;
+  --prototype-text: #f4f7f8;
+  --prototype-muted: #91a6b1;
+  --prototype-teal: #42d7c7;
+  --prototype-teal-strong: #16b9a9;
+  --prototype-orange: #ff8b4c;
+  --prototype-yellow: #f6c85f;
+  --prototype-blue: #5da9ff;
+  --prototype-purple: #a98bff;
+  --prototype-danger: #ff6f7d;
+  --prototype-radius-sm: 10px;
+  --prototype-radius-md: 15px;
+  --prototype-radius-lg: 22px;
+  --prototype-shadow: 0 18px 44px rgb(2 10 16 / 24%);
   // Primary Colors
   --color-primary-100: #e0f2f1;
   --color-primary-100-rgb: 224 242 241;
@@ -94,24 +115,24 @@
 
 // Dark Theme Overrides
 [data-theme='dark'] {
-  --background-primary: #212529;
-  --background-primary-rgb: 33 37 41;
-  --background-card: #343a40;
-  --background-card-rgb: 52 58 64;
+  --background-primary: var(--prototype-canvas);
+  --background-primary-rgb: 11 29 42;
+  --background-card: var(--prototype-surface);
+  --background-card-rgb: 18 42 56;
   --text-primary: #f8f9fa;
   --text-primary-rgb: 248 249 250;
-  --text-secondary: #adb5bd;
-  --text-secondary-rgb: 173 181 189;
-  --border-color: #6a7783;
-  --border-color-rgb: 106 119 131;
+  --text-secondary: var(--prototype-muted);
+  --text-secondary-rgb: 145 166 177;
+  --border-color: var(--prototype-border);
+  --border-color-rgb: 41 69 83;
   --border-color-secondary: #6c757d;
   --border-color-secondary-rgb: 108 117 125;
   --primary-light: #00fff0;
   --primary-light-rgb: 0 255 240;
-  --primary-color: #4db6ac;
-  --primary-color-rgb: 77 182 172;
-  --primary-dark: #009688;
-  --primary-dark-rgb: 0 150 136;
+  --primary-color: var(--prototype-teal);
+  --primary-color-rgb: 66 215 199;
+  --primary-dark: var(--prototype-teal-strong);
+  --primary-dark-rgb: 22 185 169;
   --primary-super-dark: #013631;
   --primary-super-dark-rgb: 1 54 49;
   --placeholder-color: #adb5bd;
@@ -122,6 +143,18 @@
   --toggle-hover-rgb: 85 85 85;
   --scroll-bar-color: #4db6ac;
   --scroll-bar-color-rgb: 77 182 172;
+}
+
+[data-theme='light'] {
+  --prototype-canvas: #edf3f3;
+  --prototype-sidebar: #f8fbfb;
+  --prototype-surface: #fff;
+  --prototype-surface-raised: #f4f8f8;
+  --prototype-surface-soft: #eaf1f1;
+  --prototype-border: #cbd9dc;
+  --prototype-text: #15303a;
+  --prototype-muted: #607781;
+  --prototype-shadow: 0 18px 44px rgb(27 62 70 / 12%);
 }
 
 // ======================
@@ -154,8 +187,8 @@ $container-max-width: 1400px;
 $container-padding: $spacing-3;
 
 //sidebar
-$collapsed-width: 56px;
-$expanded-width: 200px;
+$collapsed-width: 216px;
+$expanded-width: 216px;
 $transition-speed: 0.3s;
 $icon-size: 1.5rem;
 
