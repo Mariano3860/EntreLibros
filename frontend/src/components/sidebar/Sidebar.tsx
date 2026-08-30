@@ -1,5 +1,6 @@
 import { SidebarLanguageSwitcher } from '@components/sidebar/buttons/SidebarLanguageSwitcher'
 import { SidebarLoginButton } from '@components/sidebar/buttons/SidebarLoginButton'
+import { SidebarProfileButton } from '@components/sidebar/buttons/SidebarProfileButton'
 import { SidebarThemeButton } from '@components/sidebar/buttons/SidebarThemeButton'
 import { NavItem } from '@components/sidebar/Sidebar.types'
 import { useAuth } from '@contexts/auth/AuthContext'
@@ -110,6 +111,7 @@ export const Sidebar = () => {
         {/* Footer section of Sidebar */}
         <div className={styles.footer}>
           <SidebarLanguageSwitcher />
+          <SidebarProfileButton onNavigate={closeMenu} />
           <SidebarThemeButton />
           <SidebarLoginButton />
         </div>

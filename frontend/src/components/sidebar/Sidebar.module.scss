@@ -163,6 +163,7 @@
 /* === Buttons === */
 .logoutButton,
 .themeButton,
+.profileLink,
 .languageButton {
   display: flex;
   align-items: center;
@@ -177,6 +178,14 @@
   .icon {
     margin-right: 1rem;
   }
+}
+
+.profileLink {
+  text-decoration: none;
+}
+
+.profileLink:hover {
+  color: var(--primary-color);
 }
 
 .logoutButton:hover {

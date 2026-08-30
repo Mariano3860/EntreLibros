@@ -26,3 +26,36 @@
   min-height: 7rem;
   resize: vertical;
 }
+
+.fieldset {
+  border: 1px solid var(--border-color);
+  padding: 1rem;
+}
+
+.hint {
+  margin: 0;
+  opacity: 0.75;
+}
+
+.checkboxGrid {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  margin: 0.75rem 0;
+}
+
+.checkboxLabel {
+  display: flex !important;
+  align-items: center;
+  gap: 0.5rem !important;
+}
+
+.checkboxLabel input {
+  width: auto;
+}
+
+.preview {
+  border-top: 1px solid var(--border-color);
+  margin-top: 2rem;
+  padding-top: 1rem;
+}

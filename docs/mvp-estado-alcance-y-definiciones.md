@@ -1,6 +1,6 @@
 # Estado, alcance y definiciones pendientes del MVP
 
-Fecha de referencia: 2026-08-29
+Fecha de referencia: 2026-08-30
 
 Este documento es la base funcional para continuar el MVP de EntreLibros. Su objetivo es distinguir qué está implementado, qué está parcialmente implementado y qué decisiones de producto todavía deben resolverse antes de crear una nueva OpenSpec.
 
@@ -17,17 +17,16 @@ No es un backlog técnico ni una lista de tareas. Las preguntas de este document
 
 ## Resumen ejecutivo
 
-La aplicación ya tiene una base funcional real en autenticación, perfiles básicos, publicaciones, mapa, mensajería, acuerdos y persistencia. También cuenta con pruebas automatizadas, migraciones y un bot persistente para verificar la mensajería.
+La aplicación ya tiene una base funcional real en autenticación, perfiles, publicaciones, mapa, mensajería, acuerdos y persistencia. También cuenta con pruebas automatizadas, migraciones y un bot persistente para verificar la mensajería.
 
 El MVP todavía no está completamente cerrado porque varias historias tienen una implementación técnica que no cubre todos sus criterios de aceptación. Las brechas más importantes son:
 
-1. intereses y selección de zona del perfil;
-2. moderación editorial de publicaciones y Rincones;
-3. coherencia completa entre búsqueda, mapa y listado;
-4. acceso a mensajes desde perfiles y publicaciones;
-5. notificaciones visibles con texto y navegación al evento;
-6. recordatorios de acuerdos;
-7. definición precisa del cierre de sesión y del español neutro.
+1. moderación editorial de publicaciones y Rincones;
+2. coherencia completa entre búsqueda, mapa y listado;
+3. acceso a mensajes desde perfiles y publicaciones;
+4. notificaciones visibles con texto y navegación al evento;
+5. recordatorios de acuerdos;
+6. definición precisa del cierre de sesión y del español neutro.
 
 La mensajería y las notificaciones ilustran la diferencia entre infraestructura y experiencia de producto: ya existe persistencia, deduplicación, API y punto rojo, pero todavía falta diseñar el aviso visible que comunica qué ocurrió y permite llegar al lugar exacto.
 
@@ -83,7 +82,7 @@ Definir una regla simple de estilo: persona gramatical, tono, nombres oficiales 
 
 ### HU-1.4 — Edición de perfil de usuario
 
-**Prioridad original:** Alta · **Estado:** Parcial · **Prioridad para continuar:** P0
+**Prioridad original:** Alta · **Estado:** Hecho en el alcance definido · **Prioridad para continuar:** P1
 
 #### Ya existe
 
@@ -94,22 +93,19 @@ Definir una regla simple de estilo: persona gramatical, tono, nombres oficiales 
 - Granularidad pública de ubicación: privada, ciudad o barrio.
 - Perfil público sin correo ni contraseña.
 
-#### Falta
+#### También implementado
 
-- Campo o conjunto de intereses.
-- Regla de que el usuario tenga al menos tres intereses.
-- Edición explícita de barrio o ciudad.
-- Flujo para elegir una zona sin exponer una dirección exacta.
-- Visualización de intereses y zona en el perfil público.
+- Selección de intereses desde un catálogo breve y traducible, sin texto libre.
+- Recomendación de tres intereses sin bloquear el guardado con menos.
+- Ciudad obligatoria y barrio opcional mediante selectores simples.
+- Validación backend de la relación ciudad-barrio.
+- Vista previa de la información pública respetando privacidad.
 
-#### Decisiones necesarias
+#### Límite explícito
 
-- Si los intereses son texto libre, opciones predefinidas o una combinación.
-- Si tres intereses es un mínimo obligatorio para guardar o solo una recomendación.
-- Si el usuario puede elegir barrio, ciudad o ambas cosas.
-- Si la zona se obtiene mediante búsqueda, mapa, selector territorial o geolocalización.
-- Qué se muestra cuando el perfil es privado.
-- Si el nombre real y el alias tienen roles diferentes en la interfaz.
+La implementación no calcula afinidades, no genera recomendaciones, no usa
+geolocalización en este formulario y no deriva una ciudad a partir de
+coordenadas existentes.
 
 ### HU-1.5 — Privacidad y visibilidad de datos
 
@@ -426,7 +422,6 @@ Estas prioridades no son tareas de implementación. Ordenan las conversaciones q
 ### P0 — Definir antes de seguir ampliando funcionalidades
 
 - Notificaciones visibles, contenido y navegación.
-- Intereses y zona del perfil.
 - Reglas de validación editorial.
 - Relación entre mapa, listado y detalle.
 - Entrada a mensajería desde perfil y publicación.

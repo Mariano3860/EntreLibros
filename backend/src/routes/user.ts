@@ -10,6 +10,12 @@ import {
   updateUserProfile,
   type UserProfileUpdate,
 } from '../repositories/userRepository.js';
+import {
+  isProfileCity,
+  isProfileInterest,
+  isProfileNeighborhood,
+  type ProfileCity,
+} from '../constants/profileCatalog.js';
 
 const router = Router();
 
@@ -200,6 +206,51 @@ router.patch(
         });
       }
       updates.language = language;
+    }
+    if (req.body.interests !== undefined) {
+      const interests = req.body.interests;
+      if (
+        !Array.isArray(interests) ||
+        interests.length > 8 ||
+        new Set(interests).size !== interests.length ||
+        !interests.every(isProfileInterest)
+      ) {
+        return res.status(400).json({
+          error: 'InvalidFields',
+          message: 'user.errors.invalid_profile',
+        });
+      }
+      updates.interests = interests;
+    }
+    if (req.body.city !== undefined) {
+      if (!isProfileCity(req.body.city)) {
+        return res.status(400).json({
+          error: 'InvalidFields',
+          message: 'user.errors.invalid_profile',
+        });
+      }
+      updates.city = req.body.city;
+      if (req.body.neighborhood === undefined) {
+        updates.neighborhood = null;
+      }
+    }
+    if (req.body.neighborhood !== undefined) {
+      if (req.body.neighborhood === null) {
+        updates.neighborhood = null;
+      } else {
+        const city = (updates.city ?? req.user.city) as ProfileCity | null;
+        if (
+          !city ||
+          !isProfileCity(city) ||
+          !isProfileNeighborhood(city, req.body.neighborhood)
+        ) {
+          return res.status(400).json({
+            error: 'InvalidFields',
+            message: 'user.errors.invalid_profile',
+          });
+        }
+        updates.neighborhood = req.body.neighborhood;
+      }
     }
     const profile = await updateUserProfile(req.user.id, updates);
     return profile

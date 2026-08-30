@@ -12,6 +12,11 @@ import type {
   UpdateProfileRequest,
 } from '@src/api/user/profile.types'
 import { AuthQueryKeys } from '@src/constants/constants'
+import {
+  PROFILE_INTERESTS,
+  PROFILE_LOCATIONS,
+  type ProfileCity,
+} from '@src/constants/profileCatalog'
 
 import styles from './ProfilePage.module.scss'
 
@@ -46,6 +51,9 @@ export const ProfilePage = () => {
         profileVisibility: profileQuery.data.profileVisibility,
         locationVisibility: profileQuery.data.locationVisibility,
         language: profileQuery.data.language,
+        interests: profileQuery.data.interests,
+        city: profileQuery.data.city ?? '',
+        neighborhood: profileQuery.data.neighborhood,
       })
     }
   }, [profileQuery.data])
@@ -105,6 +113,72 @@ export const ProfilePage = () => {
               <option value="en">{t('language.en')}</option>
             </select>
           </label>
+          <fieldset className={styles.fieldset}>
+            <legend>{t('profile.interests')}</legend>
+            <p className={styles.hint}>{t('profile.interestsDescription')}</p>
+            <div className={styles.checkboxGrid}>
+              {PROFILE_INTERESTS.map((interest) => (
+                <label key={interest} className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    checked={form.interests.includes(interest)}
+                    onChange={(event) =>
+                      updateField(
+                        'interests',
+                        event.target.checked
+                          ? [...form.interests, interest]
+                          : form.interests.filter((item) => item !== interest)
+                      )
+                    }
+                  />
+                  {t(`profile.interestOptions.${interest}`)}
+                </label>
+              ))}
+            </div>
+            {form.interests.length < 3 && (
+              <p className={styles.hint} role="status">
+                {t('profile.interestsRecommendation')}
+              </p>
+            )}
+          </fieldset>
+          <label>
+            {t('profile.city')}
+            <select
+              value={form.city}
+              required
+              onChange={(event) => {
+                const city = event.target.value as ProfileCity | ''
+                updateField('city', city)
+                updateField('neighborhood', null)
+              }}
+            >
+              <option value="">{t('profile.selectCity')}</option>
+              {Object.keys(PROFILE_LOCATIONS).map((city) => (
+                <option key={city} value={city}>
+                  {city}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            {t('profile.neighborhood')}
+            <select
+              value={form.neighborhood ?? ''}
+              disabled={!form.city}
+              onChange={(event) =>
+                updateField('neighborhood', event.target.value || null)
+              }
+            >
+              <option value="">{t('profile.selectNeighborhood')}</option>
+              {(PROFILE_LOCATIONS[form.city as ProfileCity] ?? []).map(
+                (neighborhood) => (
+                  <option key={neighborhood} value={neighborhood}>
+                    {neighborhood}
+                  </option>
+                )
+              )}
+            </select>
+          </label>
           <label>
             <input
               type="checkbox"
@@ -155,6 +229,29 @@ export const ProfilePage = () => {
           {mutation.isSuccess && <p role="status">{t('profile.saved')}</p>}
           {mutation.isError && <p role="alert">{t('profile.saveError')}</p>}
         </form>
+        <section
+          className={styles.preview}
+          aria-labelledby="profile-preview-title"
+        >
+          <h2 id="profile-preview-title">{t('profile.publicPreview')}</h2>
+          <p>{t('profile.publicPreviewDescription')}</p>
+          {form.interests.length > 0 && (
+            <p>
+              <strong>{t('profile.interests')}:</strong>{' '}
+              {form.interests
+                .map((interest) => t(`profile.interestOptions.${interest}`))
+                .join(', ')}
+            </p>
+          )}
+          {form.locationVisibility !== 'private' && form.city && (
+            <p>
+              <strong>{t('profile.location')}:</strong> {form.city}
+              {form.locationVisibility === 'neighborhood' && form.neighborhood
+                ? `, ${form.neighborhood}`
+                : ''}
+            </p>
+          )}
+        </section>
       </main>
     </BaseLayout>
   )
