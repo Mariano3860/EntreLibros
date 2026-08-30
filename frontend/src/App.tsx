@@ -5,6 +5,8 @@ import { useUserLanguage } from '@hooks/language/useUserLanguage'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import React from 'react'
 
+import { PrototypeProvider } from '@src/features/prototype/PrototypeContext'
+
 import AppRoutes from './routes'
 
 import '@src/shared/styles/_reset.scss'
@@ -22,11 +24,13 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <ThemeProvider>
-          <LanguageInitializer />
-          <div>
-            <AppRoutes />
-            <Toaster />
-          </div>
+          <PrototypeProvider>
+            <LanguageInitializer />
+            <div>
+              <AppRoutes />
+              <Toaster />
+            </div>
+          </PrototypeProvider>
         </ThemeProvider>
       </AuthProvider>
     </QueryClientProvider>

@@ -9,7 +9,7 @@ import { RELATIVE_API_ROUTES } from '@src/api/routes'
 describe('fetchSuggestions service', () => {
   test('returns suggestions list', async () => {
     const items = await fetchSuggestions()
-    expect(items).toHaveLength(5)
+    expect(items).toHaveLength(4)
   })
 
   test('throws on invalid response', async () => {

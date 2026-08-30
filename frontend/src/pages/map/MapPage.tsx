@@ -1,349 +1,220 @@
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
-import { ErrorBanner } from '@components/map/common/ErrorBanner'
-import { CreateCornerFab } from '@components/map/CreateCornerFab/CreateCornerFab'
-import { FilterRail } from '@components/map/FilterRail/FilterRail'
-import { MapCanvas } from '@components/map/MapCanvas/MapCanvas'
-import { MapHeader } from '@components/map/MapHeader/MapHeader'
 import { PublishCornerModal } from '@components/publish/PublishCornerModal'
-import sharedStyles from '@styles/shared.module.scss'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useTranslation } from 'react-i18next'
+import { useCallback, useEffect, useState } from 'react'
 
-import type {
-  MapBoundingBox,
-  MapFilters,
-  MapLayerKey,
-  MapLayerToggles,
-  MapPin,
-} from '@src/api/map/map.types'
-import { useMapData } from '@src/hooks/api/useMapData'
-import { track } from '@src/utils/analytics'
-import { cx } from '@src/utils/cx'
-import { boundingBoxFromCenter } from '@src/utils/geospatial'
+import { prototypeCatalog } from '@src/features/prototype/catalog'
+import { usePrototype } from '@src/features/prototype/PrototypeContext'
+import {
+  Chip,
+  Panel,
+  PrototypeButton,
+  PrototypePage,
+} from '@src/features/prototype/PrototypeUI'
 
 import styles from './MapPage.module.scss'
 
-const DEFAULT_FILTERS: MapFilters = {
-  distanceKm: 5,
-  themes: [],
-  openNow: false,
-  recentActivity: true,
-}
-
-const DEFAULT_LAYERS: MapLayerToggles = {
-  corners: true,
-  publications: true,
-  activity: true,
-}
-
-const DEBOUNCE_MS = 300
-const MIN_BOUNDING_BOX_RADIUS_KM = 5.55
-const DEFAULT_CENTER = { latitude: -34.63, longitude: -58.47 }
-
-const DEFAULT_BBOX: MapBoundingBox = boundingBoxFromCenter(
-  DEFAULT_CENTER.latitude,
-  DEFAULT_CENTER.longitude,
-  DEFAULT_FILTERS.distanceKm,
-  { minDistanceKm: MIN_BOUNDING_BOX_RADIUS_KM }
-)
+type UserLocation = { latitude: number; longitude: number }
+type PrototypeCorner = (typeof prototypeCatalog.corners)[number]
 
 export const MapPage = () => {
-  const { t, i18n } = useTranslation()
-  const [searchInput, setSearchInput] = useState('')
-  const [searchTerm, setSearchTerm] = useState('')
-  const [filters, setFilters] = useState<MapFilters>(DEFAULT_FILTERS)
-  const [layers, setLayers] = useState<MapLayerToggles>(DEFAULT_LAYERS)
-  const [bbox, setBbox] = useState<MapBoundingBox>(DEFAULT_BBOX)
-  const [selectedPin, setSelectedPin] = useState<MapPin | null>(null)
-  const [userLocation, setUserLocation] = useState<{
-    latitude: number
-    longitude: number
-  } | null>(null)
-  const [isFilterRailOpen, setFilterRailOpen] = useState(true)
-  const [geolocationDenied, setGeolocationDenied] = useState(false)
-  const [zoneFallback, setZoneFallback] = useState('')
-  const [isCreateCornerOpen, setCreateCornerOpen] = useState(false)
-  const locationRequestedRef = useRef(false)
-
-  const viewStartedAtRef = useRef<number | null>(null)
-  const trackedFirstPinRef = useRef(false)
-  const previousSearchRef = useRef('')
-
-  useEffect(() => {
-    const handle = window.setTimeout(() => {
-      setSearchTerm(searchInput)
-    }, DEBOUNCE_MS)
-    return () => window.clearTimeout(handle)
-  }, [searchInput])
-
-  const mapQuery = useMemo(
-    () => ({
-      bbox,
-      searchTerm,
-      filters,
-      layers,
-      locale: i18n.language,
-    }),
-    [bbox, searchTerm, filters, layers, i18n.language]
+  const { catalog } = usePrototype()
+  const [distance, setDistance] = useState(2)
+  const [category, setCategory] = useState('Todo')
+  const [search, setSearch] = useState('')
+  const [location, setLocation] = useState<UserLocation | null>(null)
+  const [locationDenied, setLocationDenied] = useState(false)
+  const [selectedCorner, setSelectedCorner] = useState<PrototypeCorner>(
+    catalog.corners[0]
   )
+  const [createOpen, setCreateOpen] = useState(false)
 
-  const { data, isLoading, isFetching, isError, refetch } = useMapData(mapQuery)
-
-  useEffect(() => {
-    if (locationRequestedRef.current) return
-    locationRequestedRef.current = true
-
-    if (typeof navigator === 'undefined' || !navigator.geolocation) {
-      setGeolocationDenied(true)
+  const locate = useCallback(() => {
+    if (!navigator.geolocation) {
+      setLocationDenied(true)
       return
     }
-
-    navigator.geolocation.getCurrentPosition(
-      ({ coords }) => {
-        const { latitude, longitude } = coords
-        setUserLocation({ latitude, longitude })
-        setBbox(
-          boundingBoxFromCenter(
-            latitude,
-            longitude,
-            DEFAULT_FILTERS.distanceKm,
-            { minDistanceKm: MIN_BOUNDING_BOX_RADIUS_KM }
-          )
-        )
-        setGeolocationDenied(false)
-      },
-      () => setGeolocationDenied(true)
-    )
-  }, [])
-
-  useEffect(() => {
-    track('map.view_opened', { locale: i18n.language })
-    viewStartedAtRef.current = performance.now()
-    trackedFirstPinRef.current = false
-  }, [i18n.language])
-
-  useEffect(() => {
-    if (previousSearchRef.current === '' && searchTerm === '') return
-    if (previousSearchRef.current === searchTerm) return
-    previousSearchRef.current = searchTerm
-    track('map.filter_changed', { filter: 'search', value: searchTerm })
-  }, [searchTerm])
-
-  useEffect(() => {
-    if (!data) return
-    if (trackedFirstPinRef.current) return
-    const hasPins =
-      (layers?.corners && data?.corners?.length > 0) ||
-      (layers?.publications && data?.publications?.length > 0)
-    if (!hasPins) return
-    if (!viewStartedAtRef.current) return
-    trackedFirstPinRef.current = true
-    track('time.to.first.pin', {
-      milliseconds: Math.round(performance.now() - viewStartedAtRef.current),
-    })
-  }, [data, layers])
-
-  const visibleCorners = layers.corners ? (data?.corners?.length ?? 0) : 0
-  const visiblePublications = layers.publications
-    ? (data?.publications?.length ?? 0)
-    : 0
-  const visibleActivity =
-    layers.activity && filters.recentActivity
-      ? (data?.activity?.length ?? 0)
-      : 0
-  const isEmpty = visibleCorners + visiblePublications + visibleActivity === 0
-  const activityPoints = filters.recentActivity ? (data?.activity ?? []) : []
-
-  const handleToggleLayer = (layer: MapLayerKey) => {
-    setLayers((prev) => {
-      const next = { ...prev, [layer]: !prev[layer] }
-      track('map.filter_changed', {
-        filter: 'layer',
-        layer,
-        value: next[layer],
-      })
-      return next
-    })
-  }
-
-  const handleDistanceChange = (value: number) => {
-    const center = userLocation ?? {
-      latitude: (bbox.north + bbox.south) / 2,
-      longitude: (bbox.east + bbox.west) / 2,
-    }
-    setFilters((prev) => {
-      const next = { ...prev, distanceKm: value }
-      track('map.filter_changed', { filter: 'distance', value })
-      return next
-    })
-    setBbox(
-      boundingBoxFromCenter(center.latitude, center.longitude, value, {
-        minDistanceKm: MIN_BOUNDING_BOX_RADIUS_KM,
-      })
-    )
-  }
-
-  const handleToggleOpenNow = () => {
-    setFilters((prev) => {
-      const next = { ...prev, openNow: !prev.openNow }
-      track('map.filter_changed', { filter: 'openNow', value: next.openNow })
-      return next
-    })
-  }
-
-  const handleToggleRecentActivity = () => {
-    setFilters((prev) => {
-      const next = { ...prev, recentActivity: !prev.recentActivity }
-      track('map.filter_changed', {
-        filter: 'recentActivity',
-        value: next.recentActivity,
-      })
-      return next
-    })
-  }
-
-  const handleSelectPin = (pin: MapPin) => {
-    setSelectedPin(pin)
-    track('pin.opened', { type: pin.type, id: pin.data.id })
-  }
-
-  const handleCreateCorner = () => {
-    track('cta.create_corner_clicked')
-    setCreateCornerOpen(true)
-  }
-
-  const handleCloseCornerModal = useCallback(() => {
-    setCreateCornerOpen(false)
-  }, [])
-
-  const handleLocateMe = () => {
-    if (typeof navigator === 'undefined' || !navigator.geolocation) {
-      setGeolocationDenied(true)
-      return
-    }
-
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        const { latitude, longitude } = position.coords
-        setUserLocation({ latitude, longitude })
-        const nextBbox: MapBoundingBox = boundingBoxFromCenter(
-          latitude,
-          longitude,
-          filters.distanceKm,
-          { minDistanceKm: MIN_BOUNDING_BOX_RADIUS_KM }
-        )
-        setBbox(nextBbox)
-        setGeolocationDenied(false)
-        setZoneFallback('')
-        track('map.filter_changed', { filter: 'bbox', value: nextBbox })
+        setLocation({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        })
+        setLocationDenied(false)
       },
-      () => {
-        setGeolocationDenied(true)
-      }
+      () => setLocationDenied(true),
+      { enableHighAccuracy: false, timeout: 5000, maximumAge: 300000 }
     )
-  }
+  }, [])
 
-  const handleToggleRail = () => {
-    setFilterRailOpen((current) => !current)
-  }
-
-  const handleZoneFallbackChange = (value: string) => {
-    setZoneFallback(value)
-    setSearchInput(value)
-    track('map.filter_changed', { filter: 'zone', value })
-  }
-
-  const handleCornerCreated = useCallback(
-    (_cornerId: string) => {
-      setCreateCornerOpen(false)
-      void refetch()
-    },
-    [refetch]
-  )
+  useEffect(() => {
+    locate()
+  }, [locate])
 
   return (
-    <BaseLayout id={'map-page'}>
-      <div className={styles.mapPage}>
-        <MapHeader
-          searchValue={searchInput}
-          onSearchChange={setSearchInput}
-          layers={layers}
-          onToggleLayer={handleToggleLayer}
-          openNow={filters.openNow}
-          onToggleOpenNow={handleToggleOpenNow}
-          recentActivity={filters.recentActivity}
-          onToggleRecentActivity={handleToggleRecentActivity}
-          onToggleRail={handleToggleRail}
-          railOpen={isFilterRailOpen}
-          isFetching={isFetching}
-          onLocateMe={handleLocateMe}
-          geolocationDenied={geolocationDenied}
-          zoneFallback={zoneFallback}
-          onZoneFallbackChange={handleZoneFallbackChange}
-        />
-
-        <div className={cx(styles.content, sharedStyles.scrollbar)}>
-          <div
-            className={cx(
-              styles.railWrapper,
-              isFilterRailOpen ? '' : styles.railHidden
-            )}
-          >
-            <FilterRail
-              distanceKm={filters.distanceKm}
-              onDistanceChange={handleDistanceChange}
-              layers={layers}
-              onToggleLayer={handleToggleLayer}
-              openNow={filters.openNow}
-              onToggleOpenNow={handleToggleOpenNow}
-              recentActivity={filters.recentActivity}
-              onToggleRecentActivity={handleToggleRecentActivity}
-            />
+    <BaseLayout id="map-page" mainClassName={styles.layoutMain}>
+      <PrototypePage className={styles.page}>
+        <header className={styles.header}>
+          <div>
+            <h1>Mapa de rincones</h1>
+            <p>
+              {location
+                ? 'Mostrando lugares cerca de tu ubicación'
+                : 'Buenos Aires · ubicación aproximada'}
+            </p>
           </div>
+          <div>
+            <PrototypeButton onClick={locate}>⌖ Mi ubicación</PrototypeButton>
+            <PrototypeButton tone="primary" onClick={() => setCreateOpen(true)}>
+              ＋ Crear rincón
+            </PrototypeButton>
+          </div>
+        </header>
 
-          <div className={styles.mapArea}>
-            <div className={styles.mapCanvasWrapper}>
-              <MapCanvas
-                bbox={bbox}
-                corners={data?.corners ?? []}
-                publications={data?.publications ?? []}
-                activity={activityPoints}
-                userLocation={userLocation}
-                layers={layers}
-                selectedPin={selectedPin}
-                onSelectPin={handleSelectPin}
-                isLoading={isLoading}
-                isFetching={isFetching}
-                isEmpty={isEmpty}
+        <div className={styles.mapLayout}>
+          <Panel className={styles.rail} as="aside">
+            <label className={styles.search}>
+              <span>⌕</span>
+              <input
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Buscar zona o rincón"
               />
+            </label>
+            <section>
+              <h2>Distancia</h2>
+              <div className={styles.distanceValue}>
+                Hasta <strong>{distance} km</strong>
+              </div>
+              <input
+                aria-label="Distancia"
+                type="range"
+                min="1"
+                max="10"
+                value={distance}
+                onChange={(event) => setDistance(Number(event.target.value))}
+              />
+              <div className={styles.rangeLabels}>
+                <span>1 km</span>
+                <span>10 km</span>
+              </div>
+            </section>
+            <section>
+              <h2>Categorías</h2>
+              <div className={styles.categories}>
+                {catalog.mapCategories.map((item) => (
+                  <Chip
+                    key={item}
+                    active={category === item}
+                    onClick={() => setCategory(item)}
+                  >
+                    {item}
+                  </Chip>
+                ))}
+              </div>
+            </section>
+            <section>
+              <h2>Disponibilidad</h2>
+              <label className={styles.switchRow}>
+                <span>
+                  <strong>Abierto ahora</strong>
+                  <small>Rincones disponibles hoy</small>
+                </span>
+                <input type="checkbox" defaultChecked />
+              </label>
+              <label className={styles.switchRow}>
+                <span>
+                  <strong>Con actividad</strong>
+                  <small>Lectores en las últimas 2 h</small>
+                </span>
+                <input type="checkbox" defaultChecked />
+              </label>
+            </section>
+            <section className={styles.activity}>
+              <h2>Actividad cercana</h2>
+              {catalog.corners.map((corner) => (
+                <button
+                  key={corner.id}
+                  onClick={() => setSelectedCorner(corner)}
+                >
+                  <span>⌖</span>
+                  <span>
+                    <strong>{corner.name}</strong>
+                    <small>
+                      {corner.activity} · {corner.distance}
+                    </small>
+                  </span>
+                </button>
+              ))}
+            </section>
+          </Panel>
+
+          <div
+            className={styles.mapCanvas}
+            role="img"
+            aria-label={`Mapa oscuro con rincones hasta ${distance} kilómetros`}
+          >
+            <div className={styles.mapGrid} />
+            <span className={`${styles.street} ${styles.streetOne}`} />
+            <span className={`${styles.street} ${styles.streetTwo}`} />
+            <span className={`${styles.street} ${styles.streetThree}`} />
+            {catalog.corners.map((corner, index) => (
+              <button
+                key={corner.id}
+                className={`${styles.cornerPin} ${styles[`pin${index + 1}`]}`}
+                onClick={() => setSelectedCorner(corner)}
+                aria-label={corner.name}
+              >
+                <span>⌖</span>
+                {index === 1 ? <b>3</b> : null}
+              </button>
+            ))}
+            <button
+              className={styles.userLocation}
+              onClick={locate}
+              aria-label="Tu ubicación aproximada"
+            >
+              <span>⌖</span>
+            </button>
+            <div className={styles.mapControls}>
+              <button aria-label="Acercar">＋</button>
+              <button aria-label="Alejar">−</button>
+              <button aria-label="Centrar ubicación" onClick={locate}>
+                ⌖
+              </button>
             </div>
+            <Panel className={styles.placeCard} as="article">
+              <div className={styles.placeImage}>
+                <span>☕</span>
+              </div>
+              <div>
+                <span className={styles.open}>● Abierto ahora</span>
+                <h2>{selectedCorner.name}</h2>
+                <p>
+                  {selectedCorner.category} · {selectedCorner.distance}
+                </p>
+                <div className={styles.placeMeta}>
+                  <span>★ 4,8</span>
+                  <span>{selectedCorner.activity}</span>
+                </div>
+              </div>
+              <PrototypeButton tone="primary" size="small">
+                Ver rincón
+              </PrototypeButton>
+            </Panel>
+            {locationDenied ? (
+              <div className={styles.locationNotice} role="status">
+                No pudimos acceder a tu ubicación. Mostramos Buenos Aires.
+              </div>
+            ) : null}
           </div>
         </div>
+      </PrototypePage>
 
-        <CreateCornerFab onClick={handleCreateCorner} />
-
-        <div className={styles.notifications}>
-          {isError ? (
-            <ErrorBanner
-              message={t('map.status.error')}
-              tone="error"
-              onDismiss={refetch}
-            />
-          ) : null}
-          {geolocationDenied ? (
-            <ErrorBanner
-              message={t('map.status.locationDenied')}
-              tone="warning"
-            />
-          ) : null}
-        </div>
-
-        <PublishCornerModal
-          isOpen={isCreateCornerOpen}
-          onClose={handleCloseCornerModal}
-          onCreated={handleCornerCreated}
-        />
-      </div>
+      <PublishCornerModal
+        isOpen={createOpen}
+        onClose={() => setCreateOpen(false)}
+        onCreated={() => setCreateOpen(false)}
+      />
     </BaseLayout>
   )
 }

@@ -1,88 +1,422 @@
 @import '@styles/variables';
 
-.mapPage {
+.layoutMain {
+  height: 100vh;
+  padding-bottom: 28px;
+  overflow: hidden;
+}
+
+.page {
   display: flex;
+  height: 100%;
   flex-direction: column;
-  min-height: 95vh;
-  background: var(--background-primary);
-  color: var(--text-primary);
 }
 
-.content {
-  flex: 1;
+.header {
   display: flex;
-  gap: $spacing-2;
-  min-height: 0;
-  margin-top: $spacing-2;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 20px;
+}
 
-  @media (max-width: $breakpoint-tablet) {
-    gap: $spacing-1x5;
-    padding: 0 $spacing-1x5 $spacing-1x5;
+.header > div:last-child {
+  display: flex;
+  gap: 8px;
+}
+
+.header h1 {
+  margin: 3px 0;
+  font-size: 29px;
+}
+
+.header p {
+  margin: 0;
+  color: var(--prototype-muted);
+  font-size: 11px;
+}
+
+.mapLayout {
+  display: grid;
+  min-height: 0;
+  flex: 1;
+  grid-template-columns: 286px 1fr;
+  gap: 16px;
+}
+
+.rail {
+  min-height: 0;
+  padding: 14px;
+  overflow-y: auto;
+}
+
+.search {
+  display: flex;
+  min-height: 38px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 11px;
+  border: 1px solid var(--prototype-border);
+  border-radius: 9px;
+  background: var(--prototype-surface-soft);
+  color: var(--prototype-muted);
+}
+
+.search input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: white;
+  font-size: 10px;
+}
+
+.rail section {
+  padding: 15px 2px;
+  border-bottom: 1px solid var(--prototype-border);
+}
+
+.rail section:last-child {
+  border-bottom: 0;
+}
+
+.rail h2 {
+  margin: 0 0 10px;
+  font-size: 11px;
+}
+
+.distanceValue {
+  color: var(--prototype-muted);
+  font-size: 9px;
+}
+
+.distanceValue strong {
+  float: right;
+  color: var(--prototype-teal);
+}
+
+.rail input[type='range'] {
+  width: 100%;
+  accent-color: var(--prototype-teal);
+}
+
+.rangeLabels {
+  display: flex;
+  justify-content: space-between;
+  color: var(--prototype-muted);
+  font-size: 8px;
+}
+
+.categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.switchRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.switchRow strong,
+.switchRow small {
+  display: block;
+}
+
+.switchRow strong {
+  font-size: 9px;
+}
+
+.switchRow small {
+  margin-top: 2px;
+  color: var(--prototype-muted);
+  font-size: 7px;
+}
+
+.switchRow input {
+  accent-color: var(--prototype-teal);
+}
+
+.activity {
+  display: grid;
+  gap: 5px;
+}
+
+.activity h2 {
+  margin-bottom: 5px;
+}
+
+.activity button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.activity button:hover {
+  background: rgb(255 255 255 / 4%);
+}
+
+.activity button > span:first-child {
+  color: var(--prototype-orange);
+}
+
+.activity strong,
+.activity small {
+  display: block;
+}
+
+.activity strong {
+  font-size: 8px;
+}
+
+.activity small {
+  margin-top: 2px;
+  color: var(--prototype-muted);
+  font-size: 7px;
+}
+
+.mapCanvas {
+  position: relative;
+  min-height: 520px;
+  overflow: hidden;
+  border: 1px solid var(--prototype-border);
+  border-radius: 15px;
+  background: radial-gradient(circle at 53% 45%, #173a48, #091b26 68%);
+}
+
+.mapGrid {
+  position: absolute;
+  inset: -30%;
+  opacity: 0.22;
+  background-image:
+    linear-gradient(#4b6570 1px, transparent 1px),
+    linear-gradient(90deg, #4b6570 1px, transparent 1px);
+  background-size: 78px 78px;
+  transform: rotate(18deg);
+}
+
+.street {
+  position: absolute;
+  display: block;
+  background: #385664;
+  opacity: 0.58;
+}
+
+.streetOne {
+  top: 42%;
+  left: -10%;
+  width: 120%;
+  height: 6px;
+  transform: rotate(-13deg);
+}
+
+.streetTwo {
+  top: -10%;
+  left: 57%;
+  width: 5px;
+  height: 120%;
+  transform: rotate(24deg);
+}
+
+.streetThree {
+  top: 69%;
+  left: -10%;
+  width: 120%;
+  height: 3px;
+  transform: rotate(8deg);
+}
+
+.cornerPin {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 3px solid rgb(255 255 255 / 70%);
+  border-radius: 50% 50% 50% 5px;
+  background: var(--prototype-orange);
+  color: white;
+  cursor: pointer;
+  transform: rotate(-45deg);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 35%);
+}
+
+.cornerPin > span,
+.cornerPin > b {
+  transform: rotate(45deg);
+}
+
+.cornerPin b {
+  position: absolute;
+  display: grid;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+  border-radius: 50%;
+  background: white;
+  color: #553891;
+  font-size: 8px;
+}
+
+.pin1 {
+  top: 35%;
+  left: 45%;
+}
+
+.pin2 {
+  top: 20%;
+  left: 70%;
+  background: var(--prototype-purple);
+}
+
+.pin3 {
+  top: 54%;
+  left: 26%;
+  background: var(--prototype-teal);
+}
+
+.userLocation {
+  position: absolute;
+  z-index: 3;
+  top: 47%;
+  left: 58%;
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 8px solid rgb(93 169 255 / 20%);
+  border-radius: 50%;
+  background: var(--prototype-blue);
+  color: white;
+  cursor: pointer;
+  box-sizing: content-box;
+  box-shadow: 0 0 0 2px white inset;
+}
+
+.userLocation span {
+  font-size: 15px;
+}
+
+.mapControls {
+  position: absolute;
+  top: 13px;
+  right: 13px;
+  z-index: 4;
+  display: grid;
+  gap: 5px;
+}
+
+.mapControls button {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--prototype-border);
+  border-radius: 8px;
+  background: rgb(12 34 45 / 92%);
+  color: white;
+  cursor: pointer;
+}
+
+.placeCard {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  left: 18px;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: 88px 1fr auto;
+  align-items: center;
+  gap: 13px;
+  padding: 11px;
+  background: rgb(15 40 52 / 95%);
+  backdrop-filter: blur(12px);
+}
+
+.placeImage {
+  display: grid;
+  min-height: 74px;
+  place-items: center;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #ad704c, #314e48);
+  font-size: 28px;
+}
+
+.open {
+  color: var(--prototype-teal) !important;
+  font-size: 7px !important;
+  letter-spacing: 0 !important;
+}
+
+.placeCard h2 {
+  margin: 4px 0 2px;
+  font-size: 13px;
+}
+
+.placeCard p {
+  margin: 0;
+  color: var(--prototype-muted);
+  font-size: 8px;
+}
+
+.placeMeta {
+  display: flex;
+  gap: 12px;
+  margin-top: 7px;
+  color: var(--prototype-muted);
+  font-size: 8px;
+}
+
+.locationNotice {
+  position: absolute;
+  top: 13px;
+  left: 13px;
+  z-index: 4;
+  padding: 7px 10px;
+  border: 1px solid rgb(255 139 76 / 35%);
+  border-radius: 8px;
+  background: rgb(22 41 49 / 94%);
+  color: var(--prototype-orange);
+  font-size: 8px;
+}
+
+@media (max-width: $breakpoint-tablet) {
+  .layoutMain {
+    height: auto;
+    overflow: visible;
   }
 
-  @media (max-width: $breakpoint-mobile) {
+  .header {
+    align-items: stretch;
     flex-direction: column;
-    gap: $spacing-1x5;
-    padding: 0 $spacing-2 $spacing-2;
-  }
-}
-
-.railWrapper {
-  width: rem(320px);
-  flex-shrink: 0;
-  transition: transform $transition-duration-fast;
-
-  @media (max-width: $breakpoint-tablet) {
-    position: relative;
-    width: auto;
   }
 
-  @media (max-width: $breakpoint-mobile) {
-    display: contents;
-  }
-}
-
-.railHidden {
-  @media (max-width: $breakpoint-tablet) {
-    transform: translateX(-110%);
-    position: absolute;
-    inset: 0;
-  }
-}
-
-.mapArea {
-  flex: 1;
-  display: flex;
-  gap: $spacing-2;
-  min-height: 0;
-  height: 80vh;
-
-  @media (max-width: $breakpoint-tablet) {
-    gap: $spacing-1x5;
+  .mapLayout {
+    grid-template-columns: 1fr;
   }
 
-  @media (max-width: $breakpoint-mobile) {
-    flex-direction: column;
-    gap: $spacing-1x5;
+  .rail {
+    max-height: none;
   }
-}
 
-.mapCanvasWrapper {
-  flex: 1;
-  min-height: 0;
-}
+  .mapCanvas {
+    min-height: 600px;
+  }
 
-.notifications {
-  position: fixed;
-  top: $spacing-3;
-  right: $spacing-3;
-  z-index: $z-index-toast;
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-1x5;
+  .placeCard {
+    grid-template-columns: 70px 1fr;
+  }
 
-  @media (max-width: $breakpoint-mobile) {
-    right: $spacing-2;
-    left: $spacing-2;
+  .placeCard > button {
+    grid-column: 1 / -1;
   }
 }

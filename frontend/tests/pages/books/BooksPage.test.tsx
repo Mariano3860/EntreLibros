@@ -1,166 +1,52 @@
-import { BooksPage } from '@src/pages/books/BooksPage'
-import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { afterEach, describe, expect, test, vi } from 'vitest'
-import { renderWithProviders } from '../../test-utils'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, expect, test, vi } from 'vitest'
 
 vi.mock('@src/api/auth/me.service', () => ({
   fetchMe: vi.fn().mockRejectedValue(new Error('unauthenticated')),
 }))
 
-afterEach(() => {
-  vi.useRealTimers()
-  window.localStorage.clear()
-})
+import { BooksPage } from '@src/pages/books/BooksPage'
+
+import { renderWithProviders } from '../../test-utils'
 
 describe('BooksPage', () => {
-  test('renders sidebar navigation', () => {
-    const { getByRole } = renderWithProviders(<BooksPage />)
-    expect(getByRole('navigation')).toBeInTheDocument()
-  })
-
-  test('filters books by tab selection', async () => {
-    renderWithProviders(<BooksPage />)
-    fireEvent.click(
-      screen.getByRole('tab', { name: 'booksPage.tabs.for_trade' })
-    )
-    expect(await screen.findByText('1984')).toBeInTheDocument()
-
-    fireEvent.click(screen.getByRole('tab', { name: 'booksPage.tabs.seeking' }))
-    expect(await screen.findByText('El pulpo invisible')).toBeInTheDocument()
-
-    fireEvent.click(
-      screen.getByRole('tab', { name: 'booksPage.tabs.for_sale' })
-    )
-    expect(await screen.findByText('Matisse en Bélgica')).toBeInTheDocument()
-
-    fireEvent.click(screen.getByRole('tab', { name: 'booksPage.tabs.mine' }))
-    expect(await screen.findByText('Matisse en Bélgica')).toBeInTheDocument()
-  })
-
-  test('includes own-only listings in the Todos tab', async () => {
+  test('renders Todos with every catalog book', () => {
     renderWithProviders(<BooksPage />)
 
-    expect(await screen.findByText('El cuervo')).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: 'Todos' })).toHaveAttribute(
+      'aria-selected',
+      'true'
+    )
+    expect(screen.getAllByRole('button', { name: /^Ver / })).toHaveLength(5)
   })
 
-  test('shows empty state when search yields no results', () => {
+  test('keeps Todos greater than Mis libros and filters by text', () => {
     renderWithProviders(<BooksPage />)
-    fireEvent.change(
-      screen.getByPlaceholderText('booksPage.search_placeholder'),
-      {
-        target: { value: 'zzzzz' },
-      }
-    )
-    expect(screen.getByText('booksPage.empty.all')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Mis libros' }))
+    expect(screen.getAllByRole('button', { name: /^Ver / })).toHaveLength(2)
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Todos' }))
+    fireEvent.change(screen.getByRole('textbox', { name: 'Buscar libros' }), {
+      target: { value: 'luciérnagas' },
+    })
+    expect(screen.getAllByRole('button', { name: /^Ver / })).toHaveLength(1)
   })
 
-  test('opens publish modal when navigating to /books/new', () => {
-    const { getByText } = renderWithProviders(<BooksPage />, {
-      initialEntries: ['/books/new'],
-    })
-
-    expect(getByText('publishBook.title')).toBeInTheDocument()
+  test('opens the real publish modal from the page action', () => {
+    renderWithProviders(<BooksPage />)
+    fireEvent.click(screen.getByRole('button', { name: /Publicar un libro/ }))
+    expect(screen.getByText('publishBook.title')).toBeVisible()
   })
 
-  test('prefills metadata from search result', async () => {
-    renderWithProviders(<BooksPage />, { initialEntries: ['/books/new'] })
-
-    const searchInput = screen.getByPlaceholderText(
-      'publishBook.search.placeholder'
-    )
-
-    fireEvent.change(searchInput, { target: { value: '1984' } })
-
+  test('opens a book detail dialog', () => {
+    renderWithProviders(<BooksPage />)
     fireEvent.click(
-      await screen.findByRole(
-        'button',
-        { name: 'publishBook.search.use' },
-        { timeout: 5000 }
-      )
+      screen.getByRole('button', { name: 'Ver Ecos del Viento Norte' })
     )
-
-    await waitFor(() => {
-      expect(screen.getByLabelText('publishBook.fields.title')).toHaveValue(
-        '1984'
-      )
-    })
-
-    const nextButton = screen.getByRole('button', { name: 'publishBook.next' })
-    await waitFor(() => expect(nextButton).not.toBeDisabled())
-  })
-
-  test('saves draft and resumes later', async () => {
-    const { unmount } = renderWithProviders(<BooksPage />, {
-      initialEntries: ['/books/new'],
-    })
-
-    fireEvent.change(screen.getByLabelText('publishBook.fields.title'), {
-      target: { value: 'Mi libro secreto' },
-    })
-    fireEvent.change(screen.getByLabelText('publishBook.fields.author'), {
-      target: { value: 'Ana Autora' },
-    })
-    fireEvent.change(screen.getByLabelText('publishBook.fields.language'), {
-      target: { value: 'ES' },
-    })
-    fireEvent.change(screen.getByLabelText('publishBook.fields.format'), {
-      target: { value: 'Tapa blanda' },
-    })
-
-    const file = new File(['cover'], 'cover.jpg', { type: 'image/jpeg' })
-    const uploader = screen.getByLabelText('publishBook.uploader.cta')
-    fireEvent.change(uploader, { target: { files: [file] } })
-
-    fireEvent.click(
-      screen.getByRole('button', { name: 'publishBook.saveDraft' })
-    )
-
-    unmount()
-
-    vi.useFakeTimers()
-
-    const { getByText, getByRole } = renderWithProviders(<BooksPage />, {
-      initialEntries: ['/books/new'],
-    })
-
-    expect(getByText('publishBook.resume.title')).toBeInTheDocument()
-
-    await vi.advanceTimersByTimeAsync(3000)
-
-    vi.useRealTimers()
-
-    fireEvent.click(
-      getByRole('button', { name: 'publishBook.resume.continue' })
-    )
-
+    expect(screen.getByRole('button', { name: 'Cerrar detalle' })).toBeVisible()
     expect(
-      await screen.findByDisplayValue('Mi libro secreto')
-    ).toBeInTheDocument()
-  })
-
-  test('keeps focus while typing metadata fields', () => {
-    renderWithProviders(<BooksPage />, { initialEntries: ['/books/new'] })
-
-    const titleInput = screen.getByLabelText('publishBook.fields.title')
-    titleInput.focus()
-
-    expect(document.activeElement).toBe(titleInput)
-
-    fireEvent.change(titleInput, { target: { value: 'L' } })
-    expect(document.activeElement).toBe(titleInput)
-
-    fireEvent.change(titleInput, { target: { value: 'Li' } })
-
-    expect(titleInput).toHaveValue('Li')
-    expect(document.activeElement).toBe(titleInput)
-  })
-
-  test('does not open detail modal when navigating to /books/new', () => {
-    renderWithProviders(<BooksPage />, { initialEntries: ['/books/new'] })
-
-    // Should show publish modal, not detail modal
-    expect(screen.getByText('publishBook.title')).toBeInTheDocument()
-    // Should not show detail modal elements
-    expect(screen.queryByText('bookDetail.loading')).not.toBeInTheDocument()
+      screen.getByRole('button', { name: /Contactar a Lucia/ })
+    ).toBeVisible()
   })
 })

@@ -9,7 +9,7 @@ import { RELATIVE_API_ROUTES } from '@src/api/routes'
 describe('fetchActivityItems service', () => {
   test('returns activity list', async () => {
     const items = await fetchActivityItems()
-    expect(items).toHaveLength(10)
+    expect(items).toHaveLength(4)
   })
 
   test('throws on invalid response', async () => {

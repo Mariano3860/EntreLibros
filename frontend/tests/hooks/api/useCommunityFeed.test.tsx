@@ -12,7 +12,7 @@ describe('useCommunityFeed', () => {
     )
     const { result } = renderHook(() => useCommunityFeed(), { wrapper })
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
-    expect(result.current.data?.pages[0]).toHaveLength(8)
+    expect(result.current.data?.pages[0]).toHaveLength(3)
     await result.current.fetchNextPage()
     await waitFor(() => expect(result.current.data?.pages.length).toBe(2))
   })

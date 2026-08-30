@@ -1,258 +1,207 @@
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
-import { useAuth } from '@contexts/auth/AuthContext'
-import { useNotificationPreference } from '@hooks/api/useNotifications'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
+import { FormEvent, useState } from 'react'
 
-import { fetchProfile, updateProfile } from '@src/api/user/profile.service'
-import type {
-  LocationVisibility,
-  ProfileVisibility,
-  UpdateProfileRequest,
-} from '@src/api/user/profile.types'
-import { AuthQueryKeys } from '@src/constants/constants'
+import { usePrototype } from '@src/features/prototype/PrototypeContext'
 import {
-  PROFILE_INTERESTS,
-  PROFILE_LOCATIONS,
-  type ProfileCity,
-} from '@src/constants/profileCatalog'
+  Avatar,
+  Panel,
+  PrototypeButton,
+  PrototypePage,
+  SectionHeading,
+} from '@src/features/prototype/PrototypeUI'
 
 import styles from './ProfilePage.module.scss'
 
-const profileQueryKey = ['user-profile'] as const
-
 export const ProfilePage = () => {
-  const { t } = useTranslation()
-  const { isAuthenticated } = useAuth()
-  const queryClient = useQueryClient()
-  const profileQuery = useQuery({
-    queryKey: profileQueryKey,
-    queryFn: fetchProfile,
-    enabled: isAuthenticated,
-  })
-  const notificationPreference = useNotificationPreference({
-    enabled: isAuthenticated,
-  })
-  const [form, setForm] = useState<UpdateProfileRequest | null>(null)
-  const mutation = useMutation({
-    mutationFn: updateProfile,
-    onSuccess: (profile) => {
-      queryClient.setQueryData(profileQueryKey, profile)
-      queryClient.setQueryData([AuthQueryKeys.AUTH], profile)
-    },
-  })
+  const { catalog } = usePrototype()
+  const [editing, setEditing] = useState(false)
+  const [name, setName] = useState<string>(catalog.user.name)
+  const [bio, setBio] = useState<string>(catalog.user.bio)
+  const [saved, setSaved] = useState(false)
 
-  useEffect(() => {
-    if (profileQuery.data) {
-      setForm({
-        alias: profileQuery.data.alias,
-        description: profileQuery.data.profileDescription,
-        profileVisibility: profileQuery.data.profileVisibility,
-        locationVisibility: profileQuery.data.locationVisibility,
-        language: profileQuery.data.language,
-        interests: profileQuery.data.interests,
-        city: profileQuery.data.city ?? '',
-        neighborhood: profileQuery.data.neighborhood,
-      })
-    }
-  }, [profileQuery.data])
-
-  if (!isAuthenticated) return null
-  if (profileQuery.isLoading || !form) {
-    return <BaseLayout id="profile-page">{t('profile.loading')}</BaseLayout>
+  const save = (event: FormEvent) => {
+    event.preventDefault()
+    setSaved(true)
+    setEditing(false)
   }
-  if (profileQuery.isError) {
-    return <BaseLayout id="profile-page">{t('profile.error')}</BaseLayout>
-  }
-
-  const updateField = <K extends keyof UpdateProfileRequest>(
-    field: K,
-    value: UpdateProfileRequest[K]
-  ) =>
-    setForm((current) => (current ? { ...current, [field]: value } : current))
 
   return (
     <BaseLayout id="profile-page">
-      <main className={styles.page}>
-        <h1>{t('profile.title')}</h1>
-        <p>{t('profile.description')}</p>
-        <form
-          className={styles.form}
-          onSubmit={(event) => {
-            event.preventDefault()
-            mutation.mutate(form)
-          }}
-        >
-          <label>
-            {t('profile.alias')}
-            <input
-              value={form.alias}
-              maxLength={80}
-              onChange={(event) => updateField('alias', event.target.value)}
-              required
-            />
-          </label>
-          <label>
-            {t('profile.about')}
-            <textarea
-              value={form.description ?? ''}
-              maxLength={500}
-              onChange={(event) =>
-                updateField('description', event.target.value || null)
-              }
-            />
-          </label>
-          <label>
-            {t('profile.language')}
-            <select
-              value={form.language}
-              onChange={(event) => updateField('language', event.target.value)}
-            >
-              <option value="es">{t('language.es')}</option>
-              <option value="en">{t('language.en')}</option>
-            </select>
-          </label>
-          <fieldset className={styles.fieldset}>
-            <legend>{t('profile.interests')}</legend>
-            <p className={styles.hint}>{t('profile.interestsDescription')}</p>
-            <div className={styles.checkboxGrid}>
-              {PROFILE_INTERESTS.map((interest) => (
-                <label key={interest} className={styles.checkboxLabel}>
-                  <input
-                    type="checkbox"
-                    checked={form.interests.includes(interest)}
-                    onChange={(event) =>
-                      updateField(
-                        'interests',
-                        event.target.checked
-                          ? [...form.interests, interest]
-                          : form.interests.filter((item) => item !== interest)
-                      )
-                    }
-                  />
-                  {t(`profile.interestOptions.${interest}`)}
-                </label>
-              ))}
-            </div>
-            {form.interests.length < 3 && (
-              <p className={styles.hint} role="status">
-                {t('profile.interestsRecommendation')}
+      <PrototypePage>
+        <section className={styles.profileHero}>
+          <div className={styles.cover} />
+          <div className={styles.identity}>
+            <Avatar initials="M" accent="#ff8b4c" size="hero" />
+            <div className={styles.identityCopy}>
+              <h1>{name}</h1>
+              <p>
+                {catalog.user.username} · {catalog.user.city}
               </p>
-            )}
-          </fieldset>
-          <label>
-            {t('profile.city')}
-            <select
-              value={form.city}
-              required
-              onChange={(event) => {
-                const city = event.target.value as ProfileCity | ''
-                updateField('city', city)
-                updateField('neighborhood', null)
-              }}
-            >
-              <option value="">{t('profile.selectCity')}</option>
-              {Object.keys(PROFILE_LOCATIONS).map((city) => (
-                <option key={city} value={city}>
-                  {city}
-                </option>
+              <small>◷ {catalog.user.joined}</small>
+            </div>
+            <PrototypeButton onClick={() => setEditing(true)}>
+              ✎ Editar perfil
+            </PrototypeButton>
+          </div>
+          <p className={styles.bio}>{bio}</p>
+          <div className={styles.profileFooter}>
+            <div className={styles.interestBlock}>
+              <span className={styles.interestsLabel}>
+                Intereses de lectura
+              </span>
+              <div className={styles.interests}>
+                {catalog.user.interests.map((interest) => (
+                  <span key={interest}>{interest}</span>
+                ))}
+              </div>
+            </div>
+            <section className={styles.metrics} aria-label="Métricas de perfil">
+              {catalog.profileMetrics.map((metric) => (
+                <div key={metric.label}>
+                  <strong>{metric.value}</strong>
+                  <span>{metric.label}</span>
+                </div>
               ))}
-            </select>
-          </label>
-          <label>
-            {t('profile.neighborhood')}
-            <select
-              value={form.neighborhood ?? ''}
-              disabled={!form.city}
-              onChange={(event) =>
-                updateField('neighborhood', event.target.value || null)
-              }
-            >
-              <option value="">{t('profile.selectNeighborhood')}</option>
-              {(PROFILE_LOCATIONS[form.city as ProfileCity] ?? []).map(
-                (neighborhood) => (
-                  <option key={neighborhood} value={neighborhood}>
-                    {neighborhood}
-                  </option>
-                )
-              )}
-            </select>
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={notificationPreference.data ?? true}
-              disabled={notificationPreference.update.isPending}
-              onChange={(event) =>
-                notificationPreference.update.mutate(event.target.checked)
-              }
-            />
-            {t('profile.inAppNotifications')}
-          </label>
-          <label>
-            {t('profile.visibility')}
-            <select
-              value={form.profileVisibility}
-              onChange={(event) =>
-                updateField(
-                  'profileVisibility',
-                  event.target.value as ProfileVisibility
-                )
-              }
-            >
-              <option value="public">{t('profile.public')}</option>
-              <option value="private">{t('profile.private')}</option>
-            </select>
-          </label>
-          <label>
-            {t('profile.locationVisibility')}
-            <select
-              value={form.locationVisibility}
-              onChange={(event) =>
-                updateField(
-                  'locationVisibility',
-                  event.target.value as LocationVisibility
-                )
-              }
-            >
-              <option value="private">{t('profile.locationPrivate')}</option>
-              <option value="city">{t('profile.locationCity')}</option>
-              <option value="neighborhood">
-                {t('profile.locationNeighborhood')}
-              </option>
-            </select>
-          </label>
-          <button type="submit" disabled={mutation.isPending}>
-            {mutation.isPending ? t('profile.saving') : t('profile.save')}
-          </button>
-          {mutation.isSuccess && <p role="status">{t('profile.saved')}</p>}
-          {mutation.isError && <p role="alert">{t('profile.saveError')}</p>}
-        </form>
-        <section
-          className={styles.preview}
-          aria-labelledby="profile-preview-title"
-        >
-          <h2 id="profile-preview-title">{t('profile.publicPreview')}</h2>
-          <p>{t('profile.publicPreviewDescription')}</p>
-          {form.interests.length > 0 && (
-            <p>
-              <strong>{t('profile.interests')}:</strong>{' '}
-              {form.interests
-                .map((interest) => t(`profile.interestOptions.${interest}`))
-                .join(', ')}
-            </p>
-          )}
-          {form.locationVisibility !== 'private' && form.city && (
-            <p>
-              <strong>{t('profile.location')}:</strong> {form.city}
-              {form.locationVisibility === 'neighborhood' && form.neighborhood
-                ? `, ${form.neighborhood}`
-                : ''}
-            </p>
-          )}
+            </section>
+          </div>
+          {saved ? (
+            <div className={styles.saved} role="status">
+              Perfil actualizado
+            </div>
+          ) : null}
         </section>
-      </main>
+
+        <div className={styles.content}>
+          <div className={styles.primaryColumn}>
+            <Panel className={styles.preferences}>
+              <SectionHeading
+                title="Preferencias de lectura"
+                action={
+                  <button onClick={() => setEditing(true)}>Editar</button>
+                }
+              />
+              <div className={styles.preferenceGrid}>
+                {catalog.profile.preferences.map((preference) => (
+                  <article key={preference.title}>
+                    <span>{preference.icon}</span>
+                    <div>
+                      <strong>{preference.title}</strong>
+                      <p>{preference.text}</p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </Panel>
+
+            <Panel className={styles.achievements}>
+              <SectionHeading
+                title="Logros"
+                action={<span>12 desbloqueados</span>}
+              />
+              <div>
+                {catalog.profile.achievements.map((achievement) => (
+                  <article key={achievement.title}>
+                    <span>{achievement.icon}</span>
+                    <strong>{achievement.title}</strong>
+                    <small>{achievement.text}</small>
+                  </article>
+                ))}
+              </div>
+            </Panel>
+          </div>
+
+          <aside className={styles.secondaryColumn}>
+            <Panel className={styles.goal}>
+              <SectionHeading
+                title="Objetivo de lectura"
+                action={<span>{catalog.profile.goal.year}</span>}
+              />
+              <div className={styles.goalRing}>
+                <strong>{catalog.profile.goal.read}</strong>
+                <small>de {catalog.profile.goal.target} libros</small>
+              </div>
+              <div className={styles.progress}>
+                <span />
+              </div>
+              <p>
+                ¡Te faltan{' '}
+                {catalog.profile.goal.target - catalog.profile.goal.read} libros
+                para cumplir tu objetivo!
+              </p>
+            </Panel>
+            <Panel className={styles.streak}>
+              <div className={styles.flame}>♨</div>
+              <div>
+                <strong>{catalog.profile.streak.current} días de racha</strong>
+                <p>Tu mejor racha: {catalog.profile.streak.best} días</p>
+              </div>
+              <div className={styles.week}>
+                {catalog.profile.week.map((day, index) => (
+                  <span
+                    className={
+                      index < catalog.profile.streak.completedDays
+                        ? styles.done
+                        : ''
+                    }
+                    key={day}
+                  >
+                    {day}
+                  </span>
+                ))}
+              </div>
+            </Panel>
+          </aside>
+        </div>
+
+        {editing ? (
+          <div className={styles.modalBackdrop}>
+            <Panel className={styles.modal} as="div">
+              <header>
+                <h2>Editar perfil</h2>
+                <button onClick={() => setEditing(false)} aria-label="Cerrar">
+                  ×
+                </button>
+              </header>
+              <form onSubmit={save}>
+                <label>
+                  Nombre
+                  <input
+                    value={name}
+                    onChange={(event) => setName(event.target.value)}
+                  />
+                </label>
+                <label>
+                  Sobre vos
+                  <textarea
+                    value={bio}
+                    onChange={(event) => setBio(event.target.value)}
+                    maxLength={500}
+                  />
+                </label>
+                <label>
+                  Ciudad
+                  <select defaultValue="Buenos Aires">
+                    <option>Buenos Aires</option>
+                    <option>La Plata</option>
+                    <option>Córdoba</option>
+                  </select>
+                </label>
+                <div>
+                  <PrototypeButton
+                    type="button"
+                    onClick={() => setEditing(false)}
+                  >
+                    Cancelar
+                  </PrototypeButton>
+                  <PrototypeButton tone="primary" type="submit">
+                    Guardar cambios
+                  </PrototypeButton>
+                </div>
+              </form>
+            </Panel>
+          </div>
+        ) : null}
+      </PrototypePage>
     </BaseLayout>
   )
 }

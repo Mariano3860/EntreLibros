@@ -5,6 +5,7 @@ import { MemoryRouter } from 'react-router-dom'
 
 import { AuthProvider } from '@src/contexts/auth/AuthContext'
 import { ThemeProvider } from '@src/contexts/theme/ThemeContext'
+import { PrototypeProvider } from '@src/features/prototype/PrototypeContext'
 
 type WrapperOptions = {
   initialEntries?: string[]
@@ -22,7 +23,9 @@ export const createWrapper = (options?: WrapperOptions) => {
     <MemoryRouter initialEntries={options?.initialEntries}>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <ThemeProvider>{children}</ThemeProvider>
+          <ThemeProvider>
+            <PrototypeProvider>{children}</PrototypeProvider>
+          </ThemeProvider>
         </AuthProvider>
       </QueryClientProvider>
     </MemoryRouter>

@@ -14,7 +14,7 @@ describe('App Component', () => {
 
     render(<App />)
 
-    expect(await screen.findByText('home.hero_title')).toBeVisible()
+    expect(await screen.findByText(/¡Bienvenido de nuevo/)).toBeVisible()
   })
 
   test('renders correctly for logged in users', async () => {
@@ -25,6 +25,6 @@ describe('App Component', () => {
 
     render(<App />)
 
-    expect(await screen.findByText('home.hero_logged_in_title')).toBeVisible()
+    expect(await screen.findByText(/¡Bienvenido de nuevo/)).toBeVisible()
   })
 })

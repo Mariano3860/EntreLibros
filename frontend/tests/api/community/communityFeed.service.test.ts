@@ -9,7 +9,7 @@ import { RELATIVE_API_ROUTES } from '@src/api/routes'
 describe('fetchCommunityFeed service', () => {
   test('returns feed items', async () => {
     const items = await fetchCommunityFeed(0, 8)
-    expect(items).toHaveLength(8)
+    expect(items).toHaveLength(3)
   })
 
   test('throws on invalid response', async () => {

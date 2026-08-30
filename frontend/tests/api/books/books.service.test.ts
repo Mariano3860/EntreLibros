@@ -9,7 +9,7 @@ import { RELATIVE_API_ROUTES } from '@src/api/routes'
 describe('fetchBooks service', () => {
   test('returns list of books', async () => {
     const books = await fetchBooks()
-    expect(books).toHaveLength(3)
+    expect(books).toHaveLength(5)
   })
 
   test('throws on invalid response', async () => {

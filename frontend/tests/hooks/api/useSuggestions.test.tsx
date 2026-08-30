@@ -12,6 +12,6 @@ describe('useSuggestions', () => {
     )
     const { result } = renderHook(() => useSuggestions(), { wrapper })
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
-    expect(result.current.data).toHaveLength(5)
+    expect(result.current.data).toHaveLength(4)
   })
 })

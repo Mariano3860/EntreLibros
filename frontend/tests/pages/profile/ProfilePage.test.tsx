@@ -1,92 +1,39 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, expect, test, vi } from 'vitest'
 
-import type { UserProfile } from '@src/api/user/profile.types'
+vi.mock('@src/api/auth/me.service', () => ({
+  fetchMe: vi.fn().mockRejectedValue(new Error('unauthenticated')),
+}))
+
 import { ProfilePage } from '@src/pages/profile/ProfilePage'
 
 import { renderWithProviders } from '../../test-utils'
 
-const { fetchProfileMock, updateProfileMock } = vi.hoisted(() => ({
-  fetchProfileMock: vi.fn<() => Promise<UserProfile>>(),
-  updateProfileMock: vi.fn(),
-}))
-
-vi.mock('@src/api/user/profile.service', () => ({
-  fetchProfile: fetchProfileMock,
-  updateProfile: updateProfileMock,
-}))
-
-vi.mock('@contexts/auth/AuthContext', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('@contexts/auth/AuthContext')>()
-  return { ...actual, useAuth: () => ({ isAuthenticated: true }) }
-})
-
-vi.mock('@hooks/api/useNotifications', () => ({
-  useNotifications: () => ({ data: [] }),
-  useNotificationPreference: () => ({
-    data: true,
-    update: { isPending: false, mutate: vi.fn() },
-  }),
-}))
-
-const profile: UserProfile = {
-  id: 1,
-  name: 'Ana',
-  alias: 'Ana lectora',
-  email: 'ana@example.com',
-  language: 'es',
-  profileDescription: null,
-  profileVisibility: 'public',
-  locationVisibility: 'city',
-  location: null,
-  interests: ['fiction'],
-  city: 'Buenos Aires',
-  neighborhood: 'Palermo',
-}
-
 describe('ProfilePage', () => {
-  beforeEach(() => {
-    fetchProfileMock.mockResolvedValue(profile)
-    updateProfileMock.mockResolvedValue(profile)
-  })
-
-  test('loads interests and location, clears neighborhood when city changes', async () => {
+  test('renders identity, metrics and lower profile cards', () => {
     renderWithProviders(<ProfilePage />)
 
-    expect(await screen.findByDisplayValue('Ana lectora')).toBeInTheDocument()
-    expect(
-      screen.getByLabelText('profile.interestOptions.fiction')
-    ).toBeChecked()
-    expect(screen.getByDisplayValue('Palermo')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Mariano' })).toBeVisible()
+    for (const metric of ['146', '23', '58', '41']) {
+      expect(screen.getAllByText(metric)[0]).toBeVisible()
+    }
+    expect(screen.getByText('Preferencias de lectura')).toBeVisible()
+    expect(screen.getByText('Objetivo de lectura')).toBeVisible()
+    expect(screen.getByText('Logros')).toBeVisible()
+  })
 
-    fireEvent.change(screen.getByLabelText('profile.city'), {
-      target: { value: 'La Plata' },
+  test('edits the public profile and reports success', () => {
+    renderWithProviders(<ProfilePage />)
+
+    fireEvent.click(screen.getByRole('button', { name: /Editar perfil/ }))
+    fireEvent.change(screen.getByLabelText('Nombre'), {
+      target: { value: 'Mariano Lector' },
     })
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar cambios' }))
 
-    expect(screen.getByLabelText('profile.neighborhood')).toHaveValue('')
-    expect(screen.queryByDisplayValue('Palermo')).not.toBeInTheDocument()
-  })
-
-  test('recommends three interests without blocking a valid profile save', async () => {
-    renderWithProviders(<ProfilePage />)
-
-    await screen.findByDisplayValue('Ana lectora')
     expect(
-      screen.getByText('profile.interestsRecommendation')
-    ).toBeInTheDocument()
-
-    fireEvent.submit(
-      screen.getByRole('button', { name: 'profile.save' }).closest('form')!
-    )
-
-    await waitFor(() => expect(updateProfileMock).toHaveBeenCalled())
-    expect(updateProfileMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        interests: ['fiction'],
-        city: 'Buenos Aires',
-        neighborhood: 'Palermo',
-      })
-    )
+      screen.getByRole('heading', { name: 'Mariano Lector' })
+    ).toBeVisible()
+    expect(screen.getByText('Perfil actualizado')).toBeVisible()
   })
 })

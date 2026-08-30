@@ -1,182 +1,194 @@
-import { BookCard } from '@components/book/BookCard'
-import { BookDetailModal } from '@components/book/BookDetailModal/BookDetailModal'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { PublishBookModal } from '@components/publish/PublishBookModal/PublishBookModal'
-import { TabsMenu } from '@components/ui/tabs-menu/TabsMenu'
-import { useBooks } from '@hooks/api/useBooks'
-import { useUserBooks } from '@hooks/api/useUserBooks'
-import { getPathSegment } from '@utils/path'
-import React, { useMemo, useState } from 'react'
-import { useTranslation } from 'react-i18next'
+import { useMemo, useState } from 'react'
 import { useLocation, useMatch, useNavigate } from 'react-router-dom'
 
-import type { ApiUserBook } from '@src/api/books/userBooks.types'
+import type { PrototypeBook } from '@src/features/prototype/catalog'
+import { usePrototype } from '@src/features/prototype/PrototypeContext'
+import {
+  BookCover,
+  FixtureState,
+  PageHeader,
+  Panel,
+  PrototypeBookCard,
+  PrototypeButton,
+  PrototypePage,
+} from '@src/features/prototype/PrototypeUI'
 
 import styles from './BooksPage.module.scss'
 
+const tabs = [
+  { key: 'all', path: '', label: 'Todos' },
+  { key: 'mine', path: 'mine', label: 'Mis libros' },
+  { key: 'trade', path: 'trade', label: 'Disponibles para intercambio' },
+  { key: 'seeking', path: 'seeking', label: 'Buscando' },
+  { key: 'sale', path: 'sale', label: 'A la venta' },
+] as const
+
 export const BooksPage = () => {
-  const { t } = useTranslation()
-  const location = useLocation()
+  const { catalog } = usePrototype()
   const navigate = useNavigate()
-  const [search, setSearch] = useState('')
-  const { data: catalogData } = useBooks()
-  const { data: userBooksData } = useUserBooks()
-  const catalogBooks = useMemo(
-    () => (Array.isArray(catalogData) ? catalogData : []),
-    [catalogData]
-  )
-  const userBooks = useMemo(
-    () => (Array.isArray(userBooksData) ? userBooksData : []),
-    [userBooksData]
-  )
-  const allBooks = useMemo(() => {
-    const byId = new Map(catalogBooks.map((book) => [book.id, book]))
-    userBooks.forEach((book) => byId.set(book.id, book))
-    return [...byId.values()]
-  }, [catalogBooks, userBooks])
-
-  const basePath = '/books'
-
-  const tabs = useMemo(
-    () => [
-      { key: 'all', path: '', label: t('booksPage.tabs.all') },
-      { key: 'mine', path: 'mine', label: t('booksPage.tabs.mine') },
-      { key: 'trade', path: 'trade', label: t('booksPage.tabs.for_trade') },
-      { key: 'seeking', path: 'seeking', label: t('booksPage.tabs.seeking') },
-      { key: 'sale', path: 'sale', label: t('booksPage.tabs.for_sale') },
-    ],
-    [t]
-  )
-
-  const tabPaths = useMemo(() => tabs.map((t) => t.path), [tabs])
-
-  const pathSegment = getPathSegment(location.pathname, basePath)
-  const activeTab = (tabs.find((tab) => tab.path === pathSegment)?.key ??
-    'all') as 'all' | 'mine' | 'trade' | 'seeking' | 'sale'
-
+  const location = useLocation()
   const publishMatch = useMatch('/books/new')
-  const detailMatch = useMatch('/books/:bookId')
+  const [search, setSearch] = useState('')
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  const [selectedBook, setSelectedBook] = useState<PrototypeBook | null>(null)
+  const segment = location.pathname.replace(/^\/books\/?/, '').split('/')[0]
+  const active = tabs.find((tab) => tab.path === segment)?.key ?? 'all'
 
-  const bookId = detailMatch?.params?.bookId
-
-  // Exclude 'new' and known tab segments from being treated as a book ID
-  const selectedBook =
-    bookId && bookId !== 'new' && !tabPaths.includes(bookId)
-      ? ([...catalogBooks, ...userBooks].find((book) => book.id === bookId) ??
-        null)
-      : null
-
-  const books =
-    activeTab === 'all'
-      ? allBooks
-      : activeTab === 'mine'
-        ? userBooks
-        : catalogBooks
-
-  const filterByTab = (book: ApiUserBook) => {
-    switch (activeTab) {
-      case 'all':
-        return true
-      case 'trade':
-        return !!book.isForTrade
-      case 'seeking':
-        return !!book.isSeeking
-      case 'sale':
-        return !!book.isForSale
-      default:
-        return true
-    }
-  }
-
-  const filteredBooks = books.filter((book) => {
-    const matchesSearch = `${book.title} ${book.author}`
-      .toLowerCase()
-      .includes(search.toLowerCase())
-    return matchesSearch && filterByTab(book)
-  })
-
-  const handleOpenModal = () => {
-    navigate('/books/new', { state: { from: location.pathname } })
-  }
-
-  const handleCloseModal = () => {
-    navigate('/books', { replace: true })
-  }
-
-  const handlePublished = (bookIdArg: string) => {
-    navigate(`/books/${bookIdArg}`, { replace: true })
-  }
-
-  const handleCardClick = (bookIdArg: string) => {
-    navigate(`/books/${bookIdArg}`)
-  }
-
-  const handleCloseDetail = () => {
-    navigate('/books', { replace: true })
-  }
+  const books = useMemo(() => {
+    let result = [...catalog.books]
+    if (active === 'mine') result = result.slice(0, 2)
+    if (active === 'trade')
+      result = result.filter((book) => book.mode === 'Intercambio')
+    if (active === 'seeking')
+      result = result.filter((book) => book.mode === 'Buscado')
+    if (active === 'sale')
+      result = result.filter((book) => book.mode === 'Venta')
+    const normalized = search.trim().toLowerCase()
+    return normalized
+      ? result.filter((book) =>
+          `${book.title} ${book.author}`.toLowerCase().includes(normalized)
+        )
+      : result
+  }, [active, catalog.books, search])
 
   return (
-    <BaseLayout id={'books-page'}>
-      <div className={styles.wrapper}>
-        <header className={styles.header}>
-          <h1>{t('booksPage.title')}</h1>
-          <div className={styles.searchRow}>
-            <input
-              type="text"
-              className={styles.search}
-              placeholder={t('booksPage.search_placeholder') ?? ''}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <div className={styles.chips}>
-              <span className={styles.chip}>{t('booksPage.filter.near')}</span>
-              <span className={styles.chip}>
-                {t('booksPage.filter.available')}
-              </span>
-            </div>
-            <button className={styles.publishButton} onClick={handleOpenModal}>
-              {t('booksPage.publish_button')}
-            </button>
-          </div>
-        </header>
-
-        {selectedBook && (
-          <section aria-live="polite" className={styles.highlight}>
-            <h2>{t('booksPage.recently_published')}</h2>
-            <BookCard {...selectedBook} />
-          </section>
-        )}
-
-        <TabsMenu items={tabs} basePath={basePath} />
-
-        {filteredBooks.length === 0 ? (
-          <div className={styles.empty}>
-            {t(`booksPage.empty.${activeTab}`)}
-          </div>
-        ) : (
-          <div className={styles.grid}>
-            {filteredBooks.map((book) => (
-              <BookCard
-                key={book.id}
-                {...book}
-                onClick={() => handleCardClick(book.id)}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-      {publishMatch && (
-        <PublishBookModal
-          isOpen={true}
-          onClose={handleCloseModal}
-          onPublished={handlePublished}
+    <BaseLayout id="books-page">
+      <PrototypePage>
+        <PageHeader
+          title="Explorar libros"
+          description="Descubrí libros cerca tuyo para intercambiar, comprar o sumar a tu lista."
+          actions={
+            <PrototypeButton
+              tone="primary"
+              onClick={() => navigate('/books/new')}
+            >
+              ＋ Publicar un libro
+            </PrototypeButton>
+          }
         />
-      )}
-      <BookDetailModal
-        isOpen={!!selectedBook}
-        bookId={selectedBook?.id}
-        onClose={handleCloseDetail}
-      />
+
+        <div className={styles.toolbar}>
+          <label className={styles.search}>
+            <span aria-hidden="true">⌕</span>
+            <input
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Buscar por título, autor o género"
+              aria-label="Buscar libros"
+            />
+          </label>
+          <PrototypeButton
+            onClick={() => setFiltersOpen((value) => !value)}
+            aria-expanded={filtersOpen}
+          >
+            ☷ Filtros
+          </PrototypeButton>
+        </div>
+
+        {filtersOpen ? (
+          <Panel className={styles.filters}>
+            <button>Hasta 2 km</button>
+            <button>Buen estado</button>
+            <button>Disponible hoy</button>
+            <button>Ordenar: cercanos</button>
+          </Panel>
+        ) : null}
+
+        <div
+          className={styles.tabs}
+          role="tablist"
+          aria-label="Tipos de libros"
+        >
+          {tabs.map((tab) => (
+            <button
+              key={tab.key}
+              role="tab"
+              aria-selected={active === tab.key}
+              onClick={() =>
+                navigate(tab.path ? `/books/${tab.path}` : '/books')
+              }
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        <FixtureState region="books">
+          {books.length ? (
+            <div className={styles.grid}>
+              {books.map((book) => (
+                <PrototypeBookCard
+                  key={book.id}
+                  book={book}
+                  onClick={() => setSelectedBook(book)}
+                />
+              ))}
+            </div>
+          ) : (
+            <Panel className={styles.empty}>
+              <strong>No encontramos libros</strong>
+              <span>Probá con otra búsqueda o eliminá algunos filtros.</span>
+            </Panel>
+          )}
+        </FixtureState>
+
+        <div className={styles.pagination} aria-label="Páginas de resultados">
+          <button aria-label="Página anterior">←</button>
+          <span className={styles.activeDot} />
+          <span />
+          <span />
+          <button aria-label="Página siguiente">→</button>
+        </div>
+
+        {selectedBook ? (
+          <div
+            className={styles.modalBackdrop}
+            role="presentation"
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) {
+                setSelectedBook(null)
+              }
+            }}
+          >
+            <Panel className={styles.bookDialog} as="div">
+              <div className={styles.dialogCover}>
+                <BookCover book={selectedBook} />
+              </div>
+              <div>
+                <button
+                  className={styles.close}
+                  onClick={() => setSelectedBook(null)}
+                  aria-label="Cerrar detalle"
+                >
+                  ×
+                </button>
+                <span className={styles.dialogMode}>{selectedBook.mode}</span>
+                <h2>{selectedBook.title}</h2>
+                <p>{selectedBook.author}</p>
+                <p className={styles.description}>
+                  Una historia para perderse, conversar y compartir. El ejemplar
+                  está en buen estado y disponible cerca tuyo.
+                </p>
+                <PrototypeButton tone="primary">
+                  Contactar a {selectedBook.owner}
+                </PrototypeButton>
+              </div>
+            </Panel>
+          </div>
+        ) : null}
+      </PrototypePage>
+
+      {publishMatch ? (
+        <PublishBookModal
+          isOpen
+          onClose={() => navigate('/books', { replace: true })}
+          onPublished={(bookId) =>
+            navigate(`/books/${bookId}`, { replace: true })
+          }
+        />
+      ) : null}
     </BaseLayout>
   )
 }

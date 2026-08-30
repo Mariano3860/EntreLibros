@@ -15,7 +15,7 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
         | null
       if (storedTheme) return storedTheme
     }
-    return 'light'
+    return 'dark'
   })
 
   useEffect(() => {

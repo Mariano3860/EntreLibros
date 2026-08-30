@@ -1,34 +1,33 @@
-import { fireEvent, within } from '@testing-library/react'
-import { describe, expect, test } from 'vitest'
+import { fireEvent, screen } from '@testing-library/react'
+import { describe, expect, test, vi } from 'vitest'
+
+vi.mock('@src/api/auth/me.service', () => ({
+  fetchMe: vi.fn().mockRejectedValue(new Error('unauthenticated')),
+}))
 
 import { StatsPage } from '@src/pages/stats/StatsPage'
 
 import { renderWithProviders } from '../../test-utils'
 
 describe('StatsPage', () => {
-  test('renders all sections', async () => {
-    const { getByText, findByText, findByLabelText } = renderWithProviders(
-      <StatsPage />
-    )
-    expect(getByText('community.stats.title')).toBeInTheDocument()
-    expect(getByText('community.stats.subtitle')).toBeInTheDocument()
-    await findByText('community.stats.kpis.exchanges')
-    await findByText('community.stats.kpis.activeHouses')
-    await findByText('community.stats.kpis.activeUsers')
-    await findByText('community.stats.kpis.booksPublished')
-    await findByText('community.stats.trends.exchanges')
-    await findByText('community.stats.trends.newBooks')
-    await findByText('community.stats.topContributors.title')
-    const list = await findByLabelText('top-contributors')
-    expect(within(list).getAllByRole('listitem')).toHaveLength(5)
-    await findByText('community.stats.map.title')
-    await findByText('community.stats.hotSearches.title')
+  test('renders the prototype metrics and analytic regions', () => {
+    renderWithProviders(<StatsPage />)
+
+    for (const metric of ['2.843', '1.327', '5.891', '7.642']) {
+      expect(screen.getByText(metric)).toBeVisible()
+    }
+    expect(
+      screen.getByRole('img', { name: 'Intercambios por día' })
+    ).toBeVisible()
+    expect(screen.getByText('Rincones más activos')).toBeVisible()
+    expect(screen.getByText('Contribuyentes destacados')).toBeVisible()
   })
 
-  test('changes active range', async () => {
-    const { findByText } = renderWithProviders(<StatsPage />)
-    const button = await findByText('community.stats.filters.30d')
-    fireEvent.click(button)
-    expect(button).toHaveAttribute('aria-pressed', 'true')
+  test('changes the selected period', () => {
+    renderWithProviders(<StatsPage />)
+    fireEvent.change(screen.getByRole('combobox'), {
+      target: { value: 'Últimos 30 días' },
+    })
+    expect(screen.getByRole('combobox')).toHaveValue('Últimos 30 días')
   })
 })
