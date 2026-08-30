@@ -4,6 +4,7 @@ import { HeroLoggedIn } from '@components/home/HeroLoggedIn'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { UserActivityItem } from '@components/user/UserActivityItem'
 import { useAuth } from '@contexts/auth/AuthContext'
+import { useUserActivity } from '@hooks/api/useUserActivity'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
@@ -12,27 +13,16 @@ import { useBooks } from '@src/hooks/api/useBooks'
 
 import styles from './HomePage.module.scss'
 
-// Mock activity
-const mockActivities = [
-  {
-    bookTitle: 'Sapiens',
-    action: 'added' as const,
-    coverUrl: 'https://covers.openlibrary.org/b/id/11172236-L.jpg',
-    timestamp: new Date(Date.now() - 3600 * 1000).toISOString(), // hace 1 hora
-  },
-  {
-    bookTitle: 'The Hobbit',
-    action: 'exchanged' as const,
-    coverUrl: 'https://covers.openlibrary.org/b/id/6979861-L.jpg',
-    timestamp: new Date(Date.now() - 86400 * 1000).toISOString(), // hace 1 día
-  },
-]
-
 export const HomePage = () => {
   const { t } = useTranslation()
   const { isAuthenticated, isLoading } = useAuth()
   const { data: booksData } = useBooks()
   const books = Array.isArray(booksData) ? booksData : []
+  const {
+    data: activity = [],
+    isLoading: isActivityLoading,
+    isError: isActivityError,
+  } = useUserActivity(isAuthenticated)
   const navigate = useNavigate()
 
   if (isLoading) return null
@@ -70,7 +60,12 @@ export const HomePage = () => {
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
             <h2>{t('home.explore_books')}</h2>
-            <button className={styles.linkButton}>{t('home.see_all')}</button>
+            <button
+              className={styles.linkButton}
+              onClick={() => navigate(`/${HOME_URLS.BOOKS}`)}
+            >
+              {t('home.see_all')}
+            </button>
           </div>
           <div className={styles.bookList}>
             {books?.map((book, idx) => (
@@ -82,12 +77,20 @@ export const HomePage = () => {
         {/* MIS LIBROS - FEED */}
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
-            <h2>{t('home.my_books')}</h2>
+            <h2>{t('home.my_activity')}</h2>
           </div>
           <div className={styles.activityFeed}>
-            {mockActivities.map((activity, idx) => (
-              <UserActivityItem key={idx} {...activity} />
-            ))}
+            {isActivityLoading ? (
+              <p>{t('home.activity_loading')}</p>
+            ) : isActivityError ? (
+              <p role="status">{t('home.activity_error')}</p>
+            ) : activity.length > 0 ? (
+              activity.map((item) => (
+                <UserActivityItem key={item.id} {...item} />
+              ))
+            ) : (
+              <p>{t('home.activity_empty')}</p>
+            )}
           </div>
         </section>
 

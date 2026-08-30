@@ -9,6 +9,7 @@ export const RELATIVE_API_ROUTES = {
   USER: {
     PROFILE: `/user/profile`,
     PUBLIC_PROFILE: (id: number) => `/user/profile/${id}`,
+    ACTIVITY: `/user/activity`,
   },
   CONTACT_FORM: {
     SUBMIT: `/contact/submit`,
@@ -24,6 +25,7 @@ export const RELATIVE_API_ROUTES = {
     FEED: `/community/feed`,
     ACTIVITY: `/community/activity`,
     SUGGESTIONS: `/community/suggestions`,
+    STORIES: `/community/stories`,
     MESSAGES: {
       AVAILABILITY: `/community/messages/availability`,
     },
@@ -36,6 +38,7 @@ export const RELATIVE_API_ROUTES = {
   MESSAGES: {
     CONVERSATIONS: `/messages`,
     CREATE_CONVERSATION: `/messages/conversations`,
+    BOOKS: (conversationId: number) => `/messages/${conversationId}/books`,
     HISTORY: (conversationId: number) => `/messages/${conversationId}/messages`,
     READ: (conversationId: number) => `/messages/${conversationId}/read`,
   },

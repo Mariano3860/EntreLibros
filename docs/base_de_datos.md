@@ -4,25 +4,33 @@ PostgreSQL es la persistencia principal; PostGIS se usa para datos geográficos 
 
 ## Migraciones vigentes
 
-| Migración | Responsabilidad |
-| --- | --- |
-| 001 | Esquema inicial de libros |
-| 002 | Usuarios |
-| 003 | Idioma de usuario |
-| 004 | Ubicación/PostGIS de usuarios |
-| 005 | Campos adicionales de libros |
-| 006 | Publicaciones/listings |
-| 007 | Rincones comunitarios |
-| 008 | Mensajes de contacto |
-| 009 | Estados de publicación |
-| 010 | Conversaciones y mensajes |
-| 011 | Acuerdos |
-| 012 | Reservas asociadas a acuerdos/listings |
-| 013 | Corrección del índice de reservas |
-| 014 | Bloqueos entre usuarios |
-| 015 | Usuario y semilla del bot de mensajería |
+| Migración | Responsabilidad                         |
+| --------- | --------------------------------------- |
+| 001       | Esquema inicial de libros               |
+| 002       | Usuarios                                |
+| 003       | Idioma de usuario                       |
+| 004       | Ubicación/PostGIS de usuarios           |
+| 005       | Campos adicionales de libros            |
+| 006       | Publicaciones/listings                  |
+| 007       | Rincones comunitarios                   |
+| 008       | Mensajes de contacto                    |
+| 009       | Estados de publicación                  |
+| 010       | Conversaciones y mensajes               |
+| 011       | Acuerdos                                |
+| 012       | Reservas asociadas a acuerdos/listings  |
+| 013       | Corrección del índice de reservas       |
+| 014       | Bloqueos entre usuarios                 |
+| 015       | Usuario y semilla del bot de mensajería |
+| 016       | Privacidad de perfil                    |
+| 017       | Vencimiento de publicaciones            |
+| 018       | Propietario de Rincón comunitario       |
+| 019       | Notificaciones                          |
+| 020       | Intereses y ubicación de perfil         |
+| 021       | Historias de Comunidad                  |
 
 El contenido exacto de cada migración es la autoridad. No edites una migración ya aplicada: agrega otra numerada y prueba upgrade desde una base existente.
+
+La migración `021_create_community_stories.sql` agrega historias sociales con texto, imagen opcional y referencia opcional a una publicación propia vigente. Los adjuntos de libros en mensajería reutilizan el JSONB existente de `messages.attachment_metadata` y no requieren una tabla adicional.
 
 ## Mensajería y bot
 

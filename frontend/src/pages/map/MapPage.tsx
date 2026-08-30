@@ -1,5 +1,4 @@
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
-import { EmptyState } from '@components/map/common/EmptyState'
 import { ErrorBanner } from '@components/map/common/ErrorBanner'
 import { CreateCornerFab } from '@components/map/CreateCornerFab/CreateCornerFab'
 import { FilterRail } from '@components/map/FilterRail/FilterRail'
@@ -56,10 +55,15 @@ export const MapPage = () => {
   const [layers, setLayers] = useState<MapLayerToggles>(DEFAULT_LAYERS)
   const [bbox, setBbox] = useState<MapBoundingBox>(DEFAULT_BBOX)
   const [selectedPin, setSelectedPin] = useState<MapPin | null>(null)
+  const [userLocation, setUserLocation] = useState<{
+    latitude: number
+    longitude: number
+  } | null>(null)
   const [isFilterRailOpen, setFilterRailOpen] = useState(true)
   const [geolocationDenied, setGeolocationDenied] = useState(false)
   const [zoneFallback, setZoneFallback] = useState('')
   const [isCreateCornerOpen, setCreateCornerOpen] = useState(false)
+  const locationRequestedRef = useRef(false)
 
   const viewStartedAtRef = useRef<number | null>(null)
   const trackedFirstPinRef = useRef(false)
@@ -84,6 +88,33 @@ export const MapPage = () => {
   )
 
   const { data, isLoading, isFetching, isError, refetch } = useMapData(mapQuery)
+
+  useEffect(() => {
+    if (locationRequestedRef.current) return
+    locationRequestedRef.current = true
+
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
+      setGeolocationDenied(true)
+      return
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        const { latitude, longitude } = coords
+        setUserLocation({ latitude, longitude })
+        setBbox(
+          boundingBoxFromCenter(
+            latitude,
+            longitude,
+            DEFAULT_FILTERS.distanceKm,
+            { minDistanceKm: MIN_BOUNDING_BOX_RADIUS_KM }
+          )
+        )
+        setGeolocationDenied(false)
+      },
+      () => setGeolocationDenied(true)
+    )
+  }, [])
 
   useEffect(() => {
     track('map.view_opened', { locale: i18n.language })
@@ -121,8 +152,6 @@ export const MapPage = () => {
       ? (data?.activity?.length ?? 0)
       : 0
   const isEmpty = visibleCorners + visiblePublications + visibleActivity === 0
-  const showEmptyState = isEmpty && !isLoading && !isFetching
-
   const activityPoints = filters.recentActivity ? (data?.activity ?? []) : []
 
   const handleToggleLayer = (layer: MapLayerKey) => {
@@ -138,11 +167,20 @@ export const MapPage = () => {
   }
 
   const handleDistanceChange = (value: number) => {
+    const center = userLocation ?? {
+      latitude: (bbox.north + bbox.south) / 2,
+      longitude: (bbox.east + bbox.west) / 2,
+    }
     setFilters((prev) => {
       const next = { ...prev, distanceKm: value }
       track('map.filter_changed', { filter: 'distance', value })
       return next
     })
+    setBbox(
+      boundingBoxFromCenter(center.latitude, center.longitude, value, {
+        minDistanceKm: MIN_BOUNDING_BOX_RADIUS_KM,
+      })
+    )
   }
 
   const handleToggleOpenNow = () => {
@@ -187,6 +225,7 @@ export const MapPage = () => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords
+        setUserLocation({ latitude, longitude })
         const nextBbox: MapBoundingBox = boundingBoxFromCenter(
           latitude,
           longitude,
@@ -269,6 +308,7 @@ export const MapPage = () => {
                 corners={data?.corners ?? []}
                 publications={data?.publications ?? []}
                 activity={activityPoints}
+                userLocation={userLocation}
                 layers={layers}
                 selectedPin={selectedPin}
                 onSelectPin={handleSelectPin}
@@ -276,21 +316,6 @@ export const MapPage = () => {
                 isFetching={isFetching}
                 isEmpty={isEmpty}
               />
-            </div>
-
-            <div
-              className={styles.detailPlaceholder}
-              data-testid="map-detail-placeholder"
-              data-has-selection={Boolean(selectedPin)}
-            >
-              {showEmptyState ? (
-                <EmptyState
-                  title={t('map.empty.title')}
-                  description={t('map.empty.description')}
-                  actionLabel={t('map.empty.cta.createCorner')}
-                  onAction={handleCreateCorner}
-                />
-              ) : null}
             </div>
           </div>
         </div>

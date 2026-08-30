@@ -49,6 +49,28 @@
         }
       }
     },
+    "/api/user/activity": {
+      "get": {
+        "summary": "Listar la actividad del usuario autenticado",
+        "tags": ["User"],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Eventos de publicaciones ofrecidas e intercambios completados"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "description": "Error al consultar la actividad"
+          }
+        }
+      }
+    },
     "/api/user/profile/{id}": {
       "get": {
         "summary": "Consultar un perfil público",
@@ -522,6 +544,39 @@
         }
       }
     },
+    "/api/messages/{conversationId}/books": {
+      "get": {
+        "summary": "Listar libros elegibles de una conversación",
+        "tags": ["Messaging"],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "conversationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Libros propios y libros públicos de la contraparte"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "description": "La persona no participa en la conversación"
+          }
+        }
+      }
+    },
     "/api/messages/{conversationId}/messages": {
       "get": {
         "summary": "Read authorized conversation history",
@@ -606,7 +661,19 @@
                     "type": "string"
                   },
                   "attachmentMetadata": {
-                    "type": "object"
+                    "type": "object",
+                    "properties": {
+                      "key": { "type": "string" },
+                      "contentType": { "type": "string" },
+                      "size": { "type": "integer", "minimum": 1 },
+                      "name": { "type": "string" },
+                      "kind": { "type": "string", "enum": ["book"] },
+                      "bookId": { "type": "string" },
+                      "title": { "type": "string" },
+                      "author": { "type": "string" },
+                      "coverUrl": { "type": "string" }
+                    },
+                    "required": ["key", "contentType", "size"]
                   }
                 }
               }
@@ -2267,6 +2334,35 @@
         }
       }
     },
+    "/api/community/stories": {
+      "post": {
+        "summary": "Create a community story",
+        "tags": ["Community"],
+        "security": [{ "cookieAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCommunityStory"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Persisted community story",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/StoryFeedItem" }
+              }
+            }
+          },
+          "401": { "description": "auth.errors.unauthorized" },
+          "422": { "description": "community.story validation error" }
+        }
+      }
+    },
     "/api/community/activity": {
       "get": {
         "summary": "List recent community activity avatars",
@@ -2862,8 +2958,59 @@
           },
           {
             "$ref": "#/components/schemas/SeekingFeedItem"
+          },
+          {
+            "$ref": "#/components/schemas/StoryFeedItem"
           }
         ]
+      },
+      "StoryFeedItem": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "user": { "type": "string" },
+          "avatar": { "type": "string" },
+          "time": { "type": "string" },
+          "likes": { "type": "integer", "minimum": 0 },
+          "type": { "type": "string", "enum": ["story"] },
+          "title": { "type": "string" },
+          "body": { "type": "string" },
+          "image": { "type": "string" },
+          "book": { "$ref": "#/components/schemas/StoryBook" }
+        },
+        "required": [
+          "id",
+          "user",
+          "avatar",
+          "time",
+          "likes",
+          "type",
+          "title",
+          "body"
+        ]
+      },
+      "CreateCommunityStory": {
+        "type": "object",
+        "properties": {
+          "body": { "type": "string" },
+          "imageUrl": { "type": ["string", "null"] },
+          "bookListingId": { "type": ["string", "null"] }
+        },
+        "anyOf": [
+          { "required": ["body"] },
+          { "required": ["imageUrl"] },
+          { "required": ["bookListingId"] }
+        ]
+      },
+      "StoryBook": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "author": { "type": "string" },
+          "cover": { "type": "string" }
+        },
+        "required": ["id", "title", "author", "cover"]
       },
       "ActivityItem": {
         "type": "object",

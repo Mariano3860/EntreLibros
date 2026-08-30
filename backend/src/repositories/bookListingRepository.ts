@@ -660,6 +660,20 @@ export async function listUserBookListings(
   return fetchBookListings('WHERE p.user_id = $1', [userId]);
 }
 
+export async function listPublicBookListingsForUser(
+  userId: number
+): Promise<BookListing[]> {
+  return fetchBookListings(
+    `WHERE p.user_id = $1
+       AND p.availability = 'public'
+       AND p.is_draft = false
+       AND p.status = 'available'
+       AND (p.expires_at IS NULL OR p.expires_at > NOW())`,
+    [userId],
+    'ORDER BY p.created_at DESC'
+  );
+}
+
 export async function renewBookListing(
   id: number,
   userId: number

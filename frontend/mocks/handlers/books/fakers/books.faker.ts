@@ -1,11 +1,12 @@
-import { faker } from '@faker-js/faker'
-
 import { ApiBook } from '@src/api/books/books.types'
 
 interface BookData {
   author: string
   isbn: string
   titles: { en: string; es: string }
+  isForTrade?: boolean
+  isForSale?: boolean
+  isSeeking?: boolean
 }
 
 const BOOKS: BookData[] = [
@@ -13,6 +14,19 @@ const BOOKS: BookData[] = [
     author: 'George Orwell',
     isbn: '9780451524935',
     titles: { en: '1984', es: '1984' },
+    isForTrade: true,
+  },
+  {
+    author: 'Carlos Argan',
+    isbn: '9780000000001',
+    titles: { en: 'Matisse in Belgium', es: 'Matisse en Bélgica' },
+    isForSale: true,
+  },
+  {
+    author: 'A. G. Rivadera',
+    isbn: '9780000000002',
+    titles: { en: 'The Invisible Octopus', es: 'El pulpo invisible' },
+    isSeeking: true,
   },
   {
     author: 'Gabriel García Márquez',
@@ -54,12 +68,16 @@ export const generateBooks = (
   seed?: number,
   language: string = 'es'
 ): ApiBook[] => {
-  faker.seed(seed ?? 201)
-  return faker.helpers
-    .arrayElements(BOOKS, 3)
-    .map(({ titles, author, isbn }) => ({
+  void seed
+  return BOOKS.slice(0, 3).map(
+    ({ titles, author, isbn, isForTrade, isForSale, isSeeking }) => ({
+      id: `mock-${isbn}`,
       title: titles[language as 'en' | 'es'] || titles.es,
       author,
       coverUrl: coverFromIsbn(isbn),
-    }))
+      isForTrade,
+      isForSale,
+      isSeeking,
+    })
+  )
 }

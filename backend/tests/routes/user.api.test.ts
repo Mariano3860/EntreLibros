@@ -79,6 +79,56 @@ describe('user language API', () => {
   });
 });
 
+describe('user activity API', () => {
+  test('requires authentication', async () => {
+    await request(app).get('/api/user/activity').expect(401);
+  });
+
+  test('returns the authenticated user’s persisted listings', async () => {
+    const cookie = await (async () => {
+      await request(app)
+        .post('/api/auth/register')
+        .send({
+          name: 'Activity User',
+          email: 'activity@example.com',
+          password: 'Str0ng!Pass1',
+        })
+        .expect(201);
+      const login = await request(app)
+        .post('/api/auth/login')
+        .send({ email: 'activity@example.com', password: 'Str0ng!Pass1' })
+        .expect(200);
+      return login.headers['set-cookie'][0] as string;
+    })();
+    const user = await findUserByEmail('activity@example.com');
+    expect(user).not.toBeNull();
+    const books = await client.query<{ id: number; title: string }>(
+      `INSERT INTO books (title) VALUES ('Activity one'), ('Activity two')
+       RETURNING id, title`
+    );
+    await client.query(
+      `INSERT INTO book_listings (user_id, book_id, type, status)
+       VALUES ($1, $2, 'offer', 'available'), ($1, $3, 'offer', 'available')`,
+      [user!.id, books.rows[0].id, books.rows[1].id]
+    );
+
+    await request(app)
+      .get('/api/user/activity')
+      .set('Cookie', cookie)
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body).toHaveLength(2);
+        expect(body.map((item: { action: string }) => item.action)).toEqual([
+          'offered',
+          'offered',
+        ]);
+        expect(
+          body.map((item: { bookTitle: string }) => item.bookTitle)
+        ).toEqual(expect.arrayContaining(['Activity one', 'Activity two']));
+      });
+  });
+});
+
 describe('user profile API', () => {
   async function createLoggedInUser(email: string) {
     await request(app)

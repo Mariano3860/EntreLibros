@@ -29,6 +29,9 @@ type MessageComposerProps = {
   theirBooks: Book[]
   counterpartName: string
   conversationId: number
+  booksLoading?: boolean
+  booksError?: boolean
+  onRetryBooks?: () => void
 }
 
 const EMOJIS = ['😀', '😁', '😂', '😍', '🤔', '👍', '🎉', '📚']
@@ -44,6 +47,9 @@ export const MessageComposer = ({
   theirBooks,
   counterpartName,
   conversationId,
+  booksLoading = false,
+  booksError = false,
+  onRetryBooks,
 }: MessageComposerProps) => {
   const { t } = useTranslation()
   const textareaId = useId()
@@ -321,6 +327,9 @@ export const MessageComposer = ({
         myBooks={myBooks}
         theirBooks={theirBooks}
         counterpartName={counterpartName}
+        booksLoading={booksLoading}
+        booksError={booksError}
+        onRetryBooks={onRetryBooks}
         onClose={handleCloseModal}
         onConfirm={handleAttachBookConfirm}
       />
@@ -329,6 +338,9 @@ export const MessageComposer = ({
         myBooks={myBooks}
         theirBooks={theirBooks}
         counterpartName={counterpartName}
+        booksLoading={booksLoading}
+        booksError={booksError}
+        onRetryBooks={onRetryBooks}
         onClose={handleCloseModal}
         onConfirm={handleSwapConfirm}
       />
@@ -337,6 +349,9 @@ export const MessageComposer = ({
         myBooks={myBooks}
         theirBooks={theirBooks}
         counterpartName={counterpartName}
+        booksLoading={booksLoading}
+        booksError={booksError}
+        onRetryBooks={onRetryBooks}
         onClose={handleCloseModal}
         onConfirm={handleAgreementConfirm}
       />

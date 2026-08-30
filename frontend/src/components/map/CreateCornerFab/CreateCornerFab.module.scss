@@ -15,7 +15,7 @@
   box-shadow: $box-shadow-lg;
   font-weight: $font-weight-bold;
   cursor: pointer;
-  z-index: $z-index-fixed;
+  z-index: 1000;
   transition:
     transform $transition-duration-fast,
     background $transition-duration-fast;

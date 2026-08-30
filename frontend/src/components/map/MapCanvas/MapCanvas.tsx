@@ -6,11 +6,13 @@ import type {
   MapPin,
   MapPublicationPin,
 } from '@api/map/map.types'
+import { divIcon } from 'leaflet'
 import { useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   CircleMarker,
   MapContainer,
+  Marker,
   TileLayer,
   Tooltip,
   useMap,
@@ -19,6 +21,18 @@ import {
 import 'leaflet/dist/leaflet.css'
 
 import styles from './MapCanvas.module.scss'
+
+const userLocationIcon = divIcon({
+  className: styles.userLocationIcon,
+  iconSize: [34, 34],
+  iconAnchor: [17, 17],
+  html: `<span class="${styles.userLocationIconInner}" aria-hidden="true">
+    <svg viewBox="0 0 24 24" focusable="false">
+      <path d="M12 21s7-6.1 7-12A7 7 0 1 0 5 9c0 5.9 7 12 7 12Z" />
+      <circle cx="12" cy="9" r="2.5" />
+    </svg>
+  </span>`,
+})
 
 type MapCanvasProps = {
   bbox: MapBoundingBox
@@ -31,6 +45,7 @@ type MapCanvasProps = {
   isLoading: boolean
   isFetching: boolean
   isEmpty: boolean
+  userLocation?: { latitude: number; longitude: number } | null
 }
 
 const BoundsController = ({ bbox }: { bbox: MapBoundingBox }) => {
@@ -41,6 +56,27 @@ const BoundsController = ({ bbox }: { bbox: MapBoundingBox }) => {
     const northEast: [number, number] = [bbox.north, bbox.east]
     map.fitBounds([southWest, northEast], { padding: [16, 16] })
   }, [map, bbox])
+
+  return null
+}
+
+const LocationController = ({
+  userLocation,
+}: {
+  userLocation: { latitude: number; longitude: number } | null
+}) => {
+  const map = useMap()
+
+  useEffect(() => {
+    if (!userLocation) return
+    map.setView(
+      [userLocation.latitude, userLocation.longitude],
+      map.getZoom(),
+      {
+        animate: false,
+      }
+    )
+  }, [map, userLocation])
 
   return null
 }
@@ -76,6 +112,7 @@ export const MapCanvas = ({
   isLoading,
   isFetching,
   isEmpty,
+  userLocation = null,
 }: MapCanvasProps) => {
   const { t } = useTranslation()
 
@@ -209,7 +246,32 @@ export const MapCanvas = ({
         scrollWheelZoom
       >
         <BoundsController bbox={bbox} />
+        <LocationController userLocation={userLocation} />
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        {userLocation ? (
+          <>
+            <CircleMarker
+              center={[userLocation.latitude, userLocation.longitude]}
+              radius={18}
+              pathOptions={{
+                color: 'var(--color-info)',
+                fillColor: 'var(--color-info)',
+                fillOpacity: 0.18,
+                weight: 2,
+              }}
+              className={styles.userLocationMarker}
+            />
+            <Marker
+              position={[userLocation.latitude, userLocation.longitude]}
+              icon={userLocationIcon}
+              title={t('map.location.youAreHere') ?? ''}
+            >
+              <Tooltip direction="top" offset={[0, -17]}>
+                {t('map.location.youAreHere')}
+              </Tooltip>
+            </Marker>
+          </>
+        ) : null}
         {activityMarkers}
         {cornerPins}
         {publicationPins}

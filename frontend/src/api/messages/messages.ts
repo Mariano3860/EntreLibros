@@ -23,6 +23,11 @@ export type ApiMessage = {
     contentType: string
     size: number
     name?: string
+    kind?: 'book'
+    bookId?: string
+    title?: string
+    author?: string
+    coverUrl?: string
   } | null
   createdAt: string
 }
@@ -32,11 +37,25 @@ export type MessagePage = {
   nextAfter: number
 }
 
+export type ConversationBook = {
+  id: string
+  title: string
+  author: string
+  coverUrl: string
+}
+
+export type ConversationBooks = {
+  myBooks: ConversationBook[]
+  theirBooks: ConversationBook[]
+}
+
 export const messageQueryKeys = {
   all: ['messages'] as const,
   conversations: () => [...messageQueryKeys.all, 'conversations'] as const,
   history: (conversationId: number, after = 0) =>
     [...messageQueryKeys.all, 'history', conversationId, after] as const,
+  books: (conversationId: number) =>
+    [...messageQueryKeys.all, 'books', conversationId] as const,
 }
 
 export async function fetchConversations(): Promise<ApiConversation[]> {
@@ -58,10 +77,20 @@ export async function fetchMessageHistory(
   return response.data
 }
 
+export async function fetchConversationBooks(
+  conversationId: number
+): Promise<ConversationBooks> {
+  const response = await apiClient.get<ConversationBooks>(
+    RELATIVE_API_ROUTES.MESSAGES.BOOKS(conversationId)
+  )
+  return response.data
+}
+
 export async function sendPersistedMessage(input: {
   conversationId: number
   clientKey: string
   body: string
+  attachmentMetadata?: ApiMessage['attachmentMetadata']
 }): Promise<ApiMessage> {
   const response = await apiClient.post<{ message: ApiMessage }>(
     RELATIVE_API_ROUTES.MESSAGES.HISTORY(input.conversationId),

@@ -3,6 +3,7 @@ import { BookDetailModal } from '@components/book/BookDetailModal/BookDetailModa
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { PublishBookModal } from '@components/publish/PublishBookModal/PublishBookModal'
 import { TabsMenu } from '@components/ui/tabs-menu/TabsMenu'
+import { useBooks } from '@hooks/api/useBooks'
 import { useUserBooks } from '@hooks/api/useUserBooks'
 import { getPathSegment } from '@utils/path'
 import React, { useMemo, useState } from 'react'
@@ -18,13 +19,27 @@ export const BooksPage = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const [search, setSearch] = useState('')
-  const { data: booksData } = useUserBooks()
-  const books = Array.isArray(booksData) ? booksData : []
+  const { data: catalogData } = useBooks()
+  const { data: userBooksData } = useUserBooks()
+  const catalogBooks = useMemo(
+    () => (Array.isArray(catalogData) ? catalogData : []),
+    [catalogData]
+  )
+  const userBooks = useMemo(
+    () => (Array.isArray(userBooksData) ? userBooksData : []),
+    [userBooksData]
+  )
+  const allBooks = useMemo(() => {
+    const byId = new Map(catalogBooks.map((book) => [book.id, book]))
+    userBooks.forEach((book) => byId.set(book.id, book))
+    return [...byId.values()]
+  }, [catalogBooks, userBooks])
 
   const basePath = '/books'
 
   const tabs = useMemo(
     () => [
+      { key: 'all', path: '', label: t('booksPage.tabs.all') },
       { key: 'mine', path: 'mine', label: t('booksPage.tabs.mine') },
       { key: 'trade', path: 'trade', label: t('booksPage.tabs.for_trade') },
       { key: 'seeking', path: 'seeking', label: t('booksPage.tabs.seeking') },
@@ -37,7 +52,7 @@ export const BooksPage = () => {
 
   const pathSegment = getPathSegment(location.pathname, basePath)
   const activeTab = (tabs.find((tab) => tab.path === pathSegment)?.key ??
-    'mine') as 'mine' | 'trade' | 'seeking' | 'sale'
+    'all') as 'all' | 'mine' | 'trade' | 'seeking' | 'sale'
 
   const publishMatch = useMatch('/books/new')
   const detailMatch = useMatch('/books/:bookId')
@@ -47,11 +62,21 @@ export const BooksPage = () => {
   // Exclude 'new' and known tab segments from being treated as a book ID
   const selectedBook =
     bookId && bookId !== 'new' && !tabPaths.includes(bookId)
-      ? (books.find((book) => book.id === bookId) ?? null)
+      ? ([...catalogBooks, ...userBooks].find((book) => book.id === bookId) ??
+        null)
       : null
+
+  const books =
+    activeTab === 'all'
+      ? allBooks
+      : activeTab === 'mine'
+        ? userBooks
+        : catalogBooks
 
   const filterByTab = (book: ApiUserBook) => {
     switch (activeTab) {
+      case 'all':
+        return true
       case 'trade':
         return !!book.isForTrade
       case 'seeking':
@@ -122,11 +147,7 @@ export const BooksPage = () => {
           </section>
         )}
 
-        <TabsMenu items={tabs} basePath={basePath}>
-          <button className={styles.seeAll}>
-            {t('booksPage.tabs.see_all')}
-          </button>
-        </TabsMenu>
+        <TabsMenu items={tabs} basePath={basePath} />
 
         {filteredBooks.length === 0 ? (
           <div className={styles.empty}>

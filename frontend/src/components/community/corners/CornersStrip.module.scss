@@ -81,10 +81,12 @@
 
 /* ====== Figure & Avatar ====== */
 .figure {
-  /* We don't need flex here; the avatar is centered by its own wrapper */
   margin: 0;
   width: 100%;
+  height: rem(100px);
   display: block;
+  overflow: hidden;
+  flex: 0 0 rem(100px);
 }
 
 /* New wrapper: anchors the badge to the avatar box (1:1) */
@@ -114,6 +116,7 @@
   align-items: center;
   gap: $spacing-1;
   text-align: center;
+  max-width: 100%;
 }
 
 .name {

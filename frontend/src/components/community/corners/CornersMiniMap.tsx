@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 
 import { useCornersMap } from '@src/hooks/api/useCornersMap'
 
@@ -6,6 +7,7 @@ import styles from './CornersMiniMap.module.scss'
 
 export const CornersMiniMap = () => {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const { data, isLoading, isError } = useCornersMap()
   const pins = data?.pins ?? []
 
@@ -22,21 +24,8 @@ export const CornersMiniMap = () => {
           <button
             type="button"
             className={styles.iconButton}
-            aria-label={t('community.feed.cornersMap.actions.nearby') ?? ''}
-          >
-            📍
-          </button>
-          <button
-            type="button"
-            className={styles.iconButton}
-            aria-label={t('community.feed.cornersMap.actions.filter') ?? ''}
-          >
-            🧭
-          </button>
-          <button
-            type="button"
-            className={styles.iconButton}
             aria-label={t('community.feed.cornersMap.actions.expand') ?? ''}
+            onClick={() => navigate('/map')}
           >
             ⤢
           </button>

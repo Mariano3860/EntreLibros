@@ -14,7 +14,7 @@
 .textarea,
 .select {
   border-radius: 12px;
-  border: 1px solid rgb(137 171 255 / 12%);
+  border: 1px solid var(--border-color);
   padding: 12px 14px;
   font-size: 0.95rem;
   transition:
@@ -71,7 +71,7 @@
 }
 
 .upload {
-  border: 2px dashed rgb(8 15 32 / 16%);
+  border: 2px dashed var(--border-color);
   border-radius: 16px;
   padding: 20px;
   display: flex;
@@ -93,8 +93,8 @@
   font-weight: 600;
   cursor: pointer;
   border: none;
-  background: var(--neutral-100, #eef2f7);
-  color: var(--neutral-700, #1d1d1d);
+  background: var(--background-card);
+  color: var(--text-primary);
 }
 
 .uploadButton:focus-visible {

@@ -3,12 +3,17 @@ import { authenticate, type AuthenticatedRequest } from '../middleware/auth.js';
 import {
   createConversation,
   isConversationParticipant,
+  listConversationParticipantIds,
   listConversations,
   listMessages,
   markConversationRead,
   sendMessage,
   type MessageAttachment,
 } from '../repositories/messagingRepository.js';
+import {
+  listPublicBookListingsForUser,
+  type BookListing,
+} from '../repositories/bookListingRepository.js';
 import { notifyMessageRecipients } from '../services/notifications.js';
 
 const router = Router();
@@ -42,11 +47,30 @@ function asAttachmentMetadata(value: unknown): MessageAttachment | null {
     contentType: metadata.contentType,
     size: metadata.size,
     name: typeof metadata.name === 'string' ? metadata.name : undefined,
+    ...(metadata.kind === 'book'
+      ? {
+          kind: 'book' as const,
+          bookId: typeof metadata.bookId === 'string' ? metadata.bookId : '',
+          title: typeof metadata.title === 'string' ? metadata.title : '',
+          author: typeof metadata.author === 'string' ? metadata.author : '',
+          coverUrl:
+            typeof metadata.coverUrl === 'string' ? metadata.coverUrl : '',
+        }
+      : {}),
   };
 }
 
 function hasAttachmentMetadata(value: unknown): boolean {
   return value !== undefined && value !== null;
+}
+
+function toConversationBook(listing: BookListing) {
+  return {
+    id: String(listing.id),
+    title: listing.title,
+    author: listing.author ?? '',
+    coverUrl: listing.coverUrl,
+  };
 }
 
 function errorResponse(error: unknown) {
@@ -96,6 +120,41 @@ router.post('/conversations', async (req: AuthenticatedRequest, res) => {
   try {
     const conversation = await createConversation([req.user.id, participantId]);
     return res.status(201).json({ conversation });
+  } catch (error) {
+    const response = errorResponse(error);
+    return res.status(response.status).json(response.body);
+  }
+});
+
+router.get('/:conversationId/books', async (req: AuthenticatedRequest, res) => {
+  if (!req.user) {
+    return res
+      .status(401)
+      .json({ error: 'Unauthorized', message: 'auth.errors.unauthorized' });
+  }
+  const conversationId = asPositiveInteger(req.params.conversationId);
+  if (!conversationId) {
+    return res.status(422).json({
+      error: 'ValidationError',
+      message: 'messaging.errors.conversation_required',
+    });
+  }
+  try {
+    const participantIds = await listConversationParticipantIds(
+      conversationId,
+      req.user.id
+    );
+    const counterpartId = participantIds.find((id) => id !== req.user?.id);
+    const [myBooks, theirBooks] = await Promise.all([
+      listPublicBookListingsForUser(req.user.id),
+      counterpartId
+        ? listPublicBookListingsForUser(counterpartId)
+        : Promise.resolve([]),
+    ]);
+    return res.json({
+      myBooks: myBooks.map(toConversationBook),
+      theirBooks: theirBooks.map(toConversationBook),
+    });
   } catch (error) {
     const response = errorResponse(error);
     return res.status(response.status).json(response.body);

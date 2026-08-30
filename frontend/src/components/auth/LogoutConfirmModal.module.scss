@@ -1,0 +1,63 @@
+@import '@styles/variables';
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: grid;
+  place-items: center;
+  padding: $spacing-2;
+  background: rgb(0 0 0 / 55%);
+}
+
+.dialog {
+  width: min(100%, rem(420px));
+  padding: $spacing-3;
+  border: 1px solid var(--border-color);
+  border-radius: rem(16px);
+  background: var(--background-primary);
+  color: var(--text-primary);
+  box-shadow: $box-shadow-md;
+}
+
+.dialog h2 {
+  margin: 0 0 $spacing-1;
+  font-size: $h5-font-size;
+}
+
+.dialog p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-1x5;
+  margin-top: $spacing-3;
+}
+
+.cancel,
+.confirm {
+  border: 1px solid var(--border-color);
+  border-radius: rem(8px);
+  padding: $spacing-1 $spacing-2;
+  cursor: pointer;
+}
+
+.cancel {
+  background: transparent;
+  color: var(--text-primary);
+}
+
+.confirm {
+  border-color: var(--primary-color);
+  background: var(--primary-color);
+  color: #fff;
+}
+
+.cancel:disabled,
+.confirm:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}

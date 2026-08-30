@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, within } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
 import { SidebarLoginButton } from '@src/components/sidebar/buttons/SidebarLoginButton'
@@ -44,6 +44,12 @@ describe('SidebarLoginButton', () => {
     const logoutButton = screen.getByLabelText('Logout')
     fireEvent.click(logoutButton)
 
+    expect(mockLogout).not.toHaveBeenCalled()
+    fireEvent.click(
+      within(screen.getByRole('dialog')).getByRole('button', {
+        name: 'Logout',
+      })
+    )
     expect(mockLogout).toHaveBeenCalled()
   })
 

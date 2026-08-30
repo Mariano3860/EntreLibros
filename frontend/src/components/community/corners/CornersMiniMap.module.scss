@@ -30,11 +30,37 @@
 .map {
   position: relative;
   border-radius: rem(14px);
-  background: linear-gradient(
-    135deg,
-    var(--color-neutral-100),
-    rgb(255 255 255)
-  );
+  background-color: var(--color-neutral-100);
+  background-image:
+    linear-gradient(
+      28deg,
+      transparent 45%,
+      rgb(var(--primary-color-rgb) / 16%) 46%,
+      rgb(var(--primary-color-rgb) / 16%) 48%,
+      transparent 49%
+    ),
+    linear-gradient(
+      122deg,
+      transparent 46%,
+      rgb(var(--color-info-rgb) / 14%) 47%,
+      rgb(var(--color-info-rgb) / 14%) 49%,
+      transparent 50%
+    ),
+    linear-gradient(
+      90deg,
+      rgb(var(--background-primary-rgb) / 30%) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      0deg,
+      rgb(var(--background-primary-rgb) / 30%) 1px,
+      transparent 1px
+    );
+  background-size:
+    auto,
+    auto,
+    rem(34px) rem(34px),
+    rem(34px) rem(34px);
   overflow: hidden;
   border: 1px solid rgb(0 0 0 / 4%);
   height: rem(220px);
@@ -69,7 +95,8 @@
   height: rem(30px);
   border-radius: 50%;
   border: 1px solid rgb(0 0 0 / 10%);
-  background: rgb(255 255 255 / 92%);
+  background: rgb(var(--background-primary-rgb) / 92%);
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -80,7 +107,7 @@
 
   &:hover,
   &:focus-visible {
-    background: #fff;
+    background: var(--background-primary);
     transform: translateY(rem(-1px));
     outline: none;
   }

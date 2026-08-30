@@ -1,5 +1,6 @@
 import { Router, type Response } from 'express';
 import { authenticate, type AuthenticatedRequest } from '../middleware/auth.js';
+import { listUserActivity } from '../repositories/activityRepository.js';
 import {
   createUserBlock,
   deleteUserBlock,
@@ -18,6 +19,30 @@ import {
 } from '../constants/profileCatalog.js';
 
 const router = Router();
+
+router.get(
+  '/activity',
+  authenticate,
+  async (req: AuthenticatedRequest, res) => {
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'Unauthorized',
+        message: 'user.errors.unauthenticated',
+      });
+    }
+
+    try {
+      const activity = await listUserActivity(req.user.id);
+      return res.json(activity);
+    } catch (error) {
+      console.error('Failed to list user activity', error);
+      return res.status(500).json({
+        error: 'ActivityQueryFailed',
+        message: 'user.errors.activity_query_failed',
+      });
+    }
+  }
+);
 
 const PROFILE_VISIBILITIES = ['public', 'private'] as const;
 const LOCATION_VISIBILITIES = ['private', 'city', 'neighborhood'] as const;

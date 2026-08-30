@@ -27,13 +27,13 @@
 }
 
 .secondary {
-  background: var(--neutral-100, #eef2f7);
-  color: var(--neutral-700, #1d1d1d);
+  background: var(--background-card);
+  color: var(--text-primary);
 }
 
 .ghost {
   background: transparent;
-  color: var(--neutral-600, #3d4451);
+  color: var(--text-secondary);
 }
 
 .primary {
