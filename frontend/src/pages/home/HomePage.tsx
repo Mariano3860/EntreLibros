@@ -323,7 +323,9 @@ const BookRail = ({
             onClick={onPrevious}
             type="button"
           >
-            &lt;
+            <span aria-hidden="true" className={styles.railArrowGlyph}>
+              &lt;
+            </span>
           </button>
         ) : null}
         {hasNext && visibleBooks.length === 5 ? (
@@ -334,7 +336,9 @@ const BookRail = ({
             onClick={onNext}
             type="button"
           >
-            &gt;
+            <span aria-hidden="true" className={styles.railArrowGlyph}>
+              &gt;
+            </span>
           </button>
         ) : null}
       </div>

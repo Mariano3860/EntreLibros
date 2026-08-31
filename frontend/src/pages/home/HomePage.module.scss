@@ -70,27 +70,41 @@
 }
 
 .railArrow {
-  display: grid;
+  display: flex;
   position: absolute;
   top: 50%;
   z-index: 2;
   width: 52px;
   height: 52px;
-  place-items: center;
+  align-items: center;
+  justify-content: center;
   border: 1px solid rgb(255 255 255 / 8%);
   border-radius: 999px;
   background: rgb(24 39 49 / 96%);
   box-shadow: 0 8px 20px rgb(0 0 0 / 22%);
   color: var(--prototype-hero-text);
   cursor: pointer;
-  font-size: 34px;
-  font-weight: 300;
-  line-height: 1;
   transition:
     border-color 160ms ease,
     color 160ms ease,
     background-color 160ms ease,
     translate 160ms ease;
+}
+
+.railArrowGlyph {
+  display: block;
+  translate: 0 -1px;
+  font-size: 30px;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.railArrowNext .railArrowGlyph {
+  translate: 1px -1px;
+}
+
+.railArrowPrevious .railArrowGlyph {
+  translate: -1px -1px;
 }
 
 .railArrowNext {
