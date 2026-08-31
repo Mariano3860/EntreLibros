@@ -224,6 +224,12 @@
       },
       "trade": {
         "label": "Trade preferences",
+        "searchLabel": "Search trade preferences",
+        "searchPlaceholder": "Filter by genre or topic...",
+        "selectedLabel": "Selected preferences",
+        "selectedCount": "selected",
+        "remove": "Remove",
+        "empty": "No preferences match your search.",
         "genres": {
           "fiction": "Fiction",
           "nonfiction": "Non-fiction",
@@ -237,14 +243,6 @@
       "notes": {
         "label": "Owner notes",
         "counter": "{{count}}/300"
-      },
-      "corner": {
-        "label": "Attach a Book Corner (optional)",
-        "placeholder": "Select a Book Corner",
-        "loading": "Loading corners...",
-        "helper": "Let readers know where you'd prefer to exchange it.",
-        "selected": "You'll meet at {{name}}.",
-        "error": "We couldn't load the list of Book Corners right now."
       },
       "availability": {
         "label": "Availability",
@@ -277,6 +275,9 @@
       }
     },
     "review": {
+      "previewTitle": "This is how your listing will look",
+      "previewEyebrow": "Ready to share",
+      "previewDescription": "Take one last look at the details before opening this book to the community.",
       "terms": "I confirm the information is accurate and I accept EntreLibros' terms",
       "hint": "We will publish your book and refresh the grid right away."
     },

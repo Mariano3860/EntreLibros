@@ -17,22 +17,34 @@ type ReviewStepProps = {
 
 export const ReviewStep: React.FC<ReviewStepProps> = React.memo(
   ({ t, metadata, offer, coverUrl, acceptedTerms, onAcceptedTermsChange }) => (
-    <div className={styles.stepLayout}>
-      <PublishReviewCard>
-        <BookCard
-          title={metadata.title}
-          author={metadata.author}
-          coverUrl={coverUrl}
-          condition={t(`publishBook.preview.condition.${offer.condition}`)}
-          status="available"
-          isForSale={offer.sale}
-          price={offer.sale ? Number(offer.priceAmount) : undefined}
-          isForTrade={offer.trade}
-          tradePreferences={offer.tradePreferences.map((genre) =>
-            t(`publishBook.offer.trade.genres.${genre}`)
-          )}
-          isSeeking={false}
-        />
+    <div className={styles.reviewLayout}>
+      <PublishReviewCard
+        title={t('publishBook.review.previewTitle')}
+        className={styles.reviewCard}
+      >
+        <div className={styles.reviewIntro}>
+          <span className={styles.reviewEyebrow}>
+            {t('publishBook.review.previewEyebrow')}
+          </span>
+          <p>{t('publishBook.review.previewDescription')}</p>
+        </div>
+        <div className={styles.reviewBookStage}>
+          <BookCard
+            variant="review"
+            title={metadata.title}
+            author={metadata.author}
+            coverUrl={coverUrl}
+            condition={t(`publishBook.preview.condition.${offer.condition}`)}
+            status="available"
+            isForSale={offer.sale}
+            price={offer.sale ? Number(offer.priceAmount) : undefined}
+            isForTrade={offer.trade}
+            tradePreferences={offer.tradePreferences.map((genre) =>
+              t(`publishBook.offer.trade.genres.${genre}`)
+            )}
+            isSeeking={false}
+          />
+        </div>
       </PublishReviewCard>
 
       <div className={styles.checklist}>
