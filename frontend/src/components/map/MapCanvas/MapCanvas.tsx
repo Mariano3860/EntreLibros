@@ -6,6 +6,7 @@ import type {
   MapPin,
   MapPublicationPin,
 } from '@api/map/map.types'
+import { useTheme } from '@contexts/theme/ThemeContext'
 import { divIcon } from 'leaflet'
 import { useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -34,6 +35,12 @@ const userLocationIcon = divIcon({
   </span>`,
 })
 
+const cornerMarkerColors = [
+  'var(--prototype-orange)',
+  'var(--prototype-purple)',
+  'var(--prototype-teal)',
+] as const
+
 type MapCanvasProps = {
   bbox: MapBoundingBox
   corners: MapCornerPin[]
@@ -46,6 +53,7 @@ type MapCanvasProps = {
   isFetching: boolean
   isEmpty: boolean
   userLocation?: { latitude: number; longitude: number } | null
+  className?: string
 }
 
 const BoundsController = ({ bbox }: { bbox: MapBoundingBox }) => {
@@ -81,6 +89,47 @@ const LocationController = ({
   return null
 }
 
+const MapControls = ({
+  bbox,
+  userLocation,
+}: {
+  bbox: MapBoundingBox
+  userLocation: { latitude: number; longitude: number } | null
+}) => {
+  const map = useMap()
+
+  const centerMap = () => {
+    if (userLocation) {
+      map.setView(
+        [userLocation.latitude, userLocation.longitude],
+        map.getZoom(),
+        {
+          animate: true,
+        }
+      )
+      return
+    }
+
+    const southWest: [number, number] = [bbox.south, bbox.west]
+    const northEast: [number, number] = [bbox.north, bbox.east]
+    map.fitBounds([southWest, northEast], { padding: [16, 16], animate: true })
+  }
+
+  return (
+    <div className={styles.controls} aria-label="Controles del mapa">
+      <button type="button" aria-label="Acercar" onClick={() => map.zoomIn()}>
+        ＋
+      </button>
+      <button type="button" aria-label="Alejar" onClick={() => map.zoomOut()}>
+        −
+      </button>
+      <button type="button" aria-label="Centrar mapa" onClick={centerMap}>
+        ⌖
+      </button>
+    </div>
+  )
+}
+
 const resolvePublicationPosition = (
   publication: MapPublicationPin,
   cornerLookup: Map<string, MapCornerPin>
@@ -113,8 +162,10 @@ export const MapCanvas = ({
   isFetching,
   isEmpty,
   userLocation = null,
+  className = '',
 }: MapCanvasProps) => {
   const { t } = useTranslation()
+  const { theme } = useTheme()
 
   const center = useMemo(() => {
     const lat = (bbox.north + bbox.south) / 2
@@ -129,9 +180,12 @@ export const MapCanvas = ({
 
   const cornerPins = useMemo(() => {
     if (!layers.corners) return []
-    return corners.map((corner) => {
+    return corners.map((corner, index) => {
       const isSelected =
         selectedPin?.type === 'corner' && selectedPin.data.id === corner.id
+      const markerColor =
+        cornerMarkerColors[index % cornerMarkerColors.length] ??
+        'var(--primary-color)'
 
       return (
         <CircleMarker
@@ -139,8 +193,8 @@ export const MapCanvas = ({
           center={[corner.lat, corner.lon]}
           radius={isSelected ? 12 : 8}
           pathOptions={{
-            color: 'var(--primary-color)',
-            fillColor: 'var(--primary-color)',
+            color: markerColor,
+            fillColor: markerColor,
             fillOpacity: isSelected ? 0.9 : 0.7,
             weight: isSelected ? 4 : 2,
           }}
@@ -238,15 +292,22 @@ export const MapCanvas = ({
   }, [activity, layers.activity])
 
   return (
-    <div className={styles.canvas} role="presentation" data-testid="map-canvas">
+    <div
+      className={`${styles.canvas} ${className}`}
+      data-map-theme={theme}
+      role="presentation"
+      data-testid="map-canvas"
+    >
       <MapContainer
         center={center}
         zoom={13}
         className={styles.mapRoot}
+        zoomControl={false}
         scrollWheelZoom
       >
         <BoundsController bbox={bbox} />
         <LocationController userLocation={userLocation} />
+        <MapControls bbox={bbox} userLocation={userLocation} />
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         {userLocation ? (
           <>
@@ -264,7 +325,9 @@ export const MapCanvas = ({
             <Marker
               position={[userLocation.latitude, userLocation.longitude]}
               icon={userLocationIcon}
-              title={t('map.location.youAreHere') ?? ''}
+              title={t('map.location.youAreHere', {
+                defaultValue: 'Tu ubicación aproximada',
+              })}
             >
               <Tooltip direction="top" offset={[0, -17]}>
                 {t('map.location.youAreHere')}

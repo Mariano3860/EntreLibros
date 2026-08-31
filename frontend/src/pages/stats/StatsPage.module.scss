@@ -74,6 +74,15 @@
   overflow: visible;
 }
 
+.lineChart line {
+  stroke: var(--prototype-border);
+}
+
+.lineChart circle {
+  fill: var(--prototype-surface);
+  stroke: var(--prototype-teal);
+}
+
 .axis {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -140,7 +149,7 @@
   gap: 9px;
   padding: 9px;
   border-radius: 9px;
-  background: rgb(3 17 25 / 23%);
+  background: var(--prototype-inset-background);
 }
 
 .ranking b {

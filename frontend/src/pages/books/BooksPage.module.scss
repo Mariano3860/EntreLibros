@@ -136,7 +136,7 @@
   display: grid;
   place-items: center;
   padding: 24px;
-  background: rgb(1 9 14 / 76%);
+  background: var(--prototype-modal-backdrop);
   backdrop-filter: blur(8px);
 }
 
@@ -180,8 +180,8 @@
   height: 32px;
   border: 0;
   border-radius: 50%;
-  background: rgb(255 255 255 / 6%);
-  color: white;
+  background: var(--prototype-subtle-hover);
+  color: var(--prototype-text);
   cursor: pointer;
 }
 

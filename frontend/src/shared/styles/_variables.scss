@@ -23,6 +23,34 @@
   --prototype-blue: #5da9ff;
   --prototype-purple: #a98bff;
   --prototype-danger: #ff6f7d;
+  --prototype-danger-text: #ff9da7;
+  --prototype-danger-background: rgb(255 111 125 / 12%);
+  --prototype-danger-border: rgb(255 111 125 / 40%);
+  --prototype-sidebar-border: rgb(255 255 255 / 6%);
+  --prototype-sidebar-hover: rgb(255 255 255 / 4%);
+  --prototype-sidebar-divider: rgb(255 255 255 / 8%);
+  --prototype-panel-background: linear-gradient(
+    145deg,
+    rgb(24 54 69 / 92%),
+    rgb(15 37 50 / 96%)
+  );
+  --prototype-panel-shadow: 0 12px 30px rgb(2 11 17 / 12%);
+  --prototype-inset-background: rgb(3 17 25 / 24%);
+  --prototype-inset-border: rgb(255 255 255 / 5%);
+  --prototype-subtle-hover: rgb(255 255 255 / 3%);
+  --prototype-modal-backdrop: rgb(1 9 14 / 78%);
+  --prototype-input-text: #fff;
+  --prototype-hero-text: #fff;
+  --prototype-hero-muted: #c2d0d5;
+  --prototype-chat-background: rgb(7 24 34 / 30%);
+  --prototype-message-mine-background: rgb(32 99 96 / 58%);
+  --prototype-proposal-background: linear-gradient(145deg, #173341, #102a37);
+  --prototype-map-background: radial-gradient(
+    circle at 60% 40%,
+    #173846,
+    #0b202c
+  );
+  --prototype-map-road: #355360;
   --prototype-radius-sm: 10px;
   --prototype-radius-md: 15px;
   --prototype-radius-lg: 22px;
@@ -83,10 +111,10 @@
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 10%);
 
   // Light theme
-  --background-primary: #fff;
-  --background-primary-rgb: 255 255 255;
-  --background-card: #f8f9fa;
-  --background-card-rgb: 248 249 250;
+  --background-primary: #f1f5f4;
+  --background-primary-rgb: 241 245 244;
+  --background-card: #f7faf9;
+  --background-card-rgb: 247 250 249;
   --text-primary: #212529;
   --text-primary-rgb: 33 37 41;
   --text-secondary: #6c757d;
@@ -146,15 +174,59 @@
 }
 
 [data-theme='light'] {
-  --prototype-canvas: #edf3f3;
-  --prototype-sidebar: #f8fbfb;
-  --prototype-surface: #fff;
-  --prototype-surface-raised: #f4f8f8;
-  --prototype-surface-soft: #eaf1f1;
-  --prototype-border: #cbd9dc;
+  --background-primary: #f1f5f4;
+  --background-primary-rgb: 241 245 244;
+  --background-card: #f7faf9;
+  --background-card-rgb: 247 250 249;
+  --text-primary: #15303a;
+  --text-primary-rgb: 21 48 58;
+  --text-secondary: #607781;
+  --text-secondary-rgb: 96 119 129;
+  --border-color: #becfcd;
+  --border-color-rgb: 190 207 205;
+  --border-color-secondary: #7a8e92;
+  --border-color-secondary-rgb: 122 142 146;
+  --placeholder-color: #607781;
+  --placeholder-color-rgb: 96 119 129;
+  --toggle-bg: #dce8e5;
+  --toggle-bg-rgb: 220 232 229;
+  --toggle-hover: #cbdad7;
+  --toggle-hover-rgb: 203 218 215;
+  --scroll-bar-color: #6b9994;
+  --scroll-bar-color-rgb: 107 153 148;
+  --prototype-canvas: #e7efee;
+  --prototype-sidebar: #f0f5f3;
+  --prototype-surface: #f8faf9;
+  --prototype-surface-raised: #eef4f2;
+  --prototype-surface-soft: #e5efec;
+  --prototype-border: #becfcd;
   --prototype-text: #15303a;
   --prototype-muted: #607781;
+  --prototype-danger-text: #b4233b;
+  --prototype-danger-background: rgb(180 35 59 / 10%);
+  --prototype-danger-border: rgb(180 35 59 / 30%);
+  --prototype-sidebar-border: var(--prototype-border);
+  --prototype-sidebar-hover: var(--prototype-subtle-hover);
+  --prototype-sidebar-divider: rgb(203 217 220 / 82%);
   --prototype-shadow: 0 18px 44px rgb(27 62 70 / 12%);
+  --prototype-panel-background: linear-gradient(145deg, #f7faf9, #eaf2f0);
+  --prototype-panel-shadow: 0 12px 30px rgb(27 62 70 / 10%);
+  --prototype-inset-background: rgb(222 235 232 / 80%);
+  --prototype-inset-border: rgb(190 207 204 / 88%);
+  --prototype-subtle-hover: rgb(21 48 58 / 6%);
+  --prototype-modal-backdrop: rgb(21 48 58 / 48%);
+  --prototype-input-text: var(--prototype-text);
+  --prototype-hero-text: #fff;
+  --prototype-hero-muted: #e5f1f0;
+  --prototype-chat-background: #e8f1ef;
+  --prototype-message-mine-background: rgb(66 178 168 / 16%);
+  --prototype-proposal-background: linear-gradient(145deg, #fff3e8, #f8faf9);
+  --prototype-map-background: radial-gradient(
+    circle at 60% 40%,
+    #eff7f5,
+    #d3e4e1
+  );
+  --prototype-map-road: #97b7b4;
 }
 
 // ======================

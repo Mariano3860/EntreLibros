@@ -13,9 +13,15 @@ import { MapCanvas } from '@components/map/MapCanvas/MapCanvas'
 import { renderWithProviders } from '../../../test-utils'
 
 const fitBoundsMock = vi.fn()
+const zoomInMock = vi.fn()
+const zoomOutMock = vi.fn()
+const setViewMock = vi.fn()
 
 beforeEach(() => {
   fitBoundsMock.mockClear()
+  zoomInMock.mockClear()
+  zoomOutMock.mockClear()
+  setViewMock.mockClear()
 })
 
 vi.mock('react-leaflet', () => {
@@ -50,7 +56,9 @@ vi.mock('react-leaflet', () => {
     useMap: () => ({
       fitBounds: fitBoundsMock,
       getZoom: () => 13,
-      setView: vi.fn(),
+      setView: setViewMock,
+      zoomIn: zoomInMock,
+      zoomOut: zoomOutMock,
     }),
   }
 })
@@ -190,5 +198,33 @@ describe('MapCanvas', () => {
     )
 
     expect(screen.getByTestId('user-location-marker')).toBeInTheDocument()
+  })
+
+  test('provides functional zoom and recenter controls', () => {
+    renderWithProviders(
+      <MapCanvas
+        bbox={bbox}
+        corners={corners}
+        publications={[]}
+        activity={[]}
+        layers={{ corners: true, publications: false, activity: false }}
+        selectedPin={null}
+        onSelectPin={vi.fn()}
+        isLoading={false}
+        isFetching={false}
+        isEmpty={false}
+        userLocation={{ latitude: -34.6, longitude: -58.4 }}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Acercar' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Alejar' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Centrar mapa' }))
+
+    expect(zoomInMock).toHaveBeenCalledOnce()
+    expect(zoomOutMock).toHaveBeenCalledOnce()
+    expect(setViewMock).toHaveBeenCalledWith([-34.6, -58.4], 13, {
+      animate: true,
+    })
   })
 })

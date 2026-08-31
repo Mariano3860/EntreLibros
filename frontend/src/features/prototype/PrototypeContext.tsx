@@ -1,5 +1,7 @@
 import { createContext, useContext, useMemo, useState } from 'react'
 
+import { isApiMockMode } from '@src/utils/runtimeEnv'
+
 import { prototypeCatalog, type PrototypeChatMessage } from './catalog'
 
 type SocialPost = {
@@ -30,11 +32,12 @@ export const PrototypeProvider = ({
 }: {
   children: React.ReactNode
 }) => {
+  const mockMode = isApiMockMode()
   const [period, setPeriod] = useState('Últimos 7 días')
   const [socialPosts, setSocialPosts] = useState<SocialPost[]>([])
-  const [chatMessages, setChatMessages] = useState<PrototypeChatMessage[]>([
-    ...prototypeCatalog.chatMessages,
-  ])
+  const [chatMessages, setChatMessages] = useState<PrototypeChatMessage[]>(
+    () => (mockMode ? [...prototypeCatalog.chatMessages] : [])
+  )
   const [openFaq, setOpenFaq] = useState<string | null>('publish')
   const [supportSent, setSupportSent] = useState(false)
 
@@ -44,7 +47,8 @@ export const PrototypeProvider = ({
       period,
       setPeriod,
       socialPosts,
-      publishStory: (text) =>
+      publishStory: (text) => {
+        if (!mockMode) return
         setSocialPosts((current) => [
           {
             id: `post-${current.length + 1}`,
@@ -53,9 +57,11 @@ export const PrototypeProvider = ({
             createdAt: 'Ahora',
           },
           ...current,
-        ]),
+        ])
+      },
       chatMessages,
-      sendMessage: (text, kind) =>
+      sendMessage: (text, kind) => {
+        if (!mockMode) return
         setChatMessages((current) => [
           ...current,
           {
@@ -65,13 +71,16 @@ export const PrototypeProvider = ({
             time: 'Ahora',
             kind,
           },
-        ]),
+        ])
+      },
       openFaq,
       setOpenFaq,
       supportSent,
-      sendSupport: () => setSupportSent(true),
+      sendSupport: () => {
+        if (mockMode) setSupportSent(true)
+      },
     }),
-    [chatMessages, openFaq, period, socialPosts, supportSent]
+    [chatMessages, mockMode, openFaq, period, socialPosts, supportSent]
   )
 
   return (

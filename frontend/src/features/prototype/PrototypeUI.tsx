@@ -1,4 +1,9 @@
-import { useState, type ButtonHTMLAttributes, type ReactNode } from 'react'
+import {
+  useEffect,
+  useState,
+  type ButtonHTMLAttributes,
+  type ReactNode,
+} from 'react'
 
 import type { PrototypeBook } from './catalog'
 import styles from './PrototypeUI.module.scss'
@@ -98,16 +103,37 @@ export const BookCover = ({
 }: {
   book: PrototypeBook
   compact?: boolean
-}) => (
-  <div
-    className={`${styles.bookCover} ${compact ? styles.bookCoverCompact : ''}`}
-    style={{ '--book-accent': book.accent } as React.CSSProperties}
-  >
-    <span>{book.genre}</span>
-    <strong>{book.title}</strong>
-    <small>{book.author}</small>
-  </div>
-)
+}) => {
+  const [coverFailed, setCoverFailed] = useState(false)
+  const coverUrl = book.coverUrl?.trim()
+  const showCover = Boolean(coverUrl && !coverFailed)
+
+  useEffect(() => {
+    setCoverFailed(false)
+  }, [coverUrl])
+
+  return (
+    <div
+      className={`${styles.bookCover} ${compact ? styles.bookCoverCompact : ''}`}
+      style={{ '--book-accent': book.accent } as React.CSSProperties}
+    >
+      {showCover ? (
+        <img
+          src={coverUrl}
+          alt=""
+          className={styles.bookCoverImage}
+          onError={() => setCoverFailed(true)}
+        />
+      ) : (
+        <>
+          <span>{book.genre}</span>
+          <strong>{book.title}</strong>
+          <small>{book.author}</small>
+        </>
+      )}
+    </div>
+  )
+}
 
 export const PrototypeBookCard = ({
   book,
@@ -236,6 +262,19 @@ export const FixtureState = ({
     )
   return children
 }
+
+export const UnavailableState = ({
+  title = 'Esta sección todavía no está disponible',
+  description = 'Estamos conectando esta experiencia con datos reales.',
+}: {
+  title?: string
+  description?: string
+}) => (
+  <Panel className={styles.state}>
+    <strong>{title}</strong>
+    <span>{description}</span>
+  </Panel>
+)
 
 export const MiniMap = ({ large = false }: { large?: boolean }) => (
   <div

@@ -3,7 +3,7 @@ import { prototypeCatalog } from '@src/features/prototype/catalog'
 
 export const generateUserBooks = (seed?: number): ApiUserBook[] => {
   void seed
-  return prototypeCatalog.books.slice(0, 2).map((book) => ({
+  return prototypeCatalog.books.map((book) => ({
     id: book.id,
     title: book.title,
     author: book.author,

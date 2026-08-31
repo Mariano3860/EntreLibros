@@ -4,7 +4,7 @@
 
 > **Actualización técnica 2026-08-29:** la recuperación de mensajería incorporó el bot persistente mediante la migración `015_seed_messaging_bot.sql`, conversación idempotente por usuario, historial recargable y guía de diagnóstico. La mensajería mock sigue siendo útil para UI, pero no prueba persistencia real.
 
-> **Prototipo visual 2026-08-30:** `recreate-ideal-prototype-ui` reconstruye en el frontend las ocho pantallas de referencia con un catálogo MSW determinista. Es una validación visual/demo; la persistencia de historias sociales, estadísticas, perfil extendido y soporte queda para una OpenSpec backend posterior, según [`prototype-mock-contract.md`](prototype-mock-contract.md).
+> **Reconexión API 2026-08-31:** `reconnect-backend-to-prototype-frontend` conserva las ocho pantallas de referencia y conecta Inicio, libros, perfil, Comunidad, mapa, mensajería, estadísticas y consultas de soporte con los contratos reales disponibles. Series analíticas avanzadas, interacciones sociales, logros y base de conocimiento siguen diferidas según [`frontend-backend-reconnection-matrix.md`](frontend-backend-reconnection-matrix.md).
 
 > Las expansiones de confianza avanzada, reputación, moderación, métricas, integraciones de proveedores y retención de datos quedan fuera de `complete-entrelibros-recovery`. Se mantienen como trabajo futuro en [`roadmap.md`](roadmap.md) y requieren una OpenSpec propia; no son faltantes del MVP del TFG.
 
@@ -54,7 +54,7 @@ Registrado el 2026-08-30 a partir de una recorrida manual de la interfaz. Estos 
 
 Cada punto debe verificarse en navegador con una sesión autenticada y mocks desactivados, comprobando la red y la persistencia cuando aplique. Ningún botón de acción principal debe quedar sin efecto, y los estados de datos vacíos deben distinguirse de fallos de carga o de fixtures de demostración.
 
-La validación automatizada y de servicio quedó completada. La recorrida visual con navegador real no pudo ejecutarse en este entorno porque no hay un navegador conectado; queda como paso manual antes del merge.
+La validación automatizada y de servicio quedó completada. Se verificaron en navegador los estados reales de Comunidad, Estadísticas, Centro de ayuda, libros y mapa; queda como paso manual comparar las ocho rutas en todos los breakpoints antes del merge.
 
 ## Actualización del MVP: Rincones y notificaciones
 

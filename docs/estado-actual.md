@@ -1,6 +1,6 @@
 # Estado actual
 
-Fecha de referencia: 2026-08-30.
+Fecha de referencia: 2026-08-31.
 
 ## Comprobado en el repositorio
 
@@ -18,7 +18,7 @@ Fecha de referencia: 2026-08-30.
 - El modo público depende de variables de build; cambiar `.env` requiere reiniciar Rsbuild.
 - La verificación en navegador de cookies, proxy, caché y WebSocket debe hacerse aparte de Vitest.
 - El canal global legacy del bot existe por compatibilidad y no debe confundirse con su conversación persistida.
-- Las nuevas métricas, historias sociales, logros, FAQs y acciones del prototipo son estado MSW/en memoria; no prueban API ni persistencia. El contrato de transición está en [`prototype-mock-contract.md`](prototype-mock-contract.md).
+- Las métricas comunitarias, feed, rincones, sugerencias, perfil, libros, mapa, mensajes y consultas de soporte ya tienen consumidores de API real; las series avanzadas, historias/interacciones sociales, logros y base de conocimiento de ayuda siguen diferidas. El contrato de transición está en [`prototype-mock-contract.md`](prototype-mock-contract.md) y la matriz en [`frontend-backend-reconnection-matrix.md`](frontend-backend-reconnection-matrix.md).
 
 ## Hallazgos de validación manual
 
@@ -31,7 +31,7 @@ El 2026-08-30 se detectó una brecha entre capacidades técnicas documentadas y 
 - En mensajería, el chat no abre en el último mensaje y los flujos de adjuntar libro/proponer intercambio no cargan los libros del usuario.
 - El logout ocurre sin confirmación.
 
-La implementación de `close-p0-product-experience-gaps` corrigió estos recorridos en la rama `p0-product-experience`: “Todos” incluye los libros propios de la sesión, Comunidad permite historias persistidas, el mini mapa tiene un único acceso al mapa, `/map` reacciona a geolocalización autorizada y mantiene el mapa expandido, y los adjuntos de libro se guardan en el historial. Resta validar visualmente en navegador con servicios reales, especialmente permisos de geolocalización, contraste y publicación de historias.
+La implementación de `reconnect-backend-to-prototype-frontend` conserva esos recorridos en la rama actual y conecta los consumidores reales disponibles: catálogo/detalle de libros, perfil, feed y actividad comunitaria, rincones, mapa, mensajería persistida con Socket.IO, estadísticas, notificaciones y contacto. Permanecen diferidas las capacidades sin contrato suficiente (analítica avanzada, logros, historias/interacciones sociales y base de conocimiento de ayuda).
 
 ## Cómo comprobar mensajes
 

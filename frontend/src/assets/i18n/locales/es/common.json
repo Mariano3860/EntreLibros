@@ -422,6 +422,31 @@
     "messages": {
       "title": "Mensajes",
       "placeholder": "Lista de mensajes",
+      "states": {
+        "loadingConversations": "Cargando conversaciones...",
+        "conversationsError": "No pudimos cargar tus conversaciones.",
+        "messagesError": "No pudimos cargar tus mensajes.",
+        "historyError": "No pudimos cargar los mensajes.",
+        "connectionHint": "Revisá tu conexión e intentá nuevamente.",
+        "loadingMessages": "Cargando mensajes...",
+        "emptyMessages": "No hay mensajes todavía.",
+        "loadingBooks": "Cargando libros...",
+        "booksError": "No pudimos cargar los libros.",
+        "emptyBooks": "No tenés libros disponibles para adjuntar.",
+        "attachError": "No pudimos adjuntar este libro. Intentá nuevamente.",
+        "sendError": "No pudimos enviar el mensaje. Intent\u00e1 nuevamente.",
+        "retry": "Reintentar"
+      },
+      "newConversation": {
+        "eyebrow": "NUEVA CONVERSACIÓN",
+        "title": "¿Con quién querés hablar?",
+        "description": "Iniciá una conversación nueva con alguien de la comunidad.",
+        "fieldLabel": "ID de usuario",
+        "placeholder": "Ej. 42",
+        "hint": "Encontrás el ID en el perfil de la persona.",
+        "cancel": "Cancelar",
+        "submit": "Iniciar conversación"
+      },
       "status": {
         "disconnected": "Desconectado",
         "disconnectedError": "Desconectado: {{error}}",

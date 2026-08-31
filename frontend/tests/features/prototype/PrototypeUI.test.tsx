@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, test } from 'vitest'
 
-import { FixtureState } from '@src/features/prototype/PrototypeUI'
+import { BookCover, FixtureState } from '@src/features/prototype/PrototypeUI'
 
 describe('FixtureState', () => {
   beforeEach(() => window.history.replaceState({}, '', '/'))
@@ -51,5 +51,41 @@ describe('FixtureState', () => {
     )
 
     expect(screen.getByText('Cargando books…')).toBeVisible()
+  })
+})
+
+describe('BookCover', () => {
+  const book = {
+    id: 'book-1',
+    title: 'Una novela',
+    author: 'Una autora',
+    owner: 'Un lector',
+    distance: '800 m',
+    mode: 'Intercambio' as const,
+    accent: '#42d7c7',
+    genre: 'Ficcion',
+  }
+
+  test('renders the connected cover and falls back when it cannot load', () => {
+    const { container } = render(
+      <BookCover
+        book={{ ...book, coverUrl: 'https://example.com/cover.jpg' }}
+      />
+    )
+
+    const image = container.querySelector('img')
+    expect(image).toHaveAttribute('src', 'https://example.com/cover.jpg')
+
+    fireEvent.error(image as HTMLImageElement)
+
+    expect(container.querySelector('img')).not.toBeInTheDocument()
+    expect(screen.getByText('Ficcion')).toBeInTheDocument()
+  })
+
+  test('uses the prototype cover when there is no connected cover', () => {
+    const { container } = render(<BookCover book={book} />)
+
+    expect(container.querySelector('img')).not.toBeInTheDocument()
+    expect(screen.getByText('Una novela')).toBeInTheDocument()
   })
 })
