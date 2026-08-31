@@ -15,6 +15,7 @@ export const BookCard: React.FC<BookCardProps> = ({
   isForTrade,
   tradePreferences,
   isSeeking,
+  variant = 'default',
   onClick,
 }) => {
   const { t } = useTranslation()
@@ -39,7 +40,7 @@ export const BookCard: React.FC<BookCardProps> = ({
 
   return (
     <div
-      className={`${styles.card} ${onClick ? styles.clickable : ''}`}
+      className={`${styles.card} ${variant === 'review' ? styles.review : ''} ${onClick ? styles.clickable : ''}`.trim()}
       onClick={onClick}
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}

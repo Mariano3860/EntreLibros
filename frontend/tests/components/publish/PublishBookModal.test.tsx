@@ -142,7 +142,6 @@ const baseDraftState: PublishBookDraftState = {
   searchQuery: '',
   step: 'identify',
   acceptedTerms: true,
-  corner: null,
 }
 
 describe('PublishBookModal', () => {
@@ -321,7 +320,18 @@ describe('PublishBookModal', () => {
       )
     )
 
+    expect(
+      screen.getByPlaceholderText('publishBook.search.placeholder')
+    ).toHaveValue('')
+    expect(
+      screen.queryByRole('button', { name: 'publishBook.search.use' })
+    ).not.toBeInTheDocument()
+
     fireEvent.click(screen.getByRole('button', { name: 'publishBook.next' }))
+
+    expect(
+      screen.queryByLabelText('publishBook.offer.corner.label')
+    ).not.toBeInTheDocument()
 
     const tradeToggle = screen.getByLabelText('publishBook.offer.modes.trade')
     fireEvent.click(tradeToggle)
@@ -335,6 +345,31 @@ describe('PublishBookModal', () => {
 
     fireEvent.click(genreChip)
     expect(genreChip.className).not.toMatch(/badgeActive/)
+
+    const tradeSearch = screen.getByRole('searchbox', {
+      name: 'publishBook.offer.trade.searchLabel',
+    })
+    fireEvent.change(tradeSearch, { target: { value: 'fantasy' } })
+
+    expect(
+      screen.getByRole('button', {
+        name: 'publishBook.offer.trade.genres.fantasy',
+      })
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', {
+        name: 'publishBook.offer.trade.genres.fiction',
+      })
+    ).not.toBeInTheDocument()
+
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'publishBook.offer.trade.genres.fantasy',
+      })
+    )
+    expect(
+      screen.getByLabelText('publishBook.offer.trade.selectedLabel')
+    ).toHaveTextContent('publishBook.offer.trade.genres.fantasy')
   })
 
   test('updates delivery options when toggled in the offer step', async () => {
@@ -399,6 +434,13 @@ describe('PublishBookModal', () => {
     })
 
     fireEvent.click(screen.getByRole('button', { name: 'publishBook.next' }))
+
+    expect(
+      screen.getByText('publishBook.review.previewTitle')
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(/publishBook\.review\.previewEyebrow/)
+    ).toBeInTheDocument()
     fireEvent.click(screen.getByLabelText('publishBook.review.terms'))
 
     fireEvent.click(screen.getByRole('button', { name: 'publishBook.back' }))
@@ -463,6 +505,7 @@ describe('PublishBookModal', () => {
     fireEvent.click(screen.getByRole('button', { name: 'publishBook.publish' }))
 
     await waitFor(() => expect(mutateAsync).toHaveBeenCalledTimes(1))
+    expect(mutateAsync.mock.calls[0][0]).not.toHaveProperty('cornerId')
     expect(draftApi.clear).toHaveBeenCalled()
     expect(toastSuccess).toHaveBeenCalledWith('publishBook.published')
     expect(onPublished).toHaveBeenCalledWith('book-123')

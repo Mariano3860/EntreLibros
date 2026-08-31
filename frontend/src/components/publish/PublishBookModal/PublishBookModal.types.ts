@@ -18,11 +18,6 @@ export type PublishBookImage = {
   name?: string
 }
 
-export type PublishBookCorner = {
-  id: string
-  name: string
-}
-
 export type PublishBookOffer = {
   sale: boolean
   donation: boolean
@@ -49,7 +44,6 @@ export type PublishBookFormState = {
   searchQuery: string
   step: PublishBookStep
   acceptedTerms: boolean
-  corner: PublishBookCorner | null
 }
 
 export type PublishBookDraftState = PublishBookFormState

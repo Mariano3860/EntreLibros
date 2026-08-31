@@ -20,6 +20,72 @@
   gap: 24px;
 }
 
+.reviewLayout {
+  width: min(100%, 720px);
+  margin: 0 auto;
+  display: grid;
+  gap: 18px;
+}
+
+.reviewCard {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  align-self: stretch;
+  overflow: hidden;
+  border: 1px solid rgb(var(--primary-super-dark-rgb) / 35%);
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgb(var(--primary-super-dark-rgb) / 16%),
+      transparent 40%
+    ),
+    var(--prototype-panel-background);
+  box-shadow: 0 20px 45px rgb(8 15 32 / 22%);
+}
+
+.reviewCard::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 5px;
+  content: '';
+  background: linear-gradient(
+    180deg,
+    var(--primary-color),
+    var(--primary-super-dark)
+  );
+}
+
+.reviewIntro {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.reviewEyebrow {
+  color: var(--primary-color);
+  font-size: 0.7rem;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.reviewIntro p {
+  margin: 0;
+  color: var(--prototype-muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.reviewBookStage {
+  display: flex;
+  justify-content: center;
+  padding: 18px;
+  border: 1px solid var(--prototype-border);
+  border-radius: 16px;
+  background: rgb(var(--primary-super-dark-rgb) / 12%);
+}
+
 .formGrid {
   display: grid;
   gap: 16px;
@@ -71,6 +137,86 @@
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+}
+
+.tradePreferences {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tradeHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.tradeHeader label {
+  color: var(--prototype-muted);
+  font-size: 0.7rem;
+  font-weight: 650;
+}
+
+.tradeCount {
+  color: var(--primary-color);
+  font-size: 0.7rem;
+  font-weight: 650;
+}
+
+.tradeSearch {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid var(--prototype-border);
+  border-radius: 10px;
+  outline: 0;
+  background: var(--prototype-surface-raised);
+  color: var(--prototype-text);
+  font: inherit;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.tradeSearch::placeholder {
+  color: var(--prototype-muted);
+}
+
+.tradeSearch:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgb(var(--primary-super-dark-rgb) / 14%);
+}
+
+.selectedTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.selectedTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 10px;
+  border: 1px solid rgb(var(--primary-super-dark-rgb) / 40%);
+  border-radius: 999px;
+  background: rgb(var(--primary-super-dark-rgb) / 16%);
+  color: var(--prototype-text);
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.selectedTag span {
+  color: var(--primary-color);
+  font-size: 1rem;
+  line-height: 0.8;
+}
+
+.tradeEmpty {
+  margin: 0;
+  color: var(--prototype-muted);
+  font-size: 0.8rem;
 }
 
 .badge {
@@ -233,6 +379,10 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--prototype-border);
+  border-radius: 14px;
+  background: var(--prototype-surface-raised);
 }
 
 .checklistItem {

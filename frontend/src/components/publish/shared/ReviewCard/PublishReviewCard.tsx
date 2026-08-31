@@ -12,6 +12,7 @@ type PublishReviewCardProps = {
   entries?: PublishReviewCardEntry[]
   children?: React.ReactNode
   footer?: React.ReactNode
+  className?: string
 }
 
 export const PublishReviewCard: React.FC<PublishReviewCardProps> = ({
@@ -19,9 +20,10 @@ export const PublishReviewCard: React.FC<PublishReviewCardProps> = ({
   entries,
   children,
   footer,
+  className,
 }) => {
   return (
-    <div className={styles.wrapper}>
+    <div className={`${styles.wrapper} ${className ?? ''}`.trim()}>
       {title ? <h3 className={styles.title}>{title}</h3> : null}
       {entries
         ? entries.map((entry) => (

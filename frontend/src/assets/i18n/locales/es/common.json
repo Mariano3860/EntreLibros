@@ -224,6 +224,12 @@
       },
       "trade": {
         "label": "Preferencias de intercambio",
+        "searchLabel": "Buscar preferencias de intercambio",
+        "searchPlaceholder": "Filtrá por género o tema...",
+        "selectedLabel": "Preferencias seleccionadas",
+        "selectedCount": "seleccionadas",
+        "remove": "Quitar",
+        "empty": "No hay preferencias que coincidan.",
         "genres": {
           "fiction": "Ficción",
           "nonfiction": "No ficción",
@@ -237,14 +243,6 @@
       "notes": {
         "label": "Notas para quien lo reciba",
         "counter": "{{count}}/300"
-      },
-      "corner": {
-        "label": "Adjuntar un Rincón (opcional)",
-        "placeholder": "Selecciona un Rincón",
-        "loading": "Cargando rincones...",
-        "helper": "Contá dónde te gustaría concretar el intercambio.",
-        "selected": "Te encontrarás en {{name}}.",
-        "error": "No pudimos cargar la lista de Rincones en este momento."
       },
       "availability": {
         "label": "Disponibilidad",
@@ -277,6 +275,9 @@
       }
     },
     "review": {
+      "previewTitle": "Así se verá tu publicación",
+      "previewEyebrow": "Lista para compartir",
+      "previewDescription": "Revisá los detalles una última vez antes de abrir este libro a la comunidad.",
       "terms": "Confirmo que la información es correcta y acepto los términos de EntreLibros",
       "hint": "Publicaremos tu libro y lo verás en la grilla al instante."
     },

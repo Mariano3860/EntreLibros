@@ -14,5 +14,6 @@ export type BookCardProps = {
   isForTrade?: boolean
   tradePreferences?: string[]
   isSeeking?: boolean
+  variant?: 'default' | 'review'
   onClick?: () => void
 }

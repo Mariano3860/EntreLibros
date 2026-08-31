@@ -56,6 +56,8 @@ export const IdentifyStep: React.FC<IdentifyStepProps> = React.memo(
     onRetry,
     onBlur,
   }) => {
+    const hasSearchQuery = searchQuery.trim().length > 0
+
     return (
       <div className={styles.stepLayout}>
         <div>
@@ -87,12 +89,12 @@ export const IdentifyStep: React.FC<IdentifyStepProps> = React.memo(
               </button>
             </div>
           )}
-          {results && results.length === 0 && (
+          {results && hasSearchQuery && results.length === 0 && (
             <p className={styles.toastInline}>
               {t('publishBook.search.empty')}
             </p>
           )}
-          {results && results.length > 0 && (
+          {results && hasSearchQuery && results.length > 0 && (
             <div className={styles.searchResults}>
               {results.map((book) => (
                 <div key={book.id} className={styles.searchResult}>

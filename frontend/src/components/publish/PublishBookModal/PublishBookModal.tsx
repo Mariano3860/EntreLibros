@@ -31,7 +31,6 @@ import {
 } from './PublishBookModal.constants'
 import styles from './PublishBookModal.module.scss'
 import {
-  PublishBookCorner,
   PublishBookDraftState,
   PublishBookFormState,
   PublishBookImage,
@@ -263,17 +262,6 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
     [setAutosaveEnabled, setState]
   )
 
-  const updateCorner = useCallback(
-    (corner: PublishBookCorner | null) => {
-      setAutosaveEnabled(true)
-      setState((prev) => ({
-        ...prev,
-        corner,
-      }))
-    },
-    [setAutosaveEnabled, setState]
-  )
-
   const handleResult = useCallback(
     (result: ApiBookSearchResult) => {
       setState((prev) => ({
@@ -291,6 +279,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
           coverUrl: result.coverUrl ?? prev.metadata.coverUrl,
         },
         manualMode: false,
+        searchQuery: '',
         images: ensureCover(
           prev.images,
           result.coverUrl ?? prev.metadata.coverUrl
@@ -458,7 +447,6 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
         availability: state.offer.availability,
         delivery: state.offer.delivery,
       },
-      cornerId: state.corner?.id ?? null,
       draft: false,
     }
 
@@ -642,13 +630,11 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
           <OfferStep
             t={t}
             offer={state.offer}
-            corner={state.corner}
             errors={offerErrors}
             genres={genres}
             onOfferChange={updateOffer}
             onDeliveryChange={updateDelivery}
             onToggleTradePreference={toggleTradePreference}
-            onCornerChange={updateCorner}
             onBlur={handleBlur}
           />
         )}

@@ -35,7 +35,6 @@ export type PublishBookPayload = {
       shippingPayer?: 'owner' | 'requester' | 'split'
     }
   }
-  cornerId?: string | null
   draft?: boolean
 }
 
