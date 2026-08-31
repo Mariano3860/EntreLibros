@@ -46,6 +46,21 @@ const discoveryBook = {
 }
 
 describe('BooksPage discovery interactions', () => {
+  test('opens a blank want form from the header action', async () => {
+    fetchBooks.mockResolvedValue([])
+
+    renderWithProviders(<BooksPage />, {
+      initialEntries: ['/books'],
+    })
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'booksPage.want.open' })
+    )
+
+    expect(screen.getByText('booksPage.want.title')).toBeVisible()
+    expect(screen.getByLabelText('booksPage.want.titleLabel')).toHaveValue('')
+  })
+
   test('applies catalog filters and resets them from the visible panel', async () => {
     fetchBooks.mockResolvedValue([discoveryBook])
 

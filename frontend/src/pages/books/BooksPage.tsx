@@ -220,6 +220,7 @@ export const BooksPage = () => {
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [selectedBook, setSelectedBook] = useState<PrototypeBook | null>(null)
   const [wantBook, setWantBook] = useState<WantBookSource | undefined>()
+  const [isWantModalOpen, setIsWantModalOpen] = useState(false)
   const [coordinates, setCoordinates] = useState<
     { latitude: number; longitude: number } | undefined
   >()
@@ -491,6 +492,12 @@ export const BooksPage = () => {
 
   const openWantModal = (book?: PrototypeBook) => {
     setWantBook(book ? toWantSource(book) : undefined)
+    setIsWantModalOpen(true)
+  }
+
+  const closeWantModal = () => {
+    setIsWantModalOpen(false)
+    setWantBook(undefined)
   }
 
   const handleTabChange = (path: string) => {
@@ -788,9 +795,9 @@ export const BooksPage = () => {
         />
       ) : null}
       <WantBookModal
-        isOpen={wantBook !== undefined}
+        isOpen={isWantModalOpen}
         initialBook={wantBook}
-        onClose={() => setWantBook(undefined)}
+        onClose={closeWantModal}
         onCreated={() => {
           void queryClient.invalidateQueries({
             queryKey: ['prototype', 'books'],
@@ -798,7 +805,7 @@ export const BooksPage = () => {
           void queryClient.invalidateQueries({
             queryKey: ['prototype', 'books', 'mine'],
           })
-          setWantBook(undefined)
+          closeWantModal()
         }}
       />
     </BaseLayout>
