@@ -8,6 +8,10 @@ module.exports = {
     'import-notation': null,
     'property-no-vendor-prefix': null,
     'selector-class-pattern': null,
+    'selector-pseudo-class-no-unknown': [
+      true,
+      { ignorePseudoClasses: ['global'] },
+    ],
     'no-descending-specificity': null,
     'scss/at-extend-no-missing-placeholder': null,
   },

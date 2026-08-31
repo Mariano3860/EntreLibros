@@ -76,7 +76,7 @@ main.layoutMain {
   border: 0;
   outline: 0;
   background: transparent;
-  color: white;
+  color: var(--prototype-input-text);
   font-size: 11px;
 }
 
@@ -107,6 +107,24 @@ main.layoutMain {
   overflow-y: auto;
 }
 
+.conversationState {
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+  padding: 24px 14px;
+  color: var(--prototype-muted);
+  font-size: 10px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.conversationState strong {
+  max-width: 170px;
+  color: var(--prototype-text);
+  font-size: 10px;
+  font-weight: 600;
+}
+
 .conversationList > button {
   display: flex;
   width: 100%;
@@ -122,7 +140,7 @@ main.layoutMain {
 }
 
 .conversationList > button:hover {
-  background: rgb(255 255 255 / 3%);
+  background: var(--prototype-subtle-hover);
 }
 
 .conversationList > .selected {
@@ -184,7 +202,89 @@ main.layoutMain {
   min-width: 0;
   min-height: 0;
   flex-direction: column;
-  background: rgb(7 24 34 / 30%);
+  background: var(--prototype-chat-background);
+}
+
+.empty {
+  display: grid;
+  min-height: 100%;
+  place-items: center;
+  padding: 24px;
+  background: var(--prototype-chat-background);
+  color: var(--prototype-muted);
+  text-align: center;
+}
+
+.messageState {
+  display: flex;
+  width: min(100%, 300px);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: auto;
+  padding: 20px 16px;
+  color: var(--prototype-muted);
+  font-size: 10px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.messageState strong {
+  color: var(--prototype-text);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.errorState {
+  border: 1px solid rgb(255 139 76 / 28%);
+  border-radius: 11px;
+  background: rgb(255 139 76 / 7%);
+}
+
+.stateMark {
+  display: grid;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  place-items: center;
+  border: 1px solid rgb(255 139 76 / 35%);
+  border-radius: 50%;
+  background: rgb(255 139 76 / 10%);
+  color: var(--prototype-orange);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.stateSpinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--prototype-border);
+  border-top-color: var(--prototype-teal);
+  border-radius: 50%;
+  animation: messages-spin 0.8s linear infinite;
+}
+
+@keyframes messages-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.retryButton {
+  min-height: 28px;
+  padding: 0 11px;
+  border: 1px solid rgb(66 215 199 / 32%);
+  border-radius: 999px;
+  background: rgb(66 215 199 / 9%);
+  color: var(--prototype-teal);
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.retryButton:hover {
+  background: rgb(66 215 199 / 16%);
 }
 
 .chatHeader {
@@ -274,7 +374,7 @@ main.layoutMain {
   align-self: flex-end;
   border-color: rgb(66 215 199 / 24%);
   border-radius: 13px 5px 13px 13px;
-  background: rgb(32 99 96 / 58%);
+  background: var(--prototype-message-mine-background);
 }
 
 .proposal {
@@ -283,7 +383,7 @@ main.layoutMain {
   padding: 12px;
   border: 1px solid rgb(255 139 76 / 30%);
   border-radius: 13px;
-  background: linear-gradient(145deg, #173341, #102a37);
+  background: var(--prototype-proposal-background);
 }
 
 .proposalLabel {
@@ -371,7 +471,7 @@ main.layoutMain {
   border-radius: 999px;
   outline: 0;
   background: var(--prototype-surface-soft);
-  color: white;
+  color: var(--prototype-input-text);
   font-size: 11px;
 }
 
@@ -391,6 +491,23 @@ main.layoutMain {
   color: #05231f;
 }
 
+.composerError {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 14px 10px;
+  color: var(--prototype-orange);
+  font-size: 9px;
+  line-height: 1.35;
+}
+
+.composerError .stateMark {
+  width: 17px;
+  height: 17px;
+  flex-basis: 17px;
+  font-size: 9px;
+}
+
 .modalBackdrop {
   position: fixed;
   inset: 0;
@@ -398,8 +515,170 @@ main.layoutMain {
   display: grid;
   place-items: center;
   padding: 20px;
-  background: rgb(1 9 14 / 78%);
+  background: var(--prototype-modal-backdrop);
   backdrop-filter: blur(8px);
+}
+
+.newConversationDialog {
+  width: min(440px, 100%);
+}
+
+.newConversationModal {
+  width: 100%;
+  max-height: none;
+  padding: 0;
+  overflow: hidden;
+}
+
+.newConversationHeader {
+  align-items: flex-start;
+  gap: 18px;
+  padding: 22px 22px 19px;
+  border-bottom: 1px solid var(--prototype-border);
+}
+
+.newConversationTitle {
+  min-width: 0;
+  flex: 1;
+}
+
+.newConversationEyebrow {
+  display: block;
+  margin-bottom: 8px;
+  letter-spacing: 0.13em;
+}
+
+.newConversationTitle h2 {
+  margin: 0;
+  font-size: 22px;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+
+.newConversationTitle p {
+  max-width: 315px;
+  margin: 8px 0 0;
+  color: var(--prototype-muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.newConversationHeader .modalCloseButton {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  place-items: center;
+  border: 1px solid var(--prototype-border);
+  border-radius: 50%;
+  background: var(--prototype-surface-soft);
+  color: var(--prototype-muted);
+  font-size: 19px;
+  line-height: 1;
+}
+
+.newConversationHeader .modalCloseButton:hover {
+  border-color: rgb(66 215 199 / 45%);
+  background: rgb(66 215 199 / 10%);
+  color: var(--prototype-teal);
+}
+
+.newConversationForm {
+  display: grid;
+  gap: 17px;
+  padding: 20px 22px 22px;
+}
+
+.newConversationField {
+  display: grid;
+  gap: 7px;
+}
+
+.newConversationField > span {
+  color: var(--prototype-text);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.newConversationField input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 45px;
+  padding: 0 13px;
+  border: 1px solid var(--prototype-border);
+  border-radius: 10px;
+  outline: 0;
+  background: var(--prototype-surface-soft);
+  color: var(--prototype-input-text);
+  font-size: 13px;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.newConversationField input::placeholder {
+  color: var(--prototype-muted);
+}
+
+.newConversationField input:focus {
+  border-color: var(--prototype-teal);
+  box-shadow: 0 0 0 3px rgb(66 215 199 / 12%);
+}
+
+.newConversationHint {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: -3px 0 0;
+  color: var(--prototype-muted);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.newConversationHintIcon {
+  display: grid;
+  width: 17px;
+  height: 17px;
+  flex: 0 0 17px;
+  place-items: center;
+  border: 1px solid rgb(66 215 199 / 35%);
+  border-radius: 50%;
+  background: rgb(66 215 199 / 9%);
+  color: var(--prototype-teal);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.newConversationActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin: 2px -22px -22px;
+  padding: 14px 22px;
+  border-top: 1px solid var(--prototype-border);
+  background: var(--prototype-inset-background);
+}
+
+.newConversationCancel {
+  min-height: 40px;
+  padding: 0 13px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--prototype-muted);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.newConversationCancel:hover {
+  background: var(--prototype-subtle-hover);
+  color: var(--prototype-text);
+}
+
+.newConversationSubmit {
+  min-width: 166px;
 }
 
 .bookPicker {
@@ -427,7 +706,7 @@ main.layoutMain {
 .bookPicker header button {
   border: 0;
   background: transparent;
-  color: white;
+  color: var(--prototype-text);
   cursor: pointer;
   font-size: 23px;
 }
@@ -437,12 +716,54 @@ main.layoutMain {
   font-size: 10px;
 }
 
-.bookPicker > div {
+.bookPickerError,
+.bookPickerState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 12px 0 14px;
+  padding: 9px 10px;
+  border-radius: 9px;
+  font-size: 10px;
+  line-height: 1.35;
+  text-align: left;
+}
+
+.bookPickerError {
+  border: 1px solid rgb(255 139 76 / 28%);
+  background: rgb(255 139 76 / 7%);
+  color: var(--prototype-text);
+}
+
+.bookPickerError .stateMark {
+  width: 18px;
+  height: 18px;
+  flex-basis: 18px;
+  font-size: 9px;
+}
+
+.bookPickerState {
+  min-height: 72px;
+  flex-direction: column;
+  margin: 0;
+  padding: 20px 12px;
+  color: var(--prototype-muted);
+  text-align: center;
+}
+
+.bookPickerState.errorState {
+  border: 1px solid rgb(255 139 76 / 28%);
+  background: rgb(255 139 76 / 7%);
+  color: var(--prototype-text);
+}
+
+.bookPickerList {
   display: grid;
   gap: 8px;
 }
 
-.bookPicker > div > button {
+.bookPickerList > button {
   display: grid;
   grid-template-columns: 62px 1fr 25px;
   align-items: center;
@@ -456,7 +777,12 @@ main.layoutMain {
   text-align: left;
 }
 
-.bookPicker > div > button > div {
+.bookPickerList > button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.bookPickerList > button > div {
   min-height: 78px;
   border-radius: 6px;
 }

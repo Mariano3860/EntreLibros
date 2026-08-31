@@ -1,8 +1,13 @@
+import { fetchBookById, fetchBooks } from '@api/books/books.service'
+import { fetchUserBooks } from '@api/books/userBooks.service'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { PublishBookModal } from '@components/publish/PublishBookModal/PublishBookModal'
-import { useMemo, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useMatch, useNavigate } from 'react-router-dom'
 
+import type { ApiBook } from '@src/api/books/books.types'
+import { useAuth } from '@src/contexts/auth/AuthContext'
 import type { PrototypeBook } from '@src/features/prototype/catalog'
 import { usePrototype } from '@src/features/prototype/PrototypeContext'
 import {
@@ -14,6 +19,11 @@ import {
   PrototypeButton,
   PrototypePage,
 } from '@src/features/prototype/PrototypeUI'
+import {
+  mergeApiBooks,
+  toPrototypeBook,
+} from '@src/features/prototype/realData.adapters'
+import { isApiMockMode } from '@src/utils/runtimeEnv'
 
 import styles from './BooksPage.module.scss'
 
@@ -25,8 +35,34 @@ const tabs = [
   { key: 'sale', path: 'sale', label: 'A la venta' },
 ] as const
 
+const BookResults = ({
+  books,
+  onSelect,
+}: {
+  books: PrototypeBook[]
+  onSelect: (book: PrototypeBook) => void
+}) =>
+  books.length ? (
+    <div className={styles.grid}>
+      {books.map((book) => (
+        <PrototypeBookCard
+          key={book.id}
+          book={book}
+          onClick={() => onSelect(book)}
+        />
+      ))}
+    </div>
+  ) : (
+    <Panel className={styles.empty}>
+      <strong>No encontramos libros</strong>
+      <span>Probá con otra búsqueda o eliminá algunos filtros.</span>
+    </Panel>
+  )
+
 export const BooksPage = () => {
+  const { isAuthenticated } = useAuth()
   const { catalog } = usePrototype()
+  const mockMode = isApiMockMode()
   const navigate = useNavigate()
   const location = useLocation()
   const publishMatch = useMatch('/books/new')
@@ -34,11 +70,28 @@ export const BooksPage = () => {
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [selectedBook, setSelectedBook] = useState<PrototypeBook | null>(null)
   const segment = location.pathname.replace(/^\/books\/?/, '').split('/')[0]
+  const bookId = /^\d+$/.test(segment) ? Number(segment) : null
   const active = tabs.find((tab) => tab.path === segment)?.key ?? 'all'
-
-  const books = useMemo(() => {
+  const publicBooksQuery = useQuery({
+    queryKey: ['prototype', 'books', active, search],
+    queryFn: () =>
+      fetchBooks({
+        q: search.trim() || undefined,
+        ...(active === 'seeking' ? { type: 'want' as const } : {}),
+      }),
+    enabled: !mockMode && active !== 'mine' && bookId === null,
+  })
+  const ownBooksQuery = useQuery({
+    queryKey: ['prototype', 'books', 'mine'],
+    queryFn: fetchUserBooks,
+    enabled:
+      !mockMode &&
+      isAuthenticated &&
+      (active === 'mine' || active === 'all') &&
+      bookId === null,
+  })
+  const mockBooks = useMemo(() => {
     let result = [...catalog.books]
-    if (active === 'mine') result = result.slice(0, 2)
     if (active === 'trade')
       result = result.filter((book) => book.mode === 'Intercambio')
     if (active === 'seeking')
@@ -52,6 +105,40 @@ export const BooksPage = () => {
         )
       : result
   }, [active, catalog.books, search])
+  const detailQuery = useQuery({
+    queryKey: ['prototype', 'book', bookId],
+    queryFn: () => fetchBookById(bookId ?? 0),
+    enabled: !mockMode && bookId !== null,
+  })
+  useEffect(() => {
+    if (bookId === null) return
+    if (mockMode) {
+      setSelectedBook(
+        mockBooks.find((book) => Number(book.id) === bookId) ?? null
+      )
+    } else if (detailQuery.data) {
+      setSelectedBook(toPrototypeBook(detailQuery.data))
+    }
+  }, [bookId, detailQuery.data, mockMode, mockBooks])
+  const realBooks: ApiBook[] =
+    active === 'mine'
+      ? (ownBooksQuery.data ?? [])
+      : active === 'all'
+        ? mergeApiBooks(
+            publicBooksQuery.data,
+            isAuthenticated ? ownBooksQuery.data : undefined
+          )
+        : (publicBooksQuery.data ?? [])
+  const activeIsLoading =
+    active === 'mine'
+      ? ownBooksQuery.isLoading
+      : publicBooksQuery.isLoading ||
+        (active === 'all' && isAuthenticated && ownBooksQuery.isLoading)
+  const activeHasError =
+    active === 'mine' ? ownBooksQuery.isError : publicBooksQuery.isError
+  const books = mockMode
+    ? mockBooks
+    : realBooks.map((book) => toPrototypeBook(book))
 
   return (
     <BaseLayout id="books-page">
@@ -68,7 +155,6 @@ export const BooksPage = () => {
             </PrototypeButton>
           }
         />
-
         <div className={styles.toolbar}>
           <label className={styles.search}>
             <span aria-hidden="true">⌕</span>
@@ -86,7 +172,6 @@ export const BooksPage = () => {
             ☷ Filtros
           </PrototypeButton>
         </div>
-
         {filtersOpen ? (
           <Panel className={styles.filters}>
             <button>Hasta 2 km</button>
@@ -95,7 +180,6 @@ export const BooksPage = () => {
             <button>Ordenar: cercanos</button>
           </Panel>
         ) : null}
-
         <div
           className={styles.tabs}
           role="tablist"
@@ -114,26 +198,19 @@ export const BooksPage = () => {
             </button>
           ))}
         </div>
-
-        <FixtureState region="books">
-          {books.length ? (
-            <div className={styles.grid}>
-              {books.map((book) => (
-                <PrototypeBookCard
-                  key={book.id}
-                  book={book}
-                  onClick={() => setSelectedBook(book)}
-                />
-              ))}
-            </div>
-          ) : (
-            <Panel className={styles.empty}>
-              <strong>No encontramos libros</strong>
-              <span>Probá con otra búsqueda o eliminá algunos filtros.</span>
-            </Panel>
-          )}
-        </FixtureState>
-
+        {mockMode ? (
+          <FixtureState region="books">
+            <BookResults books={books} onSelect={setSelectedBook} />
+          </FixtureState>
+        ) : activeIsLoading ? (
+          <Panel className={styles.empty}>Cargando libros…</Panel>
+        ) : activeHasError ? (
+          <Panel className={styles.empty}>
+            No pudimos cargar los libros. Intentá nuevamente.
+          </Panel>
+        ) : (
+          <BookResults books={books} onSelect={setSelectedBook} />
+        )}
         <div className={styles.pagination} aria-label="Páginas de resultados">
           <button aria-label="Página anterior">←</button>
           <span className={styles.activeDot} />
@@ -141,15 +218,12 @@ export const BooksPage = () => {
           <span />
           <button aria-label="Página siguiente">→</button>
         </div>
-
         {selectedBook ? (
           <div
             className={styles.modalBackdrop}
             role="presentation"
             onMouseDown={(event) => {
-              if (event.target === event.currentTarget) {
-                setSelectedBook(null)
-              }
+              if (event.target === event.currentTarget) setSelectedBook(null)
             }}
           >
             <Panel className={styles.bookDialog} as="div">
@@ -179,7 +253,6 @@ export const BooksPage = () => {
           </div>
         ) : null}
       </PrototypePage>
-
       {publishMatch ? (
         <PublishBookModal
           isOpen

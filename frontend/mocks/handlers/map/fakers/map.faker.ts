@@ -10,11 +10,13 @@ const DEFAULT_BOUNDS = {
 }
 
 let cached: MapResponse | null = null
+const FIXTURE_REFERENCE_DATE = '2025-01-15T12:00:00.000Z'
 
 export const generateMapResponse = (): MapResponse => {
   if (cached) return cached
 
   faker.seed(2048)
+  faker.setDefaultRefDate(FIXTURE_REFERENCE_DATE)
 
   const corners = Array.from({ length: 5 }).map((_, index) => {
     const lat = faker.number.float({
@@ -100,7 +102,7 @@ export const generateMapResponse = (): MapResponse => {
     activity,
     meta: {
       bbox: DEFAULT_BOUNDS,
-      generatedAt: new Date().toISOString(),
+      generatedAt: FIXTURE_REFERENCE_DATE,
     },
   }
 

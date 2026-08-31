@@ -22,6 +22,10 @@ vi.mock('socket.io-client', () => ({
   io,
 }))
 
+vi.mock('@utils/runtimeEnv', () => ({
+  isApiMockMode: () => false,
+}))
+
 describe('useChatSocket', () => {
   const wrapper = ({ children }: PropsWithChildren) =>
     createElement(QueryClientProvider, { client: new QueryClient() }, children)

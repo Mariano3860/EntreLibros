@@ -422,6 +422,31 @@
     "messages": {
       "title": "Messages",
       "placeholder": "Messages list",
+      "states": {
+        "loadingConversations": "Loading conversations...",
+        "conversationsError": "We couldn't load your conversations.",
+        "messagesError": "We couldn't load your messages.",
+        "historyError": "We couldn't load the messages.",
+        "connectionHint": "Check your connection and try again.",
+        "loadingMessages": "Loading messages...",
+        "emptyMessages": "There are no messages yet.",
+        "loadingBooks": "Loading books...",
+        "booksError": "We couldn't load the books.",
+        "emptyBooks": "You have no books available to attach.",
+        "attachError": "We couldn't attach this book. Try again.",
+        "sendError": "We couldn't send the message. Try again.",
+        "retry": "Retry"
+      },
+      "newConversation": {
+        "eyebrow": "NEW CONVERSATION",
+        "title": "Who do you want to talk to?",
+        "description": "Start a new conversation with someone from the community.",
+        "fieldLabel": "User ID",
+        "placeholder": "e.g. 42",
+        "hint": "You can find the ID on the person's profile.",
+        "cancel": "Cancel",
+        "submit": "Start conversation"
+      },
       "status": {
         "disconnected": "Disconnected",
         "disconnectedError": "Disconnected: {{error}}",

@@ -7,53 +7,59 @@
   display: grid;
   place-items: center;
   padding: $spacing-2;
-  background: rgb(0 0 0 / 55%);
+  background: var(--prototype-modal-backdrop);
 }
 
 .dialog {
   width: min(100%, rem(420px));
-  padding: $spacing-3;
-  border: 1px solid var(--border-color);
-  border-radius: rem(16px);
-  background: var(--background-primary);
-  color: var(--text-primary);
-  box-shadow: $box-shadow-md;
+  padding: rem(24px);
+  border: 1px solid var(--prototype-border);
+  border-radius: var(--prototype-radius-lg);
+  background: var(--prototype-panel-background);
+  color: var(--prototype-text);
+  box-shadow: var(--prototype-shadow);
 }
 
 .dialog h2 {
-  margin: 0 0 $spacing-1;
-  font-size: $h5-font-size;
+  margin: 0 0 6px;
+  font-size: 1.25rem;
+  letter-spacing: -0.025em;
 }
 
 .dialog p {
   margin: 0;
-  color: var(--text-secondary);
+  color: var(--prototype-muted);
+  font-size: 0.8rem;
+  line-height: 1.5;
 }
 
 .actions {
   display: flex;
   justify-content: flex-end;
-  gap: $spacing-1x5;
-  margin-top: $spacing-3;
+  gap: 8px;
+  margin-top: 20px;
 }
 
 .cancel,
 .confirm {
-  border: 1px solid var(--border-color);
-  border-radius: rem(8px);
-  padding: $spacing-1 $spacing-2;
+  min-height: 34px;
+  border: 1px solid var(--prototype-border);
+  border-radius: 9px;
+  padding: 0 12px;
+  font-size: 0.72rem;
+  font-weight: 650;
   cursor: pointer;
 }
 
 .cancel {
-  background: transparent;
-  color: var(--text-primary);
+  background: var(--prototype-surface-raised);
+  color: var(--prototype-text);
 }
 
 .confirm {
-  border-color: var(--primary-color);
-  background: var(--primary-color);
-  color: #fff;
+  border-color: var(--prototype-teal);
+  background: var(--prototype-teal);
+  color: #06211f;
 }
 
 .cancel:disabled,

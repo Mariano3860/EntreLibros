@@ -3,17 +3,35 @@
 .form {
   display: flex;
   flex-direction: column;
-  gap: $spacing-1x5;
+  gap: $spacing-1;
+}
+
+.form label {
+  margin-top: $spacing-1;
+  color: var(--prototype-muted);
+  font-size: 0.7rem;
+  font-weight: 650;
 }
 
 .form textarea,
 .form select,
 .form input {
-  color: var(--text-primary);
-  background: var(--background-primary);
-  border: 1px solid var(--border-color);
-  border-radius: rem(8px);
+  width: 100%;
+  box-sizing: border-box;
+  color: var(--prototype-input-text);
+  background: var(--prototype-surface-soft);
+  border: 1px solid var(--prototype-border);
+  border-radius: rem(9px);
   padding: $spacing-1x5;
+}
+
+.form textarea {
+  min-height: 130px;
+  resize: vertical;
+}
+
+.form textarea::placeholder {
+  color: var(--prototype-muted);
 }
 
 .preview {
@@ -31,19 +49,22 @@
 
 .primary,
 .secondary {
-  border-radius: rem(8px);
-  padding: $spacing-1 $spacing-2;
+  min-height: 34px;
+  border-radius: rem(9px);
+  padding: 0 $spacing-2;
+  font-size: 0.72rem;
+  font-weight: 650;
   cursor: pointer;
 }
 
 .primary {
-  color: #fff;
+  color: #06211f;
   background: var(--primary-color);
   border: 0;
 }
 
 .secondary {
-  color: var(--text-primary);
-  background: var(--background-card);
-  border: 1px solid var(--border-color);
+  color: var(--prototype-text);
+  background: var(--prototype-surface-raised);
+  border: 1px solid var(--prototype-border);
 }

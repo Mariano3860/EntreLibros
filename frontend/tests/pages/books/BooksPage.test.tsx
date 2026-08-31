@@ -20,11 +20,11 @@ describe('BooksPage', () => {
     expect(screen.getAllByRole('button', { name: /^Ver / })).toHaveLength(5)
   })
 
-  test('keeps Todos greater than Mis libros and filters by text', () => {
+  test('shows the complete catalog in every tab and filters by text', () => {
     renderWithProviders(<BooksPage />)
 
     fireEvent.click(screen.getByRole('tab', { name: 'Mis libros' }))
-    expect(screen.getAllByRole('button', { name: /^Ver / })).toHaveLength(2)
+    expect(screen.getAllByRole('button', { name: /^Ver / })).toHaveLength(5)
 
     fireEvent.click(screen.getByRole('tab', { name: 'Todos' }))
     fireEvent.change(screen.getByRole('textbox', { name: 'Buscar libros' }), {

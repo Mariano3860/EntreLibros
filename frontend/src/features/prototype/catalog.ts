@@ -6,6 +6,7 @@ export type PrototypeBook = {
   distance: string
   mode: 'Intercambio' | 'Venta' | 'Buscado'
   price?: string
+  coverUrl?: string
   accent: string
   genre: string
 }

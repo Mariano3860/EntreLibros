@@ -7,7 +7,7 @@
   height: 100vh;
   width: $collapsed-width;
   background: var(--prototype-sidebar);
-  border-right: 1px solid rgb(255 255 255 / 6%);
+  border-right: 1px solid var(--prototype-sidebar-border);
   overflow: auto;
   z-index: 1000;
 
@@ -64,7 +64,7 @@
 
   &:hover {
     color: var(--text-primary);
-    background: rgb(255 255 255 / 4%);
+    background: var(--prototype-sidebar-hover);
     transform: translateX(2px);
   }
 
@@ -91,7 +91,7 @@
   width: calc(100% - 28px);
   padding: 12px 0 16px;
   margin: 0 14px;
-  border-top: 1px solid rgb(255 255 255 / 8%);
+  border-top: 1px solid var(--prototype-sidebar-divider);
 }
 
 /* === Mobile Toggle Button === */
@@ -230,7 +230,7 @@
   gap: 10px;
   padding: 14px 8px 0;
   margin-top: 6px;
-  border-top: 1px solid rgb(255 255 255 / 7%);
+  border-top: 1px solid var(--prototype-sidebar-divider);
   color: var(--prototype-text);
   text-decoration: none;
 

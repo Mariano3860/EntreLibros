@@ -2,12 +2,42 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { apiClient } from '@api/axios'
 import {
+  createConversation,
+  fetchConversations,
   fetchMessageHistory,
   messageQueryKeys,
   sendPersistedMessage,
 } from '@api/messages/messages'
 
 describe('messaging API client', () => {
+  it('creates a conversation for an authorized participant', async () => {
+    const conversation = {
+      id: 4,
+      isBot: false,
+      participantIds: [1, 2],
+      agreementId: null,
+      lastMessageSequence: 0,
+      updatedAt: '2026-08-28T00:00:00.000Z',
+      participantName: 'Ana',
+    }
+    vi.spyOn(apiClient, 'post').mockResolvedValueOnce({
+      data: { conversation },
+    })
+
+    await expect(createConversation(2)).resolves.toEqual(conversation)
+    expect(apiClient.post).toHaveBeenCalledWith('/messages/conversations', {
+      participantId: 2,
+    })
+  })
+
+  it('lists conversations from the persisted API', async () => {
+    vi.spyOn(apiClient, 'get').mockResolvedValueOnce({
+      data: { conversations: [] },
+    })
+
+    await expect(fetchConversations()).resolves.toEqual([])
+  })
+
   it('serializes history pagination and preserves the server cursor', async () => {
     vi.spyOn(apiClient, 'get').mockResolvedValueOnce({
       data: { messages: [], nextAfter: 12 },

@@ -17,10 +17,7 @@ export const SidebarThemeButton = () => {
     >
       <MoonIcon className={styles.icon} />
       <span className={styles.label}>
-        Ajustes ·{' '}
-        <span>
-          {theme === 'dark' ? t('theme.mode.dark') : t('theme.mode.light')}
-        </span>
+        {theme === 'dark' ? t('theme.mode.dark') : t('theme.mode.light')}
       </span>
     </button>
   )

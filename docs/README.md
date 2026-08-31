@@ -2,6 +2,7 @@
 
 Índice de referencia del repositorio:
 
+- [`frontend-backend-reconnection-matrix.md`](frontend-backend-reconnection-matrix.md): inventario verificable de contratos existentes, adaptaciones y capacidades diferidas del prototipo.
 - [`arquitectura.md`](arquitectura.md): componentes, límites, proxy, REST, Socket.IO y modos mock/real.
 - [`base_de_datos.md`](base_de_datos.md): modelo vigente y migraciones 001–015.
 - [`messaging-bubbles.md`](messaging-bubbles.md): contrato visual y flujo de mensajería.

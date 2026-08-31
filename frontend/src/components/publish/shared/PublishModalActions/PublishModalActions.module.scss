@@ -12,33 +12,35 @@
 }
 
 .button {
-  border-radius: 999px;
-  padding: 10px 20px;
-  font-weight: 600;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  font-size: 0.72rem;
+  font-weight: 650;
   cursor: pointer;
-  border: none;
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.95rem;
 }
 
 .secondary {
-  background: var(--background-card);
-  color: var(--text-primary);
+  border-color: var(--prototype-border);
+  background: var(--prototype-surface-raised);
+  color: var(--prototype-text);
 }
 
 .ghost {
   background: transparent;
-  color: var(--text-secondary);
+  color: var(--prototype-muted);
 }
 
 .primary {
   background: var(--primary-color);
-  color: #fff;
+  color: #06211f;
   box-shadow: 0 8px 20px rgb(var(--primary-super-dark-rgb) / 25%);
 }
 

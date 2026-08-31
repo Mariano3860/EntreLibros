@@ -2,7 +2,7 @@
 
 Fecha de referencia: 2026-08-30.
 
-Este documento describe los datos de demostración que sostienen la reconstrucción visual de `recreate-ideal-prototype-ui`. No representa persistencia real ni modifica el contrato del backend actual. La matriz visual, medidas y manifest de recursos están en [`prototype-ui-reference.md`](prototype-ui-reference.md).
+Este documento describe los datos de demostración que sostienen la reconstrucción visual de `recreate-ideal-prototype-ui`. No representa persistencia real ni modifica el contrato del backend actual. La matriz visual, medidas y manifest de recursos están en [`prototype-ui-reference.md`](prototype-ui-reference.md); el inventario de contratos que pueden reemplazarlo está en [`frontend-backend-reconnection-matrix.md`](frontend-backend-reconnection-matrix.md).
 
 ## Fuente de verdad del modo demo
 

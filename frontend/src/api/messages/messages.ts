@@ -65,6 +65,16 @@ export async function fetchConversations(): Promise<ApiConversation[]> {
   return response.data.conversations
 }
 
+export async function createConversation(
+  participantId: number
+): Promise<ApiConversation> {
+  const response = await apiClient.post<{ conversation: ApiConversation }>(
+    RELATIVE_API_ROUTES.MESSAGES.CREATE_CONVERSATION,
+    { participantId }
+  )
+  return response.data.conversation
+}
+
 export async function fetchMessageHistory(
   conversationId: number,
   after = 0,

@@ -14,6 +14,7 @@
   background:
     radial-gradient(circle at 82% 40%, rgb(66 215 199 / 12%), transparent 33%),
     linear-gradient(145deg, #153544, #0e2836);
+  color: var(--prototype-hero-text);
 }
 
 .hero h1 {
@@ -25,7 +26,7 @@
 .hero p {
   max-width: 560px;
   margin: 0 0 19px;
-  color: var(--prototype-muted);
+  color: var(--prototype-hero-muted);
   font-size: 12px;
 }
 
@@ -154,7 +155,7 @@
   overflow: hidden;
   border: 1px solid var(--prototype-border);
   border-radius: 10px;
-  background: rgb(3 17 25 / 20%);
+  background: var(--prototype-inset-background);
 }
 
 .faqList article > button {
@@ -278,7 +279,7 @@
   border-radius: 8px;
   outline: 0;
   background: var(--prototype-surface-soft);
-  color: white;
+  color: var(--prototype-input-text);
   resize: vertical;
 }
 

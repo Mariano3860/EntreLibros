@@ -1,5 +1,7 @@
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
+import { useQuery } from '@tanstack/react-query'
 
+import { fetchCommunityStats } from '@src/api/community/communityStats.service'
 import { usePrototype } from '@src/features/prototype/PrototypeContext'
 import {
   Avatar,
@@ -10,20 +12,27 @@ import {
   PrototypeButton,
   PrototypePage,
   SectionHeading,
+  UnavailableState,
 } from '@src/features/prototype/PrototypeUI'
+import { isApiMockMode } from '@src/utils/runtimeEnv'
 
 import styles from './StatsPage.module.scss'
 
 const points = (values: readonly number[]) =>
-  values
-    .map(
-      (value, index) =>
-        `${index * (600 / (values.length - 1))},${170 - value * 1.45}`
-    )
-    .join(' ')
+  values.length < 2
+    ? ''
+    : values
+        .map(
+          (value, index) =>
+            `${index * (600 / (values.length - 1))},${170 - value * 1.45}`
+        )
+        .join(' ')
 
 export const StatsPage = () => {
   const { catalog, period, setPeriod } = usePrototype()
+  const mockMode = isApiMockMode()
+
+  if (!mockMode) return <RealStatsPage />
 
   return (
     <BaseLayout id="stats-page">
@@ -184,6 +193,120 @@ export const StatsPage = () => {
             </div>
           </Panel>
         </div>
+      </PrototypePage>
+    </BaseLayout>
+  )
+}
+
+const RealStatsPage = () => {
+  const query = useQuery({
+    queryKey: ['community', 'stats'],
+    queryFn: fetchCommunityStats,
+  })
+  const stats = query.data
+  return (
+    <BaseLayout id="stats-page">
+      <PrototypePage>
+        <PageHeader
+          title="Estadísticas"
+          description="Mirá cómo crecen las lecturas, intercambios y encuentros de EntreLibros."
+        />
+        {query.isLoading ? (
+          <Panel className={styles.card}>Cargando estadísticas…</Panel>
+        ) : null}
+        {query.isError ? (
+          <UnavailableState
+            title="No pudimos cargar las estadísticas"
+            description="Intentá nuevamente en unos instantes."
+          />
+        ) : null}
+        {stats ? (
+          <>
+            <section className={styles.kpis}>
+              <KpiCard
+                icon="↔"
+                value={String(stats.kpis.exchanges)}
+                label="Intercambios"
+                tone="teal"
+              />
+              <KpiCard
+                icon="⌂"
+                value={String(stats.kpis.activeHouses)}
+                label="Rincones activos"
+                tone="blue"
+              />
+              <KpiCard
+                icon="◉"
+                value={String(stats.kpis.activeUsers)}
+                label="Usuarios activos"
+                tone="violet"
+              />
+              <KpiCard
+                icon="▣"
+                value={String(stats.kpis.booksPublished)}
+                label="Libros publicados"
+                tone="orange"
+              />
+            </section>
+            <div className={styles.dashboard}>
+              <Panel className={`${styles.card} ${styles.wide}`}>
+                <SectionHeading
+                  title="Intercambios esta semana"
+                  action={<span className={styles.growth}>En vivo</span>}
+                />
+                <svg
+                  className={styles.lineChart}
+                  viewBox="0 0 600 190"
+                  role="img"
+                  aria-label="Intercambios por día"
+                >
+                  <polyline
+                    points={points(stats.trendExchanges)}
+                    fill="none"
+                    stroke="#42d7c7"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </Panel>
+              <Panel className={styles.card}>
+                <SectionHeading title="Contribuyentes destacados" />
+                <ol className={styles.ranking}>
+                  {stats.topContributors.map((person, index) => (
+                    <li key={person.username}>
+                      <b>{index + 1}</b>
+                      <span>
+                        <strong>{person.username}</strong>
+                        <small>
+                          {person.metric === 'books'
+                            ? 'Libros publicados'
+                            : 'Intercambios'}
+                        </small>
+                      </span>
+                      <em>{person.value}</em>
+                    </li>
+                  ))}
+                </ol>
+              </Panel>
+              <Panel className={styles.card}>
+                <SectionHeading title="Búsquedas populares" />
+                <ol className={styles.ranking}>
+                  {stats.hotSearches.map((item, index) => (
+                    <li key={item.term}>
+                      <b>{index + 1}</b>
+                      <span>
+                        <strong>{item.term}</strong>
+                        <small>Consultas</small>
+                      </span>
+                      <em>{item.count}</em>
+                    </li>
+                  ))}
+                </ol>
+              </Panel>
+            </div>
+          </>
+        ) : null}
       </PrototypePage>
     </BaseLayout>
   )
