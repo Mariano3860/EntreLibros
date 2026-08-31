@@ -254,9 +254,15 @@ describe('books API listing projections', () => {
     const viewerId = await insertUser({ name: 'Home viewer' });
     const followedId = await insertUser({ name: 'Followed reader' });
     const randomId = await insertUser({ name: 'Random reader' });
+    const privateId = await insertUser({ name: 'Private reader' });
+    const expiredId = await insertUser({ name: 'Expired reader' });
+    const blockedId = await insertUser({ name: 'Blocked reader' });
     const viewerBookId = await insertBook();
     const followedBookId = await insertBook();
     const randomBookId = await insertBook();
+    const privateBookId = await insertBook();
+    const expiredBookId = await insertBook();
+    const blockedBookId = await insertBook();
     const viewerListingId = await insertListing({
       userId: viewerId,
       bookId: viewerBookId,
@@ -269,9 +275,30 @@ describe('books API listing projections', () => {
       userId: randomId,
       bookId: randomBookId,
     });
+    const privateListingId = await insertListing({
+      userId: privateId,
+      bookId: privateBookId,
+      availability: 'private',
+    });
+    const expiredListingId = await insertListing({
+      userId: expiredId,
+      bookId: expiredBookId,
+    });
+    const blockedListingId = await insertListing({
+      userId: blockedId,
+      bookId: blockedBookId,
+    });
+    await client.query(
+      "UPDATE book_listings SET expires_at = NOW() - INTERVAL '1 day' WHERE id = $1",
+      [expiredListingId]
+    );
     await client.query(
       'INSERT INTO user_follows (follower_id, followed_id) VALUES ($1, $2)',
       [viewerId, followedId]
+    );
+    await client.query(
+      'INSERT INTO user_blocks (blocker_id, blocked_id) VALUES ($1, $2)',
+      [viewerId, blockedId]
     );
 
     const res = await request(app)
@@ -279,10 +306,71 @@ describe('books API listing projections', () => {
       .set('Cookie', buildAuthCookie(viewerId))
       .expect(200);
 
-    const ids = res.body.map((listing: { id: string }) => listing.id);
+    const ids = res.body.items.map((listing: { id: string }) => listing.id);
     expect(ids[0]).toBe(String(followedListingId));
     expect(ids).toContain(String(randomListingId));
     expect(ids).not.toContain(String(viewerListingId));
+    expect(ids).not.toContain(String(privateListingId));
+    expect(ids).not.toContain(String(expiredListingId));
+    expect(ids).not.toContain(String(blockedListingId));
+    expect(res.body.page).toMatchObject({
+      limit: 5,
+      offset: 0,
+      hasPrevious: false,
+    });
+  });
+
+  test('paginates home recommendations in groups of at most five', async () => {
+    const viewerId = await insertUser({ name: 'Home viewer' });
+    const bookId = await insertBook();
+    await Promise.all(
+      Array.from({ length: 6 }, async (_, index) => {
+        const readerId = await insertUser({ name: `Reader ${index}` });
+        return insertListing({ userId: readerId, bookId });
+      })
+    );
+
+    const firstPage = await request(app)
+      .get('/api/books/home')
+      .query({ limit: 12 })
+      .set('Cookie', buildAuthCookie(viewerId))
+      .expect(200);
+
+    expect(firstPage.body.items).toHaveLength(5);
+    expect(firstPage.body.page).toEqual({
+      limit: 5,
+      offset: 0,
+      hasNext: true,
+      hasPrevious: false,
+    });
+
+    const secondPage = await request(app)
+      .get('/api/books/home')
+      .query({ offset: 5 })
+      .set('Cookie', buildAuthCookie(viewerId))
+      .expect(200);
+
+    expect(secondPage.body.items).toHaveLength(5);
+    expect(
+      secondPage.body.items.map((item: { id: string }) => item.id)
+    ).not.toContain(firstPage.body.items[0].id);
+    expect(secondPage.body.page).toMatchObject({
+      limit: 5,
+      offset: 5,
+      hasPrevious: true,
+    });
+  });
+
+  test('rejects invalid home recommendation pagination', async () => {
+    const res = await request(app)
+      .get('/api/books/home')
+      .query({ offset: -1 })
+      .expect(400);
+
+    expect(res.body).toEqual({
+      error: 'InvalidFields',
+      message: 'books.errors.invalid_filters',
+    });
   });
 
   test('filters public listings and excludes expired entries', async () => {

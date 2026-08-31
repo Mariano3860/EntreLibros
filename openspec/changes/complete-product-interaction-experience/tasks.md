@@ -1,8 +1,8 @@
 ## 1. Punto 1 — Rail renovable de Inicio
 
 - [x] 1.1 Crear `feature/home-recommendation-rail` desde `main` actualizado tras el merge de #159 y verificar que el worktree esté limpio y la rama tenga la base esperada.
-- [ ] 1.2 Extender la consulta de recomendaciones para devolver conjuntos estables de hasta cinco, con avance/retroceso o renovación y prioridad de perfiles seguidos; verificar con pruebas de repositorio/ruta que no devuelve propios, privados, bloqueados, vencidos ni más de cinco resultados.
-- [ ] 1.3 Implementar los controles compactos del rail en Inicio y mantener el detalle en modal; verificar con tests de `HomePage` navegación del rail, foco y ausencia de redirección.
+- [x] 1.2 Extender la consulta de recomendaciones para devolver conjuntos estables de hasta cinco, con avance/retroceso o renovación y prioridad de perfiles seguidos; verificar con pruebas de repositorio/ruta que no devuelve propios, privados, bloqueados, vencidos ni más de cinco resultados.
+- [x] 1.3 Implementar los controles compactos del rail en Inicio y mantener el detalle en modal; verificar con tests de `HomePage` navegación del rail, foco y ausencia de redirección.
 - [ ] 1.4 Revisar visualmente `/home` a 1440×900 y viewport estrecho contra el cuadrante superior izquierdo de `img.png`; verificar cinco cards, controles discretos, carga/vacío/error, teclado y reduced motion.
 - [ ] 1.5 Ejecutar suite backend/frontend afectada, typecheck, lint, Stylelint, build y `git diff --check`; crear commits claros, abrir PR en español contra `main` y verificar que no se realiza merge.
 

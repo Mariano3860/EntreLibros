@@ -31,10 +31,12 @@ export const HomePage = () => {
   const mockMode = isApiMockMode()
   const navigate = useNavigate()
   const [selectedBook, setSelectedBook] = useState<PrototypeBook | null>(null)
+  const [recommendationOffset, setRecommendationOffset] = useState(0)
   const booksQuery = useQuery({
-    queryKey: ['prototype', 'home', 'books'],
-    queryFn: fetchHomeBooks,
+    queryKey: ['prototype', 'home', 'books', recommendationOffset],
+    queryFn: () => fetchHomeBooks(recommendationOffset),
     enabled: !mockMode,
+    placeholderData: (previousData) => previousData,
   })
   const activityQuery = useQuery({
     queryKey: ['prototype', 'home', 'activity'],
@@ -49,8 +51,11 @@ export const HomePage = () => {
 
   if (isLoading) return null
   const books = mockMode
-    ? catalog.books
-    : (booksQuery.data ?? []).map((book) => toPrototypeBook(book))
+    ? catalog.books.slice(0, 5)
+    : (booksQuery.data?.items ?? []).map((book) => toPrototypeBook(book))
+  const recommendationPage = mockMode
+    ? { hasNext: false, hasPrevious: false }
+    : (booksQuery.data?.page ?? { hasNext: false, hasPrevious: false })
   const kpis = mockMode
     ? catalog.homeKpis
     : statsQuery.data
@@ -136,7 +141,17 @@ export const HomePage = () => {
           />
           {mockMode ? (
             <FixtureState region="books">
-              <BookRail books={books} onOpen={setSelectedBook} />
+              <BookRail
+                books={books}
+                hasNext={recommendationPage.hasNext}
+                hasPrevious={recommendationPage.hasPrevious}
+                isRefreshing={booksQuery.isFetching}
+                onNext={() => setRecommendationOffset((offset) => offset + 5)}
+                onOpen={setSelectedBook}
+                onPrevious={() =>
+                  setRecommendationOffset((offset) => Math.max(offset - 5, 0))
+                }
+              />
             </FixtureState>
           ) : booksQuery.isLoading ? (
             <Panel className={styles.state}>Cargando libros…</Panel>
@@ -145,7 +160,17 @@ export const HomePage = () => {
               No pudimos cargar los libros.
             </Panel>
           ) : (
-            <BookRail books={books} onOpen={setSelectedBook} />
+            <BookRail
+              books={books}
+              hasNext={recommendationPage.hasNext}
+              hasPrevious={recommendationPage.hasPrevious}
+              isRefreshing={booksQuery.isFetching}
+              onNext={() => setRecommendationOffset((offset) => offset + 5)}
+              onOpen={setSelectedBook}
+              onPrevious={() =>
+                setRecommendationOffset((offset) => Math.max(offset - 5, 0))
+              }
+            />
           )}
         </section>
         <Panel className={styles.activityPanel}>
@@ -204,23 +229,63 @@ const KpiRegion = ({
 )
 const BookRail = ({
   books,
+  hasNext,
+  hasPrevious,
+  isRefreshing,
+  onNext,
   onOpen,
+  onPrevious,
 }: {
   books: ReturnType<typeof toPrototypeBook>[]
+  hasNext: boolean
+  hasPrevious: boolean
+  isRefreshing: boolean
+  onNext: () => void
   onOpen: (book: PrototypeBook) => void
+  onPrevious: () => void
 }) => (
-  <div className={styles.bookRail}>
-    {books.length ? (
-      books.map((book) => (
-        <PrototypeBookCard
-          key={book.id}
-          book={book}
-          onClick={() => onOpen(book)}
-        />
-      ))
-    ) : (
-      <Panel className={styles.state}>No hay libros disponibles todavía.</Panel>
-    )}
+  <div className={styles.bookRailShell}>
+    <div className={styles.bookRail}>
+      {books.length ? (
+        books
+          .slice(0, 5)
+          .map((book) => (
+            <PrototypeBookCard
+              key={book.id}
+              book={book}
+              onClick={() => onOpen(book)}
+            />
+          ))
+      ) : (
+        <Panel className={styles.state}>
+          No hay libros disponibles todavía.
+        </Panel>
+      )}
+    </div>
+    <nav
+      className={styles.railControls}
+      aria-label="Navegación de recomendaciones"
+    >
+      <button
+        aria-label="Ver recomendaciones anteriores"
+        disabled={!hasPrevious || isRefreshing}
+        onClick={onPrevious}
+        type="button"
+      >
+        ←
+      </button>
+      <span aria-live="polite" className={styles.railStatus}>
+        {isRefreshing ? 'Actualizando recomendaciones' : 'Recomendaciones'}
+      </span>
+      <button
+        aria-label="Ver más recomendaciones"
+        disabled={!hasNext || isRefreshing}
+        onClick={onNext}
+        type="button"
+      >
+        →
+      </button>
+    </nav>
   </div>
 )
 const ActivityRegion = ({

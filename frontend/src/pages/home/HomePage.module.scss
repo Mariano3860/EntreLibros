@@ -61,6 +61,65 @@
   gap: 16px;
 }
 
+.bookRailShell {
+  display: grid;
+  gap: 10px;
+}
+
+.railControls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.railControls button {
+  display: grid;
+  width: 27px;
+  height: 27px;
+  place-items: center;
+  border: 1px solid var(--prototype-inset-border);
+  border-radius: 999px;
+  background: var(--prototype-panel);
+  color: var(--prototype-text);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  transition:
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.railControls button:not(:disabled):hover {
+  border-color: var(--prototype-teal);
+  color: var(--prototype-teal);
+  transform: translateY(-1px);
+}
+
+.railControls button:focus-visible {
+  outline: 2px solid var(--prototype-teal);
+  outline-offset: 2px;
+}
+
+.railControls button:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.railStatus {
+  min-width: 104px;
+  color: var(--prototype-muted);
+  font-size: 10px;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .railControls button {
+    transition: none;
+  }
+}
+
 .activityPanel {
   padding: 17px 19px;
 }

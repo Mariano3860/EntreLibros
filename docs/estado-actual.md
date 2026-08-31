@@ -6,6 +6,7 @@ Fecha de referencia: 2026-08-31.
 
 ## Comprobado en el repositorio
 
+- Inicio limita “Libros que podrían gustarte” a cinco publicaciones por página y permite avanzar o volver mediante controles discretos; el orden prioriza lectores seguidos cuando existe sesión.
 - Monorepo con frontend React/Rsbuild y backend TypeScript/Express.
 - PostgreSQL/PostGIS con migraciones 001–021.
 - API de mensajes y eventos Socket.IO con persistencia antes de emitir.

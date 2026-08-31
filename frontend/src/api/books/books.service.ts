@@ -1,7 +1,7 @@
 import { apiClient } from '@src/api/axios'
 import { RELATIVE_API_ROUTES } from '@src/api/routes'
 
-import { ApiBook } from './books.types'
+import { ApiBook, ApiHomeBooksPage } from './books.types'
 import { PublishBookPayload, PublishBookResponse } from './publishBook.types'
 
 export type BookCatalogFilters = {
@@ -34,12 +34,18 @@ export const fetchBooks = async (
   return response.data
 }
 
-export const fetchHomeBooks = async (): Promise<ApiBook[]> => {
-  const response = await apiClient.get<ApiBook[]>(
-    RELATIVE_API_ROUTES.BOOKS.HOME
+export const fetchHomeBooks = async (offset = 0): Promise<ApiHomeBooksPage> => {
+  const response = await apiClient.get<ApiHomeBooksPage>(
+    `${RELATIVE_API_ROUTES.BOOKS.HOME}?limit=5&offset=${offset}`
   )
 
-  if (!Array.isArray(response.data)) {
+  if (
+    !response.data ||
+    !Array.isArray(response.data.items) ||
+    !response.data.page ||
+    typeof response.data.page.hasNext !== 'boolean' ||
+    typeof response.data.page.hasPrevious !== 'boolean'
+  ) {
     throw new Error('Invalid books response')
   }
 
