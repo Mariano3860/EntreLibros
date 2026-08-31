@@ -76,6 +76,7 @@ export const toPrototypeBook = (
       ? { price: `$${book.price.toLocaleString('es-AR')}` }
       : {}),
     ...(book.coverUrl?.trim() ? { coverUrl: book.coverUrl.trim() } : {}),
+    ...(book.condition ? { condition: book.condition } : {}),
     accent: accentFor(String(book.id)),
     genre: book.condition ? titleCase(book.condition) : 'Libro',
   }

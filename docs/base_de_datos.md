@@ -28,9 +28,11 @@ PostgreSQL es la persistencia principal; PostGIS se usa para datos geográficos 
 | 020       | Intereses y ubicación de perfil         |
 | 021       | Historias de Comunidad                  |
 | 022       | Seguimiento y datos demo de Comunidad   |
+| 023       | Intereses persistentes y búsquedas de libros |
 
 La migraciÃ³n `022_create_community_following_and_demo_data.sql` crea `user_follows` y carga una semilla reproducible de lectores pÃºblicos con intereses, ubicaciÃ³n, libros disponibles e historias para validar el descubrimiento. Los perfiles privados o bloqueados quedan fuera de las sugerencias.
 
+La migración `023_create_book_discovery_interests.sql` agrega intereses idempotentes sobre publicaciones ajenas y evita duplicar búsquedas activas del mismo libro por usuario.
 El contenido exacto de cada migración es la autoridad. No edites una migración ya aplicada: agrega otra numerada y prueba upgrade desde una base existente.
 
 La migración `021_create_community_stories.sql` agrega historias sociales con texto, imagen opcional y referencia opcional a una publicación propia vigente. Los adjuntos de libros en mensajería reutilizan el JSONB existente de `messages.attachment_metadata` y no requieren una tabla adicional.

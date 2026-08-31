@@ -8,11 +8,11 @@
 
 ## 2. Punto 2 — Filtros, búsquedas e interés en Libros
 
-- [ ] 2.1 Crear `feature/books-discovery-and-wants` desde `main` actualizado y verificar la base limpia antes de añadir migraciones acumulativas para intereses personales si el esquema las requiere.
-- [ ] 2.2 Implementar contratos persistentes para filtros de catálogo faltantes, favoritos/interés idempotentes y publicación `want` sin duplicados; verificar migraciones, autorización, bloqueos y pruebas de API para éxito, vacío, duplicado y acceso no autenticado.
-- [ ] 2.3 Conectar el panel de filtros, URL/paginación, favorito y el flujo “buscar este libro” en `/books`; verificar con tests de página/servicios que cada control modifica resultados y que el formulario `want` se precompleta sin pedir campos de oferta.
-- [ ] 2.4 Revisar visualmente `/books` a 1440×900 contra el cuadrante superior derecho de `img.png`; verificar filtros activos/restablecer, estado vacío, detalle y flujo de búsqueda en viewport estrecho.
-- [ ] 2.5 Ejecutar verificaciones del paquete afectado, typecheck, lint, Stylelint, build y `git diff --check`; crear commits claros y abrir una PR en español contra `main` sin merge.
+- [x] 2.1 Crear `feature/books-discovery-and-wants` desde `main` actualizado y verificar la base limpia antes de añadir migraciones acumulativas para intereses personales si el esquema las requiere.
+- [x] 2.2 Implementar contratos persistentes para filtros de catálogo faltantes, favoritos/interés idempotentes y publicación `want` sin duplicados; verificar migraciones, autorización, bloqueos y pruebas de API para éxito, vacío, duplicado y acceso no autenticado.
+- [x] 2.3 Conectar el panel de filtros, URL/paginación, favorito y el flujo “buscar este libro” en `/books`; verificar con tests de página/servicios que cada control modifica resultados y que el formulario `want` se precompleta sin pedir campos de oferta.
+- [x] 2.4 Revisar visualmente `/books` a 1440×900 contra el cuadrante superior derecho de `img.png`; verificar filtros activos/restablecer, estado vacío, detalle y flujo de búsqueda en viewport estrecho.
+- [x] 2.5 Ejecutar verificaciones del paquete afectado, typecheck, lint, Stylelint, build y `git diff --check`; crear commits claros y abrir una PR en español contra `main` sin merge.
 
 ## 3. Punto 3 — Pestañas de Libros sin scroll vertical
 

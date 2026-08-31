@@ -3,14 +3,27 @@ import { RELATIVE_API_ROUTES } from '@src/api/routes'
 
 import { ApiBook, ApiHomeBooksPage } from './books.types'
 import { PublishBookPayload, PublishBookResponse } from './publishBook.types'
+export {
+  createWantBook,
+  toggleBookInterest,
+  type BookInterestResponse,
+} from './bookInteractions.service'
 
 export type BookCatalogFilters = {
   q?: string
   author?: string
   isbn?: string
   language?: string
+  condition?: 'new' | 'very_good' | 'good' | 'acceptable'
   status?: string
   type?: 'offer' | 'want'
+  trade?: boolean
+  sale?: boolean
+  donation?: boolean
+  sort?: 'recent' | 'nearby' | 'price_asc' | 'price_desc'
+  latitude?: number
+  longitude?: number
+  radiusKm?: number
   limit?: number
   offset?: number
 }
@@ -74,5 +87,17 @@ export const publishBook = async (
     throw new Error('Invalid publish response')
   }
 
+  return response.data
+}
+
+export const createWantFromBook = async (
+  id: string
+): Promise<PublishBookResponse> => {
+  const response = await apiClient.post<PublishBookResponse>(
+    RELATIVE_API_ROUTES.BOOKS.WANT(id)
+  )
+  if (!response.data || !response.data.id) {
+    throw new Error('Invalid want response')
+  }
   return response.data
 }

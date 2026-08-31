@@ -146,6 +146,90 @@
       "get": {
         "summary": "List public publications",
         "tags": ["Books"],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "condition",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["new", "very_good", "good", "acceptable"]
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["available", "reserved", "completed", "sold", "exchanged"]
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["offer", "want"]
+            }
+          },
+          {
+            "name": "trade",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "sale",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "donation",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["recent", "nearby", "price_asc", "price_desc"]
+            }
+          },
+          {
+            "name": "latitude",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "longitude",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "radiusKm",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Array of public publications",
@@ -198,6 +282,9 @@
                       },
                       "isForDonation": {
                         "type": "boolean"
+                      },
+                      "isInterested": {
+                        "type": "boolean"
                       }
                     }
                   }
@@ -216,7 +303,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["metadata", "offer"],
+                "required": ["metadata"],
                 "properties": {
                   "metadata": {
                     "type": "object",
@@ -456,6 +543,97 @@
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "409": {
+            "description": "Duplicate active request"
+          }
+        }
+      }
+    },
+    "/api/books/{id}/interest": {
+      "post": {
+        "summary": "Toggle personal interest in a public publication",
+        "tags": ["Books"],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Interest state updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["listingId", "interested"],
+                  "properties": {
+                    "listingId": {
+                      "type": "string"
+                    },
+                    "interested": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Cannot interact with own publication"
+          },
+          "404": {
+            "description": "Publication not found"
+          }
+        }
+      }
+    },
+    "/api/books/{id}/want": {
+      "post": {
+        "summary": "Create a want publication from a public listing",
+        "tags": ["Books"],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Want publication created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": ["want"]
+                    },
+                    "title": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Cannot request own publication"
+          },
+          "404": {
+            "description": "Publication not found"
+          },
+          "409": {
+            "description": "Duplicate active want publication"
           }
         }
       }

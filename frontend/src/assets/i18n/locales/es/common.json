@@ -104,6 +104,62 @@
     "es": "Español"
   },
   "booksPage": {
+    "description": "Descubri libros cerca tuyo para intercambiar, comprar o sumar a tu lista.",
+    "search_label": "Buscar libros",
+    "filters": {
+      "button": "Filtros",
+      "condition": "Estado",
+      "status": {
+        "label": "Disponibilidad",
+        "available": "Disponible",
+        "reserved": "Reservado"
+      },
+      "type": {
+        "label": "Publicacion",
+        "offer": "Ofrecidos",
+        "want": "Buscados"
+      },
+      "sort": "Ordenar",
+      "radius": "Distancia",
+      "trade": "Intercambio",
+      "sale": "A la venta",
+      "any": "Cualquiera",
+      "active": "Filtros activos:",
+      "reset": "Limpiar filtros",
+      "locationUnavailable": "Activa tu ubicacion para filtrar por distancia."
+    },
+    "card": {
+      "interest": "Me interesa",
+      "removeInterest": "Quitar interes",
+      "want": "Buscar este libro"
+    },
+    "want": {
+      "open": "Buscar un libro",
+      "title": "Buscar un libro",
+      "subtitle": "Contale a la comunidad que libro queres encontrar.",
+      "cancel": "Cancelar",
+      "submit": "Publicar busqueda",
+      "saving": "Publicando...",
+      "created": "Busqueda publicada",
+      "duplicate": "Ya tenes una busqueda activa para este libro.",
+      "error": "No se pudo publicar la busqueda.",
+      "search": "Buscar en el catalogo",
+      "searchPlaceholder": "ISBN, titulo o autor...",
+      "searching": "Buscando...",
+      "searchError": "No pudimos buscar ahora.",
+      "titleLabel": "Titulo",
+      "authorLabel": "Autor/a",
+      "publisherLabel": "Editorial",
+      "yearLabel": "Ano",
+      "languageLabel": "Idioma",
+      "formatLabel": "Formato",
+      "isbnLabel": "ISBN",
+      "coverLabel": "URL de portada",
+      "notesLabel": "Notas",
+      "notesPlaceholder": "Edicion, idioma o detalles que te interesen..."
+    },
+    "loading": "Cargando libros...",
+    "error": "No pudimos cargar los libros. Intenta nuevamente.",
     "title": "Explorar libros",
     "search_placeholder": "Buscar por título, autor, ISBN",
     "filter": {
@@ -113,6 +169,7 @@
     "publish_button": "Publicar un libro",
     "recently_published": "Tu nuevo libro",
     "tabs": {
+      "label": "Tipos de libros",
       "all": "Todos",
       "mine": "Mis libros",
       "for_trade": "Disponibles para intercambio",
@@ -121,6 +178,8 @@
       "see_all": "Ver todos"
     },
     "empty": {
+      "filtered": "No encontramos libros",
+      "filteredHint": "Proba con otra busqueda o elimina algunos filtros.",
       "all": "No encontramos libros publicados todavía.",
       "mine": "Aún no cargaste libros.",
       "trade": "Aún no publicaste libros para intercambio. Cargá el primero.",

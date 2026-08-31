@@ -1,6 +1,7 @@
 import { ApiUserBook } from './userBooks.types'
 
 export type PublishBookPayload = {
+  type?: 'offer' | 'want'
   metadata: {
     title: string
     author: string
@@ -36,6 +37,22 @@ export type PublishBookPayload = {
     }
   }
   draft?: boolean
+}
+
+export type CreateWantBookPayload = {
+  type: 'want'
+  metadata: Pick<
+    PublishBookPayload['metadata'],
+    | 'title'
+    | 'author'
+    | 'publisher'
+    | 'year'
+    | 'language'
+    | 'format'
+    | 'isbn'
+    | 'coverUrl'
+  >
+  notes?: string
 }
 
 export type PublishBookResponse = ApiUserBook & {
