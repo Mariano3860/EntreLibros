@@ -1,4 +1,3 @@
-import { toggleBookInterest } from '@api/books/bookInteractions.service'
 import {
   fetchBookById,
   fetchBooks,
@@ -12,7 +11,7 @@ import {
 } from '@components/books/WantBookModal/WantBookModal'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { PublishBookModal } from '@components/publish/PublishBookModal/PublishBookModal'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
@@ -124,29 +123,13 @@ const isBookMatchingFilters = (
   )
 }
 
-const toWantSource = (book: PrototypeBook): WantBookSource => ({
-  title: book.title,
-  author: book.author,
-  coverUrl: book.coverUrl,
-})
-
 const BookResults = ({
   books,
-  showActions,
-  interestedById,
-  pendingInterestId,
   onSelect,
-  onInterest,
-  onWant,
   onClearFilters,
 }: {
   books: PrototypeBook[]
-  showActions: boolean
-  interestedById: Record<string, boolean>
-  pendingInterestId: string | null
   onSelect: (book: PrototypeBook) => void
-  onInterest: (book: PrototypeBook) => void
-  onWant: (book: PrototypeBook) => void
   onClearFilters?: () => void
 }) => {
   const { t } = useTranslation()
@@ -172,34 +155,9 @@ const BookResults = ({
   return (
     <div className={styles.grid}>
       {books.map((book) => {
-        const interested = interestedById[book.id] ?? false
-        const isPending = pendingInterestId === book.id
         return (
           <article key={book.id} className={styles.resultCard}>
             <PrototypeBookCard book={book} onClick={() => onSelect(book)} />
-            {showActions && book.mode !== 'Buscado' ? (
-              <div className={styles.cardActions}>
-                <button
-                  type="button"
-                  className={`${styles.cardAction} ${interested ? styles.cardActionActive : ''}`}
-                  aria-pressed={interested}
-                  disabled={isPending}
-                  onClick={() => onInterest(book)}
-                >
-                  <span aria-hidden="true">{interested ? '♥' : '♡'}</span>
-                  {interested
-                    ? t('booksPage.card.removeInterest')
-                    : t('booksPage.card.interest')}
-                </button>
-                <button
-                  type="button"
-                  className={styles.cardAction}
-                  onClick={() => onWant(book)}
-                >
-                  {t('booksPage.card.want')}
-                </button>
-              </div>
-            ) : null}
           </article>
         )
       })}
@@ -225,12 +183,6 @@ export const BooksPage = () => {
     { latitude: number; longitude: number } | undefined
   >()
   const [locationError, setLocationError] = useState(false)
-  const [mockInterests, setMockInterests] = useState<Record<string, boolean>>(
-    {}
-  )
-  const [pendingInterestId, setPendingInterestId] = useState<string | null>(
-    null
-  )
 
   const search = searchParams.get('q') ?? ''
   const segment = location.pathname.replace(/^\/books\/?/, '').split('/')[0]
@@ -339,17 +291,6 @@ export const BooksPage = () => {
       (active === 'mine' || active === 'all') &&
       bookId === null,
   })
-  const interestMutation = useMutation({
-    mutationFn: toggleBookInterest,
-    onSuccess: (result) => {
-      setMockInterests((current) => ({
-        ...current,
-        [result.listingId]: result.interested,
-      }))
-      void queryClient.invalidateQueries({ queryKey: ['prototype', 'books'] })
-    },
-    onSettled: () => setPendingInterestId(null),
-  })
 
   const mockBooks = useMemo(() => {
     let result: PrototypeBook[] = [
@@ -419,10 +360,7 @@ export const BooksPage = () => {
         : (publicBooksQuery.data ?? []),
     [active, ownBooksQuery.data, publicBooksQuery.data]
   )
-  const realBookMap = useMemo(
-    () => new Map(realBooks.map((book) => [String(book.id), book])),
-    [realBooks]
-  )
+
   const books = mockMode
     ? mockBooks
     : realBooks
@@ -436,17 +374,7 @@ export const BooksPage = () => {
           })
         )
         .map((book) => toPrototypeBook(book))
-  const interestedById = useMemo(
-    () =>
-      books.reduce<Record<string, boolean>>((result, book) => {
-        const apiBook = realBookMap.get(book.id)
-        result[book.id] = mockMode
-          ? (mockInterests[book.id] ?? false)
-          : (mockInterests[book.id] ?? apiBook?.isInterested ?? false)
-        return result
-      }, {}),
-    [books, mockInterests, mockMode, realBookMap]
-  )
+
   const currentPage = Math.max(0, (toNumber(searchParams.get('page')) ?? 1) - 1)
   const totalPages = Math.max(1, Math.ceil(books.length / BOOKS_PER_PAGE))
   const activePage = Math.min(currentPage, totalPages - 1)
@@ -477,21 +405,8 @@ export const BooksPage = () => {
     })
   }
 
-  const handleInterest = (book: PrototypeBook) => {
-    if (!isAuthenticated || pendingInterestId) return
-    if (mockMode) {
-      setMockInterests((current) => ({
-        ...current,
-        [book.id]: !(current[book.id] ?? false),
-      }))
-      return
-    }
-    setPendingInterestId(book.id)
-    interestMutation.mutate(book.id)
-  }
-
-  const openWantModal = (book?: PrototypeBook) => {
-    setWantBook(book ? toWantSource(book) : undefined)
+  const openWantModal = () => {
+    setWantBook(undefined)
     setIsWantModalOpen(true)
   }
 
@@ -702,14 +617,7 @@ export const BooksPage = () => {
           <FixtureState region="books">
             <BookResults
               books={visibleBooks}
-              showActions={
-                isAuthenticated && active !== 'mine' && active !== 'all'
-              }
-              interestedById={interestedById}
-              pendingInterestId={pendingInterestId}
               onSelect={setSelectedBook}
-              onInterest={handleInterest}
-              onWant={openWantModal}
               onClearFilters={hasActiveFilters ? resetFilters : undefined}
             />
           </FixtureState>
@@ -720,14 +628,7 @@ export const BooksPage = () => {
         ) : (
           <BookResults
             books={visibleBooks}
-            showActions={
-              isAuthenticated && active !== 'mine' && active !== 'all'
-            }
-            interestedById={interestedById}
-            pendingInterestId={pendingInterestId}
             onSelect={setSelectedBook}
-            onInterest={handleInterest}
-            onWant={openWantModal}
             onClearFilters={hasActiveFilters ? resetFilters : undefined}
           />
         )}

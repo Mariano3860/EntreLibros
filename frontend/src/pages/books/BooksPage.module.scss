@@ -175,43 +175,8 @@
 }
 
 .resultCard > article {
+  height: 100%;
   min-width: 0;
-}
-
-.cardActions {
-  display: flex;
-  min-width: 0;
-  gap: 6px;
-}
-
-.cardAction {
-  min-width: 0;
-  flex: 1;
-  min-height: 29px;
-  padding: 0 5px;
-  overflow: hidden;
-  border: 1px solid var(--prototype-border);
-  border-radius: 8px;
-  background: var(--prototype-surface);
-  color: var(--prototype-muted);
-  cursor: pointer;
-  font-size: 9px;
-  font-weight: 700;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.cardAction:hover,
-.cardAction:focus-visible,
-.cardActionActive {
-  border-color: var(--prototype-teal);
-  color: var(--prototype-teal);
-  outline: none;
-}
-
-.cardAction:disabled {
-  cursor: wait;
-  opacity: 0.6;
 }
 
 .pagination {

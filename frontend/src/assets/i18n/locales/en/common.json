@@ -124,11 +124,6 @@
       "reset": "Clear filters",
       "locationUnavailable": "Enable your location to filter by distance."
     },
-    "card": {
-      "interest": "I'm interested",
-      "removeInterest": "Remove interest",
-      "want": "Search for this book"
-    },
     "want": {
       "open": "Search for a book",
       "title": "Search for a book",

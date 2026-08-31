@@ -2,7 +2,6 @@ import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
 const fetchBooks = vi.hoisted(() => vi.fn())
-const toggleBookInterest = vi.hoisted(() => vi.fn())
 const createWantBook = vi.hoisted(() => vi.fn())
 
 vi.mock('@src/utils/runtimeEnv', () => ({
@@ -20,7 +19,6 @@ vi.mock('@api/books/books.service', () => ({
 
 vi.mock('@api/books/bookInteractions.service', () => ({
   createWantBook,
-  toggleBookInterest,
 }))
 
 vi.mock('@api/books/userBooks.service', () => ({
@@ -59,6 +57,26 @@ describe('BooksPage discovery interactions', () => {
 
     expect(screen.getByText('booksPage.want.title')).toBeVisible()
     expect(screen.getByLabelText('booksPage.want.titleLabel')).toHaveValue('')
+
+    createWantBook.mockResolvedValue({ id: 'want-created' })
+    fireEvent.change(screen.getByLabelText('booksPage.want.titleLabel'), {
+      target: { value: 'Libro buscado desde el encabezado' },
+    })
+    fireEvent.click(
+      screen.getByRole('button', { name: 'booksPage.want.submit' })
+    )
+
+    await waitFor(() => {
+      expect(createWantBook).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'want',
+          metadata: expect.objectContaining({
+            title: 'Libro buscado desde el encabezado',
+          }),
+        })
+      )
+    })
+    expect(screen.queryByText('booksPage.want.title')).not.toBeInTheDocument()
   })
 
   test('applies catalog filters and resets them from the visible panel', async () => {
@@ -68,9 +86,15 @@ describe('BooksPage discovery interactions', () => {
       initialEntries: ['/books/trade?page=2'],
     })
 
+    const offerCardButton = await screen.findByRole('button', {
+      name: 'Ver Libro de descubrimiento',
+    })
+    expect(offerCardButton).toBeInTheDocument()
     expect(
-      await screen.findByRole('button', { name: 'Ver Libro de descubrimiento' })
-    ).toBeInTheDocument()
+      within(offerCardButton.closest('article') as HTMLElement).getAllByRole(
+        'button'
+      )
+    ).toHaveLength(1)
 
     fireEvent.click(
       screen.getByRole('button', { name: /booksPage.filters.button/ })
@@ -107,55 +131,6 @@ describe('BooksPage discovery interactions', () => {
     })
   })
 
-  test('toggles interest and opens the want modal with the selected book', async () => {
-    fetchBooks.mockResolvedValue([discoveryBook])
-    toggleBookInterest.mockResolvedValue({
-      listingId: discoveryBook.id,
-      interested: true,
-    })
-
-    renderWithProviders(<BooksPage />, {
-      initialEntries: ['/books/trade'],
-    })
-
-    await screen.findByRole('button', { name: 'Ver Libro de descubrimiento' })
-    const interestButton = await screen.findByRole('button', {
-      name: 'booksPage.card.interest',
-    })
-
-    fireEvent.click(interestButton)
-
-    await waitFor(() => {
-      expect(toggleBookInterest).toHaveBeenCalledWith(discoveryBook.id)
-      expect(interestButton).toHaveAttribute('aria-pressed', 'true')
-    })
-
-    fireEvent.click(screen.getByRole('button', { name: 'booksPage.card.want' }))
-
-    expect(screen.getByLabelText('booksPage.want.titleLabel')).toHaveValue(
-      discoveryBook.title
-    )
-    expect(screen.getByText('booksPage.want.title')).toBeVisible()
-
-    createWantBook.mockResolvedValue({ id: 'want-listing' })
-    fireEvent.click(
-      screen.getByRole('button', { name: 'booksPage.want.submit' })
-    )
-
-    await waitFor(() => {
-      expect(createWantBook).toHaveBeenCalledWith(
-        expect.objectContaining({
-          type: 'want',
-          metadata: expect.objectContaining({
-            title: discoveryBook.title,
-            author: discoveryBook.author,
-          }),
-        })
-      )
-      expect(screen.queryByText('booksPage.want.title')).not.toBeInTheDocument()
-    })
-  })
-
   test('renders want listings as searching without offer actions', async () => {
     const seekingBook = {
       ...discoveryBook,
@@ -176,12 +151,10 @@ describe('BooksPage discovery interactions', () => {
       .getByRole('button', { name: 'Ver Libro de descubrimiento' })
       .closest('article')
     expect(card).not.toBeNull()
+    expect(
+      within(card as HTMLElement).getByText('Lista de deseos')
+    ).toBeVisible()
     expect(within(card as HTMLElement).getAllByText('Buscando')).toHaveLength(1)
-    expect(
-      screen.queryByRole('button', { name: 'booksPage.card.interest' })
-    ).not.toBeInTheDocument()
-    expect(
-      screen.queryByRole('button', { name: 'booksPage.card.want' })
-    ).not.toBeInTheDocument()
+    expect(within(card as HTMLElement).getAllByRole('button')).toHaveLength(1)
   })
 })

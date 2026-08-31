@@ -128,11 +128,6 @@
       "reset": "Limpiar filtros",
       "locationUnavailable": "Activa tu ubicacion para filtrar por distancia."
     },
-    "card": {
-      "interest": "Me interesa",
-      "removeInterest": "Quitar interes",
-      "want": "Buscar este libro"
-    },
     "want": {
       "open": "Buscar un libro",
       "title": "Buscar un libro",
