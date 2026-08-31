@@ -299,6 +299,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
           title: bookPreview.title,
           author: bookPreview.author,
           coverUrl: bookPreview.coverUrl || book.coverUrl,
+          isSeeking: bookPreview.isSeeking ?? book.isSeeking,
           images: book.images.map((image, index) =>
             index === 0 && bookPreview.coverUrl
               ? { ...image, url: bookPreview.coverUrl }
@@ -368,6 +369,17 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
       isEditing && editedData.status !== undefined
         ? editedData.status
         : book.status
+    const isSeeking = displayBook.isSeeking ?? displayBook.type === 'want'
+    const statusClass = isSeeking
+      ? styles.seeking
+      : currentStatus
+        ? styles[currentStatus]
+        : ''
+    const statusLabel = isSeeking
+      ? t('bookDetail.status.seeking')
+      : currentStatus
+        ? t(`bookDetail.status.${currentStatus}`)
+        : ''
     const currentOffer = {
       ...displayBook.offer,
       ...editedData.offer,
@@ -510,10 +522,8 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
 
         <div className={styles.infoSection}>
           <div className={styles.statusBadge}>
-            <span
-              className={`${styles.status} ${currentStatus ? styles[currentStatus] : ''}`}
-            >
-              {currentStatus && t(`bookDetail.status.${currentStatus}`)}
+            <span className={`${styles.status} ${statusClass}`.trim()}>
+              {statusLabel}
             </span>
             {isOwner && (
               <span className={styles.ownerBadge}>{t('bookDetail.owner')}</span>

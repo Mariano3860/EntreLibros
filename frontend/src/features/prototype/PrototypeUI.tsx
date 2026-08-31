@@ -154,21 +154,21 @@ export const PrototypeBookCard = ({
     >
       <BookCover book={book} />
       <div className={styles.bookCardBody}>
-        <span className={styles.bookMode}>{book.mode}</span>
+        <span className={styles.bookMode}>
+          {book.mode === 'Buscado' ? 'Buscando' : book.mode}
+        </span>
         <h3>{book.title}</h3>
         <p>{book.author}</p>
         <div className={styles.bookMeta}>
           <span>{book.owner}</span>
           <span>{book.distance}</span>
         </div>
-        <div className={styles.bookFooter}>
-          <strong>
-            {book.mode === 'Buscado'
-              ? 'Buscando'
-              : (book.price ?? 'Disponible')}
-          </strong>
-          <span aria-hidden="true">→</span>
-        </div>
+        {book.mode !== 'Buscado' && (
+          <div className={styles.bookFooter}>
+            <strong>{book.price ?? 'Disponible'}</strong>
+            <span aria-hidden="true">→</span>
+          </div>
+        )}
       </div>
     </button>
   </article>

@@ -779,6 +779,7 @@ export const BooksPage = () => {
                   coverUrl:
                     selectedBook.coverUrl ??
                     `/prototype/book-cover.svg?book=${selectedBook.id}`,
+                  isSeeking: selectedBook.mode === 'Buscado',
                 }
               : undefined
           }

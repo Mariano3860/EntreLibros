@@ -917,6 +917,7 @@
       "completed": "Completed",
       "draft": "Draft",
       "sold": "Sold",
+      "seeking": "Seeking",
       "exchanged": "Exchanged"
     },
     "changeStatus": "Change status",

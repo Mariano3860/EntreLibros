@@ -70,6 +70,28 @@ describe('BookDetailModal', () => {
     expect(mainImage.getAttribute('src')).toBe(firstImageUrl)
   })
 
+  test('shows searching state instead of available for want listings', async () => {
+    server.use(
+      http.get(apiRouteMatcher(`${RELATIVE_API_ROUTES.BOOKS.LIST}/:id`), () =>
+        HttpResponse.json({
+          ...generatePublication('1'),
+          type: 'want',
+          isSeeking: true,
+          status: 'available',
+        })
+      )
+    )
+
+    renderModal()
+
+    expect(
+      await screen.findByText('bookDetail.status.seeking')
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByText('bookDetail.status.available')
+    ).not.toBeInTheDocument()
+  })
+
   test('retries fetching details when the request fails', async () => {
     let attempt = 0
     server.use(

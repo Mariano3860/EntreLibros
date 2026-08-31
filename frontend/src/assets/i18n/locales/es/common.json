@@ -913,6 +913,7 @@
       "completed": "Completado",
       "draft": "Borrador",
       "sold": "Vendido",
+      "seeking": "Buscando",
       "exchanged": "Intercambiado"
     },
     "changeStatus": "Cambiar estado",

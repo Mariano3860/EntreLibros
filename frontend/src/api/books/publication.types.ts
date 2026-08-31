@@ -24,6 +24,8 @@ export type Publication = {
   isbn?: string | null
   condition: 'new' | 'very_good' | 'good' | 'acceptable'
   status: PublicationStatus
+  type?: 'offer' | 'want'
+  isSeeking?: boolean
   notes?: string | null
   images: Array<{
     id: string

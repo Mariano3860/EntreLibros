@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
 const fetchBooks = vi.hoisted(() => vi.fn())
@@ -172,7 +172,11 @@ describe('BooksPage discovery interactions', () => {
     expect(
       await screen.findByRole('button', { name: 'Ver Libro de descubrimiento' })
     ).toBeInTheDocument()
-    expect(screen.getAllByText('Buscando')).toHaveLength(2)
+    const card = screen
+      .getByRole('button', { name: 'Ver Libro de descubrimiento' })
+      .closest('article')
+    expect(card).not.toBeNull()
+    expect(within(card as HTMLElement).getAllByText('Buscando')).toHaveLength(1)
     expect(
       screen.queryByRole('button', { name: 'booksPage.card.interest' })
     ).not.toBeInTheDocument()
