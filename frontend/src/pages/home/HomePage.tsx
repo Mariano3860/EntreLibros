@@ -5,7 +5,7 @@ import { BookDetailModal } from '@components/book/BookDetailModal/BookDetailModa
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { useAuth } from '@contexts/auth/AuthContext'
 import { useQuery } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { HOME_URLS } from '@src/constants/constants'
@@ -32,6 +32,9 @@ export const HomePage = () => {
   const navigate = useNavigate()
   const [selectedBook, setSelectedBook] = useState<PrototypeBook | null>(null)
   const [recommendationOffset, setRecommendationOffset] = useState(0)
+  const [railDirection, setRailDirection] = useState<'next' | 'previous'>(
+    'next'
+  )
   const booksQuery = useQuery({
     queryKey: ['prototype', 'home', 'books', recommendationOffset],
     queryFn: () => fetchHomeBooks(recommendationOffset),
@@ -95,6 +98,15 @@ export const HomePage = () => {
         tone: item.action === 'exchanged' ? 'purple' : 'teal',
       }))
 
+  const showNextRecommendations = () => {
+    setRailDirection('next')
+    setRecommendationOffset((offset) => offset + 5)
+  }
+  const showPreviousRecommendations = () => {
+    setRailDirection('previous')
+    setRecommendationOffset((offset) => Math.max(offset - 5, 0))
+  }
+
   return (
     <BaseLayout id="home-page">
       <PrototypePage>
@@ -146,11 +158,10 @@ export const HomePage = () => {
                 hasNext={recommendationPage.hasNext}
                 hasPrevious={recommendationPage.hasPrevious}
                 isRefreshing={booksQuery.isFetching}
-                onNext={() => setRecommendationOffset((offset) => offset + 5)}
+                direction={railDirection}
+                onNext={showNextRecommendations}
                 onOpen={setSelectedBook}
-                onPrevious={() =>
-                  setRecommendationOffset((offset) => Math.max(offset - 5, 0))
-                }
+                onPrevious={showPreviousRecommendations}
               />
             </FixtureState>
           ) : booksQuery.isLoading ? (
@@ -165,11 +176,10 @@ export const HomePage = () => {
               hasNext={recommendationPage.hasNext}
               hasPrevious={recommendationPage.hasPrevious}
               isRefreshing={booksQuery.isFetching}
-              onNext={() => setRecommendationOffset((offset) => offset + 5)}
+              direction={railDirection}
+              onNext={showNextRecommendations}
               onOpen={setSelectedBook}
-              onPrevious={() =>
-                setRecommendationOffset((offset) => Math.max(offset - 5, 0))
-              }
+              onPrevious={showPreviousRecommendations}
             />
           )}
         </section>
@@ -229,6 +239,7 @@ const KpiRegion = ({
 )
 const BookRail = ({
   books,
+  direction,
   hasNext,
   hasPrevious,
   isRefreshing,
@@ -237,57 +248,102 @@ const BookRail = ({
   onPrevious,
 }: {
   books: ReturnType<typeof toPrototypeBook>[]
+  direction: 'next' | 'previous'
   hasNext: boolean
   hasPrevious: boolean
   isRefreshing: boolean
   onNext: () => void
   onOpen: (book: PrototypeBook) => void
   onPrevious: () => void
-}) => (
-  <div className={styles.bookRailShell}>
-    <div className={styles.bookRail}>
-      {books.length ? (
-        books
-          .slice(0, 5)
-          .map((book) => (
-            <PrototypeBookCard
-              key={book.id}
-              book={book}
-              onClick={() => onOpen(book)}
-            />
-          ))
-      ) : (
-        <Panel className={styles.state}>
-          No hay libros disponibles todavía.
-        </Panel>
-      )}
-    </div>
-    <nav
-      className={styles.railControls}
-      aria-label="Navegación de recomendaciones"
-    >
-      <button
-        aria-label="Ver recomendaciones anteriores"
-        disabled={!hasPrevious || isRefreshing}
-        onClick={onPrevious}
-        type="button"
-      >
-        ←
-      </button>
+}) => {
+  const previousBooks = useRef(books)
+  const [outgoingBooks, setOutgoingBooks] = useState<PrototypeBook[]>([])
+  const [animationKey, setAnimationKey] = useState(0)
+
+  useEffect(() => {
+    const previousIds = previousBooks.current.map((book) => book.id).join(',')
+    const currentIds = books.map((book) => book.id).join(',')
+    if (previousIds === currentIds) return
+
+    setOutgoingBooks(previousBooks.current)
+    setAnimationKey((key) => key + 1)
+    previousBooks.current = books
+
+    const timeout = window.setTimeout(() => setOutgoingBooks([]), 260)
+    return () => window.clearTimeout(timeout)
+  }, [books])
+
+  const visibleBooks = books.slice(0, 5)
+  const incomingClass =
+    animationKey > 0
+      ? direction === 'next'
+        ? styles.railIncomingNext
+        : styles.railIncomingPrevious
+      : ''
+  const outgoingClass =
+    direction === 'next' ? styles.railOutgoingNext : styles.railOutgoingPrevious
+
+  return (
+    <div className={styles.bookRailShell}>
+      <div className={styles.bookRailViewport}>
+        {outgoingBooks.length ? (
+          <div
+            aria-hidden="true"
+            className={`${styles.bookRail} ${styles.railOutgoing} ${outgoingClass}`}
+            inert
+          >
+            {outgoingBooks.slice(0, 5).map((book) => (
+              <PrototypeBookCard decorative key={book.id} book={book} />
+            ))}
+          </div>
+        ) : null}
+        <div
+          className={`${styles.bookRail} ${incomingClass}`}
+          key={animationKey}
+        >
+          {visibleBooks.length ? (
+            visibleBooks.map((book) => (
+              <PrototypeBookCard
+                key={book.id}
+                book={book}
+                onClick={() => onOpen(book)}
+              />
+            ))
+          ) : (
+            <Panel className={styles.state}>
+              No hay libros disponibles todavía.
+            </Panel>
+          )}
+        </div>
+        {hasPrevious ? (
+          <button
+            aria-label="Ver recomendaciones anteriores"
+            className={`${styles.railArrow} ${styles.railArrowPrevious}`}
+            disabled={isRefreshing}
+            onClick={onPrevious}
+            type="button"
+          >
+            ←
+          </button>
+        ) : null}
+        {hasNext && visibleBooks.length === 5 ? (
+          <button
+            aria-label="Ver más recomendaciones"
+            className={`${styles.railArrow} ${styles.railArrowNext}`}
+            disabled={isRefreshing}
+            onClick={onNext}
+            type="button"
+          >
+            →
+          </button>
+        ) : null}
+      </div>
       <span aria-live="polite" className={styles.railStatus}>
-        {isRefreshing ? 'Actualizando recomendaciones' : 'Recomendaciones'}
+        {isRefreshing ? 'Actualizando recomendaciones' : ''}
       </span>
-      <button
-        aria-label="Ver más recomendaciones"
-        disabled={!hasNext || isRefreshing}
-        onClick={onNext}
-        type="button"
-      >
-        →
-      </button>
-    </nav>
-  </div>
-)
+    </div>
+  )
+}
 const ActivityRegion = ({
   items,
 }: {

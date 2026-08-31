@@ -137,9 +137,11 @@ export const BookCover = ({
 
 export const PrototypeBookCard = ({
   book,
+  decorative = false,
   onClick,
 }: {
   book: PrototypeBook
+  decorative?: boolean
   onClick?: () => void
 }) => (
   <article className={styles.bookCard}>
@@ -147,6 +149,8 @@ export const PrototypeBookCard = ({
       onClick={onClick}
       className={styles.bookCardButton}
       aria-label={`Ver ${book.title}`}
+      disabled={decorative}
+      tabIndex={decorative ? -1 : undefined}
     >
       <BookCover book={book} />
       <div className={styles.bookCardBody}>

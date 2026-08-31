@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
@@ -17,7 +17,7 @@ import { HomePage } from '@src/pages/home/HomePage'
 
 import { renderWithProviders } from '../../test-utils'
 
-const recommendations = Array.from({ length: 6 }, (_, index) => ({
+const recommendations = Array.from({ length: 11 }, (_, index) => ({
   id: String(index + 1),
   title: `Recomendación ${index + 1}`,
   author: 'Autora lectora',
@@ -63,12 +63,14 @@ describe('HomePage recommendation pagination', () => {
     nextButton.focus()
     fireEvent.click(nextButton)
 
-    expect(
-      await screen.findByRole('button', { name: 'Ver Recomendación 6' })
-    ).toBeVisible()
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: 'Ver Recomendación 10' })
+      ).toBeVisible()
+    })
     expect(
       screen.getAllByRole('button', { name: /^Ver Recomendación/ })
-    ).toHaveLength(1)
+    ).toHaveLength(5)
     expect(nextButton).toHaveFocus()
     expect(
       screen.getByRole('button', { name: 'Ver recomendaciones anteriores' })
