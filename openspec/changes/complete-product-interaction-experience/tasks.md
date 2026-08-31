@@ -4,7 +4,7 @@
 - [x] 1.2 Extender la consulta de recomendaciones para devolver conjuntos estables de hasta cinco, con avance/retroceso o renovación y prioridad de perfiles seguidos; verificar con pruebas de repositorio/ruta que no devuelve propios, privados, bloqueados, vencidos ni más de cinco resultados.
 - [x] 1.3 Implementar los controles compactos del rail en Inicio y mantener el detalle en modal; verificar con tests de `HomePage` navegación del rail, foco y ausencia de redirección.
 - [ ] 1.4 Revisar visualmente `/home` a 1440×900 y viewport estrecho contra el cuadrante superior izquierdo de `img.png`; verificar cinco cards, controles discretos, carga/vacío/error, teclado y reduced motion.
-- [ ] 1.5 Ejecutar suite backend/frontend afectada, typecheck, lint, Stylelint, build y `git diff --check`; crear commits claros, abrir PR en español contra `main` y verificar que no se realiza merge.
+- [x] 1.5 Ejecutar suite backend/frontend afectada, typecheck, lint, Stylelint, build y `git diff --check`; crear commits claros, abrir PR en español contra `main` y verificar que no se realiza merge.
 
 ## 2. Punto 2 — Filtros, búsquedas e interés en Libros
 
