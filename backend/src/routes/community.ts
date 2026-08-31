@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, type Response } from 'express';
 
 import {
   getPersistedCommunityActivity,
@@ -6,6 +6,7 @@ import {
   getPersistedCommunityStats,
   getPersistedCommunitySuggestions,
 } from '../services/communityPersistence.js';
+import { getCommunityDiscovery } from '../services/communityDiscovery.js';
 import {
   CornerValidationError,
   getCornersMap,
@@ -17,8 +18,54 @@ import {
 } from '../services/communityCorners.js';
 import { authenticate, type AuthenticatedRequest } from '../middleware/auth.js';
 import { createCommunityStory } from '../repositories/communityStoryRepository.js';
+import {
+  followUser,
+  unfollowUser,
+} from '../repositories/userFollowRepository.js';
+import { findUserById, hasUserBlock } from '../repositories/userRepository.js';
 
 const router = Router();
+
+const parseUserId = (value: string | undefined): number | null => {
+  if (!value || !/^\d+$/.test(value)) return null;
+  const id = Number(value);
+  return Number.isSafeInteger(id) && id > 0 ? id : null;
+};
+
+const invalidFollowTarget = (res: Response) =>
+  res.status(404).json({
+    error: 'NotFound',
+    message: 'community.follow.errors.target_not_found',
+  });
+
+async function validateFollowTarget(
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<number | null> {
+  const targetId = parseUserId(req.params.id);
+  if (!targetId || !req.user || targetId === req.user.id) {
+    res.status(targetId === req.user?.id ? 422 : 404).json({
+      error: targetId === req.user?.id ? 'InvalidTarget' : 'NotFound',
+      message:
+        targetId === req.user?.id
+          ? 'community.follow.errors.self'
+          : 'community.follow.errors.target_not_found',
+    });
+    return null;
+  }
+  const target = await findUserById(targetId);
+  if (
+    !target ||
+    target.role === 'bot' ||
+    target.profileVisibility === 'private' ||
+    (await hasUserBlock(req.user.id, targetId)) ||
+    (await hasUserBlock(targetId, req.user.id))
+  ) {
+    invalidFollowTarget(res);
+    return null;
+  }
+  return targetId;
+}
 
 const parseOptionalNumber = (value: unknown): number | undefined => {
   if (value === undefined) {
@@ -254,5 +301,62 @@ router.get('/suggestions', async (_req, res) => {
     });
   }
 });
+
+router.get(
+  '/discovery',
+  authenticate,
+  async (req: AuthenticatedRequest, res) => {
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'Unauthorized',
+        message: 'auth.errors.unauthorized',
+      });
+    }
+    try {
+      const discovery = await getCommunityDiscovery(req.user.id);
+      return res.json(discovery);
+    } catch (error) {
+      console.error('Failed to load community discovery', error);
+      return res.status(500).json({
+        error: 'CommunityDiscoveryQueryFailed',
+        message: 'community.errors.query_failed',
+      });
+    }
+  }
+);
+
+router.post(
+  '/follows/:id',
+  authenticate,
+  async (req: AuthenticatedRequest, res) => {
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'Unauthorized',
+        message: 'auth.errors.unauthorized',
+      });
+    }
+    const targetId = await validateFollowTarget(req, res);
+    if (!targetId) return;
+    await followUser(req.user.id, targetId);
+    return res.status(201).json({ following: true, userId: String(targetId) });
+  }
+);
+
+router.delete(
+  '/follows/:id',
+  authenticate,
+  async (req: AuthenticatedRequest, res) => {
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'Unauthorized',
+        message: 'auth.errors.unauthorized',
+      });
+    }
+    const targetId = await validateFollowTarget(req, res);
+    if (!targetId) return;
+    await unfollowUser(req.user.id, targetId);
+    return res.json({ following: false, userId: String(targetId) });
+  }
+);
 
 export default router;

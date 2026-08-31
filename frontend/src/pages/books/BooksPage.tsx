@@ -20,10 +20,7 @@ import {
   PrototypeButton,
   PrototypePage,
 } from '@src/features/prototype/PrototypeUI'
-import {
-  mergeApiBooks,
-  toPrototypeBook,
-} from '@src/features/prototype/realData.adapters'
+import { toPrototypeBook } from '@src/features/prototype/realData.adapters'
 import { isApiMockMode } from '@src/utils/runtimeEnv'
 
 import styles from './BooksPage.module.scss'
@@ -84,7 +81,8 @@ export const BooksPage = () => {
         q: search.trim() || undefined,
         ...(active === 'seeking' ? { type: 'want' as const } : {}),
       }),
-    enabled: !mockMode && active !== 'mine' && bookId === null,
+    enabled:
+      !mockMode && active !== 'mine' && active !== 'all' && bookId === null,
   })
   const ownBooksQuery = useQuery({
     queryKey: ['prototype', 'books', 'mine'],
@@ -96,7 +94,11 @@ export const BooksPage = () => {
       bookId === null,
   })
   const mockBooks = useMemo(() => {
-    let result = [...catalog.books]
+    let result = [
+      ...(active === 'mine' || active === 'all'
+        ? catalog.userBooks
+        : catalog.books),
+    ]
     if (active === 'trade')
       result = result.filter((book) => book.mode === 'Intercambio')
     if (active === 'seeking')
@@ -109,7 +111,7 @@ export const BooksPage = () => {
           `${book.title} ${book.author}`.toLowerCase().includes(normalized)
         )
       : result
-  }, [active, catalog.books, search])
+  }, [active, catalog.books, catalog.userBooks, search])
   const detailQuery = useQuery({
     queryKey: ['prototype', 'book', bookId],
     queryFn: () => fetchBookById(bookId ?? 0),
@@ -126,21 +128,17 @@ export const BooksPage = () => {
     }
   }, [bookId, detailQuery.data, mockMode, mockBooks])
   const realBooks: ApiBook[] =
-    active === 'mine'
+    active === 'mine' || active === 'all'
       ? (ownBooksQuery.data ?? [])
-      : active === 'all'
-        ? mergeApiBooks(
-            publicBooksQuery.data,
-            isAuthenticated ? ownBooksQuery.data : undefined
-          )
-        : (publicBooksQuery.data ?? [])
+      : (publicBooksQuery.data ?? [])
   const activeIsLoading =
-    active === 'mine'
+    active === 'mine' || active === 'all'
       ? ownBooksQuery.isLoading
-      : publicBooksQuery.isLoading ||
-        (active === 'all' && isAuthenticated && ownBooksQuery.isLoading)
+      : publicBooksQuery.isLoading
   const activeHasError =
-    active === 'mine' ? ownBooksQuery.isError : publicBooksQuery.isError
+    active === 'mine' || active === 'all'
+      ? ownBooksQuery.isError
+      : publicBooksQuery.isError
   const books = mockMode
     ? mockBooks
     : realBooks.map((book) => toPrototypeBook(book))

@@ -1,16 +1,24 @@
 import { fetchUserBooks } from '@api/books/userBooks.service'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { FormEvent, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
 import { fetchActivityItems } from '@src/api/community/activity.service'
 import { fetchCommunityFeed } from '@src/api/community/communityFeed.service'
 import { fetchCommunityStats } from '@src/api/community/communityStats.service'
 import { fetchNearbyCorners } from '@src/api/community/corners.service'
+import {
+  fetchCommunityDiscovery,
+  followCommunityUser,
+  unfollowCommunityUser,
+} from '@src/api/community/discovery.service'
+import type { CommunityDiscovery } from '@src/api/community/discovery.types'
 import { fetchSuggestions } from '@src/api/community/suggestions.service'
 import { CommunityStoryModal } from '@src/components/community/CommunityStoryModal'
 import type { FeedItem } from '@src/components/feed/FeedItem.types'
+import { useAuth } from '@src/contexts/auth/AuthContext'
 import { usePrototype } from '@src/features/prototype/PrototypeContext'
 import {
   Avatar,
@@ -258,6 +266,8 @@ const RealCommunityPage = ({
   navigate: ReturnType<typeof useNavigate>
 }) => {
   const { catalog } = usePrototype()
+  const { isAuthenticated, isLoading: isAuthLoading, user } = useAuth()
+  const { t } = useTranslation()
   const queryClient = useQueryClient()
   const [composerOpen, setComposerOpen] = useState(false)
   const [selectedStory, setSelectedStory] = useState<string | null>(null)
@@ -281,6 +291,48 @@ const RealCommunityPage = ({
     queryKey: ['community', 'suggestions'],
     queryFn: fetchSuggestions,
   })
+  const discovery = useQuery({
+    queryKey: ['community', 'discovery'],
+    queryFn: fetchCommunityDiscovery,
+    enabled: !isAuthLoading && isAuthenticated,
+    retry: false,
+  })
+  const followMutation = useMutation({
+    mutationFn: ({
+      userId,
+      following,
+    }: {
+      userId: string
+      following: boolean
+    }) =>
+      following ? unfollowCommunityUser(userId) : followCommunityUser(userId),
+    onSuccess: (result) => {
+      queryClient.setQueryData<CommunityDiscovery>(
+        ['community', 'discovery'],
+        (current) => {
+          if (!current) return current
+          return {
+            ...current,
+            stories: current.stories.map((story) =>
+              story.id === result.userId
+                ? { ...story, isFollowing: result.following }
+                : story
+            ),
+            suggestions: current.suggestions.map((suggestion) =>
+              suggestion.id === result.userId
+                ? { ...suggestion, isFollowing: result.following }
+                : suggestion
+            ),
+            recommendedBooks: current.recommendedBooks.map((book) =>
+              book.owner.id === result.userId
+                ? { ...book, isFollowing: result.following }
+                : book
+            ),
+          }
+        }
+      )
+    },
+  })
   const books = useQuery({
     queryKey: ['userBooks'],
     queryFn: fetchUserBooks,
@@ -297,13 +349,53 @@ const RealCommunityPage = ({
         activityLabel: corner.activity,
       }))
   const realSuggestions = suggestions.data?.length
-    ? suggestions.data.slice(0, 3)
+    ? suggestions.data.slice(0, 3).map((suggestion) => ({
+        ...suggestion,
+        isFollowing: false,
+        reason: 'active_reader' as const,
+        commonInterests: [],
+      }))
     : catalog.stats.contributors.slice(0, 3).map((person, index) => ({
         id: `prototype-suggestion-${index}`,
         user: person.name,
         avatar: '',
+        isFollowing: false,
+        reason: 'active_reader' as const,
+        commonInterests: [],
       }))
+  const displayedSuggestions = discovery.data
+    ? discovery.data.suggestions.slice(0, 3)
+    : realSuggestions
   const hasApiFeed = Boolean(feed.data?.length)
+  const storyChips = discovery.data
+    ? [
+        ...(discovery.data.stories.some(
+          (story) => String(user?.id) === story.id
+        )
+          ? []
+          : [
+              {
+                id: 'mine',
+                name: t('community.discovery.yourStory', {
+                  defaultValue: 'Tu historia',
+                }),
+                initials: 'M',
+                accent: '#ff8b4c',
+                isOwn: true,
+              },
+            ]),
+        ...discovery.data.stories.map((story) => ({
+          id: story.id,
+          name: story.user,
+          initials: story.user.slice(0, 2).toUpperCase(),
+          accent: '#42d7c7',
+          isOwn: String(user?.id) === story.id,
+        })),
+      ]
+    : catalog.stories.map((story) => ({
+        ...story,
+        isOwn: story.id === 'mine',
+      }))
 
   return (
     <BaseLayout id="community-page">
@@ -320,11 +412,11 @@ const RealCommunityPage = ({
         <div className={styles.layout}>
           <main className={styles.main}>
             <Panel className={styles.stories}>
-              {catalog.stories.map((story) => (
+              {storyChips.map((story) => (
                 <button
                   key={story.id}
                   onClick={() =>
-                    story.id === 'mine'
+                    story.id === 'mine' || story.isOwn
                       ? setComposerOpen(true)
                       : setSelectedStory(story.name)
                   }
@@ -373,6 +465,44 @@ const RealCommunityPage = ({
                 </PrototypeButton>
               </div>
             </Panel>
+            {discovery.data?.recommendedBooks.length ? (
+              <Panel className={styles.recommendations}>
+                <SectionHeading
+                  title={t('community.discovery.booksTitle', {
+                    defaultValue: 'Libros que podrían gustarte',
+                  })}
+                />
+                <div className={styles.recommendationList}>
+                  {discovery.data.recommendedBooks.map((book) => (
+                    <article className={styles.recommendation} key={book.id}>
+                      {book.cover ? (
+                        <img src={book.cover} alt="" />
+                      ) : (
+                        <div
+                          className={styles.recommendationCover}
+                          aria-hidden="true"
+                        />
+                      )}
+                      <div>
+                        <strong>{book.title}</strong>
+                        <small>
+                          {book.author ||
+                            t('community.discovery.unknownAuthor', {
+                              defaultValue: 'Autor no informado',
+                            })}
+                        </small>
+                        <small>
+                          {t('community.discovery.bookFrom', {
+                            defaultValue: 'De {{user}}',
+                            user: book.owner.user,
+                          })}
+                        </small>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </Panel>
+            ) : null}
             {activity.data?.length ? (
               <div className={styles.storyNotice} role="status">
                 {activity.data.length} movimientos recientes en tu comunidad
@@ -443,8 +573,12 @@ const RealCommunityPage = ({
               </div>
             </Panel>
             <Panel className={styles.sidePanel}>
-              <SectionHeading title="Sugerencias para vos" />
-              {realSuggestions.map((person) => (
+              <SectionHeading
+                title={t('community.discovery.suggestionsTitle', {
+                  defaultValue: 'Sugerencias para vos',
+                })}
+              />
+              {displayedSuggestions.map((person) => (
                 <article className={styles.suggestion} key={person.id}>
                   <Avatar
                     initials={person.user.slice(0, 2).toUpperCase()}
@@ -453,11 +587,48 @@ const RealCommunityPage = ({
                   />
                   <div>
                     <strong>{person.user}</strong>
-                    <small>Lecturas en común</small>
+                    <small>
+                      {person.reason === 'nearby'
+                        ? t('community.discovery.nearby', {
+                            defaultValue: 'Cerca de vos',
+                          })
+                        : person.reason === 'similar_interests'
+                          ? t('community.discovery.similarInterests', {
+                              defaultValue: 'Intereses en común',
+                            })
+                          : t('community.discovery.activeReader', {
+                              defaultValue: 'Lector activo',
+                            })}
+                    </small>
                   </div>
-                  <button>Seguir</button>
+                  <button
+                    type="button"
+                    disabled={!isAuthenticated || followMutation.isPending}
+                    onClick={() =>
+                      followMutation.mutate({
+                        userId: person.id,
+                        following: person.isFollowing,
+                      })
+                    }
+                  >
+                    {person.isFollowing
+                      ? t('community.discovery.following', {
+                          defaultValue: 'Siguiendo',
+                        })
+                      : t('community.discovery.follow', {
+                          defaultValue: 'Seguir',
+                        })}
+                  </button>
                 </article>
               ))}
+              {discovery.data && displayedSuggestions.length === 0 ? (
+                <p className={styles.emptyDiscovery}>
+                  {t('community.discovery.emptySuggestions', {
+                    defaultValue:
+                      'Completá tus intereses o ubicación para encontrar lectores afines.',
+                  })}
+                </p>
+              ) : null}
             </Panel>
             {stats.data ? (
               <Panel className={styles.sidePanel}>
@@ -478,6 +649,9 @@ const RealCommunityPage = ({
             setComposerOpen(false)
             void queryClient.invalidateQueries({
               queryKey: ['community', 'feed'],
+            })
+            void queryClient.invalidateQueries({
+              queryKey: ['community', 'discovery'],
             })
           }}
         />

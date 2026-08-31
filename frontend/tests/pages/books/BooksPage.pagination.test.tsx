@@ -21,16 +21,29 @@ vi.mock('@src/utils/runtimeEnv', () => ({
 }))
 
 vi.mock('@src/api/auth/me.service', () => ({
-  fetchMe: vi.fn().mockRejectedValue(new Error('unauthenticated')),
+  fetchMe: vi.fn().mockResolvedValue({ id: 1, name: 'Reader' }),
 }))
 
 vi.mock('@api/books/books.service', () => ({
-  fetchBooks: vi.fn().mockResolvedValue(books),
+  fetchBooks: vi.fn().mockResolvedValue([
+    {
+      id: 'random-public-book',
+      title: 'Random public book',
+      author: 'Another reader',
+      coverUrl: '',
+      condition: 'good',
+      status: 'available' as const,
+      isForTrade: true,
+      isForSale: false,
+      isSeeking: false,
+      price: null,
+    },
+  ]),
   fetchBookById: vi.fn(),
 }))
 
 vi.mock('@api/books/userBooks.service', () => ({
-  fetchUserBooks: vi.fn().mockResolvedValue([]),
+  fetchUserBooks: vi.fn().mockResolvedValue(books),
 }))
 
 import { BooksPage } from '@src/pages/books/BooksPage'

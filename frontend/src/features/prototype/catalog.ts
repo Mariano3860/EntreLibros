@@ -95,6 +95,18 @@ export const prototypeCatalog = {
       genre: 'Contemporánea',
     },
   ] satisfies PrototypeBook[],
+  userBooks: [
+    {
+      id: 'mariano-libro',
+      title: 'El nombre del viento',
+      author: 'Patrick Rothfuss',
+      owner: 'Mariano',
+      distance: 'Tu biblioteca',
+      mode: 'Intercambio',
+      accent: '#42d7c7',
+      genre: 'Ficción',
+    },
+  ] satisfies PrototypeBook[],
   homeKpis: [
     {
       icon: '↗',

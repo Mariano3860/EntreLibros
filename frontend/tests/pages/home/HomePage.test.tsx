@@ -17,7 +17,7 @@ describe('HomePage', () => {
     expect(screen.getByText('134')).toBeVisible()
     expect(screen.getByText('52')).toBeVisible()
     expect(
-      screen.getAllByRole('button', { name: /^Ver (?!todos)/ })
+      screen.getAllByRole('button', { name: /^Ver (?!todos|mis libros)/ })
     ).toHaveLength(5)
     expect(screen.getByText('Actividad reciente')).toBeVisible()
   })
@@ -28,5 +28,18 @@ describe('HomePage', () => {
       await screen.findByRole('button', { name: /Explorar libros/ })
     )
     expect(window.location.pathname).toBe('/')
+  })
+
+  test('opens the selected home book in a detail modal', async () => {
+    renderWithProviders(<HomePage />)
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Ver Ecos del Viento Norte' })
+    )
+
+    expect(
+      await screen.findByRole('button', { name: 'bookDetail.close' })
+    ).toBeVisible()
+    expect(await screen.findByText('bookDetail.offer.title')).toBeVisible()
   })
 })

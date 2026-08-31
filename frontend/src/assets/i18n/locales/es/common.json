@@ -707,6 +707,19 @@
         }
       }
     },
+    "discovery": {
+      "booksTitle": "Libros que podrían gustarte",
+      "yourStory": "Tu historia",
+      "unknownAuthor": "Autor no informado",
+      "bookFrom": "De {{user}}",
+      "suggestionsTitle": "Sugerencias para vos",
+      "nearby": "Cerca de vos",
+      "similarInterests": "Intereses en común",
+      "activeReader": "Lector activo",
+      "follow": "Seguir",
+      "following": "Siguiendo",
+      "emptySuggestions": "Completá tus intereses o ubicación para encontrar lectores afines."
+    },
     "story": {
       "title": "Compartir una historia",
       "description": "Compartí algo relacionado con los libros y la comunidad.",

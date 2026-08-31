@@ -10,25 +10,31 @@ import { BooksPage } from '@src/pages/books/BooksPage'
 import { renderWithProviders } from '../../test-utils'
 
 describe('BooksPage', () => {
-  test('renders Todos with every catalog book', () => {
+  test('renders Todos with the user books', () => {
     renderWithProviders(<BooksPage />)
 
     expect(screen.getByRole('tab', { name: 'Todos' })).toHaveAttribute(
       'aria-selected',
       'true'
     )
-    expect(screen.getAllByRole('button', { name: /^Ver / })).toHaveLength(5)
+    expect(
+      screen.getByRole('button', { name: 'Ver El nombre del viento' })
+    ).toBeVisible()
   })
 
-  test('shows the complete catalog in every tab and filters by text', () => {
+  test('keeps public books out of Todos while public tabs can explore them', () => {
     renderWithProviders(<BooksPage />)
 
     fireEvent.click(screen.getByRole('tab', { name: 'Mis libros' }))
-    expect(screen.getAllByRole('button', { name: /^Ver / })).toHaveLength(5)
+    expect(
+      screen.getByRole('button', { name: 'Ver El nombre del viento' })
+    ).toBeVisible()
 
-    fireEvent.click(screen.getByRole('tab', { name: 'Todos' }))
+    fireEvent.click(
+      screen.getByRole('tab', { name: 'Disponibles para intercambio' })
+    )
     fireEvent.change(screen.getByRole('textbox', { name: 'Buscar libros' }), {
-      target: { value: 'luciérnagas' },
+      target: { value: 'Ecos' },
     })
     expect(screen.getAllByRole('button', { name: /^Ver / })).toHaveLength(1)
   })
@@ -41,6 +47,9 @@ describe('BooksPage', () => {
 
   test('opens a book detail dialog', async () => {
     renderWithProviders(<BooksPage />)
+    fireEvent.click(
+      screen.getByRole('tab', { name: 'Disponibles para intercambio' })
+    )
     fireEvent.click(
       screen.getByRole('button', { name: 'Ver Ecos del Viento Norte' })
     )

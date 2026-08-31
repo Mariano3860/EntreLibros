@@ -15,6 +15,8 @@ El servidor escucha normalmente en `http://localhost:4000`. La configuración se
 
 ## Migraciones
 
+La migraciÃ³n `022_create_community_following_and_demo_data.sql` agrega seguimiento persistente y una semilla reproducible de lectores con historias, libros e intereses para probar el descubrimiento de Comunidad.
+
 ```bash
 npm run migrate
 ```

@@ -24,7 +24,9 @@ afterEach(async () => {
 describe('bookRepository', () => {
   test('inserts and lists books with pending verification', async () => {
     await createBook({ title: 'Test Book', author: 'Author' });
-    const books = await listBooks();
+    const books = (await listBooks()).filter(
+      (book) => book.title === 'Test Book'
+    );
     expect(books).toHaveLength(1);
     expect(books[0].title).toBe('Test Book');
     expect(books[0].verified).toBe(false);

@@ -172,6 +172,14 @@ Obtiene el listado público de libros disponibles.
 ]
 ```
 
+### `GET /books/home`
+
+Obtiene publicaciones públicas para el carrusel de Inicio. Si existe una sesión, ordena primero los libros de lectores que el usuario sigue y después completa con publicaciones públicas recientes de otras personas. No incluye publicaciones propias ni privadas.
+
+**Respuesta 200**
+
+Devuelve el mismo formato que `GET /books`.
+
 ### `GET /books/mine`
 
 Devuelve los libros publicados por el usuario autenticado.
@@ -307,3 +315,50 @@ Usuarios sugeridos para seguir.
 ```json
 [{ "id": "uuid", "user": "Pedro", "avatar": "https://example.com/avatar.png" }]
 ```
+
+### `GET /community/discovery`
+
+Requiere sesiÃ³n autenticada. Devuelve historias recientes para la tira superior, lectores relevantes por cercanÃ­a o intereses compartidos y libros publicados que coinciden con los intereses del usuario.
+
+**Respuesta 200**
+
+```json
+{
+  "stories": [
+    {
+      "id": "42",
+      "storyId": "7",
+      "user": "Clara",
+      "avatar": "/logo.svg",
+      "body": "Una historia",
+      "time": "hace 2 h",
+      "isFollowing": false
+    }
+  ],
+  "suggestions": [
+    {
+      "id": "42",
+      "user": "Clara",
+      "avatar": "/logo.svg",
+      "reason": "similar_interests",
+      "commonInterests": ["fiction"],
+      "isFollowing": false
+    }
+  ],
+  "recommendedBooks": [
+    {
+      "id": "9",
+      "title": "La casa de los espÃ­ritus",
+      "author": "Isabel Allende",
+      "cover": "https://example.com/cover.jpg",
+      "owner": { "id": "42", "user": "Clara" },
+      "commonInterests": ["fiction"],
+      "isFollowing": false
+    }
+  ]
+}
+```
+
+### `POST /community/follows/:id` y `DELETE /community/follows/:id`
+
+Requieren sesiÃ³n autenticada. Crean o eliminan el seguimiento de otro perfil pÃºblico. Ambas respuestas incluyen `{ "following": boolean, "userId": string }`; seguir dos veces es idempotente.

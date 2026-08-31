@@ -1,13 +1,15 @@
-import { fetchBooks } from '@api/books/books.service'
-import { fetchUserBooks } from '@api/books/userBooks.service'
+import { fetchHomeBooks } from '@api/books/books.service'
 import { fetchCommunityStats } from '@api/community/communityStats.service'
 import { fetchUserActivity } from '@api/user/activity.service'
+import { BookDetailModal } from '@components/book/BookDetailModal/BookDetailModal'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { useAuth } from '@contexts/auth/AuthContext'
 import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { HOME_URLS } from '@src/constants/constants'
+import type { PrototypeBook } from '@src/features/prototype/catalog'
 import { usePrototype } from '@src/features/prototype/PrototypeContext'
 import {
   FixtureState,
@@ -18,28 +20,21 @@ import {
   PrototypePage,
   SectionHeading,
 } from '@src/features/prototype/PrototypeUI'
-import {
-  mergeApiBooks,
-  toPrototypeBook,
-} from '@src/features/prototype/realData.adapters'
+import { toPrototypeBook } from '@src/features/prototype/realData.adapters'
 import { isApiMockMode } from '@src/utils/runtimeEnv'
 
 import styles from './HomePage.module.scss'
 
 export const HomePage = () => {
-  const { isAuthenticated, isLoading, user } = useAuth()
+  const { isLoading, user } = useAuth()
   const { catalog } = usePrototype()
   const mockMode = isApiMockMode()
   const navigate = useNavigate()
+  const [selectedBook, setSelectedBook] = useState<PrototypeBook | null>(null)
   const booksQuery = useQuery({
     queryKey: ['prototype', 'home', 'books'],
-    queryFn: () => fetchBooks(),
+    queryFn: fetchHomeBooks,
     enabled: !mockMode,
-  })
-  const ownBooksQuery = useQuery({
-    queryKey: ['prototype', 'home', 'own-books'],
-    queryFn: fetchUserBooks,
-    enabled: !mockMode && isAuthenticated,
   })
   const activityQuery = useQuery({
     queryKey: ['prototype', 'home', 'activity'],
@@ -55,10 +50,7 @@ export const HomePage = () => {
   if (isLoading) return null
   const books = mockMode
     ? catalog.books
-    : mergeApiBooks(
-        booksQuery.data,
-        isAuthenticated ? ownBooksQuery.data : undefined
-      ).map((book) => toPrototypeBook(book))
+    : (booksQuery.data ?? []).map((book) => toPrototypeBook(book))
   const kpis = mockMode
     ? catalog.homeKpis
     : statsQuery.data
@@ -136,28 +128,24 @@ export const HomePage = () => {
               <PrototypeButton
                 tone="ghost"
                 size="small"
-                onClick={() => navigate('/books')}
+                onClick={() => navigate('/books/mine')}
               >
-                Ver todos →
+                Ver mis libros →
               </PrototypeButton>
             }
           />
           {mockMode ? (
             <FixtureState region="books">
-              <BookRail
-                books={books}
-                onOpen={(id) => navigate(`/books/${id}`)}
-              />
+              <BookRail books={books} onOpen={setSelectedBook} />
             </FixtureState>
-          ) : booksQuery.isLoading ||
-            (isAuthenticated && ownBooksQuery.isLoading) ? (
+          ) : booksQuery.isLoading ? (
             <Panel className={styles.state}>Cargando libros…</Panel>
           ) : booksQuery.isError ? (
             <Panel className={styles.state}>
               No pudimos cargar los libros.
             </Panel>
           ) : (
-            <BookRail books={books} onOpen={(id) => navigate(`/books/${id}`)} />
+            <BookRail books={books} onOpen={setSelectedBook} />
           )}
         </section>
         <Panel className={styles.activityPanel}>
@@ -177,6 +165,22 @@ export const HomePage = () => {
             <ActivityRegion items={activities} />
           )}
         </Panel>
+        <BookDetailModal
+          isOpen={selectedBook !== null}
+          bookId={selectedBook?.id}
+          bookPreview={
+            selectedBook
+              ? {
+                  title: selectedBook.title,
+                  author: selectedBook.author,
+                  coverUrl:
+                    selectedBook.coverUrl ??
+                    `/prototype/book-cover.svg?book=${selectedBook.id}`,
+                }
+              : undefined
+          }
+          onClose={() => setSelectedBook(null)}
+        />
       </PrototypePage>
     </BaseLayout>
   )
@@ -203,7 +207,7 @@ const BookRail = ({
   onOpen,
 }: {
   books: ReturnType<typeof toPrototypeBook>[]
-  onOpen: (id: string) => void
+  onOpen: (book: PrototypeBook) => void
 }) => (
   <div className={styles.bookRail}>
     {books.length ? (
@@ -211,7 +215,7 @@ const BookRail = ({
         <PrototypeBookCard
           key={book.id}
           book={book}
-          onClick={() => onOpen(book.id)}
+          onClick={() => onOpen(book)}
         />
       ))
     ) : (

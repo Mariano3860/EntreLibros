@@ -2034,6 +2034,24 @@
         }
       }
     },
+    "/api/books/home": {
+      "get": {
+        "summary": "List public publications for the home book rail",
+        "tags": ["Books"],
+        "responses": {
+          "200": {
+            "description": "Public publications ordered with followed readers first",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/paths/~1api~1books/get/responses/200/content/application~1json/schema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/books/mine": {
       "get": {
         "summary": "List publications created by the authenticated user",
@@ -2402,6 +2420,72 @@
               }
             }
           }
+        }
+      }
+    },
+    "/api/community/discovery": {
+      "get": {
+        "summary": "Retrieve personalized community discovery data",
+        "tags": ["Community"],
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Stories, relevant books and personalized suggestions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommunityDiscovery"
+                }
+              }
+            }
+          },
+          "401": { "description": "auth.errors.unauthorized" }
+        }
+      }
+    },
+    "/api/community/follows/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "integer", "minimum": 1 }
+        }
+      ],
+      "post": {
+        "summary": "Follow a community member",
+        "tags": ["Community"],
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "201": {
+            "description": "Follow relationship created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/FollowResponse" }
+              }
+            }
+          },
+          "401": { "description": "auth.errors.unauthorized" },
+          "404": { "description": "community.follow.errors.target_not_found" },
+          "422": { "description": "community.follow.errors.self" }
+        }
+      },
+      "delete": {
+        "summary": "Stop following a community member",
+        "tags": ["Community"],
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Follow relationship removed",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/FollowResponse" }
+              }
+            }
+          },
+          "401": { "description": "auth.errors.unauthorized" },
+          "404": { "description": "community.follow.errors.target_not_found" },
+          "422": { "description": "community.follow.errors.self" }
         }
       }
     },
@@ -3043,6 +3127,108 @@
           }
         },
         "required": ["id", "user", "avatar"]
+      },
+      "FollowResponse": {
+        "type": "object",
+        "properties": {
+          "following": { "type": "boolean" },
+          "userId": { "type": "string" }
+        },
+        "required": ["following", "userId"]
+      },
+      "CommunityDiscovery": {
+        "type": "object",
+        "properties": {
+          "stories": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/CommunityStoryPreview" }
+          },
+          "suggestions": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/CommunitySuggestion" }
+          },
+          "recommendedBooks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommunityBookRecommendation"
+            }
+          }
+        },
+        "required": ["stories", "suggestions", "recommendedBooks"]
+      },
+      "CommunityStoryPreview": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "storyId": { "type": "string" },
+          "user": { "type": "string" },
+          "avatar": { "type": "string" },
+          "body": { "type": "string" },
+          "image": { "type": "string" },
+          "time": { "type": "string" },
+          "isFollowing": { "type": "boolean" }
+        },
+        "required": [
+          "id",
+          "storyId",
+          "user",
+          "avatar",
+          "body",
+          "time",
+          "isFollowing"
+        ]
+      },
+      "CommunitySuggestion": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "user": { "type": "string" },
+          "avatar": { "type": "string" },
+          "reason": {
+            "type": "string",
+            "enum": ["nearby", "similar_interests", "active_reader"]
+          },
+          "distanceKm": { "type": "number" },
+          "commonInterests": { "type": "array", "items": { "type": "string" } },
+          "isFollowing": { "type": "boolean" }
+        },
+        "required": [
+          "id",
+          "user",
+          "avatar",
+          "reason",
+          "commonInterests",
+          "isFollowing"
+        ]
+      },
+      "CommunityBookRecommendation": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "author": { "type": "string" },
+          "cover": { "type": "string" },
+          "condition": { "type": "string" },
+          "owner": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "user": { "type": "string" }
+            },
+            "required": ["id", "user"]
+          },
+          "commonInterests": { "type": "array", "items": { "type": "string" } },
+          "isFollowing": { "type": "boolean" }
+        },
+        "required": [
+          "id",
+          "title",
+          "author",
+          "cover",
+          "owner",
+          "commonInterests",
+          "isFollowing"
+        ]
       },
       "CommunityCornerSummary": {
         "type": "object",

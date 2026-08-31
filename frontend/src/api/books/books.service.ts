@@ -34,6 +34,18 @@ export const fetchBooks = async (
   return response.data
 }
 
+export const fetchHomeBooks = async (): Promise<ApiBook[]> => {
+  const response = await apiClient.get<ApiBook[]>(
+    RELATIVE_API_ROUTES.BOOKS.HOME
+  )
+
+  if (!Array.isArray(response.data)) {
+    throw new Error('Invalid books response')
+  }
+
+  return response.data
+}
+
 export const fetchBookById = async (id: number): Promise<ApiBook> => {
   const response = await apiClient.get<ApiBook>(
     `${RELATIVE_API_ROUTES.BOOKS.LIST}/${id}`
