@@ -155,4 +155,29 @@ describe('BooksPage discovery interactions', () => {
       expect(screen.queryByText('booksPage.want.title')).not.toBeInTheDocument()
     })
   })
+
+  test('renders want listings as searching without offer actions', async () => {
+    const seekingBook = {
+      ...discoveryBook,
+      id: 'seeking-book',
+      isForTrade: false,
+      isSeeking: true,
+    }
+    fetchBooks.mockResolvedValue([seekingBook])
+
+    renderWithProviders(<BooksPage />, {
+      initialEntries: ['/books/seeking'],
+    })
+
+    expect(
+      await screen.findByRole('button', { name: 'Ver Libro de descubrimiento' })
+    ).toBeInTheDocument()
+    expect(screen.getAllByText('Buscando')).toHaveLength(2)
+    expect(
+      screen.queryByRole('button', { name: 'booksPage.card.interest' })
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'booksPage.card.want' })
+    ).not.toBeInTheDocument()
+  })
 })

@@ -177,7 +177,7 @@ const BookResults = ({
         return (
           <article key={book.id} className={styles.resultCard}>
             <PrototypeBookCard book={book} onClick={() => onSelect(book)} />
-            {showActions ? (
+            {showActions && book.mode !== 'Buscado' ? (
               <div className={styles.cardActions}>
                 <button
                   type="button"

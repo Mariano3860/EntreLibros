@@ -162,7 +162,11 @@ export const PrototypeBookCard = ({
           <span>{book.distance}</span>
         </div>
         <div className={styles.bookFooter}>
-          <strong>{book.price ?? 'Disponible'}</strong>
+          <strong>
+            {book.mode === 'Buscado'
+              ? 'Buscando'
+              : (book.price ?? 'Disponible')}
+          </strong>
           <span aria-hidden="true">→</span>
         </div>
       </div>
