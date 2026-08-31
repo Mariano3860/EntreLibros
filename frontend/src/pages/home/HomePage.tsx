@@ -323,7 +323,7 @@ const BookRail = ({
             onClick={onPrevious}
             type="button"
           >
-            ←
+            &lt;
           </button>
         ) : null}
         {hasNext && visibleBooks.length === 5 ? (
@@ -334,7 +334,7 @@ const BookRail = ({
             onClick={onNext}
             type="button"
           >
-            →
+            &gt;
           </button>
         ) : null}
       </div>

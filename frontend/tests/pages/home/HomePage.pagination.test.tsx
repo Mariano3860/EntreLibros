@@ -72,8 +72,11 @@ describe('HomePage recommendation pagination', () => {
       screen.getAllByRole('button', { name: /^Ver Recomendación/ })
     ).toHaveLength(5)
     expect(nextButton).toHaveFocus()
-    expect(
-      screen.getByRole('button', { name: 'Ver recomendaciones anteriores' })
-    ).toBeEnabled()
+    const previousButton = screen.getByRole('button', {
+      name: 'Ver recomendaciones anteriores',
+    })
+    expect(previousButton).toBeEnabled()
+    expect(nextButton).toHaveTextContent('>')
+    expect(previousButton).toHaveTextContent('<')
   })
 })
