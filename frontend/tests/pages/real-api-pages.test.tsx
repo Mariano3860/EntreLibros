@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
 vi.mock('@src/utils/runtimeEnv', () => ({ isApiMockMode: () => false }))
@@ -20,6 +20,21 @@ vi.mock('@src/api/community/corners.service', () => ({
 }))
 vi.mock('@src/api/community/suggestions.service', () => ({
   fetchSuggestions: vi.fn().mockResolvedValue([]),
+}))
+vi.mock('@src/api/community/discovery.service', () => ({
+  fetchCommunityDiscovery: vi.fn().mockResolvedValue({
+    stories: [],
+    suggestions: [],
+    recommendedBooks: [],
+  }),
+  followCommunityUser: vi.fn().mockResolvedValue({
+    following: true,
+    userId: '42',
+  }),
+  unfollowCommunityUser: vi.fn().mockResolvedValue({
+    following: false,
+    userId: '42',
+  }),
 }))
 vi.mock('@src/api/community/communityStats.service', () => ({
   fetchCommunityStats: vi.fn().mockResolvedValue({
@@ -54,6 +69,10 @@ vi.mock('@src/hooks/api/useContactForm', () => ({
   }),
 }))
 import { CommunityFeedPage } from '@src/pages/community/CommunityFeedPage'
+import {
+  fetchCommunityDiscovery,
+  followCommunityUser,
+} from '@src/api/community/discovery.service'
 import { ContactPage } from '@src/pages/contact/ContactPage'
 import { StatsPage } from '@src/pages/stats/StatsPage'
 
@@ -82,6 +101,9 @@ describe('prototype pages in real API mode', () => {
   })
 
   test('opens the community publication modal in real API mode', async () => {
+    vi.mocked(fetchCommunityDiscovery).mockRejectedValueOnce(
+      new Error('discovery unavailable')
+    )
     renderWithProviders(<CommunityFeedPage />)
     const closeStoryModal = () =>
       fireEvent.click(
@@ -113,5 +135,62 @@ describe('prototype pages in real API mode', () => {
     await waitFor(() =>
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     )
+  })
+
+  test('renders personalized stories and recommendations and follows a reader', async () => {
+    vi.mocked(fetchCommunityDiscovery).mockResolvedValueOnce({
+      stories: [
+        {
+          id: '42',
+          storyId: 'story-1',
+          user: 'Clara',
+          avatar: '/logo.svg',
+          body: 'Una historia de lectura.',
+          time: 'Ahora',
+          isFollowing: false,
+        },
+      ],
+      suggestions: [
+        {
+          id: '42',
+          user: 'Clara',
+          avatar: '/logo.svg',
+          reason: 'similar_interests',
+          commonInterests: ['fiction'],
+          isFollowing: false,
+        },
+      ],
+      recommendedBooks: [
+        {
+          id: 'listing-1',
+          title: 'La casa de los espÃ­ritus',
+          author: 'Isabel Allende',
+          cover: '/cover.jpg',
+          owner: { id: '42', user: 'Clara' },
+          commonInterests: ['fiction'],
+          isFollowing: false,
+        },
+      ],
+    })
+
+    renderWithProviders(<CommunityFeedPage />)
+
+    expect(await screen.findByText('La casa de los espÃ­ritus')).toBeVisible()
+    expect(screen.getAllByText('Clara').length).toBeGreaterThan(0)
+    const suggestion = screen
+      .getAllByText('Clara')
+      .map((element) => element.closest('article'))
+      .find((article): article is HTMLElement => article !== null)
+    expect(suggestion).not.toBeNull()
+    const followButton = within(suggestion as HTMLElement).getByRole('button', {
+      name: 'Seguir',
+    })
+    await waitFor(() => expect(followButton).toBeEnabled())
+    fireEvent.click(followButton)
+
+    await waitFor(() => expect(followCommunityUser).toHaveBeenCalledWith('42'))
+    expect(
+      await screen.findByRole('button', { name: 'Siguiendo' })
+    ).toBeVisible()
   })
 })

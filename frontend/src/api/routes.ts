@@ -16,6 +16,7 @@ export const RELATIVE_API_ROUTES = {
   },
   BOOKS: {
     LIST: `/books`,
+    HOME: `/books/home`,
     MINE: `/books/mine`,
     SEARCH: `/books/search`,
     PUBLISH: `/books`,
@@ -25,6 +26,8 @@ export const RELATIVE_API_ROUTES = {
     FEED: `/community/feed`,
     ACTIVITY: `/community/activity`,
     SUGGESTIONS: `/community/suggestions`,
+    DISCOVERY: `/community/discovery`,
+    FOLLOW: (id: string) => `/community/follows/${id}`,
     STORIES: `/community/stories`,
     MESSAGES: {
       AVAILABILITY: `/community/messages/availability`,

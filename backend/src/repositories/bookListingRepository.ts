@@ -754,3 +754,40 @@ export async function listPublicBookListings(
     `ORDER BY p.created_at DESC LIMIT $${params.length - 1} OFFSET $${params.length}`
   );
 }
+
+export async function listHomeBookListings(
+  viewerId?: number,
+  limit = 8
+): Promise<BookListing[]> {
+  const safeLimit = Math.min(Math.max(Math.trunc(limit), 1), 20);
+  return fetchBookListings(
+    `JOIN users u ON u.id = p.user_id
+     WHERE p.availability = 'public'
+       AND p.is_draft = false
+       AND p.status NOT IN ('completed', 'sold', 'exchanged', 'inactive')
+       AND (p.expires_at IS NULL OR p.expires_at > NOW())
+       AND u.profile_visibility = 'public'
+       AND ($1::integer IS NULL OR p.user_id <> $1)
+       AND (
+         $1::integer IS NULL
+         OR NOT EXISTS (
+           SELECT 1
+           FROM user_blocks b
+           WHERE (b.blocker_id = $1 AND b.blocked_id = p.user_id)
+              OR (b.blocker_id = p.user_id AND b.blocked_id = $1)
+         )
+       )`,
+    [viewerId ?? null, safeLimit],
+    `ORDER BY CASE
+                WHEN $1::integer IS NOT NULL AND EXISTS (
+                  SELECT 1
+                  FROM user_follows f
+                  WHERE f.follower_id = $1 AND f.followed_id = p.user_id
+                ) THEN 0
+                ELSE 1
+              END,
+              p.created_at DESC,
+              p.id DESC
+              LIMIT $2`
+  );
+}

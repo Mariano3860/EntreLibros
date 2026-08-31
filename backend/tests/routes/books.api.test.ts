@@ -250,6 +250,41 @@ describe('books API listing projections', () => {
     });
   });
 
+  test('prioritizes followed readers in the home book rail', async () => {
+    const viewerId = await insertUser({ name: 'Home viewer' });
+    const followedId = await insertUser({ name: 'Followed reader' });
+    const randomId = await insertUser({ name: 'Random reader' });
+    const viewerBookId = await insertBook();
+    const followedBookId = await insertBook();
+    const randomBookId = await insertBook();
+    const viewerListingId = await insertListing({
+      userId: viewerId,
+      bookId: viewerBookId,
+    });
+    const followedListingId = await insertListing({
+      userId: followedId,
+      bookId: followedBookId,
+    });
+    const randomListingId = await insertListing({
+      userId: randomId,
+      bookId: randomBookId,
+    });
+    await client.query(
+      'INSERT INTO user_follows (follower_id, followed_id) VALUES ($1, $2)',
+      [viewerId, followedId]
+    );
+
+    const res = await request(app)
+      .get('/api/books/home')
+      .set('Cookie', buildAuthCookie(viewerId))
+      .expect(200);
+
+    const ids = res.body.map((listing: { id: string }) => listing.id);
+    expect(ids[0]).toBe(String(followedListingId));
+    expect(ids).toContain(String(randomListingId));
+    expect(ids).not.toContain(String(viewerListingId));
+  });
+
   test('filters public listings and excludes expired entries', async () => {
     const userId = await insertUser({ name: 'Buscador' });
     const bookId = await insertBook();

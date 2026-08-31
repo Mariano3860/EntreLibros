@@ -63,8 +63,4 @@ app.use('/api/messages', messagesRouter);
 app.use('/api/agreements', agreementsRouter);
 app.use('/api/notifications', notificationsRouter);
 
-// TODO(api-alignment): montar rutas para `/api/books/mine` y `/api/community/*`
-// cuando el backend cubra las necesidades del frontend y dejemos de depender de
-// mocks MSW.
-
 export default app;

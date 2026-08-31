@@ -4,6 +4,7 @@ import type { PoolClient } from 'pg';
 
 import app from '../../src/app.js';
 import { pool, setTestClient } from '../../src/db.js';
+import { findUserByEmail } from '../../src/repositories/userRepository.js';
 
 let client: PoolClient;
 
@@ -25,6 +26,19 @@ async function registerAndLogin() {
   await request(app)
     .post('/api/auth/register')
     .send({ name: 'Story reader', email, password })
+    .expect(201);
+  const login = await request(app)
+    .post('/api/auth/login')
+    .send({ email, password })
+    .expect(200);
+  return login.headers['set-cookie'][0] as string;
+}
+
+async function registerUser(email: string, name: string) {
+  const password = 'Str0ng!Pass1';
+  await request(app)
+    .post('/api/auth/register')
+    .send({ name, email, password })
     .expect(201);
   const login = await request(app)
     .post('/api/auth/login')
@@ -134,5 +148,120 @@ describe('community persistence endpoints', () => {
         })
       );
     }
+  });
+
+  test('recommends relevant readers and books and persists follow actions', async () => {
+    const viewerEmail = `community-viewer-${Date.now()}@example.com`;
+    const targetEmail = `community-target-${Date.now()}@example.com`;
+    const viewerCookie = await registerUser(viewerEmail, 'Community viewer');
+    const targetCookie = await registerUser(targetEmail, 'Fiction friend');
+    const target = await findUserByEmail(targetEmail);
+    expect(target).not.toBeNull();
+
+    for (const [cookie, city, neighborhood] of [
+      [viewerCookie, 'Buenos Aires', 'Palermo'],
+      [targetCookie, 'La Plata', 'Tolosa'],
+    ] as const) {
+      await request(app)
+        .patch('/api/user/profile')
+        .set('Cookie', cookie)
+        .send({
+          interests: ['fiction', 'poetry'],
+          city,
+          neighborhood,
+          locationVisibility: 'neighborhood',
+        })
+        .expect(200);
+    }
+
+    const book = await client.query<{ id: number }>(
+      `INSERT INTO books (title, author, cover_url)
+       VALUES ('Fiction friend recommendation', 'A. Author', 'https://example.com/cover.jpg')
+       RETURNING id`
+    );
+    const listing = await client.query<{ id: number }>(
+      `INSERT INTO book_listings (user_id, book_id, type, status, condition, trade)
+       VALUES ($1, $2, 'offer', 'available', 'good', true)
+       RETURNING id`,
+      [target!.id, book.rows[0].id]
+    );
+    await client.query(
+      `INSERT INTO community_stories (user_id, body, book_listing_id)
+       VALUES ($1, 'Una historia de prueba para lectores afines.', $2)`,
+      [target!.id, listing.rows[0].id]
+    );
+
+    await request(app)
+      .get('/api/community/discovery')
+      .set('Cookie', viewerCookie)
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body.stories).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              id: String(target!.id),
+              user: 'Fiction friend',
+            }),
+          ])
+        );
+        expect(body.suggestions).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              id: String(target!.id),
+              reason: 'similar_interests',
+              isFollowing: false,
+            }),
+          ])
+        );
+        expect(body.recommendedBooks).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              id: String(listing.rows[0].id),
+              owner: { id: String(target!.id), user: 'Fiction friend' },
+            }),
+          ])
+        );
+      });
+
+    await request(app)
+      .post(`/api/community/follows/${target!.id}`)
+      .set('Cookie', viewerCookie)
+      .expect(201, { following: true, userId: String(target!.id) });
+
+    await request(app)
+      .get('/api/community/discovery')
+      .set('Cookie', viewerCookie)
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body.suggestions).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              id: String(target!.id),
+              isFollowing: true,
+            }),
+          ])
+        );
+      });
+
+    await request(app)
+      .delete(`/api/community/follows/${target!.id}`)
+      .set('Cookie', viewerCookie)
+      .expect(200, { following: false, userId: String(target!.id) });
+  });
+
+  test('protects discovery and rejects following yourself', async () => {
+    await request(app).get('/api/community/discovery').expect(401);
+    const cookie = await registerAndLogin();
+    const user = await client.query<{ id: number }>(
+      `SELECT id FROM users WHERE email LIKE 'community-story-%@example.com'
+       ORDER BY id DESC LIMIT 1`
+    );
+    await request(app)
+      .post(`/api/community/follows/${user.rows[0].id}`)
+      .set('Cookie', cookie)
+      .expect(422, {
+        error: 'InvalidTarget',
+        message: 'community.follow.errors.self',
+      });
   });
 });

@@ -1,5 +1,7 @@
 # Hoja de ruta
 
+El seguimiento y el descubrimiento personalizado de Comunidad ya cuentan con una primera implementaciÃ³n persistente; las colecciones temÃ¡ticas y las seÃ±ales avanzadas quedan como evoluciÃ³n posterior.
+
 Este roadmap separa la recuperación terminada de las siguientes decisiones de producto.
 
 ## Trabajo diferido fuera de `complete-entrelibros-recovery`

@@ -27,6 +27,9 @@ PostgreSQL es la persistencia principal; PostGIS se usa para datos geográficos 
 | 019       | Notificaciones                          |
 | 020       | Intereses y ubicación de perfil         |
 | 021       | Historias de Comunidad                  |
+| 022       | Seguimiento y datos demo de Comunidad   |
+
+La migraciÃ³n `022_create_community_following_and_demo_data.sql` crea `user_follows` y carga una semilla reproducible de lectores pÃºblicos con intereses, ubicaciÃ³n, libros disponibles e historias para validar el descubrimiento. Los perfiles privados o bloqueados quedan fuera de las sugerencias.
 
 El contenido exacto de cada migración es la autoridad. No edites una migración ya aplicada: agrega otra numerada y prueba upgrade desde una base existente.
 

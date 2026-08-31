@@ -2,6 +2,7 @@ import { Router, type Request } from 'express';
 import { verifyBook } from '../repositories/bookRepository.js';
 import {
   createBookListing,
+  listHomeBookListings,
   listPublicBookListings,
   listUserBookListings,
   renewBookListing,
@@ -40,6 +41,20 @@ router.get('/', async (_req, res) => {
   }
   const listings = await listPublicBookListings(filters);
   res.json(listings.map(toPublicBookListing));
+});
+
+router.get('/home', async (req, res) => {
+  try {
+    const viewerId = await getOptionalViewerId(req);
+    const listings = await listHomeBookListings(viewerId, 8);
+    return res.json(listings.map(toPublicBookListing));
+  } catch (error) {
+    console.error('Failed to load home book recommendations', error);
+    return res.status(500).json({
+      error: 'HomeBooksQueryFailed',
+      message: 'books.errors.query_failed',
+    });
+  }
 });
 
 router.get('/search', async (req, res) => {

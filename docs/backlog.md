@@ -223,6 +223,10 @@ Feature 4.1 Mapa y listados
 
 Feature 4.2 Descubrimiento avanzado
 
+- [~] S-4.5 Seguimiento y descubrimiento personalizado en Comunidad (Must, E1; BR-32)
+  - ActualizaciÃ³n 2026-08-31: se agregaron seguimiento persistente, historias de lectores, sugerencias por cercanÃ­a/intereses y libros relevantes mediante `/api/community/discovery`; las colecciones temÃ¡ticas quedan pendientes.
+  - ActualizaciÃ³n 2026-08-31: Inicio consume `/api/books/home` para priorizar publicaciones de lectores seguidos y `/books` separa las publicaciones propias de la exploraciÃ³n pÃºblica.
+
 - [ ] S-4.3 Guardar búsquedas y alertas (Should, E2; BR-31)
   - Éxito: aviso ante nuevas coincidencias.
 - [ ] S-4.4 Sugerencias “cerca de mí” y colecciones temáticas (Could, E3; BR-32)

@@ -716,6 +716,19 @@
         }
       }
     },
+    "discovery": {
+      "booksTitle": "Books you may like",
+      "yourStory": "Your story",
+      "unknownAuthor": "Author unavailable",
+      "bookFrom": "From {{user}}",
+      "suggestionsTitle": "Suggestions for you",
+      "nearby": "Near you",
+      "similarInterests": "Shared interests",
+      "activeReader": "Active reader",
+      "follow": "Follow",
+      "following": "Following",
+      "emptySuggestions": "Complete your interests or location to find readers like you."
+    },
     "story": {
       "title": "Share a story",
       "description": "Share something related to books and the community.",

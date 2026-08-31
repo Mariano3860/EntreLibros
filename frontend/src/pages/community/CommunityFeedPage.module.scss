@@ -122,6 +122,73 @@
   padding: 15px;
 }
 
+.recommendations {
+  padding: 15px;
+}
+
+.recommendationList {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.recommendation {
+  display: flex;
+  min-width: 0;
+  gap: 9px;
+  padding: 9px;
+  border: 1px solid var(--prototype-border);
+  border-radius: 10px;
+  background: var(--prototype-surface-soft);
+}
+
+.recommendation img,
+.recommendationCover {
+  flex: 0 0 38px;
+  width: 38px;
+  height: 55px;
+  border-radius: 5px;
+  object-fit: cover;
+}
+
+.recommendationCover {
+  background: linear-gradient(
+    145deg,
+    var(--prototype-orange),
+    var(--prototype-teal)
+  );
+}
+
+.recommendation > div:last-child {
+  min-width: 0;
+}
+
+.recommendation strong,
+.recommendation small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recommendation strong {
+  color: var(--prototype-text);
+  font-size: 10px;
+}
+
+.recommendation small {
+  margin-top: 3px;
+  color: var(--prototype-muted);
+  font-size: 8px;
+}
+
+.emptyDiscovery {
+  margin: 10px 0 0;
+  color: var(--prototype-muted);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
 .postHeader {
   display: flex;
   align-items: center;
@@ -269,6 +336,11 @@
   font-size: 9px;
 }
 
+.suggestion button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 .modalBackdrop {
   position: fixed;
   inset: 0;
@@ -352,6 +424,12 @@
 
   .aside {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (width <= $breakpoint-tablet) {
+  .recommendationList {
+    grid-template-columns: 1fr;
   }
 }
 

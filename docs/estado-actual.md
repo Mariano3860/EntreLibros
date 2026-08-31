@@ -2,6 +2,8 @@
 
 Fecha de referencia: 2026-08-31.
 
+- La migraciÃ³n 022 agrega seguimiento persistente y datos demo para historias, lectores y recomendaciones personalizadas de Comunidad.
+
 ## Comprobado en el repositorio
 
 - Monorepo con frontend React/Rsbuild y backend TypeScript/Express.
