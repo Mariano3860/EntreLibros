@@ -1,9 +1,11 @@
 import { fetchBookById, fetchBooks } from '@api/books/books.service'
 import { fetchUserBooks } from '@api/books/userBooks.service'
+import { BookDetailModal } from '@components/book/BookDetailModal/BookDetailModal'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { PublishBookModal } from '@components/publish/PublishBookModal/PublishBookModal'
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useLocation, useMatch, useNavigate } from 'react-router-dom'
 
 import type { ApiBook } from '@src/api/books/books.types'
@@ -11,7 +13,6 @@ import { useAuth } from '@src/contexts/auth/AuthContext'
 import type { PrototypeBook } from '@src/features/prototype/catalog'
 import { usePrototype } from '@src/features/prototype/PrototypeContext'
 import {
-  BookCover,
   FixtureState,
   PageHeader,
   Panel,
@@ -26,6 +27,8 @@ import {
 import { isApiMockMode } from '@src/utils/runtimeEnv'
 
 import styles from './BooksPage.module.scss'
+
+const BOOKS_PER_PAGE = 5
 
 const tabs = [
   { key: 'all', path: '', label: 'Todos' },
@@ -62,12 +65,14 @@ const BookResults = ({
 export const BooksPage = () => {
   const { isAuthenticated } = useAuth()
   const { catalog } = usePrototype()
+  const { t } = useTranslation()
   const mockMode = isApiMockMode()
   const navigate = useNavigate()
   const location = useLocation()
   const publishMatch = useMatch('/books/new')
   const [search, setSearch] = useState('')
   const [filtersOpen, setFiltersOpen] = useState(false)
+  const [currentPage, setCurrentPage] = useState(0)
   const [selectedBook, setSelectedBook] = useState<PrototypeBook | null>(null)
   const segment = location.pathname.replace(/^\/books\/?/, '').split('/')[0]
   const bookId = /^\d+$/.test(segment) ? Number(segment) : null
@@ -139,6 +144,16 @@ export const BooksPage = () => {
   const books = mockMode
     ? mockBooks
     : realBooks.map((book) => toPrototypeBook(book))
+  const totalPages = Math.max(1, Math.ceil(books.length / BOOKS_PER_PAGE))
+  const activePage = Math.min(currentPage, totalPages - 1)
+  const visibleBooks = books.slice(
+    activePage * BOOKS_PER_PAGE,
+    (activePage + 1) * BOOKS_PER_PAGE
+  )
+
+  useEffect(() => {
+    setCurrentPage(0)
+  }, [active, search])
 
   return (
     <BaseLayout id="books-page">
@@ -200,7 +215,7 @@ export const BooksPage = () => {
         </div>
         {mockMode ? (
           <FixtureState region="books">
-            <BookResults books={books} onSelect={setSelectedBook} />
+            <BookResults books={visibleBooks} onSelect={setSelectedBook} />
           </FixtureState>
         ) : activeIsLoading ? (
           <Panel className={styles.empty}>Cargando libros…</Panel>
@@ -209,49 +224,63 @@ export const BooksPage = () => {
             No pudimos cargar los libros. Intentá nuevamente.
           </Panel>
         ) : (
-          <BookResults books={books} onSelect={setSelectedBook} />
+          <BookResults books={visibleBooks} onSelect={setSelectedBook} />
         )}
-        <div className={styles.pagination} aria-label="Páginas de resultados">
-          <button aria-label="Página anterior">←</button>
-          <span className={styles.activeDot} />
-          <span />
-          <span />
-          <button aria-label="Página siguiente">→</button>
-        </div>
-        {selectedBook ? (
-          <div
-            className={styles.modalBackdrop}
-            role="presentation"
-            onMouseDown={(event) => {
-              if (event.target === event.currentTarget) setSelectedBook(null)
-            }}
+        <nav
+          className={styles.pagination}
+          aria-label={t('booksPage.pagination.label')}
+        >
+          <button
+            type="button"
+            aria-label={t('booksPage.pagination.previous')}
+            disabled={activePage === 0}
+            onClick={() => setCurrentPage((page) => Math.max(0, page - 1))}
           >
-            <Panel className={styles.bookDialog} as="div">
-              <div className={styles.dialogCover}>
-                <BookCover book={selectedBook} />
-              </div>
-              <div>
-                <button
-                  className={styles.close}
-                  onClick={() => setSelectedBook(null)}
-                  aria-label="Cerrar detalle"
-                >
-                  ×
-                </button>
-                <span className={styles.dialogMode}>{selectedBook.mode}</span>
-                <h2>{selectedBook.title}</h2>
-                <p>{selectedBook.author}</p>
-                <p className={styles.description}>
-                  Una historia para perderse, conversar y compartir. El ejemplar
-                  está en buen estado y disponible cerca tuyo.
-                </p>
-                <PrototypeButton tone="primary">
-                  Contactar a {selectedBook.owner}
-                </PrototypeButton>
-              </div>
-            </Panel>
+            ←
+          </button>
+          <div className={styles.pageNumbers}>
+            {Array.from({ length: totalPages }, (_, page) => (
+              <button
+                key={page}
+                type="button"
+                className={page === activePage ? styles.pageActive : ''}
+                aria-current={page === activePage ? 'page' : undefined}
+                aria-label={t('booksPage.pagination.page', {
+                  page: page + 1,
+                })}
+                onClick={() => setCurrentPage(page)}
+              >
+                {page + 1}
+              </button>
+            ))}
           </div>
-        ) : null}
+          <button
+            type="button"
+            aria-label={t('booksPage.pagination.next')}
+            disabled={activePage === totalPages - 1}
+            onClick={() =>
+              setCurrentPage((page) => Math.min(totalPages - 1, page + 1))
+            }
+          >
+            →
+          </button>
+        </nav>
+        <BookDetailModal
+          isOpen={selectedBook !== null}
+          bookId={selectedBook?.id}
+          bookPreview={
+            selectedBook
+              ? {
+                  title: selectedBook.title,
+                  author: selectedBook.author,
+                  coverUrl:
+                    selectedBook.coverUrl ??
+                    `/prototype/book-cover.svg?book=${selectedBook.id}`,
+                }
+              : undefined
+          }
+          onClose={() => setSelectedBook(null)}
+        />
       </PrototypePage>
       {publishMatch ? (
         <PublishBookModal

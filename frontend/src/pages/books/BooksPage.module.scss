@@ -97,27 +97,41 @@
   margin-top: 21px;
 }
 
-.pagination > span {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--prototype-border);
-}
-
-.pagination .activeDot {
-  width: 18px;
-  border-radius: 999px;
-  background: var(--prototype-teal);
-}
-
 .pagination button {
-  width: 30px;
+  min-width: 30px;
   height: 30px;
+  padding: 0 8px;
   border: 1px solid var(--prototype-border);
-  border-radius: 50%;
+  border-radius: 9px;
   background: var(--prototype-surface);
   color: var(--prototype-muted);
   cursor: pointer;
+}
+
+.pagination button:hover:not(:disabled) {
+  border-color: var(--prototype-teal);
+  color: var(--prototype-teal);
+}
+
+.pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.pageNumbers {
+  display: flex;
+  gap: 5px;
+}
+
+.pageNumbers button {
+  font-size: 11px;
+}
+
+.pageNumbers .pageActive {
+  border-color: var(--prototype-teal);
+  background: var(--prototype-teal);
+  color: #06211f;
+  font-weight: 750;
 }
 
 .empty {
@@ -127,68 +141,6 @@
   align-content: center;
   gap: 7px;
   color: var(--prototype-muted);
-}
-
-.modalBackdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  display: grid;
-  place-items: center;
-  padding: 24px;
-  background: var(--prototype-modal-backdrop);
-  backdrop-filter: blur(8px);
-}
-
-.bookDialog {
-  position: relative;
-  display: grid;
-  width: min(680px, 100%);
-  grid-template-columns: 230px 1fr;
-  gap: 25px;
-  padding: 22px;
-}
-
-.dialogCover {
-  overflow: hidden;
-  border-radius: 11px;
-}
-
-.dialogCover > div {
-  min-height: 310px;
-}
-
-.bookDialog h2 {
-  margin: 10px 0 4px;
-  font-size: 26px;
-}
-
-.bookDialog p {
-  color: var(--prototype-muted);
-}
-
-.bookDialog .description {
-  margin: 20px 0;
-  line-height: 1.6;
-}
-
-.close {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 32px;
-  height: 32px;
-  border: 0;
-  border-radius: 50%;
-  background: var(--prototype-subtle-hover);
-  color: var(--prototype-text);
-  cursor: pointer;
-}
-
-.dialogMode {
-  color: var(--prototype-teal);
-  font-size: 11px;
-  font-weight: 700;
 }
 
 @media (width <= 1120px) {
@@ -205,16 +157,6 @@
 
   .grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .bookDialog {
-    grid-template-columns: 1fr;
-    max-height: 90vh;
-    overflow: auto;
-  }
-
-  .dialogCover {
-    max-width: 220px;
   }
 }
 

@@ -4,10 +4,12 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { server } from '@mocks/server'
 import { setLoggedInState } from '@mocks/handlers/auth/me.handler'
+import { generatePublication } from '@mocks/handlers/books/fakers/publication.faker'
 import { apiRouteMatcher } from '@mocks/handlers/utils'
 
 import { BookDetailModal } from '@components/book/BookDetailModal/BookDetailModal'
 import type { BookDetailModalProps } from '@components/book/BookDetailModal/BookDetailModal.types'
+import type { PublicationUpdate } from '@src/api/books/publication.types'
 import { RELATIVE_API_ROUTES } from '@src/api/routes'
 import { renderWithProviders } from '../../../test-utils'
 
@@ -54,6 +56,18 @@ describe('BookDetailModal', () => {
     expect(await screen.findByText('1984')).toBeInTheDocument()
     expect(screen.getByText('George Orwell')).toBeInTheDocument()
     expect(screen.getByText('bookDetail.offer.title')).toBeInTheDocument()
+    const mainImage = screen.getByRole('img', {
+      name: 'bookDetail.gallery.imageAlt',
+    })
+    const firstImageUrl = mainImage.getAttribute('src')
+    fireEvent.click(
+      screen.getByRole('button', { name: 'bookDetail.gallery.next' })
+    )
+    expect(mainImage.getAttribute('src')).not.toBe(firstImageUrl)
+    fireEvent.click(
+      screen.getByRole('button', { name: 'bookDetail.gallery.previous' })
+    )
+    expect(mainImage.getAttribute('src')).toBe(firstImageUrl)
   })
 
   test('retries fetching details when the request fails', async () => {
@@ -112,6 +126,112 @@ describe('BookDetailModal', () => {
 
     expect(screen.getByText('Nuevo título')).toBeInTheDocument()
     expect(screen.getByText('Notas actualizadas')).toBeInTheDocument()
+  })
+
+  test('allows the owner to edit metadata, status and offer settings', async () => {
+    const receivedUpdate = vi.fn<(update: PublicationUpdate) => void>()
+    server.use(
+      http.put(
+        apiRouteMatcher(`${RELATIVE_API_ROUTES.BOOKS.LIST}/:id`),
+        async ({ request }) => {
+          const update = (await request.json()) as PublicationUpdate
+          receivedUpdate(update)
+          const existing = generatePublication('1')
+          return HttpResponse.json({
+            ...existing,
+            ...update,
+            offer: {
+              ...existing.offer,
+              ...update.offer,
+              delivery: {
+                ...existing.offer.delivery,
+                ...update.offer?.delivery,
+              },
+            },
+          })
+        }
+      )
+    )
+
+    renderModal()
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'bookDetail.edit' })
+    )
+    fireEvent.change(screen.getByLabelText('bookDetail.fields.publisher'), {
+      target: { value: 'Nueva editorial' },
+    })
+    fireEvent.change(screen.getByLabelText('bookDetail.fields.year'), {
+      target: { value: '2026' },
+    })
+    fireEvent.change(screen.getByLabelText('bookDetail.fields.status'), {
+      target: { value: 'available' },
+    })
+    const tradeCheckbox = screen.getByRole('checkbox', {
+      name: 'publishBook.offer.modes.trade',
+    }) as HTMLInputElement
+    if (!tradeCheckbox.checked) fireEvent.click(tradeCheckbox)
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'publishBook.offer.trade.genres.fiction',
+      })
+    )
+    fireEvent.change(
+      screen.getByLabelText('publishBook.offer.availability.label'),
+      { target: { value: 'private' } }
+    )
+
+    const shippingCheckbox = screen.getByRole('checkbox', {
+      name: 'publishBook.offer.delivery.options.shipping',
+    }) as HTMLInputElement
+    if (!shippingCheckbox.checked) fireEvent.click(shippingCheckbox)
+    fireEvent.change(
+      screen.getByLabelText('publishBook.offer.delivery.shippingPayer.label'),
+      { target: { value: 'requester' } }
+    )
+
+    fireEvent.click(
+      screen.getAllByRole('button', {
+        name: 'bookDetail.gallery.remove',
+      })[0]
+    )
+    const imageInput = screen.getByLabelText(
+      'bookDetail.gallery.add'
+    ) as HTMLInputElement
+    fireEvent.change(imageInput, {
+      target: {
+        files: [new File(['image'], 'new-cover.jpg', { type: 'image/jpeg' })],
+      },
+    })
+    await waitFor(() =>
+      expect(
+        screen.getAllByRole('button', { name: 'bookDetail.gallery.remove' })
+      ).toHaveLength(2)
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'bookDetail.save' }))
+
+    await waitFor(() => expect(receivedUpdate).toHaveBeenCalledTimes(1))
+    expect(receivedUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        publisher: 'Nueva editorial',
+        year: 2026,
+        status: 'available',
+        offer: expect.objectContaining({
+          availability: 'private',
+          tradePreferences: expect.arrayContaining(['fiction']),
+          delivery: expect.objectContaining({
+            shipping: true,
+            shippingPayer: 'requester',
+          }),
+        }),
+        images: expect.arrayContaining([
+          expect.objectContaining({
+            source: 'upload',
+          }),
+        ]),
+      })
+    )
   })
 
   test('shows an error toast when saving fails', async () => {
