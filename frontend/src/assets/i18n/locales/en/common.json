@@ -138,7 +138,13 @@
       "for_trade": "Trade",
       "seeking": "Seeking"
     },
-    "cover_alt": "Cover of {{title}}"
+    "cover_alt": "Cover of {{title}}",
+    "pagination": {
+      "label": "Result pages",
+      "previous": "Previous page",
+      "next": "Next page",
+      "page": "Go to page {{page}}"
+    }
   },
   "publishBook": {
     "title": "Publish a book",
@@ -845,6 +851,17 @@
       "exchanged": "Exchanged"
     },
     "changeStatus": "Change status",
+    "gallery": {
+      "label": "Image gallery",
+      "imageAlt": "Image {{current}} of {{total}} for {{title}}",
+      "previous": "Previous image",
+      "next": "Next image",
+      "select": "View image {{number}}",
+      "counter": "{{current}} / {{total}}",
+      "count": "{{count}} of {{max}} images",
+      "add": "Add images",
+      "remove": "Remove image {{number}}"
+    },
     "fields": {
       "title": "Title",
       "author": "Author",

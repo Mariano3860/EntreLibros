@@ -39,14 +39,17 @@ describe('BooksPage', () => {
     expect(screen.getByText('publishBook.title')).toBeVisible()
   })
 
-  test('opens a book detail dialog', () => {
+  test('opens a book detail dialog', async () => {
     renderWithProviders(<BooksPage />)
     fireEvent.click(
       screen.getByRole('button', { name: 'Ver Ecos del Viento Norte' })
     )
-    expect(screen.getByRole('button', { name: 'Cerrar detalle' })).toBeVisible()
     expect(
-      screen.getByRole('button', { name: /Contactar a Lucia/ })
+      screen.getByRole('button', { name: 'bookDetail.close' })
     ).toBeVisible()
+    expect(await screen.findByText('bookDetail.offer.title')).toBeVisible()
+    expect(
+      screen.queryByRole('button', { name: /Contactar a Lucia/ })
+    ).not.toBeInTheDocument()
   })
 })

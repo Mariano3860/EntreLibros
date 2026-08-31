@@ -138,7 +138,13 @@
       "for_trade": "Intercambio",
       "seeking": "Buscando"
     },
-    "cover_alt": "Portada de {{title}}"
+    "cover_alt": "Portada de {{title}}",
+    "pagination": {
+      "label": "Páginas de resultados",
+      "previous": "Página anterior",
+      "next": "Página siguiente",
+      "page": "Ir a la página {{page}}"
+    }
   },
   "publishBook": {
     "title": "Publicar un libro",
@@ -837,6 +843,17 @@
       "exchanged": "Intercambiado"
     },
     "changeStatus": "Cambiar estado",
+    "gallery": {
+      "label": "Galería de imágenes",
+      "imageAlt": "Imagen {{current}} de {{total}} de {{title}}",
+      "previous": "Imagen anterior",
+      "next": "Imagen siguiente",
+      "select": "Ver imagen {{number}}",
+      "counter": "{{current}} / {{total}}",
+      "count": "{{count}} de {{max}} imágenes",
+      "add": "Agregar imágenes",
+      "remove": "Eliminar imagen {{number}}"
+    },
     "fields": {
       "title": "Título",
       "author": "Autor/a",
