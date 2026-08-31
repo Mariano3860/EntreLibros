@@ -223,6 +223,8 @@ Feature 4.1 Mapa y listados
 
 Feature 4.2 Descubrimiento avanzado
 
+- Actualización 2026-08-31: Inicio pagina las recomendaciones en grupos de hasta cinco libros, con controles compactos para renovar la selección sin alterar el detalle modal.
+
 - [~] S-4.5 Seguimiento y descubrimiento personalizado en Comunidad (Must, E1; BR-32)
   - ActualizaciÃ³n 2026-08-31: se agregaron seguimiento persistente, historias de lectores, sugerencias por cercanÃ­a/intereses y libros relevantes mediante `/api/community/discovery`; las colecciones temÃ¡ticas quedan pendientes.
   - ActualizaciÃ³n 2026-08-31: Inicio consume `/api/books/home` para priorizar publicaciones de lectores seguidos y `/books` separa las publicaciones propias de la exploraciÃ³n pÃºblica.

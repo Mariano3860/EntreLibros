@@ -14,7 +14,13 @@ describe('fetchBooks service', () => {
 
   test('returns the home book rail', async () => {
     const books = await fetchHomeBooks()
-    expect(books).toHaveLength(5)
+    expect(books.items).toHaveLength(5)
+    expect(books.page).toEqual({
+      limit: 5,
+      offset: 0,
+      hasNext: false,
+      hasPrevious: false,
+    })
   })
 
   test('throws on invalid response', async () => {

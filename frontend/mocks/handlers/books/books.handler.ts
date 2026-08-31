@@ -28,5 +28,20 @@ export const booksHandler = http.get(
 
 export const homeBooksHandler = http.get(
   apiRouteMatcher(RELATIVE_API_ROUTES.BOOKS.HOME),
-  listBooks
+  ({ request }) => {
+    const offset = Number(new URL(request.url).searchParams.get('offset') ?? 0)
+    const limit = 5
+    const books = generateBooks()
+    const items = books.slice(offset, offset + limit)
+
+    return HttpResponse.json({
+      items,
+      page: {
+        limit,
+        offset,
+        hasNext: offset + limit < books.length,
+        hasPrevious: offset > 0,
+      },
+    })
+  }
 )

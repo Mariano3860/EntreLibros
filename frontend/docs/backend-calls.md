@@ -174,11 +174,21 @@ Obtiene el listado público de libros disponibles.
 
 ### `GET /books/home`
 
-Obtiene publicaciones públicas para el carrusel de Inicio. Si existe una sesión, ordena primero los libros de lectores que el usuario sigue y después completa con publicaciones públicas recientes de otras personas. No incluye publicaciones propias ni privadas.
+Obtiene publicaciones públicas para el carrusel de Inicio. Si existe una sesión, ordena primero los libros de lectores que el usuario sigue y después completa con publicaciones públicas recientes de otras personas. No incluye publicaciones propias ni privadas. Acepta `limit` (máximo `5`) y `offset` para renovar el carrusel sin mostrar más de cinco libros a la vez.
 
 **Respuesta 200**
 
-Devuelve el mismo formato que `GET /books`.
+```json
+{
+  "items": [{ "id": "1", "title": "Matisse en Bélgica" }],
+  "page": {
+    "limit": 5,
+    "offset": 0,
+    "hasNext": true,
+    "hasPrevious": false
+  }
+}
+```
 
 ### `GET /books/mine`
 

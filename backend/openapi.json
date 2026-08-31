@@ -2038,13 +2038,48 @@
       "get": {
         "summary": "List public publications for the home book rail",
         "tags": ["Books"],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 5,
+              "default": 5
+            },
+            "description": "Maximum of five recommendations per page"
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": { "type": "integer", "minimum": 0, "default": 0 },
+            "description": "Zero-based recommendation offset"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Public publications ordered with followed readers first",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/paths/~1api~1books/get/responses/200/content/application~1json/schema"
+                  "type": "object",
+                  "required": ["items", "page"],
+                  "properties": {
+                    "items": {
+                      "$ref": "#/paths/~1api~1books/get/responses/200/content/application~1json/schema"
+                    },
+                    "page": {
+                      "type": "object",
+                      "required": ["limit", "offset", "hasNext", "hasPrevious"],
+                      "properties": {
+                        "limit": { "type": "integer", "maximum": 5 },
+                        "offset": { "type": "integer", "minimum": 0 },
+                        "hasNext": { "type": "boolean" },
+                        "hasPrevious": { "type": "boolean" }
+                      }
+                    }
+                  }
                 }
               }
             }

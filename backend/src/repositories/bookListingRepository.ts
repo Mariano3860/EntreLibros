@@ -757,10 +757,19 @@ export async function listPublicBookListings(
 
 export async function listHomeBookListings(
   viewerId?: number,
-  limit = 8
-): Promise<BookListing[]> {
-  const safeLimit = Math.min(Math.max(Math.trunc(limit), 1), 20);
-  return fetchBookListings(
+  options: { limit?: number; offset?: number } = {}
+): Promise<{
+  items: BookListing[];
+  page: {
+    limit: number;
+    offset: number;
+    hasNext: boolean;
+    hasPrevious: boolean;
+  };
+}> {
+  const safeLimit = Math.min(Math.max(Math.trunc(options.limit ?? 5), 1), 5);
+  const safeOffset = Math.max(Math.trunc(options.offset ?? 0), 0);
+  const listings = await fetchBookListings(
     `JOIN users u ON u.id = p.user_id
      WHERE p.availability = 'public'
        AND p.is_draft = false
@@ -777,7 +786,7 @@ export async function listHomeBookListings(
               OR (b.blocker_id = p.user_id AND b.blocked_id = $1)
          )
        )`,
-    [viewerId ?? null, safeLimit],
+    [viewerId ?? null, safeLimit + 1, safeOffset],
     `ORDER BY CASE
                 WHEN $1::integer IS NOT NULL AND EXISTS (
                   SELECT 1
@@ -788,6 +797,16 @@ export async function listHomeBookListings(
               END,
               p.created_at DESC,
               p.id DESC
-              LIMIT $2`
+              LIMIT $2 OFFSET $3`
   );
+
+  return {
+    items: listings.slice(0, safeLimit),
+    page: {
+      limit: safeLimit,
+      offset: safeOffset,
+      hasNext: listings.length > safeLimit,
+      hasPrevious: safeOffset > 0,
+    },
+  };
 }

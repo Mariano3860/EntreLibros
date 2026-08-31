@@ -44,10 +44,20 @@ router.get('/', async (_req, res) => {
 });
 
 router.get('/home', async (req, res) => {
+  const pagination = parseHomePagination(req.query);
+  if (!pagination) {
+    return res.status(400).json({
+      error: 'InvalidFields',
+      message: 'books.errors.invalid_filters',
+    });
+  }
   try {
     const viewerId = await getOptionalViewerId(req);
-    const listings = await listHomeBookListings(viewerId, 8);
-    return res.json(listings.map(toPublicBookListing));
+    const result = await listHomeBookListings(viewerId, pagination);
+    return res.json({
+      items: result.items.map(toPublicBookListing),
+      page: result.page,
+    });
   } catch (error) {
     console.error('Failed to load home book recommendations', error);
     return res.status(500).json({
@@ -392,6 +402,20 @@ function parseCatalogFilters(
     return null;
   if (filters.radiusKm !== undefined && filters.radiusKm <= 0) return null;
   return filters;
+}
+
+function parseHomePagination(
+  query: Request['query']
+): { limit?: number; offset?: number } | null {
+  const limit = queryNumber(query.limit);
+  const offset = queryNumber(query.offset);
+  if (limit !== undefined && (!Number.isInteger(limit) || limit < 1)) {
+    return null;
+  }
+  if (offset !== undefined && (!Number.isInteger(offset) || offset < 0)) {
+    return null;
+  }
+  return { limit, offset };
 }
 
 function optionalString(value: unknown): string | null {

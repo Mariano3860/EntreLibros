@@ -6,3 +6,14 @@ import type { ApiUserBook } from './userBooks.types'
 
 /** Public catalog listing returned by `/api/books`. */
 export type ApiBook = ApiUserBook
+
+/** Página de recomendaciones públicas retornada por `/api/books/home`. */
+export type ApiHomeBooksPage = {
+  items: ApiBook[]
+  page: {
+    limit: number
+    offset: number
+    hasNext: boolean
+    hasPrevious: boolean
+  }
+}
