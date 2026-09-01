@@ -1,6 +1,7 @@
 @import '@styles/variables';
 
 .layoutMain {
+  box-sizing: border-box;
   height: 100vh;
   padding-bottom: 28px;
   overflow: hidden;
