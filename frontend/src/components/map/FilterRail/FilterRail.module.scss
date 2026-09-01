@@ -46,7 +46,7 @@
 .slider {
   display: flex;
   flex-direction: column;
-  gap: $spacing-1x5;
+  gap: 2px;
   padding: 0 2px;
 
   input[type='range'] {
@@ -62,14 +62,6 @@
   color: var(--prototype-muted);
   font-size: 8px;
   text-align: center;
-
-  span:first-child {
-    text-align: left;
-  }
-
-  span:last-child {
-    text-align: right;
-  }
 }
 
 .checkboxGroup {
