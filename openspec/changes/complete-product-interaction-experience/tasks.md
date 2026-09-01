@@ -45,6 +45,7 @@
 - [x] 6.3 Recuperar el menú `+`, selector de libros, burbujas de texto/libro/acuerdo y propuesta de intercambio con ambos catálogos; verificar con tests de `Messages`, composer y modales que cada acción retorna al chat y no rompe el composer.
 - [x] 6.4 Revisar visualmente `/messages` a 1440×900 contra el cuadrante inferior derecho de `img.png`; verificar dos columnas, scroll independiente, composer anclado, adjunto y propuesta visibles, además de teclado/narrow viewport.
 - [x] 6.5 Ejecutar suites afectadas, typecheck, lint, Stylelint, build y `git diff --check`; crear commits claros y una PR en español contra `main` sin merge.
+- [x] 6.6 Incorporar un menú compacto del botón `+` con emoji, adjunto de libros propios/de contraparte e intercambio; verificar inserción del emoji en el borrador, apertura de modales, foco, teclado y viewport estrecho.
 
 ## 7. Contactos y filtro de no leídos en Mensajes
 

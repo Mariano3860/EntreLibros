@@ -59,6 +59,136 @@ const createClientKey = () =>
   globalThis.crypto?.randomUUID?.() ??
   `message-${Date.now()}-${Math.random().toString(36).slice(2)}`
 
+const COMPOSER_EMOJIS = ['😀', '😁', '😂', '😍', '🤔', '👍', '🎉', '📚']
+
+type ComposerActionMenuProps = {
+  onEmoji: () => void
+  onAttachBook: () => void
+  onProposeSwap: () => void
+  onPrepareAgreement?: () => void
+}
+
+const ComposerActionMenu = ({
+  onEmoji,
+  onAttachBook,
+  onProposeSwap,
+  onPrepareAgreement,
+}: ComposerActionMenuProps) => {
+  const { t } = useTranslation()
+
+  return (
+    <div className={styles.composerMenu} role="menu">
+      <button type="button" role="menuitem" onClick={onEmoji}>
+        {t('community.messages.composer.menu.emoji', {
+          defaultValue: 'Emoji',
+        })}
+      </button>
+      <button type="button" role="menuitem" onClick={onAttachBook}>
+        {t('community.messages.composer.menu.book', {
+          defaultValue: 'Adjuntar libro',
+        })}
+      </button>
+      <button type="button" role="menuitem" onClick={onProposeSwap}>
+        {t('community.messages.composer.menu.swap', {
+          defaultValue: 'Proponer intercambio',
+        })}
+      </button>
+      {onPrepareAgreement ? (
+        <button type="button" role="menuitem" onClick={onPrepareAgreement}>
+          {t('community.messages.composer.menu.agreement', {
+            defaultValue: 'Preparar acuerdo',
+          })}
+        </button>
+      ) : null}
+    </div>
+  )
+}
+
+type EmojiPickerModalProps = {
+  open: boolean
+  onClose: () => void
+  onSelect: (emoji: string) => void
+}
+
+const EmojiPickerModal = ({
+  open,
+  onClose,
+  onSelect,
+}: EmojiPickerModalProps) => {
+  const { t } = useTranslation()
+  const modalRef = useRef<HTMLDivElement>(null)
+
+  useFocusTrap({
+    containerRef: modalRef,
+    active: open,
+    onEscape: onClose,
+  })
+
+  if (!open) return null
+
+  return (
+    <div className={styles.modalBackdrop}>
+      <div
+        ref={modalRef}
+        className={styles.emojiPickerDialog}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="emoji-picker-title"
+      >
+        <Panel
+          className={`${styles.bookPicker} ${styles.emojiPicker}`}
+          as="div"
+        >
+          <header>
+            <div>
+              <span>
+                {t('community.messages.composer.emoji.open', {
+                  defaultValue: 'Emoji',
+                })}
+              </span>
+              <h2 id="emoji-picker-title">
+                {t('community.messages.composer.emoji.title', {
+                  defaultValue: 'Elegí un emoji',
+                })}
+              </h2>
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label={t('community.messages.composer.close', {
+                defaultValue: 'Cerrar',
+              })}
+            >
+              ×
+            </button>
+          </header>
+          <p>
+            {t('community.messages.composer.emoji.description', {
+              defaultValue: 'Insertalo en tu mensaje y seguí escribiendo.',
+            })}
+          </p>
+          <div className={styles.emojiGrid}>
+            {COMPOSER_EMOJIS.map((emoji) => (
+              <button
+                key={emoji}
+                type="button"
+                className={styles.emojiChoice}
+                onClick={() => onSelect(emoji)}
+                aria-label={t('community.messages.composer.emoji.insert', {
+                  defaultValue: 'Insertar emoji {{emoji}}',
+                  emoji,
+                })}
+              >
+                {emoji}
+              </button>
+            ))}
+          </div>
+        </Panel>
+      </div>
+    </div>
+  )
+}
+
 type ChatMessageBubbleProps = {
   item: PrototypeChatMessage
   agreement?: AgreementSnapshot
@@ -226,6 +356,9 @@ const MockMessagesPage = () => {
   const [bookPicker, setBookPicker] = useState<'attach' | 'proposal' | null>(
     null
   )
+  const [composerMenuOpen, setComposerMenuOpen] = useState(false)
+  const [emojiPickerOpen, setEmojiPickerOpen] = useState(false)
+  const messageInputRef = useRef<HTMLInputElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const activeConversation =
     catalog.conversations.find(
@@ -244,6 +377,22 @@ const MockMessagesPage = () => {
     if (!message.trim()) return
     sendMessage(message.trim())
     setMessage('')
+  }
+
+  const insertEmoji = (emoji: string) => {
+    const input = messageInputRef.current
+    const start = input?.selectionStart ?? message.length
+    const end = input?.selectionEnd ?? message.length
+    setMessage(
+      (current) => `${current.slice(0, start)}${emoji}${current.slice(end)}`
+    )
+    setEmojiPickerOpen(false)
+    setComposerMenuOpen(false)
+    requestAnimationFrame(() => {
+      input?.focus()
+      const cursorPosition = start + emoji.length
+      input?.setSelectionRange(cursorPosition, cursorPosition)
+    })
   }
 
   return (
@@ -374,26 +523,37 @@ const MockMessagesPage = () => {
             <form className={styles.composer} onSubmit={submit}>
               <button
                 type="button"
-                aria-label="Adjuntar libro"
-                onClick={() => setBookPicker('attach')}
+                aria-label="Más opciones de mensaje"
+                aria-expanded={composerMenuOpen}
+                onClick={() => {
+                  setEmojiPickerOpen(false)
+                  setComposerMenuOpen((open) => !open)
+                }}
               >
                 ＋
               </button>
-              <button
-                type="button"
-                aria-label="Proponer intercambio"
-                onClick={() => setBookPicker('proposal')}
-              >
-                ↔
-              </button>
+              {composerMenuOpen ? (
+                <ComposerActionMenu
+                  onEmoji={() => {
+                    setComposerMenuOpen(false)
+                    setEmojiPickerOpen(true)
+                  }}
+                  onAttachBook={() => {
+                    setComposerMenuOpen(false)
+                    setBookPicker('attach')
+                  }}
+                  onProposeSwap={() => {
+                    setComposerMenuOpen(false)
+                    setBookPicker('proposal')
+                  }}
+                />
+              ) : null}
               <input
+                ref={messageInputRef}
                 value={message}
                 onChange={(event) => setMessage(event.target.value)}
                 placeholder="Escribí un mensaje..."
               />
-              <button type="button" aria-label="Agregar emoji">
-                ☺
-              </button>
               <button
                 className={styles.send}
                 type="submit"
@@ -450,6 +610,11 @@ const MockMessagesPage = () => {
             </Panel>
           </div>
         ) : null}
+        <EmojiPickerModal
+          open={emojiPickerOpen}
+          onClose={() => setEmojiPickerOpen(false)}
+          onSelect={insertEmoji}
+        />
       </PrototypePage>
     </BaseLayout>
   )
@@ -468,6 +633,7 @@ const RealMessagesPage = () => {
   const [search, setSearch] = useState('')
   const [message, setMessage] = useState('')
   const [composerMenuOpen, setComposerMenuOpen] = useState(false)
+  const [emojiPickerOpen, setEmojiPickerOpen] = useState(false)
   const [bookPickerMode, setBookPickerMode] = useState<
     'attach' | 'swap' | null
   >(null)
@@ -486,6 +652,7 @@ const RealMessagesPage = () => {
   const [participantId, setParticipantId] = useState('')
   const [sendError, setSendError] = useState<string | null>(null)
   const [attachError, setAttachError] = useState<string | null>(null)
+  const messageInputRef = useRef<HTMLInputElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const modalRef = useRef<HTMLDivElement>(null)
   const conversationsQuery = useQuery({
@@ -630,6 +797,23 @@ const RealMessagesPage = () => {
       )
     }
   }
+
+  const insertEmoji = (emoji: string) => {
+    const input = messageInputRef.current
+    const start = input?.selectionStart ?? message.length
+    const end = input?.selectionEnd ?? message.length
+    setMessage(
+      (current) => `${current.slice(0, start)}${emoji}${current.slice(end)}`
+    )
+    setEmojiPickerOpen(false)
+    setComposerMenuOpen(false)
+    requestAnimationFrame(() => {
+      input?.focus()
+      const cursorPosition = start + emoji.length
+      input?.setSelectionRange(cursorPosition, cursorPosition)
+    })
+  }
+
   const attachBook = async (book: ConversationBook) => {
     if (!selected) return
     setSendError(null)
@@ -760,6 +944,29 @@ const RealMessagesPage = () => {
     ...(booksQuery.data?.myBooks ?? []),
     ...(booksQuery.data?.theirBooks ?? []),
   ]
+  const renderBookOption = (book: ConversationBook) => (
+    <button key={book.id} type="button" onClick={() => void attachBook(book)}>
+      <BookCover
+        compact
+        book={{
+          id: book.id,
+          title: book.title,
+          author: book.author,
+          owner: '',
+          distance: '',
+          mode: 'Intercambio',
+          accent: '#42d7c7',
+          genre: 'Libro',
+          coverUrl: book.coverUrl,
+        }}
+      />
+      <span>
+        <strong>{book.title}</strong>
+        <small>{book.author}</small>
+      </span>
+      <b>＋</b>
+    </button>
+  )
 
   useFocusTrap({
     containerRef: modalRef,
@@ -1010,41 +1217,32 @@ const RealMessagesPage = () => {
                 <form className={styles.composer} onSubmit={submit}>
                   <button
                     type="button"
-                    aria-label="Adjuntar libro"
+                    aria-label={t('community.messages.composer.menu.open', {
+                      defaultValue: 'Más opciones de mensaje',
+                    })}
+                    aria-expanded={composerMenuOpen}
                     onClick={() => {
                       setSendError(null)
                       setAttachError(null)
+                      setEmojiPickerOpen(false)
                       setComposerMenuOpen((open) => !open)
                     }}
                   >
                     ＋
                   </button>
                   {composerMenuOpen ? (
-                    <div className={styles.composerMenu} role="menu">
-                      <button
-                        type="button"
-                        role="menuitem"
-                        onClick={() => openBookPicker('attach')}
-                      >
-                        Adjuntar libro
-                      </button>
-                      <button
-                        type="button"
-                        role="menuitem"
-                        onClick={() => openBookPicker('swap')}
-                      >
-                        Proponer intercambio
-                      </button>
-                      <button
-                        type="button"
-                        role="menuitem"
-                        onClick={openAgreement}
-                      >
-                        Preparar acuerdo
-                      </button>
-                    </div>
+                    <ComposerActionMenu
+                      onEmoji={() => {
+                        setComposerMenuOpen(false)
+                        setEmojiPickerOpen(true)
+                      }}
+                      onAttachBook={() => openBookPicker('attach')}
+                      onProposeSwap={() => openBookPicker('swap')}
+                      onPrepareAgreement={openAgreement}
+                    />
                   ) : null}
                   <input
+                    ref={messageInputRef}
                     value={message}
                     onChange={(event) => setMessage(event.target.value)}
                     placeholder="Escribí un mensaje..."
@@ -1224,34 +1422,47 @@ const RealMessagesPage = () => {
                     </div>
                   </form>
                 ) : (
-                  <div className={styles.bookPickerList}>
-                    {pickerBooks.map((book) => (
-                      <button
-                        key={book.id}
-                        type="button"
-                        onClick={() => void attachBook(book)}
-                      >
-                        <BookCover
-                          compact
-                          book={{
-                            id: book.id,
-                            title: book.title,
-                            author: book.author,
-                            owner: '',
-                            distance: '',
-                            mode: 'Intercambio',
-                            accent: '#42d7c7',
-                            genre: 'Libro',
-                            coverUrl: book.coverUrl,
-                          }}
-                        />
-                        <span>
-                          <strong>{book.title}</strong>
-                          <small>{book.author}</small>
-                        </span>
-                        <b>＋</b>
-                      </button>
-                    ))}
+                  <div className={styles.bookPickerGroups}>
+                    <section className={styles.bookPickerGroup}>
+                      <h3>
+                        {t('community.messages.composer.bookModal.mine', {
+                          defaultValue: 'Mis libros',
+                        })}
+                      </h3>
+                      {booksQuery.data?.myBooks.length ? (
+                        <div className={styles.bookPickerList}>
+                          {booksQuery.data.myBooks.map(renderBookOption)}
+                        </div>
+                      ) : (
+                        <p className={styles.bookPickerEmpty}>
+                          {t('community.messages.composer.swapModal.noMine', {
+                            defaultValue: 'No tenés libros disponibles.',
+                          })}
+                        </p>
+                      )}
+                    </section>
+                    <section className={styles.bookPickerGroup}>
+                      <h3>
+                        {t('community.messages.composer.bookModal.theirs', {
+                          defaultValue: 'Libros de {{name}}',
+                          name:
+                            activeConversation?.participantName ??
+                            'la otra persona',
+                        })}
+                      </h3>
+                      {booksQuery.data?.theirBooks.length ? (
+                        <div className={styles.bookPickerList}>
+                          {booksQuery.data.theirBooks.map(renderBookOption)}
+                        </div>
+                      ) : (
+                        <p className={styles.bookPickerEmpty}>
+                          {t('community.messages.composer.swapModal.noTheirs', {
+                            defaultValue:
+                              'No hay libros publicados en esta conversación.',
+                          })}
+                        </p>
+                      )}
+                    </section>
                   </div>
                 )}
               </Panel>
@@ -1532,6 +1743,11 @@ const RealMessagesPage = () => {
             </div>
           </div>
         ) : null}
+        <EmojiPickerModal
+          open={emojiPickerOpen}
+          onClose={() => setEmojiPickerOpen(false)}
+          onSelect={insertEmoji}
+        />
       </PrototypePage>
     </BaseLayout>
   )

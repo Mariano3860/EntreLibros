@@ -505,6 +505,7 @@ main.layoutMain {
 }
 
 .composer {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -777,6 +778,50 @@ main.layoutMain {
   width: min(620px, calc(100vw - 40px));
 }
 
+.emojiPickerDialog {
+  width: min(320px, calc(100vw - 40px));
+}
+
+.emojiPicker {
+  padding: 18px;
+}
+
+.emojiPicker > p {
+  margin: 10px 0 0;
+  line-height: 1.4;
+}
+
+.emojiGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.emojiChoice {
+  display: grid;
+  min-height: 48px;
+  place-items: center;
+  border: 1px solid var(--prototype-border);
+  border-radius: 10px;
+  background: var(--prototype-surface-soft);
+  color: inherit;
+  cursor: pointer;
+  font-size: 24px;
+  line-height: 1;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    transform 160ms ease;
+}
+
+.emojiChoice:hover,
+.emojiChoice:focus-visible {
+  border-color: rgb(66 215 199 / 55%);
+  background: rgb(66 215 199 / 10%);
+  transform: translateY(-1px);
+}
+
 .bookPicker header {
   display: flex;
   justify-content: space-between;
@@ -850,6 +895,33 @@ main.layoutMain {
 .bookPickerList {
   display: grid;
   gap: 8px;
+}
+
+.bookPickerGroups {
+  display: grid;
+  gap: 18px;
+}
+
+.bookPickerGroup {
+  display: grid;
+  gap: 8px;
+}
+
+.bookPickerGroup h3 {
+  margin: 0;
+  color: var(--prototype-teal);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.bookPickerEmpty {
+  margin: 0;
+  padding: 10px;
+  border: 1px dashed var(--prototype-border);
+  border-radius: 9px;
+  color: var(--prototype-muted);
+  font-size: 9px;
 }
 
 .bookPickerList > button {

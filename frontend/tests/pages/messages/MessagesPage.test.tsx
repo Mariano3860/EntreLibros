@@ -23,7 +23,10 @@ describe('MessagesPage', () => {
   test('shows every user book and attaches the selected book', () => {
     renderWithProviders(<MessagesPage />)
 
-    fireEvent.click(screen.getByRole('button', { name: 'Adjuntar libro' }))
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Más opciones de mensaje' })
+    )
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Adjuntar libro' }))
     expect(
       screen.getAllByRole('button', { name: /Ecos del Viento Norte/ }).length
     ).toBeGreaterThan(0)
@@ -39,7 +42,10 @@ describe('MessagesPage', () => {
     renderWithProviders(<MessagesPage />)
 
     fireEvent.click(
-      screen.getByRole('button', { name: 'Proponer intercambio' })
+      screen.getByRole('button', { name: 'Más opciones de mensaje' })
+    )
+    fireEvent.click(
+      screen.getByRole('menuitem', { name: 'Proponer intercambio' })
     )
     const choice = screen
       .getAllByRole('button')

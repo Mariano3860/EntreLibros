@@ -599,8 +599,17 @@
         "close": "Close",
         "emoji": {
           "open": "Emoji",
+          "title": "Choose an emoji",
+          "description": "Insert it into your message and keep writing.",
           "close": "Close picker",
           "insert": "Insert emoji {{emoji}}"
+        },
+        "menu": {
+          "open": "More message options",
+          "emoji": "Emoji",
+          "book": "Attach book",
+          "swap": "Propose swap",
+          "agreement": "Prepare agreement"
         },
         "bookModal": {
           "trigger": "Attach book",

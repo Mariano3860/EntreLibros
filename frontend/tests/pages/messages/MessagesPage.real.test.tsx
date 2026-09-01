@@ -115,7 +115,9 @@ describe('MessagesPage in real API mode', () => {
     renderWithProviders(<MessagesPage />)
 
     expect(await screen.findByText('Lucia')).toBeVisible()
-    fireEvent.click(screen.getByRole('button', { name: 'Adjuntar libro' }))
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Más opciones de mensaje' })
+    )
     fireEvent.click(screen.getByRole('menuitem', { name: 'Adjuntar libro' }))
     fireEvent.click(
       await screen.findByRole('button', { name: /Ecos del Viento Norte/ })
@@ -163,6 +165,82 @@ describe('MessagesPage in real API mode', () => {
 
     expect(await screen.findByText('Libro adjunto')).toBeVisible()
     expect(screen.getByText(book.title)).toBeVisible()
+  })
+
+  test('inserts an emoji from the composer menu without sending it', async () => {
+    mocks.fetchConversations.mockResolvedValue([conversation])
+    mocks.fetchMessageHistory.mockResolvedValue({ messages: [], nextAfter: 0 })
+
+    renderWithProviders(<MessagesPage />)
+
+    await screen.findByText('Lucia')
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Más opciones de mensaje' })
+    )
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Emoji' }))
+    const emojiDialog = await screen.findByRole('dialog', {
+      name: 'Elegí un emoji',
+    })
+    expect(emojiDialog).toBeVisible()
+
+    fireEvent.keyDown(emojiDialog, { key: 'Escape' })
+    expect(
+      screen.queryByRole('dialog', { name: 'Elegí un emoji' })
+    ).not.toBeInTheDocument()
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Más opciones de mensaje' })
+    )
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Emoji' }))
+
+    const input = screen.getByPlaceholderText('Escribí un mensaje...')
+    fireEvent.click(screen.getByRole('button', { name: 'Insertar emoji 😀' }))
+
+    expect(input).toHaveValue('😀')
+    expect(mocks.sendPersistedMessage).not.toHaveBeenCalled()
+  })
+
+  test('allows attaching a book from the other participant', async () => {
+    const otherBook = {
+      ...book,
+      id: 'book-2',
+      title: 'El libro de Lucia',
+      ownerId: 8,
+    }
+    mocks.fetchConversations.mockResolvedValue([conversation])
+    mocks.fetchMessageHistory.mockResolvedValue({ messages: [], nextAfter: 0 })
+    mocks.fetchConversationBooks.mockResolvedValue({
+      myBooks: [book],
+      theirBooks: [otherBook],
+    })
+    mocks.sendPersistedMessage.mockResolvedValue({})
+
+    renderWithProviders(<MessagesPage />)
+
+    await screen.findByText('Lucia')
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Más opciones de mensaje' })
+    )
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Adjuntar libro' }))
+    expect(await screen.findByText('Mis libros')).toBeVisible()
+    expect(screen.getByText('Libros de Lucia')).toBeVisible()
+    fireEvent.click(
+      await screen.findByRole('button', { name: /El libro de Lucia/ })
+    )
+
+    await waitFor(() =>
+      expect(mocks.sendPersistedMessage).toHaveBeenCalledWith(
+        expect.objectContaining({
+          conversationId: conversation.id,
+          body: otherBook.title,
+          attachmentMetadata: expect.objectContaining({
+            kind: 'book',
+            bookId: otherBook.id,
+            ownerId: otherBook.ownerId,
+          }),
+        })
+      )
+    )
   })
 
   test('centers the history error and offers a retry', async () => {
@@ -219,7 +297,9 @@ describe('MessagesPage in real API mode', () => {
     renderWithProviders(<MessagesPage />)
 
     expect(await screen.findByText('Propuesta de intercambio')).toBeVisible()
-    fireEvent.click(screen.getByRole('button', { name: 'Adjuntar libro' }))
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Más opciones de mensaje' })
+    )
     fireEvent.click(
       screen.getByRole('menuitem', { name: 'Proponer intercambio' })
     )
@@ -273,7 +353,9 @@ describe('MessagesPage in real API mode', () => {
 
     renderWithProviders(<MessagesPage />)
     await screen.findByText('Lucia')
-    fireEvent.click(screen.getByRole('button', { name: 'Adjuntar libro' }))
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Más opciones de mensaje' })
+    )
     fireEvent.click(screen.getByRole('menuitem', { name: 'Preparar acuerdo' }))
     expect(await screen.findByRole('dialog')).toBeVisible()
     expect(

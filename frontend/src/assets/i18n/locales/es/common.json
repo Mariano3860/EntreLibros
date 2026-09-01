@@ -603,8 +603,17 @@
         "close": "Cerrar",
         "emoji": {
           "open": "Emoji",
+          "title": "Elegí un emoji",
+          "description": "Insertalo en tu mensaje y seguí escribiendo.",
           "close": "Cerrar selector",
           "insert": "Insertar emoji {{emoji}}"
+        },
+        "menu": {
+          "open": "Más opciones de mensaje",
+          "emoji": "Emoji",
+          "book": "Adjuntar libro",
+          "swap": "Proponer intercambio",
+          "agreement": "Preparar acuerdo"
         },
         "bookModal": {
           "trigger": "Adjuntar libro",
