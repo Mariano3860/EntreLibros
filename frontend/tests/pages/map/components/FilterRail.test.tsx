@@ -25,9 +25,13 @@ describe('FilterRail', () => {
       />
     )
 
-    fireEvent.click(screen.getByRole('button', { name: '30 km' }))
+    fireEvent.change(screen.getByRole('slider', { name: 'Radio geográfico' }), {
+      target: { value: '2' },
+    })
     expect(handleDistanceChange).toHaveBeenCalledWith(30)
-    fireEvent.click(screen.getByRole('button', { name: 'Sin límite' }))
+    fireEvent.change(screen.getByRole('slider', { name: 'Radio geográfico' }), {
+      target: { value: '4' },
+    })
     expect(handleDistanceChange).toHaveBeenCalledWith(null)
 
     const [cornersCheckbox, publicationsCheckbox, activityCheckbox] =

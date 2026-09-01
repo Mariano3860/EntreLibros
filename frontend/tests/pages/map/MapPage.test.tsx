@@ -62,12 +62,13 @@ describe('MapPage', () => {
   test('changes distance, categories and selected corner', () => {
     renderWithProviders(<MapPage />)
 
-    fireEvent.click(screen.getByRole('button', { name: '5 km' }))
+    fireEvent.change(screen.getByRole('slider', { name: 'Radio geográfico' }), {
+      target: { value: '1' },
+    })
     expect(screen.getByText('Hasta 5 km')).toBeVisible()
-    expect(screen.getByRole('button', { name: '5 km' })).toHaveAttribute(
-      'aria-pressed',
-      'true'
-    )
+    expect(
+      screen.getByRole('slider', { name: 'Radio geográfico' })
+    ).toHaveValue('1')
 
     fireEvent.click(screen.getByRole('button', { name: 'Bibliotecas' }))
     expect(screen.getByRole('button', { name: 'Bibliotecas' })).toHaveAttribute(
@@ -168,7 +169,9 @@ describe('MapPage', () => {
       })
     )
 
-    fireEvent.click(screen.getByRole('button', { name: '30 km' }))
+    fireEvent.change(screen.getByRole('slider', { name: 'Radio geográfico' }), {
+      target: { value: '2' },
+    })
 
     await waitFor(() =>
       expect(mapCanvasRender.mock.calls.at(-1)?.[0].radiusKm).toBe(30)

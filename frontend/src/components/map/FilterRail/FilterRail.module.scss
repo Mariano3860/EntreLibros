@@ -43,30 +43,33 @@
   font-weight: $font-weight-bold;
 }
 
-.radiusOptions {
+.slider {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1x5;
+  padding: 0 2px;
+
+  input[type='range'] {
+    width: 100%;
+    accent-color: var(--prototype-teal);
+    cursor: pointer;
+  }
+}
+
+.rangeLabels {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 4px;
-}
-
-.radiusOptions button {
-  min-width: 0;
-  padding: 6px 3px;
-  border: 1px solid var(--prototype-border);
-  border-radius: 999px;
-  background: var(--prototype-surface-soft);
   color: var(--prototype-muted);
-  cursor: pointer;
   font-size: 8px;
-}
+  text-align: center;
 
-.radiusOptions button:hover,
-.radiusOptions button:focus-visible,
-.radiusOptions button[aria-pressed='true'] {
-  border-color: var(--prototype-teal);
-  background: color-mix(in srgb, var(--prototype-teal) 14%, transparent);
-  color: var(--prototype-teal);
-  outline: none;
+  span:first-child {
+    text-align: left;
+  }
+
+  span:last-child {
+    text-align: right;
+  }
 }
 
 .checkboxGroup {

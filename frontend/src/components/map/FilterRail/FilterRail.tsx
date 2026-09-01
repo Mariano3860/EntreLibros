@@ -39,25 +39,33 @@ export const RadiusSelector = ({
       label: t('map.filters.unlimited', { defaultValue: 'Sin límite' }),
     },
   ]
+  const selectedIndex = Math.max(
+    0,
+    options.findIndex((option) => option.value === distanceKm)
+  )
 
   return (
-    <div
-      className={styles.radiusOptions}
-      role="group"
-      aria-label={t('map.filters.radiusAriaLabel', {
-        defaultValue: 'Radio geográfico',
-      })}
-    >
-      {options.map((option) => (
-        <button
-          key={option.label}
-          type="button"
-          aria-pressed={distanceKm === option.value}
-          onClick={() => onDistanceChange(option.value)}
-        >
-          {option.label}
-        </button>
-      ))}
+    <div className={styles.slider}>
+      <input
+        type="range"
+        min={0}
+        max={options.length - 1}
+        step={1}
+        value={selectedIndex}
+        aria-label={t('map.filters.radiusAriaLabel', {
+          defaultValue: 'Radio geográfico',
+        })}
+        aria-valuetext={options[selectedIndex]?.label}
+        onChange={(event) => {
+          const option = options[Number(event.target.value)]
+          onDistanceChange(option?.value ?? null)
+        }}
+      />
+      <div className={styles.rangeLabels} aria-hidden="true">
+        {options.map((option) => (
+          <span key={option.label}>{option.label}</span>
+        ))}
+      </div>
     </div>
   )
 }
