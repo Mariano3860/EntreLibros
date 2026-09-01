@@ -281,7 +281,8 @@ export async function areUsersBlocked(
 }
 
 export async function createConversation(
-  participantIds: number[]
+  participantIds: number[],
+  requesterId = participantIds[0]
 ): Promise<ConversationSummary> {
   const uniqueIds = [...new Set(participantIds)].sort((a, b) => a - b);
   if (uniqueIds.length !== 2) {
@@ -292,6 +293,25 @@ export async function createConversation(
   }
 
   return withTransaction(async (client) => {
+    const targetId = uniqueIds.find((id) => id !== requesterId);
+    if (!targetId) {
+      throw new Error('messaging.errors.self_conversation');
+    }
+
+    await client.query('SELECT pg_advisory_xact_lock($1, $2)', uniqueIds);
+
+    const target = await client.query<{ id: number }>(
+      `SELECT id
+       FROM users
+       WHERE id = $1
+         AND role = 'user'
+         AND COALESCE(profile_visibility, 'public') = 'public'`,
+      [targetId]
+    );
+    if (!target.rows[0]) {
+      throw new Error('messaging.errors.forbidden');
+    }
+
     const blocked = await client.query<{ blocked: boolean }>(
       `SELECT EXISTS (
          SELECT 1 FROM user_blocks
@@ -303,6 +323,27 @@ export async function createConversation(
     if (blocked.rows[0]?.blocked) {
       throw new Error('messaging.errors.forbidden');
     }
+
+    const existing = await client.query<ConversationRow>(
+      `${CONVERSATION_SELECT}
+       WHERE EXISTS (
+         SELECT 1 FROM conversation_participants first_member
+         WHERE first_member.conversation_id = c.id
+           AND first_member.user_id = $1
+       )
+       AND EXISTS (
+         SELECT 1 FROM conversation_participants second_member
+         WHERE second_member.conversation_id = c.id
+           AND second_member.user_id = $2
+       )
+       GROUP BY c.id
+       HAVING COUNT(cp.user_id) = 2
+       ORDER BY c.id
+       LIMIT 1`,
+      uniqueIds
+    );
+    if (existing.rows[0]) return mapConversation(existing.rows[0]);
+
     const conversationResult = await client.query<{ id: number }>(
       'INSERT INTO conversations DEFAULT VALUES RETURNING id'
     );

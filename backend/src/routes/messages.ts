@@ -194,9 +194,16 @@ function toConversationBook(listing: BookListing) {
 }
 
 function errorResponse(error: unknown) {
-  const key =
-    error instanceof Error ? error.message : 'messaging.errors.failed';
-  const status = key === 'messaging.errors.forbidden' ? 403 : 422;
+  const message = error instanceof Error ? error.message : '';
+  const key = /^messaging\.errors\.[a-z_]+$/.test(message)
+    ? message
+    : 'messaging.errors.failed';
+  const status =
+    key === 'messaging.errors.forbidden'
+      ? 403
+      : key === 'messaging.errors.failed'
+        ? 500
+        : 422;
   return { status, body: { error: 'MessagingError', message: key } };
 }
 
@@ -251,7 +258,9 @@ router.post('/conversations', async (req: AuthenticatedRequest, res) => {
   const participantId = body.participantId;
   if (
     typeof participantId !== 'number' ||
-    !Number.isSafeInteger(participantId)
+    !Number.isSafeInteger(participantId) ||
+    participantId <= 0 ||
+    participantId > 2_147_483_647
   ) {
     return res.status(422).json({
       error: 'ValidationError',
@@ -265,7 +274,10 @@ router.post('/conversations', async (req: AuthenticatedRequest, res) => {
     });
   }
   try {
-    const conversation = await createConversation([req.user.id, participantId]);
+    const conversation = await createConversation(
+      [req.user.id, participantId],
+      req.user.id
+    );
     return res.status(201).json({ conversation });
   } catch (error) {
     const response = errorResponse(error);

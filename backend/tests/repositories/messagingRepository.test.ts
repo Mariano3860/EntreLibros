@@ -110,6 +110,42 @@ describe('messagingRepository', () => {
     );
   });
 
+  test('reuses a direct conversation and rejects private targets', async () => {
+    const firstUser = await createUser('idempotent-first');
+    const secondUser = await createUser('idempotent-second');
+    const privateUser = await createUser('private-target');
+
+    const firstConversation = await createConversation([firstUser, secondUser]);
+    const secondConversation = await createConversation([
+      secondUser,
+      firstUser,
+    ]);
+
+    expect(secondConversation.id).toBe(firstConversation.id);
+
+    const conversationCount = await client.query<{ count: number }>(
+      `SELECT COUNT(*)::int AS count
+       FROM (
+         SELECT c.id
+         FROM conversations c
+         JOIN conversation_participants cp ON cp.conversation_id = c.id
+         WHERE cp.user_id = ANY($1::bigint[])
+         GROUP BY c.id
+         HAVING COUNT(cp.user_id) = 2
+       ) direct_conversations`,
+      [[firstUser, secondUser]]
+    );
+    expect(conversationCount.rows[0].count).toBe(1);
+
+    await client.query(
+      "UPDATE users SET profile_visibility = 'private' WHERE id = $1",
+      [privateUser]
+    );
+    await expect(
+      createConversation([firstUser, privateUser], firstUser)
+    ).rejects.toThrow('messaging.errors.forbidden');
+  });
+
   test('rejects a conversation with the same participant twice', async () => {
     const userId = await createUser('self-conversation');
 

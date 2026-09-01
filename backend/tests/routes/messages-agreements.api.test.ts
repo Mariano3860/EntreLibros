@@ -77,6 +77,24 @@ describe('messaging and agreements API', () => {
       .expect(({ body }) => {
         expect(body.message).toBe('messaging.errors.self_conversation');
       });
+
+    await request(app)
+      .post('/api/messages/conversations')
+      .set('Cookie', first.cookie)
+      .send({ participantId: 0 })
+      .expect(422)
+      .expect(({ body }) => {
+        expect(body.message).toBe('messaging.errors.participant_required');
+      });
+
+    await request(app)
+      .post('/api/messages/conversations')
+      .set('Cookie', first.cookie)
+      .send({ participantId: 2_147_483_647 })
+      .expect(403)
+      .expect(({ body }) => {
+        expect(body.message).toBe('messaging.errors.forbidden');
+      });
   });
 
   test('searches public contacts with followed people first', async () => {
@@ -128,6 +146,15 @@ describe('messaging and agreements API', () => {
       .set('Cookie', viewer.cookie)
       .expect(200)
       .expect(({ body }) => expect(body.contacts).toEqual([]));
+
+    await request(app)
+      .post('/api/messages/conversations')
+      .set('Cookie', viewer.cookie)
+      .send({ participantId: privateUser.id })
+      .expect(403)
+      .expect(({ body }) => {
+        expect(body.message).toBe('messaging.errors.forbidden');
+      });
   }, 15_000);
 
   test('persists a private message, supports idempotent retry and history', async () => {
@@ -141,6 +168,15 @@ describe('messaging and agreements API', () => {
       .send({ participantId: second.id })
       .expect(201);
     const conversationId = conversationResponse.body.conversation.id as number;
+
+    const duplicateConversationResponse = await request(app)
+      .post('/api/messages/conversations')
+      .set('Cookie', first.cookie)
+      .send({ participantId: second.id })
+      .expect(201);
+    expect(duplicateConversationResponse.body.conversation.id).toBe(
+      conversationId
+    );
 
     const payload = { clientKey: 'message-key-1', body: 'Hola' };
     const committedMessageIds: number[] = [];

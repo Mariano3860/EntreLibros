@@ -1,19 +1,30 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
-const mocks = vi.hoisted(() => ({
-  fetchConversations: vi.fn(),
-  fetchMessagingContacts: vi.fn(),
-  createConversation: vi.fn(),
-  fetchMessageHistory: vi.fn(),
-  fetchConversationBooks: vi.fn(),
-  sendPersistedMessage: vi.fn(),
-  fetchAgreement: vi.fn(),
-  counterProposeAgreement: vi.fn(),
-  createAgreement: vi.fn(),
-  commandAgreement: vi.fn(),
-  markMessagesRead: vi.fn(),
-  joinConversation: vi.fn(),
+const { mocks, messageQueryKeys } = vi.hoisted(() => ({
+  mocks: {
+    fetchConversations: vi.fn(),
+    fetchMessagingContacts: vi.fn(),
+    createConversation: vi.fn(),
+    fetchMessageHistory: vi.fn(),
+    fetchConversationBooks: vi.fn(),
+    sendPersistedMessage: vi.fn(),
+    fetchAgreement: vi.fn(),
+    counterProposeAgreement: vi.fn(),
+    createAgreement: vi.fn(),
+    commandAgreement: vi.fn(),
+    markMessagesRead: vi.fn(),
+    joinConversation: vi.fn(),
+  },
+  messageQueryKeys: {
+    all: ['messages'] as const,
+    conversations: () => ['messages', 'conversations'] as const,
+    contacts: (search = '') => ['messages', 'contacts', search] as const,
+    history: (conversationId: number, after = 0) =>
+      ['messages', 'history', conversationId, after] as const,
+    books: (conversationId: number) =>
+      ['messages', 'books', conversationId] as const,
+  },
 }))
 
 vi.mock('@src/utils/runtimeEnv', () => ({ isApiMockMode: () => false }))
@@ -28,6 +39,7 @@ vi.mock('@src/api/messages/messages', () => ({
   fetchConversationBooks: mocks.fetchConversationBooks,
   sendPersistedMessage: mocks.sendPersistedMessage,
   markMessagesRead: mocks.markMessagesRead,
+  messageQueryKeys,
 }))
 vi.mock('@api/messages/messages', () => ({
   fetchConversations: mocks.fetchConversations,
@@ -37,6 +49,7 @@ vi.mock('@api/messages/messages', () => ({
   fetchConversationBooks: mocks.fetchConversationBooks,
   sendPersistedMessage: mocks.sendPersistedMessage,
   markMessagesRead: mocks.markMessagesRead,
+  messageQueryKeys,
 }))
 vi.mock('@src/api/agreements/agreements', () => ({
   fetchAgreement: mocks.fetchAgreement,
@@ -662,6 +675,18 @@ describe('MessagesPage in real API mode', () => {
     expect(
       screen.getByRole('button', { name: 'Iniciar conversación' })
     ).toBeEnabled()
+    fireEvent.change(screen.getByLabelText('Buscar personas'), {
+      target: { value: 'Pablo' },
+    })
+    expect(
+      screen.getByRole('button', { name: /Iniciar conversaci/ })
+    ).toBeDisabled()
+    fireEvent.click(await within(dialog).findByRole('button', { name: /Luc/ }))
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: /Iniciar conversaci/ })
+      ).toBeEnabled()
+    )
     fireEvent.click(
       screen.getByRole('button', { name: 'Iniciar conversación' })
     )

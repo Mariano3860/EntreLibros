@@ -13,6 +13,7 @@ import {
   fetchMessagingContacts,
   fetchMessageHistory,
   markMessagesRead,
+  messageQueryKeys,
   sendPersistedMessage,
   type ConversationBook,
   type MessagingContact,
@@ -713,13 +714,14 @@ const RealMessagesPage = () => {
   const messageInputRef = useRef<HTMLInputElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const modalRef = useRef<HTMLDivElement>(null)
+  const lastReadSequenceRef = useRef(new Map<number, number>())
   const conversationsQuery = useQuery({
-    queryKey: ['prototype', 'messages', 'conversations'],
+    queryKey: messageQueryKeys.conversations(),
     queryFn: fetchConversations,
   })
   const conversations = conversationsQuery.data
   const contactsQuery = useQuery({
-    queryKey: ['prototype', 'messages', 'contacts', contactSearch],
+    queryKey: messageQueryKeys.contacts(contactSearch),
     queryFn: () => fetchMessagingContacts(contactSearch),
     enabled: newConversationOpen,
   })
@@ -729,12 +731,12 @@ const RealMessagesPage = () => {
     (id) => id !== user?.id
   )
   const historyQuery = useQuery({
-    queryKey: ['prototype', 'messages', 'history', selected],
+    queryKey: messageQueryKeys.history(selected ?? 0),
     queryFn: () => fetchMessageHistory(selected ?? 0),
     enabled: selected !== null,
   })
   const booksQuery = useQuery({
-    queryKey: ['prototype', 'messages', 'books', selected],
+    queryKey: messageQueryKeys.books(selected ?? 0),
     queryFn: () => fetchConversationBooks(selected ?? 0),
     enabled: selected !== null && (bookPickerMode !== null || agreementOpen),
   })
@@ -766,15 +768,10 @@ const RealMessagesPage = () => {
         agreement
       )
       void queryClient.invalidateQueries({
-        queryKey: ['prototype', 'messages'],
+        queryKey: messageQueryKeys.all,
       })
       void queryClient.invalidateQueries({
-        queryKey: [
-          'prototype',
-          'messages',
-          'history',
-          agreement.conversationId,
-        ],
+        queryKey: messageQueryKeys.history(agreement.conversationId),
       })
     },
   })
@@ -831,21 +828,22 @@ const RealMessagesPage = () => {
         agreement
       )
       await queryClient.invalidateQueries({
-        queryKey: [
-          'prototype',
-          'messages',
-          'history',
-          agreement.conversationId,
-        ],
+        queryKey: messageQueryKeys.history(agreement.conversationId),
       })
       await queryClient.invalidateQueries({
-        queryKey: ['prototype', 'messages', 'conversations'],
+        queryKey: messageQueryKeys.conversations(),
       })
     },
   })
   const conversationMutation = useMutation({
     mutationFn: async () => {
-      if (!selectedContactId || selectedContactId === user?.id) {
+      if (
+        !selectedContactId ||
+        selectedContactId === user?.id ||
+        !(contactsQuery.data ?? []).some(
+          (contact) => contact.id === selectedContactId
+        )
+      ) {
         throw new Error('self_conversation')
       }
       const existing = conversations?.find((conversation) =>
@@ -858,7 +856,7 @@ const RealMessagesPage = () => {
       setContactSearch('')
       setSelectedContactId(null)
       await queryClient.invalidateQueries({
-        queryKey: ['prototype', 'messages', 'conversations'],
+        queryKey: messageQueryKeys.conversations(),
       })
       setSelected(conversation.id)
     },
@@ -883,15 +881,28 @@ const RealMessagesPage = () => {
   }, [historyQuery.data?.nextAfter, isConnected, joinConversation, selected])
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView?.({ block: 'end' })
-    const last = historyQuery.data?.messages.at(-1)
-    if (selected && last) {
-      void markMessagesRead(selected, last.sequence).then(() =>
+    if (selected === null) return
+    const persistedLast = historyQuery.data?.messages.at(-1)?.sequence ?? 0
+    const liveLast = liveMessages
+      .filter((item) => item.conversationId === selected)
+      .reduce((lastSequence, item) => Math.max(lastSequence, item.sequence), 0)
+    const lastSequence = Math.max(persistedLast, liveLast)
+    const previousSequence = lastReadSequenceRef.current.get(selected) ?? 0
+    if (lastSequence <= previousSequence) return
+
+    lastReadSequenceRef.current.set(selected, lastSequence)
+    void markMessagesRead(selected, lastSequence)
+      .then(() =>
         queryClient.invalidateQueries({
-          queryKey: ['prototype', 'messages', 'conversations'],
+          queryKey: messageQueryKeys.conversations(),
         })
       )
-    }
-  }, [historyQuery.data, queryClient, selected])
+      .catch(() => {
+        if (lastReadSequenceRef.current.get(selected) === lastSequence) {
+          lastReadSequenceRef.current.delete(selected)
+        }
+      })
+  }, [historyQuery.data, liveMessages, queryClient, selected])
 
   const submit = async (event: FormEvent) => {
     event.preventDefault()
@@ -905,7 +916,7 @@ const RealMessagesPage = () => {
       })
       setMessage('')
       await queryClient.invalidateQueries({
-        queryKey: ['prototype', 'messages'],
+        queryKey: messageQueryKeys.all,
       })
     } catch {
       setSendError(
@@ -957,7 +968,7 @@ const RealMessagesPage = () => {
       setComposerMenuOpen(false)
       setAttachError(null)
       await queryClient.invalidateQueries({
-        queryKey: ['prototype', 'messages', 'history', selected],
+        queryKey: messageQueryKeys.history(selected),
       })
     } catch {
       setAttachError(
@@ -1002,7 +1013,7 @@ const RealMessagesPage = () => {
       setRequestedId('')
       setSwapNote('')
       await queryClient.invalidateQueries({
-        queryKey: ['prototype', 'messages', 'history', selected],
+        queryKey: messageQueryKeys.history(selected),
       })
     } catch {
       setAttachError(
@@ -1962,7 +1973,11 @@ const RealMessagesPage = () => {
                       id="new-conversation-contact"
                       autoFocus
                       value={contactSearch}
-                      onChange={(event) => setContactSearch(event.target.value)}
+                      onChange={(event) => {
+                        setContactSearch(event.target.value)
+                        setSelectedContactId(null)
+                        conversationMutation.reset()
+                      }}
                       placeholder={t(
                         'community.messages.newConversation.placeholder',
                         { defaultValue: 'Nombre, apellido o alias' }
@@ -2085,6 +2100,9 @@ const RealMessagesPage = () => {
                       disabled={
                         !selectedContactId ||
                         selectedContactId === user?.id ||
+                        !availableContacts.some(
+                          (contact) => contact.id === selectedContactId
+                        ) ||
                         conversationMutation.isPending
                       }
                     >
