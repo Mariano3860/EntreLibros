@@ -1,5 +1,6 @@
 import {
   commandAgreement,
+  counterProposeAgreement,
   createAgreement,
   fetchAgreement,
   type AgreementDetails,
@@ -704,6 +705,10 @@ const RealMessagesPage = () => {
     enabled:
       activeConversation?.agreementId !== null && activeConversation !== null,
   })
+  const activeAgreement = agreementQuery.data
+  const isCounterProposal =
+    activeAgreement?.state === 'proposed' ||
+    activeAgreement?.state === 'partially_confirmed'
   type AgreementMutationInput = {
     command: 'confirm' | 'reject' | 'cancel'
     reason?: string
@@ -750,6 +755,16 @@ const RealMessagesPage = () => {
         (id) => id !== user.id
       )
       if (!participantId) throw new Error('participant_unavailable')
+      if (activeConversation.agreementId !== null) {
+        if (!activeAgreement || !isCounterProposal) {
+          throw new Error('agreement_unavailable')
+        }
+        return counterProposeAgreement({
+          agreementId: activeAgreement.id,
+          expectedVersion: activeAgreement.currentVersion,
+          details,
+        })
+      }
       const matchingBooks = (booksQuery.data?.myBooks ?? [])
         .concat(booksQuery.data?.theirBooks ?? [])
         .filter((item) => item.title === details.bookTitle)
@@ -772,6 +787,10 @@ const RealMessagesPage = () => {
         time: '',
         bookTitle: '',
       })
+      queryClient.setQueryData(
+        ['prototype', 'agreement', agreement.id],
+        agreement
+      )
       await queryClient.invalidateQueries({
         queryKey: [
           'prototype',
@@ -940,6 +959,17 @@ const RealMessagesPage = () => {
     setSendError(null)
     setAttachError(null)
     setComposerMenuOpen(false)
+    setAgreementForm(
+      isCounterProposal && activeAgreement
+        ? activeAgreement.details
+        : {
+            meetingPoint: '',
+            area: '',
+            date: '',
+            time: '',
+            bookTitle: '',
+          }
+    )
     setAgreementOpen(true)
   }
   const visibleConversations = (conversations ?? []).filter((item) =>
@@ -1547,10 +1577,23 @@ const RealMessagesPage = () => {
                     <span className={styles.newConversationEyebrow}>
                       PROPUESTA DE ACUERDO
                     </span>
-                    <h2 id="agreement-title">Coordiná el intercambio</h2>
+                    <h2 id="agreement-title">
+                      {isCounterProposal
+                        ? t('community.messages.agreement.change.modalTitle', {
+                            defaultValue: 'Proponer cambios',
+                          })
+                        : 'Coordiná el intercambio'}
+                    </h2>
                     <p>
-                      Definí los datos del encuentro para que queden guardados
-                      en la conversación.
+                      {isCounterProposal
+                        ? t(
+                            'community.messages.agreement.change.modalDescription',
+                            {
+                              defaultValue:
+                                'Ajustá la propuesta actualizando al menos un dato.',
+                            }
+                          )
+                        : 'Definí los datos del encuentro para que queden guardados en la conversación.'}
                     </p>
                   </div>
                   <button
@@ -1582,6 +1625,7 @@ const RealMessagesPage = () => {
                     <select
                       aria-label="Libro del acuerdo"
                       value={agreementForm.bookTitle}
+                      disabled={isCounterProposal}
                       onChange={(event) =>
                         setAgreementForm((form) => ({
                           ...form,
@@ -1682,7 +1726,11 @@ const RealMessagesPage = () => {
                         !agreementForm.time
                       }
                     >
-                      Crear acuerdo
+                      {isCounterProposal
+                        ? t('community.messages.agreement.change.modalSubmit', {
+                            defaultValue: 'Enviar cambios',
+                          })
+                        : 'Crear acuerdo'}
                     </PrototypeButton>
                   </div>
                 </form>

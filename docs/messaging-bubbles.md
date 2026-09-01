@@ -25,6 +25,8 @@ Cada adjunto se valida contra los participantes de la conversación, el estado d
 
 En una propuesta pendiente, quien la envió solo puede cancelarla; la contraparte puede aceptarla o rechazarla, y el backend aplica la misma regla para confirmar o rechazar la versión vigente.
 
+Si la conversación ya tiene un acuerdo vigente en estado `proposed` o `partially_confirmed`, "Preparar acuerdo" recupera sus datos y envía una contraoferta mediante una nueva versión del mismo acuerdo. No intenta crear un segundo registro para la conversación, ya que el modelo admite un acuerdo por conversación; el libro queda vinculado a los listings de la versión anterior.
+
 ## Bot
 
 El bot persistente aparece con identidad “Bot”, no como “Conversación 1”. La migración `015_seed_messaging_bot.sql` crea su usuario y el repositorio garantiza una conversación por usuario. El canal global legacy puede responder con el identificador histórico `0`, pero no es el flujo persistido.

@@ -14,9 +14,10 @@ Fecha de referencia: 2026-09-01.
 - Inicio limita “Libros que podrían gustarte” a cinco publicaciones por página y permite avanzar o volver mediante controles discretos; el orden prioriza lectores seguidos cuando existe sesión.
 - Monorepo con frontend React/Rsbuild y backend TypeScript/Express.
 - `/books` separa el catálogo público de “Mis libros”, con filtros persistidos, interés y alta de publicaciones `want`.
-- PostgreSQL/PostGIS con migraciones 001–023.
+- PostgreSQL/PostGIS con migraciones 001–025.
 - API de mensajes y eventos Socket.IO con persistencia antes de emitir.
 - Bot persistente creado por migración, con conversación idempotente por usuario e historial recargable.
+- Las migraciones 024–025 dejan una conversación demo por pareja con Clara, Tomás, Julieta y Pablo para comprobar propuestas de intercambio con catálogos del interlocutor.
 - Modo MSW controlado por `PUBLIC_API_USE_MOCKS` en el bundle del frontend.
 - Pruebas Vitest frontend/backend y checks de tipo, lint, formato y build disponibles.
 - Reconstrucción visual de Inicio, Explorar, Comunidad, Mensajes, Mapa, Estadísticas, Perfil y Centro de ayuda basada en los prototipos de `Screens/Prototipo ideal`, con catálogo frontend determinista y fallbacks SVG locales.
@@ -50,5 +51,7 @@ La implementación de `reconnect-backend-to-prototype-frontend` conserva esos re
 4. Entra en `/messages`, abre “Bot” y envía un texto.
 5. Confirma la respuesta, recarga la página y confirma que ambos mensajes siguen allí.
 6. Revisa la pestaña Network para `GET /api/messages` y la conexión `/socket.io`.
+7. En una conversación con un acuerdo vigente, abre `+` > "Preparar acuerdo", confirma que el formulario recupera los datos actuales y verifica que el envío actualiza la versión mediante `POST /api/agreements/:id/versions`.
+8. Con `user2@entrelibros.com`, abre una conversación demo con Clara, Tomás, Julieta o Pablo, entra en `+` > "Proponer intercambio" y confirma que aparecen los libros publicados de la otra persona.
 
 Para comprobar una historia, abre “Publicar” en Comunidad, escribe texto, enlaza opcionalmente una publicación propia y confirma que aparece tras invalidar el feed.

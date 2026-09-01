@@ -7,6 +7,7 @@ const mocks = vi.hoisted(() => ({
   fetchConversationBooks: vi.fn(),
   sendPersistedMessage: vi.fn(),
   fetchAgreement: vi.fn(),
+  counterProposeAgreement: vi.fn(),
   createAgreement: vi.fn(),
   commandAgreement: vi.fn(),
   markMessagesRead: vi.fn(),
@@ -33,11 +34,13 @@ vi.mock('@api/messages/messages', () => ({
 }))
 vi.mock('@src/api/agreements/agreements', () => ({
   fetchAgreement: mocks.fetchAgreement,
+  counterProposeAgreement: mocks.counterProposeAgreement,
   createAgreement: mocks.createAgreement,
   commandAgreement: mocks.commandAgreement,
 }))
 vi.mock('@api/agreements/agreements', () => ({
   fetchAgreement: mocks.fetchAgreement,
+  counterProposeAgreement: mocks.counterProposeAgreement,
   createAgreement: mocks.createAgreement,
   commandAgreement: mocks.commandAgreement,
 }))
@@ -78,6 +81,7 @@ describe('MessagesPage in real API mode', () => {
     mocks.fetchConversationBooks.mockReset()
     mocks.sendPersistedMessage.mockReset()
     mocks.fetchAgreement.mockReset()
+    mocks.counterProposeAgreement.mockReset()
     mocks.createAgreement.mockReset()
     mocks.commandAgreement.mockReset()
     mocks.markMessagesRead.mockReset()
@@ -470,6 +474,78 @@ describe('MessagesPage in real API mode', () => {
         expectedVersion: agreement.currentVersion,
       })
     )
+  })
+
+  test('sends a counterproposal when the conversation already has an active agreement', async () => {
+    const agreement = {
+      id: 23,
+      conversationId: conversation.id,
+      proposerId: 7,
+      participantId: 8,
+      state: 'partially_confirmed' as const,
+      currentVersion: 2,
+      details: {
+        meetingPoint: 'Plaza central',
+        area: 'Centro',
+        date: '2026-09-04',
+        time: '17:30',
+        bookTitle: book.title,
+      },
+      acceptances: [7],
+      listingIds: [1],
+    }
+    mocks.fetchConversations.mockResolvedValue([
+      { ...conversation, agreementId: agreement.id },
+    ])
+    mocks.fetchMessageHistory.mockResolvedValue({
+      messages: [],
+      nextAfter: 0,
+    })
+    mocks.fetchConversationBooks.mockResolvedValue({
+      myBooks: [book],
+      theirBooks: [],
+    })
+    mocks.fetchAgreement.mockResolvedValue(agreement)
+    mocks.counterProposeAgreement.mockResolvedValue({
+      ...agreement,
+      currentVersion: 3,
+      details: {
+        ...agreement.details,
+        meetingPoint: 'Biblioteca municipal',
+      },
+    })
+
+    renderWithProviders(<MessagesPage />)
+
+    await screen.findByText('Lucia')
+    await waitFor(() =>
+      expect(mocks.fetchAgreement).toHaveBeenCalledWith(agreement.id)
+    )
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Más opciones de mensaje' })
+    )
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Preparar acuerdo' }))
+
+    expect(await screen.findByText('Proponer cambios')).toBeVisible()
+    expect(
+      await screen.findByRole('option', { name: book.title })
+    ).toBeVisible()
+    fireEvent.change(screen.getByLabelText('Punto de encuentro'), {
+      target: { value: 'Biblioteca municipal' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar cambios' }))
+
+    await waitFor(() =>
+      expect(mocks.counterProposeAgreement).toHaveBeenCalledWith({
+        agreementId: agreement.id,
+        expectedVersion: agreement.currentVersion,
+        details: {
+          ...agreement.details,
+          meetingPoint: 'Biblioteca municipal',
+        },
+      })
+    )
+    expect(mocks.createAgreement).not.toHaveBeenCalled()
   })
 
   test('shows only cancellation for an agreement proposed by the current user', async () => {
