@@ -7,7 +7,7 @@ import {
   listConversations,
   listMessages,
   markConversationRead,
-  sendMessage,
+  sendMessageWithStatus,
   publishMessage,
   type MessageAgreementDetails,
   type MessageBookAttachment,
@@ -346,19 +346,22 @@ router.post(
       });
     }
     try {
-      const message = await sendMessage({
+      const result = await sendMessageWithStatus({
         conversationId,
         senderId: req.user.id,
         clientKey: body.clientKey,
         body: body.body,
         attachmentMetadata,
       });
-      await notifyMessageRecipients({
-        messageId: message.id,
-        conversationId,
-        senderId: req.user.id,
-      });
-      publishMessage(message);
+      const message = result.message;
+      if (result.created) {
+        await notifyMessageRecipients({
+          messageId: message.id,
+          conversationId,
+          senderId: req.user.id,
+        });
+        publishMessage(message);
+      }
       return res.status(201).json({ message });
     } catch (error) {
       const response = errorResponse(error);

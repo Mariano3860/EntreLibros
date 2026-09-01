@@ -6,7 +6,7 @@ import {
   listConversations,
   markConversationRead,
   listMessages,
-  sendMessage,
+  sendMessageWithStatus,
   findBotIdForConversation,
   messageEvents,
   type MessageAttachment,
@@ -202,13 +202,15 @@ export function setupWebsocket(
 
     socket.on('conversation:message', async (payload) => {
       try {
-        const message = await sendMessage({
+        const result = await sendMessageWithStatus({
           conversationId: payload.conversationId,
           senderId: socket.data.user.id,
           clientKey: payload.clientKey,
           body: payload.body,
           attachmentMetadata: payload.attachmentMetadata,
         });
+        const message = result.message;
+        if (!result.created) return;
         await notifyMessageRecipients({
           messageId: message.id,
           conversationId: message.conversationId,
@@ -232,14 +234,16 @@ export function setupWebsocket(
         );
         if (botId) {
           // Keep the bot reply on the same persisted path as user messages;
-          // emit only after sendMessage succeeds so reloads cannot lose it.
+          // emit only after the message is newly persisted.
           const reply = await generateReply(payload.body);
-          const botMessage = await sendMessage({
+          const botResult = await sendMessageWithStatus({
             conversationId: payload.conversationId,
             senderId: botId,
             clientKey: `bot-reply-${message.id}`,
             body: reply,
           });
+          const botMessage = botResult.message;
+          if (!botResult.created) return;
           await notifyMessageRecipients({
             messageId: botMessage.id,
             conversationId: botMessage.conversationId,

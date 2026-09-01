@@ -10,7 +10,7 @@ import {
 } from '../repositories/agreementRepository.js';
 import {
   publishMessage,
-  sendMessage,
+  sendMessageWithStatus,
   type MessageAgreementEvent,
 } from '../repositories/messagingRepository.js';
 import type { AgreementCommand } from '../services/agreementState.js';
@@ -77,7 +77,7 @@ async function persistAgreementMessage(input: {
   event: MessageAgreementEvent;
   reason?: string;
 }): Promise<void> {
-  const message = await sendMessage({
+  const result = await sendMessageWithStatus({
     conversationId: input.agreement.conversationId,
     senderId: input.actorId,
     clientKey: `agreement:${input.agreement.id}:${input.agreement.currentVersion}:${input.event}:${input.actorId}`,
@@ -97,7 +97,7 @@ async function persistAgreementMessage(input: {
       ...(input.reason ? { reason: input.reason } : {}),
     },
   });
-  publishMessage(message);
+  if (result.created) publishMessage(result.message);
 }
 
 router.get('/:id', async (req: AuthenticatedRequest, res) => {

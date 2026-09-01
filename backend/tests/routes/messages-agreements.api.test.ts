@@ -4,6 +4,7 @@ import type { PoolClient } from 'pg';
 
 import app from '../../src/app.js';
 import { pool, setTestClient } from '../../src/db.js';
+import { messageEvents } from '../../src/repositories/messagingRepository.js';
 
 let client: PoolClient;
 
@@ -77,6 +78,11 @@ describe('messaging and agreements API', () => {
     const conversationId = conversationResponse.body.conversation.id as number;
 
     const payload = { clientKey: 'message-key-1', body: 'Hola' };
+    const committedMessageIds: number[] = [];
+    const onCommitted = (message: { id: number }) => {
+      committedMessageIds.push(message.id);
+    };
+    messageEvents.on('committed', onCommitted);
     const sent = await request(app)
       .post(`/api/messages/${conversationId}/messages`)
       .set('Cookie', first.cookie)
@@ -87,7 +93,9 @@ describe('messaging and agreements API', () => {
       .set('Cookie', first.cookie)
       .send(payload)
       .expect(201);
+    messageEvents.off('committed', onCommitted);
     expect(retry.body.message.id).toBe(sent.body.message.id);
+    expect(committedMessageIds).toEqual([sent.body.message.id]);
 
     await request(app)
       .get(`/api/messages/${conversationId}/messages`)
@@ -154,6 +162,29 @@ describe('messaging and agreements API', () => {
         bookId: String(attachedListing.rows[0].id),
       })
     );
+
+    await request(app)
+      .post(`/api/messages/${conversationId}/messages`)
+      .set('Cookie', first.cookie)
+      .send({
+        clientKey: 'book-attachment-wrong-owner',
+        body: 'No debería pasar',
+        attachmentMetadata: {
+          key: `book:${attachedListing.rows[0].id}`,
+          contentType: 'application/x-entrelibros-book',
+          size: 1,
+          kind: 'book',
+          bookId: String(attachedListing.rows[0].id),
+          title: 'Libro de prueba',
+          author: 'Autora',
+          coverUrl: '/cover.jpg',
+          ownerId: second.id,
+        },
+      })
+      .expect(403)
+      .expect(({ body }) =>
+        expect(body.message).toBe('messaging.errors.forbidden')
+      );
 
     await request(app)
       .post(`/api/messages/${conversationId}/messages`)
@@ -239,6 +270,38 @@ describe('messaging and agreements API', () => {
           expect.objectContaining({ title: 'Second book' }),
         ]);
       });
+
+    await request(app)
+      .post(`/api/messages/${conversationId}/messages`)
+      .set('Cookie', first.cookie)
+      .send({
+        clientKey: 'swap-attachment-wrong-owner',
+        body: 'No debería pasar',
+        attachmentMetadata: {
+          key: 'swap:1',
+          contentType: 'application/x-entrelibros-swap',
+          size: 1,
+          kind: 'swap',
+          offered: {
+            id: String(firstListing?.id),
+            title: 'First book',
+            author: '',
+            coverUrl: '',
+            ownerId: second.id,
+          },
+          requested: {
+            id: String(secondListing?.id),
+            title: 'Second book',
+            author: '',
+            coverUrl: '',
+            ownerId: second.id,
+          },
+        },
+      })
+      .expect(403)
+      .expect(({ body }) =>
+        expect(body.message).toBe('messaging.errors.forbidden')
+      );
 
     await request(app)
       .post(`/api/messages/${conversationId}/messages`)

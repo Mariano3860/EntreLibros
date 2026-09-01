@@ -21,7 +21,7 @@ Los mensajes pueden conservar un adjunto tipado en `attachment_metadata` sin int
 - `swap`: libro ofrecido por quien envía y libro solicitado de la contraparte, con nota opcional.
 - `agreement`: propuesta, contrapropuesta o evento del acuerdo, con versión, libros involucrados, datos del encuentro y actor.
 
-Cada adjunto se valida contra los participantes de la conversación, el estado de las publicaciones y la pertenencia del acuerdo. Las rutas HTTP de mensajes y acuerdos publican el evento persistido por Socket.IO, por lo que los adjuntos y las propuestas se reconstruyen al recargar el historial. El menú `+` del compositor permite insertar un emoji en el borrador, adjuntar un libro propio o de la contraparte, proponer un intercambio con ambos catálogos o preparar un acuerdo.
+Cada adjunto se valida contra los participantes de la conversación, el estado de las publicaciones, el propietario real de cada listing y la pertenencia del acuerdo. Las rutas HTTP de mensajes y acuerdos publican el evento persistido por Socket.IO, por lo que los adjuntos y las propuestas se reconstruyen al recargar el historial. Los reintentos con el mismo `clientKey` devuelven el mensaje ya persistido sin volver a emitirlo ni generar notificaciones duplicadas. El menú `+` del compositor permite insertar un emoji en el borrador, adjuntar un libro propio o de la contraparte, proponer un intercambio con ambos catálogos o preparar un acuerdo.
 
 En una propuesta pendiente, quien la envió solo puede cancelarla; la contraparte puede aceptarla o rechazarla, y el backend aplica la misma regla para confirmar o rechazar la versión vigente.
 

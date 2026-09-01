@@ -750,9 +750,10 @@ const RealMessagesPage = () => {
         (id) => id !== user.id
       )
       if (!participantId) throw new Error('participant_unavailable')
-      const book = (booksQuery.data?.myBooks ?? [])
+      const matchingBooks = (booksQuery.data?.myBooks ?? [])
         .concat(booksQuery.data?.theirBooks ?? [])
-        .find((item) => item.title === details.bookTitle)
+        .filter((item) => item.title === details.bookTitle)
+      const book = matchingBooks.length === 1 ? matchingBooks[0] : null
       const listingId =
         book?.id && /^\d+$/.test(book.id) ? Number(book.id) : null
       return createAgreement({
@@ -886,7 +887,7 @@ const RealMessagesPage = () => {
   }
   const proposeSwap = async (event: FormEvent) => {
     event.preventDefault()
-    if (!selected || !counterpartId) return
+    if (!selected || !counterpartId || !user) return
     const offered = booksQuery.data?.myBooks.find(
       (book) => book.id === offeredId
     )
@@ -908,7 +909,7 @@ const RealMessagesPage = () => {
           contentType: 'application/x-entrelibros-swap',
           size: 1,
           kind: 'swap',
-          offered: { ...offered, ownerId: user?.id },
+          offered: { ...offered, ownerId: user.id },
           requested: { ...requested, ownerId: counterpartId },
           ...(swapNote.trim() ? { note: swapNote.trim() } : {}),
         },

@@ -790,9 +790,12 @@ export const Messages = () => {
         )
         return
       }
-      const selectedBook = [...selected.myBooks, ...selected.theirBooks].find(
-        (book) => book.title === proposal.bookTitle
-      )
+      const matchingBooks = [
+        ...selected.myBooks,
+        ...selected.theirBooks,
+      ].filter((book) => book.title === proposal.bookTitle)
+      const selectedBook =
+        matchingBooks.length === 1 ? matchingBooks[0] : undefined
       const listingId =
         selectedBook?.id && /^\d+$/.test(selectedBook.id)
           ? Number(selectedBook.id)

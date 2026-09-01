@@ -442,6 +442,17 @@ async function validateMessageAttachment(
     throw new Error('messaging.errors.forbidden');
   }
 
+  if (input.attachmentMetadata.kind === 'book') {
+    const listing = listings.rows[0];
+    if (
+      input.attachmentMetadata.ownerId !== undefined &&
+      input.attachmentMetadata.ownerId !== listing?.user_id
+    ) {
+      throw new Error('messaging.errors.forbidden');
+    }
+    return;
+  }
+
   if (input.attachmentMetadata.kind === 'swap') {
     const counterpartId = participantIds.find(
       (participantId) => participantId !== input.senderId
@@ -451,20 +462,33 @@ async function validateMessageAttachment(
     if (
       !counterpartId ||
       offered?.user_id !== input.senderId ||
-      requested?.user_id !== counterpartId
+      requested?.user_id !== counterpartId ||
+      (input.attachmentMetadata.offered.ownerId !== undefined &&
+        input.attachmentMetadata.offered.ownerId !== offered?.user_id) ||
+      (input.attachmentMetadata.requested.ownerId !== undefined &&
+        input.attachmentMetadata.requested.ownerId !== requested?.user_id)
     ) {
       throw new Error('messaging.errors.forbidden');
     }
   }
 }
 
-export async function sendMessage(input: {
+export interface SendMessageInput {
   conversationId: number;
   senderId: number;
   clientKey: string;
   body: string;
   attachmentMetadata?: MessageAttachment | null;
-}): Promise<PersistedMessage> {
+}
+
+export interface SendMessageResult {
+  message: PersistedMessage;
+  created: boolean;
+}
+
+export async function sendMessageWithStatus(
+  input: SendMessageInput
+): Promise<SendMessageResult> {
   const body = input.body.trim();
   if (!body && !input.attachmentMetadata) {
     throw new Error('messaging.errors.body_required');
@@ -492,7 +516,9 @@ export async function sendMessage(input: {
        WHERE conversation_id = $1 AND sender_id = $2 AND client_key = $3`,
       [input.conversationId, input.senderId, input.clientKey]
     );
-    if (existing.rows[0]) return mapMessage(existing.rows[0]);
+    if (existing.rows[0]) {
+      return { message: mapMessage(existing.rows[0]), created: false };
+    }
 
     if (input.attachmentMetadata) {
       await validateMessageAttachment(client, {
@@ -532,8 +558,15 @@ export async function sendMessage(input: {
         input.attachmentMetadata ?? null,
       ]
     );
-    return mapMessage(rows[0]);
+    return { message: mapMessage(rows[0]), created: true };
   });
+}
+
+export async function sendMessage(
+  input: SendMessageInput
+): Promise<PersistedMessage> {
+  const result = await sendMessageWithStatus(input);
+  return result.message;
 }
 
 export async function markConversationRead(

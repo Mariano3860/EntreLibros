@@ -252,6 +252,7 @@ Feature 5.1 Mensajería 1:1
   - Actualización 2025-11-19: se reemplazó la barra de entrada por un compositor accesible con selector de emojis y formularios para adjuntar libros, proponer intercambios y acordar encuentros; se actualizaron los tipos de mensajes, traducciones y pruebas RTL para cubrir los nuevos flujos.
   - Actualización 2026-09-01: el flujo real de Mensajes persiste adjuntos tipados de libros, propuestas de intercambio y eventos de acuerdo; el menú `+` usa los catálogos de ambos participantes, las tarjetas se emiten por Socket.IO y se reconstruyen al recargar.
   - Actualización 2026-09-01: el menú `+` también permite insertar emojis en el borrador sin enviar el mensaje, con un selector modal compacto y accesible.
+  - Actualización 2026-09-01: los reintentos idempotentes con `clientKey` ya no reemiten mensajes ni duplican notificaciones, y el backend verifica que el propietario declarado de cada adjunto coincida con su listing.
 - [ ] S-5.2 Bloqueo/Reporte en conversación y ficha (Must, E1; BR-43)
   - Éxito: acción en ≤2 pasos.
 
