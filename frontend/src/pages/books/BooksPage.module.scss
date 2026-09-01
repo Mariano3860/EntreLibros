@@ -125,16 +125,26 @@
 
 .tabs {
   display: flex;
+  min-width: 0;
+  height: 43px;
   min-height: 43px;
+  align-items: stretch;
   gap: 24px;
   overflow: auto hidden;
   margin-bottom: 20px;
   border-bottom: 1px solid var(--prototype-border);
-  scrollbar-width: thin;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .tabs button {
   position: relative;
+  height: 43px;
   min-height: 43px;
   flex: 0 0 auto;
   padding: 0 1px;
