@@ -11,6 +11,7 @@ import { divIcon } from 'leaflet'
 import { useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
+  Circle,
   CircleMarker,
   MapContainer,
   Marker,
@@ -54,6 +55,7 @@ type MapCanvasProps = {
   isFetching: boolean
   isEmpty: boolean
   userLocation?: { latitude: number; longitude: number } | null
+  radiusKm?: number | null
   className?: string
 }
 
@@ -192,6 +194,7 @@ export const MapCanvas = ({
   isFetching,
   isEmpty,
   userLocation = null,
+  radiusKm = null,
   className = '',
 }: MapCanvasProps) => {
   const { t } = useTranslation()
@@ -345,6 +348,19 @@ export const MapCanvas = ({
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         {userLocation ? (
           <>
+            {radiusKm !== null ? (
+              <Circle
+                center={[userLocation.latitude, userLocation.longitude]}
+                radius={radiusKm * 1000}
+                pathOptions={{
+                  color: 'var(--color-info)',
+                  fillColor: 'var(--color-info)',
+                  fillOpacity: 0.1,
+                  weight: 3,
+                  dashArray: '6 8',
+                }}
+              />
+            ) : null}
             <CircleMarker
               center={[userLocation.latitude, userLocation.longitude]}
               radius={18}

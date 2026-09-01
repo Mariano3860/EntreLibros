@@ -25,8 +25,14 @@ describe('FilterRail', () => {
       />
     )
 
-    fireEvent.change(screen.getByRole('slider'), { target: { value: '8' } })
-    expect(handleDistanceChange).toHaveBeenCalledWith(8)
+    fireEvent.change(screen.getByRole('slider', { name: 'Radio geográfico' }), {
+      target: { value: '2' },
+    })
+    expect(handleDistanceChange).toHaveBeenCalledWith(30)
+    fireEvent.change(screen.getByRole('slider', { name: 'Radio geográfico' }), {
+      target: { value: '4' },
+    })
+    expect(handleDistanceChange).toHaveBeenCalledWith(null)
 
     const [cornersCheckbox, publicationsCheckbox, activityCheckbox] =
       screen.getAllByRole('checkbox')

@@ -46,53 +46,22 @@
 .slider {
   display: flex;
   flex-direction: column;
-  gap: $spacing-2;
+  gap: 2px;
+  padding: 0 2px;
 
   input[type='range'] {
-    width: rem(220px);
-    max-width: 100%;
-    accent-color: var(--primary-color);
-    appearance: none;
-    height: rem(6px);
-    border-radius: 999px;
-    background: linear-gradient(
-      to right,
-      var(--primary-color) 0 var(--range-progress),
-      var(--border-color) var(--range-progress) 100%
-    );
-
-    &::-webkit-slider-runnable-track {
-      height: rem(6px);
-      border-radius: 999px;
-      background: transparent;
-    }
-
-    &::-moz-range-track {
-      height: rem(6px);
-      border-radius: 999px;
-      background: transparent;
-    }
-
-    &::-webkit-slider-thumb {
-      appearance: none;
-      width: rem(16px);
-      height: rem(16px);
-      margin-top: rem(-5px);
-      border: 2px solid var(--background-card);
-      border-radius: 50%;
-      background: var(--primary-color);
-      cursor: pointer;
-    }
-
-    &::-moz-range-thumb {
-      width: rem(16px);
-      height: rem(16px);
-      border: 2px solid var(--background-card);
-      border-radius: 50%;
-      background: var(--primary-color);
-      cursor: pointer;
-    }
+    width: 100%;
+    accent-color: var(--prototype-teal);
+    cursor: pointer;
   }
+}
+
+.rangeLabels {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  color: var(--prototype-muted);
+  font-size: 8px;
+  text-align: center;
 }
 
 .checkboxGroup {

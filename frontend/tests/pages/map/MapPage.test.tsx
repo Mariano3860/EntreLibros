@@ -10,12 +10,14 @@ vi.mock('@components/map/MapCanvas/MapCanvas', () => ({
     selectedPin,
     userLocation,
     focusRequest,
+    radiusKm,
   }: {
     selectedPin: MapPin | null
     userLocation?: { latitude: number; longitude: number } | null
     focusRequest: number
+    radiusKm?: number | null
   }) => {
-    mapCanvasRender({ selectedPin, userLocation, focusRequest })
+    mapCanvasRender({ selectedPin, userLocation, focusRequest, radiusKm })
     return (
       <div data-testid="map-canvas">
         {userLocation ? (
@@ -60,10 +62,13 @@ describe('MapPage', () => {
   test('changes distance, categories and selected corner', () => {
     renderWithProviders(<MapPage />)
 
-    fireEvent.change(screen.getByRole('slider', { name: 'Distancia' }), {
-      target: { value: '7' },
+    fireEvent.change(screen.getByRole('slider', { name: 'Radio geográfico' }), {
+      target: { value: '1' },
     })
-    expect(screen.getByText('7 km')).toBeVisible()
+    expect(screen.getByText('Hasta 5 km')).toBeVisible()
+    expect(
+      screen.getByRole('slider', { name: 'Radio geográfico' })
+    ).toHaveValue('1')
 
     fireEvent.click(screen.getByRole('button', { name: 'Bibliotecas' }))
     expect(screen.getByRole('button', { name: 'Bibliotecas' })).toHaveAttribute(
@@ -142,6 +147,38 @@ describe('MapPage', () => {
       screen.getByRole('heading', { name: 'Biblioteca de Palermo' })
     ).toBeVisible()
     expect(screen.getByText('5 km')).toBeVisible()
+  })
+
+  test('keeps the selected radius and sends it to the map after locating', async () => {
+    const original = Object.getOwnPropertyDescriptor(navigator, 'geolocation')
+    Object.defineProperty(navigator, 'geolocation', {
+      configurable: true,
+      value: {
+        getCurrentPosition: vi.fn((success) =>
+          success({ coords: { latitude: -34.58, longitude: -58.42 } })
+        ),
+      },
+    })
+
+    mapCanvasRender.mockClear()
+    renderWithProviders(<MapPage />)
+    await waitFor(() =>
+      expect(mapCanvasRender.mock.calls.at(-1)?.[0].userLocation).toEqual({
+        latitude: -34.58,
+        longitude: -58.42,
+      })
+    )
+
+    fireEvent.change(screen.getByRole('slider', { name: 'Radio geográfico' }), {
+      target: { value: '2' },
+    })
+
+    await waitFor(() =>
+      expect(mapCanvasRender.mock.calls.at(-1)?.[0].radiusKm).toBe(30)
+    )
+
+    if (original) Object.defineProperty(navigator, 'geolocation', original)
+    else Reflect.deleteProperty(navigator, 'geolocation')
   })
 
   test('keeps Buenos Aires fallback when location is denied', async () => {

@@ -4,10 +4,17 @@ import { fetchGeocodingSuggestions } from '../services/geocoding.js';
 import {
   getMapData,
   type MapBoundingBox,
+  type MapFilters,
   type MapQuery,
 } from '../services/map.js';
 
 const router = Router();
+
+const MAP_RADIUS_OPTIONS = [1, 5, 30, 50] as const;
+type MapRadiusKm = (typeof MAP_RADIUS_OPTIONS)[number];
+
+const isMapRadius = (value: number): value is MapRadiusKm =>
+  MAP_RADIUS_OPTIONS.includes(value as MapRadiusKm);
 
 const parseNumberParam = (value: unknown): number | null => {
   if (typeof value !== 'string') {
@@ -127,18 +134,45 @@ router.get('/', async (req, res) => {
   );
 
   const themes = parseListParam(req.query.themes);
-  const distanceParam = parseNumberParam(req.query.distanceKm);
-  const distanceKm = distanceParam ?? 0;
-  if (distanceKm < 0 || distanceKm > 100) {
+  const rawDistance = req.query.distanceKm;
+  const distanceParam = parseNumberParam(rawDistance);
+  if (
+    typeof rawDistance !== 'undefined' &&
+    (distanceParam === null || !isMapRadius(distanceParam))
+  ) {
     return res
       .status(400)
       .json({ error: 'BadRequest', message: 'map.errors.distance_invalid' });
+  }
+  const distanceKm: MapFilters['distanceKm'] =
+    distanceParam !== null && isMapRadius(distanceParam) ? distanceParam : null;
+  const centerLat = parseNumberParam(req.query.centerLat);
+  const centerLon = parseNumberParam(req.query.centerLon);
+  const hasCenterParam =
+    typeof req.query.centerLat !== 'undefined' ||
+    typeof req.query.centerLon !== 'undefined';
+  if (
+    hasCenterParam &&
+    (centerLat === null ||
+      centerLon === null ||
+      centerLat < -90 ||
+      centerLat > 90 ||
+      centerLon < -180 ||
+      centerLon > 180)
+  ) {
+    return res
+      .status(400)
+      .json({ error: 'BadRequest', message: 'map.errors.center_invalid' });
   }
   const openNow = parseBooleanParam(req.query.openNow, false);
   const recentActivity = parseBooleanParam(req.query.recentActivity, true);
 
   const mapQuery: MapQuery = {
     bbox,
+    center:
+      centerLat !== null && centerLon !== null
+        ? { latitude: centerLat, longitude: centerLon }
+        : undefined,
     search,
     layers: new Set(normalizedLayers),
     filters: {
