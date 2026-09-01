@@ -1,5 +1,12 @@
 @import '@styles/variables';
 
+.headerActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 .toolbar {
   display: flex;
   gap: 11px;
@@ -29,30 +36,101 @@
 }
 
 .filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 11px;
-  margin: -4px 0 14px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  padding: 13px;
+  margin: -4px 0 10px;
 }
 
-.filters button {
-  min-height: 30px;
-  padding: 0 10px;
+.selectFilter {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+  color: var(--prototype-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.selectFilter select {
+  min-width: 0;
+  height: 32px;
+  padding: 0 9px;
+  border: 1px solid var(--prototype-border);
+  border-radius: 8px;
+  background: var(--prototype-surface-soft);
+  color: var(--prototype-text);
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.filterToggle,
+.resetFilters {
+  min-height: 31px;
+  align-self: end;
+  padding: 0 11px;
   border: 1px solid var(--prototype-border);
   border-radius: 999px;
   background: transparent;
   color: var(--prototype-muted);
   cursor: pointer;
   font-size: 10px;
+  font-weight: 700;
+}
+
+.filterToggleActive {
+  border-color: var(--prototype-teal);
+  background: rgb(66 215 199 / 12%);
+  color: var(--prototype-teal);
+}
+
+.resetFilters {
+  border-color: transparent;
+  color: var(--prototype-teal);
+}
+
+.activeFilters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  margin: -3px 0 14px;
+  color: var(--prototype-muted);
+  font-size: 10px;
+}
+
+.activeFilter {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgb(66 215 199 / 10%);
+  color: var(--prototype-teal);
+  font-weight: 700;
+}
+
+.activeFilters button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--prototype-teal);
+  cursor: pointer;
+  font-size: inherit;
+  font-weight: 700;
+}
+
+.locationHint {
+  color: var(--prototype-muted);
 }
 
 .tabs {
   display: flex;
+  min-height: 43px;
   gap: 24px;
-  overflow-x: auto;
+  overflow: auto hidden;
   margin-bottom: 20px;
   border-bottom: 1px solid var(--prototype-border);
+  scrollbar-width: thin;
 }
 
 .tabs button {
@@ -87,6 +165,18 @@
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 18px;
+}
+
+.resultCard {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.resultCard > article {
+  height: 100%;
+  min-width: 0;
 }
 
 .pagination {
@@ -141,6 +231,18 @@
   align-content: center;
   gap: 7px;
   color: var(--prototype-muted);
+  text-align: center;
+}
+
+.clearEmpty {
+  margin-top: 7px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--prototype-teal);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
 }
 
 @media (width <= 1120px) {
@@ -150,9 +252,17 @@
 }
 
 @media (max-width: $breakpoint-tablet) {
+  .headerActions {
+    justify-content: flex-start;
+  }
+
   .toolbar {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .grid {
@@ -161,6 +271,16 @@
 }
 
 @media (max-width: $breakpoint-mobile) {
+  .headerActions {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 1fr;
+  }
+
+  .filters {
+    grid-template-columns: 1fr;
+  }
+
   .grid {
     grid-template-columns: 1fr;
   }

@@ -6,6 +6,7 @@ import { PublishBookPayload } from '@src/api/books/publishBook.types'
 import { apiRouteMatcher } from '../utils'
 
 let lastGeneratedId = 5000
+const publishedWantKeys = new Set<string>()
 
 export const publishBookHandler = http.post(
   apiRouteMatcher(RELATIVE_API_ROUTES.BOOKS.PUBLISH),
@@ -15,6 +16,17 @@ export const publishBookHandler = http.post(
 
     if (body.metadata?.title?.toLowerCase?.().includes('error')) {
       return HttpResponse.json({ message: 'publish failed' }, { status: 500 })
+    }
+
+    if (body.type === 'want') {
+      const key = `${body.metadata?.isbn ?? ''}|${body.metadata?.title ?? ''}|${body.metadata?.author ?? ''}`
+      if (publishedWantKeys.has(key)) {
+        return HttpResponse.json(
+          { message: 'books.errors.want_duplicate' },
+          { status: 409 }
+        )
+      }
+      publishedWantKeys.add(key)
     }
 
     const id = `book-${++lastGeneratedId}`
@@ -36,7 +48,8 @@ export const publishBookHandler = http.post(
         price: body.offer?.sale ? priceAmount : undefined,
         isForTrade: body.offer?.trade,
         tradePreferences: body.offer?.tradePreferences ?? [],
-        isSeeking: false,
+        isSeeking: body.type === 'want',
+        type: body.type ?? 'offer',
         publisher: body.metadata?.publisher,
         year: body.metadata?.year,
         language: body.metadata?.language,

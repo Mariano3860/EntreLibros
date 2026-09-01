@@ -20,6 +20,8 @@ export const RELATIVE_API_ROUTES = {
     MINE: `/books/mine`,
     SEARCH: `/books/search`,
     PUBLISH: `/books`,
+    INTEREST: (id: string) => `/books/${id}/interest`,
+    WANT: (id: string) => `/books/${id}/want`,
   },
   COMMUNITY: {
     STATS: `/community/stats`,

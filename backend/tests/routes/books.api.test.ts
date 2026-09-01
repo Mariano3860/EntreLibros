@@ -65,6 +65,7 @@ const insertListing = async (params: {
     | 'completed'
     | 'sold'
     | 'exchanged';
+  condition?: 'new' | 'very_good' | 'good' | 'acceptable' | null;
   availability?: 'public' | 'private';
   isDraft?: boolean;
   notes?: string | null;
@@ -80,6 +81,7 @@ const insertListing = async (params: {
     userId,
     bookId,
     status = 'available',
+    condition = 'good',
     availability = 'public',
     isDraft = false,
     notes = 'Notas iniciales',
@@ -114,14 +116,15 @@ const insertListing = async (params: {
       delivery_shipping_payer,
       corner_id
     ) VALUES (
-      $1, $2, $3, 'offer', $4, 'good', $5, $6, $7, $8, $9, $10, $11, $12,
-      true, true, false, NULL, $13
+      $1, $2, $3, 'offer', $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,
+       true, true, false, NULL, $14
     ) RETURNING id`,
     [
       userId,
       bookId,
       status,
       notes,
+      condition,
       sale,
       donation,
       trade,
@@ -502,6 +505,190 @@ describe('books API listing projections', () => {
     expect(completedListing).toMatchObject({
       status: 'completed',
       bookListingStatus: 'completed',
+    });
+  });
+});
+
+describe('books API discovery interactions', () => {
+  test('applies combined condition, availability and modality filters', async () => {
+    const targetOwnerId = await insertUser({ name: 'Target owner' });
+    const otherOwnerId = await insertUser({ name: 'Other owner' });
+    const targetBookId = await insertBook();
+    const otherBookId = await insertBook();
+    await client.query('UPDATE books SET title = $1 WHERE id = $2', [
+      'Filtro objetivo unico',
+      targetBookId,
+    ]);
+    const targetListingId = await insertListing({
+      userId: targetOwnerId,
+      bookId: targetBookId,
+      condition: 'very_good',
+      sale: false,
+      trade: true,
+    });
+    await insertListing({
+      userId: otherOwnerId,
+      bookId: otherBookId,
+      condition: 'good',
+      sale: false,
+      trade: true,
+    });
+
+    const res = await request(app)
+      .get('/api/books')
+      .query({
+        q: 'Filtro objetivo unico',
+        condition: 'very_good',
+        status: 'available',
+        trade: 'true',
+        sale: 'false',
+      })
+      .expect(200);
+
+    expect(res.body.map((listing: { id: string }) => listing.id)).toEqual([
+      String(targetListingId),
+    ]);
+  });
+
+  test('rejects unsupported catalog filters', async () => {
+    const res = await request(app)
+      .get('/api/books')
+      .query({ trade: 'sometimes', sort: 'random' })
+      .expect(400);
+
+    expect(res.body).toEqual({
+      error: 'InvalidFields',
+      message: 'books.errors.invalid_filters',
+    });
+  });
+
+  test('persists and toggles interest on another reader publication', async () => {
+    const ownerId = await insertUser({ name: 'Interest owner' });
+    const viewerId = await insertUser({ name: 'Interest viewer' });
+    const bookId = await insertBook();
+    const listingId = await insertListing({ userId: ownerId, bookId });
+
+    const initial = await request(app)
+      .get('/api/books')
+      .set('Cookie', buildAuthCookie(viewerId))
+      .expect(200);
+    expect(
+      initial.body.find((item: { id: string }) => item.id === String(listingId))
+    ).toMatchObject({
+      isInterested: false,
+    });
+
+    await request(app)
+      .post(`/api/books/${listingId}/interest`)
+      .set('Cookie', buildAuthCookie(viewerId))
+      .expect(200, { listingId: String(listingId), interested: true });
+
+    const persisted = await request(app)
+      .get('/api/books')
+      .set('Cookie', buildAuthCookie(viewerId))
+      .expect(200);
+    expect(
+      persisted.body.find(
+        (item: { id: string }) => item.id === String(listingId)
+      )
+    ).toMatchObject({
+      isInterested: true,
+    });
+
+    await request(app)
+      .post(`/api/books/${listingId}/interest`)
+      .set('Cookie', buildAuthCookie(viewerId))
+      .expect(200, { listingId: String(listingId), interested: false });
+
+    const relations = await client.query(
+      'SELECT 1 FROM user_book_listing_interests WHERE user_id = $1 AND book_listing_id = $2',
+      [viewerId, listingId]
+    );
+    expect(relations.rows).toHaveLength(0);
+  });
+
+  test('protects interest actions from guests and publication owners', async () => {
+    const ownerId = await insertUser({ name: 'Interest owner' });
+    const bookId = await insertBook();
+    const listingId = await insertListing({ userId: ownerId, bookId });
+
+    await request(app).post(`/api/books/${listingId}/interest`).expect(401);
+    const res = await request(app)
+      .post(`/api/books/${listingId}/interest`)
+      .set('Cookie', buildAuthCookie(ownerId))
+      .expect(403);
+    expect(res.body).toEqual({
+      error: 'Forbidden',
+      message: 'books.errors.interest_own',
+    });
+  });
+
+  test('creates a want publication without offer data and prevents duplicates', async () => {
+    const userId = await insertUser({ name: 'Want reader' });
+    const payload = {
+      type: 'want',
+      metadata: {
+        title: 'Libro que quiero encontrar',
+        author: 'Autora buscada',
+        isbn: '9780000000001',
+      },
+      notes: 'Preferentemente en español',
+    };
+
+    const created = await request(app)
+      .post('/api/books')
+      .set('Cookie', buildAuthCookie(userId))
+      .send(payload)
+      .expect(201);
+    expect(created.body).toMatchObject({
+      type: 'want',
+      isSeeking: true,
+      status: 'available',
+      notes: 'Preferentemente en español',
+    });
+    expect(created.body.condition).toBeUndefined();
+
+    const duplicate = await request(app)
+      .post('/api/books')
+      .set('Cookie', buildAuthCookie(userId))
+      .send(payload)
+      .expect(409);
+    expect(duplicate.body).toEqual({
+      error: 'DuplicateWant',
+      message: 'books.errors.want_duplicate',
+    });
+
+    const listings = await client.query(
+      "SELECT COUNT(*)::int AS count FROM book_listings WHERE user_id = $1 AND type = 'want'",
+      [userId]
+    );
+    expect(listings.rows[0].count).toBe(1);
+  });
+
+  test('creates a want publication from another reader listing', async () => {
+    const ownerId = await insertUser({ name: 'Source owner' });
+    const viewerId = await insertUser({ name: 'Want viewer' });
+    const bookId = await insertBook();
+    const sourceListingId = await insertListing({ userId: ownerId, bookId });
+
+    const created = await request(app)
+      .post(`/api/books/${sourceListingId}/want`)
+      .set('Cookie', buildAuthCookie(viewerId))
+      .expect(201);
+    expect(created.body).toMatchObject({ type: 'want', isSeeking: true });
+
+    await request(app)
+      .post(`/api/books/${sourceListingId}/want`)
+      .set('Cookie', buildAuthCookie(viewerId))
+      .expect(409);
+
+    const own = await request(app)
+      .post(`/api/books/${sourceListingId}/want`)
+      .set('Cookie', buildAuthCookie(ownerId))
+      .expect(403);
+    expect(own.body).toEqual({
+      error: 'Forbidden',
+      message: 'books.errors.want_own',
     });
   });
 });

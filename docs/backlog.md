@@ -181,6 +181,8 @@ Feature 3.2 Búsquedas y ciclo de vida
 
 - [x] S-3.4 Búsquedas y filtros (texto, autor, ISBN, idioma, estado, distancia y ofrezco/busco) (Must, E1; BR-21)
   - Actualización 2026-08-29: `/api/books` admite filtros parametrizados, radio PostGIS y paginación limitada; el cliente los serializa sin activar mocks.
+  - Actualización 2026-08-31: el catálogo de `/books` separa “Todos” de “Mis libros” y aplica filtros de condición, estado, tipo, modalidad, donación, orden y radio.
+  - Actualización 2026-08-31: se agregaron intereses persistentes y el flujo “Buscar este libro”, con publicaciones `want` sin duplicados.
   - Éxito: resultados <2s con filtros básicos.
 - [x] S-3.5 Vencimiento/renovación de publicaciones (Should, E2; BR-23)
   - Actualización 2026-08-29: las publicaciones caducan a los 30 días, dejan de aparecer en el catálogo y el propietario puede renovarlas.

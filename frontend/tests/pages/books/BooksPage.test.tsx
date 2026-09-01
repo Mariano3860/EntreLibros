@@ -60,5 +60,10 @@ describe('BooksPage', () => {
     expect(
       screen.queryByRole('button', { name: /Contactar a Lucia/ })
     ).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'bookDetail.close' }))
+    expect(
+      screen.queryByRole('button', { name: 'bookDetail.close' })
+    ).not.toBeInTheDocument()
   })
 })

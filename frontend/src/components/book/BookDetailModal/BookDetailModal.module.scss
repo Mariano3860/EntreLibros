@@ -285,6 +285,11 @@
     background: rgb(var(--color-primary-500-rgb) / 15%);
     color: var(--color-primary-700);
   }
+
+  &.seeking {
+    background: rgb(66 215 199 / 12%);
+    color: var(--prototype-teal);
+  }
 }
 
 .ownerBadge {

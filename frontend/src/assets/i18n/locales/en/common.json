@@ -104,6 +104,53 @@
     "es": "Spanish"
   },
   "booksPage": {
+    "description": "Discover books nearby to trade, buy, or add to your list.",
+    "search_label": "Search books",
+    "filters": {
+      "button": "Filters",
+      "condition": "Condition",
+      "status": {
+        "label": "Availability",
+        "available": "Available",
+        "reserved": "Reserved"
+      },
+      "type": { "label": "Publication", "offer": "Offered", "want": "Wanted" },
+      "sort": "Sort by",
+      "radius": "Distance",
+      "trade": "Trade",
+      "sale": "For sale",
+      "any": "Any",
+      "active": "Active filters:",
+      "reset": "Clear filters",
+      "locationUnavailable": "Enable your location to filter by distance."
+    },
+    "want": {
+      "open": "Search for a book",
+      "title": "Search for a book",
+      "subtitle": "Tell the community which book you want to find.",
+      "cancel": "Cancel",
+      "submit": "Publish request",
+      "saving": "Publishing...",
+      "created": "Request published",
+      "duplicate": "You already have an active request for this book.",
+      "error": "The request could not be published.",
+      "search": "Search the catalog",
+      "searchPlaceholder": "ISBN, title, or author...",
+      "searching": "Searching...",
+      "searchError": "We couldn't search right now.",
+      "titleLabel": "Title",
+      "authorLabel": "Author",
+      "publisherLabel": "Publisher",
+      "yearLabel": "Year",
+      "languageLabel": "Language",
+      "formatLabel": "Format",
+      "isbnLabel": "ISBN",
+      "coverLabel": "Cover URL",
+      "notesLabel": "Notes",
+      "notesPlaceholder": "Edition, language, or details you care about..."
+    },
+    "loading": "Loading books...",
+    "error": "We couldn't load the books. Please try again.",
     "title": "Explore books",
     "search_placeholder": "Search by title, author, ISBN",
     "filter": {
@@ -113,6 +160,7 @@
     "publish_button": "Publish a book",
     "recently_published": "Your new book",
     "tabs": {
+      "label": "Book types",
       "all": "All",
       "mine": "My books",
       "for_trade": "Available for trade",
@@ -121,6 +169,8 @@
       "see_all": "See all"
     },
     "empty": {
+      "filtered": "No books found",
+      "filteredHint": "Try another search or remove some filters.",
       "all": "We couldn't find published books yet.",
       "mine": "You haven't added books yet.",
       "trade": "You haven't listed books for trade yet.",
@@ -862,6 +912,7 @@
       "completed": "Completed",
       "draft": "Draft",
       "sold": "Sold",
+      "seeking": "Seeking",
       "exchanged": "Exchanged"
     },
     "changeStatus": "Change status",

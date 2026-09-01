@@ -2,15 +2,19 @@ import { Router, type Request } from 'express';
 import { verifyBook } from '../repositories/bookRepository.js';
 import {
   createBookListing,
+  createWantBookListing,
+  createWantBookListingFromListing,
   listHomeBookListings,
   listPublicBookListings,
   listUserBookListings,
   renewBookListing,
+  toggleBookListingInterest,
   type BookListing,
   type BookListingDelivery,
   type BookListingCondition,
   type BookListingType,
   type BookListingAvailability,
+  type BookListingSort,
   type BookListingShippingPayer,
   type PublicBookListingFilters,
 } from '../repositories/bookListingRepository.js';
@@ -39,7 +43,8 @@ router.get('/', async (_req, res) => {
       message: 'books.errors.invalid_filters',
     });
   }
-  const listings = await listPublicBookListings(filters);
+  const viewerId = await getOptionalViewerId(_req);
+  const listings = await listPublicBookListings(filters, viewerId);
   res.json(listings.map(toPublicBookListing));
 });
 
@@ -113,6 +118,32 @@ router.post('/', authenticate, async (req: AuthenticatedRequest, res) => {
     verified = false;
   }
 
+  if (type === 'want') {
+    const result = await createWantBookListing({
+      userId: req.user.id,
+      book: {
+        title: metadata.title,
+        author: metadata.author,
+        isbn: metadata.isbn,
+        publisher: metadata.publisher,
+        publishedYear: metadata.year,
+        verified,
+        language: metadata.language,
+        format: metadata.format,
+        coverUrl: metadata.coverUrl,
+      },
+      notes: offer.notes,
+      availability: offer.availability,
+    });
+    if (result.kind === 'duplicate') {
+      return res.status(409).json({
+        error: 'DuplicateWant',
+        message: 'books.errors.want_duplicate',
+      });
+    }
+    return res.status(201).json(toUserBookListing(result.listing));
+  }
+
   const listing = await createBookListing({
     userId: req.user.id,
     book: {
@@ -159,6 +190,83 @@ router.get('/mine', authenticate, async (req: AuthenticatedRequest, res) => {
   const listings = await listUserBookListings(req.user.id);
   res.json(listings.map(toUserBookListing));
 });
+
+router.post(
+  '/:id/interest',
+  authenticate,
+  async (req: AuthenticatedRequest, res) => {
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'Unauthorized',
+        message: 'auth.errors.unauthorized',
+      });
+    }
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id) || id <= 0) {
+      return res.status(404).json({
+        error: 'NotFound',
+        message: 'books.errors.not_found',
+      });
+    }
+    const result = await toggleBookListingInterest(id, req.user.id);
+    if (result.kind === 'not_found') {
+      return res.status(404).json({
+        error: 'NotFound',
+        message: 'books.errors.not_found',
+      });
+    }
+    if (result.kind === 'forbidden') {
+      return res.status(403).json({
+        error: 'Forbidden',
+        message: 'books.errors.interest_own',
+      });
+    }
+    return res.json({
+      listingId: String(id),
+      interested: result.interested,
+    });
+  }
+);
+
+router.post(
+  '/:id/want',
+  authenticate,
+  async (req: AuthenticatedRequest, res) => {
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'Unauthorized',
+        message: 'auth.errors.unauthorized',
+      });
+    }
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id) || id <= 0) {
+      return res.status(404).json({
+        error: 'NotFound',
+        message: 'books.errors.not_found',
+      });
+    }
+    const result = await createWantBookListingFromListing(id, req.user.id);
+    if (result.kind === 'not_found') {
+      return res.status(404).json({
+        error: 'NotFound',
+        message: 'books.errors.not_found',
+      });
+    }
+    if (result.kind === 'forbidden') {
+      return res.status(403).json({
+        error: 'Forbidden',
+        message: 'books.errors.want_own',
+      });
+    }
+    if (result.kind === 'duplicate') {
+      return res.status(409).json({
+        error: 'DuplicateWant',
+        message: 'books.errors.want_duplicate',
+      });
+    }
+    return res.status(201).json(toUserBookListing(result.listing));
+  }
+);
 
 router.post(
   '/:id/renew',
@@ -301,7 +409,7 @@ type ValidatedPublishData = {
     trade: boolean;
     priceAmount: number | null;
     priceCurrency: string | null;
-    condition: BookListingCondition;
+    condition: BookListingCondition | null;
     tradePreferences: string[];
     notes: string | null;
     availability: BookListingAvailability;
@@ -323,6 +431,12 @@ const ALLOWED_AVAILABILITIES: readonly BookListingAvailability[] = [
   'private',
 ];
 const ALLOWED_TYPES: readonly BookListingType[] = ['offer', 'want'];
+const ALLOWED_SORTS: readonly BookListingSort[] = [
+  'recent',
+  'nearby',
+  'price_asc',
+  'price_desc',
+];
 const ALLOWED_SHIPPING_PAYERS: readonly BookListingShippingPayer[] = [
   'owner',
   'requester',
@@ -361,16 +475,36 @@ function queryNumber(value: unknown): number | undefined {
   return Number.isFinite(number) ? number : undefined;
 }
 
+function queryBoolean(value: unknown): boolean | undefined | null {
+  const text = queryText(value)?.toLowerCase();
+  if (!text) return undefined;
+  if (text === 'true' || text === '1') return true;
+  if (text === 'false' || text === '0') return false;
+  return null;
+}
+
 function parseCatalogFilters(
   query: Request['query']
 ): PublicBookListingFilters | null {
+  const trade = queryBoolean(query.trade);
+  const sale = queryBoolean(query.sale);
+  const donation = queryBoolean(query.donation);
+  if ([trade, sale, donation].some((value) => value === null)) return null;
+
   const filters: PublicBookListingFilters = {
     text: queryText(query.q ?? query.text),
     author: queryText(query.author),
     isbn: queryText(query.isbn),
     language: queryText(query.language),
+    condition: queryText(
+      query.condition
+    ) as PublicBookListingFilters['condition'],
     type: queryText(query.type) as PublicBookListingFilters['type'],
     status: queryText(query.status) as PublicBookListingFilters['status'],
+    trade: trade ?? undefined,
+    sale: sale ?? undefined,
+    donation: donation ?? undefined,
+    sort: queryText(query.sort) as PublicBookListingFilters['sort'],
     limit: queryNumber(query.limit),
     offset: queryNumber(query.offset),
     latitude: queryNumber(query.latitude),
@@ -388,6 +522,13 @@ function parseCatalogFilters(
   )
     return null;
   if (filters.type !== undefined && !ALLOWED_TYPES.includes(filters.type))
+    return null;
+  if (
+    filters.condition !== undefined &&
+    !ALLOWED_CONDITIONS.includes(filters.condition)
+  )
+    return null;
+  if (filters.sort !== undefined && !ALLOWED_SORTS.includes(filters.sort))
     return null;
   if (
     filters.status !== undefined &&
@@ -839,6 +980,7 @@ function toPublicBookListing(listing: BookListing) {
     isForTrade: listing.trade,
     isSeeking: listing.isSeeking,
     isForDonation: listing.donation,
+    isInterested: listing.isInterested ?? false,
   };
 }
 
@@ -883,6 +1025,23 @@ function validatePublishRequest(
   const format = optionalString(metadataRaw.format);
   const isbn = optionalString(metadataRaw.isbn);
   let coverUrl = optionalString(metadataRaw.coverUrl);
+
+  const draft = typeof body.draft === 'boolean' ? body.draft : false;
+  let type: BookListingType = 'offer';
+  if (typeof body.type === 'string') {
+    const normalized = body.type.trim().toLowerCase();
+    if (!ALLOWED_TYPES.includes(normalized as BookListingType)) {
+      return {
+        status: 400,
+        error: {
+          error: 'InvalidFields',
+          message: 'books.errors.invalid_type',
+        },
+      };
+    }
+    type = normalized as BookListingType;
+  }
+  const cornerId = optionalString(body.cornerId) ?? null;
 
   const rawYear = metadataRaw.year ?? metadataRaw.publishedYear;
   let year: number | null = null;
@@ -949,6 +1108,44 @@ function validatePublishRequest(
 
   if (!coverUrl && images.length > 0) {
     coverUrl = images[0].url;
+  }
+
+  if (type === 'want') {
+    return {
+      data: {
+        metadata: {
+          title,
+          author,
+          publisher,
+          year,
+          language,
+          format,
+          isbn,
+          coverUrl,
+        },
+        images,
+        offer: {
+          sale: false,
+          donation: false,
+          trade: false,
+          priceAmount: null,
+          priceCurrency: null,
+          condition: null,
+          tradePreferences: [],
+          notes: optionalString(body.notes),
+          availability: 'public',
+          delivery: {
+            nearBookCorner: false,
+            inPerson: false,
+            shipping: false,
+            shippingPayer: null,
+          },
+        },
+        draft,
+        type,
+        cornerId: null,
+      },
+    };
   }
 
   const offerRaw = body.offer;
@@ -1102,25 +1299,6 @@ function validatePublishRequest(
     priceAmount = Number(amount);
     priceCurrency = currency.trim().toUpperCase();
   }
-
-  const draft = typeof body.draft === 'boolean' ? body.draft : false;
-
-  let type: BookListingType = 'offer';
-  if (typeof body.type === 'string') {
-    const normalized = body.type.trim().toLowerCase();
-    if (!ALLOWED_TYPES.includes(normalized as BookListingType)) {
-      return {
-        status: 400,
-        error: {
-          error: 'InvalidFields',
-          message: 'books.errors.invalid_type',
-        },
-      };
-    }
-    type = normalized as BookListingType;
-  }
-
-  const cornerId = optionalString(body.cornerId) ?? null;
 
   return {
     data: {

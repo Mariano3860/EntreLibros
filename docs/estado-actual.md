@@ -3,12 +3,14 @@
 Fecha de referencia: 2026-08-31.
 
 - La migraciÃ³n 022 agrega seguimiento persistente y datos demo para historias, lectores y recomendaciones personalizadas de Comunidad.
+- La migración 023 agrega intereses personales sobre publicaciones ajenas y soporta publicaciones de búsqueda sin duplicados.
 
 ## Comprobado en el repositorio
 
 - Inicio limita “Libros que podrían gustarte” a cinco publicaciones por página y permite avanzar o volver mediante controles discretos; el orden prioriza lectores seguidos cuando existe sesión.
 - Monorepo con frontend React/Rsbuild y backend TypeScript/Express.
-- PostgreSQL/PostGIS con migraciones 001–021.
+- `/books` separa el catálogo público de “Mis libros”, con filtros persistidos, interés y alta de publicaciones `want`.
+- PostgreSQL/PostGIS con migraciones 001–023.
 - API de mensajes y eventos Socket.IO con persistencia antes de emitir.
 - Bot persistente creado por migración, con conversación idempotente por usuario e historial recargable.
 - Modo MSW controlado por `PUBLIC_API_USE_MOCKS` en el bundle del frontend.
