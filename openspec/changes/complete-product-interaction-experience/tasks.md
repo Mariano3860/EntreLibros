@@ -3,7 +3,7 @@
 - [x] 1.1 Crear `feature/home-recommendation-rail` desde `main` actualizado tras el merge de #159 y verificar que el worktree esté limpio y la rama tenga la base esperada.
 - [x] 1.2 Extender la consulta de recomendaciones para devolver conjuntos estables de hasta cinco, con avance/retroceso o renovación y prioridad de perfiles seguidos; verificar con pruebas de repositorio/ruta que no devuelve propios, privados, bloqueados, vencidos ni más de cinco resultados.
 - [x] 1.3 Implementar los controles compactos del rail en Inicio y mantener el detalle en modal; verificar con tests de `HomePage` navegación del rail, foco y ausencia de redirección.
-- [ ] 1.4 Revisar visualmente `/home` a 1440×900 y viewport estrecho contra el cuadrante superior izquierdo de `img.png`; verificar cinco cards, controles discretos, carga/vacío/error, teclado y reduced motion.
+- [x] 1.4 Revisar visualmente `/home` a 1440×900 y viewport estrecho contra el cuadrante superior izquierdo de `img.png`; verificar cinco cards, controles discretos, carga/vacío/error, teclado y reduced motion.
 - [x] 1.5 Ejecutar suite backend/frontend afectada, typecheck, lint, Stylelint, build y `git diff --check`; crear commits claros, abrir PR en español contra `main` y verificar que no se realiza merge.
 
 ## 2. Filtros, búsquedas e interés en Libros
@@ -16,11 +16,11 @@
 
 ## 3. Foco y panel de detalle de Rincón en Mapa
 
-- [ ] 3.1 Crear `feature/map-corner-focus-panel` desde `main` actualizado y verificar que el contrato de rincón seleccionado pueda expresarse sin depender de una rama no mergeada.
-- [ ] 3.2 Implementar selección por `corner`, centrado/aproximación y panel superpuesto con imagen, horario, distancia, disponibilidad y fallback; verificar con pruebas de API/componente que un rincón válido enfoca el mapa y uno inaccesible muestra estado seguro.
-- [ ] 3.3 Conectar “Ver rincón” desde publicaciones, lista y pines al mismo estado de selección; verificar en tests de `MapPage`/`MapCanvas` que la interacción cambia viewport y detalle.
-- [ ] 3.4 Revisar visualmente `/map` a 1440×900 contra el cuadrante superior izquierdo de `img_1.png`; verificar foco del pin, panel derecho/inferior, imagen principal y comportamiento estrecho.
-- [ ] 3.5 Ejecutar suites afectadas, typecheck, lint, Stylelint, build y `git diff --check`; crear commits claros y una PR en español contra `main` sin merge.
+- [x] 3.1 Crear `feature/map-corner-focus-panel` desde `main` actualizado y verificar que el contrato de rincón seleccionado pueda expresarse sin depender de una rama no mergeada.
+- [x] 3.2 Implementar selección por `corner`, centrado/aproximación y panel superpuesto con imagen, horario, distancia, disponibilidad y fallback; verificar con pruebas de API/componente que un rincón válido enfoca el mapa y uno inaccesible muestra estado seguro.
+- [x] 3.3 Conectar “Ver rincón” desde publicaciones, lista y pines al mismo estado de selección; verificar en tests de `MapPage`/`MapCanvas` que la interacción cambia viewport y detalle.
+- [x] 3.4 Revisar visualmente `/map` a 1440×900 contra el cuadrante superior izquierdo de `img_1.png`; verificar foco del pin, panel derecho/inferior, imagen principal y comportamiento estrecho.
+- [x] 3.5 Ejecutar suites afectadas, typecheck, lint, Stylelint, build y `git diff --check`; crear commits claros y una PR en español contra `main` sin merge.
 
 ## 4. Radio geográfico real del Mapa
 
