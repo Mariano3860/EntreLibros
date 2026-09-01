@@ -121,6 +121,15 @@ describe('messaging and agreements API', () => {
         expect(body.message).toBe('messaging.errors.forbidden')
       );
 
+    const attachedBook = await client.query<{ id: number }>(
+      'INSERT INTO books (title) VALUES ($1) RETURNING id',
+      ['Attached book']
+    );
+    const attachedListing = await client.query<{ id: number }>(
+      `INSERT INTO book_listings (user_id, book_id, type, status)
+       VALUES ($1, $2, 'offer', 'available') RETURNING id`,
+      [first.id, attachedBook.rows[0].id]
+    );
     const attached = await request(app)
       .post(`/api/messages/${conversationId}/messages`)
       .set('Cookie', first.cookie)
@@ -128,11 +137,11 @@ describe('messaging and agreements API', () => {
         clientKey: 'book-attachment-1',
         body: 'Te comparto este libro',
         attachmentMetadata: {
-          key: 'book:123',
+          key: `book:${attachedListing.rows[0].id}`,
           contentType: 'application/x-entrelibros-book',
           size: 1,
           kind: 'book',
-          bookId: '123',
+          bookId: String(attachedListing.rows[0].id),
           title: 'Libro de prueba',
           author: 'Autora',
           coverUrl: '/cover.jpg',
@@ -140,8 +149,33 @@ describe('messaging and agreements API', () => {
       })
       .expect(201);
     expect(attached.body.message.attachmentMetadata).toEqual(
-      expect.objectContaining({ kind: 'book', bookId: '123' })
+      expect.objectContaining({
+        kind: 'book',
+        bookId: String(attachedListing.rows[0].id),
+      })
     );
+
+    await request(app)
+      .post(`/api/messages/${conversationId}/messages`)
+      .set('Cookie', outsider.cookie)
+      .send({
+        clientKey: 'book-attachment-outsider',
+        body: 'No debería pasar',
+        attachmentMetadata: {
+          key: `book:${attachedListing.rows[0].id}`,
+          contentType: 'application/x-entrelibros-book',
+          size: 1,
+          kind: 'book',
+          bookId: String(attachedListing.rows[0].id),
+          title: 'Libro de prueba',
+          author: 'Autora',
+          coverUrl: '/cover.jpg',
+        },
+      })
+      .expect(403)
+      .expect(({ body }) =>
+        expect(body.message).toBe('messaging.errors.forbidden')
+      );
   });
 
   test('returns eligible books for each conversation participant', async () => {
@@ -179,6 +213,19 @@ describe('messaging and agreements API', () => {
         reservedBook.rows[0].id,
       ]
     );
+    const listings = await client.query<{ id: number; user_id: number }>(
+      `SELECT id, user_id
+       FROM book_listings
+       WHERE book_id IN ($1, $2)
+       ORDER BY id`,
+      [firstBook.rows[0].id, secondBook.rows[0].id]
+    );
+    const firstListing = listings.rows.find((row) => row.user_id === first.id);
+    const secondListing = listings.rows.find(
+      (row) => row.user_id === second.id
+    );
+    expect(firstListing).toBeDefined();
+    expect(secondListing).toBeDefined();
 
     await request(app)
       .get(`/api/messages/${conversationId}/books`)
@@ -191,6 +238,54 @@ describe('messaging and agreements API', () => {
         expect(body.theirBooks).toEqual([
           expect.objectContaining({ title: 'Second book' }),
         ]);
+      });
+
+    await request(app)
+      .post(`/api/messages/${conversationId}/messages`)
+      .set('Cookie', first.cookie)
+      .send({
+        clientKey: 'swap-attachment-1',
+        body: 'Te propongo este intercambio',
+        attachmentMetadata: {
+          key: 'swap:1',
+          contentType: 'application/x-entrelibros-swap',
+          size: 1,
+          kind: 'swap',
+          offered: {
+            id: String(firstListing?.id),
+            title: 'First book',
+            author: '',
+            coverUrl: '',
+            ownerId: first.id,
+          },
+          requested: {
+            id: String(secondListing?.id),
+            title: 'Second book',
+            author: '',
+            coverUrl: '',
+            ownerId: second.id,
+          },
+        },
+      })
+      .expect(201)
+      .expect(({ body }) => {
+        expect(body.message.attachmentMetadata).toEqual(
+          expect.objectContaining({
+            kind: 'swap',
+            offered: expect.objectContaining({
+              id: String(firstListing?.id),
+            }),
+          })
+        );
+      });
+
+    await request(app)
+      .get(`/api/messages/${conversationId}/messages`)
+      .set('Cookie', second.cookie)
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body.messages).toHaveLength(1);
+        expect(body.messages[0].attachmentMetadata.kind).toBe('swap');
       });
 
     await request(app)
@@ -234,6 +329,27 @@ describe('messaging and agreements API', () => {
       .set('Cookie', first.cookie)
       .send({ command: 'confirm', expectedVersion: 1 })
       .expect(200);
+    await request(app)
+      .get(`/api/messages/${conversationId}/messages`)
+      .set('Cookie', second.cookie)
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body.messages).toHaveLength(2);
+        expect(body.messages[0].attachmentMetadata).toEqual(
+          expect.objectContaining({
+            kind: 'agreement',
+            agreementId,
+            event: 'proposal',
+          })
+        );
+        expect(body.messages[1].attachmentMetadata).toEqual(
+          expect.objectContaining({
+            kind: 'agreement',
+            agreementId,
+            event: 'confirm',
+          })
+        );
+      });
     await request(app)
       .post(`/api/agreements/${agreementId}/commands`)
       .set('Cookie', second.cookie)
@@ -307,6 +423,28 @@ describe('messaging and agreements API', () => {
       .expect(422)
       .expect(({ body }) =>
         expect(body.message).toBe('agreements.errors.listing_unavailable')
+      );
+
+    await request(app)
+      .post(`/api/messages/${conversationId}/messages`)
+      .set('Cookie', first.cookie)
+      .send({
+        clientKey: 'reserved-book-attachment',
+        body: 'No debería pasar',
+        attachmentMetadata: {
+          key: `book:${listing.rows[0].id}`,
+          contentType: 'application/x-entrelibros-book',
+          size: 1,
+          kind: 'book',
+          bookId: String(listing.rows[0].id),
+          title: 'Unavailable',
+          author: '',
+          coverUrl: '',
+        },
+      })
+      .expect(403)
+      .expect(({ body }) =>
+        expect(body.message).toBe('messaging.errors.forbidden')
       );
   });
 

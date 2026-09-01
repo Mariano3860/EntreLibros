@@ -11,6 +11,66 @@ export type ApiConversation = {
   participantName: string | null
 }
 
+export type ApiMessageBookAttachment = {
+  id: string
+  title: string
+  author: string
+  coverUrl: string
+  ownerId?: number
+}
+
+export type ApiMessageAgreementDetails = {
+  meetingPoint: string
+  area: string
+  date: string
+  time: string
+  bookTitle: string
+}
+
+export type ApiMessageAttachment =
+  | {
+      key: string
+      contentType: string
+      size: number
+      name?: string
+      kind: 'book'
+      bookId: string
+      title: string
+      author: string
+      coverUrl: string
+      ownerId?: number
+    }
+  | {
+      key: string
+      contentType: string
+      size: number
+      name?: string
+      kind: 'swap'
+      offered: ApiMessageBookAttachment
+      requested: ApiMessageBookAttachment
+      note?: string
+    }
+  | {
+      key: string
+      contentType: string
+      size: number
+      name?: string
+      kind: 'agreement'
+      agreementId: number
+      version: number
+      event:
+        | 'proposal'
+        | 'counterproposal'
+        | 'confirm'
+        | 'cancel'
+        | 'reject'
+        | 'complete'
+      details: ApiMessageAgreementDetails
+      listingIds: number[]
+      actorName: string
+      reason?: string
+    }
+
 export type ApiMessage = {
   id: number
   conversationId: number
@@ -18,17 +78,7 @@ export type ApiMessage = {
   sequence: number
   clientKey: string
   body: string
-  attachmentMetadata: {
-    key: string
-    contentType: string
-    size: number
-    name?: string
-    kind?: 'book'
-    bookId?: string
-    title?: string
-    author?: string
-    coverUrl?: string
-  } | null
+  attachmentMetadata: ApiMessageAttachment | null
   createdAt: string
 }
 
@@ -42,6 +92,7 @@ export type ConversationBook = {
   title: string
   author: string
   coverUrl: string
+  ownerId?: number
 }
 
 export type ConversationBooks = {

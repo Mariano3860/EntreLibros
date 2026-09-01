@@ -1,4 +1,5 @@
 import { query, withTransaction, type DbClient } from '../db.js';
+import { EventEmitter } from 'node:events';
 
 export interface ConversationSummary {
   id: number;
@@ -10,16 +11,71 @@ export interface ConversationSummary {
   participantName: string | null;
 }
 
-export interface MessageAttachment {
+interface MessageAttachmentBase {
   key: string;
   contentType: string;
   size: number;
   name?: string;
-  kind?: 'book';
-  bookId?: string;
-  title?: string;
-  author?: string;
-  coverUrl?: string;
+}
+
+export interface MessageBookAttachment {
+  id: string;
+  title: string;
+  author: string;
+  coverUrl: string;
+  ownerId?: number;
+}
+
+export interface MessageAgreementDetails {
+  meetingPoint: string;
+  area: string;
+  date: string;
+  time: string;
+  bookTitle: string;
+}
+
+export type MessageAgreementEvent =
+  | 'proposal'
+  | 'counterproposal'
+  | 'confirm'
+  | 'cancel'
+  | 'reject'
+  | 'complete';
+
+export type MessageAttachment = MessageAttachmentBase &
+  (
+    | {
+        kind: 'book';
+        bookId: string;
+        title: string;
+        author: string;
+        coverUrl: string;
+        ownerId?: number;
+      }
+    | {
+        kind: 'swap';
+        offered: MessageBookAttachment;
+        requested: MessageBookAttachment;
+        note?: string;
+      }
+    | {
+        kind: 'agreement';
+        agreementId: number;
+        version: number;
+        event: MessageAgreementEvent;
+        details: MessageAgreementDetails;
+        listingIds: number[];
+        actorName: string;
+        reason?: string;
+      }
+  );
+
+export type MessageAttachmentKind = MessageAttachment['kind'];
+
+export const messageEvents = new EventEmitter();
+
+export function publishMessage(message: PersistedMessage): void {
+  messageEvents.emit('committed', message);
 }
 
 export interface PersistedMessage {
@@ -312,6 +368,96 @@ export async function listMessages(
   return rows.map(mapMessage);
 }
 
+function asListingId(value: string): number | null {
+  if (!/^\d+$/.test(value)) return null;
+  const parsed = Number(value);
+  return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : null;
+}
+
+async function validateMessageAttachment(
+  client: DbClient,
+  input: {
+    conversationId: number;
+    senderId: number;
+    attachmentMetadata: MessageAttachment;
+  }
+): Promise<void> {
+  const participants = await client.query<{ user_id: number }>(
+    `SELECT user_id
+     FROM conversation_participants
+     WHERE conversation_id = $1`,
+    [input.conversationId]
+  );
+  const participantIds = participants.rows.map((row) => Number(row.user_id));
+  if (!participantIds.includes(input.senderId)) {
+    throw new Error('messaging.errors.forbidden');
+  }
+
+  if (input.attachmentMetadata.kind === 'agreement') {
+    const agreement = await client.query<{ id: number }>(
+      `SELECT id
+       FROM exchange_agreements
+       WHERE id = $1
+         AND conversation_id = $2
+         AND ($3 = proposer_id OR $3 = participant_id)`,
+      [
+        input.attachmentMetadata.agreementId,
+        input.conversationId,
+        input.senderId,
+      ]
+    );
+    if (!agreement.rows[0]) {
+      throw new Error('messaging.errors.forbidden');
+    }
+    return;
+  }
+
+  const listingIds =
+    input.attachmentMetadata.kind === 'book'
+      ? [asListingId(input.attachmentMetadata.bookId)]
+      : [
+          asListingId(input.attachmentMetadata.offered.id),
+          asListingId(input.attachmentMetadata.requested.id),
+        ];
+  if (listingIds.some((listingId) => listingId === null)) {
+    throw new Error('messaging.errors.forbidden');
+  }
+
+  const ids = listingIds as number[];
+  const listings = await client.query<{
+    id: number;
+    user_id: number;
+  }>(
+    `SELECT id, user_id
+     FROM book_listings
+     WHERE id = ANY($1::integer[])
+       AND user_id = ANY($2::integer[])
+       AND status = 'available'
+       AND availability = 'public'
+       AND is_draft = false
+       AND (expires_at IS NULL OR expires_at > NOW())`,
+    [ids, participantIds]
+  );
+  if (listings.rows.length !== new Set(ids).size) {
+    throw new Error('messaging.errors.forbidden');
+  }
+
+  if (input.attachmentMetadata.kind === 'swap') {
+    const counterpartId = participantIds.find(
+      (participantId) => participantId !== input.senderId
+    );
+    const offered = listings.rows.find((listing) => listing.id === ids[0]);
+    const requested = listings.rows.find((listing) => listing.id === ids[1]);
+    if (
+      !counterpartId ||
+      offered?.user_id !== input.senderId ||
+      requested?.user_id !== counterpartId
+    ) {
+      throw new Error('messaging.errors.forbidden');
+    }
+  }
+}
+
 export async function sendMessage(input: {
   conversationId: number;
   senderId: number;
@@ -347,6 +493,14 @@ export async function sendMessage(input: {
       [input.conversationId, input.senderId, input.clientKey]
     );
     if (existing.rows[0]) return mapMessage(existing.rows[0]);
+
+    if (input.attachmentMetadata) {
+      await validateMessageAttachment(client, {
+        conversationId: input.conversationId,
+        senderId: input.senderId,
+        attachmentMetadata: input.attachmentMetadata,
+      });
+    }
 
     const conversation = await client.query<{ last_message_sequence: string }>(
       `SELECT last_message_sequence

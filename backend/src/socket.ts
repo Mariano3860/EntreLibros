@@ -8,6 +8,8 @@ import {
   listMessages,
   sendMessage,
   findBotIdForConversation,
+  messageEvents,
+  type MessageAttachment,
 } from './repositories/messagingRepository.js';
 import { logger } from './utils/logger.js';
 import { generateReply } from './services/chatBot.js';
@@ -52,6 +54,7 @@ export interface ClientToServerEvents {
     conversationId: number;
     clientKey: string;
     body: string;
+    attachmentMetadata?: MessageAttachment | null;
   }) => void;
   'conversation:read': (payload: {
     conversationId: number;
@@ -69,6 +72,7 @@ export interface ServerToClientEvents {
     body: string;
     clientKey: string;
     createdAt: string;
+    attachmentMetadata: MessageAttachment | null;
   }) => void;
   'agreement:updated': (msg: {
     agreementId: number;
@@ -93,6 +97,20 @@ export function setupWebsocket(
     SocketData
   >
 ) {
+  messageEvents.on('committed', (message) => {
+    io.to(`conversation:${message.conversationId}`).emit(
+      'conversation:message',
+      {
+        conversationId: message.conversationId,
+        sequence: message.sequence,
+        senderId: message.senderId,
+        body: message.body,
+        clientKey: message.clientKey,
+        createdAt: message.createdAt.toISOString(),
+        attachmentMetadata: message.attachmentMetadata,
+      }
+    );
+  });
   agreementEvents.on('committed', (agreement: AgreementSnapshot) => {
     io.to(`conversation:${agreement.conversationId}`).emit(
       'agreement:updated',
@@ -174,6 +192,7 @@ export function setupWebsocket(
               body: message.body,
               clientKey: message.clientKey,
               createdAt: message.createdAt.toISOString(),
+              attachmentMetadata: message.attachmentMetadata,
             });
           });
         }
@@ -188,6 +207,7 @@ export function setupWebsocket(
           senderId: socket.data.user.id,
           clientKey: payload.clientKey,
           body: payload.body,
+          attachmentMetadata: payload.attachmentMetadata,
         });
         await notifyMessageRecipients({
           messageId: message.id,
@@ -203,6 +223,7 @@ export function setupWebsocket(
             body: message.body,
             clientKey: message.clientKey,
             createdAt: message.createdAt.toISOString(),
+            attachmentMetadata: message.attachmentMetadata,
           }
         );
         const botId = await findBotIdForConversation(
@@ -233,6 +254,7 @@ export function setupWebsocket(
               body: botMessage.body,
               clientKey: botMessage.clientKey,
               createdAt: botMessage.createdAt.toISOString(),
+              attachmentMetadata: botMessage.attachmentMetadata,
             }
           );
         }

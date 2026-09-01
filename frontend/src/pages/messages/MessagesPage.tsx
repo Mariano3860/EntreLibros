@@ -1,18 +1,31 @@
-import { commandAgreement, fetchAgreement } from '@api/agreements/agreements'
-import { fetchUserBooks } from '@api/books/userBooks.service'
+import {
+  commandAgreement,
+  createAgreement,
+  fetchAgreement,
+  type AgreementDetails,
+  type AgreementSnapshot,
+} from '@api/agreements/agreements'
 import {
   createConversation,
+  fetchConversationBooks,
   fetchConversations,
   fetchMessageHistory,
   markMessagesRead,
   sendPersistedMessage,
+  type ConversationBook,
 } from '@api/messages/messages'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { useAuth } from '@contexts/auth/AuthContext'
+import { useFocusTrap } from '@hooks/useFocusTrap'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { FormEvent, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import type {
+  PrototypeBook,
+  PrototypeChatBook,
+  PrototypeChatMessage,
+} from '@src/features/prototype/catalog'
 import { usePrototype } from '@src/features/prototype/PrototypeContext'
 import {
   Avatar,
@@ -29,6 +42,178 @@ import { useChatSocket } from '@src/hooks/socket/useChatSocket'
 import { isApiMockMode } from '@src/utils/runtimeEnv'
 
 import styles from './MessagesPage.module.scss'
+
+const toPrototypeBook = (book: PrototypeChatBook): PrototypeBook => ({
+  id: book.id,
+  title: book.title,
+  author: book.author,
+  owner: '',
+  distance: '',
+  mode: 'Intercambio',
+  accent: '#42d7c7',
+  genre: 'Libro',
+  ...(book.coverUrl ? { coverUrl: book.coverUrl } : {}),
+})
+
+const createClientKey = () =>
+  globalThis.crypto?.randomUUID?.() ??
+  `message-${Date.now()}-${Math.random().toString(36).slice(2)}`
+
+type ChatMessageBubbleProps = {
+  item: PrototypeChatMessage
+  agreement?: AgreementSnapshot
+  agreementPending: boolean
+  onConfirmAgreement: () => void
+  onRejectAgreement: () => void
+}
+
+const ChatMessageBubble = ({
+  item,
+  agreement,
+  agreementPending,
+  onConfirmAgreement,
+  onRejectAgreement,
+}: ChatMessageBubbleProps) => {
+  const { t } = useTranslation()
+  const alignment = item.role === 'me' ? styles.mine : ''
+
+  if (item.kind === 'book' && item.book) {
+    return (
+      <article className={`${styles.bookAttachment} ${alignment}`}>
+        <BookCover compact book={toPrototypeBook(item.book)} />
+        <div>
+          <strong>{item.book.title}</strong>
+          <small>{item.book.author}</small>
+          <small>
+            {t('community.messages.bubbles.book', {
+              defaultValue: 'Libro adjunto',
+            })}
+          </small>
+          {item.text && item.text !== item.book.title ? (
+            <p>{item.text}</p>
+          ) : null}
+        </div>
+      </article>
+    )
+  }
+
+  if (item.kind === 'swap' && item.swap) {
+    return (
+      <article className={`${styles.proposal} ${alignment}`}>
+        <span className={styles.proposalLabel}>
+          {t('community.messages.bubbles.swap', {
+            defaultValue: 'Propuesta de intercambio',
+          })}
+        </span>
+        <div className={styles.proposalBooks}>
+          <div className={styles.proposalBook}>
+            <BookCover compact book={toPrototypeBook(item.swap.offered)} />
+            <span>
+              <strong>{item.swap.offered.title}</strong>
+              <small>
+                {t('community.messages.bubbles.offered', {
+                  defaultValue: 'Ofrecido',
+                })}
+              </small>
+            </span>
+          </div>
+          <div className={styles.proposalBook}>
+            <BookCover compact book={toPrototypeBook(item.swap.requested)} />
+            <span>
+              <strong>{item.swap.requested.title}</strong>
+              <small>
+                {t('community.messages.bubbles.requested', {
+                  defaultValue: 'Solicitado',
+                })}
+              </small>
+            </span>
+          </div>
+        </div>
+        {item.swap.note ? <p>{item.swap.note}</p> : null}
+        <small className={styles.bubbleTime}>{item.time}</small>
+      </article>
+    )
+  }
+
+  if (item.kind === 'agreement' && item.agreement) {
+    const agreementMessage = item.agreement
+    const canAct =
+      agreement?.id === agreementMessage.agreementId &&
+      (agreement.state === 'proposed' ||
+        agreement.state === 'partially_confirmed') &&
+      (agreementMessage.event === 'proposal' ||
+        agreementMessage.event === 'counterproposal')
+    const title =
+      agreementMessage.event === 'counterproposal'
+        ? t('community.messages.bubbles.agreementChange', {
+            defaultValue: 'Cambio en la propuesta',
+          })
+        : agreementMessage.event === 'confirm'
+          ? t('community.messages.bubbles.agreementConfirmed', {
+              defaultValue: 'Acuerdo confirmado',
+            })
+          : agreementMessage.event === 'complete'
+            ? t('community.messages.bubbles.agreementComplete', {
+                defaultValue: 'Intercambio completado',
+              })
+            : agreementMessage.event === 'cancel' ||
+                agreementMessage.event === 'reject'
+              ? t('community.messages.bubbles.agreementCancelled', {
+                  defaultValue: 'Acuerdo cancelado',
+                })
+              : t('community.messages.bubbles.agreementProposal', {
+                  defaultValue: 'Propuesta de acuerdo',
+                })
+
+    return (
+      <article className={`${styles.proposal} ${alignment}`}>
+        <span className={styles.proposalLabel}>{title}</span>
+        <strong>{agreementMessage.bookTitle}</strong>
+        <small>
+          {agreementMessage.meetingPoint} · {agreementMessage.area}
+        </small>
+        <small>
+          {agreementMessage.date} · {agreementMessage.time}
+        </small>
+        {agreementMessage.reason ? <p>{agreementMessage.reason}</p> : null}
+        {canAct ? (
+          <div className={styles.proposalActions}>
+            <PrototypeButton
+              size="small"
+              tone="primary"
+              onClick={onConfirmAgreement}
+              disabled={agreementPending}
+            >
+              {t('community.messages.bubbles.accept', {
+                defaultValue: 'Aceptar',
+              })}
+            </PrototypeButton>
+            <PrototypeButton
+              size="small"
+              onClick={onRejectAgreement}
+              disabled={agreementPending}
+            >
+              {t('community.messages.bubbles.reject', {
+                defaultValue: 'Rechazar',
+              })}
+            </PrototypeButton>
+          </div>
+        ) : null}
+        <small className={styles.bubbleTime}>{item.time}</small>
+      </article>
+    )
+  }
+
+  return (
+    <div className={`${styles.bubble} ${alignment}`}>
+      <span>{item.text}</span>
+      <small>
+        {item.time}
+        {item.role === 'me' ? ' ✓✓' : ''}
+      </small>
+    </div>
+  )
+}
 
 export const MessagesPage = () =>
   isApiMockMode() ? <MockMessagesPage /> : <RealMessagesPage />
@@ -282,12 +467,27 @@ const RealMessagesPage = () => {
   const [selected, setSelected] = useState<number | null>(null)
   const [search, setSearch] = useState('')
   const [message, setMessage] = useState('')
-  const [bookPicker, setBookPicker] = useState(false)
+  const [composerMenuOpen, setComposerMenuOpen] = useState(false)
+  const [bookPickerMode, setBookPickerMode] = useState<
+    'attach' | 'swap' | null
+  >(null)
+  const [agreementOpen, setAgreementOpen] = useState(false)
+  const [offeredId, setOfferedId] = useState('')
+  const [requestedId, setRequestedId] = useState('')
+  const [swapNote, setSwapNote] = useState('')
+  const [agreementForm, setAgreementForm] = useState<AgreementDetails>({
+    meetingPoint: '',
+    area: '',
+    date: '',
+    time: '',
+    bookTitle: '',
+  })
   const [newConversationOpen, setNewConversationOpen] = useState(false)
   const [participantId, setParticipantId] = useState('')
   const [sendError, setSendError] = useState<string | null>(null)
   const [attachError, setAttachError] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const modalRef = useRef<HTMLDivElement>(null)
   const conversationsQuery = useQuery({
     queryKey: ['prototype', 'messages', 'conversations'],
     queryFn: fetchConversations,
@@ -295,15 +495,18 @@ const RealMessagesPage = () => {
   const conversations = conversationsQuery.data
   const activeConversation =
     conversations?.find((item) => item.id === selected) ?? null
+  const counterpartId = activeConversation?.participantIds.find(
+    (id) => id !== user?.id
+  )
   const historyQuery = useQuery({
     queryKey: ['prototype', 'messages', 'history', selected],
     queryFn: () => fetchMessageHistory(selected ?? 0),
     enabled: selected !== null,
   })
   const booksQuery = useQuery({
-    queryKey: ['prototype', 'messages', 'books'],
-    queryFn: fetchUserBooks,
-    enabled: bookPicker,
+    queryKey: ['prototype', 'messages', 'books', selected],
+    queryFn: () => fetchConversationBooks(selected ?? 0),
+    enabled: selected !== null && (bookPickerMode !== null || agreementOpen),
   })
   const agreementQuery = useQuery({
     queryKey: ['prototype', 'agreement', activeConversation?.agreementId],
@@ -325,6 +528,57 @@ const RealMessagesPage = () => {
       )
       void queryClient.invalidateQueries({
         queryKey: ['prototype', 'messages'],
+      })
+      void queryClient.invalidateQueries({
+        queryKey: [
+          'prototype',
+          'messages',
+          'history',
+          agreement.conversationId,
+        ],
+      })
+    },
+  })
+  const agreementCreateMutation = useMutation({
+    mutationFn: async (details: AgreementDetails) => {
+      if (!selected || !activeConversation || !user) {
+        throw new Error('conversation_unavailable')
+      }
+      const participantId = activeConversation.participantIds.find(
+        (id) => id !== user.id
+      )
+      if (!participantId) throw new Error('participant_unavailable')
+      const book = (booksQuery.data?.myBooks ?? [])
+        .concat(booksQuery.data?.theirBooks ?? [])
+        .find((item) => item.title === details.bookTitle)
+      const listingId =
+        book?.id && /^\d+$/.test(book.id) ? Number(book.id) : null
+      return createAgreement({
+        conversationId: selected,
+        participantId,
+        details,
+        ...(listingId ? { listingIds: [listingId] } : {}),
+      })
+    },
+    onSuccess: async (agreement) => {
+      setAgreementOpen(false)
+      setAgreementForm({
+        meetingPoint: '',
+        area: '',
+        date: '',
+        time: '',
+        bookTitle: '',
+      })
+      await queryClient.invalidateQueries({
+        queryKey: [
+          'prototype',
+          'messages',
+          'history',
+          agreement.conversationId,
+        ],
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['prototype', 'messages', 'conversations'],
       })
     },
   })
@@ -361,7 +615,7 @@ const RealMessagesPage = () => {
     try {
       await sendPersistedMessage({
         conversationId: selected,
-        clientKey: crypto.randomUUID(),
+        clientKey: createClientKey(),
         body: message.trim(),
       })
       setMessage('')
@@ -376,35 +630,32 @@ const RealMessagesPage = () => {
       )
     }
   }
-  const attachBook = async (book: {
-    id: string
-    title: string
-    author: string
-    coverUrl: string
-  }) => {
+  const attachBook = async (book: ConversationBook) => {
     if (!selected) return
     setSendError(null)
     setAttachError(null)
     try {
       await sendPersistedMessage({
         conversationId: selected,
-        clientKey: crypto.randomUUID(),
+        clientKey: createClientKey(),
         body: book.title,
         attachmentMetadata: {
           key: `book:${book.id}`,
-          contentType: 'application/json',
-          size: 0,
+          contentType: 'application/x-entrelibros-book',
+          size: 1,
           kind: 'book',
           bookId: book.id,
           title: book.title,
           author: book.author,
           coverUrl: book.coverUrl,
+          ...(book.ownerId ? { ownerId: book.ownerId } : {}),
         },
       })
-      setBookPicker(false)
+      setBookPickerMode(null)
+      setComposerMenuOpen(false)
       setAttachError(null)
       await queryClient.invalidateQueries({
-        queryKey: ['prototype', 'messages'],
+        queryKey: ['prototype', 'messages', 'history', selected],
       })
     } catch {
       setAttachError(
@@ -413,6 +664,63 @@ const RealMessagesPage = () => {
         })
       )
     }
+  }
+  const proposeSwap = async (event: FormEvent) => {
+    event.preventDefault()
+    if (!selected || !counterpartId) return
+    const offered = booksQuery.data?.myBooks.find(
+      (book) => book.id === offeredId
+    )
+    const requested = booksQuery.data?.theirBooks.find(
+      (book) => book.id === requestedId
+    )
+    if (!offered || !requested) {
+      setAttachError('Elegí un libro propio y uno de la otra persona.')
+      return
+    }
+    setAttachError(null)
+    try {
+      await sendPersistedMessage({
+        conversationId: selected,
+        clientKey: createClientKey(),
+        body: swapNote.trim(),
+        attachmentMetadata: {
+          key: `swap:${offered.id}:${requested.id}`,
+          contentType: 'application/x-entrelibros-swap',
+          size: 1,
+          kind: 'swap',
+          offered: { ...offered, ownerId: user?.id },
+          requested: { ...requested, ownerId: counterpartId },
+          ...(swapNote.trim() ? { note: swapNote.trim() } : {}),
+        },
+      })
+      setBookPickerMode(null)
+      setComposerMenuOpen(false)
+      setOfferedId('')
+      setRequestedId('')
+      setSwapNote('')
+      await queryClient.invalidateQueries({
+        queryKey: ['prototype', 'messages', 'history', selected],
+      })
+    } catch {
+      setAttachError(
+        t('community.messages.states.attachError', {
+          defaultValue: 'No pudimos enviar la propuesta. Intentá nuevamente.',
+        })
+      )
+    }
+  }
+  const openBookPicker = (mode: 'attach' | 'swap') => {
+    setSendError(null)
+    setAttachError(null)
+    setComposerMenuOpen(false)
+    setBookPickerMode(mode)
+  }
+  const openAgreement = () => {
+    setSendError(null)
+    setAttachError(null)
+    setComposerMenuOpen(false)
+    setAgreementOpen(true)
   }
   const visibleConversations = (conversations ?? []).filter((item) =>
     (item.participantName ?? (item.isBot ? 'Bot' : ''))
@@ -441,13 +749,27 @@ const RealMessagesPage = () => {
             sequence: item.sequence,
             clientKey: item.clientKey,
             body: item.body,
-            attachmentMetadata: null,
+            attachmentMetadata: item.attachmentMetadata,
             createdAt: item.createdAt,
           },
           user?.id ?? -1
         )
       ),
   ]
+  const pickerBooks = [
+    ...(booksQuery.data?.myBooks ?? []),
+    ...(booksQuery.data?.theirBooks ?? []),
+  ]
+
+  useFocusTrap({
+    containerRef: modalRef,
+    active: bookPickerMode !== null || agreementOpen || newConversationOpen,
+    onEscape: () => {
+      setBookPickerMode(null)
+      setAgreementOpen(false)
+      setNewConversationOpen(false)
+    },
+  })
 
   return (
     <BaseLayout id="messages-page" mainClassName={styles.layoutMain}>
@@ -628,16 +950,18 @@ const RealMessagesPage = () => {
                     </div>
                   ) : messages.length ? (
                     messages.map((item) => (
-                      <div
+                      <ChatMessageBubble
                         key={item.id}
-                        className={`${styles.bubble} ${item.role === 'me' ? styles.mine : ''}`}
-                      >
-                        <span>{item.text}</span>
-                        <small>
-                          {item.time}
-                          {item.role === 'me' ? ' ✓✓' : ''}
-                        </small>
-                      </div>
+                        item={item}
+                        agreement={agreementQuery.data}
+                        agreementPending={agreementMutation.isPending}
+                        onConfirmAgreement={() =>
+                          agreementMutation.mutate('confirm')
+                        }
+                        onRejectAgreement={() =>
+                          agreementMutation.mutate('reject')
+                        }
+                      />
                     ))
                   ) : (
                     <div className={styles.messageState}>
@@ -650,7 +974,8 @@ const RealMessagesPage = () => {
                   )}
                   <div ref={messagesEndRef} />
                 </div>
-                {agreementQuery.data ? (
+                {agreementQuery.data &&
+                !messages.some((item) => item.kind === 'agreement') ? (
                   <Panel className={styles.proposal} as="article">
                     <span className={styles.proposalLabel}>
                       Propuesta de intercambio · {agreementQuery.data.state}
@@ -689,11 +1014,36 @@ const RealMessagesPage = () => {
                     onClick={() => {
                       setSendError(null)
                       setAttachError(null)
-                      setBookPicker(true)
+                      setComposerMenuOpen((open) => !open)
                     }}
                   >
                     ＋
                   </button>
+                  {composerMenuOpen ? (
+                    <div className={styles.composerMenu} role="menu">
+                      <button
+                        type="button"
+                        role="menuitem"
+                        onClick={() => openBookPicker('attach')}
+                      >
+                        Adjuntar libro
+                      </button>
+                      <button
+                        type="button"
+                        role="menuitem"
+                        onClick={() => openBookPicker('swap')}
+                      >
+                        Proponer intercambio
+                      </button>
+                      <button
+                        type="button"
+                        role="menuitem"
+                        onClick={openAgreement}
+                      >
+                        Preparar acuerdo
+                      </button>
+                    </div>
+                  ) : null}
                   <input
                     value={message}
                     onChange={(event) => setMessage(event.target.value)}
@@ -723,103 +1073,356 @@ const RealMessagesPage = () => {
             )}
           </section>
         </section>
-        {bookPicker ? (
+        {bookPickerMode ? (
           <div className={styles.modalBackdrop}>
-            <Panel className={styles.bookPicker} as="div">
-              <header>
-                <div>
-                  <span>ADJUNTAR AL CHAT</span>
-                  <h2>Elegí un libro</h2>
-                </div>
-                <button
-                  onClick={() => {
-                    setAttachError(null)
-                    setBookPicker(false)
-                  }}
-                  aria-label="Cerrar"
-                >
-                  ×
-                </button>
-              </header>
-              {attachError ? (
-                <p className={styles.bookPickerError} role="alert">
-                  <span className={styles.stateMark} aria-hidden="true">
-                    !
-                  </span>
-                  <span>{attachError}</span>
-                </p>
-              ) : null}
-              {booksQuery.isLoading ? (
-                <p className={styles.bookPickerState} role="status">
-                  <span className={styles.stateSpinner} aria-hidden="true" />
-                  <span>
-                    {t('community.messages.states.loadingBooks', {
-                      defaultValue: 'Cargando libros...',
+            <div
+              ref={modalRef}
+              className={styles.bookPickerDialog}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="book-picker-title"
+            >
+              <Panel className={styles.bookPicker} as="div">
+                <header>
+                  <div>
+                    <span>
+                      {bookPickerMode === 'swap'
+                        ? 'PROPUESTA DE INTERCAMBIO'
+                        : 'ADJUNTAR AL CHAT'}
+                    </span>
+                    <h2 id="book-picker-title">
+                      {bookPickerMode === 'swap'
+                        ? 'Elegí los libros'
+                        : 'Elegí un libro'}
+                    </h2>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setAttachError(null)
+                      setBookPickerMode(null)
+                    }}
+                    aria-label="Cerrar"
+                  >
+                    ×
+                  </button>
+                </header>
+                {attachError ? (
+                  <p className={styles.bookPickerError} role="alert">
+                    <span className={styles.stateMark} aria-hidden="true">
+                      !
+                    </span>
+                    <span>{attachError}</span>
+                  </p>
+                ) : null}
+                {booksQuery.isLoading ? (
+                  <p className={styles.bookPickerState} role="status">
+                    <span className={styles.stateSpinner} aria-hidden="true" />
+                    <span>
+                      {t('community.messages.states.loadingBooks', {
+                        defaultValue: 'Cargando libros...',
+                      })}
+                    </span>
+                  </p>
+                ) : booksQuery.isError ? (
+                  <p
+                    className={`${styles.bookPickerState} ${styles.errorState}`}
+                    role="alert"
+                  >
+                    <span className={styles.stateMark} aria-hidden="true">
+                      !
+                    </span>
+                    <span>
+                      {t('community.messages.states.booksError', {
+                        defaultValue: 'No pudimos cargar los libros.',
+                      })}
+                    </span>
+                    <button
+                      type="button"
+                      className={styles.retryButton}
+                      onClick={() => void booksQuery.refetch()}
+                    >
+                      {t('community.messages.states.retry', {
+                        defaultValue: 'Reintentar',
+                      })}
+                    </button>
+                  </p>
+                ) : pickerBooks.length === 0 ? (
+                  <p className={styles.bookPickerState}>
+                    {t('community.messages.states.emptyBooks', {
+                      defaultValue:
+                        'No tenés libros disponibles para adjuntar.',
                     })}
-                  </span>
-                </p>
-              ) : booksQuery.isError ? (
-                <p
-                  className={`${styles.bookPickerState} ${styles.errorState}`}
-                  role="alert"
-                >
-                  <span className={styles.stateMark} aria-hidden="true">
-                    !
-                  </span>
-                  <span>
-                    {t('community.messages.states.booksError', {
-                      defaultValue: 'No pudimos cargar los libros.',
-                    })}
-                  </span>
+                  </p>
+                ) : bookPickerMode === 'swap' ? (
+                  <form className={styles.swapForm} onSubmit={proposeSwap}>
+                    <label>
+                      <span>Tu libro</span>
+                      <select
+                        aria-label="Tu libro"
+                        value={offeredId}
+                        onChange={(event) => setOfferedId(event.target.value)}
+                      >
+                        <option value="">Elegí un libro para ofrecer</option>
+                        {(booksQuery.data?.myBooks ?? []).map((book) => (
+                          <option key={book.id} value={book.id}>
+                            {book.title}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label>
+                      <span>Libro que querés recibir</span>
+                      <select
+                        aria-label="Libro que querés recibir"
+                        value={requestedId}
+                        onChange={(event) => setRequestedId(event.target.value)}
+                      >
+                        <option value="">
+                          Elegí un libro de la otra persona
+                        </option>
+                        {(booksQuery.data?.theirBooks ?? []).map((book) => (
+                          <option key={book.id} value={book.id}>
+                            {book.title}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label>
+                      <span>Nota opcional</span>
+                      <textarea
+                        value={swapNote}
+                        onChange={(event) => setSwapNote(event.target.value)}
+                        placeholder="Contale algo sobre la propuesta"
+                        rows={3}
+                      />
+                    </label>
+                    {attachError ? (
+                      <p className={styles.bookPickerError} role="alert">
+                        {attachError}
+                      </p>
+                    ) : null}
+                    <div className={styles.newConversationActions}>
+                      <button
+                        type="button"
+                        className={styles.newConversationCancel}
+                        onClick={() => setBookPickerMode(null)}
+                      >
+                        Cancelar
+                      </button>
+                      <PrototypeButton
+                        type="submit"
+                        tone="primary"
+                        disabled={
+                          !offeredId ||
+                          !requestedId ||
+                          !booksQuery.data?.myBooks.length ||
+                          !booksQuery.data?.theirBooks.length
+                        }
+                      >
+                        Enviar propuesta
+                      </PrototypeButton>
+                    </div>
+                  </form>
+                ) : (
+                  <div className={styles.bookPickerList}>
+                    {pickerBooks.map((book) => (
+                      <button
+                        key={book.id}
+                        type="button"
+                        onClick={() => void attachBook(book)}
+                      >
+                        <BookCover
+                          compact
+                          book={{
+                            id: book.id,
+                            title: book.title,
+                            author: book.author,
+                            owner: '',
+                            distance: '',
+                            mode: 'Intercambio',
+                            accent: '#42d7c7',
+                            genre: 'Libro',
+                            coverUrl: book.coverUrl,
+                          }}
+                        />
+                        <span>
+                          <strong>{book.title}</strong>
+                          <small>{book.author}</small>
+                        </span>
+                        <b>＋</b>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </Panel>
+            </div>
+          </div>
+        ) : null}
+        {agreementOpen ? (
+          <div className={styles.modalBackdrop}>
+            <div
+              ref={modalRef}
+              className={styles.newConversationDialog}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="agreement-title"
+            >
+              <Panel
+                className={`${styles.bookPicker} ${styles.newConversationModal}`}
+                as="div"
+              >
+                <header className={styles.newConversationHeader}>
+                  <div className={styles.newConversationTitle}>
+                    <span className={styles.newConversationEyebrow}>
+                      PROPUESTA DE ACUERDO
+                    </span>
+                    <h2 id="agreement-title">Coordiná el intercambio</h2>
+                    <p>
+                      Definí los datos del encuentro para que queden guardados
+                      en la conversación.
+                    </p>
+                  </div>
                   <button
                     type="button"
-                    className={styles.retryButton}
-                    onClick={() => void booksQuery.refetch()}
+                    className={styles.modalCloseButton}
+                    onClick={() => setAgreementOpen(false)}
+                    aria-label="Cerrar"
                   >
-                    {t('community.messages.states.retry', {
-                      defaultValue: 'Reintentar',
-                    })}
+                    ×
                   </button>
-                </p>
-              ) : (booksQuery.data ?? []).length === 0 ? (
-                <p className={styles.bookPickerState}>
-                  {t('community.messages.states.emptyBooks', {
-                    defaultValue: 'No tenés libros disponibles para adjuntar.',
-                  })}
-                </p>
-              ) : (
-                <div className={styles.bookPickerList}>
-                  {(booksQuery.data ?? []).map((book) => (
-                    <button key={book.id} onClick={() => void attachBook(book)}>
-                      <BookCover
-                        compact
-                        book={{
-                          id: book.id,
-                          title: book.title,
-                          author: book.author,
-                          owner: '',
-                          distance: '',
-                          mode: 'Intercambio',
-                          accent: '#42d7c7',
-                          genre: 'Libro',
-                          coverUrl: book.coverUrl,
-                        }}
+                </header>
+                <form
+                  className={styles.newConversationForm}
+                  onSubmit={(event) => {
+                    event.preventDefault()
+                    if (
+                      agreementForm.bookTitle &&
+                      agreementForm.meetingPoint &&
+                      agreementForm.area &&
+                      agreementForm.date &&
+                      agreementForm.time
+                    ) {
+                      agreementCreateMutation.mutate(agreementForm)
+                    }
+                  }}
+                >
+                  <label className={styles.newConversationField}>
+                    <span>Libro del acuerdo</span>
+                    <select
+                      aria-label="Libro del acuerdo"
+                      value={agreementForm.bookTitle}
+                      onChange={(event) =>
+                        setAgreementForm((form) => ({
+                          ...form,
+                          bookTitle: event.target.value,
+                        }))
+                      }
+                    >
+                      <option value="">
+                        Elegí un libro de la conversación
+                      </option>
+                      {pickerBooks.map((book) => (
+                        <option key={book.id} value={book.title}>
+                          {book.title}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className={styles.newConversationField}>
+                    <span>Punto de encuentro</span>
+                    <input
+                      aria-label="Punto de encuentro"
+                      value={agreementForm.meetingPoint}
+                      onChange={(event) =>
+                        setAgreementForm((form) => ({
+                          ...form,
+                          meetingPoint: event.target.value,
+                        }))
+                      }
+                      placeholder="Ej. Café de la esquina"
+                    />
+                  </label>
+                  <label className={styles.newConversationField}>
+                    <span>Zona</span>
+                    <input
+                      aria-label="Zona"
+                      value={agreementForm.area}
+                      onChange={(event) =>
+                        setAgreementForm((form) => ({
+                          ...form,
+                          area: event.target.value,
+                        }))
+                      }
+                      placeholder="Ej. Palermo"
+                    />
+                  </label>
+                  <div className={styles.agreementFields}>
+                    <label className={styles.newConversationField}>
+                      <span>Fecha</span>
+                      <input
+                        aria-label="Fecha"
+                        type="date"
+                        value={agreementForm.date}
+                        onChange={(event) =>
+                          setAgreementForm((form) => ({
+                            ...form,
+                            date: event.target.value,
+                          }))
+                        }
                       />
-                      <span>
-                        <strong>{book.title}</strong>
-                        <small>{book.author}</small>
-                      </span>
-                      <b>＋</b>
+                    </label>
+                    <label className={styles.newConversationField}>
+                      <span>Hora</span>
+                      <input
+                        aria-label="Hora"
+                        type="time"
+                        value={agreementForm.time}
+                        onChange={(event) =>
+                          setAgreementForm((form) => ({
+                            ...form,
+                            time: event.target.value,
+                          }))
+                        }
+                      />
+                    </label>
+                  </div>
+                  {agreementCreateMutation.isError ? (
+                    <p className={styles.bookPickerError} role="alert">
+                      No pudimos crear el acuerdo. Intentá nuevamente.
+                    </p>
+                  ) : null}
+                  <div className={styles.newConversationActions}>
+                    <button
+                      type="button"
+                      className={styles.newConversationCancel}
+                      onClick={() => setAgreementOpen(false)}
+                    >
+                      Cancelar
                     </button>
-                  ))}
-                </div>
-              )}
-            </Panel>
+                    <PrototypeButton
+                      type="submit"
+                      tone="primary"
+                      disabled={
+                        agreementCreateMutation.isPending ||
+                        !agreementForm.bookTitle ||
+                        !agreementForm.meetingPoint ||
+                        !agreementForm.area ||
+                        !agreementForm.date ||
+                        !agreementForm.time
+                      }
+                    >
+                      Crear acuerdo
+                    </PrototypeButton>
+                  </div>
+                </form>
+              </Panel>
+            </div>
           </div>
         ) : null}
         {newConversationOpen ? (
           <div className={styles.modalBackdrop}>
             <div
+              ref={modalRef}
               className={styles.newConversationDialog}
               role="dialog"
               aria-modal="true"

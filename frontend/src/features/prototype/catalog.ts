@@ -23,12 +23,43 @@ export type PrototypeConversation = {
   accent: string
 }
 
+export type PrototypeChatBook = {
+  id: string
+  title: string
+  author: string
+  coverUrl: string
+}
+
 export type PrototypeChatMessage = {
   id: string
   role: 'me' | 'them'
   text: string
   time: string
-  kind?: 'book' | 'proposal'
+  kind?: 'book' | 'proposal' | 'swap' | 'agreement'
+  book?: PrototypeChatBook
+  swap?: {
+    offered: PrototypeChatBook
+    requested: PrototypeChatBook
+    note?: string
+  }
+  agreement?: {
+    agreementId: number
+    version: number
+    event:
+      | 'proposal'
+      | 'counterproposal'
+      | 'confirm'
+      | 'cancel'
+      | 'reject'
+      | 'complete'
+    meetingPoint: string
+    area: string
+    date: string
+    time: string
+    bookTitle: string
+    actorName: string
+    reason?: string
+  }
 }
 
 export const prototypeCatalog = {

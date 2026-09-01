@@ -26,7 +26,7 @@ Las migraciones están en `backend/migrations/` y se ejecutan en orden. Son appe
 
 ## Mensajería
 
-`GET /api/messages` lista conversaciones del usuario autenticado. El canal de conversación usa Socket.IO y persiste el mensaje antes de notificar a los clientes. La conversación del bot se crea de manera idempotente y sus respuestas se guardan en la base. El evento/canal global legacy se mantiene por compatibilidad.
+`GET /api/messages` lista conversaciones del usuario autenticado. `GET /api/messages/:conversationId/books` devuelve los libros disponibles de ambos participantes para adjuntarlos o proponer un intercambio. El canal de conversación usa Socket.IO y persiste el mensaje antes de notificar a los clientes; los adjuntos `book`, `swap` y `agreement` se validan contra la conversación y sobreviven a la recarga. La conversación del bot se crea de manera idempotente y sus respuestas se guardan en la base. El evento/canal global legacy se mantiene por compatibilidad.
 
 ## Comandos
 

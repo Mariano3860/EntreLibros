@@ -427,6 +427,56 @@ main.layoutMain {
   gap: 7px !important;
 }
 
+.proposalBooks {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 8px !important;
+  margin-top: 10px;
+}
+
+.proposalBook {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  padding: 6px;
+  border: 1px solid var(--prototype-border);
+  border-radius: 8px;
+  background: var(--prototype-surface-soft);
+}
+
+.proposalBook > div {
+  min-height: 58px;
+  border-radius: 5px;
+}
+
+.proposalBook strong,
+.proposalBook small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.proposalBook strong {
+  font-size: 8px;
+}
+
+.proposalBook small {
+  margin-top: 3px;
+  color: var(--prototype-muted);
+  font-size: 7px;
+}
+
+.bubbleTime {
+  display: block;
+  margin-top: 7px;
+  color: var(--prototype-muted);
+  font-size: 7px;
+  text-align: right;
+}
+
 .bookAttachment {
   display: grid;
   width: min(280px, 70%);
@@ -460,6 +510,40 @@ main.layoutMain {
   gap: 6px;
   padding: 10px 13px;
   border-top: 1px solid var(--prototype-border);
+}
+
+.composerActions {
+  position: relative;
+  flex: 0 0 31px;
+}
+
+.composerMenu {
+  position: absolute;
+  bottom: calc(100% + 9px);
+  left: 0;
+  z-index: 4;
+  display: grid;
+  width: 176px;
+  gap: 3px;
+  padding: 6px;
+  border: 1px solid var(--prototype-border);
+  border-radius: 11px;
+  background: var(--prototype-surface);
+  box-shadow: 0 14px 32px rgb(0 0 0 / 24%);
+}
+
+.composerMenu button {
+  width: auto;
+  height: 31px;
+  border-radius: 7px;
+  color: var(--prototype-text);
+  font-size: 9px;
+  text-align: left;
+}
+
+.composerMenu button:hover {
+  background: var(--prototype-subtle-hover);
+  color: var(--prototype-teal);
 }
 
 .composer input {
@@ -682,10 +766,15 @@ main.layoutMain {
 }
 
 .bookPicker {
-  width: min(620px, 100%);
+  box-sizing: border-box;
+  width: 100%;
   max-height: 82vh;
   padding: 19px;
   overflow: auto;
+}
+
+.bookPickerDialog {
+  width: min(620px, calc(100vw - 40px));
 }
 
 .bookPicker header {
@@ -806,6 +895,68 @@ main.layoutMain {
   color: var(--prototype-teal);
 }
 
+.swapForm {
+  display: grid;
+  gap: 13px;
+  margin-top: 16px;
+}
+
+.swapForm label,
+.agreementFields label {
+  display: grid;
+  gap: 6px;
+}
+
+.swapForm label > span,
+.agreementFields label > span {
+  color: var(--prototype-text);
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.swapForm select,
+.swapForm textarea,
+.bookPicker select,
+.bookPicker input[type='date'],
+.bookPicker input[type='time'] {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid var(--prototype-border);
+  border-radius: 8px;
+  outline: 0;
+  background: var(--prototype-surface-soft);
+  color: var(--prototype-input-text);
+  font: inherit;
+  font-size: 10px;
+}
+
+.swapForm textarea {
+  resize: vertical;
+}
+
+.swapForm .newConversationActions {
+  margin: 3px 0 0;
+  padding: 0;
+  border-top: 0;
+  background: transparent;
+}
+
+.swapForm select:focus,
+.swapForm textarea:focus,
+.bookPicker select:focus,
+.bookPicker input[type='date']:focus,
+.bookPicker input[type='time']:focus {
+  border-color: var(--prototype-teal);
+  box-shadow: 0 0 0 3px rgb(66 215 199 / 12%);
+}
+
+.agreementFields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
 @media (max-width: $breakpoint-tablet) {
   .layoutMain {
     height: auto;
@@ -825,6 +976,10 @@ main.layoutMain {
 
   .chat {
     min-height: 560px;
+  }
+
+  .proposalBooks {
+    grid-template-columns: 1fr !important;
   }
 
   .chatHeader nav button:nth-child(2),

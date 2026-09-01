@@ -101,7 +101,16 @@ describe('websocket messaging', () => {
       sequence: 1,
       clientKey: 'room-key',
       body: 'private',
-      attachmentMetadata: null,
+      attachmentMetadata: {
+        key: 'book:1',
+        contentType: 'application/x-entrelibros-book',
+        size: 1,
+        kind: 'book',
+        bookId: '1',
+        title: 'Libro privado',
+        author: 'Autora',
+        coverUrl: '/cover.jpg',
+      },
       createdAt: new Date(),
     });
     vi.spyOn(messagingRepo, 'listMessages').mockResolvedValue([
@@ -162,6 +171,9 @@ describe('websocket messaging', () => {
       authorized.once('conversation:message', (message) => {
         expect(message.body).toBe('private');
         expect(message.conversationId).toBe(101);
+        expect(message.attachmentMetadata).toEqual(
+          expect.objectContaining({ kind: 'book', bookId: '1' })
+        );
         resolve();
       });
     });

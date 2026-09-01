@@ -4,6 +4,7 @@ import type { UserProfile } from '@api/user/profile.types'
 
 import type {
   PrototypeBook,
+  PrototypeChatBook,
   PrototypeChatMessage,
   PrototypeConversation,
 } from './catalog'
@@ -134,10 +135,58 @@ export const toPrototypeChatMessage = (
   message: ApiMessage,
   currentUserId: number,
   now?: Date
-): PrototypeChatMessage => ({
-  id: String(message.id),
-  role: message.senderId === currentUserId ? 'me' : 'them',
-  text: message.body,
-  time: formatPrototypeTime(message.createdAt, now),
-  ...(message.attachmentMetadata?.kind === 'book' ? { kind: 'book' } : {}),
-})
+): PrototypeChatMessage => {
+  const base = {
+    id: String(message.id),
+    role:
+      message.senderId === currentUserId ? ('me' as const) : ('them' as const),
+    text: message.body,
+    time: formatPrototypeTime(message.createdAt, now),
+  }
+  const attachment = message.attachmentMetadata
+  if (!attachment) return base
+
+  const toBook = (book: {
+    id?: string
+    bookId?: string
+    title: string
+    author: string
+    coverUrl: string
+  }): PrototypeChatBook => ({
+    id: book.id ?? book.bookId ?? book.title,
+    title: book.title,
+    author: book.author,
+    coverUrl: book.coverUrl,
+  })
+
+  if (attachment.kind === 'book') {
+    return { ...base, kind: 'book', book: toBook(attachment) }
+  }
+  if (attachment.kind === 'swap') {
+    return {
+      ...base,
+      kind: 'swap',
+      swap: {
+        offered: toBook(attachment.offered),
+        requested: toBook(attachment.requested),
+        ...(attachment.note ? { note: attachment.note } : {}),
+      },
+    }
+  }
+  return {
+    ...base,
+    kind: 'agreement',
+    agreement: {
+      agreementId: attachment.agreementId,
+      version: attachment.version,
+      event: attachment.event,
+      meetingPoint: attachment.details.meetingPoint,
+      area: attachment.details.area,
+      date: attachment.details.date,
+      time: attachment.details.time,
+      bookTitle: attachment.details.bookTitle,
+      actorName: attachment.actorName,
+      ...(attachment.reason ? { reason: attachment.reason } : {}),
+    },
+  }
+}
