@@ -167,7 +167,13 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": ["available", "reserved", "completed", "sold", "exchanged"]
+              "enum": [
+                "available",
+                "reserved",
+                "completed",
+                "sold",
+                "exchanged"
+              ]
             }
           },
           {
@@ -841,15 +847,35 @@
                   "attachmentMetadata": {
                     "type": "object",
                     "properties": {
-                      "key": { "type": "string" },
-                      "contentType": { "type": "string" },
-                      "size": { "type": "integer", "minimum": 1 },
-                      "name": { "type": "string" },
-                      "kind": { "type": "string", "enum": ["book"] },
-                      "bookId": { "type": "string" },
-                      "title": { "type": "string" },
-                      "author": { "type": "string" },
-                      "coverUrl": { "type": "string" }
+                      "key": {
+                        "type": "string"
+                      },
+                      "contentType": {
+                        "type": "string"
+                      },
+                      "size": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "kind": {
+                        "type": "string",
+                        "enum": ["book"]
+                      },
+                      "bookId": {
+                        "type": "string"
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "author": {
+                        "type": "string"
+                      },
+                      "coverUrl": {
+                        "type": "string"
+                      }
                     },
                     "required": ["key", "contentType", "size"]
                   }
@@ -2231,7 +2257,11 @@
           {
             "in": "query",
             "name": "offset",
-            "schema": { "type": "integer", "minimum": 0, "default": 0 },
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
             "description": "Zero-based recommendation offset"
           }
         ],
@@ -2251,10 +2281,20 @@
                       "type": "object",
                       "required": ["limit", "offset", "hasNext", "hasPrevious"],
                       "properties": {
-                        "limit": { "type": "integer", "maximum": 5 },
-                        "offset": { "type": "integer", "minimum": 0 },
-                        "hasNext": { "type": "boolean" },
-                        "hasPrevious": { "type": "boolean" }
+                        "limit": {
+                          "type": "integer",
+                          "maximum": 5
+                        },
+                        "offset": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "hasNext": {
+                          "type": "boolean"
+                        },
+                        "hasPrevious": {
+                          "type": "boolean"
+                        }
                       }
                     }
                   }
@@ -2569,7 +2609,11 @@
       "post": {
         "summary": "Create a community story",
         "tags": ["Community"],
-        "security": [{ "cookieAuth": [] }],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -2585,12 +2629,18 @@
             "description": "Persisted community story",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/StoryFeedItem" }
+                "schema": {
+                  "$ref": "#/components/schemas/StoryFeedItem"
+                }
               }
             }
           },
-          "401": { "description": "auth.errors.unauthorized" },
-          "422": { "description": "community.story validation error" }
+          "401": {
+            "description": "auth.errors.unauthorized"
+          },
+          "422": {
+            "description": "community.story validation error"
+          }
         }
       }
     },
@@ -2640,7 +2690,11 @@
       "get": {
         "summary": "Retrieve personalized community discovery data",
         "tags": ["Community"],
-        "security": [{ "cookieAuth": [] }],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Stories, relevant books and personalized suggestions",
@@ -2652,7 +2706,9 @@
               }
             }
           },
-          "401": { "description": "auth.errors.unauthorized" }
+          "401": {
+            "description": "auth.errors.unauthorized"
+          }
         }
       }
     },
@@ -2662,43 +2718,70 @@
           "name": "id",
           "in": "path",
           "required": true,
-          "schema": { "type": "integer", "minimum": 1 }
+          "schema": {
+            "type": "integer",
+            "minimum": 1
+          }
         }
       ],
       "post": {
         "summary": "Follow a community member",
         "tags": ["Community"],
-        "security": [{ "cookieAuth": [] }],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
         "responses": {
           "201": {
             "description": "Follow relationship created",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/FollowResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/FollowResponse"
+                }
               }
             }
           },
-          "401": { "description": "auth.errors.unauthorized" },
-          "404": { "description": "community.follow.errors.target_not_found" },
-          "422": { "description": "community.follow.errors.self" }
+          "401": {
+            "description": "auth.errors.unauthorized"
+          },
+          "404": {
+            "description": "community.follow.errors.target_not_found"
+          },
+          "422": {
+            "description": "community.follow.errors.self"
+          }
         }
       },
       "delete": {
         "summary": "Stop following a community member",
         "tags": ["Community"],
-        "security": [{ "cookieAuth": [] }],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Follow relationship removed",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/FollowResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/FollowResponse"
+                }
               }
             }
           },
-          "401": { "description": "auth.errors.unauthorized" },
-          "404": { "description": "community.follow.errors.target_not_found" },
-          "422": { "description": "community.follow.errors.self" }
+          "401": {
+            "description": "auth.errors.unauthorized"
+          },
+          "404": {
+            "description": "community.follow.errors.target_not_found"
+          },
+          "422": {
+            "description": "community.follow.errors.self"
+          }
         }
       }
     },
@@ -3264,16 +3347,38 @@
       "StoryFeedItem": {
         "type": "object",
         "properties": {
-          "id": { "type": "string" },
-          "user": { "type": "string" },
-          "avatar": { "type": "string" },
-          "time": { "type": "string" },
-          "likes": { "type": "integer", "minimum": 0 },
-          "type": { "type": "string", "enum": ["story"] },
-          "title": { "type": "string" },
-          "body": { "type": "string" },
-          "image": { "type": "string" },
-          "book": { "$ref": "#/components/schemas/StoryBook" }
+          "id": {
+            "type": "string"
+          },
+          "user": {
+            "type": "string"
+          },
+          "avatar": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string"
+          },
+          "likes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "type": {
+            "type": "string",
+            "enum": ["story"]
+          },
+          "title": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "book": {
+            "$ref": "#/components/schemas/StoryBook"
+          }
         },
         "required": [
           "id",
@@ -3289,23 +3394,43 @@
       "CreateCommunityStory": {
         "type": "object",
         "properties": {
-          "body": { "type": "string" },
-          "imageUrl": { "type": ["string", "null"] },
-          "bookListingId": { "type": ["string", "null"] }
+          "body": {
+            "type": "string"
+          },
+          "imageUrl": {
+            "type": ["string", "null"]
+          },
+          "bookListingId": {
+            "type": ["string", "null"]
+          }
         },
         "anyOf": [
-          { "required": ["body"] },
-          { "required": ["imageUrl"] },
-          { "required": ["bookListingId"] }
+          {
+            "required": ["body"]
+          },
+          {
+            "required": ["imageUrl"]
+          },
+          {
+            "required": ["bookListingId"]
+          }
         ]
       },
       "StoryBook": {
         "type": "object",
         "properties": {
-          "id": { "type": "string" },
-          "title": { "type": "string" },
-          "author": { "type": "string" },
-          "cover": { "type": "string" }
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string"
+          },
+          "cover": {
+            "type": "string"
+          }
         },
         "required": ["id", "title", "author", "cover"]
       },
@@ -3344,8 +3469,12 @@
       "FollowResponse": {
         "type": "object",
         "properties": {
-          "following": { "type": "boolean" },
-          "userId": { "type": "string" }
+          "following": {
+            "type": "boolean"
+          },
+          "userId": {
+            "type": "string"
+          }
         },
         "required": ["following", "userId"]
       },
@@ -3354,11 +3483,15 @@
         "properties": {
           "stories": {
             "type": "array",
-            "items": { "$ref": "#/components/schemas/CommunityStoryPreview" }
+            "items": {
+              "$ref": "#/components/schemas/CommunityStoryPreview"
+            }
           },
           "suggestions": {
             "type": "array",
-            "items": { "$ref": "#/components/schemas/CommunitySuggestion" }
+            "items": {
+              "$ref": "#/components/schemas/CommunitySuggestion"
+            }
           },
           "recommendedBooks": {
             "type": "array",
@@ -3372,14 +3505,30 @@
       "CommunityStoryPreview": {
         "type": "object",
         "properties": {
-          "id": { "type": "string" },
-          "storyId": { "type": "string" },
-          "user": { "type": "string" },
-          "avatar": { "type": "string" },
-          "body": { "type": "string" },
-          "image": { "type": "string" },
-          "time": { "type": "string" },
-          "isFollowing": { "type": "boolean" }
+          "id": {
+            "type": "string"
+          },
+          "storyId": {
+            "type": "string"
+          },
+          "user": {
+            "type": "string"
+          },
+          "avatar": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string"
+          },
+          "isFollowing": {
+            "type": "boolean"
+          }
         },
         "required": [
           "id",
@@ -3394,16 +3543,31 @@
       "CommunitySuggestion": {
         "type": "object",
         "properties": {
-          "id": { "type": "string" },
-          "user": { "type": "string" },
-          "avatar": { "type": "string" },
+          "id": {
+            "type": "string"
+          },
+          "user": {
+            "type": "string"
+          },
+          "avatar": {
+            "type": "string"
+          },
           "reason": {
             "type": "string",
             "enum": ["nearby", "similar_interests", "active_reader"]
           },
-          "distanceKm": { "type": "number" },
-          "commonInterests": { "type": "array", "items": { "type": "string" } },
-          "isFollowing": { "type": "boolean" }
+          "distanceKm": {
+            "type": "number"
+          },
+          "commonInterests": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "isFollowing": {
+            "type": "boolean"
+          }
         },
         "required": [
           "id",
@@ -3417,21 +3581,42 @@
       "CommunityBookRecommendation": {
         "type": "object",
         "properties": {
-          "id": { "type": "string" },
-          "title": { "type": "string" },
-          "author": { "type": "string" },
-          "cover": { "type": "string" },
-          "condition": { "type": "string" },
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string"
+          },
+          "cover": {
+            "type": "string"
+          },
+          "condition": {
+            "type": "string"
+          },
           "owner": {
             "type": "object",
             "properties": {
-              "id": { "type": "string" },
-              "user": { "type": "string" }
+              "id": {
+                "type": "string"
+              },
+              "user": {
+                "type": "string"
+              }
             },
             "required": ["id", "user"]
           },
-          "commonInterests": { "type": "array", "items": { "type": "string" } },
-          "isFollowing": { "type": "boolean" }
+          "commonInterests": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "isFollowing": {
+            "type": "boolean"
+          }
         },
         "required": [
           "id",
