@@ -10,6 +10,15 @@ import { BooksPage } from '@src/pages/books/BooksPage'
 import { renderWithProviders } from '../../test-utils'
 
 describe('BooksPage', () => {
+  test('renders the book sections in one accessible horizontal tablist', () => {
+    renderWithProviders(<BooksPage />)
+
+    const tablist = screen.getByRole('tablist', { name: 'Tipos de libros' })
+
+    expect(tablist).toHaveAttribute('aria-orientation', 'horizontal')
+    expect(tablist.querySelectorAll('[role="tab"]')).toHaveLength(5)
+  })
+
   test('renders Todos with the user books', () => {
     renderWithProviders(<BooksPage />)
 

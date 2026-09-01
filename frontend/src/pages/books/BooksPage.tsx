@@ -601,6 +601,7 @@ export const BooksPage = () => {
           className={styles.tabs}
           role="tablist"
           aria-label="Tipos de libros"
+          aria-orientation="horizontal"
         >
           {tabs.map((tab) => (
             <button
