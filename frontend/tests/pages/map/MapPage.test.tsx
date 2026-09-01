@@ -1,6 +1,29 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
+import type { MapPin } from '@src/api/map/map.types'
+
+const mapCanvasRender = vi.hoisted(() => vi.fn())
+
+vi.mock('@components/map/MapCanvas/MapCanvas', () => ({
+  MapCanvas: ({
+    selectedPin,
+    userLocation,
+  }: {
+    selectedPin: MapPin | null
+    userLocation?: { latitude: number; longitude: number } | null
+  }) => {
+    mapCanvasRender({ selectedPin, userLocation })
+    return (
+      <div data-testid="map-canvas">
+        {userLocation ? (
+          <button type="button" aria-label={'Tu ubicaci\u00f3n aproximada'} />
+        ) : null}
+      </div>
+    )
+  },
+}))
+
 vi.mock('@src/api/auth/me.service', () => ({
   fetchMe: vi.fn().mockRejectedValue(new Error('unauthenticated')),
 }))
@@ -52,6 +75,29 @@ describe('MapPage', () => {
     expect(
       screen.getByRole('heading', { name: 'Biblioteca de Palermo' })
     ).toBeVisible()
+  })
+
+  test('centers the selected corner from the detail card action', () => {
+    mapCanvasRender.mockClear()
+    renderWithProviders(<MapPage />)
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Biblioteca de Palermo' })
+    )
+    const selectedPinBeforeAction = mapCanvasRender.mock.calls.at(-1)?.[0]
+      .selectedPin as MapPin
+
+    fireEvent.click(screen.getByRole('button', { name: 'Ver rinc\u00f3n' }))
+
+    const selectedPinAfterAction = mapCanvasRender.mock.calls.at(-1)?.[0]
+      .selectedPin as MapPin
+    expect(selectedPinAfterAction).toEqual(
+      expect.objectContaining({
+        type: 'corner',
+        data: expect.objectContaining({ id: 'biblioteca-palermo' }),
+      })
+    )
+    expect(selectedPinAfterAction).not.toBe(selectedPinBeforeAction)
   })
 
   test('opens the corner received from the community map', () => {

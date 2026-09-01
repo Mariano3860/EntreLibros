@@ -303,6 +303,17 @@ export const MapPage = () => {
     : selectedMapCorner?.lastSignalAt
       ? 'Actividad reciente'
       : (selectedCorner?.activity ?? 'Sin actividad reciente')
+  const cornerForSelectedCard =
+    selectedMapCorner ??
+    (selectedPublication
+      ? (mapCorners.find(
+          (corner) => corner.id === selectedPublication.cornerId
+        ) ?? null)
+      : null)
+  const handleViewCorner = useCallback(() => {
+    if (!cornerForSelectedCard) return
+    selectCorner(displayCornerForPin(cornerForSelectedCard))
+  }, [cornerForSelectedCard, displayCornerForPin, selectCorner])
 
   if (!mockMode && mapQuery.isError)
     return (
@@ -472,7 +483,12 @@ export const MapPage = () => {
                   <span>{selectedActivity}</span>
                 </div>
               </div>
-              <PrototypeButton tone="primary" size="small">
+              <PrototypeButton
+                tone="primary"
+                size="small"
+                disabled={!cornerForSelectedCard}
+                onClick={handleViewCorner}
+              >
                 Ver rincón
               </PrototypeButton>
             </Panel>
