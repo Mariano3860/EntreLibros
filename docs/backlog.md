@@ -257,6 +257,8 @@ Feature 5.1 Mensajería 1:1
 
 Feature 5.2 Acuerdos
 
+- Actualización 2026-09-01: las acciones de una propuesta pendiente respetan el autor: quien propone puede cancelar y la contraparte puede aceptar o rechazar; la API también impide confirmar o rechazar la propia versión.
+
 - [~] S-5.3 Confirmación de acuerdo (lugar RdL/espacio público, horario) (Must, E1; BR-41)
   - Éxito: registra acuerdo y dispara recordatorio.
   - Actualización 2025-09-28: se incorporaron las burbujas de Propuesta y Confirmación dentro del chat, con i18n ES/EN, respeto de tema claro/oscuro y sin exponer direcciones exactas; resta conectar la lógica persistente/notificaciones.

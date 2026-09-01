@@ -460,11 +460,84 @@ describe('MessagesPage in real API mode', () => {
 
     expect(await screen.findByText('Propuesta de acuerdo')).toBeVisible()
     fireEvent.click(screen.getByRole('button', { name: 'Aceptar' }))
+    expect(
+      screen.queryByRole('button', { name: 'Cancelar acuerdo' })
+    ).not.toBeInTheDocument()
     await waitFor(() =>
       expect(mocks.commandAgreement).toHaveBeenCalledWith({
         agreementId: agreement.id,
         command: 'confirm',
         expectedVersion: agreement.currentVersion,
+      })
+    )
+  })
+
+  test('shows only cancellation for an agreement proposed by the current user', async () => {
+    const agreement = {
+      id: 22,
+      conversationId: conversation.id,
+      proposerId: 7,
+      participantId: 8,
+      state: 'proposed' as const,
+      currentVersion: 1,
+      details: {
+        meetingPoint: 'Biblioteca',
+        area: 'Centro',
+        date: '2026-09-01',
+        time: '18:00',
+        bookTitle: book.title,
+      },
+      acceptances: [],
+      listingIds: [1],
+    }
+    mocks.fetchConversations.mockResolvedValue([
+      { ...conversation, agreementId: agreement.id },
+    ])
+    mocks.fetchMessageHistory.mockResolvedValue({
+      messages: [
+        {
+          id: 21,
+          conversationId: conversation.id,
+          senderId: 7,
+          sequence: 1,
+          clientKey: 'own-agreement-history',
+          body: '',
+          attachmentMetadata: {
+            key: 'agreement:22:1',
+            contentType: 'application/x-entrelibros-agreement',
+            size: 1,
+            kind: 'agreement',
+            agreementId: agreement.id,
+            version: 1,
+            event: 'proposal',
+            details: agreement.details,
+            listingIds: agreement.listingIds,
+            actorName: 'Mariano',
+          },
+          createdAt: '2026-08-31T10:00:00.000Z',
+        },
+      ],
+      nextAfter: 1,
+    })
+    mocks.fetchAgreement.mockResolvedValue(agreement)
+    mocks.commandAgreement.mockResolvedValue(agreement)
+
+    renderWithProviders(<MessagesPage />)
+
+    expect(await screen.findByText('Propuesta de acuerdo')).toBeVisible()
+    expect(
+      screen.queryByRole('button', { name: 'Aceptar' })
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'Rechazar' })
+    ).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Cancelar acuerdo' }))
+    await waitFor(() =>
+      expect(mocks.commandAgreement).toHaveBeenCalledWith({
+        agreementId: agreement.id,
+        command: 'cancel',
+        expectedVersion: agreement.currentVersion,
+        reason: 'El acuerdo fue cancelado.',
       })
     )
   })

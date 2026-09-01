@@ -58,7 +58,7 @@ describe('agreement concurrency', () => {
     const outcomes = await Promise.allSettled([
       commandAgreement({
         id: agreement.id,
-        actorId: proposer,
+        actorId: participant,
         expectedVersion: 1,
         command: 'confirm',
       }),

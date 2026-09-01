@@ -297,7 +297,7 @@ describe('messaging and agreements API', () => {
       );
   });
 
-  test('creates agreement history and returns a stale-version conflict', async () => {
+  test('creates agreement history and enforces proposal-author actions', async () => {
     const first = await registerAndLogin('agreement-a');
     const second = await registerAndLogin('agreement-b');
     const conversation = await request(app)
@@ -327,6 +327,14 @@ describe('messaging and agreements API', () => {
     await request(app)
       .post(`/api/agreements/${agreementId}/commands`)
       .set('Cookie', first.cookie)
+      .send({ command: 'confirm', expectedVersion: 1 })
+      .expect(403)
+      .expect(({ body }) => {
+        expect(body.message).toBe('agreements.errors.forbidden');
+      });
+    await request(app)
+      .post(`/api/agreements/${agreementId}/commands`)
+      .set('Cookie', second.cookie)
       .send({ command: 'confirm', expectedVersion: 1 })
       .expect(200);
     await request(app)

@@ -41,6 +41,11 @@ El menú del composer SHALL exponer acciones para insertar un emoji, adjuntar li
 - **WHEN** una persona abre el menú `+` y selecciona un emoji
 - **THEN** se abre un selector compacto, el emoji elegido se inserta en la posición del cursor del borrador, el selector se cierra y el mensaje queda listo para enviar
 
+#### Scenario: Acciones seguras según el autor de la propuesta
+
+- **WHEN** una propuesta o contrapropuesta queda pendiente en una burbuja del chat
+- **THEN** quien la envió solo puede cancelarla, la otra persona puede aceptarla o rechazarla y la API rechaza confirmar o rechazar la versión creada por su propio actor
+
 ### Requirement: Burbujas de chat preservadas
 
 El historial SHALL conservar burbujas de texto, adjuntos y acuerdos con estados de envío, lectura y error distinguibles, manteniendo scroll independiente y composer anclado según `img.png`.

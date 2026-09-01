@@ -195,6 +195,7 @@ type ChatMessageBubbleProps = {
   agreementPending: boolean
   onConfirmAgreement: () => void
   onRejectAgreement: () => void
+  onCancelAgreement: () => void
 }
 
 const ChatMessageBubble = ({
@@ -203,6 +204,7 @@ const ChatMessageBubble = ({
   agreementPending,
   onConfirmAgreement,
   onRejectAgreement,
+  onCancelAgreement,
 }: ChatMessageBubbleProps) => {
   const { t } = useTranslation()
   const alignment = item.role === 'me' ? styles.mine : ''
@@ -269,10 +271,13 @@ const ChatMessageBubble = ({
     const agreementMessage = item.agreement
     const canAct =
       agreement?.id === agreementMessage.agreementId &&
+      agreement.currentVersion === agreementMessage.version &&
       (agreement.state === 'proposed' ||
         agreement.state === 'partially_confirmed') &&
       (agreementMessage.event === 'proposal' ||
         agreementMessage.event === 'counterproposal')
+    const canRespond = canAct && item.role === 'them'
+    const canCancel = canAct && item.role === 'me'
     const title =
       agreementMessage.event === 'counterproposal'
         ? t('community.messages.bubbles.agreementChange', {
@@ -306,7 +311,7 @@ const ChatMessageBubble = ({
           {agreementMessage.date} · {agreementMessage.time}
         </small>
         {agreementMessage.reason ? <p>{agreementMessage.reason}</p> : null}
-        {canAct ? (
+        {canRespond ? (
           <div className={styles.proposalActions}>
             <PrototypeButton
               size="small"
@@ -325,6 +330,18 @@ const ChatMessageBubble = ({
             >
               {t('community.messages.bubbles.reject', {
                 defaultValue: 'Rechazar',
+              })}
+            </PrototypeButton>
+          </div>
+        ) : canCancel ? (
+          <div className={styles.proposalActions}>
+            <PrototypeButton
+              size="small"
+              onClick={onCancelAgreement}
+              disabled={agreementPending}
+            >
+              {t('community.messages.agreement.cancellation.confirmAction', {
+                defaultValue: 'Cancelar acuerdo',
               })}
             </PrototypeButton>
           </div>
@@ -486,12 +503,18 @@ const MockMessagesPage = () => {
                       </div>
                     </div>
                     <div className={styles.proposalActions}>
-                      <PrototypeButton size="small" tone="primary">
-                        Aceptar
-                      </PrototypeButton>
-                      <PrototypeButton size="small">
-                        Ver detalle
-                      </PrototypeButton>
+                      {item.role === 'me' ? (
+                        <PrototypeButton size="small">Cancelar</PrototypeButton>
+                      ) : (
+                        <>
+                          <PrototypeButton size="small" tone="primary">
+                            Aceptar
+                          </PrototypeButton>
+                          <PrototypeButton size="small">
+                            Rechazar
+                          </PrototypeButton>
+                        </>
+                      )}
                     </div>
                   </article>
                 ) : item.kind === 'book' ? (
@@ -681,12 +704,17 @@ const RealMessagesPage = () => {
     enabled:
       activeConversation?.agreementId !== null && activeConversation !== null,
   })
+  type AgreementMutationInput = {
+    command: 'confirm' | 'reject' | 'cancel'
+    reason?: string
+  }
   const agreementMutation = useMutation({
-    mutationFn: (command: 'confirm' | 'reject' | 'cancel') =>
+    mutationFn: ({ command, reason }: AgreementMutationInput) =>
       commandAgreement({
         agreementId: agreementQuery.data?.id ?? 0,
         command,
         expectedVersion: agreementQuery.data?.currentVersion ?? 0,
+        ...(reason ? { reason } : {}),
       }),
     onSuccess: (agreement) => {
       queryClient.setQueryData(
@@ -706,6 +734,13 @@ const RealMessagesPage = () => {
       })
     },
   })
+  const cancelAgreement = () =>
+    agreementMutation.mutate({
+      command: 'cancel',
+      reason: t('community.messages.agreement.cancellation.defaultReason', {
+        defaultValue: 'El acuerdo fue cancelado.',
+      }),
+    })
   const agreementCreateMutation = useMutation({
     mutationFn: async (details: AgreementDetails) => {
       if (!selected || !activeConversation || !user) {
@@ -1163,11 +1198,12 @@ const RealMessagesPage = () => {
                         agreement={agreementQuery.data}
                         agreementPending={agreementMutation.isPending}
                         onConfirmAgreement={() =>
-                          agreementMutation.mutate('confirm')
+                          agreementMutation.mutate({ command: 'confirm' })
                         }
                         onRejectAgreement={() =>
-                          agreementMutation.mutate('reject')
+                          agreementMutation.mutate({ command: 'reject' })
                         }
+                        onCancelAgreement={cancelAgreement}
                       />
                     ))
                   ) : (
@@ -1193,23 +1229,46 @@ const RealMessagesPage = () => {
                       {agreementQuery.data.details.date}{' '}
                       {agreementQuery.data.details.time}
                     </small>
-                    {agreementQuery.data.state === 'proposed' ? (
+                    {agreementQuery.data.state === 'proposed' && user ? (
                       <div className={styles.proposalActions}>
-                        <PrototypeButton
-                          size="small"
-                          tone="primary"
-                          onClick={() => agreementMutation.mutate('confirm')}
-                          disabled={agreementMutation.isPending}
-                        >
-                          Aceptar
-                        </PrototypeButton>
-                        <PrototypeButton
-                          size="small"
-                          onClick={() => agreementMutation.mutate('reject')}
-                          disabled={agreementMutation.isPending}
-                        >
-                          Rechazar
-                        </PrototypeButton>
+                        {agreementQuery.data.participantId === user.id ? (
+                          <>
+                            <PrototypeButton
+                              size="small"
+                              tone="primary"
+                              onClick={() =>
+                                agreementMutation.mutate({
+                                  command: 'confirm',
+                                })
+                              }
+                              disabled={agreementMutation.isPending}
+                            >
+                              Aceptar
+                            </PrototypeButton>
+                            <PrototypeButton
+                              size="small"
+                              onClick={() =>
+                                agreementMutation.mutate({
+                                  command: 'reject',
+                                })
+                              }
+                              disabled={agreementMutation.isPending}
+                            >
+                              Rechazar
+                            </PrototypeButton>
+                          </>
+                        ) : agreementQuery.data.proposerId === user.id ? (
+                          <PrototypeButton
+                            size="small"
+                            onClick={cancelAgreement}
+                            disabled={agreementMutation.isPending}
+                          >
+                            {t(
+                              'community.messages.agreement.cancellation.confirmAction',
+                              { defaultValue: 'Cancelar acuerdo' }
+                            )}
+                          </PrototypeButton>
+                        ) : null}
                       </div>
                     ) : null}
                   </Panel>

@@ -47,6 +47,8 @@
 - [x] 6.5 Ejecutar suites afectadas, typecheck, lint, Stylelint, build y `git diff --check`; crear commits claros y una PR en español contra `main` sin merge.
 - [x] 6.6 Incorporar un menú compacto del botón `+` con emoji, adjunto de libros propios/de contraparte e intercambio; verificar inserción del emoji en el borrador, apertura de modales, foco, teclado y viewport estrecho.
 
+- [x] 6.7 Restringir las acciones de acuerdos según el autor de la propuesta: el autor solo puede cancelar y la contraparte puede aceptar o rechazar; verificar UI, API, versionado y estados pendientes.
+
 ## 7. Contactos y filtro de no leídos en Mensajes
 
 - [ ] 7.1 Crear `feature/messaging-contact-discovery` desde `main` actualizado después del merge del workflow de intercambio y verificar que reutiliza su lista de conversaciones sincronizada.

@@ -150,10 +150,16 @@ describe('messaging and agreement real-service E2E', () => {
       .post(`/api/agreements/${finalAgreementId}/commands`)
       .set('Cookie', first.cookie)
       .send({ command: 'confirm', expectedVersion: 1 })
-      .expect(200);
-    const confirmed = await request(app)
+      .expect(403);
+    const partial = await request(app)
       .post(`/api/agreements/${finalAgreementId}/commands`)
       .set('Cookie', second.cookie)
+      .send({ command: 'confirm', expectedVersion: 1 })
+      .expect(200);
+    expect(partial.body.agreement.state).toBe('partially_confirmed');
+    const confirmed = await request(app)
+      .post(`/api/agreements/${finalAgreementId}/commands`)
+      .set('Cookie', first.cookie)
       .send({ command: 'confirm', expectedVersion: 2 })
       .expect(200);
     expect(confirmed.body.agreement.state).toBe('confirmed');

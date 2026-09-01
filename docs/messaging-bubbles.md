@@ -23,6 +23,8 @@ Los mensajes pueden conservar un adjunto tipado en `attachment_metadata` sin int
 
 Cada adjunto se valida contra los participantes de la conversación, el estado de las publicaciones y la pertenencia del acuerdo. Las rutas HTTP de mensajes y acuerdos publican el evento persistido por Socket.IO, por lo que los adjuntos y las propuestas se reconstruyen al recargar el historial. El menú `+` del compositor permite insertar un emoji en el borrador, adjuntar un libro propio o de la contraparte, proponer un intercambio con ambos catálogos o preparar un acuerdo.
 
+En una propuesta pendiente, quien la envió solo puede cancelarla; la contraparte puede aceptarla o rechazarla, y el backend aplica la misma regla para confirmar o rechazar la versión vigente.
+
 ## Bot
 
 El bot persistente aparece con identidad “Bot”, no como “Conversación 1”. La migración `015_seed_messaging_bot.sql` crea su usuario y el repositorio garantiza una conversación por usuario. El canal global legacy puede responder con el identificador histórico `0`, pero no es el flujo persistido.
