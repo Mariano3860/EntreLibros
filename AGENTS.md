@@ -18,7 +18,7 @@ Estas instrucciones aplican a todo el repositorio. Si existe otro `AGENTS.md` en
 3. Antes de cambiar código, revisa los `AGENTS.md` aplicables, `git status --short` y el OpenSpec asociado.
 4. Usa `rg` para buscar y `apply_patch` para editar archivos. No uses comandos destructivos como `git reset --hard` o `git checkout --`.
 5. Mantén los cambios acotados, explica los TODOs y no agregues secretos ni credenciales.
-6. Los cuerpos de Pull Request deben usar Markdown nativo de GitHub, con saltos de línea reales; no escribas secuencias `\\n` literales.
+6. Los cuerpos de Pull Request deben usar Markdown nativo de GitHub, con saltos de línea reales; no escribas secuencias `\n` literales.
 
 ## Comandos canónicos
 
