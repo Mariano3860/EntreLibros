@@ -845,39 +845,117 @@
                     "type": "string"
                   },
                   "attachmentMetadata": {
-                    "type": "object",
-                    "properties": {
-                      "key": {
-                        "type": "string"
+                    "description": "Adjunto persistido del chat. Los libros y propuestas se validan contra la conversación y las publicaciones de sus participantes.",
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "key": { "type": "string" },
+                          "contentType": { "type": "string" },
+                          "size": { "type": "integer", "minimum": 1 },
+                          "name": { "type": "string" },
+                          "kind": { "type": "string", "enum": ["book"] },
+                          "bookId": { "type": "string" },
+                          "title": { "type": "string" },
+                          "author": { "type": "string" },
+                          "coverUrl": { "type": "string" },
+                          "ownerId": { "type": "integer" }
+                        },
+                        "required": [
+                          "key",
+                          "contentType",
+                          "size",
+                          "kind",
+                          "bookId",
+                          "title",
+                          "author",
+                          "coverUrl"
+                        ]
                       },
-                      "contentType": {
-                        "type": "string"
+                      {
+                        "type": "object",
+                        "properties": {
+                          "key": { "type": "string" },
+                          "contentType": { "type": "string" },
+                          "size": { "type": "integer", "minimum": 1 },
+                          "name": { "type": "string" },
+                          "kind": { "type": "string", "enum": ["swap"] },
+                          "offered": {
+                            "$ref": "#/components/schemas/MessageBookReference"
+                          },
+                          "requested": {
+                            "$ref": "#/components/schemas/MessageBookReference"
+                          },
+                          "note": { "type": "string" }
+                        },
+                        "required": [
+                          "key",
+                          "contentType",
+                          "size",
+                          "kind",
+                          "offered",
+                          "requested"
+                        ]
                       },
-                      "size": {
-                        "type": "integer",
-                        "minimum": 1
-                      },
-                      "name": {
-                        "type": "string"
-                      },
-                      "kind": {
-                        "type": "string",
-                        "enum": ["book"]
-                      },
-                      "bookId": {
-                        "type": "string"
-                      },
-                      "title": {
-                        "type": "string"
-                      },
-                      "author": {
-                        "type": "string"
-                      },
-                      "coverUrl": {
-                        "type": "string"
+                      {
+                        "type": "object",
+                        "properties": {
+                          "key": { "type": "string" },
+                          "contentType": { "type": "string" },
+                          "size": { "type": "integer", "minimum": 1 },
+                          "name": { "type": "string" },
+                          "kind": { "type": "string", "enum": ["agreement"] },
+                          "agreementId": { "type": "integer" },
+                          "version": { "type": "integer" },
+                          "event": {
+                            "type": "string",
+                            "enum": [
+                              "proposal",
+                              "counterproposal",
+                              "confirm",
+                              "cancel",
+                              "reject",
+                              "complete"
+                            ]
+                          },
+                          "details": {
+                            "type": "object",
+                            "properties": {
+                              "meetingPoint": { "type": "string" },
+                              "area": { "type": "string" },
+                              "date": { "type": "string" },
+                              "time": { "type": "string" },
+                              "bookTitle": { "type": "string" }
+                            },
+                            "required": [
+                              "meetingPoint",
+                              "area",
+                              "date",
+                              "time",
+                              "bookTitle"
+                            ]
+                          },
+                          "listingIds": {
+                            "type": "array",
+                            "items": { "type": "integer" }
+                          },
+                          "actorName": { "type": "string" },
+                          "reason": { "type": "string" }
+                        },
+                        "required": [
+                          "key",
+                          "contentType",
+                          "size",
+                          "kind",
+                          "agreementId",
+                          "version",
+                          "event",
+                          "details",
+                          "listingIds",
+                          "actorName"
+                        ]
                       }
-                    },
-                    "required": ["key", "contentType", "size"]
+                    ]
                   }
                 }
               }
@@ -3026,6 +3104,27 @@
       }
     },
     "schemas": {
+      "MessageBookReference": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string"
+          },
+          "coverUrl": {
+            "type": "string"
+          },
+          "ownerId": {
+            "type": "integer"
+          }
+        },
+        "required": ["id", "title", "author", "coverUrl"]
+      },
       "AgreementDetails": {
         "type": "object",
         "properties": {

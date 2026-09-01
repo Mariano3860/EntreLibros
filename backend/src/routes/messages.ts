@@ -7,7 +7,10 @@ import {
   listConversations,
   listMessages,
   markConversationRead,
-  sendMessage,
+  sendMessageWithStatus,
+  publishMessage,
+  type MessageAgreementDetails,
+  type MessageBookAttachment,
   type MessageAttachment,
 } from '../repositories/messagingRepository.js';
 import {
@@ -30,6 +33,44 @@ function asBody(value: unknown): Record<string, unknown> {
     : {};
 }
 
+function asMessageBookAttachment(value: unknown): MessageBookAttachment | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const book = value as Record<string, unknown>;
+  if (
+    typeof book.id !== 'string' ||
+    typeof book.title !== 'string' ||
+    typeof book.author !== 'string' ||
+    typeof book.coverUrl !== 'string'
+  ) {
+    return null;
+  }
+  return {
+    id: book.id,
+    title: book.title,
+    author: book.author,
+    coverUrl: book.coverUrl,
+    ...(typeof book.ownerId === 'number' && Number.isSafeInteger(book.ownerId)
+      ? { ownerId: book.ownerId }
+      : {}),
+  };
+}
+
+function asAgreementDetails(value: unknown): MessageAgreementDetails | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const details = value as Record<string, unknown>;
+  const fields = ['meetingPoint', 'area', 'date', 'time', 'bookTitle'];
+  if (!fields.every((field) => typeof details[field] === 'string')) {
+    return null;
+  }
+  return {
+    meetingPoint: details.meetingPoint as string,
+    area: details.area as string,
+    date: details.date as string,
+    time: details.time as string,
+    bookTitle: details.bookTitle as string,
+  };
+}
+
 function asAttachmentMetadata(value: unknown): MessageAttachment | null {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
   const metadata = value as Record<string, unknown>;
@@ -42,22 +83,94 @@ function asAttachmentMetadata(value: unknown): MessageAttachment | null {
   ) {
     return null;
   }
-  return {
+  const base = {
     key: metadata.key,
     contentType: metadata.contentType,
     size: metadata.size,
     name: typeof metadata.name === 'string' ? metadata.name : undefined,
-    ...(metadata.kind === 'book'
-      ? {
-          kind: 'book' as const,
-          bookId: typeof metadata.bookId === 'string' ? metadata.bookId : '',
-          title: typeof metadata.title === 'string' ? metadata.title : '',
-          author: typeof metadata.author === 'string' ? metadata.author : '',
-          coverUrl:
-            typeof metadata.coverUrl === 'string' ? metadata.coverUrl : '',
-        }
-      : {}),
   };
+  if (
+    metadata.kind === 'book' &&
+    typeof metadata.bookId === 'string' &&
+    typeof metadata.title === 'string' &&
+    typeof metadata.author === 'string' &&
+    typeof metadata.coverUrl === 'string'
+  ) {
+    return {
+      ...base,
+      kind: 'book',
+      bookId: metadata.bookId,
+      title: metadata.title,
+      author: metadata.author,
+      coverUrl: metadata.coverUrl,
+      ...(typeof metadata.ownerId === 'number' &&
+      Number.isSafeInteger(metadata.ownerId)
+        ? { ownerId: metadata.ownerId }
+        : {}),
+    };
+  }
+  if (metadata.kind === 'swap') {
+    const offered = asMessageBookAttachment(metadata.offered);
+    const requested = asMessageBookAttachment(metadata.requested);
+    if (!offered || !requested) return null;
+    return {
+      ...base,
+      kind: 'swap',
+      offered,
+      requested,
+      ...(typeof metadata.note === 'string' ? { note: metadata.note } : {}),
+    };
+  }
+  if (metadata.kind === 'agreement') {
+    const agreementId = metadata.agreementId;
+    const version = metadata.version;
+    const events = [
+      'proposal',
+      'counterproposal',
+      'confirm',
+      'cancel',
+      'reject',
+      'complete',
+    ] as const;
+    const agreementDetails = asAgreementDetails(metadata.details);
+    const rawListingIds = metadata.listingIds;
+    if (
+      typeof agreementId !== 'number' ||
+      !Number.isSafeInteger(agreementId) ||
+      agreementId < 1 ||
+      typeof version !== 'number' ||
+      !Number.isSafeInteger(version) ||
+      version < 1 ||
+      typeof metadata.event !== 'string' ||
+      !events.includes(metadata.event as (typeof events)[number]) ||
+      !agreementDetails ||
+      !Array.isArray(rawListingIds) ||
+      rawListingIds.length > 2 ||
+      !rawListingIds.every(
+        (listingId) =>
+          typeof listingId === 'number' &&
+          Number.isSafeInteger(listingId) &&
+          listingId > 0
+      ) ||
+      typeof metadata.actorName !== 'string'
+    ) {
+      return null;
+    }
+    return {
+      ...base,
+      kind: 'agreement',
+      agreementId,
+      version,
+      event: metadata.event as (typeof events)[number],
+      details: agreementDetails,
+      listingIds: [...new Set(rawListingIds as number[])],
+      actorName: metadata.actorName,
+      ...(typeof metadata.reason === 'string'
+        ? { reason: metadata.reason }
+        : {}),
+    };
+  }
+  return null;
 }
 
 function hasAttachmentMetadata(value: unknown): boolean {
@@ -70,6 +183,7 @@ function toConversationBook(listing: BookListing) {
     title: listing.title,
     author: listing.author ?? '',
     coverUrl: listing.coverUrl,
+    ownerId: listing.userId,
   };
 }
 
@@ -232,18 +346,22 @@ router.post(
       });
     }
     try {
-      const message = await sendMessage({
+      const result = await sendMessageWithStatus({
         conversationId,
         senderId: req.user.id,
         clientKey: body.clientKey,
         body: body.body,
         attachmentMetadata,
       });
-      await notifyMessageRecipients({
-        messageId: message.id,
-        conversationId,
-        senderId: req.user.id,
-      });
+      const message = result.message;
+      if (result.created) {
+        await notifyMessageRecipients({
+          messageId: message.id,
+          conversationId,
+          senderId: req.user.id,
+        });
+        publishMessage(message);
+      }
       return res.status(201).json({ message });
     } catch (error) {
       const response = errorResponse(error);

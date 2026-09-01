@@ -91,6 +91,10 @@ describe('prototype real-data adapters', () => {
             contentType: 'application/json',
             size: 1,
             kind: 'book',
+            bookId: 'listing-1',
+            title: 'Libro adjunto',
+            author: 'Autora',
+            coverUrl: '/cover.jpg',
           },
           createdAt: '2026-08-30T11:59:00.000Z',
         },
@@ -98,6 +102,80 @@ describe('prototype real-data adapters', () => {
         now
       )
     ).toMatchObject({ role: 'them', kind: 'book', time: 'hace 1 min' })
+  })
+
+  it('maps swap and agreement attachments to their rich bubble models', () => {
+    const common = {
+      conversationId: 12,
+      senderId: 2,
+      clientKey: 'key',
+      createdAt: '2026-08-30T11:59:00.000Z',
+    }
+    const book = {
+      id: 'listing-1',
+      title: 'Libro de intercambio',
+      author: 'Autora',
+      coverUrl: '/cover.jpg',
+    }
+    expect(
+      toPrototypeChatMessage(
+        {
+          ...common,
+          id: 6,
+          sequence: 6,
+          body: '¿Te interesa?',
+          attachmentMetadata: {
+            key: 'swap',
+            contentType: 'application/x-entrelibros-swap',
+            size: 1,
+            kind: 'swap',
+            offered: book,
+            requested: { ...book, id: 'listing-2', title: 'Otro libro' },
+            note: 'Podemos encontrarnos el sábado',
+          },
+        },
+        1
+      )
+    ).toMatchObject({
+      kind: 'swap',
+      swap: { offered: { id: 'listing-1' }, requested: { id: 'listing-2' } },
+    })
+    expect(
+      toPrototypeChatMessage(
+        {
+          ...common,
+          id: 7,
+          sequence: 7,
+          body: '',
+          attachmentMetadata: {
+            key: 'agreement',
+            contentType: 'application/x-entrelibros-agreement',
+            size: 1,
+            kind: 'agreement',
+            agreementId: 4,
+            version: 1,
+            event: 'proposal',
+            details: {
+              meetingPoint: 'Biblioteca',
+              area: 'Centro',
+              date: '2026-09-01',
+              time: '18:00',
+              bookTitle: 'Libro de intercambio',
+            },
+            listingIds: [1],
+            actorName: 'Lucía',
+          },
+        },
+        1
+      )
+    ).toMatchObject({
+      kind: 'agreement',
+      agreement: {
+        agreementId: 4,
+        event: 'proposal',
+        bookTitle: 'Libro de intercambio',
+      },
+    })
   })
 
   it('does not fabricate a timestamp for malformed persisted dates', () => {

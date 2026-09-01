@@ -24,6 +24,7 @@ export type AgreementSnapshot = {
   currentVersion: number
   details: AgreementDetails
   acceptances: number[]
+  listingIds: number[]
 }
 
 export type AgreementHistoryEntry = {

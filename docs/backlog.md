@@ -250,16 +250,22 @@ Feature 5.1 Mensajería 1:1
   - Actualización 2025-09-30: se enriqueció la conversación mockeada con un flujo lógico de intercambio, se diferenciaron visualmente los libros propios vs. del interlocutor y se alinearon las insignias/acciones con la UI.
   - Actualización 2025-10-07: se añadieron pruebas unitarias de burbujas, pestañas y socket mockeado para garantizar traducciones, estados offline/online y envío de mensajes sin regresiones.
   - Actualización 2025-11-19: se reemplazó la barra de entrada por un compositor accesible con selector de emojis y formularios para adjuntar libros, proponer intercambios y acordar encuentros; se actualizaron los tipos de mensajes, traducciones y pruebas RTL para cubrir los nuevos flujos.
+  - Actualización 2026-09-01: el flujo real de Mensajes persiste adjuntos tipados de libros, propuestas de intercambio y eventos de acuerdo; el menú `+` usa los catálogos de ambos participantes, las tarjetas se emiten por Socket.IO y se reconstruyen al recargar.
+  - Actualización 2026-09-01: el menú `+` también permite insertar emojis en el borrador sin enviar el mensaje, con un selector modal compacto y accesible.
+  - Actualización 2026-09-01: los reintentos idempotentes con `clientKey` ya no reemiten mensajes ni duplican notificaciones, y el backend verifica que el propietario declarado de cada adjunto coincida con su listing.
 - [ ] S-5.2 Bloqueo/Reporte en conversación y ficha (Must, E1; BR-43)
   - Éxito: acción en ≤2 pasos.
 
 Feature 5.2 Acuerdos
+
+- Actualización 2026-09-01: las acciones de una propuesta pendiente respetan el autor: quien propone puede cancelar y la contraparte puede aceptar o rechazar; la API también impide confirmar o rechazar la propia versión.
 
 - [~] S-5.3 Confirmación de acuerdo (lugar RdL/espacio público, horario) (Must, E1; BR-41)
   - Éxito: registra acuerdo y dispara recordatorio.
   - Actualización 2025-09-28: se incorporaron las burbujas de Propuesta y Confirmación dentro del chat, con i18n ES/EN, respeto de tema claro/oscuro y sin exponer direcciones exactas; resta conectar la lógica persistente/notificaciones.
   - Actualización 2025-11-20: se modeló el versionado del acuerdo con cambios/cancelaciones accesibles, validación de disponibilidad mockeada y modal de confirmación inclusivo; se añadió un store dedicado, nuevas burbujas y pruebas (store + componentes) que cubren doble confirmación, cambios de versión, cancelación e idempotencia.
   - Actualización 2026-08-29: además de lo anterior, se agregó el bot persistente con conversación por usuario, respuesta echo guardada antes de emitir por Socket.IO y carga del historial al reabrir; quedan pendientes las notificaciones y el registro post-encuentro.
+  - Actualización 2026-09-01: las propuestas y cambios del acuerdo también se guardan como mensajes tipados en la conversación y muestran sus acciones al recuperar el historial.
 - [ ] S-5.4 Registro post-encuentro (“se concretó / no se concretó”) (Should, E2; BR-42)
   - Éxito: alimenta métricas sin exponer datos personales.
 

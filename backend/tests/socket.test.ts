@@ -94,15 +94,27 @@ describe('websocket messaging', () => {
       async (conversationId, userId) =>
         memberships.get(`${conversationId}:${userId}`) ?? false
     );
-    vi.spyOn(messagingRepo, 'sendMessage').mockResolvedValue({
-      id: 1,
-      conversationId: 101,
-      senderId: 1,
-      sequence: 1,
-      clientKey: 'room-key',
-      body: 'private',
-      attachmentMetadata: null,
-      createdAt: new Date(),
+    vi.spyOn(messagingRepo, 'sendMessageWithStatus').mockResolvedValue({
+      message: {
+        id: 1,
+        conversationId: 101,
+        senderId: 1,
+        sequence: 1,
+        clientKey: 'room-key',
+        body: 'private',
+        attachmentMetadata: {
+          key: 'book:1',
+          contentType: 'application/x-entrelibros-book',
+          size: 1,
+          kind: 'book',
+          bookId: '1',
+          title: 'Libro privado',
+          author: 'Autora',
+          coverUrl: '/cover.jpg',
+        },
+        createdAt: new Date(),
+      },
+      created: true,
     });
     vi.spyOn(messagingRepo, 'listMessages').mockResolvedValue([
       {
@@ -162,6 +174,9 @@ describe('websocket messaging', () => {
       authorized.once('conversation:message', (message) => {
         expect(message.body).toBe('private');
         expect(message.conversationId).toBe(101);
+        expect(message.attachmentMetadata).toEqual(
+          expect.objectContaining({ kind: 'book', bookId: '1' })
+        );
         resolve();
       });
     });

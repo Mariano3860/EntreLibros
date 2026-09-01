@@ -6,8 +6,10 @@ import {
   listConversations,
   markConversationRead,
   listMessages,
-  sendMessage,
+  sendMessageWithStatus,
   findBotIdForConversation,
+  messageEvents,
+  type MessageAttachment,
 } from './repositories/messagingRepository.js';
 import { logger } from './utils/logger.js';
 import { generateReply } from './services/chatBot.js';
@@ -52,6 +54,7 @@ export interface ClientToServerEvents {
     conversationId: number;
     clientKey: string;
     body: string;
+    attachmentMetadata?: MessageAttachment | null;
   }) => void;
   'conversation:read': (payload: {
     conversationId: number;
@@ -69,6 +72,7 @@ export interface ServerToClientEvents {
     body: string;
     clientKey: string;
     createdAt: string;
+    attachmentMetadata: MessageAttachment | null;
   }) => void;
   'agreement:updated': (msg: {
     agreementId: number;
@@ -93,6 +97,20 @@ export function setupWebsocket(
     SocketData
   >
 ) {
+  messageEvents.on('committed', (message) => {
+    io.to(`conversation:${message.conversationId}`).emit(
+      'conversation:message',
+      {
+        conversationId: message.conversationId,
+        sequence: message.sequence,
+        senderId: message.senderId,
+        body: message.body,
+        clientKey: message.clientKey,
+        createdAt: message.createdAt.toISOString(),
+        attachmentMetadata: message.attachmentMetadata,
+      }
+    );
+  });
   agreementEvents.on('committed', (agreement: AgreementSnapshot) => {
     io.to(`conversation:${agreement.conversationId}`).emit(
       'agreement:updated',
@@ -174,6 +192,7 @@ export function setupWebsocket(
               body: message.body,
               clientKey: message.clientKey,
               createdAt: message.createdAt.toISOString(),
+              attachmentMetadata: message.attachmentMetadata,
             });
           });
         }
@@ -183,12 +202,15 @@ export function setupWebsocket(
 
     socket.on('conversation:message', async (payload) => {
       try {
-        const message = await sendMessage({
+        const result = await sendMessageWithStatus({
           conversationId: payload.conversationId,
           senderId: socket.data.user.id,
           clientKey: payload.clientKey,
           body: payload.body,
+          attachmentMetadata: payload.attachmentMetadata,
         });
+        const message = result.message;
+        if (!result.created) return;
         await notifyMessageRecipients({
           messageId: message.id,
           conversationId: message.conversationId,
@@ -203,6 +225,7 @@ export function setupWebsocket(
             body: message.body,
             clientKey: message.clientKey,
             createdAt: message.createdAt.toISOString(),
+            attachmentMetadata: message.attachmentMetadata,
           }
         );
         const botId = await findBotIdForConversation(
@@ -211,14 +234,16 @@ export function setupWebsocket(
         );
         if (botId) {
           // Keep the bot reply on the same persisted path as user messages;
-          // emit only after sendMessage succeeds so reloads cannot lose it.
+          // emit only after the message is newly persisted.
           const reply = await generateReply(payload.body);
-          const botMessage = await sendMessage({
+          const botResult = await sendMessageWithStatus({
             conversationId: payload.conversationId,
             senderId: botId,
             clientKey: `bot-reply-${message.id}`,
             body: reply,
           });
+          const botMessage = botResult.message;
+          if (!botResult.created) return;
           await notifyMessageRecipients({
             messageId: botMessage.id,
             conversationId: botMessage.conversationId,
@@ -233,6 +258,7 @@ export function setupWebsocket(
               body: botMessage.body,
               clientKey: botMessage.clientKey,
               createdAt: botMessage.createdAt.toISOString(),
+              attachmentMetadata: botMessage.attachmentMetadata,
             }
           );
         }

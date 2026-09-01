@@ -4,6 +4,7 @@ import type { PoolClient } from 'pg';
 
 import app from '../../src/app.js';
 import { pool, setTestClient } from '../../src/db.js';
+import { messageEvents } from '../../src/repositories/messagingRepository.js';
 
 let client: PoolClient;
 
@@ -77,6 +78,11 @@ describe('messaging and agreements API', () => {
     const conversationId = conversationResponse.body.conversation.id as number;
 
     const payload = { clientKey: 'message-key-1', body: 'Hola' };
+    const committedMessageIds: number[] = [];
+    const onCommitted = (message: { id: number }) => {
+      committedMessageIds.push(message.id);
+    };
+    messageEvents.on('committed', onCommitted);
     const sent = await request(app)
       .post(`/api/messages/${conversationId}/messages`)
       .set('Cookie', first.cookie)
@@ -87,7 +93,9 @@ describe('messaging and agreements API', () => {
       .set('Cookie', first.cookie)
       .send(payload)
       .expect(201);
+    messageEvents.off('committed', onCommitted);
     expect(retry.body.message.id).toBe(sent.body.message.id);
+    expect(committedMessageIds).toEqual([sent.body.message.id]);
 
     await request(app)
       .get(`/api/messages/${conversationId}/messages`)
@@ -121,6 +129,15 @@ describe('messaging and agreements API', () => {
         expect(body.message).toBe('messaging.errors.forbidden')
       );
 
+    const attachedBook = await client.query<{ id: number }>(
+      'INSERT INTO books (title) VALUES ($1) RETURNING id',
+      ['Attached book']
+    );
+    const attachedListing = await client.query<{ id: number }>(
+      `INSERT INTO book_listings (user_id, book_id, type, status)
+       VALUES ($1, $2, 'offer', 'available') RETURNING id`,
+      [first.id, attachedBook.rows[0].id]
+    );
     const attached = await request(app)
       .post(`/api/messages/${conversationId}/messages`)
       .set('Cookie', first.cookie)
@@ -128,11 +145,11 @@ describe('messaging and agreements API', () => {
         clientKey: 'book-attachment-1',
         body: 'Te comparto este libro',
         attachmentMetadata: {
-          key: 'book:123',
+          key: `book:${attachedListing.rows[0].id}`,
           contentType: 'application/x-entrelibros-book',
           size: 1,
           kind: 'book',
-          bookId: '123',
+          bookId: String(attachedListing.rows[0].id),
           title: 'Libro de prueba',
           author: 'Autora',
           coverUrl: '/cover.jpg',
@@ -140,8 +157,56 @@ describe('messaging and agreements API', () => {
       })
       .expect(201);
     expect(attached.body.message.attachmentMetadata).toEqual(
-      expect.objectContaining({ kind: 'book', bookId: '123' })
+      expect.objectContaining({
+        kind: 'book',
+        bookId: String(attachedListing.rows[0].id),
+      })
     );
+
+    await request(app)
+      .post(`/api/messages/${conversationId}/messages`)
+      .set('Cookie', first.cookie)
+      .send({
+        clientKey: 'book-attachment-wrong-owner',
+        body: 'No debería pasar',
+        attachmentMetadata: {
+          key: `book:${attachedListing.rows[0].id}`,
+          contentType: 'application/x-entrelibros-book',
+          size: 1,
+          kind: 'book',
+          bookId: String(attachedListing.rows[0].id),
+          title: 'Libro de prueba',
+          author: 'Autora',
+          coverUrl: '/cover.jpg',
+          ownerId: second.id,
+        },
+      })
+      .expect(403)
+      .expect(({ body }) =>
+        expect(body.message).toBe('messaging.errors.forbidden')
+      );
+
+    await request(app)
+      .post(`/api/messages/${conversationId}/messages`)
+      .set('Cookie', outsider.cookie)
+      .send({
+        clientKey: 'book-attachment-outsider',
+        body: 'No debería pasar',
+        attachmentMetadata: {
+          key: `book:${attachedListing.rows[0].id}`,
+          contentType: 'application/x-entrelibros-book',
+          size: 1,
+          kind: 'book',
+          bookId: String(attachedListing.rows[0].id),
+          title: 'Libro de prueba',
+          author: 'Autora',
+          coverUrl: '/cover.jpg',
+        },
+      })
+      .expect(403)
+      .expect(({ body }) =>
+        expect(body.message).toBe('messaging.errors.forbidden')
+      );
   });
 
   test('returns eligible books for each conversation participant', async () => {
@@ -179,6 +244,19 @@ describe('messaging and agreements API', () => {
         reservedBook.rows[0].id,
       ]
     );
+    const listings = await client.query<{ id: number; user_id: number }>(
+      `SELECT id, user_id
+       FROM book_listings
+       WHERE book_id IN ($1, $2)
+       ORDER BY id`,
+      [firstBook.rows[0].id, secondBook.rows[0].id]
+    );
+    const firstListing = listings.rows.find((row) => row.user_id === first.id);
+    const secondListing = listings.rows.find(
+      (row) => row.user_id === second.id
+    );
+    expect(firstListing).toBeDefined();
+    expect(secondListing).toBeDefined();
 
     await request(app)
       .get(`/api/messages/${conversationId}/books`)
@@ -194,6 +272,86 @@ describe('messaging and agreements API', () => {
       });
 
     await request(app)
+      .post(`/api/messages/${conversationId}/messages`)
+      .set('Cookie', first.cookie)
+      .send({
+        clientKey: 'swap-attachment-wrong-owner',
+        body: 'No debería pasar',
+        attachmentMetadata: {
+          key: 'swap:1',
+          contentType: 'application/x-entrelibros-swap',
+          size: 1,
+          kind: 'swap',
+          offered: {
+            id: String(firstListing?.id),
+            title: 'First book',
+            author: '',
+            coverUrl: '',
+            ownerId: second.id,
+          },
+          requested: {
+            id: String(secondListing?.id),
+            title: 'Second book',
+            author: '',
+            coverUrl: '',
+            ownerId: second.id,
+          },
+        },
+      })
+      .expect(403)
+      .expect(({ body }) =>
+        expect(body.message).toBe('messaging.errors.forbidden')
+      );
+
+    await request(app)
+      .post(`/api/messages/${conversationId}/messages`)
+      .set('Cookie', first.cookie)
+      .send({
+        clientKey: 'swap-attachment-1',
+        body: 'Te propongo este intercambio',
+        attachmentMetadata: {
+          key: 'swap:1',
+          contentType: 'application/x-entrelibros-swap',
+          size: 1,
+          kind: 'swap',
+          offered: {
+            id: String(firstListing?.id),
+            title: 'First book',
+            author: '',
+            coverUrl: '',
+            ownerId: first.id,
+          },
+          requested: {
+            id: String(secondListing?.id),
+            title: 'Second book',
+            author: '',
+            coverUrl: '',
+            ownerId: second.id,
+          },
+        },
+      })
+      .expect(201)
+      .expect(({ body }) => {
+        expect(body.message.attachmentMetadata).toEqual(
+          expect.objectContaining({
+            kind: 'swap',
+            offered: expect.objectContaining({
+              id: String(firstListing?.id),
+            }),
+          })
+        );
+      });
+
+    await request(app)
+      .get(`/api/messages/${conversationId}/messages`)
+      .set('Cookie', second.cookie)
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body.messages).toHaveLength(1);
+        expect(body.messages[0].attachmentMetadata.kind).toBe('swap');
+      });
+
+    await request(app)
       .get(`/api/messages/${conversationId}/books`)
       .set('Cookie', outsider.cookie)
       .expect(403)
@@ -202,7 +360,7 @@ describe('messaging and agreements API', () => {
       );
   });
 
-  test('creates agreement history and returns a stale-version conflict', async () => {
+  test('creates agreement history and enforces proposal-author actions', async () => {
     const first = await registerAndLogin('agreement-a');
     const second = await registerAndLogin('agreement-b');
     const conversation = await request(app)
@@ -233,7 +391,36 @@ describe('messaging and agreements API', () => {
       .post(`/api/agreements/${agreementId}/commands`)
       .set('Cookie', first.cookie)
       .send({ command: 'confirm', expectedVersion: 1 })
+      .expect(403)
+      .expect(({ body }) => {
+        expect(body.message).toBe('agreements.errors.forbidden');
+      });
+    await request(app)
+      .post(`/api/agreements/${agreementId}/commands`)
+      .set('Cookie', second.cookie)
+      .send({ command: 'confirm', expectedVersion: 1 })
       .expect(200);
+    await request(app)
+      .get(`/api/messages/${conversationId}/messages`)
+      .set('Cookie', second.cookie)
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body.messages).toHaveLength(2);
+        expect(body.messages[0].attachmentMetadata).toEqual(
+          expect.objectContaining({
+            kind: 'agreement',
+            agreementId,
+            event: 'proposal',
+          })
+        );
+        expect(body.messages[1].attachmentMetadata).toEqual(
+          expect.objectContaining({
+            kind: 'agreement',
+            agreementId,
+            event: 'confirm',
+          })
+        );
+      });
     await request(app)
       .post(`/api/agreements/${agreementId}/commands`)
       .set('Cookie', second.cookie)
@@ -307,6 +494,28 @@ describe('messaging and agreements API', () => {
       .expect(422)
       .expect(({ body }) =>
         expect(body.message).toBe('agreements.errors.listing_unavailable')
+      );
+
+    await request(app)
+      .post(`/api/messages/${conversationId}/messages`)
+      .set('Cookie', first.cookie)
+      .send({
+        clientKey: 'reserved-book-attachment',
+        body: 'No debería pasar',
+        attachmentMetadata: {
+          key: `book:${listing.rows[0].id}`,
+          contentType: 'application/x-entrelibros-book',
+          size: 1,
+          kind: 'book',
+          bookId: String(listing.rows[0].id),
+          title: 'Unavailable',
+          author: '',
+          coverUrl: '',
+        },
+      })
+      .expect(403)
+      .expect(({ body }) =>
+        expect(body.message).toBe('messaging.errors.forbidden')
       );
   });
 

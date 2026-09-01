@@ -8,6 +8,11 @@ import {
   getAgreementHistory,
   type AgreementDetails,
 } from '../repositories/agreementRepository.js';
+import {
+  publishMessage,
+  sendMessageWithStatus,
+  type MessageAgreementEvent,
+} from '../repositories/messagingRepository.js';
 import type { AgreementCommand } from '../services/agreementState.js';
 
 const router = Router();
@@ -63,6 +68,36 @@ function failure(error: unknown) {
         ? 409
         : 422;
   return { status, body: { error: 'AgreementError', message } };
+}
+
+async function persistAgreementMessage(input: {
+  agreement: Awaited<ReturnType<typeof createAgreement>>;
+  actorId: number;
+  actorName: string;
+  event: MessageAgreementEvent;
+  reason?: string;
+}): Promise<void> {
+  const result = await sendMessageWithStatus({
+    conversationId: input.agreement.conversationId,
+    senderId: input.actorId,
+    clientKey: `agreement:${input.agreement.id}:${input.agreement.currentVersion}:${input.event}:${input.actorId}`,
+    body: '',
+    attachmentMetadata: {
+      key: `agreement:${input.agreement.id}:${input.agreement.currentVersion}`,
+      contentType: 'application/x-entrelibros-agreement',
+      size: 1,
+      name: input.agreement.details.bookTitle,
+      kind: 'agreement',
+      agreementId: input.agreement.id,
+      version: input.agreement.currentVersion,
+      event: input.event,
+      details: input.agreement.details,
+      listingIds: input.agreement.listingIds,
+      actorName: input.actorName,
+      ...(input.reason ? { reason: input.reason } : {}),
+    },
+  });
+  if (result.created) publishMessage(result.message);
 }
 
 router.get('/:id', async (req: AuthenticatedRequest, res) => {
@@ -147,6 +182,12 @@ router.post('/', async (req: AuthenticatedRequest, res) => {
       details: agreementDetails,
       listingIds: agreementListingIds,
     });
+    await persistAgreementMessage({
+      agreement,
+      actorId: req.user.id,
+      actorName: req.user.name,
+      event: 'proposal',
+    });
     return res.status(201).json({ agreement });
   } catch (error) {
     const response = failure(error);
@@ -182,6 +223,12 @@ router.post('/:id/versions', async (req: AuthenticatedRequest, res) => {
       actorId: req.user.id,
       expectedVersion,
       details: agreementDetails,
+    });
+    await persistAgreementMessage({
+      agreement,
+      actorId: req.user.id,
+      actorName: req.user.name,
+      event: 'counterproposal',
     });
     return res.status(201).json({ agreement });
   } catch (error) {
@@ -222,6 +269,13 @@ router.post('/:id/commands', async (req: AuthenticatedRequest, res) => {
       actorId: req.user.id,
       expectedVersion,
       command: command as AgreementCommand,
+      reason: typeof body.reason === 'string' ? body.reason : undefined,
+    });
+    await persistAgreementMessage({
+      agreement,
+      actorId: req.user.id,
+      actorName: req.user.name,
+      event: command as MessageAgreementEvent,
       reason: typeof body.reason === 'string' ? body.reason : undefined,
     });
     return res.json({ agreement });

@@ -1,5 +1,8 @@
 import { agreementQueryKeys } from '@api/agreements/agreements'
-import { messageQueryKeys } from '@api/messages/messages'
+import {
+  messageQueryKeys,
+  type ApiMessageAttachment,
+} from '@api/messages/messages'
 import { notificationKeys } from '@api/notifications/notifications'
 import { useQueryClient } from '@tanstack/react-query'
 import { isApiMockMode } from '@utils/runtimeEnv'
@@ -20,6 +23,7 @@ export interface ConversationMessage {
   body: string
   clientKey: string
   createdAt: string
+  attachmentMetadata: ApiMessageAttachment | null
 }
 
 export interface AgreementUpdate {
@@ -135,11 +139,17 @@ export const useChatSocket = () => {
   )
 
   const sendConversationMessage = useCallback(
-    (conversationId: number, clientKey: string, body: string) => {
+    (
+      conversationId: number,
+      clientKey: string,
+      body: string,
+      attachmentMetadata?: ApiMessageAttachment | null
+    ) => {
       socket?.emit('conversation:message', {
         conversationId,
         clientKey,
         body,
+        attachmentMetadata,
       })
     },
     [socket]

@@ -8,6 +8,7 @@ import {
   listConversations,
   listMessages,
   sendMessage,
+  sendMessageWithStatus,
 } from '../../src/repositories/messagingRepository.js';
 
 let client: PoolClient;
@@ -64,18 +65,20 @@ describe('messagingRepository', () => {
     const secondUser = await createUser('two');
     const conversation = await createConversation([firstUser, secondUser]);
 
-    const first = await sendMessage({
+    const firstResult = await sendMessageWithStatus({
       conversationId: conversation.id,
       senderId: firstUser,
       clientKey: 'client-1',
       body: 'Primero',
     });
-    const retry = await sendMessage({
+    const retryResult = await sendMessageWithStatus({
       conversationId: conversation.id,
       senderId: firstUser,
       clientKey: 'client-1',
       body: 'Primero',
     });
+    const first = firstResult.message;
+    const retry = retryResult.message;
     const second = await sendMessage({
       conversationId: conversation.id,
       senderId: secondUser,
@@ -84,6 +87,8 @@ describe('messagingRepository', () => {
     });
 
     expect(retry.id).toBe(first.id);
+    expect(firstResult.created).toBe(true);
+    expect(retryResult.created).toBe(false);
     expect(second.sequence).toBe(first.sequence + 1);
     await expect(
       listMessages(conversation.id, firstUser)

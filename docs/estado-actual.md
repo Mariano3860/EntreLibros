@@ -37,7 +37,7 @@ El 2026-08-30 se detectó una brecha entre capacidades técnicas documentadas y 
 - El flujo de publicación tiene problemas de contraste en modo oscuro.
 - Comunidad todavía presenta datos falsos, un botón de publicación inerte, recorte incorrecto de imágenes y un mini mapa sin contenido visible ni controles operativos.
 - `/map` no inicia en la ubicación del usuario, no muestra un indicador de posición y el filtro de distancia no recorre ni pinta correctamente todo su rango.
-- En mensajería, el chat no abre en el último mensaje y los flujos de adjuntar libro/proponer intercambio no cargan los libros del usuario.
+- En mensajería, el chat real conserva historial, adjuntos tipados y eventos de intercambio; el menú `+` permite usar los catálogos de ambos participantes y las tarjetas se reconstruyen tras recargar.
 - El logout ocurre sin confirmación.
 
 La implementación de `reconnect-backend-to-prototype-frontend` conserva esos recorridos en la rama actual y conecta los consumidores reales disponibles: catálogo/detalle de libros, perfil, feed y actividad comunitaria, rincones, mapa, mensajería persistida con Socket.IO, estadísticas, notificaciones y contacto. Permanecen diferidas las capacidades sin contrato suficiente (analítica avanzada, logros, historias/interacciones sociales y base de conocimiento de ayuda).

@@ -55,7 +55,7 @@ const details = {
 };
 
 describe('agreementRepository', () => {
-  test('preserves immutable versions and rejects stale commands', async () => {
+  test('preserves immutable versions and rejects commands from the proposal author', async () => {
     const proposer = await user('proposer');
     const participant = await user('participant');
     const conversation = await createConversation([proposer, participant]);
@@ -66,9 +66,27 @@ describe('agreementRepository', () => {
       details,
     });
 
+    await expect(
+      commandAgreement({
+        id: agreement.id,
+        actorId: proposer,
+        expectedVersion: 1,
+        command: 'confirm',
+      })
+    ).rejects.toThrow('agreements.errors.forbidden');
+    await expect(
+      commandAgreement({
+        id: agreement.id,
+        actorId: proposer,
+        expectedVersion: 1,
+        command: 'reject',
+        reason: 'Necesito revisar la propuesta.',
+      })
+    ).rejects.toThrow('agreements.errors.forbidden');
+
     const partial = await commandAgreement({
       id: agreement.id,
-      actorId: proposer,
+      actorId: participant,
       expectedVersion: 1,
       command: 'confirm',
     });
@@ -104,13 +122,13 @@ describe('agreementRepository', () => {
 
     const partial = await commandAgreement({
       id: agreement.id,
-      actorId: proposer,
+      actorId: participant,
       expectedVersion: 1,
       command: 'confirm',
     });
     const confirmed = await commandAgreement({
       id: agreement.id,
-      actorId: participant,
+      actorId: proposer,
       expectedVersion: partial.currentVersion,
       command: 'confirm',
     });

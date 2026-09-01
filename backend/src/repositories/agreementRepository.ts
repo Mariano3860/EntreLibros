@@ -49,6 +49,10 @@ interface AgreementRow {
   listing_ids: number[];
 }
 
+interface AgreementCurrentRow extends AgreementRow {
+  current_actor_id: number;
+}
+
 function mapRow(row: AgreementRow): AgreementSnapshot {
   return {
     id: Number(row.id),
@@ -204,11 +208,14 @@ export async function commandAgreement(input: {
   reason?: string;
 }): Promise<AgreementSnapshot> {
   const agreement = await withTransaction(async (client) => {
-    const current = await client.query<AgreementRow>(
+    const current = await client.query<AgreementCurrentRow>(
       `SELECT a.id, a.conversation_id, a.proposer_id, a.participant_id,
               a.state, a.current_version,
+              v.actor_id AS current_actor_id,
               '{}'::integer[] AS acceptances, '{}'::integer[] AS listing_ids
        FROM exchange_agreements a
+       JOIN exchange_agreement_versions v
+         ON v.agreement_id = a.id AND v.version = a.current_version
        WHERE a.id = $1 AND (a.proposer_id = $2 OR a.participant_id = $2)
        FOR UPDATE OF a`,
       [input.id, input.actorId]
@@ -217,6 +224,12 @@ export async function commandAgreement(input: {
     if (!row) throw new Error('agreements.errors.forbidden');
     if (row.current_version !== input.expectedVersion) {
       throw new Error('agreements.errors.conflict');
+    }
+    if (
+      (input.command === 'confirm' || input.command === 'reject') &&
+      row.current_actor_id === input.actorId
+    ) {
+      throw new Error('agreements.errors.forbidden');
     }
     const version = await client.query<{ details: AgreementDetails }>(
       `SELECT details FROM exchange_agreement_versions

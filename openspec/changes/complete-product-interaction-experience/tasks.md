@@ -40,11 +40,14 @@
 
 ## 6. Workflow completo de intercambio en Mensajes
 
-- [ ] 6.1 Crear `feature/messaging-exchange-workflow` desde `main` actualizado y relevar las burbujas, adjuntos y acuerdos existentes antes de modificar contratos; verificar que el diseño conserva cursor, client keys y autorización de participante.
-- [ ] 6.2 Completar persistencia/API para adjuntos tipados y lectura de libros propios/de contraparte cuando falte; verificar con pruebas de rutas, repositorio y Socket.IO que adjuntos/propuestas sobreviven recarga y rechazan participantes no autorizados.
-- [ ] 6.3 Recuperar el menú `+`, selector de libros, burbujas de texto/libro/acuerdo y propuesta de intercambio con ambos catálogos; verificar con tests de `Messages`, composer y modales que cada acción retorna al chat y no rompe el composer.
-- [ ] 6.4 Revisar visualmente `/messages` a 1440×900 contra el cuadrante inferior derecho de `img.png`; verificar dos columnas, scroll independiente, composer anclado, adjunto y propuesta visibles, además de teclado/narrow viewport.
-- [ ] 6.5 Ejecutar suites afectadas, typecheck, lint, Stylelint, build y `git diff --check`; crear commits claros y una PR en español contra `main` sin merge.
+- [x] 6.1 Crear `feature/messaging-exchange-workflow` desde `main` actualizado y relevar las burbujas, adjuntos y acuerdos existentes antes de modificar contratos; verificar que el diseño conserva cursor, client keys y autorización de participante.
+- [x] 6.2 Completar persistencia/API para adjuntos tipados y lectura de libros propios/de contraparte cuando falte; verificar con pruebas de rutas, repositorio y Socket.IO que adjuntos/propuestas sobreviven recarga y rechazan participantes no autorizados.
+- [x] 6.3 Recuperar el menú `+`, selector de libros, burbujas de texto/libro/acuerdo y propuesta de intercambio con ambos catálogos; verificar con tests de `Messages`, composer y modales que cada acción retorna al chat y no rompe el composer.
+- [x] 6.4 Revisar visualmente `/messages` a 1440×900 contra el cuadrante inferior derecho de `img.png`; verificar dos columnas, scroll independiente, composer anclado, adjunto y propuesta visibles, además de teclado/narrow viewport.
+- [x] 6.5 Ejecutar suites afectadas, typecheck, lint, Stylelint, build y `git diff --check`; crear commits claros y una PR en español contra `main` sin merge.
+- [x] 6.6 Incorporar un menú compacto del botón `+` con emoji, adjunto de libros propios/de contraparte e intercambio; verificar inserción del emoji en el borrador, apertura de modales, foco, teclado y viewport estrecho.
+
+- [x] 6.7 Restringir las acciones de acuerdos según el autor de la propuesta: el autor solo puede cancelar y la contraparte puede aceptar o rechazar; verificar UI, API, versionado y estados pendientes.
 
 ## 7. Contactos y filtro de no leídos en Mensajes
 

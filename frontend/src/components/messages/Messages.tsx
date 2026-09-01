@@ -127,12 +127,89 @@ function toTextMessage(
   }
 }
 
-function toConversationBook(book: ConversationBook): Book {
+function toConversationBook(
+  book: ConversationBook,
+  ownership?: Book['ownership'],
+  ownerName?: string
+): Book {
   return {
     id: book.id,
     title: book.title,
     author: book.author,
     cover: book.coverUrl,
+    ...(ownership ? { ownership } : {}),
+    ...(ownerName ? { ownerName } : {}),
+  }
+}
+
+function toPersistedMessage(
+  message: ApiMessage,
+  currentUserId?: number
+): Message {
+  const base = toTextMessage(message, currentUserId)
+  const attachment = message.attachmentMetadata
+  if (!attachment || attachment.kind === 'book') return base
+
+  if (attachment.kind === 'swap') {
+    const toBook = (book: typeof attachment.offered): Book => ({
+      id: book.id,
+      title: book.title,
+      author: book.author,
+      cover: book.coverUrl,
+      ...(book.ownerId === currentUserId
+        ? { ownership: 'mine' as const }
+        : book.ownerId
+          ? { ownership: 'theirs' as const }
+          : {}),
+    })
+    return {
+      id: message.id,
+      role: base.role,
+      tone: base.tone,
+      time: base.time,
+      type: 'swapProposal',
+      swap: {
+        offered: toBook(attachment.offered),
+        requested: toBook(attachment.requested),
+        ...(attachment.note ? { note: attachment.note } : {}),
+      },
+    }
+  }
+
+  const agreementBase = {
+    id: message.id,
+    role: base.role,
+    tone: base.tone,
+    time: base.time,
+    version: attachment.version,
+  }
+  if (attachment.event === 'proposal') {
+    return {
+      ...agreementBase,
+      type: 'agreementProposal',
+      proposal: attachment.details,
+    }
+  }
+  if (attachment.event === 'counterproposal') {
+    return {
+      ...agreementBase,
+      type: 'agreementChange',
+      proposal: attachment.details,
+    }
+  }
+  if (attachment.event === 'confirm' || attachment.event === 'complete') {
+    return {
+      ...agreementBase,
+      type: 'agreementConfirmation',
+      agreement: attachment.details,
+      confirmedBy: attachment.actorName,
+    }
+  }
+  return {
+    ...agreementBase,
+    type: 'agreementCancellation',
+    cancelledBy: attachment.actorName,
+    reason: attachment.reason,
   }
 }
 
@@ -260,8 +337,12 @@ export const Messages = () => {
             conversation.id === selectedId
               ? {
                   ...conversation,
-                  myBooks: books.myBooks.map(toConversationBook),
-                  theirBooks: books.theirBooks.map(toConversationBook),
+                  myBooks: books.myBooks.map((book) =>
+                    toConversationBook(book, 'mine')
+                  ),
+                  theirBooks: books.theirBooks.map((book) =>
+                    toConversationBook(book, 'theirs', selected?.user.name)
+                  ),
                 }
               : conversation
           )
@@ -281,7 +362,7 @@ export const Messages = () => {
     return () => {
       active = false
     }
-  }, [selectedId, useDemoConversations])
+  }, [selected?.user.name, selectedId, useDemoConversations])
 
   const retryConversationBooks = useCallback(() => {
     setConversationBooksStatus('idle')
@@ -296,15 +377,19 @@ export const Messages = () => {
             conversation.id === selectedId
               ? {
                   ...conversation,
-                  myBooks: books.myBooks.map(toConversationBook),
-                  theirBooks: books.theirBooks.map(toConversationBook),
+                  myBooks: books.myBooks.map((book) =>
+                    toConversationBook(book, 'mine')
+                  ),
+                  theirBooks: books.theirBooks.map((book) =>
+                    toConversationBook(book, 'theirs', selected?.user.name)
+                  ),
                 }
               : conversation
           )
         )
       })
       .catch(() => setConversationBooksStatus('error'))
-  }, [selectedId, useDemoConversations])
+  }, [selected?.user.name, selectedId, useDemoConversations])
 
   useEffect(() => {
     if (useDemoConversations || selectedId === null) return
@@ -468,7 +553,7 @@ export const Messages = () => {
 
     if (!useDemoConversations) {
       const persisted = serverMessages.map((message) =>
-        toTextMessage(message, currentUser?.id)
+        toPersistedMessage(message, currentUser?.id)
       )
       const live = conversationMessages
         .filter((message) => message.conversationId === selected.id)
@@ -487,7 +572,7 @@ export const Messages = () => {
               sequence: message.sequence,
               clientKey: message.clientKey,
               body: message.body,
-              attachmentMetadata: null,
+              attachmentMetadata: message.attachmentMetadata,
               createdAt: message.createdAt,
             },
             currentUser?.id
@@ -606,6 +691,9 @@ export const Messages = () => {
     if (!book) return
 
     setAttachmentError(false)
+    const ownerId = selected.myBooks.some((item) => item.id === book.id)
+      ? currentUser?.id
+      : selected.participantIds?.find((id) => id !== currentUser?.id)
     if (useDemoConversations || isBotConversation) {
       const baseMessage = createBaseMessage(selected)
       appendMessageToConversation(selectedId, {
@@ -632,6 +720,7 @@ export const Messages = () => {
         title: book.title,
         author: book.author,
         coverUrl: book.cover,
+        ...(ownerId ? { ownerId } : {}),
       },
     })
       .then((message) => setServerMessages((prev) => [...prev, message]))
@@ -640,6 +729,42 @@ export const Messages = () => {
 
   const handleSwapProposal = (details: SwapProposalDetails) => {
     if (!selected || selectedId === null) return
+
+    if (!useDemoConversations && !isBotConversation) {
+      const clientKey = `${selectedId}-${Date.now()}-${Math.random()}`
+      const counterpartId = selected.participantIds?.find(
+        (id) => id !== currentUser?.id
+      )
+      void sendPersistedMessage({
+        conversationId: selectedId,
+        clientKey,
+        body: details.note ?? '',
+        attachmentMetadata: {
+          key: `swap:${details.offered.id}:${details.requested.id}`,
+          contentType: 'application/x-entrelibros-swap',
+          size: 1,
+          kind: 'swap',
+          offered: {
+            id: details.offered.id ?? '',
+            title: details.offered.title,
+            author: details.offered.author,
+            coverUrl: details.offered.cover,
+            ...(currentUser?.id ? { ownerId: currentUser.id } : {}),
+          },
+          requested: {
+            id: details.requested.id ?? '',
+            title: details.requested.title,
+            author: details.requested.author,
+            coverUrl: details.requested.cover,
+            ...(counterpartId ? { ownerId: counterpartId } : {}),
+          },
+          ...(details.note ? { note: details.note } : {}),
+        },
+      })
+        .then((message) => setServerMessages((prev) => [...prev, message]))
+        .catch(() => setAttachmentError(true))
+      return
+    }
 
     const baseMessage = createBaseMessage(selected)
 
@@ -665,10 +790,21 @@ export const Messages = () => {
         )
         return
       }
+      const matchingBooks = [
+        ...selected.myBooks,
+        ...selected.theirBooks,
+      ].filter((book) => book.title === proposal.bookTitle)
+      const selectedBook =
+        matchingBooks.length === 1 ? matchingBooks[0] : undefined
+      const listingId =
+        selectedBook?.id && /^\d+$/.test(selectedBook.id)
+          ? Number(selectedBook.id)
+          : undefined
       void createAgreement({
         conversationId: selected.id,
         participantId,
         details: proposal,
+        ...(listingId ? { listingIds: [listingId] } : {}),
       })
         .then((agreement) => {
           setServerAgreement(agreement)
