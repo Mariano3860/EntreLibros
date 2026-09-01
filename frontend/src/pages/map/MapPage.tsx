@@ -209,7 +209,7 @@ export const MapPage = () => {
   const mapQuery = useMapData(
     {
       bbox,
-      center: location ?? undefined,
+      center: effectiveDistance === null ? undefined : (location ?? undefined),
       searchTerm: search.trim() || undefined,
       filters: {
         distanceKm: effectiveDistance,

@@ -1,5 +1,6 @@
 import { http, HttpResponse } from 'msw'
 
+import { MAP_RADIUS_OPTIONS, type MapRadiusKm } from '@src/api/map/map.types'
 import { RELATIVE_API_ROUTES } from '@src/api/routes'
 import { isWithinRadiusKm } from '@src/utils/geospatial'
 
@@ -8,6 +9,15 @@ import { apiRouteMatcher } from '../utils'
 import { generateMapResponse } from './fakers/map.faker'
 
 const normalize = (value: string | null) => value?.trim().toLowerCase() ?? ''
+
+const isMapRadius = (value: number): value is MapRadiusKm =>
+  MAP_RADIUS_OPTIONS.includes(value as MapRadiusKm)
+
+const parseBooleanParam = (value: string | null, defaultValue: boolean) => {
+  if (value === null) return defaultValue
+  const normalized = value.trim().toLowerCase()
+  return normalized === '1' || normalized === 'true'
+}
 
 export const mapHandler = http.get(
   apiRouteMatcher(RELATIVE_API_ROUTES.MAP.ROOT),
@@ -18,17 +28,47 @@ export const mapHandler = http.get(
     const searchTerm = normalize(url.searchParams.get('search'))
     const rawRadius = url.searchParams.get('distanceKm')
     const radiusParam = rawRadius === null ? null : Number(rawRadius)
-    const radiusKm =
-      radiusParam !== null && Number.isFinite(radiusParam) ? radiusParam : null
-    const centerLat = Number(url.searchParams.get('centerLat'))
-    const centerLon = Number(url.searchParams.get('centerLon'))
+    if (
+      radiusParam !== null &&
+      (!Number.isFinite(radiusParam) || !isMapRadius(radiusParam))
+    ) {
+      return HttpResponse.json(
+        { error: 'BadRequest', message: 'map.errors.distance_invalid' },
+        { status: 400 }
+      )
+    }
+    const radiusKm = radiusParam
+    const rawCenterLat = url.searchParams.get('centerLat')
+    const rawCenterLon = url.searchParams.get('centerLon')
+    const centerLat = rawCenterLat === null ? null : Number(rawCenterLat)
+    const centerLon = rawCenterLon === null ? null : Number(rawCenterLon)
+    const hasCenterParam = rawCenterLat !== null || rawCenterLon !== null
+    if (
+      hasCenterParam &&
+      (centerLat === null ||
+        centerLon === null ||
+        !Number.isFinite(centerLat) ||
+        !Number.isFinite(centerLon) ||
+        centerLat < -90 ||
+        centerLat > 90 ||
+        centerLon < -180 ||
+        centerLon > 180)
+    ) {
+      return HttpResponse.json(
+        { error: 'BadRequest', message: 'map.errors.center_invalid' },
+        { status: 400 }
+      )
+    }
     const center =
-      Number.isFinite(centerLat) && Number.isFinite(centerLon)
+      centerLat !== null && centerLon !== null
         ? { latitude: centerLat, longitude: centerLon }
         : null
     const themesParam = url.searchParams.get('themes') ?? ''
-    const openNow = url.searchParams.get('openNow') === '1'
-    const recentActivity = url.searchParams.get('recentActivity') !== '0'
+    const openNow = parseBooleanParam(url.searchParams.get('openNow'), false)
+    const recentActivity = parseBooleanParam(
+      url.searchParams.get('recentActivity'),
+      true
+    )
     const layersParam = url.searchParams.get('layers') ?? ''
     const layers = new Set(layersParam.split(',').filter(Boolean))
     if (layers.size === 0) {
@@ -77,16 +117,18 @@ export const mapHandler = http.get(
       const matchesTheme =
         themeFilters.length === 0 ||
         themeFilters.some((theme) => corner?.themes.includes(theme) ?? false)
+      const latitude = publication.lat ?? corner?.lat
+      const longitude = publication.lon ?? corner?.lon
       const matchesRadius =
         radiusKm === null ||
         !center ||
-        (publication.lat !== undefined &&
-          publication.lon !== undefined &&
+        (latitude !== undefined &&
+          longitude !== undefined &&
           isWithinRadiusKm(
             center,
             {
-              latitude: publication.lat,
-              longitude: publication.lon,
+              latitude,
+              longitude,
             },
             radiusKm
           ))

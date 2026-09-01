@@ -63,7 +63,7 @@ export const RadiusSelector = ({
       />
       <div className={styles.rangeLabels} aria-hidden="true">
         {options.map((option) => (
-          <span key={option.label}>{option.label}</span>
+          <span key={option.value ?? 'unlimited'}>{option.label}</span>
         ))}
       </div>
     </div>
