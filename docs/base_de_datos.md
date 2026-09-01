@@ -29,10 +29,13 @@ PostgreSQL es la persistencia principal; PostGIS se usa para datos geográficos 
 | 021       | Historias de Comunidad                       |
 | 022       | Seguimiento y datos demo de Comunidad        |
 | 023       | Intereses persistentes y búsquedas de libros |
+| 024       | Conversaciones demo para intercambios        |
+| 025       | Corrección de duplicados demo de mensajería  |
 
 La migraciÃ³n `022_create_community_following_and_demo_data.sql` crea `user_follows` y carga una semilla reproducible de lectores pÃºblicos con intereses, ubicaciÃ³n, libros disponibles e historias para validar el descubrimiento. Los perfiles privados o bloqueados quedan fuera de las sugerencias.
 
 La migración `023_create_book_discovery_interests.sql` agrega intereses idempotentes sobre publicaciones ajenas y evita duplicar búsquedas activas del mismo libro por usuario.
+La migración `024_seed_messaging_exchange_conversations.sql` crea conversaciones entre `user2@entrelibros.com` y los lectores demo que tienen publicaciones públicas vigentes, para validar el selector de libros del interlocutor al proponer un intercambio. La migración `025_repair_messaging_exchange_seed.sql` conserva la conversación demo más antigua por pareja y elimina únicamente duplicados vacíos de la semilla.
 El contenido exacto de cada migración es la autoridad. No edites una migración ya aplicada: agrega otra numerada y prueba upgrade desde una base existente.
 
 La migración `021_create_community_stories.sql` agrega historias sociales con texto, imagen opcional y referencia opcional a una publicación propia vigente. Los adjuntos de mensajería reutilizan el JSONB existente de `messages.attachment_metadata`: las variantes `book`, `swap` y `agreement` se validan en la capa de aplicación y no requieren una tabla adicional.
