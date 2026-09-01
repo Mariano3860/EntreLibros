@@ -62,7 +62,7 @@
 - [x] 8.2 Implementar la proyección pública por nivel geográfico y mantener calle privada; verificar con pruebas de perfil/API que `none`, país, ciudad y barrio no filtran datos superiores ni saltan bloqueos.
 - [x] 8.3 Ampliar el formulario de `/profile` para foto, intereses y ubicación/visibilidad, con validación y fallback; verificar con tests de página que guardar, recargar, errores y permisos se comportan correctamente.
 - [x] 8.4 Revisar visualmente `/profile` a 1440×900 contra el cuadrante inferior izquierdo de `img_1.png`; verificar que la edición cabe dentro del layout, conserva jerarquía y funciona en viewport estrecho.
-- [ ] 8.5 Ejecutar suites afectadas, typecheck, lint, Stylelint, build y `git diff --check`; crear commits claros y una PR en español contra `main` sin merge.
+- [x] 8.5 Ejecutar suites afectadas, typecheck, lint, Stylelint, build y `git diff --check`; crear commits claros y una PR en español contra `main` sin merge.
 
 ## 9. Interacciones sociales e historias relevantes
 
