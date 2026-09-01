@@ -2,6 +2,7 @@ import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { MapCanvas } from '@components/map/MapCanvas/MapCanvas'
 import { PublishCornerModal } from '@components/publish/PublishCornerModal'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 
 import type {
   MapBoundingBox,
@@ -44,6 +45,11 @@ const MAP_BOUNDS: MapBoundingBox = {
 const MIN_MAP_RADIUS_KM = 5.55
 const MOCK_MAP_REFERENCE_DATE = '2025-01-15T12:00:00.000Z'
 
+const parseRequestedRadius = (value: string | null) => {
+  const parsed = Number(value)
+  return Number.isInteger(parsed) && parsed >= 1 && parsed <= 10 ? parsed : 2
+}
+
 const realCategories = [
   'Todo',
   'Infancias',
@@ -67,7 +73,11 @@ export const MapPage = () => {
   const { catalog } = usePrototype()
   const { theme } = useTheme()
   const mockMode = isApiMockMode()
-  const [distance, setDistance] = useState(2)
+  const [searchParams] = useSearchParams()
+  const requestedCornerId = searchParams.get('corner')
+  const [distance, setDistance] = useState(() =>
+    parseRequestedRadius(searchParams.get('radius'))
+  )
   const [category, setCategory] = useState('Todo')
   const [search, setSearch] = useState('')
   const [bbox, setBbox] = useState<MapBoundingBox>(MAP_BOUNDS)
@@ -193,6 +203,28 @@ export const MapPage = () => {
       return
     }
 
+    if (requestedCornerId) {
+      const requestedCorner = mapCorners.find(
+        (corner) => corner.id === requestedCornerId
+      )
+
+      if (!requestedCorner) {
+        setSelectedPin(null)
+        setSelectedCorner(null)
+        return
+      }
+
+      const isRequestedCornerSelected =
+        selectedPin?.type === 'corner' &&
+        selectedPin.data.id === requestedCorner.id
+
+      if (!isRequestedCornerSelected) {
+        setSelectedCorner(displayCornerForPin(requestedCorner))
+        setSelectedPin({ type: 'corner', data: requestedCorner })
+      }
+      return
+    }
+
     const isSelectedPinVisible =
       selectedPin &&
       ((selectedPin.type === 'corner' &&
@@ -207,7 +239,13 @@ export const MapPage = () => {
       setSelectedCorner(displayCornerForPin(firstCorner))
       setSelectedPin({ type: 'corner', data: firstCorner })
     }
-  }, [displayCornerForPin, mapCorners, mapPublications, selectedPin])
+  }, [
+    displayCornerForPin,
+    mapCorners,
+    mapPublications,
+    requestedCornerId,
+    selectedPin,
+  ])
 
   const locate = useCallback(() => {
     if (!navigator.geolocation) {

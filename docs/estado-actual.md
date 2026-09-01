@@ -7,6 +7,8 @@ Fecha de referencia: 2026-08-31.
 
 ## Comprobado en el repositorio
 
+- El mini mapa de Comunidad consume rincones reales, permite seleccionar pines y abre `/map` preservando el rincón y el radio en la URL.
+
 - Inicio limita “Libros que podrían gustarte” a cinco publicaciones por página y permite avanzar o volver mediante controles discretos; el orden prioriza lectores seguidos cuando existe sesión.
 - Monorepo con frontend React/Rsbuild y backend TypeScript/Express.
 - `/books` separa el catálogo público de “Mis libros”, con filtros persistidos, interés y alta de publicaciones `want`.

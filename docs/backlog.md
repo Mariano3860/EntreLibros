@@ -52,6 +52,8 @@ Registrado el 2026-08-30 a partir de una recorrida manual de la interfaz. Estos 
 
 ### Criterio transversal de cierre P0
 
+Actualización 2026-09-01: el mini mapa de Comunidad quedó conectado al contrato real de rincones; sus pines y lista lateral abren `/map?radius=2&corner=<id>` y el mapa centra la selección cuando está disponible.
+
 Cada punto debe verificarse en navegador con una sesión autenticada y mocks desactivados, comprobando la red y la persistencia cuando aplique. Ningún botón de acción principal debe quedar sin efecto, y los estados de datos vacíos deben distinguirse de fallos de carga o de fixtures de demostración.
 
 La validación automatizada y de servicio quedó completada. Se verificaron en navegador los estados reales de Comunidad, Estadísticas, Centro de ayuda, libros y mapa; queda como paso manual comparar las ocho rutas en todos los breakpoints antes del merge.

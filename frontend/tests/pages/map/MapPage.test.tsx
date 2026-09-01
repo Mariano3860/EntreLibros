@@ -54,6 +54,17 @@ describe('MapPage', () => {
     ).toBeVisible()
   })
 
+  test('opens the corner received from the community map', () => {
+    renderWithProviders(<MapPage />, {
+      initialEntries: ['/map?corner=biblioteca-palermo&radius=5'],
+    })
+
+    expect(
+      screen.getByRole('heading', { name: 'Biblioteca de Palermo' })
+    ).toBeVisible()
+    expect(screen.getByText('5 km')).toBeVisible()
+  })
+
   test('keeps Buenos Aires fallback when location is denied', async () => {
     Object.defineProperty(navigator, 'geolocation', {
       configurable: true,

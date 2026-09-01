@@ -89,6 +89,26 @@ const LocationController = ({
   return null
 }
 
+const SelectedPinController = ({
+  selectedPin,
+}: {
+  selectedPin: MapPin | null
+}) => {
+  const map = useMap()
+
+  useEffect(() => {
+    if (selectedPin?.type !== 'corner') return
+
+    map.flyTo(
+      [selectedPin.data.lat, selectedPin.data.lon],
+      Math.max(map.getZoom(), 15),
+      { animate: true, duration: 0.6 }
+    )
+  }, [map, selectedPin])
+
+  return null
+}
+
 const MapControls = ({
   bbox,
   userLocation,
@@ -307,6 +327,7 @@ export const MapCanvas = ({
       >
         <BoundsController bbox={bbox} />
         <LocationController userLocation={userLocation} />
+        <SelectedPinController selectedPin={selectedPin} />
         <MapControls bbox={bbox} userLocation={userLocation} />
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         {userLocation ? (
