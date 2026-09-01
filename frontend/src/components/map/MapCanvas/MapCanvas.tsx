@@ -8,7 +8,7 @@ import type {
 } from '@api/map/map.types'
 import { useTheme } from '@contexts/theme/ThemeContext'
 import { divIcon } from 'leaflet'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   CircleMarker,
@@ -48,6 +48,7 @@ type MapCanvasProps = {
   activity: MapActivityPoint[]
   layers: MapLayerToggles
   selectedPin: MapPin | null
+  focusRequest?: number
   onSelectPin: (pin: MapPin) => void
   isLoading: boolean
   isFetching: boolean
@@ -91,20 +92,28 @@ const LocationController = ({
 
 const SelectedPinController = ({
   selectedPin,
+  focusRequest,
 }: {
   selectedPin: MapPin | null
+  focusRequest: number
 }) => {
   const map = useMap()
+  const selectedPinRef = useRef(selectedPin)
 
   useEffect(() => {
-    if (selectedPin?.type !== 'corner') return
+    selectedPinRef.current = selectedPin
+  }, [selectedPin])
 
-    map.flyTo(
-      [selectedPin.data.lat, selectedPin.data.lon],
-      Math.max(map.getZoom(), 15),
-      { animate: true, duration: 0.6 }
-    )
-  }, [map, selectedPin])
+  useEffect(() => {
+    if (focusRequest <= 0) return
+    const pin = selectedPinRef.current
+    if (pin?.type !== 'corner') return
+
+    map.flyTo([pin.data.lat, pin.data.lon], Math.max(map.getZoom(), 15), {
+      animate: true,
+      duration: 0.6,
+    })
+  }, [map, focusRequest])
 
   return null
 }
@@ -177,6 +186,7 @@ export const MapCanvas = ({
   activity,
   layers,
   selectedPin,
+  focusRequest = 0,
   onSelectPin,
   isLoading,
   isFetching,
@@ -327,7 +337,10 @@ export const MapCanvas = ({
       >
         <BoundsController bbox={bbox} />
         <LocationController userLocation={userLocation} />
-        <SelectedPinController selectedPin={selectedPin} />
+        <SelectedPinController
+          selectedPin={selectedPin}
+          focusRequest={focusRequest}
+        />
         <MapControls bbox={bbox} userLocation={userLocation} />
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         {userLocation ? (

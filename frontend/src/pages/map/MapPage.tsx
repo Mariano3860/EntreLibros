@@ -87,6 +87,7 @@ export const MapPage = () => {
   const [recentActivity, setRecentActivity] = useState(true)
   const [selectedCorner, setSelectedCorner] = useState<MapCorner | null>(null)
   const [selectedPin, setSelectedPin] = useState<MapPin | null>(null)
+  const [focusRequest, setFocusRequest] = useState(0)
   const [createOpen, setCreateOpen] = useState(false)
   const distanceRef = useRef(distance)
   const mockMapData = useMemo<MapResponse>(
@@ -181,7 +182,9 @@ export const MapPage = () => {
     (corner: MapCorner) => {
       setSelectedCorner(corner)
       const mapCorner = mapCorners.find((item) => item.id === corner.id)
-      if (mapCorner) setSelectedPin({ type: 'corner', data: mapCorner })
+      if (!mapCorner) return
+      setSelectedPin({ type: 'corner', data: mapCorner })
+      setFocusRequest((current) => current + 1)
     },
     [mapCorners]
   )
@@ -191,6 +194,7 @@ export const MapPage = () => {
       setSelectedPin(pin)
       if (pin.type === 'corner') {
         setSelectedCorner(displayCornerForPin(pin.data))
+        setFocusRequest((current) => current + 1)
       }
     },
     [displayCornerForPin]
@@ -221,6 +225,7 @@ export const MapPage = () => {
       if (!isRequestedCornerSelected) {
         setSelectedCorner(displayCornerForPin(requestedCorner))
         setSelectedPin({ type: 'corner', data: requestedCorner })
+        setFocusRequest((current) => current + 1)
       }
       return
     }
@@ -447,6 +452,7 @@ export const MapPage = () => {
               activity={mapActivity}
               layers={mapLayers}
               selectedPin={selectedPin}
+              focusRequest={focusRequest}
               onSelectPin={handleSelectPin}
               isLoading={!mockMode && mapQuery.isLoading}
               isFetching={!mockMode && mapQuery.isFetching}

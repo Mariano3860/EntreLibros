@@ -9,11 +9,13 @@ vi.mock('@components/map/MapCanvas/MapCanvas', () => ({
   MapCanvas: ({
     selectedPin,
     userLocation,
+    focusRequest,
   }: {
     selectedPin: MapPin | null
     userLocation?: { latitude: number; longitude: number } | null
+    focusRequest: number
   }) => {
-    mapCanvasRender({ selectedPin, userLocation })
+    mapCanvasRender({ selectedPin, userLocation, focusRequest })
     return (
       <div data-testid="map-canvas">
         {userLocation ? (
@@ -98,6 +100,37 @@ describe('MapPage', () => {
       })
     )
     expect(selectedPinAfterAction).not.toBe(selectedPinBeforeAction)
+  })
+
+  test('keeps the map focused on the user after using Mi ubicación', async () => {
+    const original = Object.getOwnPropertyDescriptor(navigator, 'geolocation')
+    const getCurrentPosition = vi.fn((success) =>
+      success({ coords: { latitude: -34.58, longitude: -58.42 } })
+    )
+    Object.defineProperty(navigator, 'geolocation', {
+      configurable: true,
+      value: { getCurrentPosition },
+    })
+
+    mapCanvasRender.mockClear()
+    renderWithProviders(<MapPage />)
+    await waitFor(() => expect(getCurrentPosition).toHaveBeenCalled())
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Biblioteca de Palermo' })
+    )
+    const focusRequestBeforeLocate = mapCanvasRender.mock.calls.at(-1)?.[0]
+      .focusRequest as number
+
+    fireEvent.click(screen.getByRole('button', { name: /Mi ubicación/ }))
+    await waitFor(() => expect(getCurrentPosition).toHaveBeenCalledTimes(2))
+
+    const focusRequestAfterLocate = mapCanvasRender.mock.calls.at(-1)?.[0]
+      .focusRequest as number
+    expect(focusRequestAfterLocate).toBe(focusRequestBeforeLocate)
+
+    if (original) Object.defineProperty(navigator, 'geolocation', original)
+    else Reflect.deleteProperty(navigator, 'geolocation')
   })
 
   test('opens the corner received from the community map', () => {
