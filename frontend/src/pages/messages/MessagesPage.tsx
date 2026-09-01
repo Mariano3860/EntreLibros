@@ -10,10 +10,13 @@ import {
   createConversation,
   fetchConversationBooks,
   fetchConversations,
+  fetchMessagingContacts,
   fetchMessageHistory,
   markMessagesRead,
+  messageQueryKeys,
   sendPersistedMessage,
   type ConversationBook,
+  type MessagingContact,
 } from '@api/messages/messages'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { useAuth } from '@contexts/auth/AuthContext'
@@ -368,8 +371,10 @@ export const MessagesPage = () =>
 
 const MockMessagesPage = () => {
   const { catalog, chatMessages, sendMessage } = usePrototype()
+  const { t } = useTranslation()
   const [selected, setSelected] = useState('lucia')
   const [search, setSearch] = useState('')
+  const [unreadOnly, setUnreadOnly] = useState(false)
   const [message, setMessage] = useState('')
   const [bookPicker, setBookPicker] = useState<'attach' | 'proposal' | null>(
     null
@@ -382,9 +387,11 @@ const MockMessagesPage = () => {
     catalog.conversations.find(
       (conversation) => conversation.id === selected
     ) ?? catalog.conversations[1]
-  const conversations = catalog.conversations.filter((conversation) =>
-    conversation.name.toLowerCase().includes(search.toLowerCase())
-  )
+  const conversations = catalog.conversations
+    .filter((conversation) =>
+      conversation.name.toLowerCase().includes(search.toLowerCase())
+    )
+    .filter((conversation) => !unreadOnly || Boolean(conversation.unread))
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView?.({ block: 'end' })
@@ -430,9 +437,33 @@ const MockMessagesPage = () => {
                 placeholder="Buscar conversaciones"
               />
             </label>
-            <div className={styles.railTabs}>
-              <button className={styles.active}>Todos</button>
-              <button>No leídos</button>
+            <div
+              className={styles.railTabs}
+              role="tablist"
+              aria-label={t('community.messages.filterLabel', {
+                defaultValue: 'Filtro de conversaciones',
+              })}
+            >
+              <button
+                type="button"
+                className={!unreadOnly ? styles.active : ''}
+                role="tab"
+                aria-selected={!unreadOnly}
+                onClick={() => setUnreadOnly(false)}
+              >
+                {t('community.messages.filters.all', { defaultValue: 'Todos' })}
+              </button>
+              <button
+                type="button"
+                className={unreadOnly ? styles.active : ''}
+                role="tab"
+                aria-selected={unreadOnly}
+                onClick={() => setUnreadOnly(true)}
+              >
+                {t('community.messages.filters.unread', {
+                  defaultValue: 'No leídos',
+                })}
+              </button>
             </div>
             <div className={styles.conversationList}>
               {conversations.map((conversation) => (
@@ -655,6 +686,7 @@ const RealMessagesPage = () => {
   } = useChatSocket()
   const [selected, setSelected] = useState<number | null>(null)
   const [search, setSearch] = useState('')
+  const [unreadOnly, setUnreadOnly] = useState(false)
   const [message, setMessage] = useState('')
   const [composerMenuOpen, setComposerMenuOpen] = useState(false)
   const [emojiPickerOpen, setEmojiPickerOpen] = useState(false)
@@ -673,29 +705,38 @@ const RealMessagesPage = () => {
     bookTitle: '',
   })
   const [newConversationOpen, setNewConversationOpen] = useState(false)
-  const [participantId, setParticipantId] = useState('')
+  const [contactSearch, setContactSearch] = useState('')
+  const [selectedContactId, setSelectedContactId] = useState<number | null>(
+    null
+  )
   const [sendError, setSendError] = useState<string | null>(null)
   const [attachError, setAttachError] = useState<string | null>(null)
   const messageInputRef = useRef<HTMLInputElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const modalRef = useRef<HTMLDivElement>(null)
+  const lastReadSequenceRef = useRef(new Map<number, number>())
   const conversationsQuery = useQuery({
-    queryKey: ['prototype', 'messages', 'conversations'],
+    queryKey: messageQueryKeys.conversations(),
     queryFn: fetchConversations,
   })
   const conversations = conversationsQuery.data
+  const contactsQuery = useQuery({
+    queryKey: messageQueryKeys.contacts(contactSearch),
+    queryFn: () => fetchMessagingContacts(contactSearch),
+    enabled: newConversationOpen,
+  })
   const activeConversation =
     conversations?.find((item) => item.id === selected) ?? null
   const counterpartId = activeConversation?.participantIds.find(
     (id) => id !== user?.id
   )
   const historyQuery = useQuery({
-    queryKey: ['prototype', 'messages', 'history', selected],
+    queryKey: messageQueryKeys.history(selected ?? 0),
     queryFn: () => fetchMessageHistory(selected ?? 0),
     enabled: selected !== null,
   })
   const booksQuery = useQuery({
-    queryKey: ['prototype', 'messages', 'books', selected],
+    queryKey: messageQueryKeys.books(selected ?? 0),
     queryFn: () => fetchConversationBooks(selected ?? 0),
     enabled: selected !== null && (bookPickerMode !== null || agreementOpen),
   })
@@ -727,15 +768,10 @@ const RealMessagesPage = () => {
         agreement
       )
       void queryClient.invalidateQueries({
-        queryKey: ['prototype', 'messages'],
+        queryKey: messageQueryKeys.all,
       })
       void queryClient.invalidateQueries({
-        queryKey: [
-          'prototype',
-          'messages',
-          'history',
-          agreement.conversationId,
-        ],
+        queryKey: messageQueryKeys.history(agreement.conversationId),
       })
     },
   })
@@ -792,43 +828,81 @@ const RealMessagesPage = () => {
         agreement
       )
       await queryClient.invalidateQueries({
-        queryKey: [
-          'prototype',
-          'messages',
-          'history',
-          agreement.conversationId,
-        ],
+        queryKey: messageQueryKeys.history(agreement.conversationId),
       })
       await queryClient.invalidateQueries({
-        queryKey: ['prototype', 'messages', 'conversations'],
+        queryKey: messageQueryKeys.conversations(),
       })
     },
   })
   const conversationMutation = useMutation({
-    mutationFn: () => createConversation(Number(participantId)),
+    mutationFn: async () => {
+      if (
+        !selectedContactId ||
+        selectedContactId === user?.id ||
+        !(contactsQuery.data ?? []).some(
+          (contact) => contact.id === selectedContactId
+        )
+      ) {
+        throw new Error('self_conversation')
+      }
+      const existing = conversations?.find((conversation) =>
+        conversation.participantIds.includes(selectedContactId)
+      )
+      return existing ?? createConversation(selectedContactId)
+    },
     onSuccess: async (conversation) => {
       setNewConversationOpen(false)
-      setParticipantId('')
+      setContactSearch('')
+      setSelectedContactId(null)
       await queryClient.invalidateQueries({
-        queryKey: ['prototype', 'messages', 'conversations'],
+        queryKey: messageQueryKeys.conversations(),
       })
       setSelected(conversation.id)
     },
   })
 
   useEffect(() => {
-    if (selected === null && conversations?.length)
-      setSelected(conversations[0].id)
-  }, [conversations, selected])
+    const normalizedSearch = search.trim().toLowerCase()
+    const filteredConversations = (conversations ?? [])
+      .filter((item) =>
+        (item.participantName ?? (item.isBot ? 'Bot' : ''))
+          .toLowerCase()
+          .includes(normalizedSearch)
+      )
+      .filter((item) => !unreadOnly || item.unreadCount > 0)
+    if (filteredConversations.some((item) => item.id === selected)) return
+    const nextConversation = filteredConversations[0]?.id ?? null
+    if (nextConversation !== selected) setSelected(nextConversation)
+  }, [conversations, search, selected, unreadOnly])
   useEffect(() => {
     if (selected === null || !isConnected) return
     joinConversation(selected, historyQuery.data?.nextAfter ?? 0)
   }, [historyQuery.data?.nextAfter, isConnected, joinConversation, selected])
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView?.({ block: 'end' })
-    const last = historyQuery.data?.messages.at(-1)
-    if (selected && last) void markMessagesRead(selected, last.sequence)
-  }, [historyQuery.data, selected])
+    if (selected === null) return
+    const persistedLast = historyQuery.data?.messages.at(-1)?.sequence ?? 0
+    const liveLast = liveMessages
+      .filter((item) => item.conversationId === selected)
+      .reduce((lastSequence, item) => Math.max(lastSequence, item.sequence), 0)
+    const lastSequence = Math.max(persistedLast, liveLast)
+    const previousSequence = lastReadSequenceRef.current.get(selected) ?? 0
+    if (lastSequence <= previousSequence) return
+
+    lastReadSequenceRef.current.set(selected, lastSequence)
+    void markMessagesRead(selected, lastSequence)
+      .then(() =>
+        queryClient.invalidateQueries({
+          queryKey: messageQueryKeys.conversations(),
+        })
+      )
+      .catch(() => {
+        if (lastReadSequenceRef.current.get(selected) === lastSequence) {
+          lastReadSequenceRef.current.delete(selected)
+        }
+      })
+  }, [historyQuery.data, liveMessages, queryClient, selected])
 
   const submit = async (event: FormEvent) => {
     event.preventDefault()
@@ -842,7 +916,7 @@ const RealMessagesPage = () => {
       })
       setMessage('')
       await queryClient.invalidateQueries({
-        queryKey: ['prototype', 'messages'],
+        queryKey: messageQueryKeys.all,
       })
     } catch {
       setSendError(
@@ -894,7 +968,7 @@ const RealMessagesPage = () => {
       setComposerMenuOpen(false)
       setAttachError(null)
       await queryClient.invalidateQueries({
-        queryKey: ['prototype', 'messages', 'history', selected],
+        queryKey: messageQueryKeys.history(selected),
       })
     } catch {
       setAttachError(
@@ -939,7 +1013,7 @@ const RealMessagesPage = () => {
       setRequestedId('')
       setSwapNote('')
       await queryClient.invalidateQueries({
-        queryKey: ['prototype', 'messages', 'history', selected],
+        queryKey: messageQueryKeys.history(selected),
       })
     } catch {
       setAttachError(
@@ -972,10 +1046,21 @@ const RealMessagesPage = () => {
     )
     setAgreementOpen(true)
   }
-  const visibleConversations = (conversations ?? []).filter((item) =>
-    (item.participantName ?? (item.isBot ? 'Bot' : ''))
-      .toLowerCase()
-      .includes(search.toLowerCase())
+  const visibleConversations = (conversations ?? [])
+    .filter((item) =>
+      (item.participantName ?? (item.isBot ? 'Bot' : ''))
+        .toLowerCase()
+        .includes(search.trim().toLowerCase())
+    )
+    .filter((item) => !unreadOnly || item.unreadCount > 0)
+  const availableContacts = (contactsQuery.data ?? []).filter(
+    (contact) => contact.id !== user?.id
+  )
+  const followedContacts = availableContacts.filter(
+    (contact) => contact.isFollowing
+  )
+  const suggestedContacts = availableContacts.filter(
+    (contact) => !contact.isFollowing
   )
   const persistedMessages = (historyQuery.data?.messages ?? []).map((item) =>
     toPrototypeChatMessage(item, user?.id ?? -1)
@@ -1034,6 +1119,43 @@ const RealMessagesPage = () => {
     </button>
   )
 
+  const renderContactOption = (contact: MessagingContact) => {
+    const initials = contact.name
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part.slice(0, 1).toUpperCase())
+      .join('')
+    return (
+      <button
+        key={contact.id}
+        type="button"
+        className={`${styles.contactOption} ${
+          selectedContactId === contact.id ? styles.contactOptionSelected : ''
+        }`}
+        aria-pressed={selectedContactId === contact.id}
+        onClick={() => setSelectedContactId(contact.id)}
+      >
+        <span className={styles.contactAvatar} aria-hidden="true">
+          {initials || '?'}
+        </span>
+        <span className={styles.contactCopy}>
+          <strong>{contact.name}</strong>
+          <small>
+            {contact.alias && contact.alias !== contact.name
+              ? `@${contact.alias}`
+              : t('community.messages.newConversation.member', {
+                  defaultValue: 'Miembro de EntreLibros',
+                })}
+          </small>
+        </span>
+        <span className={styles.contactSelection} aria-hidden="true">
+          {selectedContactId === contact.id ? '✓' : '+'}
+        </span>
+      </button>
+    )
+  }
+
   useFocusTrap({
     containerRef: modalRef,
     active: bookPickerMode !== null || agreementOpen || newConversationOpen,
@@ -1054,7 +1176,11 @@ const RealMessagesPage = () => {
               <button
                 aria-label="Redactar mensaje"
                 data-new-conversation
-                onClick={() => setNewConversationOpen(true)}
+                onClick={() => {
+                  setContactSearch('')
+                  setSelectedContactId(null)
+                  setNewConversationOpen(true)
+                }}
               >
                 ✎
               </button>
@@ -1067,9 +1193,33 @@ const RealMessagesPage = () => {
                 placeholder="Buscar conversaciones"
               />
             </label>
-            <div className={styles.railTabs}>
-              <button className={styles.active}>Todos</button>
-              <button>No leídos</button>
+            <div
+              className={styles.railTabs}
+              role="tablist"
+              aria-label={t('community.messages.filterLabel', {
+                defaultValue: 'Filtro de conversaciones',
+              })}
+            >
+              <button
+                type="button"
+                className={!unreadOnly ? styles.active : ''}
+                role="tab"
+                aria-selected={!unreadOnly}
+                onClick={() => setUnreadOnly(false)}
+              >
+                {t('community.messages.filters.all', { defaultValue: 'Todos' })}
+              </button>
+              <button
+                type="button"
+                className={unreadOnly ? styles.active : ''}
+                role="tab"
+                aria-selected={unreadOnly}
+                onClick={() => setUnreadOnly(true)}
+              >
+                {t('community.messages.filters.unread', {
+                  defaultValue: 'No leídos',
+                })}
+              </button>
             </div>
             <div className={styles.conversationList}>
               {conversationsQuery.isLoading ? (
@@ -1104,9 +1254,31 @@ const RealMessagesPage = () => {
                     })}
                   </button>
                 </div>
+              ) : visibleConversations.length === 0 ? (
+                <div className={styles.conversationState} role="status">
+                  <span className={styles.stateMark} aria-hidden="true">
+                    {unreadOnly ? '✓' : '·'}
+                  </span>
+                  <strong>
+                    {unreadOnly
+                      ? t('community.messages.states.emptyUnread', {
+                          defaultValue: 'No hay conversaciones no leídas.',
+                        })
+                      : search.trim()
+                        ? t('community.messages.states.emptySearch', {
+                            defaultValue:
+                              'No encontramos conversaciones con ese nombre.',
+                          })
+                        : t('community.messages.states.emptyConversations', {
+                            defaultValue: 'Todavía no tenés conversaciones.',
+                          })}
+                  </strong>
+                </div>
               ) : (
                 visibleConversations.map((conversation) => {
-                  const view = toPrototypeConversation(conversation)
+                  const view = toPrototypeConversation(conversation, {
+                    unread: conversation.unreadCount,
+                  })
                   return (
                     <button
                       key={conversation.id}
@@ -1126,6 +1298,11 @@ const RealMessagesPage = () => {
                       </span>
                       <span className={styles.conversationMeta}>
                         <small>{view.time}</small>
+                        {view.unread ? (
+                          <b aria-label={`${view.unread} mensajes sin leer`}>
+                            {view.unread > 99 ? '99+' : view.unread}
+                          </b>
+                        ) : null}
                       </span>
                     </button>
                   )
@@ -1783,24 +1960,27 @@ const RealMessagesPage = () => {
                   className={styles.newConversationForm}
                   onSubmit={(event) => {
                     event.preventDefault()
-                    if (Number(participantId) > 0) conversationMutation.mutate()
+                    if (selectedContactId) conversationMutation.mutate()
                   }}
                 >
                   <label className={styles.newConversationField}>
                     <span>
                       {t('community.messages.newConversation.fieldLabel', {
-                        defaultValue: 'ID de usuario',
+                        defaultValue: 'Buscar personas',
                       })}
                     </span>
                     <input
-                      id="new-conversation-user-id"
+                      id="new-conversation-contact"
                       autoFocus
-                      inputMode="numeric"
-                      value={participantId}
-                      onChange={(event) => setParticipantId(event.target.value)}
+                      value={contactSearch}
+                      onChange={(event) => {
+                        setContactSearch(event.target.value)
+                        setSelectedContactId(null)
+                        conversationMutation.reset()
+                      }}
                       placeholder={t(
                         'community.messages.newConversation.placeholder',
-                        { defaultValue: 'Ej. 42' }
+                        { defaultValue: 'Nombre, apellido o alias' }
                       )}
                       aria-describedby="new-conversation-hint"
                     />
@@ -1818,10 +1998,91 @@ const RealMessagesPage = () => {
                     <span>
                       {t('community.messages.newConversation.hint', {
                         defaultValue:
-                          'Encontrás el ID en el perfil de la persona.',
+                          'Elegí una persona para abrir una conversación nueva.',
                       })}
                     </span>
                   </p>
+                  {contactsQuery.isLoading ? (
+                    <div className={styles.contactState} role="status">
+                      <span
+                        className={styles.stateSpinner}
+                        aria-hidden="true"
+                      />
+                      <span>
+                        {t('community.messages.newConversation.loading', {
+                          defaultValue: 'Buscando personas...',
+                        })}
+                      </span>
+                    </div>
+                  ) : contactsQuery.isError ? (
+                    <div className={styles.contactState} role="alert">
+                      <span className={styles.stateMark} aria-hidden="true">
+                        !
+                      </span>
+                      <span>
+                        {t('community.messages.newConversation.error', {
+                          defaultValue: 'No pudimos cargar los contactos.',
+                        })}
+                      </span>
+                      <button
+                        type="button"
+                        className={styles.retryButton}
+                        onClick={() => void contactsQuery.refetch()}
+                      >
+                        {t('community.messages.states.retry', {
+                          defaultValue: 'Reintentar',
+                        })}
+                      </button>
+                    </div>
+                  ) : contactsQuery.data?.length ? (
+                    <div className={styles.contactSections}>
+                      {followedContacts.length ? (
+                        <section className={styles.contactSection}>
+                          <h3>
+                            {t('community.messages.newConversation.followed', {
+                              defaultValue: 'Personas que seguís',
+                            })}
+                          </h3>
+                          <div className={styles.contactList}>
+                            {followedContacts.map(renderContactOption)}
+                          </div>
+                        </section>
+                      ) : null}
+                      {suggestedContacts.length ? (
+                        <section className={styles.contactSection}>
+                          <h3>
+                            {t(
+                              'community.messages.newConversation.suggestions',
+                              { defaultValue: 'Sugerencias para vos' }
+                            )}
+                          </h3>
+                          <div className={styles.contactList}>
+                            {suggestedContacts.map(renderContactOption)}
+                          </div>
+                        </section>
+                      ) : null}
+                    </div>
+                  ) : (
+                    <p className={styles.contactEmpty}>
+                      {contactSearch.trim()
+                        ? t('community.messages.newConversation.emptySearch', {
+                            defaultValue:
+                              'No encontramos personas con ese nombre.',
+                          })
+                        : t('community.messages.newConversation.empty', {
+                            defaultValue:
+                              'No hay contactos disponibles todavía.',
+                          })}
+                    </p>
+                  )}
+                  {conversationMutation.isError ? (
+                    <p className={styles.contactError} role="alert">
+                      {t('community.messages.newConversation.createError', {
+                        defaultValue:
+                          'No pudimos iniciar la conversación. Intentá nuevamente.',
+                      })}
+                    </p>
+                  ) : null}
                   <div className={styles.newConversationActions}>
                     <button
                       type="button"
@@ -1837,7 +2098,11 @@ const RealMessagesPage = () => {
                       type="submit"
                       tone="primary"
                       disabled={
-                        Number(participantId) <= 0 ||
+                        !selectedContactId ||
+                        selectedContactId === user?.id ||
+                        !availableContacts.some(
+                          (contact) => contact.id === selectedContactId
+                        ) ||
                         conversationMutation.isPending
                       }
                     >

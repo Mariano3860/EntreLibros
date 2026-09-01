@@ -56,9 +56,10 @@ const agreementDetails = {
 };
 
 describe('messaging and agreement real-service E2E', () => {
-  test('runs the two-user persistence, negotiation, conflict and cursor flow', async () => {
+  test('runs messaging persistence, negotiation, conflict and cursor flow', async () => {
     const first = await registerAndLogin('e2e-first');
     const second = await registerAndLogin('e2e-second');
+    const third = await registerAndLogin('e2e-third');
 
     const conversation = await request(app)
       .post('/api/messages/conversations')
@@ -132,7 +133,7 @@ describe('messaging and agreement real-service E2E', () => {
     const finalConversation = await request(app)
       .post('/api/messages/conversations')
       .set('Cookie', first.cookie)
-      .send({ participantId: second.id })
+      .send({ participantId: third.id })
       .expect(201);
     const finalConversationId = finalConversation.body.conversation
       .id as number;
@@ -141,7 +142,7 @@ describe('messaging and agreement real-service E2E', () => {
       .set('Cookie', first.cookie)
       .send({
         conversationId: finalConversationId,
-        participantId: second.id,
+        participantId: third.id,
         details: agreementDetails,
       })
       .expect(201);
@@ -153,7 +154,7 @@ describe('messaging and agreement real-service E2E', () => {
       .expect(403);
     const partial = await request(app)
       .post(`/api/agreements/${finalAgreementId}/commands`)
-      .set('Cookie', second.cookie)
+      .set('Cookie', third.cookie)
       .send({ command: 'confirm', expectedVersion: 1 })
       .expect(200);
     expect(partial.body.agreement.state).toBe('partially_confirmed');

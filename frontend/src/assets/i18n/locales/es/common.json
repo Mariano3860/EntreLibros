@@ -496,15 +496,26 @@
         "emptyBooks": "No tenés libros disponibles para adjuntar.",
         "attachError": "No pudimos adjuntar este libro. Intentá nuevamente.",
         "sendError": "No pudimos enviar el mensaje. Intent\u00e1 nuevamente.",
+        "emptyUnread": "No hay conversaciones no leídas.",
+        "emptySearch": "No encontramos conversaciones con ese nombre.",
+        "emptyConversations": "Todavía no tenés conversaciones.",
         "retry": "Reintentar"
       },
       "newConversation": {
         "eyebrow": "NUEVA CONVERSACIÓN",
         "title": "¿Con quién querés hablar?",
         "description": "Iniciá una conversación nueva con alguien de la comunidad.",
-        "fieldLabel": "ID de usuario",
-        "placeholder": "Ej. 42",
-        "hint": "Encontrás el ID en el perfil de la persona.",
+        "fieldLabel": "Buscar personas",
+        "placeholder": "Nombre, apellido o alias",
+        "member": "Miembro de EntreLibros",
+        "hint": "Elegí una persona para abrir una conversación nueva.",
+        "loading": "Buscando personas...",
+        "error": "No pudimos cargar los contactos.",
+        "followed": "Personas que seguís",
+        "suggestions": "Sugerencias para vos",
+        "emptySearch": "No encontramos personas con ese nombre.",
+        "empty": "No hay contactos disponibles todavía.",
+        "createError": "No pudimos iniciar la conversación. Intentá nuevamente.",
         "cancel": "Cancelar",
         "submit": "Iniciar conversación"
       },
@@ -517,6 +528,11 @@
       },
       "searchPlaceholder": "Buscar",
       "searchAriaLabel": "Buscar conversaciones",
+      "filterLabel": "Filtro de conversaciones",
+      "filters": {
+        "all": "Todos",
+        "unread": "No leídos"
+      },
       "actions": {
         "profile": "Ver información del perfil"
       },

@@ -126,7 +126,7 @@ export const toPrototypeConversation = (
     initials: initials(name),
     preview: options.preview ?? 'Todavía no hay mensajes',
     time: formatPrototypeTime(conversation.updatedAt, options.now),
-    ...(options.unread ? { unread: options.unread } : {}),
+    ...(options.unread !== undefined ? { unread: options.unread } : {}),
     accent: accentFor(String(conversation.id)),
   }
 }

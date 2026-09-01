@@ -21,7 +21,7 @@ afterEach(async () => {
 });
 
 async function registerAndLogin(name: string) {
-  const email = `${name}-${Date.now()}@example.com`;
+  const email = `${name.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}@example.com`;
   const password = 'Str0ng!Pass1';
   const register = await request(app)
     .post('/api/auth/register')
@@ -45,6 +45,12 @@ describe('messaging and agreements API', () => {
       .expect(({ body }) => {
         expect(body.message).toBe('auth.errors.unauthorized');
       });
+    await request(app)
+      .get('/api/messages/contacts')
+      .expect(401)
+      .expect(({ body }) => {
+        expect(body.message).toBe('auth.errors.unauthorized');
+      });
 
     const first = await registerAndLogin('validation-user');
     await request(app)
@@ -63,7 +69,93 @@ describe('messaging and agreements API', () => {
       .expect(({ body }) => {
         expect(body.message).toBe('messaging.errors.participant_required');
       });
+    await request(app)
+      .post('/api/messages/conversations')
+      .set('Cookie', first.cookie)
+      .send({ participantId: first.id })
+      .expect(422)
+      .expect(({ body }) => {
+        expect(body.message).toBe('messaging.errors.self_conversation');
+      });
+
+    await request(app)
+      .post('/api/messages/conversations')
+      .set('Cookie', first.cookie)
+      .send({ participantId: 0 })
+      .expect(422)
+      .expect(({ body }) => {
+        expect(body.message).toBe('messaging.errors.participant_required');
+      });
+
+    await request(app)
+      .post('/api/messages/conversations')
+      .set('Cookie', first.cookie)
+      .send({ participantId: 2_147_483_647 })
+      .expect(403)
+      .expect(({ body }) => {
+        expect(body.message).toBe('messaging.errors.forbidden');
+      });
   });
+
+  test('searches public contacts with followed people first', async () => {
+    const viewer = await registerAndLogin('contact-viewer');
+    const followed = await registerAndLogin('Followed Reader');
+    const suggested = await registerAndLogin('Suggested Reader');
+    const privateUser = await registerAndLogin('Private Reader');
+    const blocked = await registerAndLogin('Blocked Reader');
+
+    await client.query(
+      'INSERT INTO user_follows (follower_id, followed_id) VALUES ($1, $2)',
+      [viewer.id, followed.id]
+    );
+    await client.query('UPDATE users SET alias = $1 WHERE id = $2', [
+      'bookish-reader',
+      followed.id,
+    ]);
+    await client.query(
+      "UPDATE users SET profile_visibility = 'private' WHERE id = $1",
+      [privateUser.id]
+    );
+    await client.query(
+      'INSERT INTO user_blocks (blocker_id, blocked_id) VALUES ($1, $2)',
+      [viewer.id, blocked.id]
+    );
+
+    await request(app)
+      .get('/api/messages/contacts?search=Reader')
+      .set('Cookie', viewer.cookie)
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body.contacts).toEqual([
+          expect.objectContaining({
+            id: followed.id,
+            name: 'Followed Reader',
+            alias: 'bookish-reader',
+            isFollowing: true,
+          }),
+          expect.objectContaining({
+            id: suggested.id,
+            name: 'Suggested Reader',
+            isFollowing: false,
+          }),
+        ]);
+      });
+
+    await request(app)
+      .get('/api/messages/contacts?search=contact-viewer')
+      .set('Cookie', viewer.cookie)
+      .expect(200)
+      .expect(({ body }) => expect(body.contacts).toEqual([]));
+
+    await request(app)
+      .post('/api/messages/conversations')
+      .set('Cookie', viewer.cookie)
+      .send({ participantId: privateUser.id })
+      .expect(403)
+      .expect(({ body }) => {
+        expect(body.message).toBe('messaging.errors.forbidden');
+      });
+  }, 15_000);
 
   test('persists a private message, supports idempotent retry and history', async () => {
     const first = await registerAndLogin('message-a');
@@ -76,6 +168,15 @@ describe('messaging and agreements API', () => {
       .send({ participantId: second.id })
       .expect(201);
     const conversationId = conversationResponse.body.conversation.id as number;
+
+    const duplicateConversationResponse = await request(app)
+      .post('/api/messages/conversations')
+      .set('Cookie', first.cookie)
+      .send({ participantId: second.id })
+      .expect(201);
+    expect(duplicateConversationResponse.body.conversation.id).toBe(
+      conversationId
+    );
 
     const payload = { clientKey: 'message-key-1', body: 'Hola' };
     const committedMessageIds: number[] = [];

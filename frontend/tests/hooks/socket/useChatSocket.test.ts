@@ -91,6 +91,29 @@ describe('useChatSocket', () => {
     expect(result.current.agreementUpdates).toEqual([update])
   })
 
+  test('refreshes conversation queries for incoming messages', () => {
+    const queryClient = new QueryClient()
+    const invalidateQueries = vi.spyOn(queryClient, 'invalidateQueries')
+    const customWrapper = ({ children }: PropsWithChildren) =>
+      createElement(QueryClientProvider, { client: queryClient }, children)
+
+    renderHook(() => useChatSocket(), { wrapper: customWrapper })
+    act(() => {
+      listeners['conversation:message']({
+        conversationId: 9,
+        sequence: 3,
+        senderId: 4,
+        body: 'nuevo mensaje',
+        clientKey: 'cursor-3',
+        createdAt: '2026-08-28T00:00:00.000Z',
+      })
+    })
+
+    expect(invalidateQueries).toHaveBeenCalledWith({
+      queryKey: ['messages', 'conversations'],
+    })
+  })
+
   test('sets error on connect_error', () => {
     const { result } = renderHook(() => useChatSocket(), { wrapper })
     act(() => {

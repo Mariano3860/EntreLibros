@@ -44,6 +44,10 @@ Registrado el 2026-08-30 a partir de una recorrida manual de la interfaz. Estos 
 
 > **Datos demo 2026-09-01:** las migraciones `024_seed_messaging_exchange_conversations.sql` y `025_repair_messaging_exchange_seed.sql` dejan una conversación por pareja entre `user2@entrelibros.com` y lectores demo con publicaciones públicas vigentes, para validar propuestas con libros del interlocutor.
 
+> **Actualización técnica 2026-09-01:** Mensajes incorpora `GET /api/messages/contacts` para buscar por nombre, apellido o alias, priorizar contactos seguidos y respetar visibilidad y bloqueos. El listado de conversaciones expone los no leídos entrantes y la pestaña “No leídos” filtra sobre ese estado persistido.
+
+> **Correccion de revision 2026-09-01:** `POST /api/messages/conversations` vuelve a validar en servidor la visibilidad, existencia, rol y bloqueos del destinatario, serializa el par para evitar duplicados y reutiliza la conversacion directa existente. Socket.IO refresca el contador de no leidos y la seleccion de contactos se invalida al cambiar la busqueda.
+
 - [x] **P0-13 — Apertura del chat:** al entrar en una conversación, posicionar el historial en el mensaje más reciente, al final del contenido.
 - [x] **P0-14 — Adjuntar un libro:** “Adjuntar Libro” debe listar los libros reales del usuario autenticado y permitir seleccionar uno. Mostrar un estado vacío solo cuando el usuario no tenga libros y un estado de error si no se pudieron cargar.
 - [x] **P0-15 — Proponer un intercambio:** el selector de libros debe reutilizar los libros reales disponibles del usuario y reflejar correctamente las publicaciones que puede ofrecer o solicitar.

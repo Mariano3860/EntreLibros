@@ -26,9 +26,11 @@ En desarrollo Rsbuild proxifica `/api` y `/socket.io` al backend. En producción
 
 ## Mensajería
 
-`GET /api/messages` lista conversaciones autenticadas. Los eventos `conversation:join`, `conversation:leave` y `conversation:message` operan sobre una conversación autorizada. El backend persiste el mensaje antes de emitirlo para que una reconexión o una recarga no lo pierdan.
+`GET /api/messages` lista conversaciones autenticadas y calcula `unreadCount` únicamente con mensajes recibidos después del cursor de lectura del participante. `GET /api/messages/contacts?search=` busca personas públicas por nombre o alias, prioriza a quienes el usuario sigue y excluye al propio usuario y a relaciones bloqueadas. Los eventos `conversation:join`, `conversation:leave` y `conversation:message` operan sobre una conversación autorizada. El backend persiste el mensaje antes de emitirlo para que una reconexión o una recarga no lo pierdan.
 
 La migración `015_seed_messaging_bot.sql` crea el usuario bot. El repositorio garantiza una conversación bot por usuario con bloqueo advisory e inserción idempotente. La respuesta del bot se guarda como mensaje normal y luego se entrega por Socket.IO. El handler global legacy (`message`) sigue disponible por compatibilidad y no debe usarse para validar la persistencia nueva.
+
+La creacion directa de conversaciones valida de nuevo en el servidor que el destinatario exista, sea un usuario visible y no este bloqueado; no acepta bots, perfiles privados ni IDs inexistentes aunque se invoque el endpoint manualmente. El par de participantes se serializa con un bloqueo advisory y se reutiliza la conversacion directa mas antigua si ya existe. Cada evento `conversation:message` invalida tambien el listado de conversaciones para refrescar `unreadCount`, y el chat abierto avanza el cursor de lectura con el ultimo mensaje persistido o recibido en vivo.
 
 ## Modos del frontend
 

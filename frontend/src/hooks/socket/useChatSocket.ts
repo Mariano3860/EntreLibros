@@ -70,6 +70,9 @@ export const useChatSocket = () => {
     s.on('conversation:message', (msg: ConversationMessage) => {
       void queryClient.invalidateQueries({ queryKey: notificationKeys.all })
       void queryClient.invalidateQueries({
+        queryKey: messageQueryKeys.conversations(),
+      })
+      void queryClient.invalidateQueries({
         queryKey: messageQueryKeys.history(msg.conversationId),
       })
       setConversationMessages((prev) => {
