@@ -24,11 +24,11 @@
 
 ## 4. Radio geográfico real del Mapa
 
-- [ ] 4.1 Crear `feature/map-radius-filter` desde `main` actualizado después del merge del punto 5 y verificar que hereda el estado de selección de rincón.
-- [ ] 4.2 Extender el contrato geoespacial para radios 1, 5, 30, 50 y sin límite, aplicándolo a rincones, publicaciones y listados; verificar con pruebas de API que los resultados fuera de radio no se devuelven y que sin límite no filtra por distancia.
-- [ ] 4.3 Reemplazar el slider decorativo por controles discretos y renderizar el perímetro azul-celeste desde la ubicación aproximada; verificar con tests de `FilterRail`/`MapCanvas` que radio, círculo, rail y pines se actualizan juntos y que el fallback sin permiso no inventa precisión.
-- [ ] 4.4 Revisar visualmente `/map` a 1440×900 y narrow viewport contra `img_1.png`; verificar legibilidad de radios, perímetro, ubicación y lista limitada al rango.
-- [ ] 4.5 Ejecutar suites afectadas, typecheck, lint, Stylelint, build y `git diff --check`; crear commits claros y una PR en español contra `main` sin merge.
+- [x] 4.1 Crear `feature/map-radius-filter` desde `main` actualizado después del merge del punto 5 y verificar que hereda el estado de selección de rincón.
+- [x] 4.2 Extender el contrato geoespacial para radios 1, 5, 30, 50 y sin límite, aplicándolo a rincones, publicaciones y listados; verificar con pruebas de API que los resultados fuera de radio no se devuelven y que sin límite no filtra por distancia.
+- [x] 4.3 Reemplazar el slider decorativo por controles discretos y renderizar el perímetro azul-celeste desde la ubicación aproximada; verificar con tests de `FilterRail`/`MapCanvas` que radio, círculo, rail y pines se actualizan juntos y que el fallback sin permiso no inventa precisión.
+- [x] 4.4 Revisar visualmente `/map` a 1440×900 y narrow viewport contra `img_1.png`; verificar legibilidad de radios, perímetro, ubicación y lista limitada al rango.
+- [x] 4.5 Ejecutar suites afectadas, typecheck, lint, Stylelint, build y `git diff --check`; crear commits claros y una PR en español contra `main` sin merge.
 
 ## 5. Mini mapa real de Comunidad
 

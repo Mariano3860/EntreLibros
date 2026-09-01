@@ -40,6 +40,9 @@ vi.mock('react-leaflet', () => {
       <div data-testid="leaflet-map">{children}</div>
     ),
     TileLayer: () => <div data-testid="tile-layer" />,
+    Circle: ({ radius }: { radius: number }) => (
+      <div data-testid="radius-circle" data-radius={radius} />
+    ),
     Marker: ({ children }: { children?: React.ReactNode }) => (
       <div data-testid="user-location-marker">{children}</div>
     ),
@@ -264,6 +267,30 @@ describe('MapCanvas', () => {
     )
 
     expect(screen.getByTestId('user-location-marker')).toBeInTheDocument()
+  })
+
+  test('renders the geographic radius around the approximate location', () => {
+    renderWithProviders(
+      <MapCanvas
+        bbox={bbox}
+        corners={[]}
+        publications={[]}
+        activity={[]}
+        layers={{ corners: true, publications: true, activity: true }}
+        selectedPin={null}
+        onSelectPin={vi.fn()}
+        isLoading={false}
+        isFetching={false}
+        isEmpty={false}
+        userLocation={{ latitude: -34.6, longitude: -58.4 }}
+        radiusKm={5}
+      />
+    )
+
+    expect(screen.getByTestId('radius-circle')).toHaveAttribute(
+      'data-radius',
+      '5000'
+    )
   })
 
   test('provides functional zoom and recenter controls', () => {

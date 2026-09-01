@@ -805,6 +805,8 @@
       "distance": "Distancia",
       "distanceValue": "A {{value}} km",
       "withinKm": "Hasta {{count}} km",
+      "radiusAriaLabel": "Radio geográfico",
+      "unlimited": "Sin límite",
       "types": {
         "label": "Capas",
         "corners": "Rincones de libros",

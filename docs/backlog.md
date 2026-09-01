@@ -1,6 +1,8 @@
 # Backlog de Producto (Business) — EntreLibros
 
-Última actualización: 2026-08-30
+Última actualización: 2026-09-01
+
+> **Actualización técnica 2026-09-01:** `/map` reemplaza el slider de distancia por radios de 1, 5, 30, 50 km y sin límite. Con una ubicación autorizada, el perímetro y el filtrado de rincones, publicaciones, actividad y lista usan el mismo centro y distancia geográfica; sin permiso se conserva un fallback explícito sin inventar precisión.
 
 > **Actualización técnica 2026-08-29:** la recuperación de mensajería incorporó el bot persistente mediante la migración `015_seed_messaging_bot.sql`, conversación idempotente por usuario, historial recargable y guía de diagnóstico. La mensajería mock sigue siendo útil para UI, pero no prueba persistencia real.
 
@@ -34,7 +36,7 @@ Registrado el 2026-08-30 a partir de una recorrida manual de la interfaz. Estos 
 
 - [x] **P0-10 — Centro inicial contextual:** al abrir `/map`, intentar centrar el mapa en la ubicación del usuario con permiso. Mantener un fallback claro cuando no haya permiso o ubicación disponible; Buenos Aires no debe ser el centro por defecto de una sesión con ubicación conocida.
 - [x] **P0-11 — Indicador de ubicación propia:** mostrar un marcador o indicador de precisión aproximada que permita saber dónde está el usuario, respetando la política de privacidad y sin exponer una dirección exacta públicamente.
-- [x] **P0-12 — Filtro de distancia:** hacer operativo el control “hasta 25 km”, permitiendo moverlo por todo el rango hasta el extremo derecho, reflejando correctamente el relleno azul y aplicando el filtro a los resultados.
+- [x] **P0-12 — Filtro de distancia:** reemplazar el control decorativo por radios de 1, 5, 30, 50 km y sin límite, dibujar el perímetro desde la ubicación autorizada y aplicar el mismo filtro geográfico a rincones, publicaciones, actividad y lista.
 
 ### Mensajería e intercambios
 
@@ -52,7 +54,7 @@ Registrado el 2026-08-30 a partir de una recorrida manual de la interfaz. Estos 
 
 ### Criterio transversal de cierre P0
 
-Actualización 2026-09-01: el mini mapa de Comunidad quedó conectado al contrato real de rincones; sus pines y lista lateral abren `/map?radius=2&corner=<id>` y el mapa centra la selección cuando está disponible.
+Actualización 2026-09-01: el mini mapa de Comunidad quedó conectado al contrato real de rincones; sus pines y lista lateral abren `/map?radius=5&corner=<id>` y el mapa centra la selección cuando está disponible. `/map` conserva el radio seleccionado en la URL y aplica el perímetro geográfico cuando la ubicación fue autorizada.
 
 Cada punto debe verificarse en navegador con una sesión autenticada y mocks desactivados, comprobando la red y la persistencia cuando aplique. Ningún botón de acción principal debe quedar sin efecto, y los estados de datos vacíos deben distinguirse de fallos de carga o de fixtures de demostración.
 

@@ -1,6 +1,6 @@
 # Estado actual
 
-Fecha de referencia: 2026-08-31.
+Fecha de referencia: 2026-09-01.
 
 - La migraciÃ³n 022 agrega seguimiento persistente y datos demo para historias, lectores y recomendaciones personalizadas de Comunidad.
 - La migración 023 agrega intereses personales sobre publicaciones ajenas y soporta publicaciones de búsqueda sin duplicados.
@@ -8,6 +8,8 @@ Fecha de referencia: 2026-08-31.
 ## Comprobado en el repositorio
 
 - El mini mapa de Comunidad consume rincones reales, permite seleccionar pines y abre `/map` preservando el rincón y el radio en la URL.
+
+- `/map` ofrece radios de 1, 5, 30 y 50 km o sin límite; con ubicación autorizada sincroniza perímetro, rincones, publicaciones, actividad y lista mediante distancia geográfica.
 
 - Inicio limita “Libros que podrían gustarte” a cinco publicaciones por página y permite avanzar o volver mediante controles discretos; el orden prioriza lectores seguidos cuando existe sesión.
 - Monorepo con frontend React/Rsbuild y backend TypeScript/Express.

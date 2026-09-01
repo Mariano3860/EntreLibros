@@ -1,5 +1,8 @@
 export type MapLayerKey = 'corners' | 'publications' | 'activity'
 
+export const MAP_RADIUS_OPTIONS = [1, 5, 30, 50] as const
+export type MapRadiusKm = (typeof MAP_RADIUS_OPTIONS)[number]
+
 export interface MapBoundingBox {
   north: number
   south: number
@@ -44,8 +47,13 @@ export interface MapActivityPoint {
   intensity: number
 }
 
+export interface MapCenter {
+  latitude: number
+  longitude: number
+}
+
 export interface MapFilters {
-  distanceKm: number
+  distanceKm: MapRadiusKm | null
   themes: string[]
   openNow: boolean
   recentActivity: boolean
@@ -59,6 +67,7 @@ export interface MapLayerToggles {
 
 export interface MapQueryInput {
   bbox: MapBoundingBox
+  center?: MapCenter
   searchTerm?: string
   filters: MapFilters
   layers: MapLayerToggles

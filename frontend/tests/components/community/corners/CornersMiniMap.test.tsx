@@ -138,7 +138,7 @@ describe('CornersMiniMap', () => {
     )
 
     expect(screen.getByTestId('location')).toHaveTextContent(
-      '/map?radius=2&corner=pin-1'
+      '/map?radius=5&corner=pin-1'
     )
   })
 

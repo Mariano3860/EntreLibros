@@ -1,18 +1,65 @@
-import type { MapLayerKey, MapLayerToggles } from '@api/map/map.types'
-import type { CSSProperties } from 'react'
+import {
+  MAP_RADIUS_OPTIONS,
+  type MapLayerKey,
+  type MapLayerToggles,
+  type MapRadiusKm,
+} from '@api/map/map.types'
 import { useTranslation } from 'react-i18next'
 
 import styles from './FilterRail.module.scss'
 
 type FilterRailProps = {
-  distanceKm: number
-  onDistanceChange: (value: number) => void
+  distanceKm: MapRadiusKm | null
+  onDistanceChange: (value: MapRadiusKm | null) => void
   layers: MapLayerToggles
   onToggleLayer: (layer: MapLayerKey) => void
   openNow: boolean
   onToggleOpenNow: () => void
   recentActivity: boolean
   onToggleRecentActivity: () => void
+}
+
+type RadiusSelectorProps = Pick<
+  FilterRailProps,
+  'distanceKm' | 'onDistanceChange'
+>
+
+export const RadiusSelector = ({
+  distanceKm,
+  onDistanceChange,
+}: RadiusSelectorProps) => {
+  const { t } = useTranslation()
+  const options: Array<{ value: MapRadiusKm | null; label: string }> = [
+    ...MAP_RADIUS_OPTIONS.map((value) => ({
+      value,
+      label: `${value} km`,
+    })),
+    {
+      value: null,
+      label: t('map.filters.unlimited', { defaultValue: 'Sin límite' }),
+    },
+  ]
+
+  return (
+    <div
+      className={styles.radiusOptions}
+      role="group"
+      aria-label={t('map.filters.radiusAriaLabel', {
+        defaultValue: 'Radio geográfico',
+      })}
+    >
+      {options.map((option) => (
+        <button
+          key={option.label}
+          type="button"
+          aria-pressed={distanceKm === option.value}
+          onClick={() => onDistanceChange(option.value)}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
+  )
 }
 
 export const FilterRail = ({
@@ -34,25 +81,10 @@ export const FilterRail = ({
     >
       <section className={styles.section}>
         <h3 className={styles.sectionTitle}>{t('map.filters.distance')}</h3>
-        <div className={styles.slider}>
-          <input
-            type="range"
-            min={1}
-            max={25}
-            step={1}
-            value={distanceKm}
-            style={
-              {
-                '--range-progress': `${((distanceKm - 1) / 24) * 100}%`,
-              } as CSSProperties
-            }
-            onChange={(event) => onDistanceChange(Number(event.target.value))}
-            aria-valuetext={
-              t('map.filters.distanceValue', { value: distanceKm }) ?? ''
-            }
-          />
-          <span>{t('map.filters.withinKm', { count: distanceKm })}</span>
-        </div>
+        <RadiusSelector
+          distanceKm={distanceKm}
+          onDistanceChange={onDistanceChange}
+        />
       </section>
 
       <section className={styles.section}>

@@ -13,7 +13,7 @@ type CornersMiniMapProps = {
 }
 
 export const buildCommunityMapPath = (cornerId?: string | null) => {
-  const params = new URLSearchParams({ radius: '2' })
+  const params = new URLSearchParams({ radius: '5' })
   if (cornerId) params.set('corner', cornerId)
   return `/map?${params.toString()}`
 }

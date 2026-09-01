@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   boundingBoxFromCenter,
   haversineDistanceKm,
+  isWithinRadiusKm,
 } from '@src/utils/geospatial'
 
 describe('haversineDistanceKm', () => {
@@ -96,5 +97,18 @@ describe('boundingBoxFromCenter', () => {
     expect(bbox.south).toBeLessThan(latitude)
     expect(bbox.east).toBeGreaterThan(longitude)
     expect(bbox.west).toBeLessThan(longitude)
+  })
+})
+
+describe('isWithinRadiusKm', () => {
+  it('includes points inside the selected radius and excludes points outside it', () => {
+    const origin = { latitude: -34.6037, longitude: -58.3816 }
+
+    expect(
+      isWithinRadiusKm(origin, { latitude: -34.607, longitude: -58.382 }, 1)
+    ).toBe(true)
+    expect(
+      isWithinRadiusKm(origin, { latitude: -34.63, longitude: -58.3816 }, 1)
+    ).toBe(false)
   })
 })

@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw'
 
 import { RELATIVE_API_ROUTES } from '@src/api/routes'
+import { isWithinRadiusKm } from '@src/utils/geospatial'
 
 import { apiRouteMatcher } from '../utils'
 
@@ -15,6 +16,16 @@ export const mapHandler = http.get(
     const url = new URL(request.url)
 
     const searchTerm = normalize(url.searchParams.get('search'))
+    const rawRadius = url.searchParams.get('distanceKm')
+    const radiusParam = rawRadius === null ? null : Number(rawRadius)
+    const radiusKm =
+      radiusParam !== null && Number.isFinite(radiusParam) ? radiusParam : null
+    const centerLat = Number(url.searchParams.get('centerLat'))
+    const centerLon = Number(url.searchParams.get('centerLon'))
+    const center =
+      Number.isFinite(centerLat) && Number.isFinite(centerLon)
+        ? { latitude: centerLat, longitude: centerLon }
+        : null
     const themesParam = url.searchParams.get('themes') ?? ''
     const openNow = url.searchParams.get('openNow') === '1'
     const recentActivity = url.searchParams.get('recentActivity') !== '0'
@@ -41,8 +52,17 @@ export const mapHandler = http.get(
         themeFilters.length === 0 ||
         themeFilters.some((theme) => corner.themes.includes(theme))
       const matchesOpen = !openNow || corner.isOpenNow
-      return matchesSearch && matchesTheme && matchesOpen
+      const matchesRadius =
+        radiusKm === null ||
+        !center ||
+        isWithinRadiusKm(
+          center,
+          { latitude: corner.lat, longitude: corner.lon },
+          radiusKm
+        )
+      return matchesSearch && matchesTheme && matchesOpen && matchesRadius
     })
+    const visibleCornerIds = new Set(corners.map((corner) => corner.id))
 
     const publications = base.publications.filter((publication) => {
       const matchesSearch =
@@ -57,10 +77,39 @@ export const mapHandler = http.get(
       const matchesTheme =
         themeFilters.length === 0 ||
         themeFilters.some((theme) => corner?.themes.includes(theme) ?? false)
-      return matchesSearch && matchesTheme
+      const matchesRadius =
+        radiusKm === null ||
+        !center ||
+        (publication.lat !== undefined &&
+          publication.lon !== undefined &&
+          isWithinRadiusKm(
+            center,
+            {
+              latitude: publication.lat,
+              longitude: publication.lon,
+            },
+            radiusKm
+          ))
+      return (
+        visibleCornerIds.has(publication.cornerId) &&
+        matchesSearch &&
+        matchesTheme &&
+        matchesRadius
+      )
     })
 
-    const activity = recentActivity ? base.activity : []
+    const activity = recentActivity
+      ? base.activity.filter(
+          (point) =>
+            radiusKm === null ||
+            !center ||
+            isWithinRadiusKm(
+              center,
+              { latitude: point.lat, longitude: point.lon },
+              radiusKm
+            )
+        )
+      : []
 
     const payload = {
       corners: layers.has('corners') ? corners : [],

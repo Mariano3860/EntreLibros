@@ -58,7 +58,7 @@ describe('CommunityFeedPage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Ver mapa →' }))
 
     expect(screen.getByTestId('location')).toHaveTextContent(
-      '/map?radius=2&corner=cafe-literario'
+      '/map?radius=5&corner=cafe-literario'
     )
   })
 })

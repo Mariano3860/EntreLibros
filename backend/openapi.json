@@ -1159,9 +1159,32 @@
             "in": "query",
             "required": false,
             "schema": {
-              "type": "number"
+              "type": "integer",
+              "enum": [1, 5, 30, 50]
             },
-            "description": "Maximum distance in kilometres for publications"
+            "description": "Maximum geographic distance in kilometres for corners, publications and activity; omit for no limit"
+          },
+          {
+            "name": "centerLat",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "minimum": -90,
+              "maximum": 90
+            },
+            "description": "Latitude of the authorized approximate location used as the radius center"
+          },
+          {
+            "name": "centerLon",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "minimum": -180,
+              "maximum": 180
+            },
+            "description": "Longitude of the authorized approximate location used as the radius center"
           },
           {
             "name": "themes",

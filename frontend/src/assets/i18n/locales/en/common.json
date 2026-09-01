@@ -809,6 +809,8 @@
       "distance": "Distance",
       "distanceValue": "Within {{value}} km",
       "withinKm": "Within {{count}} km",
+      "radiusAriaLabel": "Geographic radius",
+      "unlimited": "No limit",
       "types": {
         "label": "Layers",
         "corners": "Book corners",

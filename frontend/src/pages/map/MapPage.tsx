@@ -1,14 +1,17 @@
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
+import { RadiusSelector } from '@components/map/FilterRail/FilterRail'
 import { MapCanvas } from '@components/map/MapCanvas/MapCanvas'
 import { PublishCornerModal } from '@components/publish/PublishCornerModal'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
+import { MAP_RADIUS_OPTIONS } from '@src/api/map/map.types'
 import type {
   MapBoundingBox,
   MapCornerPin,
   MapPin,
   MapResponse,
+  MapRadiusKm,
 } from '@src/api/map/map.types'
 import { useTheme } from '@src/contexts/theme/ThemeContext'
 import { usePrototype } from '@src/features/prototype/PrototypeContext'
@@ -20,7 +23,7 @@ import {
   UnavailableState,
 } from '@src/features/prototype/PrototypeUI'
 import { useMapData } from '@src/hooks/api/useMapData'
-import { boundingBoxFromCenter } from '@src/utils/geospatial'
+import { boundingBoxFromCenter, isWithinRadiusKm } from '@src/utils/geospatial'
 import { isApiMockMode } from '@src/utils/runtimeEnv'
 
 import styles from './MapPage.module.scss'
@@ -45,9 +48,12 @@ const MAP_BOUNDS: MapBoundingBox = {
 const MIN_MAP_RADIUS_KM = 5.55
 const MOCK_MAP_REFERENCE_DATE = '2025-01-15T12:00:00.000Z'
 
-const parseRequestedRadius = (value: string | null) => {
+const parseRequestedRadius = (value: string | null): MapRadiusKm | null => {
+  if (value === null) return null
   const parsed = Number(value)
-  return Number.isInteger(parsed) && parsed >= 1 && parsed <= 10 ? parsed : 2
+  return MAP_RADIUS_OPTIONS.includes(parsed as MapRadiusKm)
+    ? (parsed as MapRadiusKm)
+    : null
 }
 
 const realCategories = [
@@ -73,7 +79,7 @@ export const MapPage = () => {
   const { catalog } = usePrototype()
   const { theme } = useTheme()
   const mockMode = isApiMockMode()
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const requestedCornerId = searchParams.get('corner')
   const [distance, setDistance] = useState(() =>
     parseRequestedRadius(searchParams.get('radius'))
@@ -89,7 +95,6 @@ export const MapPage = () => {
   const [selectedPin, setSelectedPin] = useState<MapPin | null>(null)
   const [focusRequest, setFocusRequest] = useState(0)
   const [createOpen, setCreateOpen] = useState(false)
-  const distanceRef = useRef(distance)
   const mockMapData = useMemo<MapResponse>(
     () => ({
       corners: catalog.corners.map((corner, index) => {
@@ -134,12 +139,80 @@ export const MapPage = () => {
     }),
     [catalog.corners]
   )
+  const effectiveDistance = location ? distance : null
+  const mockFilteredMapData = useMemo<MapResponse>(() => {
+    const normalizedSearch = search.trim().toLowerCase()
+    const matchesDistance = (latitude: number, longitude: number) =>
+      effectiveDistance === null ||
+      !location ||
+      isWithinRadiusKm(location, { latitude, longitude }, effectiveDistance)
+    const matchesSearch = (value: string) =>
+      normalizedSearch.length === 0 ||
+      value.toLowerCase().includes(normalizedSearch)
+    const matchesCategory = (themes: string[]) =>
+      category === 'Todo' ||
+      category === 'Más' ||
+      themes.some(
+        (theme) => theme === category || theme === category.replace(/s$/, '')
+      )
+
+    const visibleCorners = mockMapData.corners.filter(
+      (corner) =>
+        (matchesSearch(corner.name) ||
+          matchesSearch(corner.barrio) ||
+          matchesSearch(corner.city)) &&
+        matchesCategory(corner.themes) &&
+        (!openNow || corner.isOpenNow !== false) &&
+        matchesDistance(corner.lat, corner.lon)
+    )
+    const visibleCornerIds = new Set(visibleCorners.map((corner) => corner.id))
+    const visiblePublications = mockMapData.publications.filter(
+      (publication) => {
+        const corner = mockMapData.corners.find(
+          (item) => item.id === publication.cornerId
+        )
+        const latitude = publication.lat ?? corner?.lat
+        const longitude = publication.lon ?? corner?.lon
+        return (
+          visibleCornerIds.has(publication.cornerId) &&
+          (matchesSearch(publication.title) ||
+            publication.authors.some(matchesSearch)) &&
+          latitude !== undefined &&
+          longitude !== undefined &&
+          matchesDistance(latitude, longitude)
+        )
+      }
+    )
+    const visibleActivity = recentActivity
+      ? mockMapData.activity.filter(
+          (point) =>
+            visibleCornerIds.has(point.id.replace(/-activity$/, '')) &&
+            matchesDistance(point.lat, point.lon)
+        )
+      : []
+
+    return {
+      ...mockMapData,
+      corners: visibleCorners,
+      publications: visiblePublications,
+      activity: visibleActivity,
+    }
+  }, [
+    category,
+    effectiveDistance,
+    location,
+    mockMapData,
+    openNow,
+    recentActivity,
+    search,
+  ])
   const mapQuery = useMapData(
     {
       bbox,
+      center: location ?? undefined,
       searchTerm: search.trim() || undefined,
       filters: {
-        distanceKm: distance,
+        distanceKm: effectiveDistance,
         themes: category === 'Todo' ? [] : [category],
         openNow,
         recentActivity,
@@ -149,13 +222,17 @@ export const MapPage = () => {
     },
     { enabled: !mockMode }
   )
-  const mapData = mockMode ? mockMapData : mapQuery.data
+  const mapData = mockMode ? mockFilteredMapData : mapQuery.data
   const mapCorners = useMemo(() => mapData?.corners ?? [], [mapData])
   const mapPublications = useMemo(() => mapData?.publications ?? [], [mapData])
   const mapActivity = useMemo(() => mapData?.activity ?? [], [mapData])
-  const corners: ReadonlyArray<MapCorner> = mockMode
-    ? catalog.corners
-    : mapCorners.map(toDisplayCorner)
+  const corners: ReadonlyArray<MapCorner> = mapCorners.map((corner) => {
+    if (!mockMode) return toDisplayCorner(corner)
+    return (
+      catalog.corners.find((item) => item.id === corner.id) ??
+      toDisplayCorner(corner)
+    )
+  })
   const categories = mockMode ? catalog.mapCategories : realCategories
   const mapLayers = {
     corners: true,
@@ -264,14 +341,6 @@ export const MapPage = () => {
           longitude: position.coords.longitude,
         }
         setLocation(nextLocation)
-        setBbox(
-          boundingBoxFromCenter(
-            nextLocation.latitude,
-            nextLocation.longitude,
-            distanceRef.current,
-            { minDistanceKm: MIN_MAP_RADIUS_KM }
-          )
-        )
         setLocationDenied(false)
       },
       () => setLocationDenied(true),
@@ -280,12 +349,38 @@ export const MapPage = () => {
   }, [])
 
   useEffect(() => {
-    distanceRef.current = distance
-  }, [distance])
+    if (!location) return
+    setBbox(
+      distance === null
+        ? MAP_BOUNDS
+        : boundingBoxFromCenter(
+            location.latitude,
+            location.longitude,
+            distance,
+            { minDistanceKm: MIN_MAP_RADIUS_KM }
+          )
+    )
+  }, [distance, location])
 
   useEffect(() => {
     locate()
   }, [locate])
+
+  const handleDistanceChange = useCallback(
+    (nextDistance: MapRadiusKm | null) => {
+      setDistance(nextDistance)
+      setSearchParams(
+        (current) => {
+          const nextParams = new URLSearchParams(current)
+          if (nextDistance === null) nextParams.delete('radius')
+          else nextParams.set('radius', String(nextDistance))
+          return nextParams
+        },
+        { replace: true }
+      )
+    },
+    [setSearchParams]
+  )
 
   const selectedMapCorner =
     selectedPin?.type === 'corner' ? selectedPin.data : null
@@ -365,20 +460,15 @@ export const MapPage = () => {
             <section>
               <h2>Distancia</h2>
               <div className={styles.distanceValue}>
-                Hasta <strong>{distance} km</strong>
+                Radio activo
+                <strong>
+                  {distance === null ? 'Sin límite' : `Hasta ${distance} km`}
+                </strong>
               </div>
-              <input
-                aria-label="Distancia"
-                type="range"
-                min="1"
-                max="10"
-                value={distance}
-                onChange={(event) => setDistance(Number(event.target.value))}
+              <RadiusSelector
+                distanceKm={distance}
+                onDistanceChange={handleDistanceChange}
               />
-              <div className={styles.rangeLabels}>
-                <span>1 km</span>
-                <span>10 km</span>
-              </div>
             </section>
             <section>
               <h2>Categorías</h2>
@@ -443,7 +533,7 @@ export const MapPage = () => {
             className={styles.mapCanvas}
             data-map-theme={theme}
             role="img"
-            aria-label={`Mapa ${theme === 'dark' ? 'oscuro' : 'claro'} con rincones hasta ${distance} kilómetros`}
+            aria-label={`Mapa ${theme === 'dark' ? 'oscuro' : 'claro'} con rincones en un radio ${distance === null ? 'sin límite' : `de hasta ${distance} kilómetros`}`}
           >
             <MapCanvas
               bbox={bbox}
@@ -458,6 +548,7 @@ export const MapPage = () => {
               isFetching={!mockMode && mapQuery.isFetching}
               isEmpty={isMapEmpty}
               userLocation={location}
+              radiusKm={effectiveDistance}
               className={styles.leafletCanvas}
             />
             <Panel className={styles.placeCard} as="article">
@@ -500,7 +591,8 @@ export const MapPage = () => {
             </Panel>
             {locationDenied ? (
               <div className={styles.locationNotice} role="status">
-                No pudimos acceder a tu ubicación. Mostramos Buenos Aires.
+                No pudimos acceder a tu ubicación. Mostramos Buenos Aires; el
+                radio se aplicará cuando compartas tu ubicación.
               </div>
             ) : null}
           </div>

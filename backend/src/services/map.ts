@@ -55,7 +55,7 @@ export interface MapActivityPoint {
 }
 
 export interface MapFilters {
-  distanceKm: number;
+  distanceKm: 1 | 5 | 30 | 50 | null;
   themes: string[];
   openNow: boolean;
   recentActivity: boolean;
@@ -63,6 +63,7 @@ export interface MapFilters {
 
 export interface MapQuery {
   bbox: MapBoundingBox;
+  center?: { latitude: number; longitude: number };
   search: string;
   filters: MapFilters;
   layers: Set<'corners' | 'publications' | 'activity'>;
@@ -287,7 +288,7 @@ const fetchPublications = async (
   search: string,
   themeFilters: string[],
   center: { lat: number; lon: number },
-  maxDistanceKm: number
+  maxDistanceKm: MapFilters['distanceKm']
 ): Promise<MapPublicationPin[]> => {
   if (cornerLookup.size === 0) {
     return [];
@@ -350,7 +351,7 @@ const fetchPublications = async (
       center
     );
 
-    if (maxDistanceKm > 0 && distanceKm > maxDistanceKm) {
+    if (maxDistanceKm !== null && distanceKm > maxDistanceKm) {
       continue;
     }
 
@@ -456,6 +457,10 @@ export async function getMapData(query: MapQuery): Promise<MapResponse> {
     .map((theme) => theme.toLowerCase());
 
   const searchBounds = expandBounds(query.bbox, MAP_FETCH_PADDING_METERS);
+  const centerPoint = query.center ?? {
+    latitude: (query.bbox.north + query.bbox.south) / 2,
+    longitude: (query.bbox.east + query.bbox.west) / 2,
+  };
   let corners: CommunityCornerEntity[] = [];
   try {
     corners = await listCornersForMap(searchBounds);
@@ -497,9 +502,26 @@ export async function getMapData(query: MapQuery): Promise<MapResponse> {
       matchesCornerSearch(corner, normalizedSearch);
     const matchesTheme = hasThemeOverlap(getCornerThemes(corner), themeFilters);
     const matchesOpen = !query.filters.openNow || corner.status === 'active';
+    const distanceKm = haversineDistanceKm(
+      {
+        lat: corner.coordinates.latitude,
+        lon: corner.coordinates.longitude,
+      },
+      {
+        lat: centerPoint.latitude,
+        lon: centerPoint.longitude,
+      }
+    );
+    const matchesDistance =
+      query.filters.distanceKm === null ||
+      distanceKm <= query.filters.distanceKm;
 
     const isVisible =
-      matchesTerm && matchesTheme && matchesOpen && !corner.draft;
+      matchesTerm &&
+      matchesTheme &&
+      matchesOpen &&
+      matchesDistance &&
+      !corner.draft;
 
     if (isVisible) {
       displayCoordinates.set(corner.id, displayCoordinatesForCorner);
@@ -512,11 +534,6 @@ export async function getMapData(query: MapQuery): Promise<MapResponse> {
     filteredCorners.map((corner) => [corner.id, corner])
   );
 
-  const centerPoint = {
-    lat: (query.bbox.north + query.bbox.south) / 2,
-    lon: (query.bbox.east + query.bbox.west) / 2,
-  };
-
   let publications: MapPublicationPin[] = [];
   if (query.layers.has('publications')) {
     try {
@@ -525,7 +542,10 @@ export async function getMapData(query: MapQuery): Promise<MapResponse> {
         displayCoordinates,
         normalizedSearch,
         themeFilters,
-        centerPoint,
+        {
+          lat: centerPoint.latitude,
+          lon: centerPoint.longitude,
+        },
         query.filters.distanceKm
       );
     } catch (error) {

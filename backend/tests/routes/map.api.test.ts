@@ -10,6 +10,7 @@ import {
 } from '../../src/repositories/communityCornerRepository.js';
 
 let client: PoolClient;
+let publicationUserSequence = 0;
 
 const CORNER_INPUT: CreateCommunityCornerInput = {
   id: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
@@ -64,6 +65,20 @@ const SEVILLE_CORNER_INPUT: CreateCommunityCornerInput = {
   photo: {
     id: 'corner-sevilla-photo',
     url: 'https://example.com/corner-sevilla.jpg',
+  },
+};
+
+const DISTANT_PALERMO_CORNER_INPUT: CreateCommunityCornerInput = {
+  ...CORNER_INPUT,
+  id: 'cccccccc-dddd-eeee-ffff-000000000000',
+  name: 'Rincón Palermo distante',
+  address: {
+    ...CORNER_INPUT.address,
+    street: 'Av. Juan B. Justo',
+  },
+  coordinates: {
+    latitude: -34.625,
+    longitude: -58.39,
   },
 };
 
@@ -151,8 +166,10 @@ describe('map geocoding endpoint', () => {
 });
 
 const seedPublicationData = async (cornerId: string) => {
+  publicationUserSequence += 1;
   const user = await client.query(
-    "INSERT INTO users (name, email, password, role) VALUES ('Test User', 'user@example.com', 'hash', 'user') RETURNING id"
+    "INSERT INTO users (name, email, password, role) VALUES ('Test User', $1, 'hash', 'user') RETURNING id",
+    [`map-publication-${publicationUserSequence}@example.com`]
   );
   const userId = user.rows[0].id;
 
@@ -212,6 +229,24 @@ describe('map data endpoint', () => {
     });
   });
 
+  test('accepts only the supported geographic radius values', async () => {
+    const response = await request(app)
+      .get('/api/map')
+      .query({
+        north: -34.5,
+        south: -34.7,
+        east: -58.3,
+        west: -58.6,
+        distanceKm: 2,
+      })
+      .expect(400);
+
+    expect(response.body).toEqual({
+      error: 'BadRequest',
+      message: 'map.errors.distance_invalid',
+    });
+  });
+
   test('returns data from persisted corners and publications', async () => {
     const corner = await createCorner(CORNER_INPUT);
     await client.query(
@@ -229,6 +264,8 @@ describe('map data endpoint', () => {
         west: -58.43,
         search: 'Rincón',
         distanceKm: 5,
+        centerLat: -34.5985,
+        centerLon: -58.4102,
         themes: 'Comunidad',
         openNow: 'true',
         recentActivity: 'true',
@@ -287,7 +324,7 @@ describe('map data endpoint', () => {
         east: -5.918702824686989,
         west: -6.04430158314608,
         search: '',
-        distanceKm: 25,
+        distanceKm: 30,
         themes: '',
         openNow: 'true',
         recentActivity: 'true',
@@ -303,5 +340,48 @@ describe('map data endpoint', () => {
     ]);
     expect(response.body.activity).toEqual([]);
     expect(response.body.publications).toEqual([]);
+  });
+
+  test('filters corners and their publications by the selected radius', async () => {
+    const nearCorner = await createCorner(CORNER_INPUT);
+    const distantCorner = await createCorner(DISTANT_PALERMO_CORNER_INPUT);
+    await seedPublicationData(nearCorner.id);
+    await seedPublicationData(distantCorner.id);
+
+    const query = {
+      north: -34.57,
+      south: -34.65,
+      east: -58.36,
+      west: -58.45,
+      centerLat: -34.5985,
+      centerLon: -58.4102,
+      distanceKm: 1,
+      layers: 'corners,publications,activity',
+    };
+
+    const limitedResponse = await request(app)
+      .get('/api/map')
+      .query(query)
+      .expect(200);
+
+    expect(limitedResponse.body.corners).toEqual([
+      expect.objectContaining({ id: nearCorner.id }),
+    ]);
+    expect(limitedResponse.body.publications).toEqual([
+      expect.objectContaining({ cornerId: nearCorner.id }),
+    ]);
+
+    const unlimitedResponse = await request(app)
+      .get('/api/map')
+      .query({ ...query, distanceKm: undefined })
+      .expect(200);
+
+    expect(unlimitedResponse.body.corners).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: nearCorner.id }),
+        expect.objectContaining({ id: distantCorner.id }),
+      ])
+    );
+    expect(unlimitedResponse.body.publications).toHaveLength(2);
   });
 });

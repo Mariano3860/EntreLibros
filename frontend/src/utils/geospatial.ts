@@ -76,6 +76,18 @@ export const haversineDistanceKm = (
   return EARTH_RADIUS_KM * c
 }
 
+export const isWithinRadiusKm = (
+  origin: { latitude: number; longitude: number },
+  target: { latitude: number; longitude: number },
+  radiusKm: number
+): boolean =>
+  haversineDistanceKm(
+    origin.latitude,
+    origin.longitude,
+    target.latitude,
+    target.longitude
+  ) <= radiusKm
+
 export type BoundingBox = {
   north: number
   south: number
