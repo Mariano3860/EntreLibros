@@ -1,5 +1,7 @@
 ## Resumen de la funcionalidad `/map`
 
+El mini mapa de `/community` consume el contrato de rincones reales y navega al mapa completo con `corner` y `radius` en la URL. Por ejemplo, `/map?radius=2&corner=<id>` abre el rincón seleccionado; si no está visible con los filtros actuales, el mapa conserva esos filtros y muestra el estado correspondiente.
+
 La ruta `/map` funciona como hub territorial para descubrir Rincones de Libros, publicaciones cercanas y señales de actividad. El mock se apoya en `msw` y genera datos deterministas a partir de la semilla `2048`. El panel lateral permanece como bloque placeholder hasta definir el detalle definitivo.
 
 ### Cómo probar el mapa en desarrollo

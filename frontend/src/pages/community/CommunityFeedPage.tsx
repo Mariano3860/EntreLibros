@@ -17,13 +17,16 @@ import {
 import type { CommunityDiscovery } from '@src/api/community/discovery.types'
 import { fetchSuggestions } from '@src/api/community/suggestions.service'
 import { CommunityStoryModal } from '@src/components/community/CommunityStoryModal'
+import {
+  buildCommunityMapPath,
+  CornersMiniMap,
+} from '@src/components/community/corners/CornersMiniMap'
 import type { FeedItem } from '@src/components/feed/FeedItem.types'
 import { useAuth } from '@src/contexts/auth/AuthContext'
 import { usePrototype } from '@src/features/prototype/PrototypeContext'
 import {
   Avatar,
   FixtureState,
-  MiniMap,
   Panel,
   PrototypeButton,
   PrototypePage,
@@ -176,26 +179,14 @@ export const CommunityFeedPage = () => {
 
           <aside className={styles.aside}>
             <Panel className={styles.sidePanel}>
-              <SectionHeading
-                title="Rincones cerca de vos"
-                action={
-                  <button onClick={() => navigate('/map')}>Ver mapa →</button>
-                }
+              <CommunityCornersPanel
+                navigate={navigate}
+                corners={catalog.corners.slice(0, 2).map((corner) => ({
+                  id: corner.id,
+                  name: corner.name,
+                  meta: `${corner.distance} · ${corner.activity}`,
+                }))}
               />
-              <MiniMap />
-              <div className={styles.cornerList}>
-                {catalog.corners.slice(0, 2).map((corner) => (
-                  <article key={corner.id}>
-                    <span>⌖</span>
-                    <div>
-                      <strong>{corner.name}</strong>
-                      <small>
-                        {corner.distance} · {corner.activity}
-                      </small>
-                    </div>
-                  </article>
-                ))}
-              </div>
             </Panel>
             <Panel className={styles.sidePanel}>
               <SectionHeading title="Sugerencias para vos" />
@@ -257,6 +248,58 @@ export const CommunityFeedPage = () => {
         ) : null}
       </PrototypePage>
     </BaseLayout>
+  )
+}
+
+type CommunityCornerListItem = {
+  id: string
+  name: string
+  meta: string
+}
+
+const CommunityCornersPanel = ({
+  corners,
+  navigate,
+}: {
+  corners: CommunityCornerListItem[]
+  navigate: ReturnType<typeof useNavigate>
+}) => {
+  const [selectedCornerId, setSelectedCornerId] = useState<string | null>(null)
+
+  return (
+    <>
+      <SectionHeading
+        title="Rincones cerca de vos"
+        action={
+          <button
+            type="button"
+            onClick={() => navigate(buildCommunityMapPath(selectedCornerId))}
+          >
+            Ver mapa →
+          </button>
+        }
+      />
+      <CornersMiniMap
+        embedded
+        selectedPinId={selectedCornerId}
+        onSelectionChange={setSelectedCornerId}
+      />
+      <div className={styles.cornerList}>
+        {corners.map((corner) => (
+          <button
+            type="button"
+            key={corner.id}
+            onClick={() => navigate(buildCommunityMapPath(corner.id))}
+          >
+            <span aria-hidden="true">⌖</span>
+            <span>
+              <strong>{corner.name}</strong>
+              <small>{corner.meta}</small>
+            </span>
+          </button>
+        ))}
+      </div>
+    </>
   )
 }
 
@@ -550,27 +593,14 @@ const RealCommunityPage = ({
           </main>
           <aside className={styles.aside}>
             <Panel className={styles.sidePanel}>
-              <SectionHeading
-                title="Rincones cerca de vos"
-                action={
-                  <button onClick={() => navigate('/map')}>Ver mapa →</button>
-                }
+              <CommunityCornersPanel
+                navigate={navigate}
+                corners={realCorners.map((corner) => ({
+                  id: corner.id,
+                  name: corner.name,
+                  meta: `${corner.distanceKm} km · ${corner.activityLabel ?? 'Sin actividad'}`,
+                }))}
               />
-              <MiniMap />
-              <div className={styles.cornerList}>
-                {realCorners.map((corner) => (
-                  <article key={corner.id}>
-                    <span>⌖</span>
-                    <div>
-                      <strong>{corner.name}</strong>
-                      <small>
-                        {corner.distanceKm} km ·{' '}
-                        {corner.activityLabel ?? 'Sin actividad'}
-                      </small>
-                    </div>
-                  </article>
-                ))}
-              </div>
             </Panel>
             <Panel className={styles.sidePanel}>
               <SectionHeading

@@ -17,6 +17,7 @@ vi.mock('@src/api/community/activity.service', () => ({
 }))
 vi.mock('@src/api/community/corners.service', () => ({
   fetchNearbyCorners: vi.fn().mockResolvedValue([]),
+  fetchCornersMap: vi.fn().mockResolvedValue({ pins: [] }),
 }))
 vi.mock('@src/api/community/suggestions.service', () => ({
   fetchSuggestions: vi.fn().mockResolvedValue([]),

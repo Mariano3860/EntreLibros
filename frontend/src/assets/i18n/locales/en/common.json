@@ -755,11 +755,14 @@
         "error": "We couldn't load nearby corners. Try again later."
       },
       "cornersMap": {
+        "empty": "There are no visible corners in this area.",
+        "selected": "Selected corner: {{name}}",
         "title": "Corners map",
         "description": "See the most active book corners around your area.",
         "footer": "Open the full map to explore more corners.",
         "error": "We couldn't load the map.",
         "actions": {
+          "select": "View {{name}} on the map",
           "nearby": "Center near me",
           "filter": "Filter corners",
           "expand": "Open full map"

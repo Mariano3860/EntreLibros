@@ -2,6 +2,7 @@ import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { MapCanvas } from '@components/map/MapCanvas/MapCanvas'
 import { PublishCornerModal } from '@components/publish/PublishCornerModal'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 
 import type {
   MapBoundingBox,
@@ -44,6 +45,11 @@ const MAP_BOUNDS: MapBoundingBox = {
 const MIN_MAP_RADIUS_KM = 5.55
 const MOCK_MAP_REFERENCE_DATE = '2025-01-15T12:00:00.000Z'
 
+const parseRequestedRadius = (value: string | null) => {
+  const parsed = Number(value)
+  return Number.isInteger(parsed) && parsed >= 1 && parsed <= 10 ? parsed : 2
+}
+
 const realCategories = [
   'Todo',
   'Infancias',
@@ -67,7 +73,11 @@ export const MapPage = () => {
   const { catalog } = usePrototype()
   const { theme } = useTheme()
   const mockMode = isApiMockMode()
-  const [distance, setDistance] = useState(2)
+  const [searchParams] = useSearchParams()
+  const requestedCornerId = searchParams.get('corner')
+  const [distance, setDistance] = useState(() =>
+    parseRequestedRadius(searchParams.get('radius'))
+  )
   const [category, setCategory] = useState('Todo')
   const [search, setSearch] = useState('')
   const [bbox, setBbox] = useState<MapBoundingBox>(MAP_BOUNDS)
@@ -77,6 +87,7 @@ export const MapPage = () => {
   const [recentActivity, setRecentActivity] = useState(true)
   const [selectedCorner, setSelectedCorner] = useState<MapCorner | null>(null)
   const [selectedPin, setSelectedPin] = useState<MapPin | null>(null)
+  const [focusRequest, setFocusRequest] = useState(0)
   const [createOpen, setCreateOpen] = useState(false)
   const distanceRef = useRef(distance)
   const mockMapData = useMemo<MapResponse>(
@@ -171,7 +182,9 @@ export const MapPage = () => {
     (corner: MapCorner) => {
       setSelectedCorner(corner)
       const mapCorner = mapCorners.find((item) => item.id === corner.id)
-      if (mapCorner) setSelectedPin({ type: 'corner', data: mapCorner })
+      if (!mapCorner) return
+      setSelectedPin({ type: 'corner', data: mapCorner })
+      setFocusRequest((current) => current + 1)
     },
     [mapCorners]
   )
@@ -181,6 +194,7 @@ export const MapPage = () => {
       setSelectedPin(pin)
       if (pin.type === 'corner') {
         setSelectedCorner(displayCornerForPin(pin.data))
+        setFocusRequest((current) => current + 1)
       }
     },
     [displayCornerForPin]
@@ -190,6 +204,29 @@ export const MapPage = () => {
     if (!mapCorners.length) {
       setSelectedPin(null)
       setSelectedCorner(null)
+      return
+    }
+
+    if (requestedCornerId) {
+      const requestedCorner = mapCorners.find(
+        (corner) => corner.id === requestedCornerId
+      )
+
+      if (!requestedCorner) {
+        setSelectedPin(null)
+        setSelectedCorner(null)
+        return
+      }
+
+      const isRequestedCornerSelected =
+        selectedPin?.type === 'corner' &&
+        selectedPin.data.id === requestedCorner.id
+
+      if (!isRequestedCornerSelected) {
+        setSelectedCorner(displayCornerForPin(requestedCorner))
+        setSelectedPin({ type: 'corner', data: requestedCorner })
+        setFocusRequest((current) => current + 1)
+      }
       return
     }
 
@@ -207,7 +244,13 @@ export const MapPage = () => {
       setSelectedCorner(displayCornerForPin(firstCorner))
       setSelectedPin({ type: 'corner', data: firstCorner })
     }
-  }, [displayCornerForPin, mapCorners, mapPublications, selectedPin])
+  }, [
+    displayCornerForPin,
+    mapCorners,
+    mapPublications,
+    requestedCornerId,
+    selectedPin,
+  ])
 
   const locate = useCallback(() => {
     if (!navigator.geolocation) {
@@ -265,6 +308,17 @@ export const MapPage = () => {
     : selectedMapCorner?.lastSignalAt
       ? 'Actividad reciente'
       : (selectedCorner?.activity ?? 'Sin actividad reciente')
+  const cornerForSelectedCard =
+    selectedMapCorner ??
+    (selectedPublication
+      ? (mapCorners.find(
+          (corner) => corner.id === selectedPublication.cornerId
+        ) ?? null)
+      : null)
+  const handleViewCorner = useCallback(() => {
+    if (!cornerForSelectedCard) return
+    selectCorner(displayCornerForPin(cornerForSelectedCard))
+  }, [cornerForSelectedCard, displayCornerForPin, selectCorner])
 
   if (!mockMode && mapQuery.isError)
     return (
@@ -398,6 +452,7 @@ export const MapPage = () => {
               activity={mapActivity}
               layers={mapLayers}
               selectedPin={selectedPin}
+              focusRequest={focusRequest}
               onSelectPin={handleSelectPin}
               isLoading={!mockMode && mapQuery.isLoading}
               isFetching={!mockMode && mapQuery.isFetching}
@@ -434,7 +489,12 @@ export const MapPage = () => {
                   <span>{selectedActivity}</span>
                 </div>
               </div>
-              <PrototypeButton tone="primary" size="small">
+              <PrototypeButton
+                tone="primary"
+                size="small"
+                disabled={!cornerForSelectedCard}
+                onClick={handleViewCorner}
+              >
                 Ver rincón
               </PrototypeButton>
             </Panel>

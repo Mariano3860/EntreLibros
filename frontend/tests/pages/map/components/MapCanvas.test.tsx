@@ -16,12 +16,22 @@ const fitBoundsMock = vi.fn()
 const zoomInMock = vi.fn()
 const zoomOutMock = vi.fn()
 const setViewMock = vi.fn()
+const flyToMock = vi.fn()
+const mapMock = {
+  fitBounds: fitBoundsMock,
+  getZoom: () => 13,
+  setView: setViewMock,
+  flyTo: flyToMock,
+  zoomIn: zoomInMock,
+  zoomOut: zoomOutMock,
+}
 
 beforeEach(() => {
   fitBoundsMock.mockClear()
   zoomInMock.mockClear()
   zoomOutMock.mockClear()
   setViewMock.mockClear()
+  flyToMock.mockClear()
 })
 
 vi.mock('react-leaflet', () => {
@@ -53,13 +63,7 @@ vi.mock('react-leaflet', () => {
     Tooltip: ({ children }: { children?: React.ReactNode }) => (
       <span>{children}</span>
     ),
-    useMap: () => ({
-      fitBounds: fitBoundsMock,
-      getZoom: () => 13,
-      setView: setViewMock,
-      zoomIn: zoomInMock,
-      zoomOut: zoomOutMock,
-    }),
+    useMap: () => mapMock,
   }
 })
 
@@ -178,6 +182,68 @@ describe('MapCanvas', () => {
     )
 
     expect(screen.getByText('map.empty.description')).toBeInTheDocument()
+  })
+
+  test('centers the map on the selected corner', () => {
+    renderWithProviders(
+      <MapCanvas
+        bbox={bbox}
+        corners={corners}
+        publications={[]}
+        activity={[]}
+        layers={{ corners: true, publications: false, activity: false }}
+        selectedPin={{ type: 'corner', data: corners[1] }}
+        focusRequest={1}
+        onSelectPin={vi.fn()}
+        isLoading={false}
+        isFetching={false}
+        isEmpty={false}
+      />
+    )
+
+    expect(flyToMock).toHaveBeenCalledWith(
+      [corners[1].lat, corners[1].lon],
+      15,
+      { animate: true, duration: 0.6 }
+    )
+  })
+
+  test('does not refocus when the selected pin changes without a focus request', () => {
+    const { rerender } = renderWithProviders(
+      <MapCanvas
+        bbox={bbox}
+        corners={corners}
+        publications={[]}
+        activity={[]}
+        layers={{ corners: true, publications: false, activity: false }}
+        selectedPin={{ type: 'corner', data: corners[0] }}
+        focusRequest={1}
+        onSelectPin={vi.fn()}
+        isLoading={false}
+        isFetching={false}
+        isEmpty={false}
+      />
+    )
+
+    const initialFocusCalls = flyToMock.mock.calls.length
+
+    rerender(
+      <MapCanvas
+        bbox={bbox}
+        corners={corners}
+        publications={[]}
+        activity={[]}
+        layers={{ corners: true, publications: false, activity: false }}
+        selectedPin={{ type: 'corner', data: corners[1] }}
+        focusRequest={1}
+        onSelectPin={vi.fn()}
+        isLoading={false}
+        isFetching={false}
+        isEmpty={false}
+      />
+    )
+
+    expect(flyToMock).toHaveBeenCalledTimes(initialFocusCalls)
   })
 
   test('renders a location pin over the approximate location area', () => {

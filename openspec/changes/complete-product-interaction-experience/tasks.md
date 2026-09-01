@@ -32,11 +32,11 @@
 
 ## 5. Mini mapa real de Comunidad
 
-- [ ] 5.1 Crear `feature/community-mini-map-sync` desde `main` actualizado después de los merges de foco/radio de Mapa y verificar que puede consumir el estado URL acordado.
-- [ ] 5.2 Sustituir el fondo estático por una vista miniatura de rincones reales, con pines y selección; verificar con tests de servicio/componente que los datos provienen del contrato de rincones y manejan vacío/error.
-- [ ] 5.3 Navegar desde el mini mapa o la lista lateral a `/map` preservando rincón y radio; verificar con tests de `CommunityFeedPage` y `MapPage` que el destino queda centrado y abre el detalle correcto.
-- [ ] 5.4 Revisar visualmente `/community` a 1440×900 contra el cuadrante inferior izquierdo de `img.png`; verificar densidad del aside, pines visibles y CTA Ver mapa sin reemplazar el mapa completo.
-- [ ] 5.5 Ejecutar suites afectadas, typecheck, lint, Stylelint, build y `git diff --check`; crear commits claros y una PR en español contra `main` sin merge.
+- [x] 5.1 Crear `feature/community-mini-map-sync` desde `main` actualizado y verificar que puede consumir el estado URL acordado.
+- [x] 5.2 Sustituir el fondo estático por una vista miniatura de rincones reales, con pines y selección; verificar con tests de servicio/componente que los datos provienen del contrato de rincones y manejan vacío/error.
+- [x] 5.3 Navegar desde el mini mapa o la lista lateral a `/map` preservando rincón y radio; verificar con tests de `CommunityFeedPage` y `MapPage` que el destino queda centrado y abre el detalle correcto.
+- [x] 5.4 Revisar visualmente `/community` a 1440×900 contra el cuadrante inferior izquierdo de `img.png`; verificar densidad del aside, pines visibles y CTA Ver mapa sin reemplazar el mapa completo.
+- [x] 5.5 Ejecutar suites afectadas, typecheck, lint, Stylelint, build y `git diff --check`; crear commits claros y una PR en español contra `main` sin merge.
 
 ## 6. Workflow completo de intercambio en Mensajes
 

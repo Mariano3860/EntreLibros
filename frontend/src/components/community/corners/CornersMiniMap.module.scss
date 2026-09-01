@@ -11,6 +11,13 @@
   gap: $spacing-2;
 }
 
+.embedded {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
 .title {
   margin: 0;
   font-size: $h6-font-size;
@@ -25,45 +32,33 @@
 
 .mapWrapper {
   position: relative;
+  width: 100%;
 }
 
 .map {
   position: relative;
   border-radius: rem(14px);
-  background-color: var(--color-neutral-100);
-  background-image:
+  background:
     linear-gradient(
-      28deg,
-      transparent 45%,
-      rgb(var(--primary-color-rgb) / 16%) 46%,
-      rgb(var(--primary-color-rgb) / 16%) 48%,
-      transparent 49%
+      32deg,
+      transparent 44%,
+      var(--prototype-map-road) 45% 47%,
+      transparent 48%
     ),
     linear-gradient(
-      122deg,
-      transparent 46%,
-      rgb(var(--color-info-rgb) / 14%) 47%,
-      rgb(var(--color-info-rgb) / 14%) 49%,
-      transparent 50%
+      112deg,
+      transparent 42%,
+      color-mix(in srgb, var(--prototype-map-road) 74%, transparent) 43% 46%,
+      transparent 47%
     ),
-    linear-gradient(
-      90deg,
-      rgb(var(--background-primary-rgb) / 30%) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      0deg,
-      rgb(var(--background-primary-rgb) / 30%) 1px,
-      transparent 1px
-    );
-  background-size:
-    auto,
-    auto,
-    rem(34px) rem(34px),
-    rem(34px) rem(34px);
+    var(--prototype-map-background);
   overflow: hidden;
-  border: 1px solid rgb(0 0 0 / 4%);
+  border: 1px solid var(--prototype-border);
   height: rem(220px);
+}
+
+.embedded .map {
+  height: rem(148px);
 }
 
 .loading {
@@ -115,8 +110,10 @@
 
 .pin {
   position: absolute;
-  width: rem(12px);
-  height: rem(12px);
+  width: rem(16px);
+  height: rem(16px);
+  padding: 0;
+  border: 0;
   background: var(--primary-color);
   color: #fff;
   border-radius: 50%;
@@ -125,7 +122,19 @@
   justify-content: center;
   font-size: 0.75rem;
   transform: translate(-50%, -50%);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 20%);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 35%);
+  cursor: pointer;
+  transition:
+    transform $transition-duration-fast $transition-timing-function,
+    box-shadow $transition-duration-fast $transition-timing-function;
+
+  &:hover,
+  &:focus-visible,
+  &.pinSelected {
+    transform: translate(-50%, -50%) scale(1.35);
+    box-shadow: 0 2px 6px rgb(0 0 0 / 30%);
+    outline: none;
+  }
 }
 
 .pinQuiet {
@@ -133,7 +142,18 @@
 }
 
 .status {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
   color: var(--text-secondary);
+  font-size: $small-font-size;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.selection {
+  margin: 0;
+  color: var(--primary-color);
   font-size: $small-font-size;
 }
 
@@ -154,7 +174,15 @@
     padding: $spacing-2x5;
   }
 
+  .card.embedded {
+    padding: 0;
+  }
+
   .map {
     height: rem(180px);
+  }
+
+  .embedded .map {
+    height: rem(148px);
   }
 }

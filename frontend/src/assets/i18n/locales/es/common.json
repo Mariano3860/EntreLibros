@@ -751,11 +751,14 @@
         "error": "No pudimos cargar los rincones cercanos. Intenta más tarde."
       },
       "cornersMap": {
+        "empty": "No hay rincones visibles en esta zona.",
+        "selected": "Rinc\u00f3n seleccionado: {{name}}",
         "title": "Mapa de Rincones",
         "description": "Explora los Rincones activos en tu zona.",
         "footer": "Abre el mapa completo para ver más Rincones.",
         "error": "No pudimos cargar el mapa.",
         "actions": {
+          "select": "Ver {{name}} en el mapa",
           "nearby": "Centrar cerca de mí",
           "filter": "Filtrar Rincones",
           "expand": "Abrir mapa completo"
