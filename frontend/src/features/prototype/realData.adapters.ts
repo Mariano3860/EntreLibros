@@ -39,6 +39,7 @@ export type PrototypeProfileView = {
   name: string
   username: string
   initials: string
+  profilePhoto: string | null
   city: string
   bio: string
   interests: string[]
@@ -51,7 +52,10 @@ export const toPrototypeProfile = (
   name: profile.alias || profile.name,
   username: `@${profile.alias || profile.name}`,
   initials: initials(profile.alias || profile.name),
-  city: [profile.neighborhood, profile.city].filter(Boolean).join(' · '),
+  profilePhoto: profile.profilePhoto,
+  city: [profile.neighborhood, profile.city, profile.country]
+    .filter(Boolean)
+    .join(' · '),
   bio: profile.profileDescription ?? '',
   interests: profile.interests.map(titleCase),
 })

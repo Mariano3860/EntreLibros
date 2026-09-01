@@ -244,6 +244,53 @@ describe('user profile API', () => {
     });
   });
 
+  test('persists a validated profile photo and keeps street private', async () => {
+    const cookie = await createLoggedInUser('profile-photo@example.com');
+    const user = await findUserByEmail('profile-photo@example.com');
+    expect(user).not.toBeNull();
+    const photo = 'data:image/png;base64,aGVsbG8=';
+
+    const update = await request(app)
+      .patch('/api/user/profile')
+      .set('Cookie', cookie)
+      .send({
+        profilePhoto: photo,
+        country: 'Argentina',
+        city: 'Buenos Aires',
+        neighborhood: 'Palermo',
+        street: 'Av. Santa Fe 1234',
+        locationVisibility: 'city',
+      })
+      .expect(200);
+
+    expect(update.body.profilePhoto).toBe(photo);
+    expect(update.body.street).toBe('Av. Santa Fe 1234');
+
+    const ownProfile = await request(app)
+      .get('/api/user/profile')
+      .set('Cookie', cookie)
+      .expect(200);
+    expect(ownProfile.body.street).toBe('Av. Santa Fe 1234');
+
+    const publicProfile = await request(app)
+      .get(`/api/user/profile/${user!.id}`)
+      .expect(200);
+    expect(publicProfile.body.profilePhoto).toBe(photo);
+    expect(publicProfile.body.country).toBe('Argentina');
+    expect(publicProfile.body.city).toBe('Buenos Aires');
+    expect(publicProfile.body.neighborhood).toBeUndefined();
+    expect(publicProfile.body.street).toBeUndefined();
+
+    await request(app)
+      .patch('/api/user/profile')
+      .set('Cookie', cookie)
+      .send({ profilePhoto: 'data:image/svg+xml;base64,PHN2Zz4=' })
+      .expect(400)
+      .expect(({ body }) => {
+        expect(body.message).toBe('user.errors.invalid_profile');
+      });
+  });
+
   test('rejects unknown interests and neighborhoods from another city', async () => {
     const cookie = await createLoggedInUser(
       'invalid-profile-location@example.com'
@@ -276,31 +323,49 @@ describe('user profile API', () => {
         .send({
           city: 'Buenos Aires',
           neighborhood: 'Palermo',
+          country: 'Argentina',
+          street: 'Av. Santa Fe 1234',
           interests: [],
           locationVisibility,
         })
         .expect(200);
 
-    await update('private');
+    await update('none');
     const privateProfile = await request(app)
       .get(`/api/user/profile/${user!.id}`)
       .expect(200);
+    expect(privateProfile.body.location).toBeNull();
+    expect(privateProfile.body.country).toBeUndefined();
     expect(privateProfile.body.city).toBeUndefined();
     expect(privateProfile.body.neighborhood).toBeUndefined();
+    expect(privateProfile.body.street).toBeUndefined();
+
+    await update('country');
+    const countryProfile = await request(app)
+      .get(`/api/user/profile/${user!.id}`)
+      .expect(200);
+    expect(countryProfile.body.country).toBe('Argentina');
+    expect(countryProfile.body.city).toBeUndefined();
+    expect(countryProfile.body.neighborhood).toBeUndefined();
+    expect(countryProfile.body.street).toBeUndefined();
 
     await update('city');
     const cityProfile = await request(app)
       .get(`/api/user/profile/${user!.id}`)
       .expect(200);
+    expect(cityProfile.body.country).toBe('Argentina');
     expect(cityProfile.body.city).toBe('Buenos Aires');
     expect(cityProfile.body.neighborhood).toBeUndefined();
+    expect(cityProfile.body.street).toBeUndefined();
 
     await update('neighborhood');
     const neighborhoodProfile = await request(app)
       .get(`/api/user/profile/${user!.id}`)
       .expect(200);
+    expect(neighborhoodProfile.body.country).toBe('Argentina');
     expect(neighborhoodProfile.body.city).toBe('Buenos Aires');
     expect(neighborhoodProfile.body.neighborhood).toBe('Palermo');
+    expect(neighborhoodProfile.body.street).toBeUndefined();
     expect(neighborhoodProfile.body.email).toBeUndefined();
     expect(neighborhoodProfile.body.password).toBeUndefined();
   });

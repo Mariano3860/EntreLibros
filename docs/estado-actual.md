@@ -1,6 +1,6 @@
 # Estado actual
 
-Fecha de referencia: 2026-09-01.
+Fecha de referencia: 2026-09-02.
 
 - La migraciÃ³n 022 agrega seguimiento persistente y datos demo para historias, lectores y recomendaciones personalizadas de Comunidad.
 - La migración 023 agrega intereses personales sobre publicaciones ajenas y soporta publicaciones de búsqueda sin duplicados.
@@ -14,7 +14,8 @@ Fecha de referencia: 2026-09-01.
 - Inicio limita “Libros que podrían gustarte” a cinco publicaciones por página y permite avanzar o volver mediante controles discretos; el orden prioriza lectores seguidos cuando existe sesión.
 - Monorepo con frontend React/Rsbuild y backend TypeScript/Express.
 - `/books` separa el catálogo público de “Mis libros”, con filtros persistidos, interés y alta de publicaciones `want`.
-- PostgreSQL/PostGIS con migraciones 001–025.
+- PostgreSQL/PostGIS con migraciones 001–026.
+- El perfil autenticado permite editar foto, intereses, país, ciudad, barrio, calle privada y visibilidad geográfica. La proyección pública no devuelve la calle y limita país, ciudad y barrio al nivel elegido.
 - API de mensajes y eventos Socket.IO con persistencia antes de emitir.
 - Mensajes permite buscar contactos visibles por nombre, apellido o alias, prioriza seguidos y filtra conversaciones por no leídos entrantes.
 - Bot persistente creado por migración, con conversación idempotente por usuario e historial recargable.

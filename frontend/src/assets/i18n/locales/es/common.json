@@ -1012,7 +1012,8 @@
   "user": {
     "errors": {
       "activity_query_failed": "No se pudo cargar tu actividad.",
-      "unauthenticated": "Necesitás iniciar sesión."
+      "unauthenticated": "Necesitás iniciar sesión.",
+      "profile_update_failed": "No se pudieron guardar los cambios del perfil."
     }
   },
   "profile": {
@@ -1025,11 +1026,16 @@
     "error": "No se pudo cargar tu perfil.",
     "alias": "Alias público",
     "about": "Descripción",
+    "photo": "Foto de perfil",
+    "photoHint": "JPG, PNG o WebP de hasta 5 MB.",
+    "photoInvalid": "Elegí una imagen JPG, PNG o WebP de hasta 5 MB.",
+    "removePhoto": "Quitar foto",
     "visibility": "Visibilidad del perfil",
     "public": "Público",
     "private": "Privado",
     "locationVisibility": "Precisión de la ubicación pública",
-    "locationPrivate": "No mostrar ubicación",
+    "locationNone": "No publicar ubicación",
+    "locationCountry": "Solo país",
     "locationCity": "Ciudad aproximada",
     "locationNeighborhood": "Barrio aproximado",
     "interests": "Intereses de lectura",
@@ -1047,11 +1053,20 @@
     },
     "city": "Ciudad",
     "selectCity": "Seleccioná una ciudad",
+    "country": "País",
+    "selectCountry": "Seleccioná un país",
     "neighborhood": "Barrio (opcional)",
     "selectNeighborhood": "Seleccioná un barrio",
+    "street": "Calle (privada)",
+    "streetPrivate": "Nunca se publica; solo se usa para operaciones internas autorizadas.",
     "location": "Zona",
     "publicPreview": "Vista pública del perfil",
     "publicPreviewDescription": "Esto es lo que otras personas podrán ver según tu configuración de privacidad.",
+    "previewPrivate": "Tu perfil es privado.",
+    "previewLocationNone": "Ubicación no visible",
+    "previewLocationCountry": "País visible",
+    "previewLocationCity": "País y ciudad visibles",
+    "previewLocationNeighborhood": "País, ciudad y barrio visibles",
     "save": "Guardar cambios",
     "saving": "Guardando...",
     "saved": "Perfil actualizado.",

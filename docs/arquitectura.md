@@ -32,6 +32,10 @@ La migración `015_seed_messaging_bot.sql` crea el usuario bot. El repositorio g
 
 La creacion directa de conversaciones valida de nuevo en el servidor que el destinatario exista, sea un usuario visible y no este bloqueado; no acepta bots, perfiles privados ni IDs inexistentes aunque se invoque el endpoint manualmente. El par de participantes se serializa con un bloqueo advisory y se reutiliza la conversacion directa mas antigua si ya existe. Cada evento `conversation:message` invalida tambien el listado de conversaciones para refrescar `unreadCount`, y el chat abierto avanza el cursor de lectura con el ultimo mensaje persistido o recibido en vivo.
 
+## Perfil y privacidad
+
+`PATCH /api/user/profile` actualiza los datos editables del usuario autenticado, incluida la foto, los intereses y la ubicación estructurada. La calle se conserva únicamente en la respuesta autenticada. `GET /api/user/profile/:id` aplica la visibilidad geográfica configurada: `none` oculta la ubicación, `country` muestra solo el país, `city` muestra país y ciudad aproximada, y `neighborhood` añade el barrio aproximado; las coordenadas se redondean según ese nivel.
+
 ## Modos del frontend
 
 `PUBLIC_API_USE_MOCKS=true` activa MSW para los handlers soportados; no requiere PostgreSQL para esos flujos. Con `false` u omitida, la aplicación usa backend real. La variable es pública y de build-time: cambiar `.env` sin reiniciar no cambia el bundle ya cargado.

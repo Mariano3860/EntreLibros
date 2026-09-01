@@ -365,6 +365,126 @@
   font-size: 20px;
 }
 
+.photoField,
+.interestField,
+.locationField,
+.publicPreview {
+  display: grid;
+  gap: 8px;
+}
+
+.photoField {
+  color: var(--prototype-muted);
+  font-size: 9px;
+}
+
+.photoControls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.photoControls > div:last-child {
+  display: grid;
+  justify-items: start;
+  gap: 5px;
+}
+
+.fileButton {
+  display: inline-flex;
+  padding: 7px 10px;
+  border: 1px solid rgb(66 215 199 / 35%);
+  border-radius: 8px;
+  background: rgb(66 215 199 / 10%);
+  color: var(--prototype-teal) !important;
+  cursor: pointer;
+  font-size: 9px !important;
+}
+
+.fileButton input {
+  display: none;
+}
+
+.removePhoto {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--prototype-muted);
+  cursor: pointer;
+  font-size: 8px;
+}
+
+.photoControls small,
+.photoField > p,
+.locationField small,
+.privacyHint {
+  margin: 0;
+  color: var(--prototype-muted);
+  font-size: 8px;
+  line-height: 1.4;
+}
+
+.photoField > p {
+  color: var(--prototype-orange);
+}
+
+.interestField,
+.locationField {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--prototype-border);
+  border-radius: 9px;
+}
+
+.interestField legend,
+.locationField legend {
+  padding: 0 4px;
+  color: var(--prototype-input-text);
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.interestField > p {
+  margin: 0;
+  color: var(--prototype-muted);
+  font-size: 8px;
+}
+
+.interestOptions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.modal .interestOptions label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--prototype-input-text);
+  font-size: 8px;
+}
+
+.interestOptions input {
+  accent-color: var(--prototype-teal);
+}
+
+.publicPreview {
+  padding: 10px;
+  border: 1px solid rgb(66 215 199 / 25%);
+  border-radius: 9px;
+  background: rgb(66 215 199 / 6%);
+}
+
+.publicPreview strong {
+  color: var(--prototype-teal);
+  font-size: 9px;
+}
+
+.publicPreview span {
+  color: var(--prototype-muted);
+  font-size: 8px;
+}
+
 .modal header button {
   display: grid;
   width: 30px;
@@ -421,6 +541,11 @@
   padding-top: 4px;
 }
 
+.modal form > div .button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
 @media (width <= 1050px) {
   .content {
     grid-template-columns: 1fr;
@@ -462,6 +587,10 @@
 
   .achievements > div:last-child {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .interestOptions {
+    grid-template-columns: 1fr;
   }
 }
 

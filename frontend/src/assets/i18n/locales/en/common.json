@@ -1016,7 +1016,8 @@
   "user": {
     "errors": {
       "activity_query_failed": "Your activity could not be loaded.",
-      "unauthenticated": "You need to sign in."
+      "unauthenticated": "You need to sign in.",
+      "profile_update_failed": "Your profile changes could not be saved."
     }
   },
   "profile": {
@@ -1029,11 +1030,16 @@
     "error": "Your profile could not be loaded.",
     "alias": "Public alias",
     "about": "Description",
+    "photo": "Profile photo",
+    "photoHint": "JPG, PNG or WebP up to 5 MB.",
+    "photoInvalid": "Choose a JPG, PNG or WebP image up to 5 MB.",
+    "removePhoto": "Remove photo",
     "visibility": "Profile visibility",
     "public": "Public",
     "private": "Private",
     "locationVisibility": "Public location precision",
-    "locationPrivate": "Do not show location",
+    "locationNone": "Do not publish location",
+    "locationCountry": "Country only",
     "locationCity": "Approximate city",
     "locationNeighborhood": "Approximate neighborhood",
     "interests": "Reading interests",
@@ -1051,11 +1057,20 @@
     },
     "city": "City",
     "selectCity": "Select a city",
+    "country": "Country",
+    "selectCountry": "Select a country",
     "neighborhood": "Neighborhood (optional)",
     "selectNeighborhood": "Select a neighborhood",
+    "street": "Street (private)",
+    "streetPrivate": "Never published; used only for authorized internal operations.",
     "location": "Area",
     "publicPreview": "Public profile preview",
     "publicPreviewDescription": "This is what other people can see according to your privacy settings.",
+    "previewPrivate": "Your profile is private.",
+    "previewLocationNone": "Location is hidden",
+    "previewLocationCountry": "Country is visible",
+    "previewLocationCity": "Country and city are visible",
+    "previewLocationNeighborhood": "Country, city and neighborhood are visible",
     "save": "Save changes",
     "saving": "Saving...",
     "saved": "Profile updated.",

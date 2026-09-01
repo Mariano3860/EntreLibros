@@ -79,23 +79,43 @@ export const PrototypeButton = ({
 
 export const Avatar = ({
   initials,
+  imageUrl,
   accent = '#42d7c7',
   size = 'medium',
   online = false,
 }: {
   initials: string
+  imageUrl?: string | null
   accent?: string
   size?: 'small' | 'medium' | 'large' | 'hero'
   online?: boolean
-}) => (
-  <span
-    className={`${styles.avatar} ${styles[`avatar${size}`]} ${online ? styles.online : ''}`}
-    style={{ '--avatar-accent': accent } as React.CSSProperties}
-    aria-hidden="true"
-  >
-    {initials}
-  </span>
-)
+}) => {
+  const [imageFailed, setImageFailed] = useState(false)
+  const showImage = Boolean(imageUrl?.trim() && !imageFailed)
+
+  useEffect(() => {
+    setImageFailed(false)
+  }, [imageUrl])
+
+  return (
+    <span
+      className={`${styles.avatar} ${styles[`avatar${size}`]} ${online ? styles.online : ''}`}
+      style={{ '--avatar-accent': accent } as React.CSSProperties}
+      aria-hidden="true"
+    >
+      {showImage ? (
+        <img
+          src={imageUrl ?? undefined}
+          alt=""
+          className={styles.avatarImage}
+          onError={() => setImageFailed(true)}
+        />
+      ) : (
+        initials
+      )}
+    </span>
+  )
+}
 
 export const BookCover = ({
   book,

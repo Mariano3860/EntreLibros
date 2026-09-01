@@ -46,7 +46,6 @@
 - [x] 6.4 Revisar visualmente `/messages` a 1440×900 contra el cuadrante inferior derecho de `img.png`; verificar dos columnas, scroll independiente, composer anclado, adjunto y propuesta visibles, además de teclado/narrow viewport.
 - [x] 6.5 Ejecutar suites afectadas, typecheck, lint, Stylelint, build y `git diff --check`; crear commits claros y una PR en español contra `main` sin merge.
 - [x] 6.6 Incorporar un menú compacto del botón `+` con emoji, adjunto de libros propios/de contraparte e intercambio; verificar inserción del emoji en el borrador, apertura de modales, foco, teclado y viewport estrecho.
-
 - [x] 6.7 Restringir las acciones de acuerdos según el autor de la propuesta: el autor solo puede cancelar y la contraparte puede aceptar o rechazar; verificar UI, API, versionado y estados pendientes.
 
 ## 7. Contactos y filtro de no leídos en Mensajes
@@ -59,10 +58,10 @@
 
 ## 8. Edición y privacidad ampliada de Perfil
 
-- [ ] 8.1 Crear `feature/profile-privacy-editor` desde `main` actualizado y añadir una migración acumulativa para foto/ubicación estructurada/visibilidad solo si el esquema existente no cubre esos datos; verificar migración limpia y compatibilidad con perfiles existentes.
-- [ ] 8.2 Implementar la proyección pública por nivel geográfico y mantener calle privada; verificar con pruebas de perfil/API que `none`, país, ciudad y barrio no filtran datos superiores ni saltan bloqueos.
-- [ ] 8.3 Ampliar el formulario de `/profile` para foto, intereses y ubicación/visibilidad, con validación y fallback; verificar con tests de página que guardar, recargar, errores y permisos se comportan correctamente.
-- [ ] 8.4 Revisar visualmente `/profile` a 1440×900 contra el cuadrante inferior izquierdo de `img_1.png`; verificar que la edición cabe dentro del layout, conserva jerarquía y funciona en viewport estrecho.
+- [x] 8.1 Crear `feature/profile-privacy-editor` desde `main` actualizado y añadir una migración acumulativa para foto/ubicación estructurada/visibilidad solo si el esquema existente no cubre esos datos; verificar migración limpia y compatibilidad con perfiles existentes.
+- [x] 8.2 Implementar la proyección pública por nivel geográfico y mantener calle privada; verificar con pruebas de perfil/API que `none`, país, ciudad y barrio no filtran datos superiores ni saltan bloqueos.
+- [x] 8.3 Ampliar el formulario de `/profile` para foto, intereses y ubicación/visibilidad, con validación y fallback; verificar con tests de página que guardar, recargar, errores y permisos se comportan correctamente.
+- [x] 8.4 Revisar visualmente `/profile` a 1440×900 contra el cuadrante inferior izquierdo de `img_1.png`; verificar que la edición cabe dentro del layout, conserva jerarquía y funciona en viewport estrecho.
 - [ ] 8.5 Ejecutar suites afectadas, typecheck, lint, Stylelint, build y `git diff --check`; crear commits claros y una PR en español contra `main` sin merge.
 
 ## 9. Interacciones sociales e historias relevantes

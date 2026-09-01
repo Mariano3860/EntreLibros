@@ -1,5 +1,6 @@
 export type ProfileVisibility = 'public' | 'private'
-export type LocationVisibility = 'private' | 'city' | 'neighborhood'
+export type LocationVisibility = 'none' | 'country' | 'city' | 'neighborhood'
+export type ProfileCountry = 'Argentina'
 export type ProfileInterest =
   | 'fiction'
   | 'fantasy'
@@ -17,21 +18,26 @@ export type UserProfile = {
   email: string
   language: string
   profileDescription: string | null
+  profilePhoto: string | null
   profileVisibility: ProfileVisibility
   locationVisibility: LocationVisibility
   location: { latitude: number; longitude: number } | null
   interests: ProfileInterest[]
+  country: ProfileCountry | null
   city: string | null
   neighborhood: string | null
+  street: string | null
 }
 
 export type PublicProfile = {
   id: number
   alias: string
   profileDescription: string | null
+  profilePhoto: string | null
   language: string
   location: { latitude: number; longitude: number } | null
   interests: ProfileInterest[]
+  country?: ProfileCountry
   city?: string
   neighborhood?: string
 }
@@ -39,10 +45,13 @@ export type PublicProfile = {
 export type UpdateProfileRequest = {
   alias: string
   description: string | null
+  profilePhoto: string | null
   profileVisibility: ProfileVisibility
   locationVisibility: LocationVisibility
   language: string
   interests: ProfileInterest[]
-  city: string
+  country: ProfileCountry
+  city: string | null
   neighborhood: string | null
+  street: string | null
 }

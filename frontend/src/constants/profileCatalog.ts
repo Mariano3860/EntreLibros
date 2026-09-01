@@ -1,4 +1,7 @@
 import type { ProfileInterest } from '@src/api/user/profile.types'
+import type { ProfileCountry } from '@src/api/user/profile.types'
+
+export const PROFILE_COUNTRIES: readonly ProfileCountry[] = ['Argentina']
 
 export const PROFILE_INTERESTS: readonly ProfileInterest[] = [
   'fiction',
