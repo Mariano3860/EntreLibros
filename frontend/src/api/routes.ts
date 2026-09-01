@@ -42,6 +42,7 @@ export const RELATIVE_API_ROUTES = {
   },
   MESSAGES: {
     CONVERSATIONS: `/messages`,
+    CONTACTS: `/messages/contacts`,
     CREATE_CONVERSATION: `/messages/conversations`,
     BOOKS: (conversationId: number) => `/messages/${conversationId}/books`,
     HISTORY: (conversationId: number) => `/messages/${conversationId}/messages`,

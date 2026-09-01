@@ -4,6 +4,7 @@ import { apiClient } from '@api/axios'
 import {
   createConversation,
   fetchConversations,
+  fetchMessagingContacts,
   fetchMessageHistory,
   messageQueryKeys,
   sendPersistedMessage,
@@ -19,6 +20,7 @@ describe('messaging API client', () => {
       lastMessageSequence: 0,
       updatedAt: '2026-08-28T00:00:00.000Z',
       participantName: 'Ana',
+      unreadCount: 2,
     }
     vi.spyOn(apiClient, 'post').mockResolvedValueOnce({
       data: { conversation },
@@ -36,6 +38,21 @@ describe('messaging API client', () => {
     })
 
     await expect(fetchConversations()).resolves.toEqual([])
+  })
+
+  it('searches messaging contacts by name and preserves follow ordering data', async () => {
+    const contacts = [
+      { id: 8, name: 'Ana Gómez', alias: 'anita', isFollowing: true },
+      { id: 9, name: 'Pablo Ruiz', alias: 'pablo', isFollowing: false },
+    ]
+    vi.spyOn(apiClient, 'get').mockResolvedValueOnce({
+      data: { contacts },
+    })
+
+    await expect(fetchMessagingContacts('ana')).resolves.toEqual(contacts)
+    expect(apiClient.get).toHaveBeenCalledWith('/messages/contacts', {
+      params: { search: 'ana' },
+    })
   })
 
   it('serializes history pagination and preserves the server cursor', async () => {

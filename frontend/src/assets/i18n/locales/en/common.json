@@ -492,15 +492,26 @@
         "emptyBooks": "You have no books available to attach.",
         "attachError": "We couldn't attach this book. Try again.",
         "sendError": "We couldn't send the message. Try again.",
+        "emptyUnread": "There are no unread conversations.",
+        "emptySearch": "We couldn't find conversations with that name.",
+        "emptyConversations": "You don't have any conversations yet.",
         "retry": "Retry"
       },
       "newConversation": {
         "eyebrow": "NEW CONVERSATION",
         "title": "Who do you want to talk to?",
         "description": "Start a new conversation with someone from the community.",
-        "fieldLabel": "User ID",
-        "placeholder": "e.g. 42",
-        "hint": "You can find the ID on the person's profile.",
+        "fieldLabel": "Search people",
+        "placeholder": "Name, last name or alias",
+        "member": "EntreLibros member",
+        "hint": "Choose someone to open a new conversation.",
+        "loading": "Searching people...",
+        "error": "We couldn't load contacts.",
+        "followed": "People you follow",
+        "suggestions": "Suggestions for you",
+        "emptySearch": "We couldn't find anyone with that name.",
+        "empty": "There are no contacts available yet.",
+        "createError": "We couldn't start the conversation. Try again.",
         "cancel": "Cancel",
         "submit": "Start conversation"
       },
@@ -513,6 +524,11 @@
       },
       "searchPlaceholder": "Search",
       "searchAriaLabel": "Search conversations",
+      "filterLabel": "Conversation filter",
+      "filters": {
+        "all": "All",
+        "unread": "Unread"
+      },
       "actions": {
         "profile": "View profile info"
       },

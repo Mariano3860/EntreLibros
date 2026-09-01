@@ -51,10 +51,10 @@
 
 ## 7. Contactos y filtro de no leídos en Mensajes
 
-- [ ] 7.1 Crear `feature/messaging-contact-discovery` desde `main` actualizado después del merge del workflow de intercambio y verificar que reutiliza su lista de conversaciones sincronizada.
-- [ ] 7.2 Añadir búsqueda de personas por nombre/apellido/alias con seguidos primero y sugerencias después, aplicando visibilidad y bloqueos; verificar con pruebas de API los resultados ordenados, exclusión propia y accesos denegados.
-- [ ] 7.3 Reemplazar el selector por ID y hacer efectivo el filtro No leídos sobre conversaciones persistidas; verificar con tests de `MessagesPage` que busca por nombre, crea/abre conversación y alterna correctamente el filtro.
-- [ ] 7.4 Revisar visualmente `/messages` a 1440×900 y narrow viewport contra `img.png`; verificar selector legible, estado vacío de No leídos y foco del diálogo.
+- [x] 7.1 Continuar sobre `main` actualizado después del merge del workflow de intercambio y reutilizar su lista de conversaciones sincronizada; la política del repositorio mantiene el trabajo en la rama actual.
+- [x] 7.2 Añadir búsqueda de personas por nombre/apellido/alias con seguidos primero y sugerencias después, aplicando visibilidad y bloqueos; verificar con pruebas de API los resultados ordenados, exclusión propia y accesos denegados.
+- [x] 7.3 Reemplazar el selector por ID y hacer efectivo el filtro No leídos sobre conversaciones persistidas; verificar con tests de `MessagesPage` que busca por nombre, crea/abre conversación y alterna correctamente el filtro.
+- [x] 7.4 Revisar visualmente `/messages` a 1440×900 y narrow viewport contra `img.png`; verificar selector legible, estado vacío de No leídos y foco del diálogo.
 - [ ] 7.5 Ejecutar suites afectadas, typecheck, lint, Stylelint, build y `git diff --check`; crear commits claros y una PR en español contra `main` sin merge.
 
 ## 8. Edición y privacidad ampliada de Perfil

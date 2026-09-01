@@ -9,6 +9,14 @@ export type ApiConversation = {
   lastMessageSequence: number
   updatedAt: string
   participantName: string | null
+  unreadCount: number
+}
+
+export type MessagingContact = {
+  id: number
+  name: string
+  alias: string
+  isFollowing: boolean
 }
 
 export type ApiMessageBookAttachment = {
@@ -103,6 +111,8 @@ export type ConversationBooks = {
 export const messageQueryKeys = {
   all: ['messages'] as const,
   conversations: () => [...messageQueryKeys.all, 'conversations'] as const,
+  contacts: (search = '') =>
+    [...messageQueryKeys.all, 'contacts', search] as const,
   history: (conversationId: number, after = 0) =>
     [...messageQueryKeys.all, 'history', conversationId, after] as const,
   books: (conversationId: number) =>
@@ -114,6 +124,16 @@ export async function fetchConversations(): Promise<ApiConversation[]> {
     RELATIVE_API_ROUTES.MESSAGES.CONVERSATIONS
   )
   return response.data.conversations
+}
+
+export async function fetchMessagingContacts(
+  search = ''
+): Promise<MessagingContact[]> {
+  const response = await apiClient.get<{ contacts: MessagingContact[] }>(
+    RELATIVE_API_ROUTES.MESSAGES.CONTACTS,
+    { params: { search } }
+  )
+  return response.data.contacts
 }
 
 export async function createConversation(

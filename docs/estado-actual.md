@@ -16,6 +16,7 @@ Fecha de referencia: 2026-09-01.
 - `/books` separa el catálogo público de “Mis libros”, con filtros persistidos, interés y alta de publicaciones `want`.
 - PostgreSQL/PostGIS con migraciones 001–025.
 - API de mensajes y eventos Socket.IO con persistencia antes de emitir.
+- Mensajes permite buscar contactos visibles por nombre, apellido o alias, prioriza seguidos y filtra conversaciones por no leídos entrantes.
 - Bot persistente creado por migración, con conversación idempotente por usuario e historial recargable.
 - Las migraciones 024–025 dejan una conversación demo por pareja con Clara, Tomás, Julieta y Pablo para comprobar propuestas de intercambio con catálogos del interlocutor.
 - Modo MSW controlado por `PUBLIC_API_USE_MOCKS` en el bundle del frontend.
@@ -53,5 +54,7 @@ La implementación de `reconnect-backend-to-prototype-frontend` conserva esos re
 6. Revisa la pestaña Network para `GET /api/messages` y la conexión `/socket.io`.
 7. En una conversación con un acuerdo vigente, abre `+` > "Preparar acuerdo", confirma que el formulario recupera los datos actuales y verifica que el envío actualiza la versión mediante `POST /api/agreements/:id/versions`.
 8. Con `user2@entrelibros.com`, abre una conversación demo con Clara, Tomás, Julieta o Pablo, entra en `+` > "Proponer intercambio" y confirma que aparecen los libros publicados de la otra persona.
+9. Abre una conversación nueva, busca por nombre, apellido o alias y confirma que los contactos seguidos aparecen primero; los perfiles privados o bloqueados no deben aparecer.
+10. Alterna la pestaña "No leídos" y confirma que solo muestra conversaciones con mensajes entrantes pendientes; si no hay resultados debe aparecer el estado vacío y "Todos" debe restaurar la lista.
 
 Para comprobar una historia, abre “Publicar” en Comunidad, escribe texto, enlaza opcionalmente una publicación propia y confirma que aparece tras invalidar el feed.

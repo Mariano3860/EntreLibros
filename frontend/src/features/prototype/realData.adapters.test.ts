@@ -68,6 +68,7 @@ describe('prototype real-data adapters', () => {
           lastMessageSequence: 4,
           updatedAt: '2026-08-30T11:59:00.000Z',
           participantName: 'Lucía',
+          unreadCount: 2,
         },
         { preview: 'Hola', unread: 2, now }
       )

@@ -7,6 +7,7 @@ import {
   listConversations,
   listMessages,
   markConversationRead,
+  searchMessagingContacts,
   sendMessageWithStatus,
   publishMessage,
   type MessageAgreementDetails,
@@ -31,6 +32,11 @@ function asBody(value: unknown): Record<string, unknown> {
   return value && typeof value === 'object' && !Array.isArray(value)
     ? (value as Record<string, unknown>)
     : {};
+}
+
+function asSearchParam(value: unknown): string {
+  const candidate = Array.isArray(value) ? value[0] : value;
+  return typeof candidate === 'string' ? candidate.trim().slice(0, 80) : '';
 }
 
 function asMessageBookAttachment(value: unknown): MessageBookAttachment | null {
@@ -213,6 +219,27 @@ router.get('/', async (req: AuthenticatedRequest, res) => {
   }
 });
 
+router.get('/contacts', async (req: AuthenticatedRequest, res) => {
+  if (!req.user) {
+    return res.status(401).json({
+      error: 'Unauthorized',
+      message: 'auth.errors.unauthorized',
+    });
+  }
+  try {
+    const contacts = await searchMessagingContacts(
+      req.user.id,
+      asSearchParam(req.query.search)
+    );
+    return res.json({ contacts });
+  } catch {
+    return res.status(500).json({
+      error: 'MessagingError',
+      message: 'messaging.errors.contacts_failed',
+    });
+  }
+});
+
 router.post('/conversations', async (req: AuthenticatedRequest, res) => {
   if (!req.user) {
     return res.status(401).json({
@@ -229,6 +256,12 @@ router.post('/conversations', async (req: AuthenticatedRequest, res) => {
     return res.status(422).json({
       error: 'ValidationError',
       message: 'messaging.errors.participant_required',
+    });
+  }
+  if (participantId === req.user.id) {
+    return res.status(422).json({
+      error: 'ValidationError',
+      message: 'messaging.errors.self_conversation',
     });
   }
   try {

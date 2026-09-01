@@ -9,6 +9,14 @@ export interface ConversationSummary {
   lastMessageSequence: number;
   updatedAt: Date;
   participantName: string | null;
+  unreadCount: number;
+}
+
+export interface MessagingContact {
+  id: number;
+  name: string;
+  alias: string;
+  isFollowing: boolean;
 }
 
 interface MessageAttachmentBase {
@@ -119,6 +127,7 @@ function mapConversation(row: ConversationRow): ConversationSummary {
     lastMessageSequence: Number(row.last_message_sequence),
     updatedAt: row.updated_at,
     participantName: row.participant_name ?? null,
+    unreadCount: 0,
   };
 }
 
@@ -276,6 +285,9 @@ export async function createConversation(
 ): Promise<ConversationSummary> {
   const uniqueIds = [...new Set(participantIds)].sort((a, b) => a - b);
   if (uniqueIds.length !== 2) {
+    if (uniqueIds.length === 1 && participantIds.length > 1) {
+      throw new Error('messaging.errors.self_conversation');
+    }
     throw new Error('messaging.errors.participants_required');
   }
 
@@ -340,9 +352,86 @@ export async function listConversations(
       nameByConversation.set(Number(row.conversation_id), row.name);
     }
   }
+  const unread = await query<{
+    conversation_id: number;
+    unread_count: number;
+  }>(
+    `SELECT cp.conversation_id, COUNT(m.id)::int AS unread_count
+     FROM conversation_participants cp
+     LEFT JOIN messages m
+       ON m.conversation_id = cp.conversation_id
+      AND m.sequence > cp.last_read_sequence
+      AND m.sender_id <> cp.user_id
+     WHERE cp.user_id = $2
+       AND cp.conversation_id = ANY($1::bigint[])
+     GROUP BY cp.conversation_id`,
+    [conversations.map((conversation) => conversation.id), userId]
+  );
+  const unreadByConversation = new Map<number, number>();
+  for (const row of unread.rows) {
+    unreadByConversation.set(
+      Number(row.conversation_id),
+      Number(row.unread_count)
+    );
+  }
   return conversations.map((conversation) => ({
     ...conversation,
     participantName: nameByConversation.get(conversation.id) ?? null,
+    unreadCount: unreadByConversation.get(conversation.id) ?? 0,
+  }));
+}
+
+export async function searchMessagingContacts(
+  userId: number,
+  search = ''
+): Promise<MessagingContact[]> {
+  const term = search.trim().slice(0, 80);
+  const { rows } = await query<{
+    id: number;
+    name: string;
+    alias: string;
+    is_following: boolean;
+  }>(
+    `SELECT u.id,
+            u.name,
+            COALESCE(NULLIF(u.alias, ''), u.name) AS alias,
+            EXISTS (
+              SELECT 1
+              FROM user_follows f
+              WHERE f.follower_id = $1 AND f.followed_id = u.id
+            ) AS is_following
+     FROM users u
+     WHERE u.id <> $1
+       AND u.role = 'user'
+       AND COALESCE(u.profile_visibility, 'public') = 'public'
+       AND (
+         u.name ILIKE '%' || $2 || '%'
+         OR COALESCE(u.alias, '') ILIKE '%' || $2 || '%'
+       )
+       AND NOT EXISTS (
+         SELECT 1
+         FROM user_blocks b
+         WHERE (b.blocker_id = $1 AND b.blocked_id = u.id)
+            OR (b.blocker_id = u.id AND b.blocked_id = $1)
+       )
+     ORDER BY is_following DESC,
+              CASE
+                WHEN lower(u.name) = lower($2)
+                  OR lower(COALESCE(u.alias, '')) = lower($2) THEN 0
+                WHEN lower(u.name) LIKE lower($2) || '%'
+                  OR lower(COALESCE(u.alias, '')) LIKE lower($2) || '%' THEN 1
+                ELSE 2
+              END,
+              lower(u.name),
+              u.id
+     LIMIT 20`,
+    [userId, term]
+  );
+  return rows.map((row) => ({
+    id: Number(row.id),
+    name: row.name,
+    alias: row.alias,
+    isFollowing: row.is_following,
   }));
 }
 

@@ -125,6 +125,12 @@ main.layoutMain {
   font-weight: 600;
 }
 
+.conversationState .stateMark {
+  border-color: rgb(66 215 199 / 28%);
+  background: rgb(66 215 199 / 8%);
+  color: var(--prototype-teal);
+}
+
 .conversationList > button {
   display: flex;
   width: 100%;
@@ -670,8 +676,10 @@ main.layoutMain {
 
 .newConversationForm {
   display: grid;
+  max-height: min(620px, calc(100vh - 210px));
   gap: 17px;
   padding: 20px 22px 22px;
+  overflow-y: auto;
 }
 
 .newConversationField {
@@ -732,6 +740,150 @@ main.layoutMain {
   color: var(--prototype-teal);
   font-size: 10px;
   font-weight: 700;
+}
+
+.contactSections {
+  display: grid;
+  gap: 17px;
+}
+
+.contactSection {
+  display: grid;
+  gap: 8px;
+}
+
+.contactSection h3 {
+  margin: 0;
+  color: var(--prototype-teal);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.contactList {
+  display: grid;
+  gap: 6px;
+}
+
+.contactOption {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 34px minmax(0, 1fr) 25px;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 7px 9px;
+  border: 1px solid var(--prototype-border);
+  border-radius: 11px;
+  background: var(--prototype-surface-soft);
+  color: var(--prototype-text);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    transform 160ms ease;
+}
+
+.contactOption:hover,
+.contactOption:focus-visible {
+  border-color: rgb(66 215 199 / 48%);
+  background: rgb(66 215 199 / 8%);
+  transform: translateY(-1px);
+}
+
+.contactOptionSelected {
+  border-color: var(--prototype-teal);
+  background: rgb(66 215 199 / 12%);
+  box-shadow: 0 0 0 2px rgb(66 215 199 / 8%);
+}
+
+.contactAvatar {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 50%;
+  background: rgb(66 215 199 / 15%);
+  color: var(--prototype-teal);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.contactCopy {
+  min-width: 0;
+}
+
+.contactCopy strong,
+.contactCopy small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contactCopy strong {
+  font-size: 11px;
+}
+
+.contactCopy small {
+  margin-top: 3px;
+  color: var(--prototype-muted);
+  font-size: 9px;
+}
+
+.contactSelection {
+  display: grid;
+  width: 23px;
+  height: 23px;
+  place-items: center;
+  border: 1px solid rgb(66 215 199 / 32%);
+  border-radius: 50%;
+  color: var(--prototype-teal);
+  font-size: 14px;
+  line-height: 1;
+}
+
+.contactState,
+.contactEmpty,
+.contactError {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 11px;
+  border-radius: 9px;
+  color: var(--prototype-muted);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.contactState {
+  justify-content: center;
+  min-height: 50px;
+  border: 1px dashed var(--prototype-border);
+}
+
+.contactState .stateMark {
+  width: 18px;
+  height: 18px;
+  flex-basis: 18px;
+  font-size: 9px;
+}
+
+.contactState .retryButton {
+  margin-left: auto;
+}
+
+.contactEmpty {
+  border: 1px dashed var(--prototype-border);
+  text-align: center;
+}
+
+.contactError {
+  border: 1px solid rgb(255 139 76 / 28%);
+  background: rgb(255 139 76 / 7%);
+  color: var(--prototype-text);
 }
 
 .newConversationActions {

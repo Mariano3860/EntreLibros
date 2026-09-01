@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => ({
   fetchConversations: vi.fn(),
+  fetchMessagingContacts: vi.fn(),
+  createConversation: vi.fn(),
   fetchMessageHistory: vi.fn(),
   fetchConversationBooks: vi.fn(),
   sendPersistedMessage: vi.fn(),
@@ -20,6 +22,8 @@ vi.mock('@src/api/auth/me.service', () => ({
 }))
 vi.mock('@src/api/messages/messages', () => ({
   fetchConversations: mocks.fetchConversations,
+  fetchMessagingContacts: mocks.fetchMessagingContacts,
+  createConversation: mocks.createConversation,
   fetchMessageHistory: mocks.fetchMessageHistory,
   fetchConversationBooks: mocks.fetchConversationBooks,
   sendPersistedMessage: mocks.sendPersistedMessage,
@@ -27,6 +31,8 @@ vi.mock('@src/api/messages/messages', () => ({
 }))
 vi.mock('@api/messages/messages', () => ({
   fetchConversations: mocks.fetchConversations,
+  fetchMessagingContacts: mocks.fetchMessagingContacts,
+  createConversation: mocks.createConversation,
   fetchMessageHistory: mocks.fetchMessageHistory,
   fetchConversationBooks: mocks.fetchConversationBooks,
   sendPersistedMessage: mocks.sendPersistedMessage,
@@ -65,6 +71,7 @@ const conversation = {
   lastMessageSequence: 0,
   updatedAt: '2026-08-31T10:00:00.000Z',
   participantName: 'Lucia',
+  unreadCount: 0,
 }
 
 const book = {
@@ -77,6 +84,8 @@ const book = {
 describe('MessagesPage in real API mode', () => {
   beforeEach(() => {
     mocks.fetchConversations.mockReset()
+    mocks.fetchMessagingContacts.mockReset()
+    mocks.createConversation.mockReset()
     mocks.fetchMessageHistory.mockReset()
     mocks.fetchConversationBooks.mockReset()
     mocks.sendPersistedMessage.mockReset()
@@ -618,9 +627,14 @@ describe('MessagesPage in real API mode', () => {
     )
   })
 
-  test('opens a compact new conversation modal with clear actions', async () => {
+  test('searches contacts and opens an existing conversation', async () => {
     mocks.fetchConversations.mockResolvedValue([conversation])
     mocks.fetchMessageHistory.mockResolvedValue({ messages: [], nextAfter: 0 })
+    mocks.fetchMessagingContacts.mockResolvedValue([
+      { id: 7, name: 'Mariano', alias: 'mariano', isFollowing: false },
+      { id: 8, name: 'Lucía Fernández', alias: 'lucia', isFollowing: true },
+      { id: 9, name: 'Pablo Ruiz', alias: 'pablo', isFollowing: false },
+    ])
 
     renderWithProviders(<MessagesPage />)
 
@@ -632,23 +646,77 @@ describe('MessagesPage in real API mode', () => {
       name: '¿Con quién querés hablar?',
     })
     expect(dialog).toHaveClass(styles.newConversationDialog)
+    expect(await screen.findByText('Personas que seguís')).toBeVisible()
     expect(
-      screen.getByText(
-        'Iniciá una conversación nueva con alguien de la comunidad.'
-      )
+      screen.getByRole('button', { name: /Lucía Fernández/ })
     ).toBeVisible()
+    expect(
+      screen.queryByRole('button', { name: /Mariano/ })
+    ).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Pablo Ruiz/ })).toBeVisible()
     expect(
       screen.getByRole('button', { name: 'Iniciar conversación' })
     ).toBeDisabled()
 
-    const userIdInput = screen.getByLabelText('ID de usuario')
-    expect(userIdInput).toHaveAttribute('placeholder', 'Ej. 42')
-    fireEvent.change(userIdInput, { target: { value: '42' } })
+    fireEvent.click(screen.getByRole('button', { name: /Lucía Fernández/ }))
     expect(
       screen.getByRole('button', { name: 'Iniciar conversación' })
     ).toBeEnabled()
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Iniciar conversación' })
+    )
 
-    fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }))
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    )
+    expect(mocks.createConversation).not.toHaveBeenCalled()
+  })
+
+  test('filters persisted conversations by unread state and restores all', async () => {
+    const readConversation = {
+      ...conversation,
+      id: 12,
+      participantName: 'Ana',
+      unreadCount: 0,
+    }
+    const unreadConversation = {
+      ...conversation,
+      id: 13,
+      participantIds: [7, 9],
+      participantName: 'Pablo',
+      unreadCount: 3,
+    }
+    mocks.fetchConversations.mockResolvedValue([
+      readConversation,
+      unreadConversation,
+    ])
+    mocks.fetchMessageHistory.mockResolvedValue({ messages: [], nextAfter: 0 })
+
+    renderWithProviders(<MessagesPage />)
+
+    expect(await screen.findByText('Ana')).toBeVisible()
+    expect(screen.getAllByText('Pablo')[0]).toBeVisible()
+    fireEvent.click(screen.getByRole('tab', { name: 'No leídos' }))
+
+    await waitFor(() => {
+      expect(screen.queryByText('Ana')).not.toBeInTheDocument()
+    })
+    expect(screen.getAllByText('Pablo')[0]).toBeVisible()
+    expect(screen.getByText('3')).toBeVisible()
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Todos' }))
+    expect(await screen.findByText('Ana')).toBeVisible()
+  })
+
+  test('shows an empty state when no conversation is unread', async () => {
+    mocks.fetchConversations.mockResolvedValue([conversation])
+    mocks.fetchMessageHistory.mockResolvedValue({ messages: [], nextAfter: 0 })
+
+    renderWithProviders(<MessagesPage />)
+
+    fireEvent.click(await screen.findByRole('tab', { name: 'No leídos' }))
+    expect(
+      await screen.findByText('No hay conversaciones no leídas.')
+    ).toBeVisible()
   })
 })

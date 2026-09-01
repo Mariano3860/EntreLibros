@@ -7,6 +7,7 @@ import {
   ensureBotConversation,
   listConversations,
   listMessages,
+  markConversationRead,
   sendMessage,
   sendMessageWithStatus,
 } from '../../src/repositories/messagingRepository.js';
@@ -106,6 +107,44 @@ describe('messagingRepository', () => {
 
     await expect(listMessages(conversation.id, thirdUser)).rejects.toThrow(
       'messaging.errors.forbidden'
+    );
+  });
+
+  test('rejects a conversation with the same participant twice', async () => {
+    const userId = await createUser('self-conversation');
+
+    await expect(createConversation([userId, userId])).rejects.toThrow(
+      'messaging.errors.self_conversation'
+    );
+  });
+
+  test('counts only incoming messages as unread and clears the count on read', async () => {
+    const firstUser = await createUser('unread-first');
+    const secondUser = await createUser('unread-second');
+    const conversation = await createConversation([firstUser, secondUser]);
+
+    await sendMessage({
+      conversationId: conversation.id,
+      senderId: firstUser,
+      clientKey: 'unread-check-1',
+      body: 'Mensaje propio',
+    });
+    await expect(listConversations(firstUser)).resolves.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: conversation.id, unreadCount: 0 }),
+      ])
+    );
+    await expect(listConversations(secondUser)).resolves.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: conversation.id, unreadCount: 1 }),
+      ])
+    );
+
+    await markConversationRead(conversation.id, secondUser, 1);
+    await expect(listConversations(secondUser)).resolves.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: conversation.id, unreadCount: 0 }),
+      ])
     );
   });
 });
