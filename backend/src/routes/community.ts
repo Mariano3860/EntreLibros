@@ -10,9 +10,12 @@ import { getCommunityDiscovery } from '../services/communityDiscovery.js';
 import {
   CornerValidationError,
   getCornersMap,
+  getPublicCornerDetail,
   listNearbyCorners,
   publishCorner,
   editCorner,
+  updateCornerEditorialStatus,
+  type PublishCornerEditorialStatus,
   type PublishCornerPayload,
   type UpdateCornerPayload,
 } from '../services/communityCorners.js';
@@ -36,6 +39,13 @@ import {
 import { findUserById, hasUserBlock } from '../repositories/userRepository.js';
 
 const router = Router();
+
+const CORNER_EDITORIAL_STATUSES: readonly PublishCornerEditorialStatus[] = [
+  'pending',
+  'needs_correction',
+  'approved',
+  'rejected',
+];
 
 const parseUserId = (value: string | undefined): number | null => {
   if (!value || !/^\d+$/.test(value)) return null;
@@ -147,6 +157,41 @@ router.get('/corners/map', async (_req, res) => {
   }
 });
 
+router.get(
+  '/corners/:id',
+  authenticateOptional,
+  async (req: AuthenticatedRequest, res) => {
+    const id = req.params.id;
+    if (
+      !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+        id
+      )
+    ) {
+      return res.status(404).json({
+        error: 'NotFound',
+        message: 'community.corners.errors.not_found',
+      });
+    }
+
+    try {
+      const corner = await getPublicCornerDetail(id, req.user?.id);
+      if (!corner) {
+        return res.status(404).json({
+          error: 'NotFound',
+          message: 'community.corners.errors.not_found',
+        });
+      }
+      return res.json(corner);
+    } catch (error) {
+      console.error('Failed to load public corner detail', error);
+      return res.status(500).json({
+        error: 'CornerQueryFailed',
+        message: 'community.corners.errors.query_failed',
+      });
+    }
+  }
+);
+
 router.post(
   '/corners',
   authenticate,
@@ -177,6 +222,54 @@ router.post(
 );
 
 router.patch(
+  '/corners/:id/editorial',
+  authenticate,
+  async (req: AuthenticatedRequest, res) => {
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'Unauthorized',
+        message: 'auth.errors.unauthorized',
+      });
+    }
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        error: 'Forbidden',
+        message: 'community.corners.errors.editorial_admin_required',
+      });
+    }
+
+    const status = req.body?.status as PublishCornerEditorialStatus;
+    if (!CORNER_EDITORIAL_STATUSES.includes(status)) {
+      return res.status(422).json({
+        error: 'InvalidFields',
+        message: 'community.corners.errors.editorial_status_invalid',
+      });
+    }
+    const reason =
+      typeof req.body?.reason === 'string' ? req.body.reason.trim() : '';
+    if ((status === 'needs_correction' || status === 'rejected') && !reason) {
+      return res.status(422).json({
+        error: 'MissingFields',
+        message: 'community.corners.errors.editorial_reason_required',
+      });
+    }
+
+    const updated = await updateCornerEditorialStatus(
+      req.params.id,
+      status,
+      status === 'approved' || status === 'pending' ? null : reason
+    );
+    if (!updated) {
+      return res.status(404).json({
+        error: 'NotFound',
+        message: 'community.corners.errors.not_found',
+      });
+    }
+    return res.json(updated);
+  }
+);
+
+router.patch(
   '/corners/:id',
   authenticate,
   async (req: AuthenticatedRequest, res) => {
@@ -195,7 +288,13 @@ router.patch(
           error: 'NotFound',
           message: 'community.corners.errors.not_found',
         });
-      return res.json(updated);
+      const detail = await getPublicCornerDetail(req.params.id, req.user.id);
+      if (!detail)
+        return res.status(404).json({
+          error: 'NotFound',
+          message: 'community.corners.errors.not_found',
+        });
+      return res.json(detail);
     } catch (error) {
       if (error instanceof CornerValidationError)
         return res.status(422).json({ errors: error.errors });

@@ -41,11 +41,17 @@ export const Panel = ({
   children,
   className = '',
   as: Element = 'section',
+  'aria-label': ariaLabel,
 }: {
   children: ReactNode
   className?: string
   as?: 'section' | 'article' | 'div' | 'aside'
-}) => <Element className={`${styles.panel} ${className}`}>{children}</Element>
+  'aria-label'?: string
+}) => (
+  <Element className={`${styles.panel} ${className}`} aria-label={ariaLabel}>
+    {children}
+  </Element>
+)
 
 export const SectionHeading = ({
   title,

@@ -31,6 +31,16 @@ Esta guía reúne el procedimiento actual para comprobar que EntreLibros arranca
 - El punto rojo y el contador de Mensajes aumentan con un mensaje entrante y desaparecen al leerlo.
 - Los estados de carga, vacío y error son distinguibles y ofrecen reintento cuando corresponde.
 
+## Comprobacion manual de edicion de Rincones
+
+- Crea o usa un Rincon aprobado con una cuenta propietaria y abre `/map` con `PUBLIC_API_USE_MOCKS=false`.
+- Selecciona el Rincon y pulsa `Ver rincon`. Debe aparecer el panel a la derecha del mapa con foto, nombre, anfitrion, zona aproximada, horario, normas, actividad y estado.
+- También puedes abrir ese panel haciendo clic en el pin del Rincon en el mapa o en su entrada del listado lateral.
+- Como propietario, comprueba `Editar rincon`, cambia nombre, normas, horario o visibilidad, guarda y recarga. Los cambios deben persistir.
+- Desde el mismo panel pausa y reactiva el Rincon. El estado debe cambiar y la accion debe conservarse despues de recargar.
+- Como otra cuenta o invitado, comprueba que el detalle sigue siendo visible pero no aparecen los controles de propietario.
+- En todos los casos confirma que nunca aparecen calle, altura, contacto interno ni coordenadas exactas.
+
 ## Calidad y recuperación
 
 Antes de revisar una entrega ejecuta:

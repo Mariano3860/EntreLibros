@@ -13,6 +13,8 @@ export type BookCatalogFilters = {
   q?: string
   author?: string
   isbn?: string
+  topic?: string
+  interest?: string
   language?: string
   condition?: 'new' | 'very_good' | 'good' | 'acceptable'
   status?: string

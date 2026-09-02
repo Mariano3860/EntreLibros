@@ -45,6 +45,7 @@ export const initialState: PublishBookFormState = {
   searchQuery: '',
   step: 'identify',
   acceptedTerms: false,
+  cornerId: '',
 }
 
 export const genres = [

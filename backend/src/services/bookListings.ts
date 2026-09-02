@@ -11,6 +11,7 @@ import {
   type PersistedBookListingUpdate,
   type BookListingImageInput,
   type BookUpdateInput,
+  type PublicationConsents,
 } from '../repositories/bookListingRepository.js';
 import { DEFAULT_LISTING_CONDITION } from '../constants.js';
 
@@ -64,6 +65,8 @@ export interface Publication {
   ownerId: string;
   createdAt: string;
   updatedAt: string;
+  editorialStatus: 'pending' | 'needs_correction' | 'approved' | 'rejected';
+  editorialReason?: string | null;
 }
 
 export interface PublicationImageUpdate {
@@ -99,6 +102,7 @@ export interface PublicationUpdateInput {
     };
   };
   cornerId?: string | null;
+  consents?: PublicationConsents;
 }
 
 export type UpdatePublicationResult =
@@ -145,12 +149,36 @@ export async function updatePublication(
   }
 
   const persisted = buildPersistedUpdate(input);
+  if (hasEditorialContentChange(input)) {
+    persisted.listing = {
+      ...(persisted.listing ?? {}),
+      editorialStatus: 'pending',
+      editorialReason: null,
+    };
+  }
   const updated = await updateBookListing(id, persisted);
   if (!updated) {
     return { kind: 'not_found' };
   }
 
   return { kind: 'updated', publication: toPublication(updated) };
+}
+
+function hasEditorialContentChange(input: PublicationUpdateInput): boolean {
+  return (
+    input.title !== undefined ||
+    input.author !== undefined ||
+    input.publisher !== undefined ||
+    input.year !== undefined ||
+    input.language !== undefined ||
+    input.format !== undefined ||
+    input.isbn !== undefined ||
+    input.condition !== undefined ||
+    input.notes !== undefined ||
+    input.images !== undefined ||
+    input.offer !== undefined ||
+    input.cornerId !== undefined
+  );
 }
 
 function isValidStatusTransition(
@@ -190,6 +218,10 @@ function canAccessListing(listing: BookListing, viewerId?: number) {
   }
 
   if (listing.availability === 'private') {
+    return false;
+  }
+
+  if (listing.editorialStatus !== 'approved') {
     return false;
   }
 
@@ -246,6 +278,8 @@ function toPublication(listing: BookListing): Publication {
     ownerId: String(listing.userId),
     createdAt: listing.createdAt.toISOString(),
     updatedAt: listing.updatedAt.toISOString(),
+    editorialStatus: listing.editorialStatus,
+    editorialReason: listing.editorialReason,
   };
 }
 
@@ -349,6 +383,9 @@ function buildPersistedUpdate(
   }
   if (input.cornerId !== undefined) {
     listingUpdates.cornerId = input.cornerId;
+  }
+  if (input.consents !== undefined) {
+    listingUpdates.consents = input.consents;
   }
 
   if (input.offer) {

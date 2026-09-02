@@ -15,7 +15,11 @@ import { toast } from 'react-toastify'
 
 import { PublishBookPayload } from '@src/api/books/publishBook.types'
 import { ApiBookSearchResult } from '@src/api/books/searchBooks.types'
-import { MAX_IMAGES_UPLOAD } from '@src/constants/constants'
+import {
+  MAX_IMAGE_BYTES,
+  MAX_IMAGES_UPLOAD,
+  SUPPORTED_IMAGE_TYPES,
+} from '@src/constants/constants'
 
 import { IdentifyStep } from './components/IdentifyStep'
 import { OfferStep } from './components/OfferStep'
@@ -294,15 +298,32 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
   const handleFiles = useCallback(
     async (files: FileList | null) => {
       if (!files) return
-      const fileArray = Array.from(files).slice(0, MAX_IMAGES_UPLOAD)
+      const selectedFiles = Array.from(files)
+      const invalidFiles = selectedFiles.filter(
+        (file) =>
+          !SUPPORTED_IMAGE_TYPES.includes(
+            file.type as (typeof SUPPORTED_IMAGE_TYPES)[number]
+          ) || file.size > MAX_IMAGE_BYTES
+      )
+      if (invalidFiles.length > 0) {
+        toast.error(t('publishBook.errors.imageInvalid'))
+      }
+      const fileArray = selectedFiles
+        .filter((file) => !invalidFiles.includes(file))
+        .slice(0, MAX_IMAGES_UPLOAD)
       const uploads = await Promise.all(
         fileArray.map(
           (file, index) =>
             new Promise<PublishBookImage>((resolve, reject) => {
               const reader = new FileReader()
+              const safeName = file.name
+                .normalize('NFKD')
+                .replace(/[^a-zA-Z0-9._-]+/g, '_')
+                .slice(0, 96)
+              const fileName = safeName || 'imagen'
               reader.onload = () =>
                 resolve({
-                  id: `${file.name}-${Date.now()}-${index}`,
+                  id: `${fileName}-${Date.now()}-${index}`,
                   url: String(reader.result),
                   source: 'upload',
                   name: file.name,
@@ -322,7 +343,7 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
       })
       setAutosaveEnabled(true)
     },
-    [setAutosaveEnabled, setState]
+    [setAutosaveEnabled, setState, t]
   )
 
   const removeImage = useCallback(
@@ -448,6 +469,12 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
         delivery: state.offer.delivery,
       },
       draft: false,
+      cornerId: state.cornerId.trim() || null,
+      consents: {
+        content: state.acceptedTerms,
+        image: state.acceptedTerms,
+        rules: state.acceptedTerms,
+      },
     }
 
     try {
@@ -630,6 +657,10 @@ export const PublishBookModal: React.FC<PublishBookModalProps> = ({
           <OfferStep
             t={t}
             offer={state.offer}
+            cornerId={state.cornerId}
+            onCornerIdChange={(cornerId) =>
+              setState((prev) => ({ ...prev, cornerId }))
+            }
             errors={offerErrors}
             genres={genres}
             onOfferChange={updateOffer}

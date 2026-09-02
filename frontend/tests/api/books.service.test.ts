@@ -42,6 +42,31 @@ describe('books service', () => {
     await expect(fetchBooks()).rejects.toThrow('Invalid books response')
   })
 
+  test('serializes combined discovery filters', async () => {
+    getMock.mockResolvedValueOnce({ data: [] })
+
+    await expect(
+      fetchBooks({
+        q: 'astronomía',
+        author: 'Autora',
+        isbn: '9780000000002',
+        topic: 'espacio',
+        interest: 'ciencia-ficcion',
+        condition: 'good',
+        trade: true,
+        latitude: -34.6,
+        longitude: -58.4,
+        radiusKm: 5,
+        limit: 10,
+        offset: 20,
+      })
+    ).resolves.toEqual([])
+
+    expect(getMock).toHaveBeenCalledWith(
+      '/books?q=astronom%C3%ADa&author=Autora&isbn=9780000000002&topic=espacio&interest=ciencia-ficcion&condition=good&trade=true&latitude=-34.6&longitude=-58.4&radiusKm=5&limit=10&offset=20'
+    )
+  })
+
   test('fetchBookById returns a persisted publication', async () => {
     const sample = {
       id: '7',
@@ -82,6 +107,7 @@ describe('books service', () => {
           shipping: false,
         },
       },
+      consents: { content: true, image: true, rules: true },
       draft: false,
     }
 
@@ -121,6 +147,7 @@ describe('books service', () => {
             shipping: false,
           },
         },
+        consents: { content: true, image: true, rules: true },
       })
     ).rejects.toThrow('Invalid publish response')
   })

@@ -115,6 +115,10 @@
         "reserved": "Reserved"
       },
       "type": { "label": "Publication", "offer": "Offered", "want": "Wanted" },
+      "topic": "Topic",
+      "topicPlaceholder": "Science, fiction, history...",
+      "interest": "Interest",
+      "interestPlaceholder": "Fiction, poetry, cooking...",
       "sort": "Sort by",
       "radius": "Distance",
       "trade": "Trade",
@@ -307,6 +311,9 @@
           "private": "Private with link"
         }
       },
+      "meetingCorner": {
+        "label": "Meeting corner or area (optional)"
+      },
       "delivery": {
         "label": "Delivery",
         "options": {
@@ -343,9 +350,16 @@
       "language": "Select the language",
       "format": "Select the format",
       "image": "Add at least one image",
+      "image_required": "Add at least one image before publishing",
+      "imageInvalid": "Choose JPG, PNG or WebP images up to 5 MB.",
       "condition": "Choose a condition",
       "modes": "Pick at least one modality",
-      "price": "Price must be greater than 0"
+      "price": "Price must be greater than 0",
+      "invalid_isbn": "The ISBN is not valid.",
+      "consent_required": "Confirm the consents before publishing.",
+      "content_not_allowed": "The content does not meet publication rules.",
+      "suspicious_link": "Review the links before publishing.",
+      "duplicate": "You already have an identical active publication."
     },
     "previewAlt": "Preview cover"
   },
@@ -435,6 +449,9 @@
       "geolocationUnsupported": "Your browser doesn't support automatic location retrieval.",
       "geolocationDenied": "We couldn't access your location. Check the permissions and try again.",
       "photoRead": "We couldn't read the image. Try again.",
+      "photoInvalid": "Choose a JPG, PNG or WebP image up to 5 MB.",
+      "content_not_allowed": "The content does not meet publication rules.",
+      "suspicious_link": "Review the links before publishing.",
       "publish": "We couldn't create the corner. Please try again."
     },
     "review": {
@@ -627,6 +644,15 @@
           "swap": "Propose swap",
           "agreement": "Prepare agreement"
         },
+        "templates": {
+          "label": "First-contact templates",
+          "availabilityLabel": "Ask about availability",
+          "availability": "Hi, is this still available?",
+          "meetingLabel": "Arrange a meeting",
+          "meeting": "Hi, I’d like to coordinate a meeting place and time.",
+          "exchangeLabel": "Suggest a swap",
+          "exchange": "Hi, would you like to discuss a possible swap?"
+        },
         "bookModal": {
           "trigger": "Attach book",
           "title": "Attach book",
@@ -671,6 +697,14 @@
           "loading": "Loading available books...",
           "noBooks": "No books are listed in this conversation.",
           "submit": "Send proposal"
+        },
+        "outcome": {
+          "title": "Meeting outcome",
+          "description": "Record the result for this conversation only.",
+          "notePlaceholder": "Optional note",
+          "completed": "Completed",
+          "notCompleted": "Not completed",
+          "saved": "Your latest outcome was saved."
         }
       },
       "snippets": {
@@ -895,7 +929,37 @@
       "createCorner": "Create corner",
       "proposeMeeting": "Propose meetup",
       "sendMessage": "Send message",
-      "openReference": "Open reference"
+      "openReference": "Open reference",
+      "openPublication": "View publication",
+      "openCorner": "View corner"
+    },
+    "cornerDetail": {
+      "title": "Corner details",
+      "loading": "Loading corner details...",
+      "error": "We couldn't load this corner.",
+      "retry": "Try again",
+      "status": {
+        "active": "Active",
+        "paused": "Paused"
+      },
+      "location": "Area",
+      "schedule": "Hours",
+      "rules": "House rules",
+      "activity": "Activity",
+      "weekly": "exchanges this week",
+      "total": "exchanges recorded",
+      "notProvided": "No information provided",
+      "owner": "Manage your corner",
+      "edit": "Edit corner",
+      "pause": "Pause corner",
+      "reactivate": "Reactivate corner",
+      "editTitle": "Edit corner",
+      "cancel": "Cancel",
+      "saving": "Saving...",
+      "save": "Save changes",
+      "nameRequired": "Enter a name for the corner.",
+      "updateError": "We couldn't save the changes.",
+      "privacyNote": "The public location stays approximate to protect the address."
     },
     "empty": {
       "title": "No activity in this area yet",
@@ -944,6 +1008,10 @@
     "saving": "Saving...",
     "saved": "Changes saved",
     "saveError": "Failed to save",
+    "contact": "Contact owner",
+    "contacting": "Opening conversation...",
+    "contactError": "The conversation could not be opened.",
+    "firstContactMessage": "Hi, I’m interested in your listing “{{title}}”. Is it still available?",
     "confirmClose": "You have unsaved changes. Do you want to leave anyway?",
     "readOnly": "Read-only",
     "owner": "Your publication",
@@ -1030,6 +1098,28 @@
       "unauthenticated": "You need to sign in.",
       "profile_update_failed": "Your profile changes could not be saved."
     }
+  },
+  "reports": {
+    "report": "Report",
+    "category": "Category",
+    "reason": "Reason",
+    "submit": "Submit report",
+    "sending": "Sending...",
+    "submitted": "Report received. Thanks for letting us know.",
+    "error": "The report could not be sent.",
+    "categories": {
+      "content": "Content",
+      "conduct": "Conduct",
+      "cornerMissing": "Missing corner"
+    }
+  },
+  "publicProfile": {
+    "loading": "Loading profile...",
+    "notFound": "Profile unavailable.",
+    "member": "EntreLibros member",
+    "contact": "Send message",
+    "contacting": "Opening conversation...",
+    "contactError": "The conversation could not be opened."
   },
   "profile": {
     "title": "My profile",

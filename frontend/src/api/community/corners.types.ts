@@ -69,3 +69,37 @@ export type PublishCornerResponse = {
   status: PublishCornerStatus
   locationSummary: string
 }
+
+export type CommunityCornerDetail = {
+  id: string
+  name: string
+  scope: PublishCornerScope
+  hostAlias: string
+  rules: string | null
+  schedule: string | null
+  status: PublishCornerStatus
+  visibilityPreference: PublishCornerVisibilityPreference
+  imageUrl: string | null
+  isOwner: boolean
+  location: {
+    city: string
+    neighborhood: string
+    referencePointLabel: string
+    latitude: number
+    longitude: number
+    approximate: true
+  }
+  activity: {
+    totalExchanges: number
+    weeklyExchanges: number
+    lastActivityAt: string | null
+  }
+}
+
+export type UpdateCornerPayload = Partial<{
+  name: string
+  rules: string | null
+  schedule: string | null
+  status: PublishCornerStatus
+  visibilityPreference: PublishCornerVisibilityPreference
+}>

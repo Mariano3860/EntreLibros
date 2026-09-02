@@ -142,6 +142,7 @@ const baseDraftState: PublishBookDraftState = {
   searchQuery: '',
   step: 'identify',
   acceptedTerms: true,
+  cornerId: '',
 }
 
 describe('PublishBookModal', () => {
@@ -505,7 +506,7 @@ describe('PublishBookModal', () => {
     fireEvent.click(screen.getByRole('button', { name: 'publishBook.publish' }))
 
     await waitFor(() => expect(mutateAsync).toHaveBeenCalledTimes(1))
-    expect(mutateAsync.mock.calls[0][0]).not.toHaveProperty('cornerId')
+    expect(mutateAsync.mock.calls[0][0]).toHaveProperty('cornerId', null)
     expect(draftApi.clear).toHaveBeenCalled()
     expect(toastSuccess).toHaveBeenCalledWith('publishBook.published')
     expect(onPublished).toHaveBeenCalledWith('book-123')

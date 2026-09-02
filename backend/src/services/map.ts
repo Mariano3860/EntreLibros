@@ -2,8 +2,8 @@ import { createHash } from 'node:crypto';
 
 import { DatabaseError } from 'pg';
 
-import { query } from '../db.js';
 import { clamp } from '../utils/math.js';
+import { listPublicBookListings } from '../repositories/bookListingRepository.js';
 import {
   listCornersForMap,
   type CommunityCornerEntity,
@@ -81,17 +81,6 @@ export interface MapResponse {
   meta: MapResponseMeta;
 }
 
-interface MapPublicationRow {
-  id: number;
-  title: string;
-  author: string | null;
-  type: 'offer' | 'want';
-  sale: boolean;
-  donation: boolean;
-  corner_id: string | null;
-  photo_url: string | null;
-}
-
 const DEFAULT_CITY = 'Ciudad Autónoma de Buenos Aires';
 const DEFAULT_BARRIO = 'Zona comunitaria';
 const DEFAULT_THEMES = ['Comunidad'];
@@ -105,13 +94,6 @@ const matchesCornerSearch = (corner: CommunityCornerEntity, term: string) =>
   matchesSearch(corner.name, term) ||
   matchesSearch(corner.locationSummary, term) ||
   matchesSearch(corner.address.street, term);
-
-const matchesPublicationSearch = (
-  publication: MapPublicationRow,
-  term: string
-) =>
-  matchesSearch(publication.title, term) ||
-  (publication.author ? matchesSearch(publication.author, term) : false);
 
 const hasThemeOverlap = (themes: string[], filters: string[]) => {
   if (filters.length === 0) {
@@ -182,7 +164,7 @@ const deriveOffsetFromId = (id: string) => {
 
 const APPROXIMATION_OFFSET_METERS = 150;
 
-const getDisplayCoordinates = (
+export const getDisplayCoordinates = (
   corner: CommunityCornerEntity
 ): { lat: number; lon: number; approximate: boolean } => {
   const { latitude, longitude } = corner.coordinates;
@@ -269,19 +251,6 @@ const buildActivityPoints = (
     })
     .filter((point): point is MapActivityPoint => point !== null);
 
-const derivePublicationType = (row: MapPublicationRow): PublicationType => {
-  if (row.sale) {
-    return 'sale';
-  }
-  if (row.donation) {
-    return 'donation';
-  }
-  if (row.type === 'want') {
-    return 'want';
-  }
-  return 'offer';
-};
-
 const fetchPublications = async (
   cornerLookup: Map<string, CommunityCornerEntity>,
   displayCoordinates: Map<string, DisplayCoordinates>,
@@ -299,46 +268,21 @@ const fetchPublications = async (
     return [];
   }
 
-  const { rows } = await query<MapPublicationRow>(
-    `SELECT
-      bl.id,
-      b.title,
-      b.author,
-      bl.type,
-      bl.sale,
-      bl.donation,
-      bl.corner_id,
-      img.url AS photo_url
-    FROM book_listings bl
-    JOIN books b ON bl.book_id = b.id
-    LEFT JOIN LATERAL (
-      SELECT url
-      FROM book_listing_images
-      WHERE book_listing_id = bl.id
-      ORDER BY is_primary DESC, id ASC
-      LIMIT 1
-    ) img ON true
-    WHERE bl.status = 'available'
-      AND bl.availability = 'public'
-      AND bl.is_draft = false
-      AND bl.corner_id IS NOT NULL
-      AND bl.corner_id = ANY($1)`,
-    [cornerIds]
-  );
+  const rows = await listPublicBookListings({
+    text: search || undefined,
+    cornerIds,
+    sort: 'recent',
+    limit: 100,
+    latitude: center.lat,
+    longitude: center.lon,
+    radiusKm: maxDistanceKm ?? undefined,
+  });
 
   const pins: MapPublicationPin[] = [];
 
   for (const row of rows) {
-    const corner = row.corner_id ? cornerLookup.get(row.corner_id) : undefined;
+    const corner = row.cornerId ? cornerLookup.get(row.cornerId) : undefined;
     if (!corner) {
-      continue;
-    }
-
-    if (
-      search.length > 0 &&
-      !matchesPublicationSearch(row, search) &&
-      !matchesCornerSearch(corner, search)
-    ) {
       continue;
     }
 
@@ -356,7 +300,7 @@ const fetchPublications = async (
     }
 
     const authors = row.author ? [row.author] : [];
-    const photo = row.photo_url ?? corner.photo?.url ?? undefined;
+    const photo = row.coverUrl || corner.photo?.url || undefined;
     const coordinates =
       displayCoordinates.get(corner.id) ?? getDisplayCoordinates(corner);
 
@@ -364,7 +308,13 @@ const fetchPublications = async (
       id: `listing-${row.id}`,
       title: row.title,
       authors,
-      type: derivePublicationType(row),
+      type: row.sale
+        ? 'sale'
+        : row.donation
+          ? 'donation'
+          : row.type === 'want'
+            ? 'want'
+            : 'offer',
       photo,
       distanceKm,
       cornerId: corner.id,
@@ -487,7 +437,7 @@ export async function getMapData(query: MapQuery): Promise<MapResponse> {
 
   const displayCoordinates = new Map<string, DisplayCoordinates>();
 
-  const filteredCorners = corners.filter((corner) => {
+  const spatialCorners = corners.filter((corner) => {
     const displayCoordinatesForCorner = adjustDisplayCoordinates(
       getDisplayCoordinates(corner),
       query.bbox
@@ -497,9 +447,6 @@ export async function getMapData(query: MapQuery): Promise<MapResponse> {
       return false;
     }
 
-    const matchesTerm =
-      normalizedSearch.length === 0 ||
-      matchesCornerSearch(corner, normalizedSearch);
     const matchesTheme = hasThemeOverlap(getCornerThemes(corner), themeFilters);
     const matchesOpen = !query.filters.openNow || corner.status === 'active';
     const distanceKm = haversineDistanceKm(
@@ -517,11 +464,7 @@ export async function getMapData(query: MapQuery): Promise<MapResponse> {
       distanceKm <= query.filters.distanceKm;
 
     const isVisible =
-      matchesTerm &&
-      matchesTheme &&
-      matchesOpen &&
-      matchesDistance &&
-      !corner.draft;
+      matchesTheme && matchesOpen && matchesDistance && !corner.draft;
 
     if (isVisible) {
       displayCoordinates.set(corner.id, displayCoordinatesForCorner);
@@ -530,15 +473,16 @@ export async function getMapData(query: MapQuery): Promise<MapResponse> {
     return isVisible;
   });
 
-  const cornerLookup = new Map(
-    filteredCorners.map((corner) => [corner.id, corner])
+  const candidateCornerLookup = new Map(
+    spatialCorners.map((corner) => [corner.id, corner])
   );
 
+  let candidatePublications: MapPublicationPin[] = [];
   let publications: MapPublicationPin[] = [];
   if (query.layers.has('publications')) {
     try {
-      publications = await fetchPublications(
-        cornerLookup,
+      candidatePublications = await fetchPublications(
+        candidateCornerLookup,
         displayCoordinates,
         normalizedSearch,
         themeFilters,
@@ -551,12 +495,26 @@ export async function getMapData(query: MapQuery): Promise<MapResponse> {
     } catch (error) {
       if (error instanceof DatabaseError) {
         console.warn('Failed to load publications for map view', error.message);
-        publications = [];
+        candidatePublications = [];
       } else {
         throw error;
       }
     }
   }
+
+  const matchingPublicationCornerIds = new Set(
+    candidatePublications.map((publication) => publication.cornerId)
+  );
+  const filteredCorners = spatialCorners.filter(
+    (corner) =>
+      normalizedSearch.length === 0 ||
+      matchesCornerSearch(corner, normalizedSearch) ||
+      matchingPublicationCornerIds.has(corner.id)
+  );
+  const filteredCornerIds = new Set(filteredCorners.map((corner) => corner.id));
+  publications = candidatePublications.filter((publication) =>
+    filteredCornerIds.has(publication.cornerId)
+  );
 
   const activity =
     query.layers.has('activity') && query.filters.recentActivity

@@ -49,6 +49,8 @@ const tabs = [
 ] as const
 
 const filterKeys = [
+  'topic',
+  'interest',
   'condition',
   'status',
   'type',
@@ -185,6 +187,8 @@ export const BooksPage = () => {
   const [locationError, setLocationError] = useState(false)
 
   const search = searchParams.get('q') ?? ''
+  const selectedTopic = searchParams.get('topic') ?? ''
+  const selectedInterest = searchParams.get('interest') ?? ''
   const segment = location.pathname.replace(/^\/books\/?/, '').split('/')[0]
   const bookId = /^\d+$/.test(segment) ? Number(segment) : null
   const active = tabs.find((tab) => tab.path === segment)?.key ?? 'all'
@@ -227,6 +231,8 @@ export const BooksPage = () => {
       active === 'seeking' ? 'want' : (selectedType ?? ('offer' as const))
     return {
       q: search.trim() || undefined,
+      topic: selectedTopic.trim() || undefined,
+      interest: selectedInterest.trim() || undefined,
       condition: selectedCondition ?? undefined,
       status: selectedStatus ?? undefined,
       type,
@@ -244,7 +250,9 @@ export const BooksPage = () => {
   }, [
     active,
     coordinates,
+    selectedInterest,
     search,
+    selectedTopic,
     selectedCondition,
     selectedRadius,
     selectedSale,
@@ -424,6 +432,8 @@ export const BooksPage = () => {
   }
 
   const filterSummary = [
+    selectedTopic || null,
+    selectedInterest || null,
     selectedCondition
       ? conditions.find((item) => item.value === selectedCondition)?.label
       : null,
@@ -474,6 +484,26 @@ export const BooksPage = () => {
         </div>
         {filtersOpen ? (
           <Panel className={styles.filters}>
+            <label className={styles.textFilter}>
+              <span>{t('booksPage.filters.topic')}</span>
+              <input
+                value={selectedTopic}
+                onChange={(event) =>
+                  updateParams({ topic: event.target.value })
+                }
+                placeholder={t('booksPage.filters.topicPlaceholder')}
+              />
+            </label>
+            <label className={styles.textFilter}>
+              <span>{t('booksPage.filters.interest')}</span>
+              <input
+                value={selectedInterest}
+                onChange={(event) =>
+                  updateParams({ interest: event.target.value })
+                }
+                placeholder={t('booksPage.filters.interestPlaceholder')}
+              />
+            </label>
             <label className={styles.selectFilter}>
               <span>{t('booksPage.filters.condition')}</span>
               <select

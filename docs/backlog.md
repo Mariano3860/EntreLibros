@@ -2,10 +2,11 @@
 
 Última actualización: 2026-09-02.
 
-Este backlog reúne únicamente trabajo vigente. El código, las migraciones, los contratos y las pruebas son la fuente de verdad para marcar una tarea como hecha; las notas históricas se conservan en Git y no se repiten aquí.
+Este backlog reúne únicamente trabajo vigente. El código, las migraciones, los contratos y las pruebas son la fuente de verdad para marcar una tarea como implementada; la clasificación de cierre y su evidencia se mantiene en [`tfg-mvp-trazabilidad.md`](tfg-mvp-trazabilidad.md). Las notas históricas se conservan en Git y no se repiten aquí.
 
-## Hecho
+## Implementado en código
 
+- Selección de Rincones desde el pin del mapa o el listado lateral con apertura del panel de detalle en la misma vista.
 - Registro, inicio/cierre de sesión, perfiles editables, intereses, idioma y privacidad básica.
 - Catálogo público, libros propios, publicación/edición, modalidades, condición, ISBN opcional, intereses y vencimiento.
 - Rincones con alta, edición del propietario, foto, normas, consentimiento, zona, visibilidad barrio/ciudad y pausa/reactivación.
@@ -18,7 +19,7 @@ Este backlog reúne únicamente trabajo vigente. El código, las migraciones, lo
 ## Prioridad P0 — cerrar el recorrido principal
 
 - [ ] **P0-01 — Recorrido real completo:** registrar o usar dos perfiles, publicar, descubrir, contactar, acordar y recargar sin perder datos. Verificar con API real y evidencia manual.
-- [ ] **P0-02 — Rincones consistentes:** completar baja o sustituto documentado, estados visibles, validaciones y propiedad. Verificar autorización y persistencia.
+- [ ] **P0-02 — Rincones consistentes:** verificar el sustituto de baja mediante pausa reversible, estados visibles, validaciones y propiedad. Verificar autorización y persistencia.
 - [ ] **P0-03 — Publicaciones válidas:** cerrar campos mínimos, consentimientos, imagen, modalidad, precio, disponibilidad y estados editoriales. Verificar API, UI y búsqueda.
 - [ ] **P0-04 — Privacidad territorial:** asegurar que ningún detalle, mapa o respuesta pública expone dirección o coordenadas exactas. Verificar visibilidad de ciudad/barrio con pruebas de API.
 - [ ] **P0-05 — Descubrimiento unificado:** mantener filtros combinables y la misma consulta para mapa y listado, incluyendo fallback sin geolocalización. Verificar selección, radio, vacío y error.

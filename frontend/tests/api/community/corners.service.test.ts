@@ -2,24 +2,30 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import {
   createCorner,
+  fetchCornerDetail,
   fetchCornersMap,
   fetchNearbyCorners,
+  updateCorner,
 } from '@api/community/corners.service'
 import { RELATIVE_API_ROUTES } from '@api/routes'
 import {
   CommunityCornerMap,
+  CommunityCornerDetail,
   CommunityCornerSummary,
   PublishCornerPayload,
+  UpdateCornerPayload,
 } from '@api/community/corners.types'
 
-const { getMock, postMock } = vi.hoisted(() => ({
+const { getMock, patchMock, postMock } = vi.hoisted(() => ({
   getMock: vi.fn(),
+  patchMock: vi.fn(),
   postMock: vi.fn(),
 }))
 
 vi.mock('@api/axios', () => ({
   apiClient: {
     get: getMock,
+    patch: patchMock,
     post: postMock,
   },
 }))
@@ -27,6 +33,7 @@ vi.mock('@api/axios', () => ({
 describe('community corners service', () => {
   beforeEach(() => {
     getMock.mockReset()
+    patchMock.mockReset()
     postMock.mockReset()
   })
 
@@ -126,6 +133,63 @@ describe('community corners service', () => {
     expect(result).toEqual(response)
     expect(postMock).toHaveBeenCalledWith(
       RELATIVE_API_ROUTES.COMMUNITY.CORNERS.CREATE,
+      payload
+    )
+  })
+
+  test('fetchCornerDetail gets the selected corner detail', async () => {
+    const payload: CommunityCornerDetail = {
+      id: 'corner-1',
+      name: 'RincÃ³n Centro',
+      scope: 'public',
+      hostAlias: 'AnfitriÃ³n',
+      rules: 'Cuidar los libros',
+      schedule: 'SÃ¡bados',
+      status: 'active',
+      visibilityPreference: 'approximate',
+      imageUrl: '/corner.jpg',
+      isOwner: true,
+      location: {
+        city: 'Buenos Aires',
+        neighborhood: 'Centro',
+        referencePointLabel: 'Cerca de la plaza',
+        latitude: -34.6,
+        longitude: -58.4,
+        approximate: true,
+      },
+      activity: {
+        totalExchanges: 4,
+        weeklyExchanges: 2,
+        lastActivityAt: null,
+      },
+    }
+    getMock.mockResolvedValueOnce({ data: payload })
+
+    const result = await fetchCornerDetail(payload.id)
+
+    expect(result).toEqual(payload)
+    expect(getMock).toHaveBeenCalledWith(
+      RELATIVE_API_ROUTES.COMMUNITY.CORNERS.DETAIL(payload.id)
+    )
+  })
+
+  test('updateCorner patches the owner payload and returns refreshed detail', async () => {
+    const payload: UpdateCornerPayload = {
+      name: 'RincÃ³n Actualizado',
+      status: 'paused',
+    }
+    const response = {
+      id: 'corner-1',
+      name: payload.name,
+      status: payload.status,
+    }
+    patchMock.mockResolvedValueOnce({ data: response })
+
+    const result = await updateCorner('corner-1', payload)
+
+    expect(result).toEqual(response)
+    expect(patchMock).toHaveBeenCalledWith(
+      RELATIVE_API_ROUTES.COMMUNITY.CORNERS.UPDATE('corner-1'),
       payload
     )
   })

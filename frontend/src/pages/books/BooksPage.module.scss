@@ -43,7 +43,8 @@
   margin: -4px 0 10px;
 }
 
-.selectFilter {
+.selectFilter,
+.textFilter {
   display: grid;
   min-width: 0;
   gap: 5px;
@@ -54,7 +55,8 @@
   text-transform: uppercase;
 }
 
-.selectFilter select {
+.selectFilter select,
+.textFilter input {
   min-width: 0;
   height: 32px;
   padding: 0 9px;

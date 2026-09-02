@@ -14,6 +14,11 @@ export type BookListingAvailability = 'public' | 'private';
 export type BookListingCondition = 'new' | 'very_good' | 'good' | 'acceptable';
 export type BookListingShippingPayer = 'owner' | 'requester' | 'split';
 export type BookListingSort = 'recent' | 'nearby' | 'price_asc' | 'price_desc';
+export type PublicationEditorialStatus =
+  | 'pending'
+  | 'needs_correction'
+  | 'approved'
+  | 'rejected';
 
 export interface BookListingDelivery {
   nearBookCorner: boolean;
@@ -41,6 +46,9 @@ export interface BookListing {
   notes: string | null;
   availability: BookListingAvailability;
   isDraft: boolean;
+  editorialStatus: PublicationEditorialStatus;
+  editorialReason: string | null;
+  consents: PublicationConsents;
   isSeeking: boolean;
   cornerId: string | null;
   delivery: BookListingDelivery;
@@ -57,6 +65,12 @@ export interface BookListing {
   expiresAt: Date | null;
   images: BookListingImage[];
   isInterested?: boolean;
+}
+
+export interface PublicationConsents {
+  content: boolean;
+  image: boolean;
+  rules: boolean;
 }
 
 export interface BookListingImage {
@@ -84,6 +98,11 @@ interface BookListingRow {
   trade_preferences: string[] | null;
   availability: BookListingAvailability;
   is_draft: boolean;
+  editorial_status: PublicationEditorialStatus;
+  editorial_reason: string | null;
+  content_consent: boolean;
+  image_consent: boolean;
+  rules_consent: boolean;
   delivery_near_book_corner: boolean;
   delivery_in_person: boolean;
   delivery_shipping: boolean;
@@ -150,6 +169,9 @@ export interface BookListingUpdateInput {
     shippingPayer?: BookListingShippingPayer | null;
   };
   cornerId?: string | null;
+  consents?: PublicationConsents;
+  editorialStatus?: PublicationEditorialStatus;
+  editorialReason?: string | null;
 }
 
 export interface PersistedBookListingUpdate {
@@ -172,6 +194,7 @@ export interface NewBookListing {
   tradePreferences: string[];
   availability: BookListingAvailability;
   isDraft: boolean;
+  consents?: PublicationConsents;
   cornerId: string | null;
   delivery: BookListingDelivery;
   images: BookListingImageInput[];
@@ -182,6 +205,7 @@ export interface NewWantBookListing {
   book: NewBook;
   notes?: string | null;
   availability?: BookListingAvailability;
+  consents?: PublicationConsents;
 }
 
 export type CreateWantBookListingResult =
@@ -205,6 +229,11 @@ const BOOK_LISTING_SELECT = `
     p.trade_preferences,
     p.availability,
     p.is_draft,
+    p.editorial_status,
+    p.editorial_reason,
+    p.content_consent,
+    p.image_consent,
+    p.rules_consent,
     p.delivery_near_book_corner,
     p.delivery_in_person,
     p.delivery_shipping,
@@ -259,6 +288,13 @@ function mapRow(row: BookListingRow): BookListing {
     notes: row.description,
     availability: row.availability,
     isDraft: row.is_draft,
+    editorialStatus: row.editorial_status,
+    editorialReason: row.editorial_reason,
+    consents: {
+      content: row.content_consent,
+      image: row.image_consent,
+      rules: row.rules_consent,
+    },
     isSeeking: row.type === 'want',
     cornerId: row.corner_id,
     delivery: {
@@ -394,7 +430,7 @@ export async function createBookListing(
     );
     const bookId = bookRes.rows[0].id;
 
-    // 2) Insert listing (books)
+    // 2) Insert listing
     const {
       userId,
       type,
@@ -411,6 +447,7 @@ export async function createBookListing(
       cornerId,
       delivery,
       images,
+      consents,
     } = listing;
 
     const pubRes = await client.query<{ id: number }>(
@@ -429,14 +466,18 @@ export async function createBookListing(
         trade_preferences,
         availability,
         is_draft,
+        content_consent,
+        image_consent,
+        rules_consent,
         delivery_near_book_corner,
         delivery_in_person,
         delivery_shipping,
         delivery_shipping_payer,
         corner_id
       ) VALUES (
-                 $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19
-               )
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,
+        $16, $17, $18, $19, $20, $21, $22
+      )
        RETURNING id`,
       [
         userId,
@@ -453,6 +494,9 @@ export async function createBookListing(
         tradePreferences,
         availability,
         isDraft,
+        consents?.content ?? true,
+        consents?.image ?? true,
+        consents?.rules ?? true,
         delivery.nearBookCorner,
         delivery.inPerson,
         delivery.shipping,
@@ -624,6 +668,22 @@ export async function updateBookListing(
         fields.push(`corner_id = $${index++}`);
         values.push(listing.cornerId);
       }
+      if (listing.consents !== undefined) {
+        fields.push(`content_consent = $${index++}`);
+        values.push(listing.consents.content);
+        fields.push(`image_consent = $${index++}`);
+        values.push(listing.consents.image);
+        fields.push(`rules_consent = $${index++}`);
+        values.push(listing.consents.rules);
+      }
+      if (listing.editorialStatus !== undefined) {
+        fields.push(`editorial_status = $${index++}`);
+        values.push(listing.editorialStatus);
+      }
+      if (listing.editorialReason !== undefined) {
+        fields.push(`editorial_reason = $${index++}`);
+        values.push(listing.editorialReason);
+      }
       if (fields.length > 0) {
         fields.push('updated_at = NOW()');
         values.push(id);
@@ -663,6 +723,24 @@ export async function updateBookListing(
       }
     }
 
+    return fetchBookListingByIdWithClient(client, id);
+  });
+}
+
+export async function updateBookListingEditorial(
+  id: number,
+  status: PublicationEditorialStatus,
+  reason: string | null
+): Promise<BookListing | null> {
+  return withTransaction(async (client) => {
+    const updated = await client.query<{ id: number }>(
+      `UPDATE book_listings
+       SET editorial_status = $1, editorial_reason = $2, updated_at = NOW()
+       WHERE id = $3
+       RETURNING id`,
+      [status, reason, id]
+    );
+    if (!updated.rows[0]) return null;
     return fetchBookListingByIdWithClient(client, id);
   });
 }
@@ -731,16 +809,27 @@ async function createWantBookListingWithClient(
       is_draft,
       delivery_near_book_corner,
       delivery_in_person,
-      delivery_shipping
+      delivery_shipping,
+      content_consent,
+      image_consent,
+      rules_consent
     ) VALUES (
       $1, $2, 'available', 'want', $3, NULL, false, false, false, ARRAY[]::TEXT[],
-      $4, false, false, false, false
+      $4, false, false, false, false, $5, $6, $7
     )
     ON CONFLICT (user_id, book_id)
       WHERE type = 'want' AND is_draft = false AND status = 'available'
     DO NOTHING
     RETURNING id`,
-    [input.userId, bookId, description, availability]
+    [
+      input.userId,
+      bookId,
+      description,
+      availability,
+      input.consents?.content ?? true,
+      input.consents?.image ?? true,
+      input.consents?.rules ?? true,
+    ]
   );
 
   if (inserted.rows[0]) {
@@ -866,6 +955,7 @@ function isPublicActiveListing(listing: BookListing): boolean {
     listing.availability === 'public' &&
     !listing.isDraft &&
     listing.status !== 'draft' &&
+    listing.editorialStatus === 'approved' &&
     !['completed', 'sold', 'exchanged', 'inactive'].includes(listing.status) &&
     (!listing.expiresAt || listing.expiresAt.getTime() > Date.now())
   );
@@ -894,6 +984,32 @@ export async function listUserBookListings(
   return fetchBookListings('WHERE p.user_id = $1', [userId]);
 }
 
+export async function hasExactActiveBookListing(input: {
+  userId: number;
+  type: BookListingType;
+  title: string;
+  author: string | null;
+  isbn: string | null;
+}): Promise<boolean> {
+  const result = await query<{ id: number }>(
+    `SELECT p.id
+     FROM book_listings p
+     JOIN books b ON b.id = p.book_id
+     WHERE p.user_id = $1
+       AND p.type = $2
+       AND p.status = 'available'
+       AND p.is_draft = false
+       AND p.editorial_status IN ('pending', 'needs_correction', 'approved')
+       AND (p.expires_at IS NULL OR p.expires_at > NOW())
+       AND lower(trim(b.title)) = lower(trim($3))
+       AND lower(trim(coalesce(b.author, ''))) = lower(trim(coalesce($4, '')))
+       AND coalesce(b.isbn, '') = coalesce($5, '')
+     LIMIT 1`,
+    [input.userId, input.type, input.title, input.author, input.isbn]
+  );
+  return result.rows.length > 0;
+}
+
 export async function listPublicBookListingsForUser(
   userId: number
 ): Promise<BookListing[]> {
@@ -902,6 +1018,7 @@ export async function listPublicBookListingsForUser(
        AND p.availability = 'public'
        AND p.is_draft = false
        AND p.status = 'available'
+       AND p.editorial_status = 'approved'
        AND (p.expires_at IS NULL OR p.expires_at > NOW())`,
     [userId],
     'ORDER BY p.created_at DESC'
@@ -916,6 +1033,7 @@ export async function renewBookListing(
     const result = await client.query<{ id: number }>(
       `UPDATE book_listings
        SET status = 'available', is_draft = false,
+           editorial_status = 'approved', editorial_reason = NULL,
            expires_at = NOW() + INTERVAL '30 days', updated_at = NOW()
        WHERE id = $1 AND user_id = $2
        RETURNING id`,
@@ -930,6 +1048,8 @@ export interface PublicBookListingFilters {
   text?: string;
   author?: string;
   isbn?: string;
+  topic?: string;
+  interest?: string;
   language?: string;
   condition?: BookListingCondition;
   status?: BookListingStatus;
@@ -943,6 +1063,8 @@ export interface PublicBookListingFilters {
   radiusKm?: number;
   limit?: number;
   offset?: number;
+  /** Internal projection filter used by the map; never exposed as a query parameter. */
+  cornerIds?: string[];
 }
 
 export async function listPublicBookListings(
@@ -954,6 +1076,7 @@ export async function listPublicBookListings(
     'p.is_draft = false',
     "p.status NOT IN ('completed', 'sold', 'exchanged', 'inactive')",
     '(p.expires_at IS NULL OR p.expires_at > NOW())',
+    "p.editorial_status = 'approved'",
   ];
   const params: unknown[] = [];
   const add = (condition: string, value: unknown) => {
@@ -961,13 +1084,28 @@ export async function listPublicBookListings(
     conditions.push(condition.replace('?', `$${params.length}`));
   };
   if (filters.text) {
-    params.push(filters.text, filters.text);
+    params.push(filters.text, filters.text, filters.text, filters.text);
     conditions.push(
-      `(b.title ILIKE '%' || $${params.length - 1} || '%' OR b.author ILIKE '%' || $${params.length} || '%')`
+      `(b.title ILIKE '%' || $${params.length - 3} || '%'
+        OR b.author ILIKE '%' || $${params.length - 2} || '%'
+        OR c.name ILIKE '%' || $${params.length - 1} || '%'
+        OR c.address_street ILIKE '%' || $${params.length} || '%')`
     );
   }
   if (filters.author) add("b.author ILIKE '%' || ? || '%'", filters.author);
   if (filters.isbn) add('b.isbn = ?', filters.isbn);
+  if (filters.topic) {
+    add(
+      "(b.title || ' ' || COALESCE(p.description, '')) ILIKE '%' || ? || '%'",
+      filters.topic
+    );
+  }
+  if (filters.interest) {
+    add(
+      'EXISTS (SELECT 1 FROM unnest(p.trade_preferences) AS preference WHERE preference ILIKE ?)',
+      filters.interest
+    );
+  }
   if (filters.language) add('b.language = ?', filters.language);
   if (filters.condition) add('p.condition = ?', filters.condition);
   if (filters.status) add('p.status = ?', filters.status);
@@ -975,6 +1113,10 @@ export async function listPublicBookListings(
   if (filters.trade !== undefined) add('p.trade = ?', filters.trade);
   if (filters.sale !== undefined) add('p.sale = ?', filters.sale);
   if (filters.donation !== undefined) add('p.donation = ?', filters.donation);
+  if (filters.cornerIds) {
+    if (filters.cornerIds.length === 0) return [];
+    add('p.corner_id = ANY(?::text[])', filters.cornerIds);
+  }
 
   let distanceExpression: string | null = null;
   if (
@@ -986,9 +1128,9 @@ export async function listPublicBookListings(
     const lon = params.length - 2;
     const lat = params.length - 1;
     const radius = params.length;
-    distanceExpression = `ST_Distance(u.location, ST_SetSRID(ST_MakePoint($${lon}, $${lat}), 4326)::geography)`;
+    distanceExpression = `ST_Distance(COALESCE(c.location, u.location), ST_SetSRID(ST_MakePoint($${lon}, $${lat}), 4326)::geography)`;
     conditions.push(
-      `u.location IS NOT NULL AND ST_DWithin(u.location, ST_SetSRID(ST_MakePoint($${lon}, $${lat}), 4326)::geography, $${radius})`
+      `COALESCE(c.location, u.location) IS NOT NULL AND ST_DWithin(COALESCE(c.location, u.location), ST_SetSRID(ST_MakePoint($${lon}, $${lat}), 4326)::geography, $${radius})`
     );
   }
   const limit = Math.min(Math.max(filters.limit ?? 50, 1), 100);
@@ -997,6 +1139,7 @@ export async function listPublicBookListings(
   const orderClause = getPublicListingOrder(filters.sort, distanceExpression);
   const listings = await fetchBookListings(
     `JOIN users u ON u.id = p.user_id
+     LEFT JOIN community_corners c ON c.id::text = p.corner_id
      WHERE ${conditions.join(' AND ')}`,
     params,
     `${orderClause} LIMIT $${params.length - 1} OFFSET $${params.length}`
@@ -1053,6 +1196,7 @@ export async function listHomeBookListings(
      WHERE p.availability = 'public'
        AND p.is_draft = false
        AND p.status NOT IN ('completed', 'sold', 'exchanged', 'inactive')
+       AND p.editorial_status = 'approved'
        AND (p.expires_at IS NULL OR p.expires_at > NOW())
        AND u.profile_visibility = 'public'
        AND ($1::integer IS NULL OR p.user_id <> $1)

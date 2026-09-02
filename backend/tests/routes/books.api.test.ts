@@ -550,6 +550,41 @@ describe('books API discovery interactions', () => {
     ]);
   });
 
+  test('combines topic and reading-interest filters with the catalog query', async () => {
+    const ownerId = await insertUser({ name: 'Topic owner' });
+    const targetBookId = await insertBook();
+    const otherBookId = await insertBook();
+    await client.query('UPDATE books SET title = $1 WHERE id = $2', [
+      'Historias de astronomía',
+      targetBookId,
+    ]);
+    await client.query('UPDATE books SET title = $1 WHERE id = $2', [
+      'Recetas familiares',
+      otherBookId,
+    ]);
+    const targetListingId = await insertListing({
+      userId: ownerId,
+      bookId: targetBookId,
+      notes: 'Ciencia y exploración del espacio.',
+      tradePreferences: ['ciencia-ficcion'],
+    });
+    await insertListing({
+      userId: ownerId,
+      bookId: otherBookId,
+      notes: 'Cocina y memoria familiar.',
+      tradePreferences: ['cocina'],
+    });
+
+    const response = await request(app)
+      .get('/api/books')
+      .query({ topic: 'astronomía', interest: 'ciencia-ficcion' })
+      .expect(200);
+
+    expect(response.body.map((listing: { id: string }) => listing.id)).toEqual([
+      String(targetListingId),
+    ]);
+  });
+
   test('rejects unsupported catalog filters', async () => {
     const res = await request(app)
       .get('/api/books')
@@ -630,8 +665,9 @@ describe('books API discovery interactions', () => {
       metadata: {
         title: 'Libro que quiero encontrar',
         author: 'Autora buscada',
-        isbn: '9780000000001',
+        isbn: '9780140328721',
       },
+      consents: { content: true, image: true, rules: true },
       notes: 'Preferentemente en español',
     };
 
@@ -690,6 +726,261 @@ describe('books API discovery interactions', () => {
       error: 'Forbidden',
       message: 'books.errors.want_own',
     });
+  });
+});
+
+describe('books API publication creation validation', () => {
+  const buildOfferPayload = (overrides: Record<string, unknown> = {}) => ({
+    type: 'offer',
+    metadata: {
+      title: 'Publicación manual',
+      author: 'Autora manual',
+      isbn: '0-306-40615-2',
+    },
+    images: [
+      {
+        id: 'cover-1',
+        url: 'data:image/png;base64,aGVsbG8=',
+        source: 'cover',
+      },
+    ],
+    offer: {
+      sale: false,
+      donation: true,
+      trade: false,
+      condition: 'good',
+      tradePreferences: [],
+      availability: 'public',
+      delivery: {
+        nearBookCorner: true,
+        inPerson: true,
+        shipping: false,
+      },
+    },
+    consents: { content: true, image: true, rules: true },
+    ...overrides,
+  });
+
+  test('normalizes ISBN-10 and persists publication consents', async () => {
+    const userId = await insertUser({ name: 'Publication owner' });
+
+    const response = await request(app)
+      .post('/api/books')
+      .set('Cookie', buildAuthCookie(userId))
+      .send(buildOfferPayload())
+      .expect(201);
+
+    const saved = await client.query(
+      `SELECT b.isbn, p.content_consent, p.image_consent, p.rules_consent
+       FROM book_listings p
+       JOIN books b ON b.id = p.book_id
+       WHERE p.id = $1`,
+      [Number(response.body.id)]
+    );
+    expect(saved.rows[0]).toEqual({
+      isbn: '0306406152',
+      content_consent: true,
+      image_consent: true,
+      rules_consent: true,
+    });
+  });
+
+  test('rejects invalid ISBN and image without persisting a listing', async () => {
+    const userId = await insertUser({ name: 'Validation owner' });
+    const before = await client.query(
+      'SELECT COUNT(*)::int AS count FROM book_listings WHERE user_id = $1',
+      [userId]
+    );
+
+    const invalidIsbn = await request(app)
+      .post('/api/books')
+      .set('Cookie', buildAuthCookie(userId))
+      .send(
+        buildOfferPayload({
+          metadata: {
+            title: 'ISBN inválido',
+            author: 'Autora',
+            isbn: '9780000000001',
+          },
+        })
+      )
+      .expect(400);
+    expect(invalidIsbn.body).toEqual({
+      error: 'InvalidFields',
+      message: 'books.errors.invalid_isbn',
+    });
+
+    const invalidImage = await request(app)
+      .post('/api/books')
+      .set('Cookie', buildAuthCookie(userId))
+      .send(
+        buildOfferPayload({
+          images: [
+            { id: 'cover-1', url: 'javascript:alert(1)', source: 'cover' },
+          ],
+        })
+      )
+      .expect(400);
+    expect(invalidImage.body).toEqual({
+      error: 'InvalidFields',
+      message: 'books.errors.invalid_image',
+    });
+
+    const after = await client.query(
+      'SELECT COUNT(*)::int AS count FROM book_listings WHERE user_id = $1',
+      [userId]
+    );
+    expect(after.rows[0].count).toBe(before.rows[0].count);
+  });
+
+  test('requires publication consents before publishing', async () => {
+    const userId = await insertUser({ name: 'Consent owner' });
+    const response = await request(app)
+      .post('/api/books')
+      .set('Cookie', buildAuthCookie(userId))
+      .send(
+        buildOfferPayload({
+          consents: { content: true, image: false, rules: true },
+        })
+      )
+      .expect(400);
+
+    expect(response.body).toEqual({
+      error: 'MissingConsent',
+      message: 'books.errors.consent_required',
+    });
+  });
+
+  test('rejects unsafe editorial content before persisting a publication', async () => {
+    const userId = await insertUser({ name: 'Editorial validation owner' });
+    const response = await request(app)
+      .post('/api/books')
+      .set('Cookie', buildAuthCookie(userId))
+      .send(
+        buildOfferPayload({
+          offer: {
+            ...buildOfferPayload().offer,
+            notes: '<script>alert(1)</script>',
+          },
+        })
+      )
+      .expect(422);
+
+    expect(response.body).toEqual({
+      error: 'EditorialRejected',
+      message: 'books.errors.content_not_allowed',
+    });
+
+    const listings = await client.query(
+      'SELECT COUNT(*)::int AS count FROM book_listings WHERE user_id = $1',
+      [userId]
+    );
+    expect(listings.rows[0].count).toBe(0);
+  });
+
+  test('rejects an identical active offer from the same reader', async () => {
+    const userId = await insertUser({ name: 'Duplicate offer owner' });
+    const payload = buildOfferPayload();
+
+    await request(app)
+      .post('/api/books')
+      .set('Cookie', buildAuthCookie(userId))
+      .send(payload)
+      .expect(201);
+
+    const duplicate = await request(app)
+      .post('/api/books')
+      .set('Cookie', buildAuthCookie(userId))
+      .send(payload)
+      .expect(409);
+
+    expect(duplicate.body).toEqual({
+      error: 'DuplicatePublication',
+      message: 'books.errors.duplicate',
+    });
+  });
+
+  test('keeps non-approved publications private and supports the admin correction flow', async () => {
+    const ownerId = await insertUser({ name: 'Publication owner' });
+    const adminId = await insertUser({ name: 'Editorial admin' });
+    const created = await request(app)
+      .post('/api/books')
+      .set('Cookie', buildAuthCookie(ownerId))
+      .send(buildOfferPayload())
+      .expect(201);
+    const listingId = Number(created.body.id);
+
+    const forbidden = await request(app)
+      .patch(`/api/books/${listingId}/editorial`)
+      .set('Cookie', buildAuthCookie(ownerId))
+      .send({
+        status: 'needs_correction',
+        reason: 'Falta completar la edición.',
+      })
+      .expect(403);
+    expect(forbidden.body).toEqual({
+      error: 'Forbidden',
+      message: 'books.errors.editorial_admin_required',
+    });
+
+    await client.query("UPDATE users SET role = 'admin' WHERE id = $1", [
+      adminId,
+    ]);
+
+    const needsCorrection = await request(app)
+      .patch(`/api/books/${listingId}/editorial`)
+      .set('Cookie', buildAuthCookie(adminId))
+      .send({
+        status: 'needs_correction',
+        reason: 'Falta completar la edición.',
+      })
+      .expect(200);
+    expect(needsCorrection.body).toMatchObject({
+      id: String(listingId),
+      editorialStatus: 'needs_correction',
+      editorialReason: 'Falta completar la edición.',
+    });
+
+    await request(app)
+      .get('/api/books')
+      .expect(200)
+      .then((response) => {
+        expect(response.body).not.toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({ id: String(listingId) }),
+          ])
+        );
+      });
+    await request(app).get(`/api/books/${listingId}`).expect(404);
+
+    const corrected = await request(app)
+      .put(`/api/books/${listingId}`)
+      .set('Cookie', buildAuthCookie(ownerId))
+      .send({ notes: 'Edición completada.' })
+      .expect(200);
+    expect(corrected.body).toMatchObject({
+      editorialStatus: 'pending',
+      editorialReason: null,
+    });
+
+    await request(app)
+      .patch(`/api/books/${listingId}/editorial`)
+      .set('Cookie', buildAuthCookie(adminId))
+      .send({ status: 'rejected' })
+      .expect(422);
+
+    await request(app)
+      .patch(`/api/books/${listingId}/editorial`)
+      .set('Cookie', buildAuthCookie(adminId))
+      .send({ status: 'approved' })
+      .expect(200);
+
+    const publicListings = await request(app).get('/api/books').expect(200);
+    expect(publicListings.body).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: String(listingId) }),
+      ])
+    );
   });
 });
 

@@ -3192,6 +3192,92 @@
         }
       }
     },
+    "/api/community/corners/{id}": {
+      "get": {
+        "summary": "Retrieve a public community corner detail",
+        "tags": ["Community"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Public corner detail with approximate location",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommunityCornerDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Corner not found or not publicly available"
+          },
+          "500": {
+            "description": "Unable to load the corner detail"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Edit a community corner owned by the current user",
+        "tags": ["Community"],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCornerPayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Corner updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommunityCornerDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication is required"
+          },
+          "404": {
+            "description": "Corner not found or not owned by the current user"
+          },
+          "422": {
+            "description": "Validation errors"
+          }
+        }
+      }
+    },
     "/api/community/corners": {
       "post": {
         "summary": "Publish a new community corner",
@@ -4022,6 +4108,129 @@
           }
         },
         "required": ["pins"]
+      },
+      "CommunityCornerDetail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "scope": {
+            "type": "string",
+            "enum": ["public", "semiprivate"]
+          },
+          "hostAlias": {
+            "type": "string"
+          },
+          "isOwner": {
+            "type": "boolean"
+          },
+          "rules": {
+            "type": ["string", "null"]
+          },
+          "schedule": {
+            "type": ["string", "null"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "paused"]
+          },
+          "visibilityPreference": {
+            "type": "string",
+            "enum": ["exact", "approximate"]
+          },
+          "imageUrl": {
+            "type": ["string", "null"]
+          },
+          "location": {
+            "type": "object",
+            "properties": {
+              "city": {
+                "type": "string"
+              },
+              "neighborhood": {
+                "type": "string"
+              },
+              "referencePointLabel": {
+                "type": "string"
+              },
+              "latitude": {
+                "type": "number"
+              },
+              "longitude": {
+                "type": "number"
+              },
+              "approximate": {
+                "type": "boolean",
+                "const": true
+              }
+            },
+            "required": [
+              "city",
+              "neighborhood",
+              "referencePointLabel",
+              "latitude",
+              "longitude",
+              "approximate"
+            ]
+          },
+          "activity": {
+            "type": "object",
+            "properties": {
+              "totalExchanges": {
+                "type": "integer"
+              },
+              "weeklyExchanges": {
+                "type": "integer"
+              },
+              "lastActivityAt": {
+                "type": ["string", "null"],
+                "format": "date-time"
+              }
+            },
+            "required": ["totalExchanges", "weeklyExchanges", "lastActivityAt"]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "scope",
+          "hostAlias",
+          "isOwner",
+          "rules",
+          "schedule",
+          "status",
+          "visibilityPreference",
+          "imageUrl",
+          "location",
+          "activity"
+        ]
+      },
+      "UpdateCornerPayload": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "rules": {
+            "type": ["string", "null"]
+          },
+          "schedule": {
+            "type": ["string", "null"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "paused"]
+          },
+          "visibilityPreference": {
+            "type": "string",
+            "enum": ["exact", "approximate"]
+          }
+        },
+        "additionalProperties": false
       },
       "PublishCornerAddress": {
         "type": "object",

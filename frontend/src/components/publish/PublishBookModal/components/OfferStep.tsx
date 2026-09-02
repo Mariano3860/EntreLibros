@@ -14,9 +14,11 @@ type OfferStepErrors = Partial<Record<'modes' | 'condition' | 'price', string>>
 type OfferStepProps = {
   t: TFunction
   offer: PublishBookOffer
+  cornerId: string
   errors: OfferStepErrors
   genres: readonly PublishBookOffer['tradePreferences'][number][]
   onOfferChange: (update: Partial<PublishBookOffer>) => void
+  onCornerIdChange: (cornerId: string) => void
   onDeliveryChange: (update: Partial<PublishBookOffer['delivery']>) => void
   onToggleTradePreference: (
     genre: PublishBookOffer['tradePreferences'][number]
@@ -28,9 +30,11 @@ export const OfferStep: React.FC<OfferStepProps> = React.memo(
   ({
     t,
     offer,
+    cornerId,
     errors,
     genres,
     onOfferChange,
+    onCornerIdChange,
     onDeliveryChange,
     onToggleTradePreference,
     onBlur,
@@ -232,6 +236,15 @@ export const OfferStep: React.FC<OfferStepProps> = React.memo(
             ))}
           </div>
         </div>
+
+        <PublishTextField
+          id="publish-corner-id"
+          label={t('publishBook.offer.meetingCorner.label')}
+          value={cornerId}
+          onChange={(event) => onCornerIdChange(event.target.value)}
+          onBlur={onBlur}
+          containerClassName={styles.formGroup}
+        />
 
         <div className={styles.formGroup}>
           <label>{t('publishBook.offer.delivery.label')}</label>

@@ -2,6 +2,8 @@
 
 La prioridad actual es cerrar el recorrido local de publicación, descubrimiento y encuentro con datos persistentes. Las interacciones sociales básicas —historias relevantes, seguimiento, likes, comentarios y compartir— ya forman parte de Comunidad.
 
+El estado verificable y la evidencia de cada compromiso se mantiene en [`tfg-mvp-trazabilidad.md`](tfg-mvp-trazabilidad.md).
+
 ## Próximo cierre del MVP
 
 1. Completar validación, estados y privacidad de Rincones y publicaciones.

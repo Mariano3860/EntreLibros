@@ -59,6 +59,7 @@ export async function isVisibleCommunityPost(
              AND listing.availability = 'public'
              AND listing.is_draft = false
              AND listing.status = 'available'
+             AND listing.editorial_status = 'approved'
              AND (listing.expires_at IS NULL OR listing.expires_at > NOW())
              AND owner.role = 'user'
              AND owner.profile_visibility = 'public'
