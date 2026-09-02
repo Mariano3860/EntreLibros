@@ -72,4 +72,4 @@ Implementacion de 9.1-9.3 completada: rama creada desde `main` actualizado, like
 - [x] 9.2 Añadir migraciones y contratos para likes únicos, comentarios ordenados y permisos de feed, incluyendo bloqueos/visibilidad; verificar con pruebas de API alternancia idempotente, comentario válido/inválido y prohibición de acceso.
 - [x] 9.3 Implementar me gusta, comentarios, compartir con fallback y CTA separada para crear historia; verificar con tests de feed que el estado persiste, compartir confirma la acción y la tira excluye al usuario actual.
 - [x] 9.4 Revisar visualmente `/community` a 1440×900 y narrow viewport contra el cuadrante inferior izquierdo de `img.png`; verificar acciones accesibles, contador, hilo de comentarios, tira sin usuario propio y estados vacío/error.
-- [ ] 9.5 Ejecutar suites afectadas, typecheck, lint, Stylelint, build y `git diff --check`; crear commits claros y una PR en español contra `main` sin merge.
+- [x] 9.5 Ejecutar suites afectadas, typecheck, lint, Stylelint, build y `git diff --check`; crear commits claros y una PR en español contra `main` sin merge.
