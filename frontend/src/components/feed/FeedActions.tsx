@@ -167,34 +167,13 @@ export const FeedActions = ({
     post && !mockMode ? (commentsQuery.data ?? []) : localComments
 
   return (
-    <div className={styles.actions}>
-      <div className={styles.buttons}>
-        <button
-          {...(enhanced ? { type: 'button' } : {})}
-          aria-label={t('community.feed.actions.like')}
-          onClick={handleLikeClick}
-          className={liked ? styles.liked : undefined}
-          {...(enhanced ? { 'aria-pressed': liked } : {})}
-          {...(enhanced && likeMutation.isPending ? { disabled: true } : {})}
-        >
-          <HeartIcon />
-        </button>
-        <button
-          {...(enhanced ? { type: 'button' } : {})}
-          aria-label={t('community.feed.actions.comment')}
-          onClick={() => setCommentsOpen((open) => !open)}
-          {...(enhanced ? { 'aria-expanded': commentsOpen } : {})}
-        >
-          <CommentIcon />
-        </button>
-        <button
-          {...(enhanced ? { type: 'button' } : {})}
-          aria-label={t('community.feed.actions.share')}
-          onClick={() => void handleShare()}
-        >
-          <ShareIcon />
-        </button>
-      </div>
+    <div
+      className={
+        enhanced
+          ? `${styles.actions} ${styles.communityActions}`
+          : styles.actions
+      }
+    >
       {enhanced ? (
         <div className={styles.stats}>
           <span className={styles.likes}>
@@ -206,11 +185,42 @@ export const FeedActions = ({
             </span>
           ) : null}
         </div>
-      ) : (
+      ) : null}
+      <div className={styles.buttons}>
+        <button
+          {...(enhanced ? { type: 'button' } : {})}
+          aria-label={t('community.feed.actions.like')}
+          onClick={handleLikeClick}
+          className={liked ? styles.liked : undefined}
+          {...(enhanced ? { 'aria-pressed': liked } : {})}
+          {...(enhanced && likeMutation.isPending ? { disabled: true } : {})}
+        >
+          <HeartIcon />
+          {enhanced ? <span>{t('community.feed.actions.like')}</span> : null}
+        </button>
+        <button
+          {...(enhanced ? { type: 'button' } : {})}
+          aria-label={t('community.feed.actions.comment')}
+          onClick={() => setCommentsOpen((open) => !open)}
+          {...(enhanced ? { 'aria-expanded': commentsOpen } : {})}
+        >
+          <CommentIcon />
+          {enhanced ? <span>{t('community.feed.actions.comment')}</span> : null}
+        </button>
+        <button
+          {...(enhanced ? { type: 'button' } : {})}
+          aria-label={t('community.feed.actions.share')}
+          onClick={() => void handleShare()}
+        >
+          <ShareIcon />
+          {enhanced ? <span>{t('community.feed.actions.share')}</span> : null}
+        </button>
+      </div>
+      {!enhanced ? (
         <span className={styles.likes}>
           {likes} {t('community.feed.actions.likes')}
         </span>
-      )}
+      ) : null}
       {shareStatus ? (
         <p className={styles.status} role="status">
           {shareStatus.kind === 'shared' ? (

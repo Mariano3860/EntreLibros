@@ -6,6 +6,11 @@
   padding: $spacing-1 $spacing-2;
 }
 
+.communityActions {
+  padding: 0;
+  margin-top: 5px;
+}
+
 .buttons {
   display: flex;
   align-items: center;
@@ -27,8 +32,37 @@
   height: rem(24px);
 }
 
-.liked {
-  color: var(--color-error);
+.communityActions .buttons {
+  gap: 0;
+  border-top: 1px solid var(--prototype-border);
+}
+
+.communityActions .buttons button {
+  min-height: 34px;
+  flex: 1;
+  justify-content: center;
+  gap: 5px;
+  color: var(--prototype-muted);
+  font-size: 10px;
+}
+
+.communityActions .buttons button:hover:not(:disabled) {
+  background: var(--prototype-subtle-hover);
+  color: var(--prototype-text);
+}
+
+.communityActions .buttons button svg {
+  width: rem(18px);
+  height: rem(18px);
+}
+
+.communityActions .buttons button.liked {
+  color: var(--prototype-danger);
+}
+
+.communityActions .buttons button.liked svg {
+  fill: currentcolor;
+  stroke: currentcolor;
 }
 
 .likes {
@@ -38,10 +72,11 @@
 
 .stats {
   display: flex;
-  gap: $spacing-2;
-  margin-top: $spacing-1;
-  color: var(--text-secondary);
-  font-size: 0.8rem;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 2px;
+  color: var(--prototype-muted);
+  font-size: 9px;
 }
 
 .stats .likes {
