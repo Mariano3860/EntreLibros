@@ -1,25 +1,37 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
-import type { MapPin } from '@src/api/map/map.types'
+import type { MapCornerPin, MapPin } from '@src/api/map/map.types'
 
 const mapCanvasRender = vi.hoisted(() => vi.fn())
 
 vi.mock('@components/map/MapCanvas/MapCanvas', () => ({
   MapCanvas: ({
+    corners,
     selectedPin,
     userLocation,
     focusRequest,
     radiusKm,
+    onSelectPin,
   }: {
+    corners: MapCornerPin[]
     selectedPin: MapPin | null
     userLocation?: { latitude: number; longitude: number } | null
     focusRequest: number
     radiusKm?: number | null
+    onSelectPin: (pin: MapPin) => void
   }) => {
     mapCanvasRender({ selectedPin, userLocation, focusRequest, radiusKm })
     return (
       <div data-testid="map-canvas">
+        {corners.map((corner) => (
+          <button
+            key={corner.id}
+            type="button"
+            aria-label={`Pin del mapa: ${corner.name}`}
+            onClick={() => onSelectPin({ type: 'corner', data: corner })}
+          />
+        ))}
         {userLocation ? (
           <button type="button" aria-label={'Tu ubicaci\u00f3n aproximada'} />
         ) : null}
@@ -80,17 +92,21 @@ describe('MapPage', () => {
       screen.getByRole('button', { name: 'Biblioteca de Palermo' })
     )
     expect(
-      screen.getByRole('heading', { name: 'Biblioteca de Palermo' })
-    ).toBeVisible()
+      screen.getAllByRole('heading', { name: 'Biblioteca de Palermo' })
+    ).toHaveLength(2)
   })
 
-  test('shows the selected corner details in the right panel', () => {
+  test('opens the selected corner details from the side list', () => {
     renderWithProviders(<MapPage />)
 
     fireEvent.click(
       screen.getByRole('button', { name: 'Biblioteca de Palermo' })
     )
-    fireEvent.click(screen.getByRole('button', { name: /Ver rinc/ }))
+
+    expect(screen.getByRole('article').querySelector('img')).toHaveAttribute(
+      'src',
+      '/prototype/reading-room.svg'
+    )
 
     const panel = screen.getAllByRole('complementary')[1]
     expect(panel).toBeDefined()
@@ -101,6 +117,21 @@ describe('MapPage', () => {
     expect(
       within(panel).queryByTestId('corner-edit-button')
     ).not.toBeInTheDocument()
+  })
+
+  test('opens the selected corner details from a map pin', () => {
+    renderWithProviders(<MapPage />)
+
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'Pin del mapa: Biblioteca de Palermo',
+      })
+    )
+
+    const panel = screen.getAllByRole('complementary')[1]
+    expect(
+      within(panel).getByRole('heading', { name: 'Biblioteca de Palermo' })
+    ).toBeVisible()
   })
 
   test('centers the selected corner from the detail card action', () => {

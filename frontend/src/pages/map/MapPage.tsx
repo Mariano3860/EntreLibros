@@ -134,7 +134,7 @@ export const MapPage = () => {
           lastSignalAt: new Date(
             Date.parse(MOCK_MAP_REFERENCE_DATE) - (index + 1) * 12 * 60_000
           ).toISOString(),
-          photos: [],
+          photos: ['/prototype/reading-room.svg'],
           themes: [corner.category],
           isOpenNow: true,
           status: 'active',
@@ -289,8 +289,8 @@ export const MapPage = () => {
 
   const handleSelectPin = useCallback(
     (pin: MapPin) => {
-      setCornerDetailsOpen(false)
       setSelectedPin(pin)
+      setCornerDetailsOpen(pin.type === 'corner')
       if (pin.type === 'corner') {
         setSelectedCorner(displayCornerForPin(pin.data))
         setFocusRequest((current) => current + 1)
@@ -445,7 +445,7 @@ export const MapPage = () => {
       schedule: null,
       status: selectedMapCorner.status,
       visibilityPreference: 'approximate',
-      imageUrl: selectedMapCorner.photos[0] ?? null,
+      imageUrl: selectedMapCorner.photos?.[0] ?? null,
       isOwner: false,
       location: {
         city: selectedMapCorner.city,
@@ -466,13 +466,16 @@ export const MapPage = () => {
   const cornerDetailQuery = useQuery({
     queryKey: cornerKeys.detail(selectedMapCorner?.id ?? ''),
     queryFn: () => fetchCornerDetail(selectedMapCorner?.id ?? ''),
-    enabled:
-      cornerDetailsOpen && !mockMode && Boolean(selectedMapCorner?.id),
+    enabled: cornerDetailsOpen && !mockMode && Boolean(selectedMapCorner?.id),
     retry: false,
   })
   const selectedCornerDetail = mockMode
     ? mockCornerDetail
     : (cornerDetailQuery.data ?? null)
+  const selectedPlaceImage =
+    selectedPublication?.photo ||
+    selectedMapCorner?.photos?.[0] ||
+    selectedCornerDetail?.imageUrl
   const cornerUpdateMutation = useMutation({
     mutationFn: (input: { id: string; payload: UpdateCornerPayload }) =>
       updateCorner(input.id, input.payload),
@@ -612,7 +615,7 @@ export const MapPage = () => {
                 <button
                   key={corner.id}
                   aria-label={corner.name}
-                  onClick={() => selectCorner(corner)}
+                  onClick={() => selectCorner(corner, true)}
                 >
                   <span>⌖</span>
                   <span>
@@ -651,9 +654,9 @@ export const MapPage = () => {
             <Panel className={styles.placeCard} as="article">
               <div className={styles.placeImage}>
                 <span>☕</span>
-                {selectedPublication?.photo ? (
+                {selectedPlaceImage ? (
                   <img
-                    src={selectedPublication.photo}
+                    src={selectedPlaceImage}
                     alt=""
                     className={styles.placeImageCover}
                     onError={(event) => {

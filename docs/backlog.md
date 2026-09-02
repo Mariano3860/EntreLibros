@@ -6,6 +6,7 @@ Este backlog reúne únicamente trabajo vigente. El código, las migraciones, lo
 
 ## Implementado en código
 
+- Selección de Rincones desde el pin del mapa o el listado lateral con apertura del panel de detalle en la misma vista.
 - Registro, inicio/cierre de sesión, perfiles editables, intereses, idioma y privacidad básica.
 - Catálogo público, libros propios, publicación/edición, modalidades, condición, ISBN opcional, intereses y vencimiento.
 - Rincones con alta, edición del propietario, foto, normas, consentimiento, zona, visibilidad barrio/ciudad y pausa/reactivación.

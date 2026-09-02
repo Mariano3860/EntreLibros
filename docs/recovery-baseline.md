@@ -35,6 +35,7 @@ Esta guía reúne el procedimiento actual para comprobar que EntreLibros arranca
 
 - Crea o usa un Rincon aprobado con una cuenta propietaria y abre `/map` con `PUBLIC_API_USE_MOCKS=false`.
 - Selecciona el Rincon y pulsa `Ver rincon`. Debe aparecer el panel a la derecha del mapa con foto, nombre, anfitrion, zona aproximada, horario, normas, actividad y estado.
+- También puedes abrir ese panel haciendo clic en el pin del Rincon en el mapa o en su entrada del listado lateral.
 - Como propietario, comprueba `Editar rincon`, cambia nombre, normas, horario o visibilidad, guarda y recarga. Los cambios deben persistir.
 - Desde el mismo panel pausa y reactiva el Rincon. El estado debe cambiar y la accion debe conservarse despues de recargar.
 - Como otra cuenta o invitado, comprueba que el detalle sigue siendo visible pero no aparecen los controles de propietario.
