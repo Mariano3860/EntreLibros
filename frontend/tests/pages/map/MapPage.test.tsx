@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
 import type { MapPin } from '@src/api/map/map.types'
@@ -82,6 +82,25 @@ describe('MapPage', () => {
     expect(
       screen.getByRole('heading', { name: 'Biblioteca de Palermo' })
     ).toBeVisible()
+  })
+
+  test('shows the selected corner details in the right panel', () => {
+    renderWithProviders(<MapPage />)
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Biblioteca de Palermo' })
+    )
+    fireEvent.click(screen.getByRole('button', { name: /Ver rinc/ }))
+
+    const panel = screen.getAllByRole('complementary')[1]
+    expect(panel).toBeDefined()
+    expect(
+      within(panel).getByRole('heading', { name: 'Biblioteca de Palermo' })
+    ).toBeVisible()
+    expect(panel.textContent).toContain('Buenos Aires')
+    expect(
+      within(panel).queryByTestId('corner-edit-button')
+    ).not.toBeInTheDocument()
   })
 
   test('centers the selected corner from the detail card action', () => {

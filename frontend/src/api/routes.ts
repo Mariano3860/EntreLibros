@@ -42,6 +42,8 @@ export const RELATIVE_API_ROUTES = {
       NEARBY: `/community/corners/nearby`,
       MAP: `/community/corners/map`,
       CREATE: `/community/corners`,
+      DETAIL: (cornerId: string) => `/community/corners/${cornerId}`,
+      UPDATE: (cornerId: string) => `/community/corners/${cornerId}`,
     },
   },
   MESSAGES: {

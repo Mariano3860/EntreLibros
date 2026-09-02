@@ -1,0 +1,17 @@
+@import '@styles/variables';
+
+.modal {
+  width: min(620px, 100%);
+}
+
+.form {
+  display: grid;
+  gap: 18px;
+}
+
+.notice {
+  margin: 0;
+  color: var(--prototype-muted);
+  font-size: 10px;
+  line-height: 1.5;
+}

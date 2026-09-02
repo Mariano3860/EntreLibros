@@ -102,9 +102,11 @@ export interface CommunityCornerPublicDetailDto {
   name: string;
   scope: PublishCornerScope;
   hostAlias: string;
+  isOwner: boolean;
   rules: string | null;
   schedule: string | null;
   status: PublishCornerStatus;
+  visibilityPreference: PublishCornerVisibilityPreference;
   imageUrl: string | null;
   location: {
     city: string;
@@ -425,14 +427,16 @@ export const getCornersMap = async (): Promise<CommunityCornerMapDto> => {
 };
 
 export const getPublicCornerDetail = async (
-  id: string
+  id: string,
+  viewerId?: number
 ): Promise<CommunityCornerPublicDetailDto | null> => {
   const corner = await findCornerById(id);
+  const isOwner = viewerId !== undefined && corner?.ownerId === viewerId;
   if (
     !corner ||
     corner.draft ||
     !corner.consent ||
-    corner.editorialStatus !== 'approved'
+    (!isOwner && corner.editorialStatus !== 'approved')
   ) {
     return null;
   }
@@ -445,9 +449,11 @@ export const getPublicCornerDetail = async (
     name: corner.name,
     scope: corner.scope,
     hostAlias: corner.hostAlias,
+    isOwner,
     rules: corner.rules,
     schedule: corner.schedule,
     status: corner.status,
+    visibilityPreference: corner.visibilityPreference,
     imageUrl: corner.photo?.url ?? null,
     location: {
       city: 'Ciudad Autónoma de Buenos Aires',

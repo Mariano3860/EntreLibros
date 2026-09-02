@@ -157,36 +157,40 @@ router.get('/corners/map', async (_req, res) => {
   }
 });
 
-router.get('/corners/:id', async (req, res) => {
-  const id = req.params.id;
-  if (
-    !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
-      id
-    )
-  ) {
-    return res.status(404).json({
-      error: 'NotFound',
-      message: 'community.corners.errors.not_found',
-    });
-  }
-
-  try {
-    const corner = await getPublicCornerDetail(id);
-    if (!corner) {
+router.get(
+  '/corners/:id',
+  authenticateOptional,
+  async (req: AuthenticatedRequest, res) => {
+    const id = req.params.id;
+    if (
+      !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+        id
+      )
+    ) {
       return res.status(404).json({
         error: 'NotFound',
         message: 'community.corners.errors.not_found',
       });
     }
-    return res.json(corner);
-  } catch (error) {
-    console.error('Failed to load public corner detail', error);
-    return res.status(500).json({
-      error: 'CornerQueryFailed',
-      message: 'community.corners.errors.query_failed',
-    });
+
+    try {
+      const corner = await getPublicCornerDetail(id, req.user?.id);
+      if (!corner) {
+        return res.status(404).json({
+          error: 'NotFound',
+          message: 'community.corners.errors.not_found',
+        });
+      }
+      return res.json(corner);
+    } catch (error) {
+      console.error('Failed to load public corner detail', error);
+      return res.status(500).json({
+        error: 'CornerQueryFailed',
+        message: 'community.corners.errors.query_failed',
+      });
+    }
   }
-});
+);
 
 router.post(
   '/corners',
@@ -284,7 +288,13 @@ router.patch(
           error: 'NotFound',
           message: 'community.corners.errors.not_found',
         });
-      return res.json(updated);
+      const detail = await getPublicCornerDetail(req.params.id, req.user.id);
+      if (!detail)
+        return res.status(404).json({
+          error: 'NotFound',
+          message: 'community.corners.errors.not_found',
+        });
+      return res.json(detail);
     } catch (error) {
       if (error instanceof CornerValidationError)
         return res.status(422).json({ errors: error.errors });

@@ -933,6 +933,34 @@
       "openPublication": "View publication",
       "openCorner": "View corner"
     },
+    "cornerDetail": {
+      "title": "Corner details",
+      "loading": "Loading corner details...",
+      "error": "We couldn't load this corner.",
+      "retry": "Try again",
+      "status": {
+        "active": "Active",
+        "paused": "Paused"
+      },
+      "location": "Area",
+      "schedule": "Hours",
+      "rules": "House rules",
+      "activity": "Activity",
+      "weekly": "exchanges this week",
+      "total": "exchanges recorded",
+      "notProvided": "No information provided",
+      "owner": "Manage your corner",
+      "edit": "Edit corner",
+      "pause": "Pause corner",
+      "reactivate": "Reactivate corner",
+      "editTitle": "Edit corner",
+      "cancel": "Cancel",
+      "saving": "Saving...",
+      "save": "Save changes",
+      "nameRequired": "Enter a name for the corner.",
+      "updateError": "We couldn't save the changes.",
+      "privacyNote": "The public location stays approximate to protect the address."
+    },
     "empty": {
       "title": "No activity in this area yet",
       "description": "Try adjusting the filters or explore nearby neighborhoods to discover active book corners.",

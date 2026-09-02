@@ -198,8 +198,19 @@ describe('community corners API', () => {
       .send({ rules: 'Normas actualizadas.' })
       .expect(200);
     expect(corrected.body).toMatchObject({
-      editorialStatus: 'pending',
-      editorialReason: null,
+      id: cornerId,
+      rules: 'Normas actualizadas.',
+      isOwner: true,
+    });
+    expect(corrected.body).not.toHaveProperty('internalContact');
+    expect(corrected.body).not.toHaveProperty('address');
+    const correctedState = await client.query(
+      'SELECT editorial_status, editorial_reason FROM community_corners WHERE id = $1',
+      [cornerId]
+    );
+    expect(correctedState.rows[0]).toEqual({
+      editorial_status: 'pending',
+      editorial_reason: null,
     });
 
     await request(app)
@@ -455,6 +466,7 @@ describe('community corners API', () => {
     expect(response.body).toMatchObject({
       id: created.id,
       name: created.name,
+      isOwner: false,
       location: {
         city: 'Ciudad Autónoma de Buenos Aires',
         neighborhood: '1000',
@@ -491,5 +503,27 @@ describe('community corners API', () => {
     expect(approximateResponse.body.location.longitude).not.toBe(
       approximateCorner.coordinates.longitude
     );
+  });
+
+  test('marks the detail as owned only for the authenticated owner', async () => {
+    const ownerId = await insertUser();
+    const otherUserId = await insertUser();
+    const created = await createCorner({
+      ...BASE_CORNER_INPUT,
+      id: 'dddddddd-eeee-4fff-8aaa-bbbbbbbbbbbb',
+      ownerId,
+    });
+
+    const ownerResponse = await request(app)
+      .get(`/api/community/corners/${created.id}`)
+      .set('Cookie', buildAuthCookie(ownerId))
+      .expect(200);
+    expect(ownerResponse.body.isOwner).toBe(true);
+
+    const otherResponse = await request(app)
+      .get(`/api/community/corners/${created.id}`)
+      .set('Cookie', buildAuthCookie(otherUserId))
+      .expect(200);
+    expect(otherResponse.body.isOwner).toBe(false);
   });
 });

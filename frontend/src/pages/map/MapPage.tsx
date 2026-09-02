@@ -1,19 +1,32 @@
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
+import { CornerDetailsPanel } from '@components/map/CornerDetailsPanel/CornerDetailsPanel'
+import { CornerEditModal } from '@components/map/CornerEditModal/CornerEditModal'
 import { RadiusSelector } from '@components/map/FilterRail/FilterRail'
 import { MapCanvas } from '@components/map/MapCanvas/MapCanvas'
 import { PublishCornerModal } from '@components/publish/PublishCornerModal'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
-import { MAP_RADIUS_OPTIONS } from '@src/api/map/map.types'
+import {
+  cornerKeys,
+  fetchCornerDetail,
+  updateCorner,
+} from '@src/api/community/corners.service'
 import type {
-  MapBoundingBox,
-  MapCornerPin,
-  MapPin,
-  MapResponse,
-  MapRadiusKm,
+  CommunityCornerDetail,
+  UpdateCornerPayload,
+} from '@src/api/community/corners.types'
+import {
+  MAP_RADIUS_OPTIONS,
+  type MapBoundingBox,
+  type MapCornerPin,
+  type MapPin,
+  type MapResponse,
+  type MapRadiusKm,
 } from '@src/api/map/map.types'
+import { mapKeys } from '@src/api/map/mapApi'
 import { useTheme } from '@src/contexts/theme/ThemeContext'
 import { usePrototype } from '@src/features/prototype/PrototypeContext'
 import {
@@ -82,6 +95,7 @@ export const MapPage = () => {
   const { t } = useTranslation()
   const mockMode = isApiMockMode()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const [searchParams, setSearchParams] = useSearchParams()
   const requestedCornerId = searchParams.get('corner')
   const [distance, setDistance] = useState(() =>
@@ -96,8 +110,11 @@ export const MapPage = () => {
   const [recentActivity, setRecentActivity] = useState(true)
   const [selectedCorner, setSelectedCorner] = useState<MapCorner | null>(null)
   const [selectedPin, setSelectedPin] = useState<MapPin | null>(null)
+  const [cornerDetailsOpen, setCornerDetailsOpen] = useState(false)
   const [focusRequest, setFocusRequest] = useState(0)
   const [createOpen, setCreateOpen] = useState(false)
+  const [editingCorner, setEditingCorner] =
+    useState<CommunityCornerDetail | null>(null)
   const mockMapData = useMemo<MapResponse>(
     () => ({
       corners: catalog.corners.map((corner, index) => {
@@ -259,8 +276,9 @@ export const MapPage = () => {
   )
 
   const selectCorner = useCallback(
-    (corner: MapCorner) => {
+    (corner: MapCorner, openDetails = false) => {
       setSelectedCorner(corner)
+      setCornerDetailsOpen(openDetails)
       const mapCorner = mapCorners.find((item) => item.id === corner.id)
       if (!mapCorner) return
       setSelectedPin({ type: 'corner', data: mapCorner })
@@ -271,6 +289,7 @@ export const MapPage = () => {
 
   const handleSelectPin = useCallback(
     (pin: MapPin) => {
+      setCornerDetailsOpen(false)
       setSelectedPin(pin)
       if (pin.type === 'corner') {
         setSelectedCorner(displayCornerForPin(pin.data))
@@ -303,6 +322,7 @@ export const MapPage = () => {
         selectedPin.data.id === requestedCorner.id
 
       if (!isRequestedCornerSelected) {
+        setCornerDetailsOpen(false)
         setSelectedCorner(displayCornerForPin(requestedCorner))
         setSelectedPin({ type: 'corner', data: requestedCorner })
         setFocusRequest((current) => current + 1)
@@ -321,6 +341,7 @@ export const MapPage = () => {
 
     if (!isSelectedPinVisible) {
       const firstCorner = mapCorners[0]
+      setCornerDetailsOpen(false)
       setSelectedCorner(displayCornerForPin(firstCorner))
       setSelectedPin({ type: 'corner', data: firstCorner })
     }
@@ -413,9 +434,56 @@ export const MapPage = () => {
           (corner) => corner.id === selectedPublication.cornerId
         ) ?? null)
       : null)
+  const mockCornerDetail = useMemo<CommunityCornerDetail | null>(() => {
+    if (!selectedMapCorner) return null
+    return {
+      id: selectedMapCorner.id,
+      name: selectedMapCorner.name,
+      scope: 'public',
+      hostAlias: 'EntreLibros',
+      rules: selectedMapCorner.rules ?? null,
+      schedule: null,
+      status: selectedMapCorner.status,
+      visibilityPreference: 'approximate',
+      imageUrl: selectedMapCorner.photos[0] ?? null,
+      isOwner: false,
+      location: {
+        city: selectedMapCorner.city,
+        neighborhood: selectedMapCorner.barrio,
+        referencePointLabel:
+          selectedMapCorner.referencePointLabel ?? selectedMapCorner.barrio,
+        latitude: selectedMapCorner.lat,
+        longitude: selectedMapCorner.lon,
+        approximate: true,
+      },
+      activity: {
+        totalExchanges: 0,
+        weeklyExchanges: 0,
+        lastActivityAt: selectedMapCorner.lastSignalAt,
+      },
+    }
+  }, [selectedMapCorner])
+  const cornerDetailQuery = useQuery({
+    queryKey: cornerKeys.detail(selectedMapCorner?.id ?? ''),
+    queryFn: () => fetchCornerDetail(selectedMapCorner?.id ?? ''),
+    enabled:
+      cornerDetailsOpen && !mockMode && Boolean(selectedMapCorner?.id),
+    retry: false,
+  })
+  const selectedCornerDetail = mockMode
+    ? mockCornerDetail
+    : (cornerDetailQuery.data ?? null)
+  const cornerUpdateMutation = useMutation({
+    mutationFn: (input: { id: string; payload: UpdateCornerPayload }) =>
+      updateCorner(input.id, input.payload),
+    onSuccess: (data, input) => {
+      queryClient.setQueryData(cornerKeys.detail(input.id), data)
+      void queryClient.invalidateQueries({ queryKey: mapKeys.all })
+    },
+  })
   const handleViewCorner = useCallback(() => {
     if (!cornerForSelectedCard) return
-    selectCorner(displayCornerForPin(cornerForSelectedCard))
+    selectCorner(displayCornerForPin(cornerForSelectedCard), true)
   }, [cornerForSelectedCard, displayCornerForPin, selectCorner])
   const handleViewPublication = useCallback(() => {
     if (!selectedPublication) return
@@ -423,6 +491,26 @@ export const MapPage = () => {
     if (!/^\d+$/.test(listingId)) return
     navigate(`/books/${listingId}`)
   }, [navigate, selectedPublication])
+  const handleSaveCorner = useCallback(
+    async (payload: UpdateCornerPayload) => {
+      if (!selectedCornerDetail) return
+      await cornerUpdateMutation.mutateAsync({
+        id: selectedCornerDetail.id,
+        payload,
+      })
+      setEditingCorner(null)
+    },
+    [cornerUpdateMutation, selectedCornerDetail]
+  )
+  const handleToggleCornerStatus = useCallback(() => {
+    if (!selectedCornerDetail?.isOwner) return
+    void cornerUpdateMutation.mutateAsync({
+      id: selectedCornerDetail.id,
+      payload: {
+        status: selectedCornerDetail.status === 'active' ? 'paused' : 'active',
+      },
+    })
+  }, [cornerUpdateMutation, selectedCornerDetail])
 
   if (!mockMode && mapQuery.isError)
     return (
@@ -609,8 +697,37 @@ export const MapPage = () => {
               </div>
             ) : null}
           </div>
+          {cornerDetailsOpen && selectedMapCorner ? (
+            <CornerDetailsPanel
+              detail={selectedCornerDetail}
+              isLoading={!mockMode && cornerDetailQuery.isLoading}
+              isError={!mockMode && cornerDetailQuery.isError}
+              isUpdating={cornerUpdateMutation.isPending}
+              error={
+                cornerUpdateMutation.isError
+                  ? t('map.cornerDetail.updateError')
+                  : undefined
+              }
+              onRetry={() => void cornerDetailQuery.refetch()}
+              onEdit={
+                selectedCornerDetail?.isOwner
+                  ? () => setEditingCorner(selectedCornerDetail)
+                  : undefined
+              }
+              onToggleStatus={handleToggleCornerStatus}
+            />
+          ) : null}
         </div>
       </PrototypePage>
+
+      {editingCorner ? (
+        <CornerEditModal
+          corner={editingCorner}
+          isSaving={cornerUpdateMutation.isPending}
+          onClose={() => setEditingCorner(null)}
+          onSave={handleSaveCorner}
+        />
+      ) : null}
 
       <PublishCornerModal
         isOpen={createOpen}

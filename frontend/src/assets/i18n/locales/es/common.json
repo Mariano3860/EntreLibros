@@ -929,6 +929,34 @@
       "openPublication": "Ver publicación",
       "openCorner": "Ver rincón"
     },
+    "cornerDetail": {
+      "title": "Detalle del rincón",
+      "loading": "Cargando datos del rincón...",
+      "error": "No pudimos cargar este rincón.",
+      "retry": "Intentar nuevamente",
+      "status": {
+        "active": "Activo",
+        "paused": "En pausa"
+      },
+      "location": "Zona",
+      "schedule": "Horarios",
+      "rules": "Normas",
+      "activity": "Actividad",
+      "weekly": "intercambios esta semana",
+      "total": "intercambios registrados",
+      "notProvided": "Sin datos cargados",
+      "owner": "Administrá tu rincón",
+      "edit": "Editar rincón",
+      "pause": "Pausar rincón",
+      "reactivate": "Reactivar rincón",
+      "editTitle": "Editar rincón",
+      "cancel": "Cancelar",
+      "saving": "Guardando...",
+      "save": "Guardar cambios",
+      "nameRequired": "Ingresá un nombre para el rincón.",
+      "updateError": "No se pudieron guardar los cambios.",
+      "privacyNote": "La ubicación pública se mantiene aproximada para proteger el domicilio."
+    },
     "empty": {
       "title": "Todavía no hay actividad en esta zona",
       "description": "Ajustá los filtros o explorá barrios cercanos para descubrir Rincones activos.",
