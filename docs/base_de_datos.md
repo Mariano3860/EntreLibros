@@ -31,10 +31,12 @@ PostgreSQL es la persistencia principal; PostGIS se usa para datos geográficos 
 | 023       | Intereses persistentes y búsquedas de libros |
 | 024       | Conversaciones demo para intercambios        |
 | 025       | Corrección de duplicados demo de mensajería  |
+| 026       | Foto y ubicación estructurada de perfil      |
 
 La migraciÃ³n `022_create_community_following_and_demo_data.sql` crea `user_follows` y carga una semilla reproducible de lectores pÃºblicos con intereses, ubicaciÃ³n, libros disponibles e historias para validar el descubrimiento. Los perfiles privados o bloqueados quedan fuera de las sugerencias.
 
 La migración `023_create_book_discovery_interests.sql` agrega intereses idempotentes sobre publicaciones ajenas y evita duplicar búsquedas activas del mismo libro por usuario.
+La migración `026_add_profile_photo_and_location_details.sql` agrega foto, país y calle privada al perfil, y sustituye la visibilidad histórica `private` por los niveles `none`, `country`, `city` y `neighborhood`.
 La migración `024_seed_messaging_exchange_conversations.sql` crea conversaciones entre `user2@entrelibros.com` y los lectores demo que tienen publicaciones públicas vigentes, para validar el selector de libros del interlocutor al proponer un intercambio. La migración `025_repair_messaging_exchange_seed.sql` conserva la conversación demo más antigua por pareja y elimina únicamente duplicados vacíos de la semilla.
 El contenido exacto de cada migración es la autoridad. No edites una migración ya aplicada: agrega otra numerada y prueba upgrade desde una base existente.
 

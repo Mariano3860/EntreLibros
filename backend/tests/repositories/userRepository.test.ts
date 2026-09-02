@@ -6,6 +6,8 @@ import {
   createUser,
   findUserByEmail,
   findUserById,
+  findPublicProfileById,
+  updateUserProfile,
   updateUserLanguage,
   updateUserLocation,
 } from '../../src/repositories/userRepository.js';
@@ -68,5 +70,33 @@ describe('userRepository', () => {
       longitude: -3.7038,
     });
     expect(updated?.searchRadius).toBe(1000);
+  });
+
+  test('projects structured profile location according to visibility', async () => {
+    const user = await createUser(
+      'Dora',
+      'dora@example.com',
+      'secret',
+      DEFAULT_USER_ROLE
+    );
+    await updateUserLocation(user.id, -58.3816, -34.6037, 10);
+    await updateUserProfile(user.id, {
+      profilePhoto: 'https://example.com/dora.png',
+      country: 'Argentina',
+      city: 'Buenos Aires',
+      neighborhood: 'Palermo',
+      street: 'Av. Santa Fe 1234',
+      locationVisibility: 'country',
+    });
+
+    const publicProfile = await findPublicProfileById(user.id);
+    expect(publicProfile).toMatchObject({
+      profilePhoto: 'https://example.com/dora.png',
+      country: 'Argentina',
+      location: { latitude: -34.6, longitude: -58.4 },
+    });
+    expect(publicProfile?.city).toBeUndefined();
+    expect(publicProfile?.neighborhood).toBeUndefined();
+    expect(publicProfile).not.toHaveProperty('street');
   });
 });

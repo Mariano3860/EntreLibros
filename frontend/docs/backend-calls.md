@@ -326,6 +326,14 @@ Usuarios sugeridos para seguir.
 [{ "id": "uuid", "user": "Pedro", "avatar": "https://example.com/avatar.png" }]
 ```
 
+### `GET /user/profile` y `PATCH /user/profile`
+
+Requieren sesión autenticada. `GET` devuelve el perfil propio, incluida la calle privada. `PATCH` acepta `alias`, `description`, `profilePhoto` (URL HTTPS o imagen JPG/PNG/WebP en base64 de hasta 5 MB), `interests`, `country`, `city`, `neighborhood`, `street`, `profileVisibility` y `locationVisibility` (`none`, `country`, `city` o `neighborhood`). La respuesta mantiene los campos privados porque pertenece al usuario autenticado.
+
+### `GET /user/profile/:id`
+
+Devuelve la proyección pública del perfil cuando es público. La ubicación respeta `locationVisibility`: país, ciudad o barrio se agregan de forma progresiva y las coordenadas se redondean; `street` nunca se incluye.
+
 ### `GET /community/discovery`
 
 Requiere sesiÃ³n autenticada. Devuelve historias recientes para la tira superior, lectores relevantes por cercanÃ­a o intereses compartidos y libros publicados que coinciden con los intereses del usuario.

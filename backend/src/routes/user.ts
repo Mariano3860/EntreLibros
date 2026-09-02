@@ -12,6 +12,7 @@ import {
   type UserProfileUpdate,
 } from '../repositories/userRepository.js';
 import {
+  isProfileCountry,
   isProfileCity,
   isProfileInterest,
   isProfileNeighborhood,
@@ -45,7 +46,13 @@ router.get(
 );
 
 const PROFILE_VISIBILITIES = ['public', 'private'] as const;
-const LOCATION_VISIBILITIES = ['private', 'city', 'neighborhood'] as const;
+const LOCATION_VISIBILITIES = [
+  'none',
+  'country',
+  'city',
+  'neighborhood',
+] as const;
+const MAX_PROFILE_PHOTO_BYTES = 5 * 1024 * 1024;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
@@ -56,6 +63,15 @@ function optionalText(value: unknown, maxLength: number): string | null {
   if (typeof value !== 'string') return null;
   const text = value.trim();
   return text.length > 0 && text.length <= maxLength ? text : null;
+}
+
+function isValidProfilePhoto(value: string): boolean {
+  if (/^https:\/\/[^\s]+$/i.test(value)) return true;
+  const match = value.match(
+    /^data:(image\/(?:jpeg|png|webp));base64,([a-z0-9+/=]+)$/i
+  );
+  if (!match) return false;
+  return Math.floor((match[2].length * 3) / 4) <= MAX_PROFILE_PHOTO_BYTES;
 }
 
 function blockTargetId(value: string | undefined): number | null {
@@ -200,6 +216,22 @@ router.patch(
       }
       updates.profileDescription = description;
     }
+    if (req.body.profilePhoto !== undefined) {
+      if (
+        req.body.profilePhoto !== null &&
+        (typeof req.body.profilePhoto !== 'string' ||
+          !isValidProfilePhoto(req.body.profilePhoto.trim()))
+      ) {
+        return res.status(400).json({
+          error: 'InvalidFields',
+          message: 'user.errors.invalid_profile',
+        });
+      }
+      updates.profilePhoto =
+        typeof req.body.profilePhoto === 'string'
+          ? req.body.profilePhoto.trim()
+          : null;
+    }
     if (req.body.profileVisibility !== undefined) {
       if (!PROFILE_VISIBILITIES.includes(req.body.profileVisibility as never)) {
         return res.status(400).json({
@@ -247,14 +279,23 @@ router.patch(
       }
       updates.interests = interests;
     }
-    if (req.body.city !== undefined) {
-      if (!isProfileCity(req.body.city)) {
+    if (req.body.country !== undefined) {
+      if (!isProfileCountry(req.body.country)) {
         return res.status(400).json({
           error: 'InvalidFields',
           message: 'user.errors.invalid_profile',
         });
       }
-      updates.city = req.body.city;
+      updates.country = req.body.country;
+    }
+    if (req.body.city !== undefined) {
+      if (req.body.city !== null && !isProfileCity(req.body.city)) {
+        return res.status(400).json({
+          error: 'InvalidFields',
+          message: 'user.errors.invalid_profile',
+        });
+      }
+      updates.city = req.body.city as ProfileCity | null;
       if (req.body.neighborhood === undefined) {
         updates.neighborhood = null;
       }
@@ -263,7 +304,9 @@ router.patch(
       if (req.body.neighborhood === null) {
         updates.neighborhood = null;
       } else {
-        const city = (updates.city ?? req.user.city) as ProfileCity | null;
+        const city = (
+          updates.city !== undefined ? updates.city : req.user.city
+        ) as ProfileCity | null;
         if (
           !city ||
           !isProfileCity(city) ||
@@ -277,13 +320,40 @@ router.patch(
         updates.neighborhood = req.body.neighborhood;
       }
     }
-    const profile = await updateUserProfile(req.user.id, updates);
-    return profile
-      ? res.json(profile)
-      : res.status(404).json({
-          error: 'NotFound',
-          message: 'user.errors.profile_not_found',
+    if (req.body.street !== undefined) {
+      if (req.body.street === null) {
+        updates.street = null;
+      } else if (typeof req.body.street === 'string') {
+        const street = req.body.street.trim();
+        if (street.length > 160) {
+          return res.status(400).json({
+            error: 'InvalidFields',
+            message: 'user.errors.invalid_profile',
+          });
+        }
+        updates.street = street || null;
+      } else {
+        return res.status(400).json({
+          error: 'InvalidFields',
+          message: 'user.errors.invalid_profile',
         });
+      }
+    }
+    try {
+      const profile = await updateUserProfile(req.user.id, updates);
+      return profile
+        ? res.json(profile)
+        : res.status(404).json({
+            error: 'NotFound',
+            message: 'user.errors.profile_not_found',
+          });
+    } catch (error) {
+      console.error('Failed to update user profile', error);
+      return res.status(500).json({
+        error: 'ProfileUpdateFailed',
+        message: 'user.errors.profile_update_failed',
+      });
+    }
   }
 );
 

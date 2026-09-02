@@ -131,6 +131,8 @@ Feature 1.1 Cuenta y acceso
 
 Feature 1.2 Perfil y privacidad
 
+> **Actualización técnica 2026-09-02:** el editor de perfil persistido incorpora foto JPG/PNG/WebP con fallback, país, calle privada, selección de intereses y vista previa de privacidad. La migración 026 mantiene compatibilidad con perfiles existentes y la proyección pública nunca devuelve la calle.
+
 - [x] S-1.4 Perfil editable (alias, descripción, intereses y zona) (Must, E1; BR-02)
   - Actualización 2026-08-30: el perfil autenticado permite editar alias, descripción, idioma, intereses predefinidos, ciudad y barrio opcional; la relación ciudad-barrio se valida en backend y los perfiles existentes conservan valores vacíos hasta completarse.
   - Éxito: se recomiendan al menos 3 intereses sin bloquear el guardado; la ciudad es obligatoria al completar la zona; la zona pública respeta privacidad.
