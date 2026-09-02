@@ -14,6 +14,7 @@ import {
 import { logger } from './utils/logger.js';
 import { generateReply } from './services/chatBot.js';
 import { notifyMessageRecipients } from './services/notifications.js';
+import { markMessageNotificationsRead } from './repositories/notificationRepository.js';
 import {
   agreementEvents,
   type AgreementSnapshot,
@@ -285,6 +286,7 @@ export function setupWebsocket(
           socket.data.user.id,
           sequence
         );
+        await markMessageNotificationsRead(conversationId, socket.data.user.id);
       } catch (error) {
         socket.emit('conversation:error', {
           message:

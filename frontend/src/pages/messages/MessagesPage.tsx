@@ -18,6 +18,7 @@ import {
   type ConversationBook,
   type MessagingContact,
 } from '@api/messages/messages'
+import { notificationKeys } from '@api/notifications/notifications'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { useAuth } from '@contexts/auth/AuthContext'
 import { useFocusTrap } from '@hooks/useFocusTrap'
@@ -370,7 +371,13 @@ export const MessagesPage = () =>
   isApiMockMode() ? <MockMessagesPage /> : <RealMessagesPage />
 
 const MockMessagesPage = () => {
-  const { catalog, chatMessages, sendMessage } = usePrototype()
+  const {
+    catalog,
+    chatMessages,
+    markConversationRead,
+    readConversationIds,
+    sendMessage,
+  } = usePrototype()
   const { t } = useTranslation()
   const [selected, setSelected] = useState('lucia')
   const [search, setSearch] = useState('')
@@ -388,6 +395,11 @@ const MockMessagesPage = () => {
       (conversation) => conversation.id === selected
     ) ?? catalog.conversations[1]
   const conversations = catalog.conversations
+    .map((conversation) =>
+      readConversationIds.has(conversation.id)
+        ? { ...conversation, unread: undefined }
+        : conversation
+    )
     .filter((conversation) =>
       conversation.name.toLowerCase().includes(search.toLowerCase())
     )
@@ -396,6 +408,9 @@ const MockMessagesPage = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView?.({ block: 'end' })
   }, [chatMessages, selected])
+  useEffect(() => {
+    markConversationRead(selected)
+  }, [markConversationRead, selected])
 
   const submit = (event: FormEvent) => {
     event.preventDefault()
@@ -892,11 +907,14 @@ const RealMessagesPage = () => {
 
     lastReadSequenceRef.current.set(selected, lastSequence)
     void markMessagesRead(selected, lastSequence)
-      .then(() =>
-        queryClient.invalidateQueries({
-          queryKey: messageQueryKeys.conversations(),
-        })
-      )
+      .then(async () => {
+        await Promise.all([
+          queryClient.invalidateQueries({
+            queryKey: messageQueryKeys.conversations(),
+          }),
+          queryClient.invalidateQueries({ queryKey: notificationKeys.all }),
+        ])
+      })
       .catch(() => {
         if (lastReadSequenceRef.current.get(selected) === lastSequence) {
           lastReadSequenceRef.current.delete(selected)

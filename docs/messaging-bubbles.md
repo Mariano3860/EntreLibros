@@ -29,6 +29,8 @@ El diálogo de nueva conversación consulta `GET /api/messages/contacts?search=`
 
 Cada resumen de conversación incluye `unreadCount`, calculado desde el cursor de lectura del participante y contando solo mensajes enviados por la otra persona. La pestaña “No leídos” usa ese valor y muestra un estado vacío explícito cuando no hay conversaciones pendientes.
 
+El punto rojo de `Mensajes` en el sidebar usa el mismo `unreadCount`, se actualiza con la invalidación del listado tras eventos Socket.IO y se refresca periódicamente mientras la sesión está abierta. Al abrir una conversación, el cursor y las notificaciones de mensajes de esa conversación se marcan como leídos; en modo mock el estado equivalente se mantiene en el proveedor del prototipo.
+
 En una propuesta pendiente, quien la envió solo puede cancelarla; la contraparte puede aceptarla o rechazarla, y el backend aplica la misma regla para confirmar o rechazar la versión vigente.
 
 Si la conversación ya tiene un acuerdo vigente en estado `proposed` o `partially_confirmed`, "Preparar acuerdo" recupera sus datos y envía una contraoferta mediante una nueva versión del mismo acuerdo. No intenta crear un segundo registro para la conversación, ya que el modelo admite un acuerdo por conversación; el libro queda vinculado a los listings de la versión anterior.

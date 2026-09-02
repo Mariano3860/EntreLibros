@@ -1,10 +1,12 @@
+import { fetchConversations, messageQueryKeys } from '@api/messages/messages'
 import { LogoEntreLibros } from '@components/logo/LogoEntreLibros'
 import { SidebarLanguageSwitcher } from '@components/sidebar/buttons/SidebarLanguageSwitcher'
 import { SidebarLoginButton } from '@components/sidebar/buttons/SidebarLoginButton'
 import { SidebarThemeButton } from '@components/sidebar/buttons/SidebarThemeButton'
 import { NavItem } from '@components/sidebar/Sidebar.types'
 import { useAuth } from '@contexts/auth/AuthContext'
-import { useNotifications } from '@hooks/api/useNotifications'
+import { useQuery } from '@tanstack/react-query'
+import { isApiMockMode } from '@utils/runtimeEnv'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
@@ -18,6 +20,7 @@ import { ReactComponent as Messages } from '@src/assets/icons/messages.svg'
 import { ReactComponent as Profile } from '@src/assets/icons/profile.svg'
 import { ReactComponent as Stats } from '@src/assets/icons/stats.svg'
 import { HOME_URLS } from '@src/constants/constants'
+import { usePrototype } from '@src/features/prototype/PrototypeContext'
 
 import styles from './Sidebar.module.scss'
 
@@ -25,12 +28,26 @@ export const Sidebar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { t } = useTranslation()
   const { isAuthenticated } = useAuth()
-  const { data: notifications = [] } = useNotifications({
-    enabled: isAuthenticated,
+  const { catalog, readConversationIds } = usePrototype()
+  const mockMode = isApiMockMode()
+  const conversationsQuery = useQuery({
+    queryKey: messageQueryKeys.conversations(),
+    queryFn: fetchConversations,
+    staleTime: 15_000,
+    refetchInterval: 15_000,
+    enabled: isAuthenticated && !mockMode,
   })
-  const hasUnreadMessages = notifications.some(
-    (notification) => notification.kind === 'message' && !notification.readAt
-  )
+  const hasUnreadMessages =
+    isAuthenticated &&
+    (mockMode
+      ? catalog.conversations.some(
+          (conversation) =>
+            Boolean(conversation.unread) &&
+            !readConversationIds.has(conversation.id)
+        )
+      : (conversationsQuery.data ?? []).some(
+          (conversation) => conversation.unreadCount > 0
+        ))
 
   const navItems: NavItem[] = [
     {
