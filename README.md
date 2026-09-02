@@ -46,6 +46,7 @@ Vitest/Testing Library y MSW cubren pruebas automatizadas. La validación final 
 
 ## Documentación
 
+- [`docs/performance-map.md`](docs/performance-map.md): medición reproducible del mapa.
 - [`backend/README.md`](backend/README.md): API, migraciones y mensajería.
 - [`frontend/README.md`](frontend/README.md): desarrollo del cliente y modo demo.
 - [`docs/README.md`](docs/README.md): índice de documentación.

@@ -11,6 +11,7 @@ Este backlog reúne únicamente trabajo vigente. El código, las migraciones, lo
 - Catálogo público, libros propios, publicación/edición, modalidades, condición, ISBN opcional, intereses y vencimiento.
 - Rincones con alta, edición del propietario, foto, normas, consentimiento, zona, visibilidad barrio/ciudad y pausa/reactivación.
 - Búsqueda parametrizada, catálogo unificado, mapa con radio contextual y estados de carga, vacío y error.
+- Orden del mapa por cercanía cuando hay ubicación del dispositivo o zona de perfil; fallback visible sin distancia inventada y medición reproducible bajo dos segundos.
 - Feed de Comunidad, historias relevantes, seguimiento, likes únicos, comentarios y compartir con fallback.
 - Mensajería privada persistente, contactos visibles, adjuntos de libros, propuestas y acuerdos versionados.
 - Notificaciones in-app de mensajes/acuerdos, preferencia básica, deduplicación y contador no leído en Mensajes.
@@ -33,7 +34,7 @@ Este backlog reúne únicamente trabajo vigente. El código, las migraciones, lo
 - [ ] **P1-01 — Métricas mínimas:** calcular Rincones activos, publicaciones activas, acuerdos confirmados, tiempo de descubrimiento y embudo publicación → contacto → acuerdo → confirmación. Verificar periodo, denominadores y `sin datos`.
 - [ ] **P1-02 — Seguridad del MVP:** auditar autenticación, cookies, CORS/CSRF, cabeceras, rate limiting, autorización, logs y errores traducibles. Registrar riesgos residuales sin afirmar controles no implementados.
 - [ ] **P1-03 — Datos y consentimiento:** documentar retención mínima, revocación de consentimientos, imágenes, mensajes y reportes. Verificar minimización y ausencia de datos personales innecesarios.
-- [ ] **P1-04 — Rendimiento:** medir una búsqueda representativa y registrar resultado, entorno y desviaciones frente al objetivo de dos segundos.
+- [x] **P1-04 — Rendimiento:** medir una búsqueda representativa y registrar resultado, entorno y desviaciones frente al objetivo de dos segundos en [`performance-map.md`](performance-map.md).
 - [ ] **P1-05 — Accesibilidad y lenguaje:** revisar teclado, foco, contraste, responsive y español neutro en las rutas principales. Verificar manualmente en navegador real.
 - [ ] **P1-06 — Recuperación:** comprobar backup, restauración, migración desde una base existente y procedimiento de rollback. Verificar que no se editan migraciones aplicadas.
 - [ ] **P1-07 — Evidencia:** preparar dataset sintético, capturas anonimizadas, checklist de navegador y matriz de requisitos para la entrega académica.

@@ -81,6 +81,7 @@ const baseCorner: Omit<MapCornerPin, 'id' | 'name' | 'barrio'> = {
   city: 'Ciudad',
   lat: -34.6,
   lon: -58.4,
+  distanceKm: null,
   lastSignalAt: new Date().toISOString(),
   photos: [],
   themes: ['Club lector'],

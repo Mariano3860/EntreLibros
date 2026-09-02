@@ -288,6 +288,7 @@ describe('map data endpoint', () => {
     expect(corners).toHaveLength(1);
     expect(corners[0]).toMatchObject({
       id: corner.id,
+      distanceKm: 0,
       name: 'Rincón Palermo',
       barrio: '1425',
       city: 'Ciudad Autónoma de Buenos Aires',
@@ -323,7 +324,7 @@ describe('map data endpoint', () => {
         south: 37.314631335827066,
         east: -5.918702824686989,
         west: -6.04430158314608,
-        search: '',
+        search: 'Sevilla',
         distanceKm: 30,
         themes: '',
         openNow: 'true',
@@ -356,6 +357,7 @@ describe('map data endpoint', () => {
       centerLat: -34.5985,
       centerLon: -58.4102,
       distanceKm: 1,
+      search: 'Palermo',
       layers: 'corners,publications,activity',
     };
 
@@ -373,7 +375,12 @@ describe('map data endpoint', () => {
 
     const unlimitedResponse = await request(app)
       .get('/api/map')
-      .query({ ...query, distanceKm: undefined })
+      .query({
+        ...query,
+        distanceKm: undefined,
+        centerLat: undefined,
+        centerLon: undefined,
+      })
       .expect(200);
 
     expect(unlimitedResponse.body.corners).toEqual(
@@ -382,6 +389,43 @@ describe('map data endpoint', () => {
         expect.objectContaining({ id: distantCorner.id }),
       ])
     );
+    expect(
+      unlimitedResponse.body.corners.every(
+        (corner: { distanceKm: number | null }) => corner.distanceKm === null
+      )
+    ).toBe(true);
     expect(unlimitedResponse.body.publications).toHaveLength(2);
+    expect(
+      unlimitedResponse.body.publications.every(
+        (publication: { distanceKm: number | null }) =>
+          publication.distanceKm === null
+      )
+    ).toBe(true);
+  });
+
+  test('orders corners by precise distance when a center is provided', async () => {
+    const distantCorner = await createCorner(DISTANT_PALERMO_CORNER_INPUT);
+    const nearCorner = await createCorner(CORNER_INPUT);
+
+    const response = await request(app)
+      .get('/api/map')
+      .query({
+        north: -34.57,
+        south: -34.65,
+        east: -58.36,
+        west: -58.45,
+        centerLat: -34.5985,
+        centerLon: -58.4102,
+        distanceKm: 30,
+        search: 'Palermo',
+        layers: 'corners',
+      })
+      .expect(200);
+
+    expect(
+      response.body.corners.map((corner: { id: string }) => corner.id)
+    ).toEqual([nearCorner.id, distantCorner.id]);
+    expect(response.body.corners[0].distanceKm).toBe(0);
+    expect(response.body.corners[1].distanceKm).toBeGreaterThan(2);
   });
 });

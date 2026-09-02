@@ -46,7 +46,7 @@ describe('fetchMapData', () => {
     })
   })
 
-  test('omits distance and center when no limit is selected', async () => {
+  test('keeps the center when no distance limit is selected', async () => {
     vi.spyOn(apiClient, 'get').mockResolvedValueOnce({ data: response })
 
     await fetchMapData({
@@ -58,8 +58,8 @@ describe('fetchMapData', () => {
     expect(apiClient.get).toHaveBeenCalledWith('/map', {
       params: expect.objectContaining({
         distanceKm: undefined,
-        centerLat: undefined,
-        centerLon: undefined,
+        centerLat: -34.6037,
+        centerLon: -58.3816,
       }),
     })
   })

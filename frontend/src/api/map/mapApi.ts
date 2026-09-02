@@ -10,7 +10,7 @@ export const mapKeys = {
       ...mapKeys.all,
       {
         bbox: input.bbox,
-        center: input.filters.distanceKm === null ? undefined : input.center,
+        center: input.center,
         search: input.searchTerm ?? '',
         filters: input.filters,
         layers: input.layers,
@@ -26,7 +26,7 @@ export const fetchMapData = async (
     .filter(([, isActive]) => isActive)
     .map(([layer]) => layer)
     .join(',')
-  const center = input.filters.distanceKm === null ? undefined : input.center
+  const center = input.center
 
   const params = {
     north: input.bbox.north,

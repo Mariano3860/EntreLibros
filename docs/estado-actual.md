@@ -15,7 +15,7 @@ La clasificación detallada del compromiso del TFG, las brechas de cierre y la e
 - **Libros:** catálogo público, libros propios, alta/edición, modalidades de oferta o búsqueda, condición, imágenes limitadas, ISBN normalizado, consentimientos, intereses, vencimiento y estado de revisión editorial.
 - **Rincones:** alta con formulario por pasos, foto, normas, consentimiento, zona, visibilidad y estado activo/en pausa; el propietario puede editar, pausar y reactivar su Rincón. La baja del MVP es una pausa reversible que conserva el historial.
 - **Comunidad:** feed persistente, historias relevantes, seguimiento, likes únicos, comentarios ordenados, compartir y filtros de visibilidad/bloqueos.
-- **Mapa:** Rincones, publicaciones y actividad con radio de 1, 5, 30, 50 km o sin límite; el centro y el perímetro respetan el permiso de ubicación.
+- **Mapa:** Rincones, publicaciones y actividad con radio de 1, 5, 30, 50 km o sin límite; el centro puede venir del dispositivo o de la zona privada del perfil, el orden por cercanía se conserva con radio ilimitado y, sin centro, se muestra un fallback sin distancia inventada. La medición reproducible está en [`performance-map.md`](performance-map.md).
 - **Mensajería:** conversaciones privadas persistentes, contactos visibles, historial, Socket.IO, bot persistente, adjuntos de libros, propuestas y acuerdos.
 - **Acuerdos:** propuesta, contrapropuesta, confirmación, rechazo, cancelación, versionado e historial dentro de la conversación.
 - **Notificaciones:** avisos in-app de mensajes y acuerdos, preferencia básica, deduplicación, estado leído/no leído y punto rojo sincronizado en Mensajes.

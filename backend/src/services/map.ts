@@ -24,6 +24,7 @@ export interface MapCornerPin {
   city: string;
   lat: number;
   lon: number;
+  distanceKm: number | null;
   lastSignalAt: string | null;
   photos: string[];
   rules?: string;
@@ -41,7 +42,7 @@ export interface MapPublicationPin {
   authors: string[];
   type: PublicationType;
   photo?: string;
-  distanceKm: number;
+  distanceKm: number | null;
   cornerId: string;
   lat?: number;
   lon?: number;
@@ -106,7 +107,7 @@ const hasThemeOverlap = (themes: string[], filters: string[]) => {
 
 const toRadians = (value: number) => (value * Math.PI) / 180;
 
-const haversineDistanceKm = (
+const calculateHaversineDistanceKm = (
   a: { lat: number; lon: number },
   b: { lat: number; lon: number }
 ) => {
@@ -122,8 +123,11 @@ const haversineDistanceKm = (
   const c = sinLat * sinLat + Math.cos(lat1) * Math.cos(lat2) * sinLon * sinLon;
   const d = 2 * Math.atan2(Math.sqrt(c), Math.sqrt(1 - c));
 
-  return Math.round(R * d * 10) / 10;
+  return R * d;
 };
+
+const roundDistanceKm = (distanceKm: number) =>
+  Math.round(distanceKm * 10) / 10;
 
 const getCornerThemes = (corner: CommunityCornerEntity): string[] => {
   const themes = [...DEFAULT_THEMES];
@@ -197,7 +201,8 @@ type DisplayCoordinates = ReturnType<typeof getDisplayCoordinates>;
 
 const buildCornerPin = (
   corner: CommunityCornerEntity,
-  coordinates: DisplayCoordinates
+  coordinates: DisplayCoordinates,
+  distanceKm: number | null
 ): MapCornerPin => {
   const photos = corner.photo?.url ? [corner.photo.url] : [];
   const barrio = corner.address.postalCode ?? DEFAULT_BARRIO;
@@ -208,6 +213,7 @@ const buildCornerPin = (
     city: DEFAULT_CITY,
     lat: coordinates.lat,
     lon: coordinates.lon,
+    distanceKm,
     lastSignalAt: corner.metrics.lastActivityAt,
     photos,
     rules: corner.rules ?? undefined,
@@ -256,7 +262,8 @@ const fetchPublications = async (
   displayCoordinates: Map<string, DisplayCoordinates>,
   search: string,
   themeFilters: string[],
-  center: { lat: number; lon: number },
+  center: { lat: number; lon: number } | null,
+  filteringCenter: { lat: number; lon: number } | null,
   maxDistanceKm: MapFilters['distanceKm']
 ): Promise<MapPublicationPin[]> => {
   if (cornerLookup.size === 0) {
@@ -271,11 +278,15 @@ const fetchPublications = async (
   const rows = await listPublicBookListings({
     text: search || undefined,
     cornerIds,
-    sort: 'recent',
+    sort: center ? 'nearby' : 'recent',
     limit: 100,
-    latitude: center.lat,
-    longitude: center.lon,
-    radiusKm: maxDistanceKm ?? undefined,
+    ...(filteringCenter
+      ? {
+          latitude: filteringCenter.lat,
+          longitude: filteringCenter.lon,
+          radiusKm: maxDistanceKm ?? undefined,
+        }
+      : {}),
   });
 
   const pins: MapPublicationPin[] = [];
@@ -290,12 +301,30 @@ const fetchPublications = async (
       continue;
     }
 
-    const distanceKm = haversineDistanceKm(
-      { lat: corner.coordinates.latitude, lon: corner.coordinates.longitude },
-      center
-    );
+    const preciseDistanceKm = center
+      ? calculateHaversineDistanceKm(
+          {
+            lat: corner.coordinates.latitude,
+            lon: corner.coordinates.longitude,
+          },
+          center
+        )
+      : null;
+    const preciseFilteringDistanceKm = filteringCenter
+      ? calculateHaversineDistanceKm(
+          {
+            lat: corner.coordinates.latitude,
+            lon: corner.coordinates.longitude,
+          },
+          filteringCenter
+        )
+      : null;
 
-    if (maxDistanceKm !== null && distanceKm > maxDistanceKm) {
+    if (
+      maxDistanceKm !== null &&
+      (preciseFilteringDistanceKm === null ||
+        preciseFilteringDistanceKm > maxDistanceKm)
+    ) {
       continue;
     }
 
@@ -316,7 +345,8 @@ const fetchPublications = async (
             ? 'want'
             : 'offer',
       photo,
-      distanceKm,
+      distanceKm:
+        preciseDistanceKm === null ? null : roundDistanceKm(preciseDistanceKm),
       cornerId: corner.id,
       lat: coordinates.lat,
       lon: coordinates.lon,
@@ -407,13 +437,15 @@ export async function getMapData(query: MapQuery): Promise<MapResponse> {
     .map((theme) => theme.toLowerCase());
 
   const searchBounds = expandBounds(query.bbox, MAP_FETCH_PADDING_METERS);
-  const centerPoint = query.center ?? {
+  const viewportCenter = {
     latitude: (query.bbox.north + query.bbox.south) / 2,
     longitude: (query.bbox.east + query.bbox.west) / 2,
   };
+  const filteringCenter =
+    query.center ?? (query.filters.distanceKm === null ? null : viewportCenter);
   let corners: CommunityCornerEntity[] = [];
   try {
-    corners = await listCornersForMap(searchBounds);
+    corners = await listCornersForMap(searchBounds, query.center);
   } catch (error) {
     const message =
       error instanceof Error ? error.message : String(error ?? 'unknown error');
@@ -423,7 +455,7 @@ export async function getMapData(query: MapQuery): Promise<MapResponse> {
     );
 
     try {
-      corners = await listCornersForMap();
+      corners = await listCornersForMap(undefined, query.center);
     } catch (fallbackError) {
       if (fallbackError instanceof DatabaseError) {
         console.error(
@@ -449,19 +481,21 @@ export async function getMapData(query: MapQuery): Promise<MapResponse> {
 
     const matchesTheme = hasThemeOverlap(getCornerThemes(corner), themeFilters);
     const matchesOpen = !query.filters.openNow || corner.status === 'active';
-    const distanceKm = haversineDistanceKm(
-      {
-        lat: corner.coordinates.latitude,
-        lon: corner.coordinates.longitude,
-      },
-      {
-        lat: centerPoint.latitude,
-        lon: centerPoint.longitude,
-      }
-    );
+    const distanceKm = filteringCenter
+      ? calculateHaversineDistanceKm(
+          {
+            lat: corner.coordinates.latitude,
+            lon: corner.coordinates.longitude,
+          },
+          {
+            lat: filteringCenter.latitude,
+            lon: filteringCenter.longitude,
+          }
+        )
+      : null;
     const matchesDistance =
       query.filters.distanceKm === null ||
-      distanceKm <= query.filters.distanceKm;
+      (distanceKm !== null && distanceKm <= query.filters.distanceKm);
 
     const isVisible =
       matchesTheme && matchesOpen && matchesDistance && !corner.draft;
@@ -473,8 +507,28 @@ export async function getMapData(query: MapQuery): Promise<MapResponse> {
     return isVisible;
   });
 
+  const orderedCorners = query.center
+    ? [...spatialCorners].sort((left, right) => {
+        const leftDistance = calculateHaversineDistanceKm(
+          {
+            lat: left.coordinates.latitude,
+            lon: left.coordinates.longitude,
+          },
+          { lat: query.center!.latitude, lon: query.center!.longitude }
+        );
+        const rightDistance = calculateHaversineDistanceKm(
+          {
+            lat: right.coordinates.latitude,
+            lon: right.coordinates.longitude,
+          },
+          { lat: query.center!.latitude, lon: query.center!.longitude }
+        );
+        return leftDistance - rightDistance;
+      })
+    : spatialCorners;
+
   const candidateCornerLookup = new Map(
-    spatialCorners.map((corner) => [corner.id, corner])
+    orderedCorners.map((corner) => [corner.id, corner])
   );
 
   let candidatePublications: MapPublicationPin[] = [];
@@ -486,10 +540,18 @@ export async function getMapData(query: MapQuery): Promise<MapResponse> {
         displayCoordinates,
         normalizedSearch,
         themeFilters,
-        {
-          lat: centerPoint.latitude,
-          lon: centerPoint.longitude,
-        },
+        query.center
+          ? {
+              lat: query.center.latitude,
+              lon: query.center.longitude,
+            }
+          : null,
+        filteringCenter
+          ? {
+              lat: filteringCenter.latitude,
+              lon: filteringCenter.longitude,
+            }
+          : null,
         query.filters.distanceKm
       );
     } catch (error) {
@@ -505,7 +567,7 @@ export async function getMapData(query: MapQuery): Promise<MapResponse> {
   const matchingPublicationCornerIds = new Set(
     candidatePublications.map((publication) => publication.cornerId)
   );
-  const filteredCorners = spatialCorners.filter(
+  const filteredCorners = orderedCorners.filter(
     (corner) =>
       normalizedSearch.length === 0 ||
       matchesCornerSearch(corner, normalizedSearch) ||
@@ -525,7 +587,21 @@ export async function getMapData(query: MapQuery): Promise<MapResponse> {
     ? filteredCorners.map((corner) =>
         buildCornerPin(
           corner,
-          displayCoordinates.get(corner.id) ?? getDisplayCoordinates(corner)
+          displayCoordinates.get(corner.id) ?? getDisplayCoordinates(corner),
+          query.center
+            ? roundDistanceKm(
+                calculateHaversineDistanceKm(
+                  {
+                    lat: corner.coordinates.latitude,
+                    lon: corner.coordinates.longitude,
+                  },
+                  {
+                    lat: query.center.latitude,
+                    lon: query.center.longitude,
+                  }
+                )
+              )
+            : null
         )
       )
     : [];

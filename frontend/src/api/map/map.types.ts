@@ -17,6 +17,7 @@ export interface MapCornerPin {
   city: string
   lat: number
   lon: number
+  distanceKm: number | null
   lastSignalAt: string | null
   photos: string[]
   rules?: string
@@ -34,7 +35,7 @@ export interface MapPublicationPin {
   authors: string[]
   type: PublicationType
   photo?: string
-  distanceKm: number
+  distanceKm: number | null
   cornerId: string
   lat?: number
   lon?: number

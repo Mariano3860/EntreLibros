@@ -1,5 +1,5 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react'
-import { describe, expect, test, vi } from 'vitest'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import type { MapCornerPin, MapPin } from '@src/api/map/map.types'
 
@@ -40,15 +40,22 @@ vi.mock('@components/map/MapCanvas/MapCanvas', () => ({
   },
 }))
 
-vi.mock('@src/api/auth/me.service', () => ({
-  fetchMe: vi.fn().mockRejectedValue(new Error('unauthenticated')),
+const { fetchMe } = vi.hoisted(() => ({
+  fetchMe: vi.fn(),
 }))
+
+vi.mock('@src/api/auth/me.service', () => ({ fetchMe }))
 
 import { MapPage } from '@src/pages/map/MapPage'
 
 import { renderWithProviders } from '../../test-utils'
 
 describe('MapPage', () => {
+  beforeEach(() => {
+    fetchMe.mockReset()
+    fetchMe.mockRejectedValue(new Error('unauthenticated'))
+  })
+
   test('requests location automatically and renders the expanded map', async () => {
     const original = Object.getOwnPropertyDescriptor(navigator, 'geolocation')
     const getCurrentPosition = vi.fn((success) =>
@@ -238,5 +245,17 @@ describe('MapPage', () => {
     })
     renderWithProviders(<MapPage />)
     expect(await screen.findByText(/Mostramos Buenos Aires/)).toBeVisible()
+  })
+
+  test('explains that distance order is unavailable when geolocation is absent', async () => {
+    const original = Object.getOwnPropertyDescriptor(navigator, 'geolocation')
+    Reflect.deleteProperty(navigator, 'geolocation')
+
+    try {
+      renderWithProviders(<MapPage />)
+      expect(await screen.findByText(/sin ordenar por distancia/)).toBeVisible()
+    } finally {
+      if (original) Object.defineProperty(navigator, 'geolocation', original)
+    }
   })
 })

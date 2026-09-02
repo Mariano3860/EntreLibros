@@ -465,8 +465,14 @@ export interface MapBounds {
   west: number;
 }
 
+export interface MapCenter {
+  latitude: number;
+  longitude: number;
+}
+
 export async function listCornersForMap(
-  bounds?: MapBounds
+  bounds?: MapBounds,
+  center?: MapCenter
 ): Promise<CommunityCornerEntity[]> {
   const params: number[] = [];
   const whereConditions: string[] = [
@@ -508,12 +514,23 @@ export async function listCornersForMap(
   }
 
   const whereClause = `WHERE ${whereConditions.join('\n      AND ')}`;
+  let orderClause =
+    'ORDER BY metrics.weekly_exchanges DESC NULLS LAST, c.created_at DESC';
+  if (center) {
+    const longitudeIndex = params.length + 1;
+    const latitudeIndex = params.length + 2;
+    params.push(center.longitude, center.latitude);
+    orderClause = `ORDER BY ST_Distance(
+      c.location,
+      ST_SetSRID(ST_MakePoint($${longitudeIndex}, $${latitudeIndex}), 4326)::geography
+    ) ASC, metrics.weekly_exchanges DESC NULLS LAST, c.created_at DESC`;
+  }
 
   const { rows } = await query<CommunityCornerRow>(
     `${BASE_FIELDS}
     ${BASE_FROM}
     ${whereClause}
-    ORDER BY metrics.weekly_exchanges DESC NULLS LAST, c.created_at DESC
+    ${orderClause}
     LIMIT 200`,
     params
   );

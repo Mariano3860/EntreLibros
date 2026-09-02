@@ -1391,6 +1391,7 @@
                           "city",
                           "lat",
                           "lon",
+                          "distanceKm",
                           "photos",
                           "themes"
                         ],
@@ -1412,6 +1413,9 @@
                           },
                           "lon": {
                             "type": "number"
+                          },
+                          "distanceKm": {
+                            "type": ["number", "null"]
                           },
                           "lastSignalAt": {
                             "type": ["string", "null"],
@@ -1474,7 +1478,7 @@
                             "type": "string"
                           },
                           "distanceKm": {
-                            "type": "number"
+                            "type": ["number", "null"]
                           },
                           "cornerId": {
                             "type": "string"
