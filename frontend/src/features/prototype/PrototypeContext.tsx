@@ -1,4 +1,10 @@
-import { createContext, useContext, useMemo, useState } from 'react'
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from 'react'
 
 import { isApiMockMode } from '@src/utils/runtimeEnv'
 
@@ -19,6 +25,8 @@ type PrototypeContextValue = {
   publishStory: (text: string) => void
   chatMessages: PrototypeChatMessage[]
   sendMessage: (text: string, kind?: PrototypeChatMessage['kind']) => void
+  readConversationIds: ReadonlySet<string>
+  markConversationRead: (conversationId: string) => void
   openFaq: string | null
   setOpenFaq: (id: string | null) => void
   supportSent: boolean
@@ -38,9 +46,23 @@ export const PrototypeProvider = ({
   const [chatMessages, setChatMessages] = useState<PrototypeChatMessage[]>(
     () => (mockMode ? [...prototypeCatalog.chatMessages] : [])
   )
+  const [readConversationIds, setReadConversationIds] = useState<Set<string>>(
+    () => new Set()
+  )
   const [openFaq, setOpenFaq] = useState<string | null>('publish')
   const [supportSent, setSupportSent] = useState(false)
-
+  const markConversationRead = useCallback(
+    (conversationId: string) => {
+      if (!mockMode) return
+      setReadConversationIds((current) => {
+        if (current.has(conversationId)) return current
+        const next = new Set(current)
+        next.add(conversationId)
+        return next
+      })
+    },
+    [mockMode]
+  )
   const value = useMemo<PrototypeContextValue>(
     () => ({
       catalog: prototypeCatalog,
@@ -73,6 +95,8 @@ export const PrototypeProvider = ({
           },
         ])
       },
+      readConversationIds,
+      markConversationRead,
       openFaq,
       setOpenFaq,
       supportSent,
@@ -80,7 +104,16 @@ export const PrototypeProvider = ({
         if (mockMode) setSupportSent(true)
       },
     }),
-    [chatMessages, mockMode, openFaq, period, socialPosts, supportSent]
+    [
+      chatMessages,
+      markConversationRead,
+      mockMode,
+      openFaq,
+      period,
+      readConversationIds,
+      socialPosts,
+      supportSent,
+    ]
   )
 
   return (

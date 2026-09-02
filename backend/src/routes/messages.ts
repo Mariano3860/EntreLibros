@@ -18,6 +18,7 @@ import {
   listPublicBookListingsForUser,
   type BookListing,
 } from '../repositories/bookListingRepository.js';
+import { markMessageNotificationsRead } from '../repositories/notificationRepository.js';
 import { notifyMessageRecipients } from '../services/notifications.js';
 
 const router = Router();
@@ -444,6 +445,7 @@ router.patch(
           .json({ error: 'Forbidden', message: 'messaging.errors.forbidden' });
       }
       await markConversationRead(conversationId, req.user.id, sequence);
+      await markMessageNotificationsRead(conversationId, req.user.id);
       return res.status(204).send();
     } catch (error) {
       const response = errorResponse(error);

@@ -223,6 +223,13 @@ describe('messaging and agreements API', () => {
       .send({ sequence: 1 })
       .expect(204);
     await request(app)
+      .get('/api/notifications')
+      .set('Cookie', second.cookie)
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body.notifications[0].readAt).not.toBeNull();
+      });
+    await request(app)
       .get(`/api/messages/${conversationId}/messages`)
       .set('Cookie', outsider.cookie)
       .expect(403)

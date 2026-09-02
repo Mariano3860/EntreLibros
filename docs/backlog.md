@@ -263,6 +263,7 @@ Feature 5.1 Mensajería 1:1
   - Actualización 2026-09-01: el flujo real de Mensajes persiste adjuntos tipados de libros, propuestas de intercambio y eventos de acuerdo; el menú `+` usa los catálogos de ambos participantes, las tarjetas se emiten por Socket.IO y se reconstruyen al recargar.
   - Actualización 2026-09-01: el menú `+` también permite insertar emojis en el borrador sin enviar el mensaje, con un selector modal compacto y accesible.
   - Actualización 2026-09-01: los reintentos idempotentes con `clientKey` ya no reemiten mensajes ni duplican notificaciones, y el backend verifica que el propietario declarado de cada adjunto coincida con su listing.
+  - Actualización 2026-09-02: el punto rojo de Mensajes del sidebar se sincroniza con `unreadCount` y al abrir una conversación también se limpian sus notificaciones pendientes, con estado equivalente en modo mock.
 - [ ] S-5.2 Bloqueo/Reporte en conversación y ficha (Must, E1; BR-43)
   - Éxito: acción en ≤2 pasos.
 

@@ -59,6 +59,21 @@ export async function markNotificationRead(
   return result.rows.length > 0;
 }
 
+export async function markMessageNotificationsRead(
+  conversationId: number,
+  userId: number
+): Promise<void> {
+  await query(
+    `UPDATE notifications
+     SET read_at = COALESCE(read_at, NOW())
+     WHERE recipient_id = $1
+       AND kind = 'message'
+       AND entity_id = $2
+       AND read_at IS NULL`,
+    [userId, String(conversationId)]
+  );
+}
+
 export async function getNotificationPreference(
   userId: number
 ): Promise<boolean> {
