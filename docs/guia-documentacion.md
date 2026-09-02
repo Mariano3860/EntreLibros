@@ -1,21 +1,33 @@
-# Guía de actualización de documentación
+# Guía de documentación
+
+La documentación debe explicar el producto que existe hoy y los límites que una persona puede comprobar en el repositorio. No debe conservar instrucciones para rutas, scripts, variables o servicios que ya no existen.
 
 ## Al cambiar una funcionalidad
 
-1. Revisa `AGENTS.md` raíz y el agente más cercano.
-2. Busca nombres antiguos con `rg` en código, README, docs, workflows y OpenSpec.
-3. Confirma la fuente de verdad: scripts, rutas, variables, migraciones y tests.
-4. Actualiza README local, documento técnico, troubleshooting y backlog según el alcance.
-5. Separa comportamiento actual de historia y anota fecha/hash solo cuando sea útil.
-6. Verifica enlaces relativos y comandos desde la raíz.
-7. Ejecuta formato, tests proporcionales y `git diff --check`.
+1. Revisa las instrucciones del repositorio y del paquete afectado.
+2. Confirma el comportamiento en código, contratos, migraciones, pruebas y UI.
+3. Actualiza el README local si cambian comandos o variables.
+4. Actualiza `docs/estado-actual.md` si cambia una capacidad disponible.
+5. Actualiza `docs/backlog.md` y `docs/roadmap.md` solo si cambia el alcance.
+6. Añade la ruta, evento, migración o procedimiento correspondiente.
+7. Ejecuta comprobaciones proporcionales y `git diff --check`.
 
-## Checklist de entrega
+## Lista de revisión
 
-- [ ] No quedan rutas, variables o scripts inexistentes.
-- [ ] Las migraciones documentadas coinciden con `backend/migrations/`.
-- [ ] Mock, demo, legacy y persistencia están diferenciados.
-- [ ] Se actualizó `docs/backlog.md` sin duplicados.
-- [ ] El OpenSpec tiene tareas marcadas y valida en modo estricto.
-- [ ] El diff no contiene secretos ni cambios runtime accidentales.
-- [ ] `git status --short` queda limpio después del commit.
+- [ ] Las rutas, variables, migraciones y comandos existen.
+- [ ] Los estados de carga, vacío y error están descritos.
+- [ ] API real, modo demo, datos sintéticos y persistencia están diferenciados.
+- [ ] Los errores públicos usan claves de traducción.
+- [ ] No aparecen secretos, tokens, dumps, direcciones ni datos personales.
+- [ ] Los enlaces Markdown apuntan a archivos existentes.
+- [ ] La documentación no presenta capacidades futuras como disponibles.
+- [ ] Las instrucciones se pueden ejecutar desde un entorno limpio.
+
+## Fuentes de verdad
+
+- Código y `package.json`: comportamiento y comandos.
+- `backend/migrations/`: esquema aplicado.
+- `backend/openapi.json`: contrato HTTP publicado.
+- `docs/estado-actual.md`: capacidades verificadas.
+- `docs/backlog.md`: trabajo pendiente.
+- `docs/roadmap.md`: evolución posterior.

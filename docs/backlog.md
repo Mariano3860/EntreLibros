@@ -1,388 +1,51 @@
-# Backlog de Producto (Business) — EntreLibros
+# Backlog de producto
 
-Última actualización: 2026-09-02
+Última actualización: 2026-09-02.
 
-> **Actualización técnica 2026-09-01:** `/map` reemplaza el slider de distancia por radios de 1, 5, 30, 50 km y sin límite. Con una ubicación autorizada, el perímetro y el filtrado de rincones, publicaciones, actividad y lista usan el mismo centro y distancia geográfica; sin permiso se conserva un fallback explícito sin inventar precisión.
+Este backlog reúne únicamente trabajo vigente. El código, las migraciones, los contratos y las pruebas son la fuente de verdad para marcar una tarea como hecha; las notas históricas se conservan en Git y no se repiten aquí.
 
-> **Actualización técnica 2026-08-29:** la recuperación de mensajería incorporó el bot persistente mediante la migración `015_seed_messaging_bot.sql`, conversación idempotente por usuario, historial recargable y guía de diagnóstico. La mensajería mock sigue siendo útil para UI, pero no prueba persistencia real.
+## Hecho
 
-> **Reconexión API 2026-08-31:** `reconnect-backend-to-prototype-frontend` conserva las ocho pantallas de referencia y conecta Inicio, libros, perfil, Comunidad, mapa, mensajería, estadísticas y consultas de soporte con los contratos reales disponibles. Series analíticas avanzadas, moderación, logros y base de conocimiento siguen diferidas según [`frontend-backend-reconnection-matrix.md`](frontend-backend-reconnection-matrix.md).
+- Registro, inicio/cierre de sesión, perfiles editables, intereses, idioma y privacidad básica.
+- Catálogo público, libros propios, publicación/edición, modalidades, condición, ISBN opcional, intereses y vencimiento.
+- Rincones con alta, edición del propietario, foto, normas, consentimiento, zona, visibilidad barrio/ciudad y pausa/reactivación.
+- Búsqueda parametrizada, catálogo unificado, mapa con radio contextual y estados de carga, vacío y error.
+- Feed de Comunidad, historias relevantes, seguimiento, likes únicos, comentarios y compartir con fallback.
+- Mensajería privada persistente, contactos visibles, adjuntos de libros, propuestas y acuerdos versionados.
+- Notificaciones in-app de mensajes/acuerdos, preferencia básica, deduplicación y contador no leído en Mensajes.
+- Migraciones acumulativas, pruebas automatizadas, comprobaciones de tipos, lint, formato, build y CI.
 
-> Las expansiones de confianza avanzada, reputación, moderación, métricas, integraciones de proveedores y retención de datos quedan fuera de `complete-entrelibros-recovery`. Se mantienen como trabajo futuro en [`roadmap.md`](roadmap.md) y requieren una OpenSpec propia; no son faltantes del MVP del TFG.
+## Prioridad P0 — cerrar el recorrido principal
 
-## Prioridad P0 — Brechas observadas en validación manual
+- [ ] **P0-01 — Recorrido real completo:** registrar o usar dos perfiles, publicar, descubrir, contactar, acordar y recargar sin perder datos. Verificar con API real y evidencia manual.
+- [ ] **P0-02 — Rincones consistentes:** completar baja o sustituto documentado, estados visibles, validaciones y propiedad. Verificar autorización y persistencia.
+- [ ] **P0-03 — Publicaciones válidas:** cerrar campos mínimos, consentimientos, imagen, modalidad, precio, disponibilidad y estados editoriales. Verificar API, UI y búsqueda.
+- [ ] **P0-04 — Privacidad territorial:** asegurar que ningún detalle, mapa o respuesta pública expone dirección o coordenadas exactas. Verificar visibilidad de ciudad/barrio con pruebas de API.
+- [ ] **P0-05 — Descubrimiento unificado:** mantener filtros combinables y la misma consulta para mapa y listado, incluyendo fallback sin geolocalización. Verificar selección, radio, vacío y error.
+- [ ] **P0-06 — Contacto desde el producto:** iniciar conversación desde publicación y perfil visibles, con plantilla opcional, bloqueos y reutilización de conversaciones. Verificar autorización y recarga.
+- [ ] **P0-07 — Acuerdos cerrables:** completar recordatorio, rechazo/cancelación, cambios de fecha y resultado post-encuentro. Verificar historial, concurrencia y notificación a las partes.
+- [ ] **P0-08 — Notificaciones accionables:** mostrar alias, estado y destino de mensaje/acuerdo; mantener punto rojo y contador sincronizados con lectura persistente. Verificar reintentos, Socket.IO y recarga.
+- [ ] **P0-09 — Reportes mínimos:** permitir reportar contenido, conducta o Rincón inexistente y dejar estado, motivo y canal de tratamiento. Documentar límites de moderación.
 
-Registrado el 2026-08-30 a partir de una recorrida manual de la interfaz. Estos hallazgos tienen prioridad máxima porque afectan datos visibles, navegación y acciones principales. Se deben validar contra la API real y corregir antes de considerar cerrada la experiencia del MVP. Los mocks solo deben permanecer en pruebas o en un modo demo explícito.
+## Prioridad P1 — calidad y evidencia de entrega
 
-> **Actualizacion tecnica 2026-09-02:** Comunidad ya cuenta con likes persistentes por usuario, comentarios ordenados, compartir con fallback, feed filtrado por visibilidad/bloqueos y una tira de historias relevantes que excluye la historia propia.
+- [ ] **P1-01 — Métricas mínimas:** calcular Rincones activos, publicaciones activas, acuerdos confirmados, tiempo de descubrimiento y embudo publicación → contacto → acuerdo → confirmación. Verificar periodo, denominadores y `sin datos`.
+- [ ] **P1-02 — Seguridad del MVP:** auditar autenticación, cookies, CORS/CSRF, cabeceras, rate limiting, autorización, logs y errores traducibles. Registrar riesgos residuales sin afirmar controles no implementados.
+- [ ] **P1-03 — Datos y consentimiento:** documentar retención mínima, revocación de consentimientos, imágenes, mensajes y reportes. Verificar minimización y ausencia de datos personales innecesarios.
+- [ ] **P1-04 — Rendimiento:** medir una búsqueda representativa y registrar resultado, entorno y desviaciones frente al objetivo de dos segundos.
+- [ ] **P1-05 — Accesibilidad y lenguaje:** revisar teclado, foco, contraste, responsive y español neutro en las rutas principales. Verificar manualmente en navegador real.
+- [ ] **P1-06 — Recuperación:** comprobar backup, restauración, migración desde una base existente y procedimiento de rollback. Verificar que no se editan migraciones aplicadas.
+- [ ] **P1-07 — Evidencia:** preparar dataset sintético, capturas anonimizadas, checklist de navegador y matriz de requisitos para la entrega académica.
 
-### Inicio y descubrimiento de libros
+## Fuera del MVP
 
-- [x] **P0-01 — Catálogo real en inicio:** “Explorar libros” debe mostrar publicaciones visibles de todos los usuarios, no solo una parte de los libros del usuario autenticado ni datos incompletos.
-- [x] **P0-02 — Libros y actividad del usuario:** “Mis libros” debe cargar los libros reales del usuario autenticado. Si la sección también va a mostrar eventos como “ofreciste este libro” o “intercambiaste este libro”, evaluar renombrarla a “Mi actividad” y definir el modelo de eventos; no duplicar el acceso a libros propios que ya aparece en la parte superior.
-- [x] **P0-03 — Enlace “Ver todos” del inicio:** debe navegar al listado completo de libros y conservar el contexto de búsqueda/filtros cuando corresponda.
-- [x] **P0-04 — Entrada unificada al listado:** el “Ver todos” verde de la vista de libros no debe quedar inerte. Evaluar reemplazarlo por una primera columna/pestaña “Todos”, hacer que `/books` sea el listado completo (o redirija a una ruta canónica como `/books/all`) y mostrar “Todos” como selección activa al abrirlo.
+Estas capacidades pueden planificarse después sin bloquear el cierre del producto actual:
 
-### Publicar un libro
+- Recomendación automática o modelo de machine learning.
+- Email, push, MFA, recuperación avanzada de contraseña y proveedores cloud productivos.
+- Moderación avanzada, reputación, ratings, sanciones complejas y panel operativo completo.
+- PWA/offline, API pública, importación/exportación masiva y analítica avanzada.
 
-- [x] **P0-05 — Contraste en modo oscuro:** corregir colores de textos, campos, controles y estados del flujo de publicación que actualmente quedan negros o ilegibles sobre el fondo oscuro.
+## Criterio de cierre
 
-### Comunidad
-
-- [x] **P0-06 — Imágenes de Rincones de Libros:** limitar correctamente imágenes verticales o largas dentro de su contenedor, reservando el espacio del título para que nunca lo cubran. Mantener el comportamiento correcto de las imágenes cuadradas.
-- [x] **P0-07 — Publicar desde Comunidad:** hacer funcional el botón “Publicar” de la esquina superior derecha, con navegación o apertura del flujo de publicación correspondiente.
-- [x] **P0-08 — Datos reales de comunidad:** reemplazar personas y publicaciones mockeadas por datos reales de la API/persistencia. Los fixtures deben quedar restringidos a pruebas o demo explícita y no presentarse como actividad real.
-- [x] **P0-09 — Mini mapa y controles:** corregir el fondo/capas para que el mini mapa no aparezca blanco, mostrar su contenido y hacer funcionales sus tres botones, incluyendo estados de carga, error y vacío.
-
-### Mapa y ubicación
-
-- [x] **P0-10 — Centro inicial contextual:** al abrir `/map`, intentar centrar el mapa en la ubicación del usuario con permiso. Mantener un fallback claro cuando no haya permiso o ubicación disponible; Buenos Aires no debe ser el centro por defecto de una sesión con ubicación conocida.
-- [x] **P0-11 — Indicador de ubicación propia:** mostrar un marcador o indicador de precisión aproximada que permita saber dónde está el usuario, respetando la política de privacidad y sin exponer una dirección exacta públicamente.
-- [x] **P0-12 — Filtro de distancia:** reemplazar el control decorativo por radios de 1, 5, 30, 50 km y sin límite, dibujar el perímetro desde la ubicación autorizada y aplicar el mismo filtro geográfico a rincones, publicaciones, actividad y lista.
-
-### Mensajería e intercambios
-
-> **Actualización técnica 2026-09-01:** en Mensajes, `Preparar acuerdo` distingue entre una conversación sin acuerdo y una con acuerdo vigente. En el segundo caso edita los datos de la versión activa y persiste una contraoferta, evitando el conflicto por intentar insertar otro acuerdo para la misma conversación.
-
-> **Datos demo 2026-09-01:** las migraciones `024_seed_messaging_exchange_conversations.sql` y `025_repair_messaging_exchange_seed.sql` dejan una conversación por pareja entre `user2@entrelibros.com` y lectores demo con publicaciones públicas vigentes, para validar propuestas con libros del interlocutor.
-
-> **Actualización técnica 2026-09-01:** Mensajes incorpora `GET /api/messages/contacts` para buscar por nombre, apellido o alias, priorizar contactos seguidos y respetar visibilidad y bloqueos. El listado de conversaciones expone los no leídos entrantes y la pestaña “No leídos” filtra sobre ese estado persistido.
-
-> **Correccion de revision 2026-09-01:** `POST /api/messages/conversations` vuelve a validar en servidor la visibilidad, existencia, rol y bloqueos del destinatario, serializa el par para evitar duplicados y reutiliza la conversacion directa existente. Socket.IO refresca el contador de no leidos y la seleccion de contactos se invalida al cambiar la busqueda.
-
-- [x] **P0-13 — Apertura del chat:** al entrar en una conversación, posicionar el historial en el mensaje más reciente, al final del contenido.
-- [x] **P0-14 — Adjuntar un libro:** “Adjuntar Libro” debe listar los libros reales del usuario autenticado y permitir seleccionar uno. Mostrar un estado vacío solo cuando el usuario no tenga libros y un estado de error si no se pudieron cargar.
-- [x] **P0-15 — Proponer un intercambio:** el selector de libros debe reutilizar los libros reales disponibles del usuario y reflejar correctamente las publicaciones que puede ofrecer o solicitar.
-
-### Sesión
-
-- [x] **P0-16 — Confirmación de logout:** mostrar un modal de confirmación antes de cerrar sesión, con acciones claras de cancelar y confirmar.
-- [x] **P0-17 — Superset del catálogo:** “Todos” une el catálogo público con los libros propios de la sesión, sin exponer publicaciones privadas ajenas.
-- [x] **P0-18 — Historias de Comunidad:** “Publicar” abre un compositor social persistido con texto, foto opcional y libro enlazado.
-- [x] **P0-19 — Mini mapa y mapa principal:** el mini mapa conserva sólo el acceso al mapa; `/map` recentra la vista con geolocalización autorizada, mantiene el mapa expandido y compacta el filtro de distancia.
-- [x] **P0-20 — Adjuntar libro persistido:** la selección del chat crea un mensaje con metadata de libro y se reconstruye como tarjeta al recargar.
-
-### Criterio transversal de cierre P0
-
-Actualización 2026-09-01: el mini mapa de Comunidad quedó conectado al contrato real de rincones; sus pines y lista lateral abren `/map?radius=5&corner=<id>` y el mapa centra la selección cuando está disponible. `/map` conserva el radio seleccionado en la URL y aplica el perímetro geográfico cuando la ubicación fue autorizada.
-
-Cada punto debe verificarse en navegador con una sesión autenticada y mocks desactivados, comprobando la red y la persistencia cuando aplique. Ningún botón de acción principal debe quedar sin efecto, y los estados de datos vacíos deben distinguirse de fallos de carga o de fixtures de demostración.
-
-La validación automatizada y de servicio quedó completada. Se verificaron en navegador los estados reales de Comunidad, Estadísticas, Centro de ayuda, libros y mapa; queda como paso manual comparar las ocho rutas en todos los breakpoints antes del merge.
-
-## Actualización del MVP: Rincones y notificaciones
-
-- **Rincones de Libros:** completada la propiedad por usuario, la edición autenticada del propietario, los estados activo/en pausa y la compatibilidad segura con Rincones históricos sin propietario.
-- **Mapa:** completados los límites de coordenadas y distancia, la consulta acotada y la proyección pública de coordenadas redondeadas. La interfaz conserva estados de carga, error y vacío.
-- **Notificaciones in-app:** completada la persistencia mínima, la preferencia esencial de activación, la deduplicación de eventos de mensajes/acuerdos y un punto rojo accesible integrado en “Mensajes”. No existe una ruta `/notifications`.
-- **Pendiente:** no queda implementación funcional dentro de esta OpenSpec. Moderación, denuncias, reputación, email y preferencias avanzadas requieren una OpenSpec posterior.
-
-Resumen ejecutivo
-EntreLibros conecta lectores mediante Rincones de Libros (RdL), publicaciones de ejemplares y acuerdos entre pares, priorizando privacidad por diseño y operación comunitaria. Este backlog ordena el trabajo en épicas, features y stories, con foco en el valor de negocio y en resultados observables. El estado actual refleja avances ya logrados (auth básica, mensajería, geolocalización, normalización de libros, scripts/CI), y alinea los pendientes críticos (RdL, descubrimiento, moderación, métricas y notificaciones) para alcanzar un MVP robusto.
-
-Convenciones
-
-- Epic > Feature > Story (unidad de entrega).
-- Prioridad: Must (crítico), Should (recomendado), Could (opcional).
-- Entrega: E1, E2, E3, E4 (hitos por fases).
-- Estado: [x] Hecho | [~] Parcial | [ ] Pendiente.
-- Criterio de éxito: condición observable y verificable.
-- Este documento es de producto; las referencias técnicas son indicativas.
-
-Mapa de Épicas
-
-- EP-1 Identidad y Perfil (BR-01..04, BR-100–101)
-- EP-2 Rincones de Libros (RdL) (BR-10..14)
-- EP-3 Publicaciones (Ofrezco/Busco) (BR-20..24)
-- EP-4 Descubrimiento y Navegación (BR-30..32)
-- EP-5 Mensajería, Acuerdos y Notificaciones (BR-40..43, BR-60–61)
-- EP-6 Moderación y Convivencia (BR-50–52)
-- EP-7 Métricas y Tableros (BR-70..72)
-- EP-8 Privacidad y Gobierno del Dato (BR-80..82)
-- EP-9 Operación Comunitaria y Alianzas (BR-90–91)
-- EP-10 Sostenibilidad (BR-110)
-
-Resumen de Hechos (hasta la fecha)
-
-- Acceso básico: registro, login, logout; idioma de usuario inicial. [x]
-- Geolocalización base de usuarios (barrio/ciudad). [x]/[~]
-- Mensajería base y UI de conversaciones inicial. [~]
-- Normalización/verificación de libros asistida por metadata/ISBN. [~]
-- Bases de trabajo: scripts de desarrollo y CI, documentación de entorno. [x]
-- Flujo de despliegue a Docker Hub para `main` y `dev`; plantillas `.env` con `JWT_SECRET`. [x]
-- PostGIS local con Docker Compose para desarrollo. [x]
-- Documentación de arquitectura de despliegue (diagrama Mermaid + descripción de flujos). [x]
-
-EP-1 Identidad y Perfil
-Feature 1.1 Cuenta y acceso
-
-- [~] S-1.1 Registro con alias público (Must, E1; BR-01)
-  - Éxito: registro ≤2 min; alias visible; datos personales no públicos por defecto.
-- [x] S-1.2 Login/Logout y sesión (Must, E1)
-  - Éxito: login/logout confiable; sesión persistente controlada.
-- [~] S-1.3 Idioma base y copy claro (Must, E1; BR-100; Should BR-101 en E2)
-  - Éxito: español neutral; glosario/etiquetas centralizadas.
-  - Actualización 2025-09-30: se sumaron pruebas del selector de idioma y la actualización remota de preferencias en frontend, garantizando persistencia en cookies y sincronización con la API.
-- [x] S-1.7 Cobertura automatizada de autenticación y servicios transversales (Should, E1; QA-01)
-  - Éxito: middleware de auth y servicios comunes protegidos por pruebas unitarias que fallan ante regresiones críticas.
-  - Actualización 2025-09-30: se añadieron tests de middleware de autenticación, servicio de Open Library y utilidades de logging para sostener respuestas i18n coherentes ante fallos.
-  - Actualización 2025-10-10: se ampliaron las pruebas automatizadas del frontend cubriendo el `BaseLayout` y el `Header`, asegurando que la estructura principal, los puntos de acceso y los controles de idioma/tema permanezcan estables.
-  - Actualización 2025-10-10 (2): se extendió la cobertura de la interfaz comunitaria (feed, toggles y filtros) elevando la cobertura de ramas del frontend por encima del 85% requerido.
-  - Actualización 2025-10-23: se corrigió un error SQL en el servicio de mapa del backend que impedía la recuperación de publicaciones (cast incorrecto de uuid[]). Se añadieron pruebas para `useCornersMap` y utilidades de `path`, elevando la cobertura de ramas del frontend a 85.24% y garantizando que todos los tests pasen.
-  - Actualización 2025-10-23 (2): se mejoró la mantenibilidad del código extrayendo constantes mágicas, agregando comentarios explicativos sobre cálculos geoespaciales, polyfills de MSW, manejo del antimeridiano y generación de IDs de fotos. Todos los tests siguen pasando sin cambios funcionales.
-
-Feature 1.2 Perfil y privacidad
-
-> **Actualización técnica 2026-09-02:** el editor de perfil persistido incorpora foto JPG/PNG/WebP con fallback, país, calle privada, selección de intereses y vista previa de privacidad. La migración 026 mantiene compatibilidad con perfiles existentes y la proyección pública nunca devuelve la calle.
-
-- [x] S-1.4 Perfil editable (alias, descripción, intereses y zona) (Must, E1; BR-02)
-  - Actualización 2026-08-30: el perfil autenticado permite editar alias, descripción, idioma, intereses predefinidos, ciudad y barrio opcional; la relación ciudad-barrio se valida en backend y los perfiles existentes conservan valores vacíos hasta completarse.
-  - Éxito: se recomiendan al menos 3 intereses sin bloquear el guardado; la ciudad es obligatoria al completar la zona; la zona pública respeta privacidad.
-- [x] S-1.5 Privacidad por diseño (Must, E1; BR-04)
-  - Actualización 2026-08-29: se añadieron visibilidad pública/privada, redondeo de coordenadas y validaciones de imágenes.
-  - Éxito: no se expone calle/altura; auditoría interna.
-- [ ] S-1.6 Reputación liviana (Should, E2; BR-03)
-  - Éxito: 2+ señales visibles tras intercambio/actividad.
-
-EP-2 Rincones de Libros (RdL)
-Feature 2.1 Alta y gestión de RdL
-
-- [x] S-2.1 Alta de RdL (foto, reglas, zona) + aprobación liviana (Must, E1; BR-10)
-  - Éxito: formulario completo; visible en mapa tras aprobación.
-  - Actualización 2025-10-16: se implementó el modal multipaso "Crear Rincón" con stepper, validación inline, consentimiento explícito y flujo de borrador/publicación reutilizando los componentes compartidos de publicación. Se agregó MSW (201/422) y pruebas de navegación/errores. Falta enlazar con backend real y lógica de moderación para considerarlo completado.
-  - Actualización 2025-10-20: el paso de dirección ahora ofrece autocompletado con vista previa en mapa, fija latitud/longitud automáticamente y mantiene la preferencia de visibilidad sin exponer coordenadas manuales.
-  - Actualización 2025-10-21: se completaron pruebas unitarias del servicio de geocodificación, handlers MSW y del paso de ubicación (autocomplete, errores, reinicio), recuperando la cobertura de ramas >85% y asegurando la regresión de privacidad.
-  - Actualización 2025-10-22: se modularizó el paso de ubicación (inputs, carga de foto y consentimiento) y el modal completo via hooks dedicados para simplificar mantenimiento, agregando pruebas unitarias de navegación, errores y reinicio que elevan la cobertura de ramas y validan escenarios de teclado.
-  - Actualización 2025-11-01: se incorporó persistencia real de Rincones (migraciones PostGIS, repositorio y endpoints `/api/community/corners*`), con validaciones i18n, publicación efectiva y proyección en el mini mapa.
-- [ ] S-2.2 Estados de RdL (Activo / Pausa / Observación) (Should, E2; BR-12)
-  - Éxito: pausa oculta de resultados temporalmente.
-- [ ] S-2.3 Verificación ligera de anfitrión (Could, E3; BR-14)
-  - Éxito: etiqueta “verificado” tras revisión mínima.
-
-Feature 2.2 Visibilidad y actividad
-
-- [~] S-2.4 Control de granularidad en mapa (barrio/ciudad) (Must, E1; BR-11)
-  - Éxito: 100% de RdL respetan granularidad elegida.
-  - Actualización 2025-10-16: el flujo de alta de RdL exige elegir visibilidad barrio/ciudad, persiste el consentimiento y refleja la selección en la revisión previa; resta propagarla al backend/mapa productivo.
-  - Actualización 2025-10-30: se publicaron los endpoints `/api/map` y `/api/map/geocode` conectados al frontend, con filtrado real por capas, geocodificación de Nominatim y dataset territorial inicial respetando los límites solicitados.
-  - Actualización 2025-11-01: el servicio de mapa consume ahora los Rincones persistidos y publicaciones activas, generando pines con barrio y actividad desde PostGIS y alineando el mapa principal con el mini mapa comunitario.
-  - Actualización 2025-11-02: se ajustaron las envolventes PostGIS y las validaciones del alta para que los Rincones publicados aparezcan en el mapa global sin errores 500.
-- [ ] S-2.5 Señales de actividad en RdL (Should, E2; BR-13)
-  - Éxito: 2 señales simples (visitas, contactos cercanos).
-
-EP-3 Publicaciones (Ofrezco/Busco)
-Feature 3.1 Publicación y calidad del dato
-
-- [x] S-3.1 Publicar ejemplares (título, autor, estado; ISBN si existe; foto opcional) (Must, E1; BR-20)
-  - Éxito: 90% publicaciones con campos mínimos.
-  - Actualización 2025-10-05: se entregó el flujo completo en frontend (modal por ruta, stepper, autosave, preview e i18n) consumiendo mocks MSW; queda pendiente integrar con backend real y telemetría persistente.
-  - Actualización 2025-10-06: se ajustó el autosave para evitar sobrescrituras del borrador al reanudar y se mejoró la accesibilidad del focus trap.
-  - Actualización 2025-10-07: se reforzó la suite automatizada (MSW + RTL) cubriendo autosave, reanudación, publicación y errores, elevando la cobertura global del workspace por encima del 85% requerido.
-  - Actualización 2025-10-08: se refactorizó el modal en componentes reutilizables, optimizando renders y mantenimiento sin alterar el flujo funcional.
-  - Actualización 2025-10-08 (backend): se documentó en `docs/base_de_datos.md` la brecha entre el flujo del frontend y el modelo real (solo `users`/`books`). TODO: migraciones para `publications`, endpoints `/books/mine`, `/books/:id` y soporte de imágenes.
-  - Actualización 2025-10-30: se agregó persistencia real de publicaciones (tabla `publications` + `publication_images`), endpoints `/api/books` y `/api/books/mine`, validaciones de oferta/entrega y pruebas end-to-end para publicar y listar ejemplares propios.
-- [x] S-3.1b Ver y editar detalle de publicación (Must, E1; BR-20)
-  - Éxito: dueño puede ver y actualizar sus publicaciones; otros usuarios ven solo lectura.
-  - Actualización 2025-10-23: se implementó el modal de detalle de publicación (`BookDetailModal`) con modos lectura/edición basado en propiedad, hooks `useBookDetails` y `useUpdateBook` con actualizaciones optimistas, handlers MSW para GET/PUT `/api/books/:id` (200/404/403/400), tipos TypeScript completos (`Publication`, `PublicationStatus`, `PublicationUpdate`), integración en `BooksPage` con tarjetas clicables, i18n ES/EN y pruebas unitarias de servicios y hooks. Funciona completamente sobre mocks; resta conectar con backend real una vez disponibles los endpoints correspondientes.
-  - Actualización 2025-11-10: se alineó el modal con el contexto de autenticación real para identificar al dueño, se corrigió el botón de reintento para que vuelva a consultar la API mockeada, se robustecieron los handlers de MSW y se añadió la suite de pruebas de `BookDetailModal` cubriendo edición, reintento, confirmación y errores de guardado.
-  - Actualización 2025-11-12: se deshabilitó el reintento automático de React Query para mostrar de inmediato el estado de error con botón de reintento, se conectó la UI al usuario autenticado de MSW (`/auth/me`), se afinó el handler `apiRouteMatcher` para hosts y parámetros dinámicos y se estabilizó la suite de pruebas integrando MSW real y verificando el flujo de reintento.
-  - Actualización 2025-11-13: se ejecutó la suite completa `npm run test:frontend` confirmando que `BookDetailModal` y el resto del workspace funcionan correctamente con MSW y el contexto de autenticación mockeado.
-  - Actualización 2025-11-15: el backend expone GET/PUT reales en `/api/books/:id` con conversión a `Publication`, validaciones completas, control de acceso, pruebas de integración y documentación OpenAPI, habilitando la edición desde el frontend conectado.
-- [~] S-3.2 Normalización asistida por ISBN/metadata (Should, E2; BR-22)
-  - Éxito: autocompletado; reducción de duplicados/ambigüedades.
-- [ ] S-3.3 Contenidos permitidos/denegados (política editorial) (Must, E1; BR-24)
-  - Éxito: proceso de baja/ocultamiento ante incumplimientos.
-
-Feature 3.2 Búsquedas y ciclo de vida
-
-- [x] S-3.4 Búsquedas y filtros (texto, autor, ISBN, idioma, estado, distancia y ofrezco/busco) (Must, E1; BR-21)
-  - Actualización 2026-08-29: `/api/books` admite filtros parametrizados, radio PostGIS y paginación limitada; el cliente los serializa sin activar mocks.
-  - Actualización 2026-08-31: el catálogo de `/books` separa “Todos” de “Mis libros” y aplica filtros de condición, estado, tipo, modalidad, donación, orden y radio.
-  - Actualización 2026-08-31: se agregaron intereses persistentes y el flujo “Buscar este libro”, con publicaciones `want` sin duplicados.
-  - Éxito: resultados <2s con filtros básicos.
-- [x] S-3.5 Vencimiento/renovación de publicaciones (Should, E2; BR-23)
-  - Actualización 2026-08-29: las publicaciones caducan a los 30 días, dejan de aparecer en el catálogo y el propietario puede renovarlas.
-  - Éxito: aviso previo; reducción de obsoletas.
-- [x] S-3.6 Documentar diagrama de clases del modelo de datos (Mermaid) (Should, E1; DOC-01)
-  - Éxito: diagrama actualizado en `docs/base_de_datos.md`, visible en GitHub y alineado con entidades principales.
-  - Actualización: se documentó el modelo físico completo (tablas reales, columnas y enums), se aclararon relaciones clave y se listaron proyecciones futuras para mantener la trazabilidad técnica.
-  - Actualización 2025-09-16: se corrigió la sintaxis Mermaid para que GitHub renderice el diagrama y se mantuvo terminología consistente en la documentación.
-  - Actualización 2025-09-27: se ajustaron los estilos y la sintaxis del diagrama Mermaid para evitar errores de parseo/render en la documentación.
-  - Actualización 2025-09-27 (2): se incorporaron métodos asociados a cada tabla, se añadió configuración Mermaid para layout uniforme y se sumó un diccionario de datos para términos en inglés.
-- [x] S-3.7 Estados visibles alineados con UI (Must, E1; BR-23)
-  - Éxito: los estados persistidos y expuestos distinguen publicaciones disponibles, reservadas, completadas, vendidas e intercambiadas.
-  - Actualización 2025-11-16: se extendió el enum `publication_status`, se ajustaron las proyecciones de `/api/books`, `/api/books/mine` y `/api/books/:id` y se añadieron pruebas que validan la traducción entre estados internos y visibles.
-  - Actualización 2025-11-18: el modal de detalle refleja los estados "Vendido" e "Intercambiado" con nuevas etiquetas y estilos, garantizando traducciones consistentes en ES/EN.
-
-EP-4 Descubrimiento y Navegación
-Feature 4.1 Mapa y listados
-
-- [~] S-4.1 Geolocalización de usuario (base) (Must, E1; soporte de BR-30)
-  - Éxito: detección de zona para ordenar por cercanía.
-- [~] S-4.2 Mapa de RdL + listado ordenado por cercanía/afinidad (Must, E1; BR-30)
-  - Éxito: resultados consistentes entre lista y mapa.
-  - Actualización 2025-10-09: se integró en Community la tira de Rincones cercanos, un mini-mapa en la barra lateral y la vinculación de publicaciones/flujo de publicación con Rincones (chips y selector), quedando pendiente la conexión con datos en tiempo real y filtros avanzados.
-  - Actualización 2025-10-12: se desplegó la vista `/map` como hub territorial con rail de filtros y heatmap sobre mocks MSW; el panel de detalle queda como bloque placeholder hasta la próxima iteración mientras se termina de definir contenido y acciones. Resta conectar servicios reales y geocercas dinámicas.
-  - Actualización 2025-10-13: se añadieron pruebas unitarias del mini-mapa, la tira de rincones y los chips de rincones del feed, cubriendo estados de carga/errores y asegurando la accesibilidad del panel derecho y filtros para sostener la cobertura >85%.
-  - Actualización 2025-10-14: se sustituyó la aproximación lineal de distancia por cálculos geodésicos Haversine para centrar el mapa y se modernizaron los estilos con sintaxis `rgb(var() / α)` en los componentes vinculados.
-  - Actualización 2025-10-15: se factorizaron los cálculos de geocercas con la utilidad Haversine reutilizable, se ajustó la bbox inicial del mapa y se añadieron pruebas unitarias dedicadas.
-  - Actualización 2025-10-19: el modal de alta de Rincones ahora captura la dirección exacta (calle, número, opcionales) y coordenadas, almacena la preferencia de visibilidad (exacta/aproximada) y actualiza la confirmación de privacidad. Se adaptaron payloads/mock MSW, validaciones y pruebas para reflejar la política de logística y visualización.
-  - Actualización 2025-10-22: se robusteció el cálculo de estados vacíos en el mapa considerando capas visibles y actividad reciente, evitando falsos positivos cuando se ocultan capas; se añadieron pruebas unitarias del paso de ubicación para sostener la cobertura mínima requerida.
-  - Actualización 2025-11-02: la vista `/map` ahora consulta el backend real por defecto (MSW solo se habilita explícitamente) y el estado vacío se despliega en el panel derecho, alineando la UI con el diseño previsto y mostrando Rincones recién publicados sin recargar manualmente.
-  - Actualización 2025-11-03: el backend del mapa amplía el bounding box consultado y reutiliza coordenadas proyectadas para no omitir rincones recién cargados al borde de la vista, manteniendo la privacidad de ubicaciones aproximadas.
-  - Actualización 2025-11-04: se corrigió la intersección geoespacial del mapa para respetar el bounding box del viewport (incluyendo cruces por antimeridiano) y se elevó el límite de carga JSON del backend para aceptar formularios de Rincones con imágenes en base64 sin errores `413`.
-  - Actualización 2025-11-05: la API del mapa ajusta las coordenadas aproximadas dentro del viewport para no ocultar Rincones recién publicados y la vista `/map` simplifica el panel de filtros retirando la sección de temas obsoleta.
-  - Actualización 2025-11-06: se corrigió la intersección geoespacial del mapa para respetar el SRID de PostGIS y se filtraron los pines con las coordenadas proyectadas, evitando errores 500 intermitentes y mostrando los Rincones recién guardados en el viewport.
-  - Actualización 2025-11-07: el backend del mapa volvió a usar filtros cartesianos sobre latitud/longitud para estabilizar las consultas sin depender de envolventes PostGIS, alineó el estado de los pines con el del Rincón y se reforzó la suite de mocks MSW para respetar el prefijo `/api`.
-  - Actualización 2025-11-08: se agregó un fallback seguro en la API del mapa para recuperar Rincones aun cuando la intersección geoespacial falle, se expone el estado real de cada pin y se endurecieron las pruebas de MSW/`index.tsx` para habilitar o deshabilitar mocks explícitamente elevando la cobertura de ramas >85%.
-  - Actualización 2025-11-09: se robusteció el servicio de mapa con una segunda consulta sin límites cuando la búsqueda acotada falla y se ajustaron las pruebas de arranque del frontend para orquestar `setupMocks` de forma determinística, recuperando los escenarios de error en servicios REST y el umbral de cobertura global. Además, se corrigió la intersección geográfica mediante envolventes `ST_MakeEnvelope` compatibles con antimeridiano y se añadió un polyfill controlado de `ProgressEvent` para que MSW se inicie sin rechazos en entornos de prueba.
-  - Actualización 2025-11-10: el feed comunitario incorpora ítems de swaps modelados desde la nueva entidad `community_swaps`, mostrando participantes, ofertas y pedidos en la paginación junto a publicaciones tradicionales y añadiendo pruebas de servicio que validan estructura y orden.
-  - Actualización 2025-11-10 (3): se alineó el esquema OpenAPI y la UI del feed para consumir los swaps anidados (participantes, publicaciones ofrecidas y solicitadas), mostrando carátulas y propietarios correctos sin romper la compatibilidad con los clientes existentes.
-
-Feature 4.2 Descubrimiento avanzado
-
-- Actualizacion 2026-09-02: la experiencia social de Comunidad se implemento con likes unicos, comentarios ordenados y stories relevantes excluyendo al usuario actual; las colecciones tematicas siguen pendientes.
-
-- Actualización 2026-08-31: Inicio pagina las recomendaciones en grupos de hasta cinco libros, con controles compactos para renovar la selección sin alterar el detalle modal.
-
-- [~] S-4.5 Seguimiento y descubrimiento personalizado en Comunidad (Must, E1; BR-32)
-  - ActualizaciÃ³n 2026-08-31: se agregaron seguimiento persistente, historias de lectores, sugerencias por cercanÃ­a/intereses y libros relevantes mediante `/api/community/discovery`; las colecciones temÃ¡ticas quedan pendientes.
-  - ActualizaciÃ³n 2026-08-31: Inicio consume `/api/books/home` para priorizar publicaciones de lectores seguidos y `/books` separa las publicaciones propias de la exploraciÃ³n pÃºblica.
-
-- [ ] S-4.3 Guardar búsquedas y alertas (Should, E2; BR-31)
-  - Éxito: aviso ante nuevas coincidencias.
-- [ ] S-4.4 Sugerencias “cerca de mí” y colecciones temáticas (Could, E3; BR-32)
-  - Éxito: CTR objetivo interno.
-
-EP-5 Mensajería, Acuerdos y Notificaciones
-Feature 5.1 Mensajería 1:1
-
-- [~] S-5.1 Chat 1:1 con plantillas de primer contacto (Must, E1; BR-40)
-  - Éxito: iniciar conversación desde ficha en ≤2 taps/clicks.
-  - Actualización 2025-01-09: se creó el wrapper `BubbleBase` y se adaptaron los mensajes genéricos para reutilizarlo sin alterar el estilo actual, preparando el chat para nuevas variantes de burbuja.
-  - Actualización 2025-09-29: se ajustaron los mocks del chat al español y se corrigió el layout para que la barra de mensajes permanezca visible mientras el historial hace scroll.
-  - Actualización 2025-09-30: se enriqueció la conversación mockeada con un flujo lógico de intercambio, se diferenciaron visualmente los libros propios vs. del interlocutor y se alinearon las insignias/acciones con la UI.
-  - Actualización 2025-10-07: se añadieron pruebas unitarias de burbujas, pestañas y socket mockeado para garantizar traducciones, estados offline/online y envío de mensajes sin regresiones.
-  - Actualización 2025-11-19: se reemplazó la barra de entrada por un compositor accesible con selector de emojis y formularios para adjuntar libros, proponer intercambios y acordar encuentros; se actualizaron los tipos de mensajes, traducciones y pruebas RTL para cubrir los nuevos flujos.
-  - Actualización 2026-09-01: el flujo real de Mensajes persiste adjuntos tipados de libros, propuestas de intercambio y eventos de acuerdo; el menú `+` usa los catálogos de ambos participantes, las tarjetas se emiten por Socket.IO y se reconstruyen al recargar.
-  - Actualización 2026-09-01: el menú `+` también permite insertar emojis en el borrador sin enviar el mensaje, con un selector modal compacto y accesible.
-  - Actualización 2026-09-01: los reintentos idempotentes con `clientKey` ya no reemiten mensajes ni duplican notificaciones, y el backend verifica que el propietario declarado de cada adjunto coincida con su listing.
-  - Actualización 2026-09-02: el punto rojo de Mensajes del sidebar se sincroniza con `unreadCount` y al abrir una conversación también se limpian sus notificaciones pendientes, con estado equivalente en modo mock.
-- [ ] S-5.2 Bloqueo/Reporte en conversación y ficha (Must, E1; BR-43)
-  - Éxito: acción en ≤2 pasos.
-
-Feature 5.2 Acuerdos
-
-- Actualización 2026-09-01: las acciones de una propuesta pendiente respetan el autor: quien propone puede cancelar y la contraparte puede aceptar o rechazar; la API también impide confirmar o rechazar la propia versión.
-
-- [~] S-5.3 Confirmación de acuerdo (lugar RdL/espacio público, horario) (Must, E1; BR-41)
-  - Éxito: registra acuerdo y dispara recordatorio.
-  - Actualización 2025-09-28: se incorporaron las burbujas de Propuesta y Confirmación dentro del chat, con i18n ES/EN, respeto de tema claro/oscuro y sin exponer direcciones exactas; resta conectar la lógica persistente/notificaciones.
-  - Actualización 2025-11-20: se modeló el versionado del acuerdo con cambios/cancelaciones accesibles, validación de disponibilidad mockeada y modal de confirmación inclusivo; se añadió un store dedicado, nuevas burbujas y pruebas (store + componentes) que cubren doble confirmación, cambios de versión, cancelación e idempotencia.
-  - Actualización 2026-08-29: además de lo anterior, se agregó el bot persistente con conversación por usuario, respuesta echo guardada antes de emitir por Socket.IO y carga del historial al reabrir; quedan pendientes las notificaciones y el registro post-encuentro.
-  - Actualización 2026-09-01: las propuestas y cambios del acuerdo también se guardan como mensajes tipados en la conversación y muestran sus acciones al recuperar el historial.
-- [ ] S-5.4 Registro post-encuentro (“se concretó / no se concretó”) (Should, E2; BR-42)
-  - Éxito: alimenta métricas sin exponer datos personales.
-
-Feature 5.3 Notificaciones
-
-- [ ] S-5.5 Notificaciones in-app y correo opcional (nuevos mensajes, confirmaciones, alertas) (Must, E1; BR-60)
-  - Éxito: opt-in por canal; silenciamiento por tipo.
-- [ ] S-5.6 Resumen semanal opcional (Should, E2; BR-61)
-  - Éxito: apertura y desuscripción fácil.
-- [x] S-5.7 Buzón de contacto comunitario (Must, E1; BR-60)
-  - Éxito: API `/api/contact/submit` persiste mensajes con validaciones i18n, documentada en OpenAPI y cubierta por pruebas de integración (201/400/500).
-  - Actualización 2025-11-05: la API devuelve una confirmación con clave i18n y conserva el registro guardado, permitiendo que el frontend muestre el toast correcto sin exponer el mensaje del usuario.
-
-EP-6 Moderación y Convivencia
-Feature 6.1 Reportes y toolkit
-
-- [ ] S-6.1 Recepción y tratamiento de reportes (contenido, conducta, RdL inexistente) (Must, E1; BR-50)
-  - Éxito: triage en ≤72 h; bitácora de acciones.
-- [ ] S-6.2 Acciones de moderación (ocultar, solicitar corrección, pausar, levantar sanción) (Should, E2; BR-51)
-  - Éxito: 4 acciones básicas disponibles.
-- [ ] S-6.3 Normas de convivencia y uso (aceptación al registrarse y antes de publicar) (Must, E1; BR-52)
-  - Éxito: tasas de aceptación registradas; accesibles desde perfil.
-
-EP-7 Métricas y Tableros
-Feature 7.1 Métricas mínimas y tableros
-
-- [ ] S-7.1 Métricas mínimas (nº RdL activos, publicaciones activas, acuerdos confirmados, tiempo de descubrimiento) (Must, E1; BR-70)
-  - Éxito: tablero básico visible a coordinación.
-  - Actualización 2025-11-01: se habilitaron los endpoints `/api/community/stats`, `/api/community/feed`, `/api/community/activity` y `/api/community/suggestions` con agregaciones deterministas (KPIs, tendencias, búsquedas y participantes), documentación OpenAPI y pruebas de regresión, dejando la información lista para tableros y SSR.
-- [ ] S-7.2 Indicadores por zona y actividad (Should, E2; BR-71)
-  - Éxito: filtro por zona en tablero.
-- [ ] S-7.3 Embudos publicación→contacto→acuerdo→confirmación (Could, E3; BR-72)
-  - Éxito: visibilidad global por etapa.
-
-EP-8 Privacidad y Gobierno del Dato
-Feature 8.1 Consentimientos y retención
-
-- [ ] S-8.1 Consentimientos explícitos para RdL, publicaciones e imágenes (Must, E1; BR-80)
-  - Éxito: campos de consentimiento marcados; auditoría.
-- [ ] S-8.2 Configuración de visibilidad de ubicación (barrio/ciudad) (Must, E1; BR-81)
-  - Éxito: elección requerida; nunca dirección exacta.
-- [ ] S-8.3 Política de retención/anonimización de inactivos (Should, E2; BR-82)
-  - Éxito: definiciones públicas y aplicadas.
-
-EP-9 Operación Comunitaria y Alianzas
-Feature 9.1 Onboarding y materiales
-
-- [ ] S-9.1 Onboarding de anfitriones (guía rápida, checklist, materiales imprimibles) (Should, E2; BR-90)
-  - Éxito: kit descargable; alta de nuevos RdL más fluida.
-- [ ] S-9.2 Puntos aliados (escuelas, clubes, comercios) (Could, E3; BR-91)
-  - Éxito: etiqueta visual + página informativa.
-
-EP-10 Sostenibilidad
-Feature 10.1 Participación y soporte
-
-- [ ] S-10.1 Cajas de donación o voluntariado (informativo, no transaccional) (Could, E3/E4; BR-110)
-  - Éxito: módulo informativo sin fricción.
-
-Matriz de estado actual (resumen)
-
-- EP-1 Identidad y Perfil: [x]/[~]/[ ] → Auth y perfil editable implementados; español neutro y reputación siguen pendientes.
-- EP-2 RdL: [ ] → Alta, estados, verificación, actividad y granularidad: pendientes.
-- EP-3 Publicaciones: [~]/[ ] → Normalización por ISBN parcial; publicación y filtros pendientes.
-- EP-4 Descubrimiento: [~]/[ ] → Geolocalización base hecha; mapa+lista y afinidad pendientes.
-- EP-5 Mensajería/Acuerdos/Notificaciones: [~]/[ ] → Chat base; acuerdos, reporte y notificaciones pendientes.
-- EP-6 Moderación: [ ] → Reportes, toolkit y normas: pendientes.
-- EP-7 Métricas: [ ] → Tablero e indicadores: pendientes.
-- EP-8 Privacidad/Datos: [~]/[ ] → Base de ubicación por barrio/ciudad; consentimientos y retención: pendientes.
-- EP-9 Operación Comunitaria: [ ] → Onboarding y aliados: pendientes.
-- EP-10 Sostenibilidad: [ ] → Pendiente.
-
-Roadmap por entregas (ajustado al estado actual)
-
-- E1 (cierre corto): EP-1 (perfil+privacidad mínima), EP-2 (alta RdL + granularidad), EP-3 (publicar y buscar básico), EP-4 (mapa+lista), EP-5 (acuerdos, reporte y notificaciones mínimas), EP-6 (recepción de reportes), EP-7 (métricas mínimas), EP-8 (consentimientos y visibilidad), EP-5/EP-1 (copy y accesibilidad AA básica).
-- E2: EP-3 (vencimientos), EP-3 (normalización completa), EP-2 (estados y señales), EP-5 (post-encuentro), EP-5 (resumen semanal), EP-7 (indicadores por zona), EP-8 (retención), EP-9 (onboarding anfitriones), EP-1 (glosario/idioma).
-- E3: EP-2 (verificación ligera), EP-4 (sugerencias cerca/colecciones), EP-7 (embudos), EP-9 (puntos aliados), EP-10 (donaciones/voluntariado informativo).
-- E4: consolidación, pruebas y cierre documental.
-
-Criterios de éxito transversales
-
-- Consistencia mapa/lista y tiempos de respuesta funcionales (<2s en filtros básicos).
-- Zero-directional exposure: nunca calle/altura; siempre barrio/ciudad.
-- Fricción mínima para acuerdos y primer contacto (≤2 pasos).
-- Observabilidad mínima de métricas de adopción y actividad.
-- Moderación con SLA simple y trazabilidad.
-
-Supuestos y límites (para mantener el enfoque)
-
-- No se gestiona inventario en los RdL (solo visibilidad del punto).
-- Encuentros mano a mano, sin pagos en la plataforma (salvo información no transaccional en S-10.1).
-- Ubicación nunca a nivel de puerta: barrio o ciudad, siempre con consentimiento.
-
-Trazabilidad de PRs (referencias clave; lista completa se añadirá como anexo)
-
-- Acceso/Perfil/Idioma: #64, #65, #75, #81
-- Geolocalización: #84
-- Mensajería/UI/Chatbot: #78, #55, #79
-- Normalización de libros: #87
-- Scripts/Workflows/CI/Docs: #85, #60, #58, #63, #62, #73, #72, #70, #67, #140 (Hecho: runtime Node 22, contratos same-origin, proxy API/Socket.IO, MSW opt-in y runbook de recuperación reproducible)
-
-Cómo mantener este backlog
-
-- Cada PR que afecte funcionalidad debe enlazar una Story (S-x.y) en este documento.
-- Actualizar Estado y Criterio de éxito al merge.
-- Revisar Roadmap y prioridades al final de cada entrega (E1–E4).
+El MVP se considera listo cuando el recorrido P0 funciona en API real con datos persistentes, las reglas de privacidad y errores están verificadas, pasan las suites del repositorio, existe evidencia manual del navegador y cada capacidad fuera de alcance está declarada como tal.

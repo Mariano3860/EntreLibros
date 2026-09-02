@@ -1,6 +1,6 @@
 # Backend de EntreLibros
 
-Servicio Node.js/TypeScript con Express, PostgreSQL/PostGIS y Socket.IO. Expone autenticación, libros, mapa, acuerdos y mensajería.
+Servicio Node.js/TypeScript con Express, PostgreSQL/PostGIS y Socket.IO. Expone autenticación, perfiles, libros, Comunidad, Rincones, mapa, mensajería, acuerdos y notificaciones.
 
 ## Ejecutar
 
@@ -11,22 +11,19 @@ npm run migrate
 npm run dev:backend
 ```
 
-El servidor escucha normalmente en `http://localhost:4000`. La configuración se carga con `dotenv`; no comitees archivos `.env` ni credenciales.
+El servidor escucha normalmente en `http://localhost:4000`. La configuración se carga con `dotenv`; no guardes archivos `.env` ni credenciales en el repositorio.
 
 ## Migraciones
 
-La migración `023_create_book_discovery_interests.sql` agrega intereses idempotentes sobre publicaciones ajenas y evita búsquedas activas duplicadas. La API de libros expone filtros parametrizados, `POST /api/books/:id/interest` y `POST /api/books/:id/want`.
-La migraciÃ³n `022_create_community_following_and_demo_data.sql` agrega seguimiento persistente y una semilla reproducible de lectores con historias, libros e intereses para probar el descubrimiento de Comunidad.
+Las migraciones están en `backend/migrations/` y se ejecutan en orden. Son append-only: para corregir un esquema existente agrega un archivo numerado nuevo. La migración `015_seed_messaging_bot.sql` crea el bot persistente y las migraciones posteriores agregan privacidad, descubrimiento, Comunidad, notificaciones y likes/comentarios.
 
 ```bash
 npm run migrate
 ```
 
-Las migraciones están en `backend/migrations/` y se ejecutan en orden. Son append-only: para un cambio nuevo agrega un archivo numerado. La migración `015_seed_messaging_bot.sql` crea el usuario bot y deja preparada su identidad persistente.
-
 ## Mensajería
 
-`GET /api/messages` lista conversaciones del usuario autenticado. `GET /api/messages/:conversationId/books` devuelve los libros disponibles de ambos participantes para adjuntarlos o proponer un intercambio. El canal de conversación usa Socket.IO y persiste el mensaje antes de notificar a los clientes; los adjuntos `book`, `swap` y `agreement` se validan contra la conversación y sobreviven a la recarga. La conversación del bot se crea de manera idempotente y sus respuestas se guardan en la base. El evento/canal global legacy se mantiene por compatibilidad.
+`GET /api/messages` lista las conversaciones del usuario autenticado. `GET /api/messages/:conversationId/books` devuelve publicaciones disponibles para adjuntar o proponer un intercambio. Socket.IO persiste los mensajes antes de notificar a los clientes; los adjuntos tipados y acuerdos sobreviven a la recarga.
 
 ## Comandos
 
@@ -39,4 +36,4 @@ npm run build -w backend
 npm run openapi -w backend
 ```
 
-Para errores de API, conserva claves de i18n en la respuesta pública. Para cambios de persistencia, cubre autorización, transacciones, reintentos y concurrencia en tests.
+Los errores públicos deben conservar claves de traducción. Los cambios de persistencia deben cubrir autorización, transacciones, reintentos y concurrencia en pruebas.

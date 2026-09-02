@@ -2,46 +2,42 @@
 
 ## Vista general
 
-Comunidad usa `GET /api/community/feed` con sesion opcional para proyectar `likedByMe` y filtrar listings e historias por publicacion vigente, perfil publico y bloqueos. `POST /api/community/posts/:postType/:id/like` alterna un like unico por usuario; `GET/POST /api/community/posts/:postType/:id/comments` lista o crea comentarios ordenados. El descubrimiento de stories usa seguimiento, intereses, ciudad y radio, excluye al usuario actual y respeta visibilidad y bloqueos.
-
 ```text
 Navegador
-  ├─ React/Rsbuild (3000 en dev, bundle estático en despliegue)
-  ├─ HTTP /api ───────────────┐
-  └─ Socket.IO /socket.io ────┤
-                               ▼
-                    Backend Express (4000)
-                               │
-                               ▼
-                    PostgreSQL / PostGIS
+  ├─ React/Rsbuild ── HTTP /api ───────┐
+  └─ Socket.IO /socket.io ────────────┤
+                                      ▼
+                               Express/TypeScript
+                                      │
+                                      ▼
+                               PostgreSQL/PostGIS
 ```
 
-En desarrollo Rsbuild proxifica `/api` y `/socket.io` al backend. En producción el proxy o servidor que entrega el frontend debe conservar esos mismos contratos. La configuración de despliegue puede variar; este documento describe la aplicación y el entorno local, no una topología cloud obligatoria.
+En desarrollo, Rsbuild proxifica `/api` y `/socket.io` al backend. Los Dockerfiles, archivos Compose y workflows son la referencia para empaquetado y CI/CD. Este documento describe el entorno local y no presupone una topología cloud concreta.
 
-## Límites
+## Responsabilidades
 
-- `frontend/` contiene rutas, componentes, estado, i18n, clientes HTTP y Socket.IO.
-- `backend/src/routes/` contiene endpoints HTTP; `backend/src/socket.ts` contiene eventos en tiempo real.
-- `backend/src/repositories/` es la frontera de persistencia.
-- `backend/migrations/` es la fuente de verdad del esquema aplicado.
-- MSW/mock es una capacidad del cliente para desarrollo y pruebas, no una base de datos alternativa del backend.
+- `frontend/`: rutas, componentes, estado, i18n, clientes HTTP y Socket.IO.
+- `backend/src/routes/`: endpoints HTTP.
+- `backend/src/socket.ts`: eventos en tiempo real.
+- `backend/src/repositories/`: acceso a PostgreSQL.
+- `backend/migrations/`: fuente de verdad del esquema aplicado.
+- `frontend/mocks/`: respuestas de demo para MSW; no es una base de datos alternativa.
+
+## Comunidad y descubrimiento
+
+`GET /api/community/feed` proyecta historias y publicaciones visibles respetando perfiles, bloqueos y sesión. Likes, comentarios, seguimiento e historias relevantes tienen persistencia. El mapa consulta Rincones, publicaciones y actividad con filtros de radio y ubicación aproximada.
 
 ## Mensajería
 
-`GET /api/messages` lista conversaciones autenticadas y calcula `unreadCount` únicamente con mensajes recibidos después del cursor de lectura del participante. `GET /api/messages/contacts?search=` busca personas públicas por nombre o alias, prioriza a quienes el usuario sigue y excluye al propio usuario y a relaciones bloqueadas. Los eventos `conversation:join`, `conversation:leave` y `conversation:message` operan sobre una conversación autorizada. El backend persiste el mensaje antes de emitirlo para que una reconexión o una recarga no lo pierdan.
+`GET /api/messages` lista conversaciones autenticadas y calcula `unreadCount` desde el cursor de lectura. `GET /api/messages/contacts?search=` busca personas públicas por nombre o alias y respeta seguimiento, visibilidad y bloqueos.
 
-La migración `015_seed_messaging_bot.sql` crea el usuario bot. El repositorio garantiza una conversación bot por usuario con bloqueo advisory e inserción idempotente. La respuesta del bot se guarda como mensaje normal y luego se entrega por Socket.IO. El handler global legacy (`message`) sigue disponible por compatibilidad y no debe usarse para validar la persistencia nueva.
-
-La creacion directa de conversaciones valida de nuevo en el servidor que el destinatario exista, sea un usuario visible y no este bloqueado; no acepta bots, perfiles privados ni IDs inexistentes aunque se invoque el endpoint manualmente. El par de participantes se serializa con un bloqueo advisory y se reutiliza la conversacion directa mas antigua si ya existe. Cada evento `conversation:message` invalida tambien el listado de conversaciones para refrescar `unreadCount`, y el chat abierto avanza el cursor de lectura con el ultimo mensaje persistido o recibido en vivo.
+Los eventos `conversation:join`, `conversation:leave` y `conversation:message` operan sobre conversaciones autorizadas. El backend persiste cada mensaje antes de emitirlo, y el cliente invalida el listado para mantener sincronizados historial, no leídos y notificaciones. El bot persistente se crea de forma idempotente con la migración `015_seed_messaging_bot.sql`.
 
 ## Perfil y privacidad
 
-`PATCH /api/user/profile` actualiza los datos editables del usuario autenticado, incluida la foto, los intereses y la ubicación estructurada. La calle se conserva únicamente en la respuesta autenticada. `GET /api/user/profile/:id` aplica la visibilidad geográfica configurada: `none` oculta la ubicación, `country` muestra solo el país, `city` muestra país y ciudad aproximada, y `neighborhood` añade el barrio aproximado; las coordenadas se redondean según ese nivel.
+`PATCH /api/user/profile` actualiza los datos editables del usuario autenticado. La calle solo existe en el contexto autorizado; el perfil público puede ocultar la ubicación o mostrar país, ciudad o barrio aproximado con coordenadas redondeadas.
 
 ## Modos del frontend
 
-`PUBLIC_API_USE_MOCKS=true` activa MSW para los handlers soportados; no requiere PostgreSQL para esos flujos. Con `false` u omitida, la aplicación usa backend real. La variable es pública y de build-time: cambiar `.env` sin reiniciar no cambia el bundle ya cargado.
-
-## Despliegue
-
-Los Dockerfiles, compose y workflows son la referencia para empaquetado y CI/CD. Las notas históricas de AWS/nginx que existan en documentos antiguos deben leerse como contexto, no como requisito local. Antes de cambiar infraestructura, actualiza este documento y el workflow afectado.
+`PUBLIC_API_USE_MOCKS=true` activa MSW para los flujos de demo soportados. Con `false` u omitida, el cliente utiliza backend y Socket.IO reales. La variable se resuelve durante dev/build y requiere reiniciar Rsbuild al cambiarla.
