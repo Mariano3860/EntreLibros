@@ -250,11 +250,14 @@ export async function commandAgreement(input: {
       input.reason
     );
     const nextVersion = row.current_version + 1;
-    await client.query(
+    const updated = await client.query(
       `UPDATE exchange_agreements SET state = $2, current_version = $3, updated_at = NOW()
-       WHERE id = $1`,
-      [input.id, nextState, nextVersion]
+       WHERE id = $1 AND current_version = $4`,
+      [input.id, nextState, nextVersion, input.expectedVersion]
     );
+    if (updated.rowCount !== 1) {
+      throw new Error('agreements.errors.conflict');
+    }
     await client.query(
       `INSERT INTO exchange_agreement_versions
        (agreement_id, version, actor_id, state, details)
@@ -367,12 +370,15 @@ export async function counterProposeAgreement(input: {
     if (!version.rows[0]) throw new Error('agreements.errors.not_found');
     row.details = version.rows[0].details;
     const nextVersion = row.current_version + 1;
-    await client.query(
+    const updated = await client.query(
       `UPDATE exchange_agreements
        SET state = 'proposed', current_version = $2, updated_at = NOW()
-       WHERE id = $1`,
-      [input.id, nextVersion]
+       WHERE id = $1 AND current_version = $3`,
+      [input.id, nextVersion, input.expectedVersion]
     );
+    if (updated.rowCount !== 1) {
+      throw new Error('agreements.errors.conflict');
+    }
     await client.query(
       `INSERT INTO exchange_agreement_versions
        (agreement_id, version, actor_id, state, details)
