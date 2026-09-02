@@ -109,6 +109,137 @@ describe('community persistence endpoints', () => {
     );
   });
 
+  test('persists unique likes and ordered comments for visible posts', async () => {
+    const email = `community-social-${Date.now()}@example.com`;
+    const cookie = await registerUser(email, 'Social reader');
+    const user = await findUserByEmail(email);
+    expect(user).not.toBeNull();
+
+    const book = await client.query<{ id: number }>(
+      `INSERT INTO books (title, author)
+       VALUES ('Social engagement book', 'A. Reader')
+       RETURNING id`
+    );
+    const listing = await client.query<{ id: number }>(
+      `INSERT INTO book_listings (user_id, book_id, type, status, condition, trade)
+       VALUES ($1, $2, 'offer', 'available', 'good', true)
+       RETURNING id`,
+      [user!.id, book.rows[0].id]
+    );
+    const story = await client.query<{ id: number }>(
+      `INSERT INTO community_stories (user_id, body)
+       VALUES ($1, 'Una historia para probar interacciones.')
+       RETURNING id`,
+      [user!.id]
+    );
+
+    await request(app)
+      .post(`/api/community/posts/listing/${listing.rows[0].id}/like`)
+      .expect(401);
+    await request(app)
+      .post('/api/community/posts/listing/not-an-id/like')
+      .set('Cookie', cookie)
+      .expect(400, {
+        error: 'BadRequest',
+        message: 'community.social.invalid_post',
+      });
+
+    const blockedViewerEmail = `community-blocked-viewer-${Date.now()}@example.com`;
+    const blockedViewerCookie = await registerUser(
+      blockedViewerEmail,
+      'Blocked viewer'
+    );
+    const blockedViewer = await findUserByEmail(blockedViewerEmail);
+    await client.query(
+      `INSERT INTO user_blocks (blocker_id, blocked_id) VALUES ($1, $2)`,
+      [blockedViewer!.id, user!.id]
+    );
+    await request(app)
+      .post(`/api/community/posts/listing/${listing.rows[0].id}/like`)
+      .set('Cookie', blockedViewerCookie)
+      .expect(404, {
+        error: 'NotFound',
+        message: 'community.social.post_not_found',
+      });
+    await request(app)
+      .get(`/api/community/posts/listing/${listing.rows[0].id}/comments`)
+      .set('Cookie', blockedViewerCookie)
+      .expect(404, {
+        error: 'NotFound',
+        message: 'community.social.post_not_found',
+      });
+
+    await request(app)
+      .post(`/api/community/posts/listing/${listing.rows[0].id}/like`)
+      .set('Cookie', cookie)
+      .expect(200, { liked: true, likes: 1 });
+    await request(app)
+      .post(`/api/community/posts/listing/${listing.rows[0].id}/like`)
+      .set('Cookie', cookie)
+      .expect(200, { liked: false, likes: 0 });
+    await request(app)
+      .post(`/api/community/posts/story/story-${story.rows[0].id}/like`)
+      .set('Cookie', cookie)
+      .expect(200, { liked: true, likes: 1 });
+
+    await request(app)
+      .post(`/api/community/posts/listing/${listing.rows[0].id}/comments`)
+      .set('Cookie', cookie)
+      .send({ body: '   ' })
+      .expect(422, {
+        error: 'CommunityCommentError',
+        message: 'community.social.comment_invalid',
+      });
+    const comment = await request(app)
+      .post(`/api/community/posts/listing/${listing.rows[0].id}/comments`)
+      .set('Cookie', cookie)
+      .send({ body: 'Me interesa conocer esta edición.' })
+      .expect(201);
+
+    expect(comment.body).toEqual(
+      expect.objectContaining({
+        author: 'Social reader',
+        body: 'Me interesa conocer esta edición.',
+        createdAt: expect.any(String),
+      })
+    );
+
+    await request(app)
+      .get(`/api/community/posts/listing/${listing.rows[0].id}/comments`)
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body).toEqual([
+          expect.objectContaining({
+            id: comment.body.id,
+            body: 'Me interesa conocer esta edición.',
+          }),
+        ]);
+      });
+
+    await request(app)
+      .get('/api/community/feed')
+      .set('Cookie', cookie)
+      .query({ size: 20 })
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              id: String(listing.rows[0].id),
+              likes: 0,
+              commentsCount: 1,
+              likedByMe: false,
+            }),
+            expect.objectContaining({
+              id: `story-${story.rows[0].id}`,
+              likes: 1,
+              likedByMe: true,
+            }),
+          ])
+        );
+      });
+  });
+
   test('validates pagination input', async () => {
     const response = await request(app)
       .get('/api/community/feed')
@@ -155,7 +286,9 @@ describe('community persistence endpoints', () => {
     const targetEmail = `community-target-${Date.now()}@example.com`;
     const viewerCookie = await registerUser(viewerEmail, 'Community viewer');
     const targetCookie = await registerUser(targetEmail, 'Fiction friend');
+    const viewer = await findUserByEmail(viewerEmail);
     const target = await findUserByEmail(targetEmail);
+    expect(viewer).not.toBeNull();
     expect(target).not.toBeNull();
 
     for (const [cookie, city, neighborhood] of [
@@ -190,6 +323,11 @@ describe('community persistence endpoints', () => {
        VALUES ($1, 'Una historia de prueba para lectores afines.', $2)`,
       [target!.id, listing.rows[0].id]
     );
+    await client.query(
+      `INSERT INTO community_stories (user_id, body)
+       VALUES ($1, 'Esta historia propia no debe aparecer en la tira.')`,
+      [viewer!.id]
+    );
 
     await request(app)
       .get('/api/community/discovery')
@@ -202,6 +340,11 @@ describe('community persistence endpoints', () => {
               id: String(target!.id),
               user: 'Fiction friend',
             }),
+          ])
+        );
+        expect(body.stories).not.toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({ id: String(viewer!.id) }),
           ])
         );
         expect(body.suggestions).toEqual(

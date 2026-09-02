@@ -88,8 +88,12 @@ export async function getCommunityDiscovery(
   const [storiesResult, suggestionsResult, booksResult] = await Promise.all([
     query<StoryAuthorRow>(
       `
-        WITH latest_stories AS (
-          SELECT DISTINCT ON (u.id)
+        WITH viewer AS (
+          SELECT id, interests, city, location, location_visibility, search_radius
+          FROM users
+          WHERE id = $1
+        ), story_candidates AS (
+          SELECT
             u.id AS user_id,
             COALESCE(u.alias, u.name) AS user_name,
             s.id AS story_id,
@@ -99,19 +103,56 @@ export async function getCommunityDiscovery(
             EXISTS (
               SELECT 1
               FROM user_follows f
-              WHERE f.follower_id = $1 AND f.followed_id = u.id
-            ) AS is_following
+              WHERE f.follower_id = v.id AND f.followed_id = u.id
+            ) AS is_following,
+            ARRAY(
+              SELECT interest
+              FROM unnest(COALESCE(u.interests, ARRAY[]::TEXT[])) AS interest
+              WHERE interest = ANY(COALESCE(v.interests, ARRAY[]::TEXT[]))
+            ) AS common_interests,
+            u.location_visibility IN ('city', 'neighborhood')
+              AND v.location_visibility IN ('city', 'neighborhood')
+              AND v.city IS NOT NULL
+              AND u.city = v.city AS same_city,
+            CASE
+              WHEN u.location_visibility IN ('city', 'neighborhood')
+                AND v.location_visibility IN ('city', 'neighborhood')
+                AND u.location IS NOT NULL
+                AND v.location IS NOT NULL
+              THEN ST_Distance(u.location, v.location) / 1000
+              ELSE NULL
+            END AS distance_km
           FROM community_stories s
           JOIN users u ON u.id = s.user_id
-          WHERE u.profile_visibility = 'public'
+          CROSS JOIN viewer v
+          WHERE u.id <> v.id
+            AND u.profile_visibility = 'public'
             AND u.role = 'user'
             AND NOT EXISTS (
               SELECT 1
               FROM user_blocks b
-              WHERE (b.blocker_id = $1 AND b.blocked_id = u.id)
-                 OR (b.blocker_id = u.id AND b.blocked_id = $1)
+              WHERE (b.blocker_id = v.id AND b.blocked_id = u.id)
+                 OR (b.blocker_id = u.id AND b.blocked_id = v.id)
             )
-          ORDER BY u.id, s.created_at DESC, s.id DESC
+        ), latest_stories AS (
+          SELECT DISTINCT ON (candidate.user_id)
+            candidate.user_id,
+            candidate.user_name,
+            candidate.story_id,
+            candidate.body,
+            candidate.image_url,
+            candidate.created_at,
+            candidate.is_following
+          FROM story_candidates candidate
+          WHERE candidate.is_following
+             OR cardinality(candidate.common_interests) > 0
+             OR candidate.same_city
+             OR candidate.distance_km <= COALESCE(
+                  (SELECT search_radius FROM viewer),
+                  25
+                )
+          ORDER BY candidate.user_id, candidate.created_at DESC,
+                   candidate.story_id DESC
         )
         SELECT *
         FROM latest_stories
@@ -123,7 +164,7 @@ export async function getCommunityDiscovery(
     query<SuggestionRow>(
       `
         WITH viewer AS (
-          SELECT id, interests, city, location, search_radius
+          SELECT id, interests, city, location, location_visibility, search_radius
           FROM users
           WHERE id = $1
         ),
@@ -137,11 +178,17 @@ export async function getCommunityDiscovery(
               WHERE interest = ANY(COALESCE(v.interests, ARRAY[]::TEXT[]))
             ) AS common_interests,
             CASE
-              WHEN u.location IS NOT NULL AND v.location IS NOT NULL
+              WHEN u.location_visibility IN ('city', 'neighborhood')
+                AND v.location_visibility IN ('city', 'neighborhood')
+                AND u.location IS NOT NULL
+                AND v.location IS NOT NULL
               THEN ST_Distance(u.location, v.location) / 1000
               ELSE NULL
             END AS distance_km,
-            v.city IS NOT NULL AND u.city = v.city AS same_city,
+            u.location_visibility IN ('city', 'neighborhood')
+              AND v.location_visibility IN ('city', 'neighborhood')
+              AND v.city IS NOT NULL
+              AND u.city = v.city AS same_city,
             EXISTS (
               SELECT 1
               FROM user_follows f

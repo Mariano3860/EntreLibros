@@ -23,7 +23,7 @@ Los endpoints se montan bajo `/api`; las filas autenticadas usan cookie de sesi�
 | Explorar: tabs, filtros y paginación         | estado local             | filtros de `/books`                                                   | Adaptación compatible | Mapear tabs a semántica real, sin inventar filtros; probar URL y vacío.                                                                                                    |
 | Comunidad: feed                              | posts demo               | `GET /community/feed`                                                 | Reconectar            | Adaptar feed persistido a cards; probar carga/error y orden.                                                                                                               |
 | Comunidad: publicar historia                 | `publishStory`           | `POST /community/stories`                                             | Adaptación compatible | La escritura existe; confirmar lista/media/libro y añadir sólo campos compatibles.                                                                                         |
-| Comunidad: stories, reacciones y comentarios | `catalog.stories`        | sin lectura/eventos sociales equivalentes                             | Diferir               | Requiere entidad/listado de historias e interacciones.                                                                                                                     |
+| Comunidad: stories, reacciones y comentarios | `catalog.stories`        | `/api/community/discovery`, `/api/community/feed`, likes y comentarios | Reconectar            | Historias relevantes excluyen al usuario actual; feed e interacciones aplican visibilidad y bloqueos.                                                                      |
 | Comunidad: rincones y sugerencias            | rincones demo            | `GET /community/corners/nearby`, `GET /community/suggestions`         | Reconectar            | Adaptar distancia, imagen y fallback; probar vacío y geografía sin permiso.                                                                                                |
 | Comunidad: mini mapa y estadísticas          | datos estáticos          | `GET /community/corners/map`, `/stats`, `/activity`                   | Adaptación compatible | Base disponible; clusters, heatmap y agregados editoriales requieren mapeo/extensión.                                                                                      |
 | Mapa: puntos, rincones y detalle             | `catalog.corners`        | `GET /map`, `/community/corners/map`, `/nearby`                       | Reconectar            | Normalizar coordenadas, estado y detalle respetando privacidad; renderizar teselas OSM en `MapCanvas` con paneo, zoom y selección persistidos.                             |
@@ -43,6 +43,8 @@ Los endpoints se montan bajo `/api`; las filas autenticadas usan cookie de sesi�
 | Mensajes: propuesta/cambio                   | card demo                | rutas de acuerdos, mensajes tipados y `agreement:updated`             | Reconectar            | Las propuestas, contrapropuestas y eventos del acuerdo se persisten como mensajes, se emiten por Socket.IO y se adaptan a burbujas accionables.                            |
 | Notificaciones/preferencias                  | no conectado             | rutas `/notifications` y `/notifications/preferences`                 | Reconectar            | Conectar indicador/ajuste visible; probar lectura y preferencia persistida.                                                                                                |
 
+La fila de Comunidad para stories, reacciones y comentarios queda reconectada con `/api/community/discovery`, `/api/community/feed` y los endpoints de likes/comentarios. El feed aplica visibilidad y bloqueos; compartir usa un enlace canonico con fallback del navegador.
+
 ## Eventos y seguridad
 
 | Evento o mutación            | Persistencia/autorización auditada                            | Uso objetivo                                            |
@@ -57,7 +59,7 @@ Los endpoints se montan bajo `/api`; las filas autenticadas usan cookie de sesi�
 ## Diferidos para una OpenSpec posterior
 
 1. Agregado personalizado de Inicio: recomendaciones y KPIs diarios/personales.
-2. Red social completa: historias listables, media, libro enlazado, reacciones, comentarios y eventos.
+2. Analitica social avanzada: media, libro enlazado, reacciones/comentarios en tiempo real, eventos y moderacion.
 3. Analítica: series, comparativos, rankings, mapa de actividad y exportación.
 4. Perfil lector: métricas, objetivo, racha, logros y relaciones.
 5. Mapa enriquecido: clusters, heatmap, actividad no derivable y política explícita de ubicación aproximada.

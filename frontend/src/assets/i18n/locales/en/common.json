@@ -746,7 +746,17 @@
         "like": "Like",
         "comment": "Comment",
         "share": "Share",
-        "likes": "likes"
+        "likes": "likes",
+        "comments": "comments",
+        "commentsLoading": "Loading comments…",
+        "commentsError": "We couldn't load the comments.",
+        "commentsEmpty": "No comments yet.",
+        "commentLabel": "Write a comment",
+        "commentPlaceholder": "Write a comment…",
+        "commentSubmit": "Post",
+        "shareTitle": "EntreLibros post",
+        "shareSuccess": "Link shared.",
+        "shareFallback": "Copy this link to share it:"
       },
       "swap": {
         "wants": "{{requester}} wants to swap “{{offeredTitle}}” for {{requestedOwner}}'s “{{requestedTitle}}”",
@@ -797,6 +807,7 @@
     "discovery": {
       "booksTitle": "Books you may like",
       "yourStory": "Your story",
+      "emptyStories": "There are no relevant stories for you yet.",
       "unknownAuthor": "Author unavailable",
       "bookFrom": "From {{user}}",
       "suggestionsTitle": "Suggestions for you",

@@ -2,6 +2,8 @@
 
 ## Vista general
 
+Comunidad usa `GET /api/community/feed` con sesion opcional para proyectar `likedByMe` y filtrar listings e historias por publicacion vigente, perfil publico y bloqueos. `POST /api/community/posts/:postType/:id/like` alterna un like unico por usuario; `GET/POST /api/community/posts/:postType/:id/comments` lista o crea comentarios ordenados. El descubrimiento de stories usa seguimiento, intereses, ciudad y radio, excluye al usuario actual y respeta visibilidad y bloqueos.
+
 ```text
 Navegador
   ├─ React/Rsbuild (3000 en dev, bundle estático en despliegue)

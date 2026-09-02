@@ -2,6 +2,8 @@
 
 Fecha de referencia: 2026-09-02.
 
+- La migración 027 agrega likes únicos y comentarios persistentes para publicaciones e historias de Comunidad; compartir incluye fallback y la tira de stories excluye la historia propia.
+
 - La migraciÃ³n 022 agrega seguimiento persistente y datos demo para historias, lectores y recomendaciones personalizadas de Comunidad.
 - La migración 023 agrega intereses personales sobre publicaciones ajenas y soporta publicaciones de búsqueda sin duplicados.
 
@@ -14,7 +16,7 @@ Fecha de referencia: 2026-09-02.
 - Inicio limita “Libros que podrían gustarte” a cinco publicaciones por página y permite avanzar o volver mediante controles discretos; el orden prioriza lectores seguidos cuando existe sesión.
 - Monorepo con frontend React/Rsbuild y backend TypeScript/Express.
 - `/books` separa el catálogo público de “Mis libros”, con filtros persistidos, interés y alta de publicaciones `want`.
-- PostgreSQL/PostGIS con migraciones 001–026.
+- PostgreSQL/PostGIS con migraciones 001–027.
 - El perfil autenticado permite editar foto, intereses, país, ciudad, barrio, calle privada y visibilidad geográfica. La proyección pública no devuelve la calle y limita país, ciudad y barrio al nivel elegido.
 - API de mensajes y eventos Socket.IO con persistencia antes de emitir.
 - Mensajes permite buscar contactos visibles por nombre, apellido o alias, prioriza seguidos y filtra conversaciones por no leídos entrantes.
@@ -30,7 +32,7 @@ Fecha de referencia: 2026-09-02.
 - El modo público depende de variables de build; cambiar `.env` requiere reiniciar Rsbuild.
 - La verificación en navegador de cookies, proxy, caché y WebSocket debe hacerse aparte de Vitest.
 - El canal global legacy del bot existe por compatibilidad y no debe confundirse con su conversación persistida.
-- Las métricas comunitarias, feed, rincones, sugerencias, perfil, libros, mapa, mensajes y consultas de soporte ya tienen consumidores de API real; las series avanzadas, historias/interacciones sociales, logros y base de conocimiento de ayuda siguen diferidas. El contrato de transición está en [`prototype-mock-contract.md`](prototype-mock-contract.md) y la matriz en [`frontend-backend-reconnection-matrix.md`](frontend-backend-reconnection-matrix.md).
+- Las métricas comunitarias, feed, rincones, sugerencias, perfil, libros, mapa, mensajes, interacciones sociales y consultas de soporte ya tienen consumidores de API real; las series avanzadas, moderación, logros y base de conocimiento de ayuda siguen diferidas. El contrato de transición está en [`prototype-mock-contract.md`](prototype-mock-contract.md) y la matriz en [`frontend-backend-reconnection-matrix.md`](frontend-backend-reconnection-matrix.md).
 
 ## Hallazgos de validación manual
 
@@ -38,12 +40,12 @@ El 2026-08-30 se detectó una brecha entre capacidades técnicas documentadas y 
 
 - El inicio y algunas secciones de libros muestran datos incompletos o mockeados; además, hay enlaces “Ver todos” sin acción y debe definirse la relación entre “Mis libros” y “Mi actividad”.
 - El flujo de publicación tiene problemas de contraste en modo oscuro.
-- Comunidad todavía presenta datos falsos, un botón de publicación inerte, recorte incorrecto de imágenes y un mini mapa sin contenido visible ni controles operativos.
+- Comunidad conserva como pendientes históricos las colecciones temáticas y la moderación; el feed, el CTA de publicación, las historias relevantes, el mini mapa y las interacciones sociales ya tienen conexión real o fallback explícito.
 - `/map` no inicia en la ubicación del usuario, no muestra un indicador de posición y el filtro de distancia no recorre ni pinta correctamente todo su rango.
 - En mensajería, el chat real conserva historial, adjuntos tipados y eventos de intercambio; el menú `+` permite usar los catálogos de ambos participantes y las tarjetas se reconstruyen tras recargar.
 - El logout ocurre sin confirmación.
 
-La implementación de `reconnect-backend-to-prototype-frontend` conserva esos recorridos en la rama actual y conecta los consumidores reales disponibles: catálogo/detalle de libros, perfil, feed y actividad comunitaria, rincones, mapa, mensajería persistida con Socket.IO, estadísticas, notificaciones y contacto. Permanecen diferidas las capacidades sin contrato suficiente (analítica avanzada, logros, historias/interacciones sociales y base de conocimiento de ayuda).
+La implementación de `reconnect-backend-to-prototype-frontend` conserva esos recorridos en la rama actual y conecta los consumidores reales disponibles: catálogo/detalle de libros, perfil, feed y actividad comunitaria, rincones, mapa, mensajería persistida con Socket.IO, estadísticas, notificaciones, interacciones sociales y contacto. Permanecen diferidas las capacidades sin contrato suficiente (analítica avanzada, moderación, logros y base de conocimiento de ayuda).
 
 ## Cómo comprobar mensajes
 
@@ -58,4 +60,4 @@ La implementación de `reconnect-backend-to-prototype-frontend` conserva esos re
 9. Abre una conversación nueva, busca por nombre, apellido o alias y confirma que los contactos seguidos aparecen primero; los perfiles privados o bloqueados no deben aparecer.
 10. Alterna la pestaña "No leídos" y confirma que solo muestra conversaciones con mensajes entrantes pendientes; si no hay resultados debe aparecer el estado vacío y "Todos" debe restaurar la lista.
 
-Para comprobar una historia, abre “Publicar” en Comunidad, escribe texto, enlaza opcionalmente una publicación propia y confirma que aparece tras invalidar el feed.
+Para comprobar una historia, abre “Publicar” en Comunidad, escribe texto, enlaza opcionalmente una publicación propia y confirma que aparece tras invalidar el feed. En `/community`, alterna el like, abre comentarios y usa compartir; confirma en Network `POST /api/community/posts/:postType/:id/like`, `GET/POST /api/community/posts/:postType/:id/comments` y el enlace canónico de fallback.

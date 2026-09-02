@@ -16,8 +16,19 @@ import {
   type PublishCornerPayload,
   type UpdateCornerPayload,
 } from '../services/communityCorners.js';
-import { authenticate, type AuthenticatedRequest } from '../middleware/auth.js';
+import {
+  authenticate,
+  authenticateOptional,
+  type AuthenticatedRequest,
+} from '../middleware/auth.js';
 import { createCommunityStory } from '../repositories/communityStoryRepository.js';
+import {
+  createCommunityComment,
+  isVisibleCommunityPost,
+  listCommunityComments,
+  parseCommunityPostId,
+  toggleCommunityPostLike,
+} from '../repositories/communitySocialRepository.js';
 import {
   followUser,
   unfollowUser,
@@ -209,37 +220,154 @@ router.get('/stats', async (_req, res) => {
   }
 });
 
-router.get('/feed', async (req, res) => {
-  const rawPage = req.query.page;
-  const rawSize = req.query.size;
+router.get(
+  '/feed',
+  authenticateOptional,
+  async (req: AuthenticatedRequest, res) => {
+    const rawPage = req.query.page;
+    const rawSize = req.query.size;
 
-  const page = rawPage === undefined ? 0 : Number(rawPage);
-  const size = rawSize === undefined ? 8 : Number(rawSize);
+    const page = rawPage === undefined ? 0 : Number(rawPage);
+    const size = rawSize === undefined ? 8 : Number(rawSize);
 
-  if (
-    !Number.isInteger(page) ||
-    page < 0 ||
-    !Number.isInteger(size) ||
-    size <= 0
-  ) {
-    return res.status(400).json({
-      error: 'BadRequest',
-      message: 'community.errors.invalid_pagination',
-    });
+    if (
+      !Number.isInteger(page) ||
+      page < 0 ||
+      !Number.isInteger(size) ||
+      size <= 0
+    ) {
+      return res.status(400).json({
+        error: 'BadRequest',
+        message: 'community.errors.invalid_pagination',
+      });
+    }
+
+    const clampedSize = Math.min(size, 20);
+    try {
+      const feed = await getPersistedCommunityFeed(
+        page,
+        clampedSize,
+        req.user?.id
+      );
+      return res.json(feed);
+    } catch (error) {
+      console.error('Failed to load persisted community feed', error);
+      return res.status(500).json({
+        error: 'CommunityFeedQueryFailed',
+        message: 'community.errors.query_failed',
+      });
+    }
   }
+);
 
-  const clampedSize = Math.min(size, 20);
-  try {
-    const feed = await getPersistedCommunityFeed(page, clampedSize);
-    return res.json(feed);
-  } catch (error) {
-    console.error('Failed to load persisted community feed', error);
-    return res.status(500).json({
-      error: 'CommunityFeedQueryFailed',
-      message: 'community.errors.query_failed',
-    });
+router.post(
+  '/posts/:postType/:id/like',
+  authenticate,
+  async (req: AuthenticatedRequest, res) => {
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'Unauthorized',
+        message: 'auth.errors.unauthorized',
+      });
+    }
+    const post = parseCommunityPostId(req.params.postType, req.params.id);
+    if (!post) {
+      return res.status(400).json({
+        error: 'BadRequest',
+        message: 'community.social.invalid_post',
+      });
+    }
+    try {
+      if (!(await isVisibleCommunityPost(post, req.user.id))) {
+        return res.status(404).json({
+          error: 'NotFound',
+          message: 'community.social.post_not_found',
+        });
+      }
+      return res.json(await toggleCommunityPostLike(post, req.user.id));
+    } catch (error) {
+      console.error('Failed to toggle community like', error);
+      return res.status(500).json({
+        error: 'CommunityLikeFailed',
+        message: 'community.social.like_failed',
+      });
+    }
   }
-});
+);
+
+router.get(
+  '/posts/:postType/:id/comments',
+  authenticateOptional,
+  async (req: AuthenticatedRequest, res) => {
+    const post = parseCommunityPostId(req.params.postType, req.params.id);
+    if (!post) {
+      return res.status(400).json({
+        error: 'BadRequest',
+        message: 'community.social.invalid_post',
+      });
+    }
+    try {
+      if (!(await isVisibleCommunityPost(post, req.user?.id))) {
+        return res.status(404).json({
+          error: 'NotFound',
+          message: 'community.social.post_not_found',
+        });
+      }
+      return res.json(await listCommunityComments(post, req.user?.id));
+    } catch (error) {
+      console.error('Failed to list community comments', error);
+      return res.status(500).json({
+        error: 'CommunityCommentsFailed',
+        message: 'community.social.comments_failed',
+      });
+    }
+  }
+);
+
+router.post(
+  '/posts/:postType/:id/comments',
+  authenticate,
+  async (req: AuthenticatedRequest, res) => {
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'Unauthorized',
+        message: 'auth.errors.unauthorized',
+      });
+    }
+    const post = parseCommunityPostId(req.params.postType, req.params.id);
+    if (!post) {
+      return res.status(400).json({
+        error: 'BadRequest',
+        message: 'community.social.invalid_post',
+      });
+    }
+    try {
+      if (!(await isVisibleCommunityPost(post, req.user.id))) {
+        return res.status(404).json({
+          error: 'NotFound',
+          message: 'community.social.post_not_found',
+        });
+      }
+      const body = req.body && typeof req.body === 'object' ? req.body : {};
+      const comment = await createCommunityComment({
+        post,
+        userId: req.user.id,
+        body: typeof body.body === 'string' ? body.body : '',
+      });
+      return res.status(201).json(comment);
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'community.social.comment_failed';
+      const status = message === 'community.social.comment_invalid' ? 422 : 500;
+      return res.status(status).json({
+        error: 'CommunityCommentError',
+        message,
+      });
+    }
+  }
+);
 
 router.post(
   '/stories',

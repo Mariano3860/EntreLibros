@@ -69,3 +69,27 @@ export async function authenticate(
     });
   }
 }
+
+export async function authenticateOptional(
+  req: AuthenticatedRequest,
+  _res: Response,
+  next: NextFunction
+) {
+  const jwtSecret = process.env.JWT_SECRET;
+  const jwtAlgorithm = (process.env.JWT_ALGORITHM || 'HS256') as Algorithm;
+  if (!jwtSecret) return next();
+
+  const token = parseCookies(req.headers.cookie).sessionToken;
+  if (!token) return next();
+
+  try {
+    const payload = jwt.verify(token, jwtSecret, {
+      algorithms: [jwtAlgorithm],
+    }) as { id: number };
+    const user = await findUserById(payload.id);
+    if (user) req.user = toPublicUser(user);
+  } catch {
+    // Public community reads remain available when an optional session is stale.
+  }
+  return next();
+}

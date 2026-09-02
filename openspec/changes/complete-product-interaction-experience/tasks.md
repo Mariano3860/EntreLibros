@@ -66,8 +66,10 @@
 
 ## 9. Interacciones sociales e historias relevantes
 
-- [ ] 9.1 Crear `feature/community-social-engagement` desde `main` actualizado tras el merge de #159 y revisar que el diseño de stories no vuelva a incluir al usuario autenticado en la tira.
-- [ ] 9.2 Añadir migraciones y contratos para likes únicos, comentarios ordenados y permisos de feed, incluyendo bloqueos/visibilidad; verificar con pruebas de API alternancia idempotente, comentario válido/inválido y prohibición de acceso.
-- [ ] 9.3 Implementar me gusta, comentarios, compartir con fallback y CTA separada para crear historia; verificar con tests de feed que el estado persiste, compartir confirma la acción y la tira excluye al usuario actual.
-- [ ] 9.4 Revisar visualmente `/community` a 1440×900 y narrow viewport contra el cuadrante inferior izquierdo de `img.png`; verificar acciones accesibles, contador, hilo de comentarios, tira sin usuario propio y estados vacío/error.
-- [ ] 9.5 Ejecutar suites afectadas, typecheck, lint, Stylelint, build y `git diff --check`; crear commits claros y una PR en español contra `main` sin merge.
+Implementacion de 9.1-9.3 completada: rama creada desde `main` actualizado, likes/comentarios persistidos con permisos de feed y acciones de comunidad conectadas con fallback.
+
+- [x] 9.1 Crear `feature/community-social-engagement` desde `main` actualizado tras el merge de #159 y revisar que el diseño de stories no vuelva a incluir al usuario autenticado en la tira.
+- [x] 9.2 Añadir migraciones y contratos para likes únicos, comentarios ordenados y permisos de feed, incluyendo bloqueos/visibilidad; verificar con pruebas de API alternancia idempotente, comentario válido/inválido y prohibición de acceso.
+- [x] 9.3 Implementar me gusta, comentarios, compartir con fallback y CTA separada para crear historia; verificar con tests de feed que el estado persiste, compartir confirma la acción y la tira excluye al usuario actual.
+- [x] 9.4 Revisar visualmente `/community` a 1440×900 y narrow viewport contra el cuadrante inferior izquierdo de `img.png`; verificar acciones accesibles, contador, hilo de comentarios, tira sin usuario propio y estados vacío/error.
+- [x] 9.5 Ejecutar suites afectadas, typecheck, lint, Stylelint, build y `git diff --check`; crear commits claros y una PR en español contra `main` sin merge.

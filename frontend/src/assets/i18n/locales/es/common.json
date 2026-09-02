@@ -750,7 +750,17 @@
         "like": "Me gusta",
         "comment": "Comentar",
         "share": "Compartir",
-        "likes": "Me gusta"
+        "likes": "Me gusta",
+        "comments": "comentarios",
+        "commentsLoading": "Cargando comentarios…",
+        "commentsError": "No pudimos cargar los comentarios.",
+        "commentsEmpty": "Todavía no hay comentarios.",
+        "commentLabel": "Escribir un comentario",
+        "commentPlaceholder": "Escribí un comentario…",
+        "commentSubmit": "Publicar",
+        "shareTitle": "Publicación de EntreLibros",
+        "shareSuccess": "Enlace compartido.",
+        "shareFallback": "Copiá este enlace para compartirlo:"
       },
       "swap": {
         "wants": "{{requester}} quiere intercambiar «{{offeredTitle}}» por «{{requestedTitle}}» de {{requestedOwner}}",
@@ -793,6 +803,7 @@
     "discovery": {
       "booksTitle": "Libros que podrían gustarte",
       "yourStory": "Tu historia",
+      "emptyStories": "Todavía no hay historias relevantes para vos.",
       "unknownAuthor": "Autor no informado",
       "bookFrom": "De {{user}}",
       "suggestionsTitle": "Sugerencias para vos",
