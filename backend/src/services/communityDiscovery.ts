@@ -205,6 +205,7 @@ export async function getCommunityDiscovery(
                 AND p.availability = 'public'
                 AND p.is_draft = false
                 AND p.status = 'available'
+                AND p.editorial_status = 'approved'
                 AND (p.expires_at IS NULL OR p.expires_at > NOW())
             ) AS has_activity
           FROM users u
@@ -278,6 +279,7 @@ export async function getCommunityDiscovery(
             AND p.availability = 'public'
             AND p.is_draft = false
             AND p.status = 'available'
+            AND p.editorial_status = 'approved'
             AND (p.expires_at IS NULL OR p.expires_at > NOW())
             AND owner.id <> v.id
             AND owner.profile_visibility = 'public'

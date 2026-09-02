@@ -44,6 +44,7 @@ export type PublishBookFormState = {
   searchQuery: string
   step: PublishBookStep
   acceptedTerms: boolean
+  cornerId: string
 }
 
 export type PublishBookDraftState = PublishBookFormState

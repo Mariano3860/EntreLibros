@@ -3,7 +3,8 @@ import { RadiusSelector } from '@components/map/FilterRail/FilterRail'
 import { MapCanvas } from '@components/map/MapCanvas/MapCanvas'
 import { PublishCornerModal } from '@components/publish/PublishCornerModal'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 
 import { MAP_RADIUS_OPTIONS } from '@src/api/map/map.types'
 import type {
@@ -78,7 +79,9 @@ const toDisplayCorner = (corner: MapCornerPin): MapCorner => ({
 export const MapPage = () => {
   const { catalog } = usePrototype()
   const { theme } = useTheme()
+  const { t } = useTranslation()
   const mockMode = isApiMockMode()
+  const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const requestedCornerId = searchParams.get('corner')
   const [distance, setDistance] = useState(() =>
@@ -414,6 +417,12 @@ export const MapPage = () => {
     if (!cornerForSelectedCard) return
     selectCorner(displayCornerForPin(cornerForSelectedCard))
   }, [cornerForSelectedCard, displayCornerForPin, selectCorner])
+  const handleViewPublication = useCallback(() => {
+    if (!selectedPublication) return
+    const listingId = selectedPublication.id.replace(/^listing-/, '')
+    if (!/^\d+$/.test(listingId)) return
+    navigate(`/books/${listingId}`)
+  }, [navigate, selectedPublication])
 
   if (!mockMode && mapQuery.isError)
     return (
@@ -583,10 +592,14 @@ export const MapPage = () => {
               <PrototypeButton
                 tone="primary"
                 size="small"
-                disabled={!cornerForSelectedCard}
-                onClick={handleViewCorner}
+                disabled={!selectedPublication && !cornerForSelectedCard}
+                onClick={
+                  selectedPublication ? handleViewPublication : handleViewCorner
+                }
               >
-                Ver rincón
+                {selectedPublication
+                  ? t('map.cta.openPublication')
+                  : 'Ver rincón'}
               </PrototypeButton>
             </Panel>
             {locationDenied ? (

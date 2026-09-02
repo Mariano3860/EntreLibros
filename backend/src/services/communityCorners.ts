@@ -1,18 +1,25 @@
 import {
   createCorner,
+  findCornerById,
   listCornersForMap,
   listCornersNear,
   updateCorner,
+  updateCornerEditorial,
   type CommunityCornerEntity,
+  type CommunityCornerEditorialStatus,
   type CommunityCornerStatus,
   type CommunityCornerVisibilityPreference,
   type MapBounds,
 } from '../repositories/communityCornerRepository.js';
+import { getDisplayCoordinates } from './map.js';
 import { clamp } from '../utils/math.js';
+import { isSafeExternalId, isValidImageReference } from './mediaValidation.js';
+import { validateEditorialText } from './editorialValidation.js';
 
 export type PublishCornerScope = 'public' | 'semiprivate';
 export type PublishCornerVisibilityPreference = 'exact' | 'approximate';
 export type PublishCornerStatus = 'active' | 'paused';
+export type PublishCornerEditorialStatus = CommunityCornerEditorialStatus;
 
 export interface PublishCornerAddress {
   street: string;
@@ -57,6 +64,8 @@ export interface PublishCornerResponse {
   imageUrl: string;
   status: PublishCornerStatus;
   locationSummary: string;
+  editorialStatus: PublishCornerEditorialStatus;
+  editorialReason: string | null;
 }
 
 export interface UpdateCornerPayload {
@@ -86,6 +95,32 @@ export interface CommunityCornerMapPinDto {
 export interface CommunityCornerMapDto {
   pins: CommunityCornerMapPinDto[];
   description?: string;
+}
+
+export interface CommunityCornerPublicDetailDto {
+  id: string;
+  name: string;
+  scope: PublishCornerScope;
+  hostAlias: string;
+  rules: string | null;
+  schedule: string | null;
+  status: PublishCornerStatus;
+  imageUrl: string | null;
+  location: {
+    city: string;
+    neighborhood: string;
+    referencePointLabel: string;
+    latitude: number;
+    longitude: number;
+    approximate: true;
+  };
+  activity: CommunityCornerMetricsDto;
+}
+
+interface CommunityCornerMetricsDto {
+  totalExchanges: number;
+  weeklyExchanges: number;
+  lastActivityAt: string | null;
 }
 
 export interface NearbyCornersOptions {
@@ -244,7 +279,9 @@ const validatePayload = (
 
   const photoId = normalizeString(payload.photo?.id);
   const photoUrl = normalizeString(payload.photo?.url);
-  if (!photoId || !photoUrl) {
+  if (!photoId || !photoUrl || !isSafeExternalId(photoId)) {
+    errors.photo = ERROR_MESSAGES.photo;
+  } else if (!isValidImageReference(photoUrl)) {
     errors.photo = ERROR_MESSAGES.photo;
   }
 
@@ -265,14 +302,24 @@ const validatePayload = (
   const validVisibility =
     visibilityPreference as PublishCornerVisibilityPreference;
   const validStatus = status as PublishCornerStatus;
+  const rules = normalizeString(payload.rules) || null;
+  const schedule = normalizeString(payload.schedule) || null;
+
+  const editorialError = validateEditorialText(
+    [name, hostAlias, rules ?? '', schedule ?? ''],
+    'community'
+  );
+  if (editorialError) {
+    throw new CornerValidationError({ content: editorialError });
+  }
 
   return {
     name,
     scope: validScope,
     hostAlias,
     internalContact,
-    rules: normalizeString(payload.rules) || null,
-    schedule: normalizeString(payload.schedule) || null,
+    rules,
+    schedule,
     location: {
       address: {
         street,
@@ -356,7 +403,14 @@ export const getCornersMap = async (): Promise<CommunityCornerMapDto> => {
 
   const pins = corners
     .map((corner) => {
-      const { x, y } = projectToBounds(corner.coordinates, MINI_MAP_BOUNDS);
+      const displayCoordinates = getDisplayCoordinates(corner);
+      const { x, y } = projectToBounds(
+        {
+          latitude: displayCoordinates.lat,
+          longitude: displayCoordinates.lon,
+        },
+        MINI_MAP_BOUNDS
+      );
       return {
         id: corner.id,
         name: corner.name,
@@ -368,6 +422,49 @@ export const getCornersMap = async (): Promise<CommunityCornerMapDto> => {
     .filter((pin) => Number.isFinite(pin.x) && Number.isFinite(pin.y));
 
   return { pins, description: DEFAULT_DESCRIPTION };
+};
+
+export const getPublicCornerDetail = async (
+  id: string
+): Promise<CommunityCornerPublicDetailDto | null> => {
+  const corner = await findCornerById(id);
+  if (
+    !corner ||
+    corner.draft ||
+    !corner.consent ||
+    corner.editorialStatus !== 'approved'
+  ) {
+    return null;
+  }
+
+  const displayCoordinates = getDisplayCoordinates(corner);
+  const neighborhood = corner.address.postalCode ?? 'Zona comunitaria';
+
+  return {
+    id: corner.id,
+    name: corner.name,
+    scope: corner.scope,
+    hostAlias: corner.hostAlias,
+    rules: corner.rules,
+    schedule: corner.schedule,
+    status: corner.status,
+    imageUrl: corner.photo?.url ?? null,
+    location: {
+      city: 'Ciudad Autónoma de Buenos Aires',
+      neighborhood,
+      referencePointLabel: corner.address.postalCode
+        ? `CP ${corner.address.postalCode}`
+        : 'Zona aproximada',
+      latitude: displayCoordinates.lat,
+      longitude: displayCoordinates.lon,
+      approximate: true,
+    },
+    activity: {
+      totalExchanges: corner.metrics.totalExchanges,
+      weeklyExchanges: corner.metrics.weeklyExchanges,
+      lastActivityAt: corner.metrics.lastActivityAt,
+    },
+  };
 };
 
 export const publishCorner = async (
@@ -400,6 +497,8 @@ export const publishCorner = async (
     imageUrl: ensureImageUrl(created),
     status: created.status,
     locationSummary: created.locationSummary,
+    editorialStatus: created.editorialStatus,
+    editorialReason: created.editorialReason,
   };
 };
 
@@ -424,17 +523,46 @@ export const editCorner = async (
     payload.name === undefined ? undefined : normalizeString(payload.name);
   if (name === '')
     throw new CornerValidationError({ name: ERROR_MESSAGES.name });
+  const current = await findCornerById(id);
+  if (!current || current.ownerId !== ownerId) return null;
+  const rules =
+    payload.rules === undefined
+      ? undefined
+      : normalizeString(payload.rules) || null;
+  const schedule =
+    payload.schedule === undefined
+      ? undefined
+      : normalizeString(payload.schedule) || null;
+  const editorialError = validateEditorialText(
+    [
+      name ?? current.name,
+      current.hostAlias,
+      rules ?? current.rules ?? '',
+      schedule ?? current.schedule ?? '',
+    ],
+    'community'
+  );
+  if (editorialError) {
+    throw new CornerValidationError({ content: editorialError });
+  }
+
+  const hasEditorialContentChange =
+    name !== undefined || rules !== undefined || schedule !== undefined;
   return updateCorner(id, ownerId, {
     name,
-    rules:
-      payload.rules === undefined
-        ? undefined
-        : normalizeString(payload.rules) || null,
-    schedule:
-      payload.schedule === undefined
-        ? undefined
-        : normalizeString(payload.schedule) || null,
+    rules,
+    schedule,
     status: payload.status,
     visibilityPreference: payload.visibilityPreference,
+    ...(hasEditorialContentChange
+      ? { editorialStatus: 'pending', editorialReason: null }
+      : {}),
   });
 };
+
+export const updateCornerEditorialStatus = async (
+  id: string,
+  status: PublishCornerEditorialStatus,
+  reason: string | null
+): Promise<CommunityCornerEntity | null> =>
+  updateCornerEditorial(id, status, reason);

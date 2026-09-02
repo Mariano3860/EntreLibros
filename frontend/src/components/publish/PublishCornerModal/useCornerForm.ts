@@ -10,6 +10,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
 
 import {
+  MAX_IMAGE_BYTES,
+  SUPPORTED_IMAGE_TYPES,
+} from '@src/constants/constants'
+
+import {
   STORAGE_KEY,
   initialState,
   stepOrder,
@@ -136,11 +141,25 @@ export const useCornerForm = ({
     (files: FileList | null) => {
       if (!files || files.length === 0) return
       const file = files[0]
+      if (
+        !SUPPORTED_IMAGE_TYPES.includes(
+          file.type as (typeof SUPPORTED_IMAGE_TYPES)[number]
+        ) ||
+        file.size > MAX_IMAGE_BYTES
+      ) {
+        toast.error(t('publishCorner.errors.photoInvalid'))
+        return
+      }
       const reader = new FileReader()
       reader.onload = () => {
         updateState({
           photo: {
-            id: `${file.name}-${Date.now()}`,
+            id: `${
+              file.name
+                .normalize('NFKD')
+                .replace(/[^a-zA-Z0-9._-]+/g, '_')
+                .slice(0, 96) || 'imagen'
+            }-${Date.now()}`,
             url: String(reader.result),
             alt: file.name,
           },

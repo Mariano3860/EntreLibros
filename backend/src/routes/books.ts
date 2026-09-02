@@ -17,6 +17,10 @@ import {
   type BookListingSort,
   type BookListingShippingPayer,
   type PublicBookListingFilters,
+  type PublicationConsents,
+  hasExactActiveBookListing,
+  updateBookListingEditorial,
+  type PublicationEditorialStatus,
 } from '../repositories/bookListingRepository.js';
 import {
   searchBooksApiResults,
@@ -32,6 +36,9 @@ import {
   type PublicationImageUpdate,
   resolvePublicationStatus,
 } from '../services/bookListings.js';
+import { isValidImageReference } from '../services/mediaValidation.js';
+import { normalizeIsbn } from '../services/isbn.js';
+import { validateEditorialText } from '../services/editorialValidation.js';
 
 const router = Router();
 
@@ -105,7 +112,24 @@ router.post('/', authenticate, async (req: AuthenticatedRequest, res) => {
     return res.status(validation.status).json(validation.error);
   }
 
-  const { metadata, images, offer, draft, type, cornerId } = validation.data;
+  const { metadata, images, offer, draft, type, cornerId, consents } =
+    validation.data;
+
+  if (
+    type === 'offer' &&
+    (await hasExactActiveBookListing({
+      userId: req.user.id,
+      type,
+      title: metadata.title,
+      author: metadata.author,
+      isbn: metadata.isbn,
+    }))
+  ) {
+    return res.status(409).json({
+      error: 'DuplicatePublication',
+      message: 'books.errors.duplicate',
+    });
+  }
 
   let verified: boolean;
   try {
@@ -134,6 +158,7 @@ router.post('/', authenticate, async (req: AuthenticatedRequest, res) => {
       },
       notes: offer.notes,
       availability: offer.availability,
+      consents,
     });
     if (result.kind === 'duplicate') {
       return res.status(409).json({
@@ -175,6 +200,7 @@ router.post('/', authenticate, async (req: AuthenticatedRequest, res) => {
       source: image.source,
       isPrimary: image.isPrimary ?? index === 0,
     })),
+    consents,
   });
 
   res.status(201).json(toUserBookListing(listing));
@@ -386,6 +412,58 @@ router.put('/:id', authenticate, async (req: AuthenticatedRequest, res) => {
   return res.json(result.publication);
 });
 
+router.patch(
+  '/:id/editorial',
+  authenticate,
+  async (req: AuthenticatedRequest, res) => {
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'Unauthorized',
+        message: 'auth.errors.unauthorized',
+      });
+    }
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        error: 'Forbidden',
+        message: 'books.errors.editorial_admin_required',
+      });
+    }
+
+    const id = Number(req.params.id);
+    const status = req.body?.status as PublicationEditorialStatus;
+    if (
+      !Number.isInteger(id) ||
+      id <= 0 ||
+      !EDITORIAL_STATUSES.includes(status)
+    ) {
+      return res.status(422).json({
+        error: 'InvalidFields',
+        message: 'books.errors.editorial_status_invalid',
+      });
+    }
+    const reason = optionalString(req.body?.reason);
+    if ((status === 'needs_correction' || status === 'rejected') && !reason) {
+      return res.status(422).json({
+        error: 'MissingFields',
+        message: 'books.errors.editorial_reason_required',
+      });
+    }
+
+    const publication = await updateBookListingEditorial(
+      id,
+      status,
+      status === 'approved' || status === 'pending' ? null : reason
+    );
+    if (!publication) {
+      return res.status(404).json({
+        error: 'NotFound',
+        message: 'books.errors.not_found',
+      });
+    }
+    return res.json(toUserBookListing(publication));
+  }
+);
+
 type ValidationError = {
   status: number;
   error: { error: string; message: string };
@@ -418,6 +496,7 @@ type ValidatedPublishData = {
   draft: boolean;
   type: BookListingType;
   cornerId: string | null;
+  consents: PublicationConsents;
 };
 
 const ALLOWED_CONDITIONS: readonly BookListingCondition[] = [
@@ -450,12 +529,17 @@ const ALLOWED_PUBLICATION_STATUSES: readonly PublicationStatus[] = [
   'exchanged',
   'draft',
 ];
+const EDITORIAL_STATUSES: readonly PublicationEditorialStatus[] = [
+  'pending',
+  'needs_correction',
+  'approved',
+  'rejected',
+];
 const ALLOWED_IMAGE_SOURCES: readonly PublicationImageUpdate['source'][] = [
   'cover',
   'upload',
 ];
 const MAX_PUBLICATION_IMAGES = 6;
-const MAX_INLINE_IMAGE_BYTES = 5 * 1024 * 1024;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
@@ -495,6 +579,8 @@ function parseCatalogFilters(
     text: queryText(query.q ?? query.text),
     author: queryText(query.author),
     isbn: queryText(query.isbn),
+    topic: queryText(query.topic),
+    interest: queryText(query.interest),
     language: queryText(query.language),
     condition: queryText(
       query.condition
@@ -568,12 +654,7 @@ function optionalString(value: unknown): string | null {
 }
 
 function isValidImageUrl(value: string): boolean {
-  if (/^https?:\/\/[^\s]+$/i.test(value)) return true;
-  const match = value.match(
-    /^data:(image\/(?:jpeg|png|webp));base64,([a-z0-9+/=]+)$/i
-  );
-  if (!match) return false;
-  return Math.floor((match[2].length * 3) / 4) <= MAX_INLINE_IMAGE_BYTES;
+  return isValidImageReference(value);
 }
 
 function hasValidImageCount(images: unknown[]): boolean {
@@ -686,10 +767,33 @@ function validatePublicationUpdate(
     if (body.isbn === null) {
       data.isbn = null;
     } else if (typeof body.isbn === 'string') {
-      data.isbn = body.isbn.trim().length > 0 ? body.isbn.trim() : null;
+      const input = body.isbn.trim();
+      if (input.length === 0) {
+        data.isbn = null;
+      } else {
+        const normalized = normalizeIsbn(input);
+        if (!normalized) {
+          return {
+            status: 400,
+            error: {
+              error: 'InvalidFields',
+              message: 'books.errors.invalid_isbn',
+            },
+          };
+        }
+        data.isbn = normalized;
+      }
     } else {
       return invalidUpdateError();
     }
+  }
+
+  if (body.consents !== undefined) {
+    const consentsResult = parsePublicationConsents(body.consents, false);
+    if ('error' in consentsResult) {
+      return consentsResult;
+    }
+    data.consents = consentsResult.data;
   }
 
   if (body.year !== undefined) {
@@ -929,6 +1033,22 @@ function validatePublicationUpdate(
     }
   }
 
+  const editorialError = validateEditorialText(
+    [
+      data.title ?? '',
+      data.author ?? '',
+      data.publisher ?? '',
+      data.notes ?? '',
+    ],
+    'books'
+  );
+  if (editorialError) {
+    return {
+      status: 422,
+      error: { error: 'EditorialRejected', message: editorialError },
+    };
+  }
+
   return { data };
 }
 
@@ -959,6 +1079,8 @@ function toUserBookListing(listing: BookListing) {
     format: listing.metadata.format ?? undefined,
     isbn: listing.metadata.isbn ?? undefined,
     draft: listing.isDraft,
+    editorialStatus: listing.editorialStatus,
+    editorialReason: listing.editorialReason ?? undefined,
     type: listing.type,
   };
 }
@@ -981,6 +1103,7 @@ function toPublicBookListing(listing: BookListing) {
     isSeeking: listing.isSeeking,
     isForDonation: listing.donation,
     isInterested: listing.isInterested ?? false,
+    ownerId: String(listing.userId),
   };
 }
 
@@ -1023,10 +1146,25 @@ function validatePublishRequest(
   const publisher = optionalString(metadataRaw.publisher);
   const language = optionalString(metadataRaw.language);
   const format = optionalString(metadataRaw.format);
-  const isbn = optionalString(metadataRaw.isbn);
+  const isbnInput = optionalString(metadataRaw.isbn);
+  const isbn = isbnInput ? normalizeIsbn(isbnInput) : null;
+  if (isbnInput && !isbn) {
+    return {
+      status: 400,
+      error: {
+        error: 'InvalidFields',
+        message: 'books.errors.invalid_isbn',
+      },
+    };
+  }
   let coverUrl = optionalString(metadataRaw.coverUrl);
 
   const draft = typeof body.draft === 'boolean' ? body.draft : false;
+  const consentsResult = parsePublicationConsents(body.consents, !draft);
+  if ('error' in consentsResult) {
+    return consentsResult;
+  }
+  const consents = consentsResult.data;
   let type: BookListingType = 'offer';
   if (typeof body.type === 'string') {
     const normalized = body.type.trim().toLowerCase();
@@ -1100,17 +1238,63 @@ function validatePublishRequest(
         };
       }
       const source = optionalString(entry.source);
+      if (
+        source !== null &&
+        !ALLOWED_IMAGE_SOURCES.includes(
+          source.toLowerCase() as PublicationImageUpdate['source']
+        )
+      ) {
+        return {
+          status: 400,
+          error: {
+            error: 'InvalidFields',
+            message: 'books.errors.invalid_image',
+          },
+        };
+      }
       const isPrimary =
         typeof entry.isPrimary === 'boolean' ? entry.isPrimary : undefined;
-      images.push({ url, source, isPrimary });
+      images.push({
+        url,
+        source: source ? source.toLowerCase() : null,
+        isPrimary,
+      });
     }
   }
 
   if (!coverUrl && images.length > 0) {
     coverUrl = images[0].url;
   }
+  if (coverUrl && !isValidImageUrl(coverUrl)) {
+    return {
+      status: 400,
+      error: {
+        error: 'InvalidFields',
+        message: 'books.errors.invalid_image',
+      },
+    };
+  }
+  if (type === 'offer' && !coverUrl && images.length === 0) {
+    return {
+      status: 400,
+      error: {
+        error: 'MissingFields',
+        message: 'books.errors.image_required',
+      },
+    };
+  }
 
   if (type === 'want') {
+    const editorialError = validateEditorialText(
+      [title, author ?? '', publisher ?? '', optionalString(body.notes) ?? ''],
+      'books'
+    );
+    if (editorialError) {
+      return {
+        status: 422,
+        error: { error: 'EditorialRejected', message: editorialError },
+      };
+    }
     return {
       data: {
         metadata: {
@@ -1144,6 +1328,7 @@ function validatePublishRequest(
         draft,
         type,
         cornerId: null,
+        consents,
       },
     };
   }
@@ -1300,6 +1485,17 @@ function validatePublishRequest(
     priceCurrency = currency.trim().toUpperCase();
   }
 
+  const editorialError = validateEditorialText(
+    [title, author ?? '', publisher ?? '', notes ?? ''],
+    'books'
+  );
+  if (editorialError) {
+    return {
+      status: 422,
+      error: { error: 'EditorialRejected', message: editorialError },
+    };
+  }
+
   return {
     data: {
       metadata: {
@@ -1333,8 +1529,71 @@ function validatePublishRequest(
       draft,
       type,
       cornerId,
+      consents,
     },
   };
+}
+
+function parsePublicationConsents(
+  value: unknown,
+  required: boolean
+): { data: PublicationConsents } | ValidationError {
+  if (value === undefined && !required) {
+    return { data: { content: true, image: true, rules: true } };
+  }
+
+  if (!isRecord(value)) {
+    return {
+      status: 400,
+      error: {
+        error: 'MissingFields',
+        message: 'books.errors.consent_required',
+      },
+    };
+  }
+
+  const content = value.content;
+  const image = value.image;
+  const rules = value.rules;
+  if (
+    (content !== undefined && typeof content !== 'boolean') ||
+    (image !== undefined && typeof image !== 'boolean') ||
+    (rules !== undefined && typeof rules !== 'boolean')
+  ) {
+    return {
+      status: 400,
+      error: {
+        error: 'InvalidFields',
+        message: 'books.errors.consent_required',
+      },
+    };
+  }
+
+  const consents = {
+    content: content === true,
+    image: image === true,
+    rules: rules === true,
+  };
+  if (required && !consents.content) {
+    return {
+      status: 400,
+      error: {
+        error: 'MissingConsent',
+        message: 'books.errors.consent_required',
+      },
+    };
+  }
+  if (required && (!consents.image || !consents.rules)) {
+    return {
+      status: 400,
+      error: {
+        error: 'MissingConsent',
+        message: 'books.errors.consent_required',
+      },
+    };
+  }
+
+  return { data: consents };
 }
 
 export default router;

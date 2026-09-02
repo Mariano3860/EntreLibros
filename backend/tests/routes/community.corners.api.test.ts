@@ -142,6 +142,80 @@ describe('community corners API', () => {
     });
   });
 
+  test('keeps non-approved corners private and supports the admin correction flow', async () => {
+    const ownerId = await insertUser();
+    const adminId = await insertUser();
+    const payload = {
+      name: 'Rincón editorial',
+      scope: 'public',
+      hostAlias: 'Anfitriona',
+      internalContact: 'contacto@entrelibros.org',
+      rules: 'Reglas básicas',
+      schedule: 'Siempre abierto',
+      location: {
+        address: { street: 'Libertad', number: '987' },
+        coordinates: { latitude: -34.6037, longitude: -58.3816 },
+        visibilityPreference: 'approximate',
+      },
+      consent: true,
+      photo: { id: 'photo-editorial', url: 'https://example.com/photo.jpg' },
+      status: 'active',
+      draft: false,
+    };
+
+    const created = await request(app)
+      .post('/api/community/corners')
+      .set('Cookie', buildAuthCookie(ownerId))
+      .send(payload)
+      .expect(201);
+    const cornerId = created.body.id as string;
+
+    await request(app)
+      .patch(`/api/community/corners/${cornerId}/editorial`)
+      .set('Cookie', buildAuthCookie(ownerId))
+      .send({ status: 'needs_correction', reason: 'Revisar las normas.' })
+      .expect(403);
+
+    await client.query("UPDATE users SET role = 'admin' WHERE id = $1", [
+      adminId,
+    ]);
+    const needsCorrection = await request(app)
+      .patch(`/api/community/corners/${cornerId}/editorial`)
+      .set('Cookie', buildAuthCookie(adminId))
+      .send({ status: 'needs_correction', reason: 'Revisar las normas.' })
+      .expect(200);
+    expect(needsCorrection.body).toMatchObject({
+      id: cornerId,
+      editorialStatus: 'needs_correction',
+      editorialReason: 'Revisar las normas.',
+    });
+
+    await request(app).get(`/api/community/corners/${cornerId}`).expect(404);
+
+    const corrected = await request(app)
+      .patch(`/api/community/corners/${cornerId}`)
+      .set('Cookie', buildAuthCookie(ownerId))
+      .send({ rules: 'Normas actualizadas.' })
+      .expect(200);
+    expect(corrected.body).toMatchObject({
+      editorialStatus: 'pending',
+      editorialReason: null,
+    });
+
+    await request(app)
+      .patch(`/api/community/corners/${cornerId}/editorial`)
+      .set('Cookie', buildAuthCookie(adminId))
+      .send({ status: 'rejected' })
+      .expect(422);
+    await request(app)
+      .patch(`/api/community/corners/${cornerId}/editorial`)
+      .set('Cookie', buildAuthCookie(adminId))
+      .send({ status: 'approved' })
+      .expect(200);
+
+    await request(app).get(`/api/community/corners/${cornerId}`).expect(200);
+  });
+
   test('returns validation errors when payload is incomplete', async () => {
     const userId = await insertUser();
     const response = await request(app)
@@ -168,6 +242,102 @@ describe('community corners API', () => {
       longitude: 'community.corners.errors.longitude_required',
       consent: 'community.corners.errors.consent_required',
       photo: 'community.corners.errors.photo_required',
+    });
+  });
+
+  test('rejects an unsafe corner image without persisting the corner', async () => {
+    const userId = await insertUser();
+    const before = await client.query(
+      'SELECT COUNT(*)::int AS count FROM community_corners WHERE owner_id = $1',
+      [userId]
+    );
+
+    const response = await request(app)
+      .post('/api/community/corners')
+      .set('Cookie', buildAuthCookie(userId))
+      .send({
+        name: 'Rincón inválido',
+        scope: 'public',
+        hostAlias: 'Anfitriona',
+        internalContact: 'contacto@entrelibros.org',
+        location: {
+          address: { street: 'Libertad', number: '987' },
+          coordinates: { latitude: -34.6037, longitude: -58.3816 },
+          visibilityPreference: 'approximate',
+        },
+        consent: true,
+        photo: { id: 'photo-unsafe', url: 'data:text/plain;base64,SGk=' },
+        status: 'active',
+        draft: false,
+      })
+      .expect(422);
+
+    expect(response.body.errors).toEqual({
+      photo: 'community.corners.errors.photo_required',
+    });
+    const after = await client.query(
+      'SELECT COUNT(*)::int AS count FROM community_corners WHERE owner_id = $1',
+      [userId]
+    );
+    expect(after.rows[0].count).toBe(before.rows[0].count);
+  });
+
+  test('rejects unsafe corner text without persisting the corner', async () => {
+    const userId = await insertUser();
+    const before = await client.query(
+      'SELECT COUNT(*)::int AS count FROM community_corners WHERE owner_id = $1',
+      [userId]
+    );
+
+    const response = await request(app)
+      .post('/api/community/corners')
+      .set('Cookie', buildAuthCookie(userId))
+      .send({
+        name: 'Rincón inválido',
+        scope: 'public',
+        hostAlias: 'Anfitriona',
+        internalContact: 'contacto@entrelibros.org',
+        rules: '<script>alert(1)</script>',
+        location: {
+          address: { street: 'Libertad', number: '987' },
+          coordinates: { latitude: -34.6037, longitude: -58.3816 },
+          visibilityPreference: 'approximate',
+        },
+        consent: true,
+        photo: { id: 'photo-safe', url: 'https://example.com/photo.jpg' },
+        status: 'active',
+        draft: false,
+      })
+      .expect(422);
+
+    expect(response.body.errors).toEqual({
+      content: 'community.corners.errors.content_not_allowed',
+    });
+    const after = await client.query(
+      'SELECT COUNT(*)::int AS count FROM community_corners WHERE owner_id = $1',
+      [userId]
+    );
+    expect(after.rows[0].count).toBe(before.rows[0].count);
+  });
+
+  test('rejects a corner location outside geographic bounds', async () => {
+    const userId = await insertUser();
+    const response = await request(app)
+      .post('/api/community/corners')
+      .set('Cookie', buildAuthCookie(userId))
+      .send({
+        ...BASE_CORNER_INPUT,
+        id: undefined,
+        location: {
+          address: BASE_CORNER_INPUT.address,
+          coordinates: { latitude: 91, longitude: -58.3816 },
+          visibilityPreference: 'approximate',
+        },
+      })
+      .expect(422);
+
+    expect(response.body.errors).toMatchObject({
+      latitude: 'community.corners.errors.latitude_required',
     });
   });
 
@@ -198,8 +368,8 @@ describe('community corners API', () => {
       ...BASE_CORNER_INPUT,
       id: '99999999-aaaa-bbbb-cccc-dddddddddddd',
       coordinates: {
-        latitude: -34.61,
-        longitude: -58.42,
+        latitude: -34.612345,
+        longitude: -58.423456,
       },
     });
 
@@ -220,5 +390,106 @@ describe('community corners API', () => {
     expect(pin.x).toBeLessThanOrEqual(100);
     expect(pin.y).toBeGreaterThanOrEqual(0);
     expect(pin.y).toBeLessThanOrEqual(100);
+
+    const exactX = ((-58.423456 - -58.55) / 0.19) * 100;
+    const exactY = (1 - (-34.612345 - -34.72) / 0.18) * 100;
+    expect(pin.x).not.toBeCloseTo(exactX, 4);
+    expect(pin.y).not.toBeCloseTo(exactY, 4);
+  });
+
+  test('updates corner status for the owner and supports reactivation', async () => {
+    const ownerId = await insertUser();
+    const otherUserId = await insertUser();
+    const created = await createCorner({
+      ...BASE_CORNER_INPUT,
+      id: 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee',
+      ownerId,
+    });
+
+    await request(app)
+      .patch(`/api/community/corners/${created.id}`)
+      .set('Cookie', buildAuthCookie(otherUserId))
+      .send({ status: 'paused' })
+      .expect(404);
+
+    await request(app)
+      .patch(`/api/community/corners/${created.id}`)
+      .set('Cookie', buildAuthCookie(ownerId))
+      .send({ status: 'paused' })
+      .expect(200);
+
+    const paused = await client.query(
+      'SELECT status FROM community_corners WHERE id = $1',
+      [created.id]
+    );
+    expect(paused.rows[0].status).toBe('paused');
+
+    await request(app)
+      .patch(`/api/community/corners/${created.id}`)
+      .set('Cookie', buildAuthCookie(ownerId))
+      .send({ status: 'active' })
+      .expect(200);
+
+    const reactivated = await client.query(
+      'SELECT status FROM community_corners WHERE id = $1',
+      [created.id]
+    );
+    expect(reactivated.rows[0].status).toBe('active');
+  });
+
+  test('public corner detail never exposes exact address or coordinates', async () => {
+    const created = await createCorner({
+      ...BASE_CORNER_INPUT,
+      id: 'bbbbbbbb-cccc-4ddd-8eee-ffffffffffff',
+      coordinates: {
+        latitude: -34.612345,
+        longitude: -58.423456,
+      },
+      visibilityPreference: 'exact',
+    });
+
+    const response = await request(app)
+      .get(`/api/community/corners/${created.id}`)
+      .expect(200);
+
+    expect(response.body).toMatchObject({
+      id: created.id,
+      name: created.name,
+      location: {
+        city: 'Ciudad Autónoma de Buenos Aires',
+        neighborhood: '1000',
+        referencePointLabel: 'CP 1000',
+        approximate: true,
+      },
+    });
+    expect(response.body.location.latitude).not.toBe(
+      BASE_CORNER_INPUT.coordinates.latitude
+    );
+    expect(response.body.location.longitude).not.toBe(
+      BASE_CORNER_INPUT.coordinates.longitude
+    );
+    expect(response.body).not.toHaveProperty('internalContact');
+    expect(response.body).not.toHaveProperty('address');
+
+    const approximateCorner = await createCorner({
+      ...BASE_CORNER_INPUT,
+      id: 'cccccccc-dddd-4eee-8fff-aaaaaaaaaaaa',
+      visibilityPreference: 'approximate',
+      coordinates: {
+        latitude: -34.612345,
+        longitude: -58.423456,
+      },
+    });
+    const approximateResponse = await request(app)
+      .get(`/api/community/corners/${approximateCorner.id}`)
+      .expect(200);
+
+    expect(approximateResponse.body.location.approximate).toBe(true);
+    expect(approximateResponse.body.location.latitude).not.toBe(
+      approximateCorner.coordinates.latitude
+    );
+    expect(approximateResponse.body.location.longitude).not.toBe(
+      approximateCorner.coordinates.longitude
+    );
   });
 });

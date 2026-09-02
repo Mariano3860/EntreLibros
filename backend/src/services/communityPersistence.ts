@@ -96,6 +96,7 @@ function publicListingWhere(alias: string): string {
   return `${alias}.availability = 'public'
     AND ${alias}.is_draft = false
     AND ${alias}.status = 'available'
+    AND ${alias}.editorial_status = 'approved'
     AND (${alias}.expires_at IS NULL OR ${alias}.expires_at > NOW())`;
 }
 
@@ -147,7 +148,11 @@ export async function getPersistedCommunityFeed(
       FROM book_listings p
       JOIN books b ON b.id = p.book_id
       JOIN users u ON u.id = p.user_id
-      LEFT JOIN community_corners c ON c.id::text = p.corner_id
+      LEFT JOIN community_corners c
+        ON c.id::text = p.corner_id
+       AND c.draft = false
+       AND c.consent = true
+       AND c.editorial_status = 'approved'
       LEFT JOIN LATERAL (
         SELECT url
         FROM book_listing_images
@@ -301,7 +306,7 @@ export async function getPersistedCommunityStats(): Promise<PersistedCommunitySt
       `
           SELECT
             (SELECT COUNT(*) FROM exchange_agreements WHERE state = 'completed') AS exchanges,
-            (SELECT COUNT(*) FROM community_corners WHERE status = 'active' AND draft = false) AS active_houses,
+            (SELECT COUNT(*) FROM community_corners WHERE status = 'active' AND draft = false AND editorial_status = 'approved') AS active_houses,
             (SELECT COUNT(DISTINCT user_id) FROM book_listings WHERE ${publicListingWhere('book_listings')}) AS active_users,
             (SELECT COUNT(*) FROM book_listings WHERE ${publicListingWhere('book_listings')}) AS books_published
         `

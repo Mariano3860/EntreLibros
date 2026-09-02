@@ -1,5 +1,11 @@
 import { ApiUserBook } from './userBooks.types'
 
+export type PublishBookConsents = {
+  content: boolean
+  image: boolean
+  rules: boolean
+}
+
 export type PublishBookPayload = {
   type?: 'offer' | 'want'
   metadata: {
@@ -36,6 +42,8 @@ export type PublishBookPayload = {
       shippingPayer?: 'owner' | 'requester' | 'split'
     }
   }
+  consents: PublishBookConsents
+  cornerId?: string | null
   draft?: boolean
 }
 

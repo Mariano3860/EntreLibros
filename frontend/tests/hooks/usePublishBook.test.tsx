@@ -60,6 +60,7 @@ describe('usePublishBook', () => {
           shippingPayer: 'owner',
         },
       },
+      consents: { content: true, image: true, rules: true },
       draft: false,
     }
 
@@ -118,6 +119,7 @@ describe('usePublishBook', () => {
           shippingPayer: 'requester',
         },
       },
+      consents: { content: true, image: true, rules: true },
     }
 
     const created = {

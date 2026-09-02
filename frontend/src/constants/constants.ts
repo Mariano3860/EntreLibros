@@ -15,6 +15,12 @@ export const HOME_URLS = {
 } as const
 
 export const MAX_IMAGES_UPLOAD = 5
+export const MAX_IMAGE_BYTES = 5 * 1024 * 1024
+export const SUPPORTED_IMAGE_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+] as const
 
 export const DEFAULT_AUTOSAVE_DELAY = 2500
 

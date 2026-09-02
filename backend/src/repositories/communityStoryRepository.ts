@@ -117,6 +117,7 @@ export async function listCommunityStories(
        AND l.availability = 'public'
        AND l.is_draft = false
        AND l.status = 'available'
+       AND l.editorial_status = 'approved'
        AND (l.expires_at IS NULL OR l.expires_at > NOW())
      LEFT JOIN books b ON b.id = l.book_id
      LEFT JOIN LATERAL (
@@ -162,6 +163,7 @@ export async function createCommunityStory(
          AND l.availability = 'public'
          AND l.is_draft = false
          AND l.status = 'available'
+         AND l.editorial_status = 'approved'
          AND (l.expires_at IS NULL OR l.expires_at > NOW())
        WHERE $4::bigint IS NULL OR l.id IS NOT NULL
        RETURNING *

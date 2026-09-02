@@ -119,6 +119,10 @@
         "offer": "Ofrecidos",
         "want": "Buscados"
       },
+      "topic": "Tema",
+      "topicPlaceholder": "Ciencia, novela, historia...",
+      "interest": "Interés",
+      "interestPlaceholder": "Ficción, poesía, cocina...",
       "sort": "Ordenar",
       "radius": "Distancia",
       "trade": "Intercambio",
@@ -311,6 +315,9 @@
           "private": "Privada con link"
         }
       },
+      "meetingCorner": {
+        "label": "Rincón o zona de encuentro (opcional)"
+      },
       "delivery": {
         "label": "Entrega",
         "options": {
@@ -347,9 +354,16 @@
       "language": "Indicá el idioma",
       "format": "Indicá el formato",
       "image": "Necesitás al menos una imagen",
+      "image_required": "Agregá al menos una imagen para publicar",
+      "imageInvalid": "Elegí imágenes JPG, PNG o WebP de hasta 5 MB.",
       "condition": "Seleccioná un estado",
       "modes": "Elegí al menos una modalidad",
-      "price": "El precio debe ser mayor a 0"
+      "price": "El precio debe ser mayor a 0",
+      "invalid_isbn": "El ISBN no es válido.",
+      "consent_required": "Confirmá los consentimientos para publicar.",
+      "content_not_allowed": "El contenido no cumple las reglas de publicación.",
+      "suspicious_link": "Revisá los enlaces incluidos antes de publicar.",
+      "duplicate": "Ya tenés una publicación igual activa."
     },
     "previewAlt": "Vista previa de la portada"
   },
@@ -439,6 +453,9 @@
       "geolocationUnsupported": "Tu navegador no permite obtener la ubicación automáticamente.",
       "geolocationDenied": "No pudimos obtener tu ubicación. Revisá los permisos e intentá nuevamente.",
       "photoRead": "No pudimos leer la imagen. Intentalo de nuevo.",
+      "photoInvalid": "Elegí una imagen JPG, PNG o WebP de hasta 5 MB.",
+      "content_not_allowed": "El contenido no cumple las reglas de publicación.",
+      "suspicious_link": "Revisá los enlaces incluidos antes de publicar.",
       "publish": "No pudimos crear el Rincón. Probá otra vez."
     },
     "review": {
@@ -631,6 +648,15 @@
           "swap": "Proponer intercambio",
           "agreement": "Preparar acuerdo"
         },
+        "templates": {
+          "label": "Plantillas de primer contacto",
+          "availabilityLabel": "Consultar disponibilidad",
+          "availability": "Hola, ¿todavía está disponible?",
+          "meetingLabel": "Coordinar encuentro",
+          "meeting": "Hola, me interesa coordinar un punto y horario de encuentro.",
+          "exchangeLabel": "Proponer intercambio",
+          "exchange": "Hola, ¿te interesa conversar sobre un posible intercambio?"
+        },
         "bookModal": {
           "trigger": "Adjuntar libro",
           "title": "Adjuntar libro",
@@ -675,6 +701,14 @@
           "loading": "Cargando libros disponibles...",
           "noBooks": "No hay libros cargados en la conversación.",
           "submit": "Enviar propuesta"
+        },
+        "outcome": {
+          "title": "Resultado del encuentro",
+          "description": "Registrá el resultado solo para esta conversación.",
+          "notePlaceholder": "Nota opcional",
+          "completed": "Se completó",
+          "notCompleted": "No se completó",
+          "saved": "Tu último resultado quedó guardado."
         }
       },
       "snippets": {
@@ -891,7 +925,9 @@
       "createCorner": "Crear rincón",
       "proposeMeeting": "Proponer encuentro",
       "sendMessage": "Enviar mensaje",
-      "openReference": "Abrir referencia"
+      "openReference": "Abrir referencia",
+      "openPublication": "Ver publicación",
+      "openCorner": "Ver rincón"
     },
     "empty": {
       "title": "Todavía no hay actividad en esta zona",
@@ -940,6 +976,10 @@
     "saving": "Guardando...",
     "saved": "Cambios guardados",
     "saveError": "No se pudo guardar",
+    "contact": "Contactar",
+    "contacting": "Abriendo conversación...",
+    "contactError": "No se pudo abrir la conversación.",
+    "firstContactMessage": "Hola, me interesa tu publicación «{{title}}». ¿Todavía está disponible?",
     "confirmClose": "Hay cambios sin guardar. ¿Querés salir igualmente?",
     "readOnly": "Solo lectura",
     "owner": "Tu publicación",
@@ -1026,6 +1066,28 @@
       "unauthenticated": "Necesitás iniciar sesión.",
       "profile_update_failed": "No se pudieron guardar los cambios del perfil."
     }
+  },
+  "reports": {
+    "report": "Reportar",
+    "category": "Categoría",
+    "reason": "Motivo",
+    "submit": "Enviar reporte",
+    "sending": "Enviando...",
+    "submitted": "Reporte recibido. Gracias por avisar.",
+    "error": "No se pudo enviar el reporte.",
+    "categories": {
+      "content": "Contenido",
+      "conduct": "Conducta",
+      "cornerMissing": "Rincón inexistente"
+    }
+  },
+  "publicProfile": {
+    "loading": "Cargando perfil...",
+    "notFound": "Perfil no disponible.",
+    "member": "Miembro de EntreLibros",
+    "contact": "Enviar mensaje",
+    "contacting": "Abriendo conversación...",
+    "contactError": "No se pudo abrir la conversación."
   },
   "profile": {
     "title": "Mi perfil",

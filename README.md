@@ -25,7 +25,7 @@ PUBLIC_API_USE_MOCKS=true
 Con `true`, el frontend usa respuestas de demostración y no persiste en PostgreSQL. Con `false` u omitida, utiliza la API y Socket.IO reales. Después de cambiar `.env` o `.env.local`, reinicia Rsbuild. El modo resuelto puede comprobarse con:
 
 ```js
-document.documentElement.dataset.apiMode
+document.documentElement.dataset.apiMode;
 ```
 
 La mensajería real requiere sesión, backend activo y migraciones aplicadas. La migración `015_seed_messaging_bot.sql` crea el bot persistente y sus conversaciones de forma idempotente.
@@ -49,6 +49,7 @@ Vitest/Testing Library y MSW cubren pruebas automatizadas. La validación final 
 - [`backend/README.md`](backend/README.md): API, migraciones y mensajería.
 - [`frontend/README.md`](frontend/README.md): desarrollo del cliente y modo demo.
 - [`docs/README.md`](docs/README.md): índice de documentación.
+- [`docs/tfg-mvp-trazabilidad.md`](docs/tfg-mvp-trazabilidad.md): matriz de requisitos, estado y evidencia del MVP.
 - [`docs/estado-actual.md`](docs/estado-actual.md): capacidades verificadas y límites.
 - [`docs/backlog.md`](docs/backlog.md): pendientes de producto y criterios de cierre.
 - [`docs/arquitectura.md`](docs/arquitectura.md): arquitectura y límites técnicos.

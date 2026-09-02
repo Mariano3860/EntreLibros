@@ -5,6 +5,11 @@ import { query, withTransaction, type DbClient } from '../db.js';
 export type CommunityCornerScope = 'public' | 'semiprivate';
 export type CommunityCornerVisibilityPreference = 'exact' | 'approximate';
 export type CommunityCornerStatus = 'active' | 'paused';
+export type CommunityCornerEditorialStatus =
+  | 'pending'
+  | 'needs_correction'
+  | 'approved'
+  | 'rejected';
 
 export interface CommunityCornerAddress {
   street: string;
@@ -39,6 +44,8 @@ export interface CreateCommunityCornerInput {
   coordinates: CommunityCornerCoordinates;
   photo: CommunityCornerPhoto;
   ownerId: number;
+  editorialStatus?: CommunityCornerEditorialStatus;
+  editorialReason?: string | null;
 }
 
 export interface CommunityCornerMetrics {
@@ -56,7 +63,10 @@ export interface CommunityCornerEntity {
   rules: string | null;
   schedule: string | null;
   status: CommunityCornerStatus;
+  editorialStatus: CommunityCornerEditorialStatus;
+  editorialReason: string | null;
   draft: boolean;
+  consent: boolean;
   visibilityPreference: CommunityCornerVisibilityPreference;
   address: CommunityCornerAddress;
   coordinates: CommunityCornerCoordinates;
@@ -77,6 +87,8 @@ interface CommunityCornerRow {
   rules: string | null;
   schedule: string | null;
   status: CommunityCornerStatus;
+  editorial_status: CommunityCornerEditorialStatus;
+  editorial_reason: string | null;
   draft: boolean;
   consent: boolean;
   visibility_preference: CommunityCornerVisibilityPreference;
@@ -105,6 +117,8 @@ const BASE_FIELDS = `
     c.rules,
     c.schedule,
     c.status,
+    c.editorial_status,
+    c.editorial_reason,
     c.draft,
     c.consent,
     c.owner_id,
@@ -188,7 +202,10 @@ const mapRowToEntity = (row: CommunityCornerRow): CommunityCornerEntity => {
     rules: row.rules,
     schedule: row.schedule,
     status: row.status,
+    editorialStatus: row.editorial_status,
+    editorialReason: row.editorial_reason,
     draft: row.draft,
+    consent: row.consent,
     visibilityPreference: row.visibility_preference,
     address: {
       street: row.address_street,
@@ -342,7 +359,13 @@ export async function updateCorner(
   input: Partial<
     Pick<
       CreateCommunityCornerInput,
-      'name' | 'rules' | 'schedule' | 'status' | 'visibilityPreference'
+      | 'name'
+      | 'rules'
+      | 'schedule'
+      | 'status'
+      | 'visibilityPreference'
+      | 'editorialStatus'
+      | 'editorialReason'
     >
   >
 ): Promise<CommunityCornerEntity | null> {
@@ -354,6 +377,8 @@ export async function updateCorner(
     ['schedule', input.schedule],
     ['status', input.status],
     ['visibility_preference', input.visibilityPreference],
+    ['editorial_status', input.editorialStatus],
+    ['editorial_reason', input.editorialReason],
   ];
   for (const [column, value] of updates) {
     if (value !== undefined) {
@@ -370,6 +395,24 @@ export async function updateCorner(
     values
   );
   return result.rows.length === 0 ? null : findCornerById(id);
+}
+
+export async function updateCornerEditorial(
+  id: string,
+  status: CommunityCornerEditorialStatus,
+  reason: string | null
+): Promise<CommunityCornerEntity | null> {
+  return withTransaction(async (client) => {
+    const updated = await client.query<{ id: string }>(
+      `UPDATE community_corners
+       SET editorial_status = $1, editorial_reason = $2, updated_at = NOW()
+       WHERE id = $3
+       RETURNING id`,
+      [status, reason, id]
+    );
+    if (!updated.rows[0]) return null;
+    return fetchCornerByIdWithClient(client, id);
+  });
 }
 
 export interface NearbyCornersQuery {
@@ -400,6 +443,8 @@ export async function listCornersNear(
     ) AS distance_meters
     ${BASE_FROM}
     WHERE c.draft = false
+      AND c.consent = true
+      AND c.editorial_status = 'approved'
       AND ST_DWithin(
         c.location,
         ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography,
@@ -424,7 +469,11 @@ export async function listCornersForMap(
   bounds?: MapBounds
 ): Promise<CommunityCornerEntity[]> {
   const params: number[] = [];
-  const whereConditions: string[] = ['c.draft = false', 'c.consent = true'];
+  const whereConditions: string[] = [
+    'c.draft = false',
+    'c.consent = true',
+    "c.editorial_status = 'approved'",
+  ];
 
   if (bounds) {
     const minLat = Math.min(bounds.south, bounds.north);
