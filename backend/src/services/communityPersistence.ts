@@ -10,6 +10,8 @@ export type PersistedFeedItem = {
   avatar: string;
   time: string;
   likes: number;
+  commentsCount: number;
+  likedByMe: boolean;
   corner?: { id: string; name: string };
   type: FeedCategory | 'story';
   title: string;
@@ -61,6 +63,9 @@ type FeedRow = {
   corner_id: string | null;
   corner_name: string | null;
   created_at: Date;
+  likes: number | string;
+  comments_count: number | string;
+  liked_by_me: boolean;
 };
 
 type ActivityRow = {
@@ -96,7 +101,8 @@ function publicListingWhere(alias: string): string {
 
 export async function getPersistedCommunityFeed(
   page: number,
-  size: number
+  size: number,
+  viewerId?: number
 ): Promise<PersistedFeedItem[]> {
   const safeSize = Math.min(Math.max(Math.trunc(size), 1), 20);
   const safePage = Math.max(Math.trunc(page), 0);
@@ -115,7 +121,29 @@ export async function getPersistedCommunityFeed(
              ELSE 'book' END AS category,
         p.corner_id,
         c.name AS corner_name,
-        p.created_at
+        p.created_at,
+        (SELECT COUNT(*)::int FROM community_listing_likes
+         WHERE listing_id = p.id) AS likes,
+        (SELECT COUNT(*)::int
+         FROM community_comments comment
+         JOIN users comment_author ON comment_author.id = comment.user_id
+         WHERE comment.listing_id = p.id
+           AND comment_author.role = 'user'
+           AND comment_author.profile_visibility = 'public'
+           AND ($3::integer IS NULL OR NOT EXISTS (
+             SELECT 1
+             FROM user_blocks comment_block
+             WHERE (comment_block.blocker_id = $3
+                    AND comment_block.blocked_id = comment_author.id)
+                OR (comment_block.blocker_id = comment_author.id
+                    AND comment_block.blocked_id = $3)
+           ))) AS comments_count,
+        CASE WHEN $3::integer IS NULL THEN false
+             ELSE EXISTS (
+               SELECT 1 FROM community_listing_likes like_row
+               WHERE like_row.listing_id = p.id AND like_row.user_id = $3
+             )
+        END AS liked_by_me
       FROM book_listings p
       JOIN books b ON b.id = p.book_id
       JOIN users u ON u.id = p.user_id
@@ -128,19 +156,33 @@ export async function getPersistedCommunityFeed(
         LIMIT 1
       ) img ON true
       WHERE ${publicListingWhere('p')}
+        AND u.role = 'user'
+        AND u.profile_visibility = 'public'
+        AND ($3::integer IS NULL OR NOT EXISTS (
+          SELECT 1
+          FROM user_blocks blocked
+          WHERE (blocked.blocker_id = $3 AND blocked.blocked_id = u.id)
+             OR (blocked.blocker_id = u.id AND blocked.blocked_id = $3)
+        ))
       ORDER BY p.created_at DESC, p.id DESC
       LIMIT $1 OFFSET $2
     `,
-    [safeSize, safePage * safeSize]
+    [safeSize, safePage * safeSize, viewerId ?? null]
   );
-  const stories = await listCommunityStories(safeSize, safePage * safeSize);
+  const stories = await listCommunityStories(
+    safeSize,
+    safePage * safeSize,
+    viewerId
+  );
   const listingItems = rows.map((row) => {
     const base = {
       id: String(row.id),
       user: row.user_name,
       avatar: AVATAR_FALLBACK,
       time: relativeTime(new Date(row.created_at)),
-      likes: 0,
+      likes: Number(row.likes),
+      commentsCount: Number(row.comments_count),
+      likedByMe: row.liked_by_me,
       ...(row.corner_id && row.corner_name
         ? { corner: { id: row.corner_id, name: row.corner_name } }
         : {}),
@@ -176,6 +218,8 @@ export async function getPersistedCommunityFeed(
     avatar: story.avatar,
     time: story.time,
     likes: story.likes,
+    commentsCount: story.commentsCount,
+    likedByMe: story.likedByMe,
     type: 'story' as const,
     title: story.body,
     body: story.body,

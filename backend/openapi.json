@@ -2767,6 +2767,117 @@
         }
       }
     },
+    "/api/community/posts/{postType}/{id}/like": {
+      "parameters": [
+        {
+          "name": "postType",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "enum": ["listing", "story"]
+          }
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^(story-)?[0-9]+$"
+          }
+        }
+      ],
+      "post": {
+        "summary": "Toggle a persistent community post like",
+        "tags": ["Community"],
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Updated like state and total",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CommunityLike" }
+              }
+            }
+          },
+          "401": { "description": "auth.errors.unauthorized" },
+          "404": { "description": "community.social.post_not_found" }
+        }
+      }
+    },
+    "/api/community/posts/{postType}/{id}/comments": {
+      "parameters": [
+        {
+          "name": "postType",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "enum": ["listing", "story"]
+          }
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "pattern": "^(story-)?[0-9]+$"
+          }
+        }
+      ],
+      "get": {
+        "summary": "List ordered comments for a community post",
+        "tags": ["Community"],
+        "responses": {
+          "200": {
+            "description": "Community comments",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/CommunityComment" }
+                }
+              }
+            }
+          },
+          "404": { "description": "community.social.post_not_found" }
+        }
+      },
+      "post": {
+        "summary": "Create a comment on a community post",
+        "tags": ["Community"],
+        "security": [{ "cookieAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["body"],
+                "properties": {
+                  "body": { "type": "string", "maxLength": 1000 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created comment",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CommunityComment" }
+              }
+            }
+          },
+          "401": { "description": "auth.errors.unauthorized" },
+          "404": { "description": "community.social.post_not_found" },
+          "422": { "description": "community.social.comment_invalid" }
+        }
+      }
+    },
     "/api/community/stories": {
       "post": {
         "summary": "Create a community story",
@@ -3347,6 +3458,13 @@
           "likes": {
             "type": "integer"
           },
+          "commentsCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "likedByMe": {
+            "type": "boolean"
+          },
           "corner": {
             "oneOf": [
               {
@@ -3358,7 +3476,15 @@
             ]
           }
         },
-        "required": ["id", "user", "avatar", "time", "likes"]
+        "required": [
+          "id",
+          "user",
+          "avatar",
+          "time",
+          "likes",
+          "commentsCount",
+          "likedByMe"
+        ]
       },
       "BookFeedItem": {
         "allOf": [
@@ -3527,6 +3653,25 @@
           }
         ]
       },
+      "CommunityLike": {
+        "type": "object",
+        "properties": {
+          "liked": { "type": "boolean" },
+          "likes": { "type": "integer", "minimum": 0 }
+        },
+        "required": ["liked", "likes"]
+      },
+      "CommunityComment": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "author": { "type": "string" },
+          "avatar": { "type": "string" },
+          "body": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "author", "avatar", "body", "createdAt"]
+      },
       "StoryFeedItem": {
         "type": "object",
         "properties": {
@@ -3545,6 +3690,13 @@
           "likes": {
             "type": "integer",
             "minimum": 0
+          },
+          "commentsCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "likedByMe": {
+            "type": "boolean"
           },
           "type": {
             "type": "string",
@@ -3569,6 +3721,8 @@
           "avatar",
           "time",
           "likes",
+          "commentsCount",
+          "likedByMe",
           "type",
           "title",
           "body"

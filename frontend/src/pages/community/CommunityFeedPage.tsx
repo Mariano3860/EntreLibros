@@ -21,6 +21,7 @@ import {
   buildCommunityMapPath,
   CornersMiniMap,
 } from '@src/components/community/corners/CornersMiniMap'
+import { FeedActions } from '@src/components/feed/FeedActions'
 import type { FeedItem } from '@src/components/feed/FeedItem.types'
 import { useAuth } from '@src/contexts/auth/AuthContext'
 import { usePrototype } from '@src/features/prototype/PrototypeContext'
@@ -54,6 +55,8 @@ export const CommunityFeedPage = () => {
     setComposerOpen(false)
   }
 
+  const storyChips = catalog.stories.filter((story) => story.id !== 'mine')
+
   return (
     <BaseLayout id="community-page">
       <PrototypePage>
@@ -70,14 +73,19 @@ export const CommunityFeedPage = () => {
         <div className={styles.layout}>
           <main className={styles.main}>
             <Panel className={styles.stories}>
-              {catalog.stories.map((story) => (
+              <button
+                className={styles.createStory}
+                type="button"
+                onClick={() => setComposerOpen(true)}
+              >
+                <Avatar initials="+" accent="#42d7c7" size="large" />
+                <span>Tu historia</span>
+              </button>
+              {storyChips.map((story) => (
                 <button
                   key={story.id}
-                  onClick={() =>
-                    story.id === 'mine'
-                      ? setComposerOpen(true)
-                      : setSelectedStory(story.name)
-                  }
+                  type="button"
+                  onClick={() => setSelectedStory(story.name)}
                 >
                   <Avatar
                     initials={story.initials}
@@ -139,11 +147,11 @@ export const CommunityFeedPage = () => {
                       <button aria-label="Más opciones">•••</button>
                     </div>
                     <p>{post.text}</p>
-                    <div className={styles.postActions}>
-                      <button>♡ Me gusta</button>
-                      <button>◯ Comentar</button>
-                      <button>↗ Compartir</button>
-                    </div>
+                    <FeedActions
+                      initialCommentsCount={0}
+                      initialLikes={0}
+                      post={{ type: 'story', id: post.id }}
+                    />
                   </Panel>
                 ))}
                 {catalog.communityPosts.map((post) => (
@@ -162,15 +170,11 @@ export const CommunityFeedPage = () => {
                     </div>
                     <p>{post.text}</p>
                     <img src={post.image} alt={post.imageAlt} />
-                    <div className={styles.postStats}>
-                      <span>{post.likes}</span>
-                      <span>{post.comments}</span>
-                    </div>
-                    <div className={styles.postActions}>
-                      <button>♡ Me gusta</button>
-                      <button>◯ Comentar</button>
-                      <button>↗ Compartir</button>
-                    </div>
+                    <FeedActions
+                      initialCommentsCount={parseMockCount(post.comments)}
+                      initialLikes={parseMockCount(post.likes)}
+                      post={{ type: 'listing', id: post.id }}
+                    />
                   </Panel>
                 ))}
               </div>
@@ -411,34 +415,15 @@ const RealCommunityPage = ({
     : realSuggestions
   const hasApiFeed = Boolean(feed.data?.length)
   const storyChips = discovery.data
-    ? [
-        ...(discovery.data.stories.some(
-          (story) => String(user?.id) === story.id
-        )
-          ? []
-          : [
-              {
-                id: 'mine',
-                name: t('community.discovery.yourStory', {
-                  defaultValue: 'Tu historia',
-                }),
-                initials: 'M',
-                accent: '#ff8b4c',
-                isOwn: true,
-              },
-            ]),
-        ...discovery.data.stories.map((story) => ({
+    ? discovery.data.stories
+        .filter((story) => String(user?.id) !== story.id)
+        .map((story) => ({
           id: story.id,
           name: story.user,
           initials: story.user.slice(0, 2).toUpperCase(),
           accent: '#42d7c7',
-          isOwn: String(user?.id) === story.id,
-        })),
-      ]
-    : catalog.stories.map((story) => ({
-        ...story,
-        isOwn: story.id === 'mine',
-      }))
+        }))
+    : catalog.stories.filter((story) => story.id !== 'mine')
 
   return (
     <BaseLayout id="community-page">
@@ -455,14 +440,23 @@ const RealCommunityPage = ({
         <div className={styles.layout}>
           <main className={styles.main}>
             <Panel className={styles.stories}>
+              <button
+                className={styles.createStory}
+                type="button"
+                onClick={() => setComposerOpen(true)}
+              >
+                <Avatar initials="+" accent="#42d7c7" size="large" />
+                <span>
+                  {t('community.discovery.yourStory', {
+                    defaultValue: 'Tu historia',
+                  })}
+                </span>
+              </button>
               {storyChips.map((story) => (
                 <button
                   key={story.id}
-                  onClick={() =>
-                    story.id === 'mine' || story.isOwn
-                      ? setComposerOpen(true)
-                      : setSelectedStory(story.name)
-                  }
+                  type="button"
+                  onClick={() => setSelectedStory(story.name)}
                 >
                   <Avatar
                     initials={story.initials}
@@ -472,6 +466,14 @@ const RealCommunityPage = ({
                   <span>{story.name}</span>
                 </button>
               ))}
+              {discovery.data && storyChips.length === 0 ? (
+                <p className={styles.emptyStories}>
+                  {t('community.discovery.emptyStories', {
+                    defaultValue:
+                      'Todavía no hay historias relevantes para vos.',
+                  })}
+                </p>
+              ) : null}
             </Panel>
             {selectedStory ? (
               <div className={styles.storyNotice} role="status">
@@ -577,11 +579,10 @@ const RealCommunityPage = ({
                       </div>
                       <p>{post.text}</p>
                       <img src={post.image} alt={post.imageAlt} />
-                      <div className={styles.postActions}>
-                        <button>♡ Me gusta</button>
-                        <button>◯ Comentar</button>
-                        <button>↗ Compartir</button>
-                      </div>
+                      <FeedActions
+                        initialCommentsCount={parseMockCount(post.comments)}
+                        initialLikes={parseMockCount(post.likes)}
+                      />
                     </div>
                   ))}
                   {!catalog.communityPosts.length
@@ -750,14 +751,20 @@ const RealFeedCard = ({ item }: { item: FeedItem }) => {
           {item.offered.title} ↔ {item.requested.title}
         </small>
       ) : null}
-      <div className={styles.postStats}>
-        <span>{item.likes} Me gusta</span>
-      </div>
-      <div className={styles.postActions}>
-        <button>♡ Me gusta</button>
-        <button>◯ Comentar</button>
-        <button>↗ Compartir</button>
-      </div>
+      <FeedActions
+        initialCommentsCount={item.commentsCount ?? 0}
+        initialLiked={item.likedByMe}
+        initialLikes={item.likes}
+        post={{
+          type: item.type === 'story' ? 'story' : 'listing',
+          id: item.id,
+        }}
+      />
     </Panel>
   )
+}
+
+const parseMockCount = (value: string): number => {
+  const match = value.match(/\d+/)
+  return match ? Number(match[0]) : 0
 }

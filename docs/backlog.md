@@ -1,18 +1,20 @@
 # Backlog de Producto (Business) — EntreLibros
 
-Última actualización: 2026-09-01
+Última actualización: 2026-09-02
 
 > **Actualización técnica 2026-09-01:** `/map` reemplaza el slider de distancia por radios de 1, 5, 30, 50 km y sin límite. Con una ubicación autorizada, el perímetro y el filtrado de rincones, publicaciones, actividad y lista usan el mismo centro y distancia geográfica; sin permiso se conserva un fallback explícito sin inventar precisión.
 
 > **Actualización técnica 2026-08-29:** la recuperación de mensajería incorporó el bot persistente mediante la migración `015_seed_messaging_bot.sql`, conversación idempotente por usuario, historial recargable y guía de diagnóstico. La mensajería mock sigue siendo útil para UI, pero no prueba persistencia real.
 
-> **Reconexión API 2026-08-31:** `reconnect-backend-to-prototype-frontend` conserva las ocho pantallas de referencia y conecta Inicio, libros, perfil, Comunidad, mapa, mensajería, estadísticas y consultas de soporte con los contratos reales disponibles. Series analíticas avanzadas, interacciones sociales, logros y base de conocimiento siguen diferidas según [`frontend-backend-reconnection-matrix.md`](frontend-backend-reconnection-matrix.md).
+> **Reconexión API 2026-08-31:** `reconnect-backend-to-prototype-frontend` conserva las ocho pantallas de referencia y conecta Inicio, libros, perfil, Comunidad, mapa, mensajería, estadísticas y consultas de soporte con los contratos reales disponibles. Series analíticas avanzadas, moderación, logros y base de conocimiento siguen diferidas según [`frontend-backend-reconnection-matrix.md`](frontend-backend-reconnection-matrix.md).
 
 > Las expansiones de confianza avanzada, reputación, moderación, métricas, integraciones de proveedores y retención de datos quedan fuera de `complete-entrelibros-recovery`. Se mantienen como trabajo futuro en [`roadmap.md`](roadmap.md) y requieren una OpenSpec propia; no son faltantes del MVP del TFG.
 
 ## Prioridad P0 — Brechas observadas en validación manual
 
 Registrado el 2026-08-30 a partir de una recorrida manual de la interfaz. Estos hallazgos tienen prioridad máxima porque afectan datos visibles, navegación y acciones principales. Se deben validar contra la API real y corregir antes de considerar cerrada la experiencia del MVP. Los mocks solo deben permanecer en pruebas o en un modo demo explícito.
+
+> **Actualizacion tecnica 2026-09-02:** Comunidad ya cuenta con likes persistentes por usuario, comentarios ordenados, compartir con fallback, feed filtrado por visibilidad/bloqueos y una tira de historias relevantes que excluye la historia propia.
 
 ### Inicio y descubrimiento de libros
 
@@ -238,6 +240,8 @@ Feature 4.1 Mapa y listados
   - Actualización 2025-11-10 (3): se alineó el esquema OpenAPI y la UI del feed para consumir los swaps anidados (participantes, publicaciones ofrecidas y solicitadas), mostrando carátulas y propietarios correctos sin romper la compatibilidad con los clientes existentes.
 
 Feature 4.2 Descubrimiento avanzado
+
+- Actualizacion 2026-09-02: la experiencia social de Comunidad se implemento con likes unicos, comentarios ordenados y stories relevantes excluyendo al usuario actual; las colecciones tematicas siguen pendientes.
 
 - Actualización 2026-08-31: Inicio pagina las recomendaciones en grupos de hasta cinco libros, con controles compactos para renovar la selección sin alterar el detalle modal.
 

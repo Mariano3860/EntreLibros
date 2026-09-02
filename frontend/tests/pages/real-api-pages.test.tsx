@@ -142,6 +142,15 @@ describe('prototype pages in real API mode', () => {
     vi.mocked(fetchCommunityDiscovery).mockResolvedValueOnce({
       stories: [
         {
+          id: '7',
+          storyId: 'story-own',
+          user: 'Mariano',
+          avatar: '/logo.svg',
+          body: 'Historia propia.',
+          time: 'Ahora',
+          isFollowing: false,
+        },
+        {
           id: '42',
           storyId: 'story-1',
           user: 'Clara',
@@ -177,6 +186,11 @@ describe('prototype pages in real API mode', () => {
     renderWithProviders(<CommunityFeedPage />)
 
     expect(await screen.findByText('La casa de los espÃ­ritus')).toBeVisible()
+    expect(
+      screen.queryByRole('button', { name: /^Mariano$/ })
+    ).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^Clara$/ })).toBeVisible()
+    expect(screen.getByText('Tu historia')).toBeVisible()
     expect(screen.getAllByText('Clara').length).toBeGreaterThan(0)
     const suggestion = screen
       .getAllByText('Clara')

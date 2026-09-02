@@ -1,5 +1,7 @@
 # Base de datos
 
+La migracion 027 agrega likes unicos por usuario para listings e historias, comentarios con un unico destino y orden estable, y borrado en cascada al eliminar la publicacion asociada.
+
 PostgreSQL es la persistencia principal; PostGIS se usa para datos geográficos cuando el entorno lo habilita. El esquema se crea en orden mediante `backend/migrations/`.
 
 ## Migraciones vigentes

@@ -31,6 +31,10 @@ export const RELATIVE_API_ROUTES = {
     DISCOVERY: `/community/discovery`,
     FOLLOW: (id: string) => `/community/follows/${id}`,
     STORIES: `/community/stories`,
+    POST_LIKE: (postType: string, id: string) =>
+      `/community/posts/${postType}/${id}/like`,
+    POST_COMMENTS: (postType: string, id: string) =>
+      `/community/posts/${postType}/${id}/comments`,
     MESSAGES: {
       AVAILABILITY: `/community/messages/availability`,
     },

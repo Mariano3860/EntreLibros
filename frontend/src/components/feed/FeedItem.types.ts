@@ -15,6 +15,8 @@ export type FeedBase = {
   avatar: string
   time: string
   likes: number
+  commentsCount?: number
+  likedByMe?: boolean
   corner?: FeedCorner
 }
 

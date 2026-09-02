@@ -57,6 +57,18 @@
   color: var(--prototype-teal);
 }
 
+.createStory {
+  color: var(--prototype-teal) !important;
+}
+
+.emptyStories {
+  align-self: center;
+  margin: 0;
+  color: var(--prototype-muted);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
 .storyNotice {
   padding: 8px 12px;
   border-radius: 9px;
@@ -230,32 +242,6 @@
   max-height: 330px;
   border-radius: 11px;
   object-fit: cover;
-}
-
-.postStats,
-.postActions {
-  display: flex;
-  justify-content: space-between;
-  color: var(--prototype-muted);
-  font-size: 9px;
-}
-
-.postStats {
-  padding: 9px 2px;
-}
-
-.postActions {
-  border-top: 1px solid var(--prototype-border);
-}
-
-.postActions button {
-  flex: 1;
-  min-height: 34px;
-  border: 0;
-  background: transparent;
-  color: var(--prototype-muted);
-  cursor: pointer;
-  font-size: 10px;
 }
 
 .sidePanel {

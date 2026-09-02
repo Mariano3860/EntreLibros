@@ -1,5 +1,7 @@
 # Hoja de ruta
 
+Las interacciones sociales basicas de Comunidad ya estan persistidas: likes unicos, comentarios, compartir con fallback y stories relevantes. Las senales avanzadas y las colecciones tematicas quedan para una evolucion posterior.
+
 El seguimiento y el descubrimiento personalizado de Comunidad ya cuentan con una primera implementaciÃ³n persistente; las colecciones temÃ¡ticas y las seÃ±ales avanzadas quedan como evoluciÃ³n posterior.
 
 Este roadmap separa la recuperación terminada de las siguientes decisiones de producto.
