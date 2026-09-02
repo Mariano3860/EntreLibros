@@ -1,19 +1,23 @@
 # Documentación
 
-Índice de referencia del repositorio:
+Índice de referencia del producto y de su operación.
 
-- [`frontend-backend-reconnection-matrix.md`](frontend-backend-reconnection-matrix.md): inventario verificable de contratos existentes, adaptaciones y capacidades diferidas del prototipo.
-- [`arquitectura.md`](arquitectura.md): componentes, límites, proxy, REST, Socket.IO y modos mock/real.
-- [`base_de_datos.md`](base_de_datos.md): modelo vigente y migraciones 001–015.
-- [`messaging-bubbles.md`](messaging-bubbles.md): contrato visual y flujo de mensajería.
-- [`recovery-baseline.md`](recovery-baseline.md): línea base histórica de recuperación y PR #138.
-- [`troubleshooting.md`](troubleshooting.md): diagnóstico de `/messages`, mocks, migraciones, cookies y sockets.
-- [`estado-actual.md`](estado-actual.md): capacidades verificadas y límites conocidos.
-- [`roadmap.md`](roadmap.md): próximos pasos de producto y deuda técnica.
-- [`backlog.md`](backlog.md): pendientes y trazabilidad de producto.
-- [`mvp-estado-alcance-y-definiciones.md`](mvp-estado-alcance-y-definiciones.md): estado funcional de las historias del MVP, prioridades y decisiones pendientes antes de crear una nueva OpenSpec.
-- [`guia-documentacion.md`](guia-documentacion.md): protocolo para mantener los documentos sincronizados.
-- [`security-runbook.md`](security-runbook.md): configuración y comprobaciones operativas de seguridad MVP.
-- [`threat-model.md`](threat-model.md): activos, amenazas cubiertas y riesgos residuales del MVP.
+## Producto
 
-Las instrucciones de contribución están en [`../AGENTS.md`](../AGENTS.md); las de cada área están en sus respectivos `AGENTS.md`.
+- [`estado-actual.md`](estado-actual.md): capacidades verificadas, límites y estado de la integración real.
+- [`backlog.md`](backlog.md): pendientes, prioridades y criterios de cierre.
+- [`arquitectura.md`](arquitectura.md): componentes, comunicación y límites técnicos.
+- [`base_de_datos.md`](base_de_datos.md): modelo persistente y migraciones.
+- [`messaging-bubbles.md`](messaging-bubbles.md): mensajería, acuerdos, adjuntos y no leídos.
+- [`prototype-ui-reference.md`](prototype-ui-reference.md): referencia visual y responsive.
+- [`prototype-mock-contract.md`](prototype-mock-contract.md): contrato del modo demo con MSW.
+- [`frontend-backend-integration.md`](frontend-backend-integration.md): integración de pantallas con la API real.
+
+## Operación
+
+- [`recovery-baseline.md`](recovery-baseline.md): puesta en marcha, recuperación y validación manual.
+- [`troubleshooting.md`](troubleshooting.md): diagnóstico de entorno, API, cookies y Socket.IO.
+- [`security-runbook.md`](security-runbook.md): controles de seguridad y comprobaciones previas.
+- [`threat-model.md`](threat-model.md): activos, amenazas y riesgos residuales.
+- [`roadmap.md`](roadmap.md): evolución posterior al cierre del MVP.
+- [`guia-documentacion.md`](guia-documentacion.md): reglas para mantener la documentación sincronizada.

@@ -1,28 +1,27 @@
-# Notas de amenazas MVP
+# Modelo de amenazas del MVP
 
-## Activos y límites
+## Activos
 
-Los activos principales son cuentas/sesiones, publicaciones de libros,
-mensajes privados, acuerdos de intercambio y la ubicación de rincones. El
-prototipo no implementa moderadores ni control de inventario completo; la
-verificación automática del libro no sustituye una revisión humana futura.
+- Cuentas, sesiones y preferencias de privacidad.
+- Publicaciones, imágenes y metadata bibliográfica.
+- Ubicación aproximada de Rincones y perfiles.
+- Mensajes privados, acuerdos y reportes.
 
-## Amenazas cubiertas
+## Controles actuales
 
-- **CSRF y origen cruzado:** cookie de sesión con `SameSite=Strict`, CORS por
-  allowlist exacta y protección `Origin` para mutaciones en producción.
-- **Acceso no autenticado:** rincones y verificación de libros requieren sesión;
-  mensajes/acuerdos además comprueban pertenencia y estado de la operación.
-- **IDOR en publicaciones:** las actualizaciones comprueban propietario y
-  devuelven 403 sin modificar datos ajenos.
-- **Filtración accidental:** headers de seguridad de Helmet, respuestas de error
-  con claves i18n y redacción de secretos/PII en metadata de logs.
-- **Denegación de servicio conocida:** dependencias runtime auditadas y
-  actualizadas; los límites de JSON y de paginación siguen aplicándose.
+- Cookies de sesión protegidas y validación de origen en mutaciones.
+- CORS restringido al frontend configurado.
+- Autorización por usuario, propietario, participante y conversación.
+- Validación de entradas, límites de JSON/paginación y errores sin detalles internos.
+- Redacción de campos sensibles en logs.
+- Redondeo de coordenadas y proyección pública por nivel de visibilidad.
+- Dependencias runtime auditables mediante `npm audit`.
 
-## Riesgo residual explícito
+## Riesgos residuales
 
-El servicio depende de que el despliegue use HTTPS, un `JWT_SECRET` fuerte,
-backups y una base protegida por red. Las pruebas automáticas no reemplazan una
-revisión de infraestructura ni una prueba manual del navegador con cookies,
-proxy y Socket.IO.
+- La protección depende de desplegar con HTTPS, un `JWT_SECRET` fuerte y una base no expuesta públicamente.
+- El prototipo no incluye moderación humana completa, reputación ni control de inventario.
+- Backups, restauración, rate limiting y observabilidad avanzada deben comprobarse en el entorno de despliegue.
+- Las pruebas automatizadas no sustituyen una revisión manual del navegador con cookies, proxy, permisos y Socket.IO.
+
+Para revisar controles y configuración consulta [`security-runbook.md`](security-runbook.md).
