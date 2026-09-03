@@ -322,9 +322,7 @@ describe('BookDetailModal', () => {
 
     renderModal({ onStartConversation: vi.fn() })
 
-    fireEvent.click(
-      await screen.findByRole('button', { name: /reportar/i })
-    )
+    fireEvent.click(await screen.findByRole('button', { name: /reportar/i }))
 
     expect(
       await screen.findByRole('heading', { name: 'reports.report' })
