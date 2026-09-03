@@ -19,6 +19,14 @@
   font-size: 13px;
 }
 
+.headerActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 .layout {
   display: grid;
   grid-template-columns: minmax(0, 1.78fr) minmax(260px, 0.9fr);
@@ -441,6 +449,10 @@
   .header {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .headerActions {
+    justify-content: flex-start;
   }
 
   .aside {
