@@ -27,6 +27,8 @@ import {
   type MapRadiusKm,
 } from '@src/api/map/map.types'
 import { mapKeys } from '@src/api/map/mapApi'
+import { fetchProfile } from '@src/api/user/profile.service'
+import { useAuth } from '@src/contexts/auth/AuthContext'
 import { useTheme } from '@src/contexts/theme/ThemeContext'
 import { usePrototype } from '@src/features/prototype/PrototypeContext'
 import {
@@ -37,7 +39,11 @@ import {
   UnavailableState,
 } from '@src/features/prototype/PrototypeUI'
 import { useMapData } from '@src/hooks/api/useMapData'
-import { boundingBoxFromCenter, isWithinRadiusKm } from '@src/utils/geospatial'
+import {
+  boundingBoxFromCenter,
+  haversineDistanceKm,
+  isWithinRadiusKm,
+} from '@src/utils/geospatial'
 import { isApiMockMode } from '@src/utils/runtimeEnv'
 
 import styles from './MapPage.module.scss'
@@ -82,7 +88,10 @@ const toDisplayCorner = (corner: MapCornerPin): MapCorner => ({
   id: corner.id,
   name: corner.name,
   category: corner.themes[0] ?? corner.barrio,
-  distance: 'Cerca',
+  distance:
+    corner.distanceKm === null
+      ? 'Sin distancia'
+      : `${corner.distanceKm.toLocaleString('es-AR')} km`,
   activity: corner.lastSignalAt
     ? 'Actividad reciente'
     : 'Sin actividad reciente',
@@ -93,6 +102,7 @@ export const MapPage = () => {
   const { catalog } = usePrototype()
   const { theme } = useTheme()
   const { t } = useTranslation()
+  const { isAuthenticated } = useAuth()
   const mockMode = isApiMockMode()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -115,6 +125,14 @@ export const MapPage = () => {
   const [createOpen, setCreateOpen] = useState(false)
   const [editingCorner, setEditingCorner] =
     useState<CommunityCornerDetail | null>(null)
+  const profileQuery = useQuery({
+    queryKey: ['prototype', 'profile'],
+    queryFn: fetchProfile,
+    enabled: !mockMode && isAuthenticated,
+    retry: false,
+  })
+  const profileLocation = profileQuery.data?.location ?? null
+  const discoveryLocation = location ?? profileLocation
   const mockMapData = useMemo<MapResponse>(
     () => ({
       corners: catalog.corners.map((corner, index) => {
@@ -131,6 +149,7 @@ export const MapPage = () => {
           city: 'Buenos Aires',
           lat: latitude,
           lon: longitude,
+          distanceKm: null,
           lastSignalAt: new Date(
             Date.parse(MOCK_MAP_REFERENCE_DATE) - (index + 1) * 12 * 60_000
           ).toISOString(),
@@ -159,13 +178,28 @@ export const MapPage = () => {
     }),
     [catalog.corners]
   )
-  const effectiveDistance = location ? distance : null
+  const effectiveDistance = discoveryLocation ? distance : null
   const mockFilteredMapData = useMemo<MapResponse>(() => {
     const normalizedSearch = search.trim().toLowerCase()
+    const getDistanceKm = (corner: MapCornerPin) =>
+      discoveryLocation
+        ? Math.round(
+            haversineDistanceKm(
+              discoveryLocation.latitude,
+              discoveryLocation.longitude,
+              corner.lat,
+              corner.lon
+            ) * 10
+          ) / 10
+        : null
     const matchesDistance = (latitude: number, longitude: number) =>
       effectiveDistance === null ||
-      !location ||
-      isWithinRadiusKm(location, { latitude, longitude }, effectiveDistance)
+      !discoveryLocation ||
+      isWithinRadiusKm(
+        discoveryLocation,
+        { latitude, longitude },
+        effectiveDistance
+      )
     const matchesSearch = (value: string) =>
       normalizedSearch.length === 0 ||
       value.toLowerCase().includes(normalizedSearch)
@@ -176,15 +210,27 @@ export const MapPage = () => {
         (theme) => theme === category || theme === category.replace(/s$/, '')
       )
 
-    const visibleCorners = mockMapData.corners.filter(
-      (corner) =>
-        (matchesSearch(corner.name) ||
-          matchesSearch(corner.barrio) ||
-          matchesSearch(corner.city)) &&
-        matchesCategory(corner.themes) &&
-        (!openNow || corner.isOpenNow !== false) &&
-        matchesDistance(corner.lat, corner.lon)
-    )
+    const visibleCorners = mockMapData.corners
+      .filter(
+        (corner) =>
+          (matchesSearch(corner.name) ||
+            matchesSearch(corner.barrio) ||
+            matchesSearch(corner.city)) &&
+          matchesCategory(corner.themes) &&
+          (!openNow || corner.isOpenNow !== false) &&
+          matchesDistance(corner.lat, corner.lon)
+      )
+      .map((corner) => ({
+        ...corner,
+        distanceKm: getDistanceKm(corner),
+      }))
+    if (discoveryLocation) {
+      visibleCorners.sort(
+        (left, right) =>
+          (left.distanceKm ?? Number.POSITIVE_INFINITY) -
+          (right.distanceKm ?? Number.POSITIVE_INFINITY)
+      )
+    }
     const visibleCornerIds = new Set(visibleCorners.map((corner) => corner.id))
     const visiblePublications = mockMapData.publications.filter(
       (publication) => {
@@ -220,7 +266,7 @@ export const MapPage = () => {
   }, [
     category,
     effectiveDistance,
-    location,
+    discoveryLocation,
     mockMapData,
     openNow,
     recentActivity,
@@ -229,7 +275,7 @@ export const MapPage = () => {
   const mapQuery = useMapData(
     {
       bbox,
-      center: effectiveDistance === null ? undefined : (location ?? undefined),
+      center: discoveryLocation ?? undefined,
       searchTerm: search.trim() || undefined,
       filters: {
         distanceKm: effectiveDistance,
@@ -248,10 +294,13 @@ export const MapPage = () => {
   const mapActivity = useMemo(() => mapData?.activity ?? [], [mapData])
   const corners: ReadonlyArray<MapCorner> = mapCorners.map((corner) => {
     if (!mockMode) return toDisplayCorner(corner)
-    return (
-      catalog.corners.find((item) => item.id === corner.id) ??
-      toDisplayCorner(corner)
-    )
+    const mockCorner = catalog.corners.find((item) => item.id === corner.id)
+    return mockCorner
+      ? {
+          ...mockCorner,
+          distance: toDisplayCorner(corner).distance,
+        }
+      : toDisplayCorner(corner)
   })
   const categories = mockMode ? catalog.mapCategories : realCategories
   const mapLayers = {
@@ -373,18 +422,18 @@ export const MapPage = () => {
   }, [])
 
   useEffect(() => {
-    if (!location) return
+    if (!discoveryLocation) return
     setBbox(
       distance === null
         ? MAP_BOUNDS
         : boundingBoxFromCenter(
-            location.latitude,
-            location.longitude,
+            discoveryLocation.latitude,
+            discoveryLocation.longitude,
             distance,
             { minDistanceKm: MIN_MAP_RADIUS_KM }
           )
     )
-  }, [distance, location])
+  }, [distance, discoveryLocation])
 
   useEffect(() => {
     locate()
@@ -418,12 +467,14 @@ export const MapPage = () => {
   const selectedSubtitle = selectedPublication
     ? selectedPublication.authors.join(', ')
     : selectedMapCorner
-      ? `${selectedMapCorner.themes[0] ?? selectedMapCorner.barrio} · Cerca`
+      ? `${selectedMapCorner.themes[0] ?? selectedMapCorner.barrio} · ${toDisplayCorner(selectedMapCorner).distance}`
       : selectedCorner
         ? `${selectedCorner.category} · ${selectedCorner.distance}`
         : 'Esperando datos del mapa.'
   const selectedActivity = selectedPublication
-    ? `${selectedPublication.distanceKm.toLocaleString('es-AR')} km del rincón`
+    ? selectedPublication.distanceKm === null
+      ? 'Distancia no disponible'
+      : `${selectedPublication.distanceKm.toLocaleString('es-AR')} km del rincón`
     : selectedMapCorner?.lastSignalAt
       ? 'Actividad reciente'
       : (selectedCorner?.activity ?? 'Sin actividad reciente')
@@ -536,7 +587,9 @@ export const MapPage = () => {
             <p>
               {location
                 ? 'Mostrando lugares cerca de tu ubicación'
-                : 'Buenos Aires · ubicación aproximada'}
+                : profileLocation
+                  ? 'Ordenando lugares según tu zona de perfil'
+                  : 'Buenos Aires · ubicación aproximada'}
             </p>
           </div>
           <div>
@@ -647,7 +700,7 @@ export const MapPage = () => {
               isLoading={!mockMode && mapQuery.isLoading}
               isFetching={!mockMode && mapQuery.isFetching}
               isEmpty={isMapEmpty}
-              userLocation={location}
+              userLocation={discoveryLocation}
               radiusKm={effectiveDistance}
               className={styles.leafletCanvas}
             />
@@ -695,8 +748,9 @@ export const MapPage = () => {
             </Panel>
             {locationDenied ? (
               <div className={styles.locationNotice} role="status">
-                No pudimos acceder a tu ubicación. Mostramos Buenos Aires; el
-                radio se aplicará cuando compartas tu ubicación.
+                {discoveryLocation
+                  ? 'No pudimos acceder a tu ubicación. Usamos tu zona de perfil para ordenar y aplicar el radio.'
+                  : 'No pudimos acceder a tu ubicación. Mostramos Buenos Aires sin ordenar por distancia; podés configurar una zona o volver a intentar.'}
               </div>
             ) : null}
           </div>

@@ -972,6 +972,7 @@
     "publications": {
       "empty": "Aún no hay publicaciones cerca.",
       "distance": "a {{count}} km",
+      "distanceUnavailable": "Distancia no disponible",
       "types": {
         "offer": "Oferta",
         "want": "Busca",

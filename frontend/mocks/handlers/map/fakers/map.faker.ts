@@ -36,6 +36,7 @@ export const generateMapResponse = (): MapResponse => {
       city: 'Buenos Aires',
       lat,
       lon,
+      distanceKm: null,
       lastSignalAt: faker.date.recent({ days: 2 }).toISOString(),
       photos: [faker.image.urlPicsumPhotos({ width: 640, height: 360 })],
       rules: faker.helpers.arrayElement([

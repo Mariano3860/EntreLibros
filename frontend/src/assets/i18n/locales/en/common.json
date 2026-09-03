@@ -976,6 +976,7 @@
     "publications": {
       "empty": "No nearby publications yet.",
       "distance": "{{count}} km away",
+      "distanceUnavailable": "Distance unavailable",
       "types": {
         "offer": "Offer",
         "want": "Wants",

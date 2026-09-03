@@ -288,9 +288,11 @@ export const MapCanvas = ({
               <strong>{publication.title}</strong>
               <span>{publication.authors[0] ?? ''}</span>
               <span className={styles.tooltipMeta}>
-                {t('map.publications.distance', {
-                  count: publication.distanceKm,
-                })}
+                {publication.distanceKm === null
+                  ? t('map.publications.distanceUnavailable')
+                  : t('map.publications.distance', {
+                      count: publication.distanceKm,
+                    })}
               </span>
             </div>
           </Tooltip>

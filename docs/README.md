@@ -16,6 +16,7 @@
 
 ## Operación
 
+- [`performance-map.md`](performance-map.md): medición reproducible y resultado de rendimiento del mapa.
 - [`recovery-baseline.md`](recovery-baseline.md): puesta en marcha, recuperación y validación manual.
 - [`troubleshooting.md`](troubleshooting.md): diagnóstico de entorno, API, cookies y Socket.IO.
 - [`security-runbook.md`](security-runbook.md): controles de seguridad y comprobaciones previas.

@@ -1119,19 +1119,18 @@ export async function listPublicBookListings(
   }
 
   let distanceExpression: string | null = null;
-  if (
-    filters.latitude !== undefined &&
-    filters.longitude !== undefined &&
-    filters.radiusKm !== undefined
-  ) {
-    params.push(filters.longitude, filters.latitude, filters.radiusKm * 1000);
-    const lon = params.length - 2;
-    const lat = params.length - 1;
-    const radius = params.length;
+  if (filters.latitude !== undefined && filters.longitude !== undefined) {
+    params.push(filters.longitude, filters.latitude);
+    const lon = params.length - 1;
+    const lat = params.length;
     distanceExpression = `ST_Distance(COALESCE(c.location, u.location), ST_SetSRID(ST_MakePoint($${lon}, $${lat}), 4326)::geography)`;
-    conditions.push(
-      `COALESCE(c.location, u.location) IS NOT NULL AND ST_DWithin(COALESCE(c.location, u.location), ST_SetSRID(ST_MakePoint($${lon}, $${lat}), 4326)::geography, $${radius})`
-    );
+    if (filters.radiusKm !== undefined) {
+      params.push(filters.radiusKm * 1000);
+      const radius = params.length;
+      conditions.push(
+        `COALESCE(c.location, u.location) IS NOT NULL AND ST_DWithin(COALESCE(c.location, u.location), ST_SetSRID(ST_MakePoint($${lon}, $${lat}), 4326)::geography, $${radius})`
+      );
+    }
   }
   const limit = Math.min(Math.max(filters.limit ?? 50, 1), 100);
   const offset = Math.max(filters.offset ?? 0, 0);
