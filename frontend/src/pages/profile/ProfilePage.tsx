@@ -9,7 +9,7 @@ import type {
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { useNotificationPreference } from '@hooks/api/useNotifications'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -29,6 +29,14 @@ import { toPrototypeProfile } from '@src/features/prototype/realData.adapters'
 import { isApiMockMode } from '@src/utils/runtimeEnv'
 
 import styles from './ProfilePage.module.scss'
+import {
+  cropProfilePhotoToSquare,
+  defaultProfilePhotoFocus,
+  isSupportedProfilePhoto,
+  readProfilePhotoFile,
+  type ProfilePhotoFocus,
+} from './profilePhoto'
+import { ProfilePhotoCropper } from './ProfilePhotoCropper'
 
 type ProfileStateProps = { text: string; error?: boolean }
 type ProfileCity = keyof typeof PROFILE_LOCATIONS
@@ -44,8 +52,6 @@ const PROFILE_VISIBILITY_OPTIONS: readonly ProfileVisibility[] = [
   'public',
   'private',
 ]
-const MAX_PROFILE_PHOTO_BYTES = 5 * 1024 * 1024
-const PROFILE_PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 const mockInterests: ProfileInterest[] = PROFILE_INTERESTS.slice(0, 5)
 
 const isProfileCity = (value: string): value is ProfileCity =>
@@ -87,10 +93,17 @@ export const ProfilePage = () => {
   const [city, setCity] = useState<string>('Buenos Aires')
   const [neighborhood, setNeighborhood] = useState<string | null>(null)
   const [street, setStreet] = useState('')
+  const [photoCropSource, setPhotoCropSource] = useState<string | null>(null)
+  const [photoCropFocus, setPhotoCropFocus] = useState<ProfilePhotoFocus>(
+    defaultProfilePhotoFocus()
+  )
   const [saved, setSaved] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
   const [photoError, setPhotoError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+  const [readingPhoto, setReadingPhoto] = useState(false)
+  const photoInputRef = useRef<HTMLInputElement>(null)
+  const photoSelectionId = useRef(0)
   const profile = profileQuery.data
   const realProfile = profile ? toPrototypeProfile(profile) : null
   const availableNeighborhoods = isProfileCity(city)
@@ -103,6 +116,8 @@ export const ProfilePage = () => {
     setName(next.name)
     setBio(next.bio)
     setProfilePhoto(profile.profilePhoto)
+    setPhotoCropSource(null)
+    setPhotoCropFocus(defaultProfilePhotoFocus())
     setProfileVisibility(profile.profileVisibility)
     setLocationVisibility(profile.locationVisibility)
     setInterests(profile.interests)
@@ -112,17 +127,72 @@ export const ProfilePage = () => {
     setStreet(profile.street ?? '')
   }, [profile])
 
+  const resetEditorDraft = () => {
+    photoSelectionId.current += 1
+    setReadingPhoto(false)
+    if (profile) {
+      const next = toPrototypeProfile(profile)
+      setName(next.name)
+      setBio(next.bio)
+      setProfileVisibility(profile.profileVisibility)
+      setLocationVisibility(profile.locationVisibility)
+      setInterests(profile.interests)
+      setCountry(profile.country ?? 'Argentina')
+      setCity(profile.city ?? '')
+      setNeighborhood(profile.neighborhood)
+      setStreet(profile.street ?? '')
+      setProfilePhoto(profile.profilePhoto)
+    } else {
+      setName(catalog.user.name)
+      setBio(catalog.user.bio)
+      setProfileVisibility('public')
+      setLocationVisibility('city')
+      setInterests(mockInterests)
+      setCountry('Argentina')
+      setCity('Buenos Aires')
+      setNeighborhood(null)
+      setStreet('')
+      setProfilePhoto(null)
+    }
+    setPhotoCropSource(null)
+    setPhotoCropFocus(defaultProfilePhotoFocus())
+    setPhotoError(null)
+  }
+
   const save = async (event: FormEvent) => {
     event.preventDefault()
     if (saving) return
+
+    setSaveError(null)
+    setSaving(true)
+    let photoToSave = profilePhoto
+    if (photoCropSource) {
+      try {
+        photoToSave = await cropProfilePhotoToSquare(
+          photoCropSource,
+          photoCropFocus
+        )
+      } catch (error) {
+        const errorKey =
+          error instanceof Error && error.message === 'profile.photo.too_large'
+            ? 'profile.photoInvalid'
+            : 'profile.photoReadError'
+        setPhotoError(
+          t(errorKey, {
+            defaultValue: 'No pudimos leer la imagen. Intentá nuevamente.',
+          })
+        )
+        setSaving(false)
+        return
+      }
+    }
+
     if (!mockMode && profile) {
-      setSaveError(null)
-      setSaving(true)
       try {
         const updated = await updateProfile({
           alias: name.trim(),
           description: bio.trim() || null,
-          profilePhoto,
+          profilePhoto: photoToSave,
           profileVisibility,
           locationVisibility,
           language: profile.language,
@@ -142,55 +212,65 @@ export const ProfilePage = () => {
         setSaving(false)
         return
       }
-      setSaving(false)
     }
+
+    setProfilePhoto(photoToSave)
+    setPhotoCropSource(null)
+    setPhotoCropFocus(defaultProfilePhotoFocus())
+    setSaving(false)
     setSaved(true)
     setEditing(false)
   }
 
   const openEditor = () => {
+    resetEditorDraft()
     setSaved(false)
     setSaveError(null)
-    setPhotoError(null)
     setEditing(true)
   }
 
-  const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const closeEditor = () => {
+    resetEditorDraft()
+    setEditing(false)
+  }
+
+  const handlePhotoChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
-    if (
-      !PROFILE_PHOTO_TYPES.includes(file.type) ||
-      file.size > MAX_PROFILE_PHOTO_BYTES
-    ) {
+
+    const selectionId = photoSelectionId.current + 1
+    photoSelectionId.current = selectionId
+    event.target.value = ''
+    if (photoInputRef.current) photoInputRef.current.value = ''
+    setReadingPhoto(true)
+    setPhotoCropSource(null)
+    setPhotoCropFocus(defaultProfilePhotoFocus())
+
+    if (!isSupportedProfilePhoto(file)) {
       setPhotoError(
         t('profile.photoInvalid', {
           defaultValue: 'Elegí una imagen JPG, PNG o WebP de hasta 5 MB.',
         })
       )
-      event.target.value = ''
+      setReadingPhoto(false)
       return
     }
-    const reader = new FileReader()
-    reader.onload = () => {
-      const result = typeof reader.result === 'string' ? reader.result : null
-      if (!result) {
-        setPhotoError(
-          t('profile.photoInvalid', {
-            defaultValue: 'Elegí una imagen JPG, PNG o WebP de hasta 5 MB.',
-          })
-        )
-        return
-      }
-      setProfilePhoto(result)
+
+    try {
+      const source = await readProfilePhotoFile(file)
+      if (selectionId !== photoSelectionId.current) return
+      setPhotoCropSource(source)
+      setPhotoCropFocus(defaultProfilePhotoFocus())
       setPhotoError(null)
-    }
-    reader.onerror = () =>
+    } catch {
       setPhotoError(
-        t('profile.photoInvalid', {
-          defaultValue: 'Elegí una imagen JPG, PNG o WebP de hasta 5 MB.',
+        t('profile.photoReadError', {
+          defaultValue: 'No pudimos leer la imagen. Intentá nuevamente.',
         })
       )
-    reader.readAsDataURL(file)
+    } finally {
+      if (selectionId === photoSelectionId.current) setReadingPhoto(false)
+    }
   }
 
   const toggleInterest = (interest: ProfileInterest) => {
@@ -245,7 +325,7 @@ export const ProfilePage = () => {
               <small>◷ Miembro de EntreLibros</small>
             </div>
             <PrototypeButton onClick={openEditor}>
-              ✎ Editar perfil
+              {t('profile.edit', { defaultValue: 'Editar perfil' })}
             </PrototypeButton>
           </div>
           <p className={styles.bio}>{bio}</p>
@@ -402,48 +482,103 @@ export const ProfilePage = () => {
 
         {editing ? (
           <div className={styles.modalBackdrop}>
-            <Panel className={styles.modal} as="div">
+            <Panel
+              className={styles.modal}
+              as="div"
+              role="dialog"
+              aria-modal={true}
+              aria-labelledby="profile-edit-title"
+            >
               <header>
-                <h2>Editar perfil</h2>
+                <h2 id="profile-edit-title">
+                  {t('profile.edit', { defaultValue: 'Editar perfil' })}
+                </h2>
                 <button
                   type="button"
-                  onClick={() => setEditing(false)}
-                  aria-label="Cerrar"
+                  onClick={closeEditor}
+                  aria-label={t('profile.close', { defaultValue: 'Cerrar' })}
                 >
                   ×
                 </button>
               </header>
               <form onSubmit={save}>
-                <label>
-                  Nombre
-                  <input
-                    value={name}
-                    onChange={(event) => setName(event.target.value)}
-                  />
-                </label>
                 <div className={styles.photoField}>
                   <span>{t('profile.photo')}</span>
                   <div className={styles.photoControls}>
-                    <Avatar
-                      initials={name.slice(0, 1).toUpperCase() || '?'}
-                      imageUrl={profilePhoto}
-                      accent="#ff8b4c"
-                      size="large"
-                    />
+                    {photoCropSource ? (
+                      <ProfilePhotoCropper
+                        source={photoCropSource}
+                        focus={photoCropFocus}
+                        onFocusChange={setPhotoCropFocus}
+                        onReset={() =>
+                          setPhotoCropFocus(defaultProfilePhotoFocus())
+                        }
+                        onCancel={() => {
+                          setPhotoCropSource(null)
+                          setPhotoCropFocus(defaultProfilePhotoFocus())
+                        }}
+                        labels={{
+                          title: t('profile.photoCropTitle', {
+                            defaultValue: 'Ajustá el encuadre',
+                          }),
+                          hint: t('profile.photoCropHint', {
+                            defaultValue:
+                              'Arrastrá la imagen o usá los controles para centrarla.',
+                          }),
+                          horizontal: t('profile.photoCropHorizontal', {
+                            defaultValue: 'Horizontal',
+                          }),
+                          vertical: t('profile.photoCropVertical', {
+                            defaultValue: 'Vertical',
+                          }),
+                          focus: t('profile.photoCropFocus', {
+                            defaultValue: 'Foco del recorte',
+                          }),
+                          reset: t('profile.photoCropReset', {
+                            defaultValue: 'Restablecer encuadre',
+                          }),
+                          cancel: t('profile.photoCropCancel', {
+                            defaultValue: 'Descartar foto nueva',
+                          }),
+                        }}
+                      />
+                    ) : (
+                      <Avatar
+                        initials={name.slice(0, 1).toUpperCase() || '?'}
+                        imageUrl={profilePhoto}
+                        accent="#ff8b4c"
+                        size="large"
+                      />
+                    )}
                     <div>
                       <label className={styles.fileButton}>
-                        {t('profile.photo')}
+                        {profilePhoto
+                          ? t('profile.changePhoto', {
+                              defaultValue: 'Cambiar foto',
+                            })
+                          : t('profile.photo')}
                         <input
+                          ref={photoInputRef}
                           type="file"
                           accept="image/jpeg,image/png,image/webp"
+                          aria-label={t('profile.photo')}
+                          onClick={(event) => {
+                            event.currentTarget.value = ''
+                          }}
                           onChange={handlePhotoChange}
                         />
                       </label>
-                      {profilePhoto ? (
+                      {profilePhoto || photoCropSource ? (
                         <button
                           type="button"
                           className={styles.removePhoto}
-                          onClick={() => setProfilePhoto(null)}
+                          onClick={() => {
+                            photoSelectionId.current += 1
+                            setReadingPhoto(false)
+                            setProfilePhoto(null)
+                            setPhotoCropSource(null)
+                            setPhotoCropFocus(defaultProfilePhotoFocus())
+                          }}
                         >
                           {t('profile.removePhoto')}
                         </button>
@@ -453,6 +588,13 @@ export const ProfilePage = () => {
                   </div>
                   {photoError ? <p role="alert">{photoError}</p> : null}
                 </div>
+                <label>
+                  {t('profile.name', { defaultValue: 'Nombre' })}
+                  <input
+                    value={name}
+                    onChange={(event) => setName(event.target.value)}
+                  />
+                </label>
                 <label>
                   Sobre vos
                   <textarea
@@ -605,16 +747,17 @@ export const ProfilePage = () => {
                   {t('profile.inAppNotifications')}
                 </label>
                 <div>
-                  <PrototypeButton
-                    type="button"
-                    onClick={() => setEditing(false)}
-                  >
-                    Cancelar
+                  <PrototypeButton type="button" onClick={closeEditor}>
+                    {t('profile.cancel', { defaultValue: 'Cancelar' })}
                   </PrototypeButton>
                   <PrototypeButton
                     tone="primary"
                     type="submit"
-                    disabled={saving || Boolean(photoError)}
+                    disabled={
+                      saving ||
+                      readingPhoto ||
+                      Boolean(photoError && !profilePhoto && !photoCropSource)
+                    }
                   >
                     {saving
                       ? t('profile.saving', { defaultValue: 'Guardando...' })

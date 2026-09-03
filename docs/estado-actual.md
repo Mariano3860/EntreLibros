@@ -14,8 +14,8 @@ La matriz de requisitos y la evidencia se mantienen en
 
 ## Capacidades disponibles
 
-- Identidad y perfil: registro, inicio/cierre de sesion, perfil editable, idioma,
-  intereses y visibilidad territorial.
+- Identidad y perfil: registro, inicio/cierre de sesion, perfil editable con foto
+  recortada, idioma, intereses y visibilidad territorial.
 - Privacidad: las proyecciones publicas omiten correo, contrasena, calle, altura y
   coordenadas exactas; muestran como maximo el nivel territorial permitido.
 - Libros: catalogo, publicaciones offer/want, condicion, imagenes limitadas,
@@ -26,7 +26,8 @@ La matriz de requisitos y la evidencia se mantienen en
 - Descubrimiento: mapa y listado real comparten filtros, radio, orden y estados
   de carga/vacio/error; sin centro valido no se inventa una distancia.
 - Comunidad: feed persistente, historias, seguimiento, likes unicos, comentarios,
-  compartir, Rincones cercanos y sugerencias con enlaces reales a perfiles.
+  compartir, Rincones cercanos, fotos de perfil y sugerencias con enlaces reales a
+  perfiles.
 - Contacto: se puede iniciar una conversacion desde una publicacion o un perfil;
   el primer mensaje es idempotente y puede llevar un adjunto de libro.
 - Acuerdos: propuesta, contrapropuesta, confirmacion, rechazo, cancelacion,

@@ -1,7 +1,11 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, test } from 'vitest'
 
-import { BookCover, FixtureState } from '@src/features/prototype/PrototypeUI'
+import {
+  Avatar,
+  BookCover,
+  FixtureState,
+} from '@src/features/prototype/PrototypeUI'
 
 describe('FixtureState', () => {
   beforeEach(() => window.history.replaceState({}, '', '/'))
@@ -87,5 +91,27 @@ describe('BookCover', () => {
 
     expect(container.querySelector('img')).not.toBeInTheDocument()
     expect(screen.getByText('Una novela')).toBeInTheDocument()
+  })
+})
+
+describe('Avatar', () => {
+  test('uses the same confirmed square photo across avatar sizes and falls back on load failure', () => {
+    const photo = 'data:image/png;base64,square-photo'
+    const { container } = render(
+      <>
+        <Avatar initials="ML" imageUrl={photo} size="hero" />
+        <Avatar initials="ML" imageUrl={photo} size="medium" />
+        <Avatar initials="ML" imageUrl={photo} size="small" />
+      </>
+    )
+
+    const images = Array.from(container.querySelectorAll('img'))
+    expect(images).toHaveLength(3)
+    expect(images.map((image) => image.src)).toEqual([photo, photo, photo])
+    expect(images.every((image) => image.className)).toBe(true)
+
+    fireEvent.error(images[0])
+    expect(container.querySelectorAll('img')).toHaveLength(2)
+    expect(container).toHaveTextContent('ML')
   })
 })

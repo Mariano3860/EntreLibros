@@ -80,6 +80,69 @@ describe('community persistence endpoints', () => {
     }
   });
 
+  test('uses persisted profile photos for community avatars', async () => {
+    const email = `community-avatar-${Date.now()}@example.com`;
+    const cookie = await registerUser(email, 'Photo reader');
+    const user = await findUserByEmail(email);
+    expect(user).not.toBeNull();
+
+    const profilePhoto = 'https://example.com/profile-photo.png';
+    await client.query(
+      `UPDATE users SET profile_photo_url = $1 WHERE id = $2`,
+      [profilePhoto, user!.id]
+    );
+    const book = await client.query<{ id: number }>(
+      `INSERT INTO books (title, author)
+       VALUES ('Community avatar book', 'A. Reader')
+       RETURNING id`
+    );
+    const listing = await client.query<{ id: number }>(
+      `INSERT INTO book_listings (user_id, book_id, type, status, condition, trade)
+       VALUES ($1, $2, 'offer', 'available', 'good', true)
+       RETURNING id`,
+      [user!.id, book.rows[0].id]
+    );
+    const story = await client.query<{ id: number }>(
+      `INSERT INTO community_stories (user_id, body)
+       VALUES ($1, 'Una historia con foto.')
+       RETURNING id`,
+      [user!.id]
+    );
+
+    const feed = await request(app)
+      .get('/api/community/feed')
+      .set('Cookie', cookie)
+      .query({ size: 20 })
+      .expect(200);
+    expect(feed.body).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: String(listing.rows[0].id),
+          avatar: profilePhoto,
+        }),
+        expect.objectContaining({
+          id: `story-${story.rows[0].id}`,
+          avatar: profilePhoto,
+        }),
+      ])
+    );
+
+    const [activity, suggestions] = await Promise.all([
+      request(app).get('/api/community/activity').expect(200),
+      request(app).get('/api/community/suggestions').expect(200),
+    ]);
+    expect(activity.body).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: String(user!.id), avatar: profilePhoto }),
+      ])
+    );
+    expect(suggestions.body).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: String(user!.id), avatar: profilePhoto }),
+      ])
+    );
+  });
+
   test('persists a social story and returns it in the feed', async () => {
     const cookie = await registerAndLogin();
     const created = await request(app)

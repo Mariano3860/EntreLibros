@@ -437,6 +437,88 @@
   color: var(--prototype-orange);
 }
 
+.cropper {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid rgb(66 215 199 / 28%);
+  border-radius: 12px;
+  background: rgb(66 215 199 / 5%);
+  color: var(--prototype-muted);
+  font-size: 9px;
+
+  strong {
+    color: var(--prototype-input-text);
+    font-size: 11px;
+  }
+
+  p {
+    margin: 0;
+    line-height: 1.45;
+  }
+}
+
+.cropPreview {
+  position: relative;
+  width: min(220px, 100%);
+  aspect-ratio: 1;
+  margin: 2px auto 0;
+  overflow: hidden;
+  border: 3px solid var(--prototype-teal);
+  border-radius: 50%;
+  background: var(--prototype-surface-soft);
+  cursor: grab;
+  touch-action: none;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.cropImage {
+  width: 100%;
+  height: 100%;
+  user-select: none;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.cropSliders {
+  display: grid;
+  gap: 6px;
+
+  label {
+    display: grid;
+    gap: 3px;
+    color: var(--prototype-muted);
+    font-size: 8px;
+  }
+
+  input {
+    width: 100%;
+    accent-color: var(--prototype-teal);
+  }
+}
+
+.cropActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  button {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--prototype-teal);
+    cursor: pointer;
+    font-size: 8px;
+  }
+
+  button:last-child {
+    color: var(--prototype-muted);
+  }
+}
+
 .interestField,
 .locationField {
   min-width: 0;

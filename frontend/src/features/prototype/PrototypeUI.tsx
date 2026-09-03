@@ -1,6 +1,7 @@
 import {
   useEffect,
   useState,
+  type AriaRole,
   type ButtonHTMLAttributes,
   type ReactNode,
 } from 'react'
@@ -42,13 +43,25 @@ export const Panel = ({
   className = '',
   as: Element = 'section',
   'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
+  'aria-modal': ariaModal,
+  role,
 }: {
   children: ReactNode
   className?: string
   as?: 'section' | 'article' | 'div' | 'aside'
   'aria-label'?: string
+  'aria-labelledby'?: string
+  'aria-modal'?: boolean
+  role?: AriaRole
 }) => (
-  <Element className={`${styles.panel} ${className}`} aria-label={ariaLabel}>
+  <Element
+    className={`${styles.panel} ${className}`}
+    aria-label={ariaLabel}
+    aria-labelledby={ariaLabelledBy}
+    aria-modal={ariaModal}
+    role={role}
+  >
     {children}
   </Element>
 )
