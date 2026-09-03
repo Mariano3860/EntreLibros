@@ -3,6 +3,7 @@ import {
   type AgreementSnapshot,
 } from '../repositories/agreementRepository.js';
 import { createNotification } from '../repositories/notificationRepository.js';
+import { recordAnalyticsEvent } from '../repositories/analyticsRepository.js';
 import { query } from '../db.js';
 
 export async function notifyMessageRecipients(input: {
@@ -36,8 +37,6 @@ export async function notifyMessageRecipients(input: {
 }
 
 async function notifyAgreement(agreement: AgreementSnapshot): Promise<void> {
-  if (agreement.state !== 'confirmed') return;
-
   const participantIds = [agreement.proposerId, agreement.participantId];
   const { rows } = await query<{ id: number; display_name: string }>(
     `SELECT id, COALESCE(NULLIF(alias, ''), name) AS display_name
@@ -61,9 +60,90 @@ async function notifyAgreement(agreement: AgreementSnapshot): Promise<void> {
           conversationId: agreement.conversationId,
           participantName:
             names.get(otherParticipantId ?? recipientId) ?? 'un usuario',
+          state: agreement.state,
+          date: agreement.details.date,
+          time: agreement.details.time,
         },
         idempotencyKey: `agreement:${agreement.id}:version:${agreement.currentVersion}:user:${recipientId}`,
       });
+    })
+  );
+}
+
+type ReminderRow = {
+  id: number;
+  conversation_id: number;
+  current_version: number;
+  proposer_id: number;
+  participant_id: number;
+  date: string;
+  time: string;
+  proposer_name: string;
+  participant_name: string;
+};
+
+export async function createAgreementReminderNotifications(
+  now = new Date()
+): Promise<void> {
+  const { rows } = await query<ReminderRow>(
+    `SELECT a.id, a.conversation_id, a.current_version,
+            a.proposer_id, a.participant_id,
+            v.details->>'date' AS date,
+            v.details->>'time' AS time,
+            COALESCE(NULLIF(proposer.alias, ''), proposer.name) AS proposer_name,
+            COALESCE(NULLIF(participant.alias, ''), participant.name) AS participant_name
+     FROM exchange_agreements a
+     JOIN exchange_agreement_versions v
+       ON v.agreement_id = a.id AND v.version = a.current_version
+     JOIN users proposer ON proposer.id = a.proposer_id
+     JOIN users participant ON participant.id = a.participant_id
+     WHERE a.state = 'confirmed'`
+  );
+  const windowStart = now.getTime() + 23 * 60 * 60 * 1000;
+  const windowEnd = now.getTime() + 25 * 60 * 60 * 1000;
+
+  await Promise.all(
+    rows.flatMap((row) => {
+      const scheduledAt = new Date(`${row.date}T${row.time}:00Z`);
+      const scheduledTime = scheduledAt.getTime();
+      if (
+        !Number.isFinite(scheduledTime) ||
+        scheduledTime < windowStart ||
+        scheduledTime > windowEnd
+      ) {
+        return [];
+      }
+      const recipients: Array<[number, string]> = [
+        [row.proposer_id, row.participant_name],
+        [row.participant_id, row.proposer_name],
+      ];
+      return [
+        recordAnalyticsEvent({
+          eventType: 'agreement_reminder',
+          entityType: 'agreement',
+          entityId: String(row.id),
+          metadata: { version: row.current_version },
+          idempotencyKey: `agreement-reminder-event:${row.id}:${row.current_version}`,
+        }),
+        ...recipients.map(([recipientId, participantName]) =>
+          createNotification({
+            recipientId,
+            kind: 'agreement',
+            entityId: String(row.id),
+            titleKey: 'notifications.agreement.reminderTitle',
+            bodyKey: 'notifications.agreement.reminderBody',
+            data: {
+              agreementId: row.id,
+              conversationId: row.conversation_id,
+              participantName,
+              reminder: 'true',
+              date: row.date,
+              time: row.time,
+            },
+            idempotencyKey: `agreement-reminder:${row.id}:version:${row.current_version}:user:${recipientId}`,
+          })
+        ),
+      ];
     })
   );
 }

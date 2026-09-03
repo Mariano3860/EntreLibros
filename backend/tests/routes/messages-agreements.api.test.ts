@@ -539,10 +539,46 @@ describe('messaging and agreements API', () => {
         expect(body.agreement.currentVersion).toBe(2);
       });
     await request(app)
+      .post(`/api/agreements/${agreementId}/commands`)
+      .set('Cookie', first.cookie)
+      .send({ command: 'confirm', expectedVersion: 2 })
+      .expect(200)
+      .expect(({ body }) => expect(body.agreement.state).toBe('confirmed'));
+    await request(app)
       .get(`/api/agreements/${agreementId}/history`)
       .set('Cookie', second.cookie)
       .expect(200)
-      .expect(({ body }) => expect(body.history).toHaveLength(2));
+      .expect(({ body }) => expect(body.history).toHaveLength(3));
+
+    const firstOutcome = await request(app)
+      .post(`/api/agreements/${agreementId}/outcome`)
+      .set('Cookie', first.cookie)
+      .send({ outcome: 'completed', reason: 'Intercambio realizado' })
+      .expect(200);
+    expect(firstOutcome.body.agreement.state).toBe('confirmed');
+    expect(firstOutcome.body.agreement.outcomes).toEqual([
+      expect.objectContaining({
+        userId: first.id,
+        outcome: 'completed',
+        reason: 'Intercambio realizado',
+      }),
+    ]);
+
+    const secondOutcome = await request(app)
+      .post(`/api/agreements/${agreementId}/outcome`)
+      .set('Cookie', second.cookie)
+      .send({ outcome: 'not_completed', reason: 'No coincidimos en el lugar' })
+      .expect(200);
+    expect(secondOutcome.body.agreement.state).toBe('completed');
+    expect(secondOutcome.body.agreement.outcomes).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ userId: first.id, outcome: 'completed' }),
+        expect.objectContaining({
+          userId: second.id,
+          outcome: 'not_completed',
+        }),
+      ])
+    );
   });
 
   test('rejects non-members and unavailable listings with localized errors', async () => {

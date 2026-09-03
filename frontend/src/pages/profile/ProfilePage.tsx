@@ -7,6 +7,7 @@ import type {
   UserProfile,
 } from '@api/user/profile.types'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
+import { useNotificationPreference } from '@hooks/api/useNotifications'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -65,6 +66,9 @@ export const ProfilePage = () => {
   const queryClient = useQueryClient()
   const { t } = useTranslation()
   const mockMode = isApiMockMode()
+  const notificationPreference = useNotificationPreference({
+    enabled: !mockMode,
+  })
   const profileQuery = useQuery({
     queryKey: PROFILE_QUERY_KEY,
     queryFn: fetchProfile,
@@ -587,6 +591,19 @@ export const ProfilePage = () => {
                         )}
                   </span>
                 </div>
+                <label className={styles.notificationPreference}>
+                  <input
+                    type="checkbox"
+                    checked={mockMode || notificationPreference.data !== false}
+                    disabled={
+                      mockMode || notificationPreference.update.isPending
+                    }
+                    onChange={(event) =>
+                      notificationPreference.update.mutate(event.target.checked)
+                    }
+                  />
+                  {t('profile.inAppNotifications')}
+                </label>
                 <div>
                   <PrototypeButton
                     type="button"

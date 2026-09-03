@@ -6,7 +6,9 @@ import {
   commandAgreement,
   counterProposeAgreement,
   createAgreement,
+  fetchAgreement,
   fetchAgreementHistory,
+  recordAgreementOutcome,
 } from '@api/agreements/agreements'
 
 const details = {
@@ -63,5 +65,26 @@ describe('agreements API client', () => {
       expectedVersion: 1,
     })
     expect(agreementQueryKeys.detail(8)).toEqual(['agreements', 8])
+  })
+
+  it('loads an agreement and records a private outcome', async () => {
+    const agreement = { id: 8, currentVersion: 2, details }
+    vi.spyOn(apiClient, 'get').mockResolvedValueOnce({ data: { agreement } })
+    await expect(fetchAgreement(8)).resolves.toEqual(agreement)
+    expect(apiClient.get).toHaveBeenCalledWith('/agreements/8')
+
+    vi.spyOn(apiClient, 'post').mockResolvedValueOnce({ data: { agreement } })
+    await expect(
+      recordAgreementOutcome({
+        agreementId: 8,
+        outcome: 'completed',
+        reason: 'Encuentro realizado',
+      })
+    ).resolves.toEqual(agreement)
+    expect(apiClient.post).toHaveBeenCalledWith('/agreements/8/outcome', {
+      agreementId: 8,
+      outcome: 'completed',
+      reason: 'Encuentro realizado',
+    })
   })
 })

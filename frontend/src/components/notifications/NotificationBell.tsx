@@ -28,8 +28,9 @@ type MessageGroup = {
 type AgreementNotification = {
   id: number
   conversationId: number
-  label: string
+  participantName: string
   createdAt: string
+  reminder: boolean
 }
 
 export const NotificationBell = () => {
@@ -112,8 +113,9 @@ export const NotificationBell = () => {
             {
               id: notification.id,
               conversationId,
-              label: t('notifications.agreement.confirmedWith', { name }),
+              participantName: name,
               createdAt: notification.createdAt,
+              reminder: notification.data.reminder === 'true',
             },
           ]
         }),
@@ -173,7 +175,7 @@ export const NotificationBell = () => {
       >
         <BellIcon aria-hidden="true" />
         <span className={styles.count} aria-hidden="true">
-          {unreadMessageNotifications.length}
+          {unreadCount}
         </span>
       </button>
       {isOpen ? (
@@ -215,7 +217,13 @@ export const NotificationBell = () => {
                   })
                 }}
               >
-                {notification.label}
+                {notification.reminder
+                  ? t('notifications.agreement.reminderWith', {
+                      name: notification.participantName,
+                    })
+                  : t('notifications.agreement.confirmedWith', {
+                      name: notification.participantName,
+                    })}
               </button>
             ))}
           </div>

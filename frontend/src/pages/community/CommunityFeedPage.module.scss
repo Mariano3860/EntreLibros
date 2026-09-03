@@ -305,6 +305,14 @@
   font-size: 10px;
 }
 
+.suggestion strong a,
+.suggestion strong a:hover,
+.suggestion strong a:focus-visible {
+  color: var(--prototype-text);
+  text-decoration: none;
+  cursor: pointer;
+}
+
 .cornerList small,
 .suggestion small {
   margin-top: 2px;

@@ -911,16 +911,38 @@
                       {
                         "type": "object",
                         "properties": {
-                          "key": { "type": "string" },
-                          "contentType": { "type": "string" },
-                          "size": { "type": "integer", "minimum": 1 },
-                          "name": { "type": "string" },
-                          "kind": { "type": "string", "enum": ["book"] },
-                          "bookId": { "type": "string" },
-                          "title": { "type": "string" },
-                          "author": { "type": "string" },
-                          "coverUrl": { "type": "string" },
-                          "ownerId": { "type": "integer" }
+                          "key": {
+                            "type": "string"
+                          },
+                          "contentType": {
+                            "type": "string"
+                          },
+                          "size": {
+                            "type": "integer",
+                            "minimum": 1
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "kind": {
+                            "type": "string",
+                            "enum": ["book"]
+                          },
+                          "bookId": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "author": {
+                            "type": "string"
+                          },
+                          "coverUrl": {
+                            "type": "string"
+                          },
+                          "ownerId": {
+                            "type": "integer"
+                          }
                         },
                         "required": [
                           "key",
@@ -936,18 +958,32 @@
                       {
                         "type": "object",
                         "properties": {
-                          "key": { "type": "string" },
-                          "contentType": { "type": "string" },
-                          "size": { "type": "integer", "minimum": 1 },
-                          "name": { "type": "string" },
-                          "kind": { "type": "string", "enum": ["swap"] },
+                          "key": {
+                            "type": "string"
+                          },
+                          "contentType": {
+                            "type": "string"
+                          },
+                          "size": {
+                            "type": "integer",
+                            "minimum": 1
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "kind": {
+                            "type": "string",
+                            "enum": ["swap"]
+                          },
                           "offered": {
                             "$ref": "#/components/schemas/MessageBookReference"
                           },
                           "requested": {
                             "$ref": "#/components/schemas/MessageBookReference"
                           },
-                          "note": { "type": "string" }
+                          "note": {
+                            "type": "string"
+                          }
                         },
                         "required": [
                           "key",
@@ -961,13 +997,29 @@
                       {
                         "type": "object",
                         "properties": {
-                          "key": { "type": "string" },
-                          "contentType": { "type": "string" },
-                          "size": { "type": "integer", "minimum": 1 },
-                          "name": { "type": "string" },
-                          "kind": { "type": "string", "enum": ["agreement"] },
-                          "agreementId": { "type": "integer" },
-                          "version": { "type": "integer" },
+                          "key": {
+                            "type": "string"
+                          },
+                          "contentType": {
+                            "type": "string"
+                          },
+                          "size": {
+                            "type": "integer",
+                            "minimum": 1
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "kind": {
+                            "type": "string",
+                            "enum": ["agreement"]
+                          },
+                          "agreementId": {
+                            "type": "integer"
+                          },
+                          "version": {
+                            "type": "integer"
+                          },
                           "event": {
                             "type": "string",
                             "enum": [
@@ -982,11 +1034,21 @@
                           "details": {
                             "type": "object",
                             "properties": {
-                              "meetingPoint": { "type": "string" },
-                              "area": { "type": "string" },
-                              "date": { "type": "string" },
-                              "time": { "type": "string" },
-                              "bookTitle": { "type": "string" }
+                              "meetingPoint": {
+                                "type": "string"
+                              },
+                              "area": {
+                                "type": "string"
+                              },
+                              "date": {
+                                "type": "string"
+                              },
+                              "time": {
+                                "type": "string"
+                              },
+                              "bookTitle": {
+                                "type": "string"
+                              }
                             },
                             "required": [
                               "meetingPoint",
@@ -998,10 +1060,16 @@
                           },
                           "listingIds": {
                             "type": "array",
-                            "items": { "type": "integer" }
+                            "items": {
+                              "type": "integer"
+                            }
                           },
-                          "actorName": { "type": "string" },
-                          "reason": { "type": "string" }
+                          "actorName": {
+                            "type": "string"
+                          },
+                          "reason": {
+                            "type": "string"
+                          }
                         },
                         "required": [
                           "key",
@@ -1239,6 +1307,63 @@
           },
           "422": {
             "description": "Localized transition validation error"
+          }
+        }
+      }
+    },
+    "/api/agreements/{id}/outcome": {
+      "post": {
+        "summary": "Record a private post-meeting outcome",
+        "tags": ["Agreements"],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["outcome"],
+                "properties": {
+                  "outcome": {
+                    "type": "string",
+                    "enum": ["completed", "not_completed"]
+                  },
+                  "reason": {
+                    "type": "string",
+                    "maxLength": 1000
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated agreement with private outcomes"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "description": "Not a participant in the agreement"
+          },
+          "422": {
+            "description": "Outcome unavailable or invalid"
           }
         }
       }
@@ -1726,6 +1851,54 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/reports": {
+      "post": {
+        "summary": "Submit an authenticated trust and safety report",
+        "tags": ["Reports"],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["targetType", "targetId", "reason"],
+                "properties": {
+                  "targetType": {
+                    "type": "string",
+                    "enum": ["content", "conduct", "corner_missing"]
+                  },
+                  "targetId": {
+                    "type": "string",
+                    "maxLength": 120
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 1000
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Report received with support channel and due date"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "422": {
+            "description": "Invalid report category, target or reason"
           }
         }
       }
@@ -2722,6 +2895,45 @@
         }
       }
     },
+    "/api/community/metrics": {
+      "get": {
+        "summary": "Retrieve the MVP funnel and activity metrics",
+        "tags": ["Community"],
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [7, 30, 90],
+              "default": 30
+            }
+          },
+          {
+            "name": "zone",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 80,
+              "default": "all"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Activity counts, discovery time and publication funnel"
+          },
+          "422": {
+            "description": "Unsupported period or zone filter"
+          },
+          "500": {
+            "description": "community.metrics.query_failed"
+          }
+        }
+      }
+    },
     "/api/community/feed": {
       "get": {
         "summary": "Retrieve the paginated community feed",
@@ -2795,18 +3007,28 @@
       "post": {
         "summary": "Toggle a persistent community post like",
         "tags": ["Community"],
-        "security": [{ "cookieAuth": [] }],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Updated like state and total",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/CommunityLike" }
+                "schema": {
+                  "$ref": "#/components/schemas/CommunityLike"
+                }
               }
             }
           },
-          "401": { "description": "auth.errors.unauthorized" },
-          "404": { "description": "community.social.post_not_found" }
+          "401": {
+            "description": "auth.errors.unauthorized"
+          },
+          "404": {
+            "description": "community.social.post_not_found"
+          }
         }
       }
     },
@@ -2841,18 +3063,26 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/CommunityComment" }
+                  "items": {
+                    "$ref": "#/components/schemas/CommunityComment"
+                  }
                 }
               }
             }
           },
-          "404": { "description": "community.social.post_not_found" }
+          "404": {
+            "description": "community.social.post_not_found"
+          }
         }
       },
       "post": {
         "summary": "Create a comment on a community post",
         "tags": ["Community"],
-        "security": [{ "cookieAuth": [] }],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -2861,7 +3091,10 @@
                 "type": "object",
                 "required": ["body"],
                 "properties": {
-                  "body": { "type": "string", "maxLength": 1000 }
+                  "body": {
+                    "type": "string",
+                    "maxLength": 1000
+                  }
                 }
               }
             }
@@ -2872,13 +3105,21 @@
             "description": "Created comment",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/CommunityComment" }
+                "schema": {
+                  "$ref": "#/components/schemas/CommunityComment"
+                }
               }
             }
           },
-          "401": { "description": "auth.errors.unauthorized" },
-          "404": { "description": "community.social.post_not_found" },
-          "422": { "description": "community.social.comment_invalid" }
+          "401": {
+            "description": "auth.errors.unauthorized"
+          },
+          "404": {
+            "description": "community.social.post_not_found"
+          },
+          "422": {
+            "description": "community.social.comment_invalid"
+          }
         }
       }
     },
@@ -3746,19 +3987,35 @@
       "CommunityLike": {
         "type": "object",
         "properties": {
-          "liked": { "type": "boolean" },
-          "likes": { "type": "integer", "minimum": 0 }
+          "liked": {
+            "type": "boolean"
+          },
+          "likes": {
+            "type": "integer",
+            "minimum": 0
+          }
         },
         "required": ["liked", "likes"]
       },
       "CommunityComment": {
         "type": "object",
         "properties": {
-          "id": { "type": "string" },
-          "author": { "type": "string" },
-          "avatar": { "type": "string" },
-          "body": { "type": "string" },
-          "createdAt": { "type": "string", "format": "date-time" }
+          "id": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string"
+          },
+          "avatar": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
         },
         "required": ["id", "author", "avatar", "body", "createdAt"]
       },

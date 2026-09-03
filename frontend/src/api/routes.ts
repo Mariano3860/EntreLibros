@@ -25,6 +25,7 @@ export const RELATIVE_API_ROUTES = {
   },
   COMMUNITY: {
     STATS: `/community/stats`,
+    METRICS: `/community/metrics`,
     FEED: `/community/feed`,
     ACTIVITY: `/community/activity`,
     SUGGESTIONS: `/community/suggestions`,
@@ -60,11 +61,15 @@ export const RELATIVE_API_ROUTES = {
     CREATE: `/agreements`,
     VERSION: (agreementId: number) => `/agreements/${agreementId}/versions`,
     COMMAND: (agreementId: number) => `/agreements/${agreementId}/commands`,
+    OUTCOME: (agreementId: number) => `/agreements/${agreementId}/outcome`,
   },
   NOTIFICATIONS: {
     LIST: `/notifications`,
     READ: (id: number) => `/notifications/${id}/read`,
     PREFERENCES: `/notifications/preferences`,
+  },
+  REPORTS: {
+    CREATE: `/reports`,
   },
   LANGUAGE: {
     UPDATE: `/user/language`,

@@ -1,0 +1,81 @@
+@import '@styles/variables';
+
+.backdrop {
+  position: fixed;
+  z-index: 1100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgb(3 14 21 / 75%);
+}
+
+.modal {
+  width: min(100%, 480px);
+  padding: 18px;
+}
+
+.header,
+.actions {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.header {
+  margin-bottom: 16px;
+}
+
+.header span {
+  color: var(--prototype-teal);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.header h2 {
+  margin: 4px 0 0;
+  font-size: 18px;
+}
+
+.header button {
+  border: 0;
+  background: transparent;
+  color: var(--prototype-muted);
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.field {
+  display: grid;
+  gap: 7px;
+  color: var(--prototype-muted);
+  font-size: 12px;
+}
+
+.field textarea {
+  resize: vertical;
+  padding: 9px;
+  border: 1px solid var(--prototype-border);
+  border-radius: 8px;
+  background: var(--prototype-surface-raised);
+  color: var(--prototype-text);
+  font: inherit;
+}
+
+.actions {
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.error {
+  color: var(--prototype-danger-text);
+}
+
+.success {
+  display: grid;
+  gap: 15px;
+  justify-items: start;
+}

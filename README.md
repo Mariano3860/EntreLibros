@@ -1,10 +1,12 @@
 # EntreLibros
 
-EntreLibros es una plataforma web para descubrir, compartir, reseñar e intercambiar libros físicos en comunidad. El monorepo contiene un frontend React/Rsbuild y un backend TypeScript/Express con PostgreSQL/PostGIS y Socket.IO.
+EntreLibros es una plataforma web para descubrir, compartir y ofrecer libros
+fisicos en comunidad. El monorepo contiene un frontend React/Rsbuild y un backend
+TypeScript/Express con PostgreSQL/PostGIS y Socket.IO.
 
-## Inicio rápido
+## Inicio rapido
 
-Requisitos: Node `>=22.19.0 <23`, npm y PostgreSQL para el modo real.
+Requisitos: Node `>=22.19.0 <23`, npm y PostgreSQL/PostGIS para el modo real.
 
 ```bash
 npm install
@@ -12,25 +14,38 @@ npm run migrate
 npm run dev
 ```
 
-El frontend se sirve normalmente en `http://localhost:3000` y el backend en `http://localhost:4000`. Rsbuild proxifica `/api` y `/socket.io` al backend. También se puede levantar PostgreSQL/PostGIS con el compose disponible en el repositorio.
+El frontend se sirve normalmente en `http://localhost:3000` y el backend en
+`http://localhost:4000`. Rsbuild proxifica `/api` y `/socket.io` al backend.
 
-## Modos de ejecución
+## Modos de ejecucion
 
-Las variables públicas del frontend comienzan con `PUBLIC_`. Para usar MSW en pruebas o una demo aislada:
+Las variables publicas del frontend empiezan con `PUBLIC_`. Para MSW:
 
 ```env
 PUBLIC_API_USE_MOCKS=true
 ```
 
-Con `true`, el frontend usa respuestas de demostración y no persiste en PostgreSQL. Con `false` u omitida, utiliza la API y Socket.IO reales. Después de cambiar `.env` o `.env.local`, reinicia Rsbuild. El modo resuelto puede comprobarse con:
+Con `false` u omitida se usan API y Socket.IO reales. Reinicia Rsbuild tras
+cambiar `.env` o `.env.local`. Comprueba el modo con:
 
 ```js
 document.documentElement.dataset.apiMode;
 ```
 
-La mensajería real requiere sesión, backend activo y migraciones aplicadas. La migración `015_seed_messaging_bot.sql` crea el bot persistente y sus conversaciones de forma idempotente.
+## Dataset de demo real
 
-## Verificación
+Sobre una base aislada y ya migrada:
+
+```bash
+psql "$DATABASE_URL" -f backend/scripts/seed-demo-dataset.sql
+```
+
+El script crea dos usuarios sinteticos, publicaciones, un Rincon, conversacion,
+acuerdo, notificaciones, eventos y un resultado. No lo ejecutes sobre produccion.
+La ruta `/profile/:id`, el contacto desde publicacion/perfil, los reportes y
+`/stats` forman parte del recorrido real.
+
+## Verificacion
 
 ```bash
 npm run test:backend
@@ -42,30 +57,19 @@ npm run build -w frontend
 npm run complete-check
 ```
 
-Vitest/Testing Library y MSW cubren pruebas automatizadas. La validación final del navegador debe comprobar cookies, proxy, caché, modo real, mapa y Socket.IO; consulta [`docs/recovery-baseline.md`](docs/recovery-baseline.md).
+La validacion manual de cookies, proxy, cache, mapa, Socket.IO, responsive y
+privacidad esta en [`docs/tfg-browser-checklist.md`](docs/tfg-browser-checklist.md)
+y [`docs/recovery-baseline.md`](docs/recovery-baseline.md).
 
-## Documentación
+## Documentacion
 
-- [`docs/performance-map.md`](docs/performance-map.md): medición reproducible del mapa.
-- [`backend/README.md`](backend/README.md): API, migraciones y mensajería.
-- [`frontend/README.md`](frontend/README.md): desarrollo del cliente y modo demo.
-- [`docs/README.md`](docs/README.md): índice de documentación.
-- [`docs/tfg-mvp-trazabilidad.md`](docs/tfg-mvp-trazabilidad.md): matriz de requisitos, estado y evidencia del MVP.
-- [`docs/estado-actual.md`](docs/estado-actual.md): capacidades verificadas y límites.
-- [`docs/backlog.md`](docs/backlog.md): pendientes de producto y criterios de cierre.
-- [`docs/arquitectura.md`](docs/arquitectura.md): arquitectura y límites técnicos.
+- [`docs/estado-actual.md`](docs/estado-actual.md): capacidades y limites.
+- [`docs/tfg-mvp-trazabilidad.md`](docs/tfg-mvp-trazabilidad.md): matriz del TFG.
+- [`docs/tfg-browser-checklist.md`](docs/tfg-browser-checklist.md): evidencia manual.
+- [`docs/arquitectura.md`](docs/arquitectura.md): arquitectura.
 - [`docs/base_de_datos.md`](docs/base_de_datos.md): esquema y migraciones.
-- [`docs/messaging-bubbles.md`](docs/messaging-bubbles.md): mensajería, acuerdos y no leídos.
-- [`docs/recovery-baseline.md`](docs/recovery-baseline.md): recuperación y validación del entorno.
-- [`docs/security-runbook.md`](docs/security-runbook.md): controles operativos de seguridad.
-- [`docs/threat-model.md`](docs/threat-model.md): amenazas y riesgos residuales.
-- [`docs/troubleshooting.md`](docs/troubleshooting.md): problemas frecuentes.
+- [`docs/security-runbook.md`](docs/security-runbook.md): seguridad.
+- [`docs/recovery-baseline.md`](docs/recovery-baseline.md): recuperacion.
 
-## Estructura
-
-- `backend/`: API, persistencia, migraciones y Socket.IO.
-- `frontend/`: interfaz React, rutas, i18n, MSW y clientes de API.
-- `docs/`: documentación actual del producto y su operación.
-- `.github/workflows/`: validaciones y empaquetado CI/CD.
-
-No se deben guardar credenciales, archivos `.env`, dumps, datos personales ni material de referencia privado en el repositorio.
+No guardes credenciales, archivos `.env`, dumps, datos personales ni material
+privado en el repositorio.

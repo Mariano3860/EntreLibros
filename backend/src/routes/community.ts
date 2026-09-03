@@ -37,6 +37,7 @@ import {
   unfollowUser,
 } from '../repositories/userFollowRepository.js';
 import { findUserById, hasUserBlock } from '../repositories/userRepository.js';
+import { getMvpMetrics } from '../services/mvpMetrics.js';
 
 const router = Router();
 
@@ -315,6 +316,31 @@ router.get('/stats', async (_req, res) => {
     return res.status(500).json({
       error: 'CommunityStatsQueryFailed',
       message: 'community.errors.query_failed',
+    });
+  }
+});
+
+router.get('/metrics', async (req, res) => {
+  const rawDays = req.query.days;
+  const days = rawDays === undefined ? 30 : Number(rawDays);
+  const zone =
+    typeof req.query.zone === 'string' ? req.query.zone.trim() : 'all';
+  if (
+    !Number.isInteger(days) ||
+    ![7, 30, 90].includes(days) ||
+    zone.length > 80
+  ) {
+    return res.status(422).json({
+      error: 'ValidationError',
+      message: 'community.metrics.invalid_filters',
+    });
+  }
+  try {
+    return res.json(await getMvpMetrics(days, zone || 'all'));
+  } catch {
+    return res.status(500).json({
+      error: 'CommunityMetricsQueryFailed',
+      message: 'community.metrics.query_failed',
     });
   }
 });

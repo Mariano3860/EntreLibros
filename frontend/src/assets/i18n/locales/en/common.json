@@ -1090,7 +1090,10 @@
       "title": "Agreement update",
       "confirmedWith": "Great! You confirmed the agreement with {{name}}",
       "personFallback": "another user",
-      "body": "An exchange agreement was updated."
+      "body": "An exchange agreement was updated.",
+      "reminderTitle": "Meeting reminder",
+      "reminderBody": "Your meeting with {{name}} is within 24 hours.",
+      "reminderWith": "Meeting with {{name}} within 24 hours"
     }
   },
   "user": {
@@ -1108,6 +1111,10 @@
     "sending": "Sending...",
     "submitted": "Report received. Thanks for letting us know.",
     "error": "The report could not be sent.",
+    "errors": {
+      "invalid": "Choose a category and provide a valid reason.",
+      "failed": "The report could not be registered."
+    },
     "categories": {
       "content": "Content",
       "conduct": "Conduct",

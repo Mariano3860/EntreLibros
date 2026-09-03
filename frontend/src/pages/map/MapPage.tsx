@@ -4,6 +4,7 @@ import { CornerEditModal } from '@components/map/CornerEditModal/CornerEditModal
 import { RadiusSelector } from '@components/map/FilterRail/FilterRail'
 import { MapCanvas } from '@components/map/MapCanvas/MapCanvas'
 import { PublishCornerModal } from '@components/publish/PublishCornerModal'
+import { ReportModal } from '@components/reports/ReportModal'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -121,6 +122,7 @@ export const MapPage = () => {
   const [selectedCorner, setSelectedCorner] = useState<MapCorner | null>(null)
   const [selectedPin, setSelectedPin] = useState<MapPin | null>(null)
   const [cornerDetailsOpen, setCornerDetailsOpen] = useState(false)
+  const [cornerReportOpen, setCornerReportOpen] = useState(false)
   const [focusRequest, setFocusRequest] = useState(0)
   const [createOpen, setCreateOpen] = useState(false)
   const [editingCorner, setEditingCorner] =
@@ -772,6 +774,7 @@ export const MapPage = () => {
                   : undefined
               }
               onToggleStatus={handleToggleCornerStatus}
+              onReport={() => setCornerReportOpen(true)}
             />
           ) : null}
         </div>
@@ -793,6 +796,12 @@ export const MapPage = () => {
           setCreateOpen(false)
           void mapQuery.refetch()
         }}
+      />
+      <ReportModal
+        isOpen={cornerReportOpen && Boolean(selectedCornerDetail)}
+        targetType="corner_missing"
+        targetId={selectedCornerDetail?.id ?? ''}
+        onClose={() => setCornerReportOpen(false)}
       />
     </BaseLayout>
   )

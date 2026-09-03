@@ -106,13 +106,13 @@ describe('prototype pages in real API mode', () => {
       new Error('discovery unavailable')
     )
     renderWithProviders(<CommunityFeedPage />)
+    expect(
+      screen.queryByRole('button', { name: 'Red tea' })
+    ).not.toBeInTheDocument()
     const closeStoryModal = () =>
       fireEvent.click(
         screen.getAllByRole('button', { name: 'community.story.cancel' })[0]
       )
-    fireEvent.click(screen.getByRole('button', { name: 'Red tea' }))
-    expect(screen.getByRole('status')).toHaveTextContent('Red tea')
-    fireEvent.click(screen.getByRole('button', { name: 'Cerrar' }))
     fireEvent.click(screen.getByRole('button', { name: /Foto\/Video/ }))
     closeStoryModal()
     fireEvent.click(screen.getByRole('button', { name: /Ofrecer libro/ }))

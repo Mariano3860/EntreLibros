@@ -1,6 +1,7 @@
 import { query, withTransaction } from '../db.js';
 import { EventEmitter } from 'node:events';
 import { areUsersBlocked } from './messagingRepository.js';
+import { recordAnalyticsEvent } from './analyticsRepository.js';
 import {
   transitionAgreement,
   type AgreementCommand,
@@ -15,6 +16,15 @@ export interface AgreementDetails {
   bookTitle: string;
 }
 
+export type AgreementOutcomeValue = 'completed' | 'not_completed';
+
+export interface AgreementOutcome {
+  userId: number;
+  outcome: AgreementOutcomeValue;
+  reason: string | null;
+  recordedAt: Date;
+}
+
 export interface AgreementSnapshot {
   id: number;
   conversationId: number;
@@ -25,6 +35,7 @@ export interface AgreementSnapshot {
   details: AgreementDetails;
   acceptances: number[];
   listingIds: number[];
+  outcomes?: AgreementOutcome[];
 }
 
 export interface AgreementHistoryEntry {
@@ -91,7 +102,11 @@ export async function getAgreement(
      GROUP BY a.id, v.details`,
     [id, userId]
   );
-  return rows[0] ? mapRow(rows[0]) : null;
+  if (!rows[0]) return null;
+  return {
+    ...mapRow(rows[0]),
+    outcomes: await getAgreementOutcomes(id, userId),
+  };
 }
 
 export async function getAgreementHistory(
@@ -107,6 +122,131 @@ export async function getAgreementHistory(
     [id, userId]
   );
   return rows;
+}
+
+export async function getAgreementOutcomes(
+  id: number,
+  userId: number
+): Promise<AgreementOutcome[]> {
+  const { rows } = await query<AgreementOutcome>(
+    `SELECT o.user_id AS "userId", o.outcome, o.reason,
+            o.recorded_at AS "recordedAt"
+     FROM exchange_agreement_outcomes o
+     JOIN exchange_agreements a ON a.id = o.agreement_id
+     WHERE o.agreement_id = $1
+       AND (a.proposer_id = $2 OR a.participant_id = $2)
+     ORDER BY o.recorded_at ASC, o.user_id ASC`,
+    [id, userId]
+  );
+  return rows;
+}
+
+export async function recordAgreementOutcome(input: {
+  id: number;
+  actorId: number;
+  outcome: AgreementOutcomeValue;
+  reason?: string;
+}): Promise<AgreementSnapshot> {
+  await withTransaction(async (client) => {
+    const current = await client.query<{
+      id: number;
+      state: AgreementState;
+      current_version: number;
+      proposer_id: number;
+      participant_id: number;
+      details: AgreementDetails;
+    }>(
+      `SELECT a.id, a.state, a.current_version, a.proposer_id,
+              a.participant_id, v.details
+       FROM exchange_agreements a
+       JOIN exchange_agreement_versions v
+         ON v.agreement_id = a.id AND v.version = a.current_version
+       WHERE a.id = $1
+         AND (a.proposer_id = $2 OR a.participant_id = $2)
+       FOR UPDATE OF a`,
+      [input.id, input.actorId]
+    );
+    const row = current.rows[0];
+    if (!row) throw new Error('agreements.errors.forbidden');
+    if (row.state !== 'confirmed' && row.state !== 'completed') {
+      throw new Error('agreements.errors.outcome_unavailable');
+    }
+
+    await client.query(
+      `INSERT INTO exchange_agreement_outcomes
+       (agreement_id, user_id, outcome, reason)
+       VALUES ($1, $2, $3, $4)
+       ON CONFLICT (agreement_id, user_id) DO UPDATE
+       SET outcome = EXCLUDED.outcome,
+           reason = EXCLUDED.reason,
+           recorded_at = NOW()`,
+      [input.id, input.actorId, input.outcome, input.reason?.trim() || null]
+    );
+    await client.query(
+      `INSERT INTO agreement_events
+       (agreement_id, version, actor_id, event_type, reason)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [
+        input.id,
+        row.current_version,
+        input.actorId,
+        `outcome_${input.outcome}`,
+        input.reason?.trim() || null,
+      ]
+    );
+
+    const outcomes = await client.query<{ count: string }>(
+      `SELECT COUNT(*)::text AS count
+       FROM exchange_agreement_outcomes
+       WHERE agreement_id = $1`,
+      [input.id]
+    );
+    if (
+      Number(outcomes.rows[0]?.count ?? 0) === 2 &&
+      row.state === 'confirmed'
+    ) {
+      const nextVersion = row.current_version + 1;
+      await client.query(
+        `UPDATE exchange_agreements
+         SET state = 'completed', current_version = $2, updated_at = NOW()
+         WHERE id = $1 AND current_version = $3`,
+        [input.id, nextVersion, row.current_version]
+      );
+      await client.query(
+        `INSERT INTO exchange_agreement_versions
+         (agreement_id, version, actor_id, state, details)
+         VALUES ($1, $2, $3, 'completed', $4)`,
+        [input.id, nextVersion, input.actorId, JSON.stringify(row.details)]
+      );
+      await client.query(
+        `INSERT INTO exchange_agreement_items
+         (agreement_id, version, listing_id, owner_id)
+         SELECT agreement_id, $2, listing_id, owner_id
+         FROM exchange_agreement_items
+         WHERE agreement_id = $1 AND version = $3`,
+        [input.id, nextVersion, row.current_version]
+      );
+      await client.query(
+        `INSERT INTO agreement_events
+         (agreement_id, version, actor_id, event_type)
+         VALUES ($1, $2, $3, 'complete')`,
+        [input.id, nextVersion, input.actorId]
+      );
+    }
+  });
+
+  const agreement = await getAgreement(input.id, input.actorId);
+  if (!agreement) throw new Error('agreements.errors.not_found');
+  agreementEvents.emit('committed', agreement);
+  await recordAnalyticsEvent({
+    eventType: 'outcome_recorded',
+    actorId: input.actorId,
+    entityType: 'agreement',
+    entityId: String(agreement.id),
+    metadata: { outcome: input.outcome },
+    idempotencyKey: `outcome-recorded:${agreement.id}:${input.actorId}:${input.outcome}`,
+  });
+  return agreement;
 }
 
 export async function createAgreement(input: {
@@ -197,6 +337,13 @@ export async function createAgreement(input: {
     return mapRow(rows[0]);
   });
   agreementEvents.emit('committed', agreement);
+  await recordAnalyticsEvent({
+    eventType: 'agreement_created',
+    actorId: input.proposerId,
+    entityType: 'agreement',
+    entityId: String(agreement.id),
+    idempotencyKey: `agreement-created:${agreement.id}`,
+  });
   return agreement;
 }
 
@@ -211,11 +358,8 @@ export async function commandAgreement(input: {
     const current = await client.query<AgreementCurrentRow>(
       `SELECT a.id, a.conversation_id, a.proposer_id, a.participant_id,
               a.state, a.current_version,
-              v.actor_id AS current_actor_id,
               '{}'::integer[] AS acceptances, '{}'::integer[] AS listing_ids
        FROM exchange_agreements a
-       JOIN exchange_agreement_versions v
-         ON v.agreement_id = a.id AND v.version = a.current_version
        WHERE a.id = $1 AND (a.proposer_id = $2 OR a.participant_id = $2)
        FOR UPDATE OF a`,
       [input.id, input.actorId]
@@ -225,18 +369,22 @@ export async function commandAgreement(input: {
     if (row.current_version !== input.expectedVersion) {
       throw new Error('agreements.errors.conflict');
     }
+    const version = await client.query<{
+      actor_id: number;
+      details: AgreementDetails;
+    }>(
+      `SELECT actor_id, details FROM exchange_agreement_versions
+       WHERE agreement_id = $1 AND version = $2`,
+      [input.id, row.current_version]
+    );
+    if (!version.rows[0]) throw new Error('agreements.errors.not_found');
+    row.current_actor_id = version.rows[0].actor_id;
     if (
       (input.command === 'confirm' || input.command === 'reject') &&
       row.current_actor_id === input.actorId
     ) {
       throw new Error('agreements.errors.forbidden');
     }
-    const version = await client.query<{ details: AgreementDetails }>(
-      `SELECT details FROM exchange_agreement_versions
-       WHERE agreement_id = $1 AND version = $2`,
-      [input.id, row.current_version]
-    );
-    if (!version.rows[0]) throw new Error('agreements.errors.not_found');
     row.details = version.rows[0].details;
     const acceptanceResult = await client.query<{ user_id: number }>(
       `SELECT user_id FROM exchange_agreement_acceptances
@@ -338,6 +486,16 @@ export async function commandAgreement(input: {
     return mapRow(rows[0]);
   });
   agreementEvents.emit('committed', agreement);
+  if (input.command === 'confirm') {
+    await recordAnalyticsEvent({
+      eventType: 'agreement_confirmed',
+      actorId: input.actorId,
+      entityType: 'agreement',
+      entityId: String(agreement.id),
+      metadata: { version: agreement.currentVersion },
+      idempotencyKey: `agreement-confirmed:${agreement.id}:${agreement.currentVersion}:${input.actorId}`,
+    });
+  }
   return agreement;
 }
 

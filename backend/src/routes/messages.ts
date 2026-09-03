@@ -20,6 +20,7 @@ import {
 } from '../repositories/bookListingRepository.js';
 import { markMessageNotificationsRead } from '../repositories/notificationRepository.js';
 import { notifyMessageRecipients } from '../services/notifications.js';
+import { recordAnalyticsEvent } from '../repositories/analyticsRepository.js';
 
 const router = Router();
 
@@ -279,6 +280,13 @@ router.post('/conversations', async (req: AuthenticatedRequest, res) => {
       [req.user.id, participantId],
       req.user.id
     );
+    await recordAnalyticsEvent({
+      eventType: 'contact_started',
+      actorId: req.user.id,
+      entityType: 'conversation',
+      entityId: String(conversation.id),
+      idempotencyKey: `contact-started:${conversation.id}:${req.user.id}`,
+    });
     return res.status(201).json({ conversation });
   } catch (error) {
     const response = errorResponse(error);
@@ -401,6 +409,16 @@ router.post(
       });
       const message = result.message;
       if (result.created) {
+        if (attachmentMetadata?.kind === 'book') {
+          await recordAnalyticsEvent({
+            eventType: 'contact_started',
+            actorId: req.user.id,
+            entityType: 'listing',
+            entityId: attachmentMetadata.bookId,
+            metadata: { conversationId },
+            idempotencyKey: `contact-listing:${conversationId}:${attachmentMetadata.bookId}:${req.user.id}`,
+          });
+        }
         await notifyMessageRecipients({
           messageId: message.id,
           conversationId,

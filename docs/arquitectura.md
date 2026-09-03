@@ -41,3 +41,21 @@ Los eventos `conversation:join`, `conversation:leave` y `conversation:message` o
 ## Modos del frontend
 
 `PUBLIC_API_USE_MOCKS=true` activa MSW para los flujos de demo soportados. Con `false` u omitida, el cliente utiliza backend y Socket.IO reales. La variable se resuelve durante dev/build y requiere reiniciar Rsbuild al cambiarla.
+
+## Cierre funcional del MVP
+
+El contacto desde publicacion y perfil reutiliza conversaciones idempotentes y
+persiste plantillas con adjuntos de libro. Los acuerdos mantienen versiones,
+confirmaciones, recordatorios y resultados privados por participante.
+
+`POST /api/reports` recibe reportes autenticados de contenido, conducta o Rincon
+inexistente. `GET /api/community/metrics` expone el contrato de metricas del MVP.
+Los eventos de funnel se guardan en `analytics_events` con clave idempotente.
+
+Las migraciones 031-034 agregan resultados de acuerdos, reportes, eventos
+analiticos y compatibilidad con bases que ya tenian columnas de reportes. El
+dataset reproducible esta en `backend/scripts/seed-demo-dataset.sql`.
+
+No se presupone rate limiting de aplicacion, email/push, MFA, almacenamiento de
+objetos ni moderacion avanzada. El conteo de Rincones por zona es global porque
+`community_corners` no tiene una ciudad propietaria.

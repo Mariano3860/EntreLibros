@@ -1,44 +1,63 @@
 # Base de datos
 
-PostgreSQL es la persistencia principal y PostGIS se utiliza para las consultas geográficas. Las migraciones de `backend/migrations/` se ejecutan en orden y son acumulativas: nunca se edita una migración aplicada; cualquier corrección debe agregarse en un archivo numerado nuevo.
+PostgreSQL es la persistencia principal y PostGIS se utiliza para consultas
+geograficas. Las migraciones de `backend/migrations/` se ejecutan en orden y son
+acumulativas: nunca se edita una migracion aplicada; una correccion se agrega en
+un archivo numerado nuevo.
 
 ## Migraciones vigentes
 
-| Migración | Responsabilidad                                                           |
-| --------- | ------------------------------------------------------------------------- |
-| 001–006   | Esquema inicial, usuarios, idioma, ubicación y publicaciones              |
-| 007–009   | Rincones, mensajes de contacto y estados de publicación                   |
-| 010–013   | Conversaciones, acuerdos, reservas e índices                              |
-| 014–018   | Bloqueos, bot, privacidad de perfil, vencimientos y propietario de Rincón |
-| 019–020   | Notificaciones, intereses y ubicación estructurada de perfil              |
-| 021–023   | Historias, seguimiento, datos demo e intereses de descubrimiento          |
-| 024–025   | Conversaciones demo y reparación de duplicados                            |
-| 026       | Foto, país, calle privada y niveles de visibilidad de perfil              |
-| 027       | Likes únicos y comentarios de Comunidad                                   |
-| 028       | Consentimientos de contenido, imagen y normas para publicaciones          |
-| 029       | Estado y motivo de revisión editorial de publicaciones                    |
-| 030       | Estado y motivo de revisión editorial de Rincones                         |
+| Migracion | Responsabilidad |
+| --- | --- |
+| 001-006 | Esquema inicial, usuarios, idioma, ubicacion y publicaciones. |
+| 007-009 | Rincones, mensajes de contacto y estados de publicacion. |
+| 010-013 | Conversaciones, acuerdos, reservas e indices. |
+| 014-018 | Bloqueos, bot, privacidad, vencimientos y propietario de Rincon. |
+| 019-020 | Notificaciones, intereses y ubicacion estructurada. |
+| 021-025 | Historias, seguimiento, demo y reparacion de conversaciones. |
+| 026-030 | Foto y privacidad de perfil, likes, comentarios, consentimientos y revision editorial. |
+| 031 | Resultados privados por participante para acuerdos. |
+| 032 | Reportes autenticados con categoria, estado, canal y plazo. |
+| 033 | Eventos append-only para funnel y metricas. |
+| 034 | Compatibilidad de reportes y creacion segura de tablas nuevas. |
 
-El contenido SQL de cada archivo es la autoridad sobre el esquema real. Antes de migrar una base compartida, realiza una copia verificable y prueba la actualización sobre una base aislada.
+El SQL de cada archivo es la autoridad sobre el esquema real. Antes de migrar una
+base compartida, realiza una copia verificable y prueba la actualizacion sobre una
+base aislada.
 
 ## Entidades principales
 
-- **Usuarios:** credenciales hash, perfil, idioma, intereses, zona y preferencias de privacidad.
-- **Publicaciones:** libro, metadata bibliográfica, condición, modalidad, disponibilidad, consentimientos, imágenes, intereses, vencimiento y revisión editorial (`pending`, `needs_correction`, `approved`, `rejected`).
-- **Rincones:** propietario, datos comunitarios, ubicación protegida, visibilidad, consentimiento, fotos, métricas de actividad y revisión editorial.
-- **Mensajería:** participantes, mensajes secuenciales, cursor de lectura, clave idempotente y adjuntos tipados.
-- **Acuerdos:** estado vigente, versiones, participantes, publicaciones y datos protegidos del encuentro.
-- **Comunidad:** historias, seguimiento, likes y comentarios con referencias a listings o historias.
-- **Notificaciones:** destinatario, tipo, evento, datos mínimos, estado leído y preferencias in-app.
+- Usuarios: credenciales hash, perfil, idioma, intereses, zona y preferencias.
+- Publicaciones: libro, metadata bibliografica, condicion, modalidad,
+  disponibilidad, consentimientos, imagenes y revision editorial.
+- Rincones: propietario, datos comunitarios, ubicacion protegida, visibilidad,
+  consentimiento, actividad y revision editorial.
+- Mensajeria: participantes, mensajes secuenciales, cursor, idempotencia y
+  adjuntos tipados.
+- Acuerdos: estado, versiones, participantes, publicaciones, datos protegidos del
+  encuentro y outcomes privados por participante.
+- Comunidad: historias, seguimiento, likes y comentarios.
+- Notificaciones: destinatario, tipo, evento, datos minimos, lectura y preferencias.
+- Reportes: denunciante interno, objetivo, motivo, estado, canal, plazo e idempotencia.
+- Analitica: evento, actor opcional, entidad, metadata minima, fecha y clave unica.
 
-## Mensajería y bot
+## Mensajeria y bot
 
-La migración `015_seed_messaging_bot.sql` crea el usuario bot. El backend obtiene una conversación por usuario de forma idempotente y persiste las respuestas antes de emitirlas por Socket.IO. Los adjuntos `book`, `swap` y `agreement` se almacenan en `messages.attachment_metadata` y se validan contra la conversación, las publicaciones y sus propietarios.
+La migracion `015_seed_messaging_bot.sql` crea el usuario bot. El backend obtiene
+una conversacion por usuario de forma idempotente y persiste las respuestas antes
+de emitirlas por Socket.IO. Los adjuntos `book`, `swap` y `agreement` se validan
+contra la conversacion, las publicaciones y sus propietarios.
 
-## Operación
+## Operacion
 
 ```bash
 npm run migrate
 ```
 
-Ejecuta el comando con el backend apuntando a la base correcta. No compartas dumps con datos personales ni credenciales en documentación o tickets.
+Para el recorrido reproducible, carga solamente en una base aislada:
+
+```bash
+psql "$DATABASE_URL" -f backend/scripts/seed-demo-dataset.sql
+```
+
+No compartas dumps con datos personales ni credenciales en documentacion o tickets.

@@ -520,6 +520,12 @@
   gap: 8px;
 }
 
+.contactError {
+  margin: 7px 0 0;
+  color: var(--prototype-danger-text);
+  font-size: 0.68rem;
+}
+
 .cancelButton,
 .saveButton,
 .editButton {

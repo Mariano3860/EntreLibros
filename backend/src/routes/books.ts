@@ -39,6 +39,7 @@ import {
 import { isValidImageReference } from '../services/mediaValidation.js';
 import { normalizeIsbn } from '../services/isbn.js';
 import { validateEditorialText } from '../services/editorialValidation.js';
+import { recordAnalyticsEvent } from '../repositories/analyticsRepository.js';
 
 const router = Router();
 
@@ -166,6 +167,13 @@ router.post('/', authenticate, async (req: AuthenticatedRequest, res) => {
         message: 'books.errors.want_duplicate',
       });
     }
+    await recordAnalyticsEvent({
+      eventType: 'listing_published',
+      actorId: req.user.id,
+      entityType: 'listing',
+      entityId: String(result.listing.id),
+      idempotencyKey: `listing-published:${result.listing.id}`,
+    });
     return res.status(201).json(toUserBookListing(result.listing));
   }
 
@@ -201,6 +209,14 @@ router.post('/', authenticate, async (req: AuthenticatedRequest, res) => {
       isPrimary: image.isPrimary ?? index === 0,
     })),
     consents,
+  });
+
+  await recordAnalyticsEvent({
+    eventType: 'listing_published',
+    actorId: req.user.id,
+    entityType: 'listing',
+    entityId: String(listing.id),
+    idempotencyKey: `listing-published:${listing.id}`,
   });
 
   res.status(201).json(toUserBookListing(listing));

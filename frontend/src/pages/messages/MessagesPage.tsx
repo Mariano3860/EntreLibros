@@ -3,7 +3,9 @@ import {
   counterProposeAgreement,
   createAgreement,
   fetchAgreement,
+  recordAgreementOutcome,
   type AgreementDetails,
+  type AgreementOutcome,
   type AgreementSnapshot,
 } from '@api/agreements/agreements'
 import {
@@ -25,6 +27,7 @@ import { useFocusTrap } from '@hooks/useFocusTrap'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { FormEvent, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useLocation } from 'react-router-dom'
 
 import type {
   PrototypeBook,
@@ -65,6 +68,14 @@ const createClientKey = () =>
   `message-${Date.now()}-${Math.random().toString(36).slice(2)}`
 
 const COMPOSER_EMOJIS = ['😀', '😁', '😂', '😍', '🤔', '👍', '🎉', '📚']
+
+const conversationIdFromRouteState = (state: unknown): number | null => {
+  if (!state || typeof state !== 'object' || !('conversationId' in state)) {
+    return null
+  }
+  const id = state.conversationId
+  return typeof id === 'number' && Number.isSafeInteger(id) ? id : null
+}
 
 type ComposerActionMenuProps = {
   onEmoji: () => void
@@ -201,6 +212,78 @@ type ChatMessageBubbleProps = {
   onConfirmAgreement: () => void
   onRejectAgreement: () => void
   onCancelAgreement: () => void
+}
+
+const AgreementOutcomePanel = ({
+  agreement,
+  userId,
+  pending,
+  onSave,
+}: {
+  agreement: AgreementSnapshot
+  userId: number
+  pending: boolean
+  onSave: (outcome: AgreementOutcome['outcome'], reason: string) => void
+}) => {
+  const { t } = useTranslation()
+  const ownOutcome = agreement.outcomes?.find((item) => item.userId === userId)
+  const [outcome, setOutcome] = useState<AgreementOutcome['outcome']>(
+    ownOutcome?.outcome ?? 'completed'
+  )
+  const [reason, setReason] = useState(ownOutcome?.reason ?? '')
+
+  return (
+    <Panel className={styles.proposal} as="article">
+      <span className={styles.proposalLabel}>
+        {t('community.messages.outcome.title', {
+          defaultValue: 'Resultado del encuentro',
+        })}
+      </span>
+      <p>
+        {t('community.messages.outcome.description', {
+          defaultValue: 'Registrá el resultado solo para esta conversación.',
+        })}
+      </p>
+      <select
+        value={outcome}
+        onChange={(event) =>
+          setOutcome(event.target.value as AgreementOutcome['outcome'])
+        }
+        aria-label={t('community.messages.outcome.title', {
+          defaultValue: 'Resultado del encuentro',
+        })}
+      >
+        <option value="completed">
+          {t('community.messages.outcome.completed', {
+            defaultValue: 'Se completó',
+          })}
+        </option>
+        <option value="not_completed">
+          {t('community.messages.outcome.notCompleted', {
+            defaultValue: 'No se completó',
+          })}
+        </option>
+      </select>
+      <textarea
+        value={reason}
+        onChange={(event) => setReason(event.target.value)}
+        placeholder={t('community.messages.outcome.notePlaceholder', {
+          defaultValue: 'Nota opcional',
+        })}
+        rows={2}
+      />
+      <PrototypeButton
+        size="small"
+        tone="primary"
+        onClick={() => onSave(outcome, reason)}
+        disabled={pending}
+      >
+        {t('community.messages.outcome.saved', {
+          defaultValue: 'Guardar resultado',
+        })}
+      </PrototypeButton>
+    </Panel>
+  )
 }
 
 const ChatMessageBubble = ({
@@ -693,6 +776,7 @@ const MockMessagesPage = () => {
 const RealMessagesPage = () => {
   const { user } = useAuth()
   const { t } = useTranslation()
+  const location = useLocation()
   const queryClient = useQueryClient()
   const {
     conversationMessages: liveMessages,
@@ -723,6 +807,9 @@ const RealMessagesPage = () => {
   const [contactSearch, setContactSearch] = useState('')
   const [selectedContactId, setSelectedContactId] = useState<number | null>(
     null
+  )
+  const requestedConversationIdRef = useRef(
+    conversationIdFromRouteState(location.state)
   )
   const [sendError, setSendError] = useState<string | null>(null)
   const [attachError, setAttachError] = useState<string | null>(null)
@@ -788,6 +875,36 @@ const RealMessagesPage = () => {
       void queryClient.invalidateQueries({
         queryKey: messageQueryKeys.history(agreement.conversationId),
       })
+    },
+  })
+  const outcomeMutation = useMutation({
+    mutationFn: ({
+      agreementId,
+      outcome,
+      reason,
+    }: {
+      agreementId: number
+      outcome: AgreementOutcome['outcome']
+      reason: string
+    }) =>
+      recordAgreementOutcome({
+        agreementId,
+        outcome,
+        ...(reason.trim() ? { reason: reason.trim() } : {}),
+      }),
+    onSuccess: async (agreement) => {
+      queryClient.setQueryData(
+        ['prototype', 'agreement', agreement.id],
+        agreement
+      )
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: messageQueryKeys.history(agreement.conversationId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: messageQueryKeys.conversations(),
+        }),
+      ])
     },
   })
   const cancelAgreement = () =>
@@ -890,6 +1007,14 @@ const RealMessagesPage = () => {
     const nextConversation = filteredConversations[0]?.id ?? null
     if (nextConversation !== selected) setSelected(nextConversation)
   }, [conversations, search, selected, unreadOnly])
+  useEffect(() => {
+    const requestedConversationId = requestedConversationIdRef.current
+    if (requestedConversationId === null || !conversations) return
+    if (conversations.some((item) => item.id === requestedConversationId)) {
+      setSelected(requestedConversationId)
+      requestedConversationIdRef.current = null
+    }
+  }, [conversations])
   useEffect(() => {
     if (selected === null || !isConnected) return
     joinConversation(selected, historyQuery.data?.nextAfter ?? 0)
@@ -1498,6 +1623,23 @@ const RealMessagesPage = () => {
                       </div>
                     ) : null}
                   </Panel>
+                ) : null}
+                {agreementQuery.data &&
+                user &&
+                (agreementQuery.data.state === 'confirmed' ||
+                  agreementQuery.data.state === 'completed') ? (
+                  <AgreementOutcomePanel
+                    agreement={agreementQuery.data}
+                    userId={user.id}
+                    pending={outcomeMutation.isPending}
+                    onSave={(outcome, reason) =>
+                      outcomeMutation.mutate({
+                        agreementId: agreementQuery.data?.id ?? 0,
+                        outcome,
+                        reason,
+                      })
+                    }
+                  />
                 ) : null}
                 <form className={styles.composer} onSubmit={submit}>
                   <button

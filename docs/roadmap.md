@@ -1,25 +1,34 @@
 # Hoja de ruta
 
-La prioridad actual es cerrar el recorrido local de publicación, descubrimiento y encuentro con datos persistentes. Las interacciones sociales básicas —historias relevantes, seguimiento, likes, comentarios y compartir— ya forman parte de Comunidad.
+Fecha de referencia: 2026-09-03. El estado verificable se mantiene en
+[`tfg-mvp-trazabilidad.md`](tfg-mvp-trazabilidad.md).
 
-El estado verificable y la evidencia de cada compromiso se mantiene en [`tfg-mvp-trazabilidad.md`](tfg-mvp-trazabilidad.md).
+## Cierre inmediato
 
-## Próximo cierre del MVP
+1. Completar la checklist manual de navegador en los viewport de entrega y
+   conservar evidencia anonimizada.
+2. Ejecutar una prueba de backup/restauracion sobre una base aislada del entorno
+   de despliegue y registrar el resultado.
+3. Revisar espanol neutro, foco, contraste y responsive en la entrega final.
+4. Mantener la matriz, el backlog y los READMEs sincronizados con las rutas,
+   migraciones y variables reales.
 
-1. Completar validación, estados y privacidad de Rincones y publicaciones.
-2. Unificar búsqueda, filtros, mapa y listado.
-3. Terminar contacto desde publicación/perfil, recordatorios y resultado del encuentro.
-4. Asegurar notificaciones accionables, reportes mínimos y métricas básicas.
-5. Verificar seguridad, recuperación, accesibilidad, responsive y documentación de entrega.
+El recorrido funcional de publicacion, descubrimiento, contacto, acuerdo,
+notificacion, reporte y metricas ya esta implementado y cubierto por pruebas de
+servicio y frontend. Los puntos anteriores son evidencia y operacion pendiente,
+no nuevos contratos de producto.
 
-## Evolución posterior
+## Evolucion posterior
 
-- Recomendación por proximidad e intereses.
-- Reputación, valoraciones, moderación avanzada y herramientas de confianza.
-- Email, push, MFA, recuperación avanzada y proveedores de almacenamiento.
-- Observabilidad avanzada, retención/exportación, API pública, PWA y modo offline.
-- Importación/exportación de catálogos y analítica comunitaria avanzada.
+- Recomendacion automatica por proximidad e intereses.
+- Reputacion, ratings, moderacion avanzada, sanciones y panel de confianza.
+- Email, push, MFA, recuperacion avanzada y almacenamiento de objetos.
+- Rate limiting de aplicacion, observabilidad avanzada, retencion/exportacion y
+  API publica.
+- PWA/offline, importacion/exportacion masiva y analitica comunitaria avanzada.
 
 ## Regla de mantenimiento
 
-Cada iniciativa debe tener una justificación, alcance, criterio de aceptación y evidencia de verificación. Las capacidades futuras no deben aparecer como disponibles en la interfaz ni en la documentación de estado actual.
+Cada iniciativa debe tener alcance, criterio de aceptacion y evidencia. Las
+capacidades futuras no deben aparecer como disponibles en la interfaz ni en el
+estado actual.

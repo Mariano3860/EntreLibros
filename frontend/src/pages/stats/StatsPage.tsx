@@ -1,7 +1,9 @@
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
 
 import { fetchCommunityStats } from '@src/api/community/communityStats.service'
+import { fetchMvpMetrics } from '@src/api/community/mvpMetrics.service'
 import { usePrototype } from '@src/features/prototype/PrototypeContext'
 import {
   Avatar,
@@ -199,9 +201,15 @@ export const StatsPage = () => {
 }
 
 const RealStatsPage = () => {
+  const [days, setDays] = useState<7 | 30 | 90>(30)
   const query = useQuery({
     queryKey: ['community', 'stats'],
     queryFn: fetchCommunityStats,
+  })
+  const metricsQuery = useQuery({
+    queryKey: ['community', 'metrics', days],
+    queryFn: () => fetchMvpMetrics({ days }),
+    retry: false,
   })
   const stats = query.data
   return (
@@ -210,7 +218,78 @@ const RealStatsPage = () => {
         <PageHeader
           title="Estadísticas"
           description="Mirá cómo crecen las lecturas, intercambios y encuentros de EntreLibros."
+          actions={
+            <label className={styles.period}>
+              <span>Período</span>
+              <select
+                value={days}
+                onChange={(event) =>
+                  setDays(Number(event.target.value) as 7 | 30 | 90)
+                }
+              >
+                <option value={7}>Últimos 7 días</option>
+                <option value={30}>Últimos 30 días</option>
+                <option value={90}>Últimos 90 días</option>
+              </select>
+            </label>
+          }
         />
+        {metricsQuery.isLoading ? (
+          <Panel className={styles.card}>Cargando métricas…</Panel>
+        ) : metricsQuery.isError ? (
+          <Panel className={styles.card}>
+            No pudimos cargar las métricas mínimas.
+          </Panel>
+        ) : metricsQuery.data?.status === 'no_data' ? (
+          <Panel className={styles.card}>
+            Sin datos para el período seleccionado.
+          </Panel>
+        ) : metricsQuery.data ? (
+          <Panel className={`${styles.card} ${styles.metricSummary}`}>
+            <SectionHeading
+              title="Métricas del MVP"
+              action={
+                <span className={styles.growth}>
+                  {metricsQuery.data.lastUpdatedAt
+                    ? `Actualizado ${new Date(metricsQuery.data.lastUpdatedAt).toLocaleString()}`
+                    : 'Sin actualización'}
+                </span>
+              }
+            />
+            <div className={styles.metricGrid}>
+              <span>
+                <strong>{metricsQuery.data.activeCorners}</strong>
+                Rincones activos
+              </span>
+              <span>
+                <strong>{metricsQuery.data.activeListings}</strong>
+                Publicaciones activas
+              </span>
+              <span>
+                <strong>{metricsQuery.data.confirmedAgreements}</strong>
+                Acuerdos confirmados
+              </span>
+              <span>
+                <strong>
+                  {metricsQuery.data.discoveryTimeMinutes === null
+                    ? '—'
+                    : `${Math.round(metricsQuery.data.discoveryTimeMinutes)} min`}
+                </strong>
+                Tiempo de descubrimiento
+              </span>
+            </div>
+            <div className={styles.funnel}>
+              <span>
+                Publicaciones → {metricsQuery.data.funnel.publications}
+              </span>
+              <span>Contactos → {metricsQuery.data.funnel.contacts}</span>
+              <span>Acuerdos → {metricsQuery.data.funnel.agreements}</span>
+              <span>
+                Confirmaciones → {metricsQuery.data.funnel.confirmations}
+              </span>
+            </div>
+          </Panel>
+        ) : null}
         {query.isLoading ? (
           <Panel className={styles.card}>Cargando estadísticas…</Panel>
         ) : null}

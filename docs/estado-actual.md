@@ -1,43 +1,67 @@
 # Estado actual
 
-Fecha de referencia: 2026-09-02.
+Fecha de referencia: 2026-09-03.
 
-## Resumen
+## Resumen de cierre
 
-EntreLibros tiene una base funcional real para perfiles, publicaciones, Rincones de Libros, descubrimiento geográfico, Comunidad, mensajería, acuerdos y notificaciones. La persistencia usa PostgreSQL/PostGIS y la comunicación en tiempo real usa Socket.IO. MSW queda reservado para pruebas y demostraciones aisladas.
+EntreLibros tiene un recorrido MVP persistente con PostgreSQL/PostGIS y Socket.IO:
+perfil, publicaciones, Rincones, descubrimiento, Comunidad, contacto, mensajeria,
+acuerdos, recordatorios, resultados, notificaciones, reportes y metricas.
 
-La clasificación detallada del compromiso del TFG, las brechas de cierre y la evidencia pendiente está en [`tfg-mvp-trazabilidad.md`](tfg-mvp-trazabilidad.md).
+La matriz de requisitos y la evidencia se mantienen en
+[`tfg-mvp-trazabilidad.md`](tfg-mvp-trazabilidad.md). La checklist manual esta en
+[`tfg-browser-checklist.md`](tfg-browser-checklist.md).
 
 ## Capacidades disponibles
 
-- **Identidad y perfil:** registro, inicio y cierre de sesión, perfil editable, idioma, intereses, zona y niveles de visibilidad.
-- **Privacidad:** el perfil público no muestra correo ni contraseña; la ubicación pública se redondea y puede limitarse a país, ciudad o barrio.
-- **Libros:** catálogo público, libros propios, alta/edición, modalidades de oferta o búsqueda, condición, imágenes limitadas, ISBN normalizado, consentimientos, intereses, vencimiento y estado de revisión editorial.
-- **Rincones:** alta con formulario por pasos, foto, normas, consentimiento, zona, visibilidad y estado activo/en pausa; el propietario puede editar, pausar y reactivar su Rincón. La baja del MVP es una pausa reversible que conserva el historial.
-- **Comunidad:** feed persistente, historias relevantes, seguimiento, likes únicos, comentarios ordenados, compartir y filtros de visibilidad/bloqueos.
-- **Mapa:** Rincones, publicaciones y actividad con radio de 1, 5, 30, 50 km o sin límite; el centro puede venir del dispositivo o de la zona privada del perfil, el orden por cercanía se conserva con radio ilimitado y, sin centro, se muestra un fallback sin distancia inventada. La medición reproducible está en [`performance-map.md`](performance-map.md).
-- **Mensajería:** conversaciones privadas persistentes, contactos visibles, historial, Socket.IO, bot persistente, adjuntos de libros, propuestas y acuerdos.
-- **Acuerdos:** propuesta, contrapropuesta, confirmación, rechazo, cancelación, versionado e historial dentro de la conversación.
-- **Notificaciones:** avisos in-app de mensajes y acuerdos, preferencia básica, deduplicación, estado leído/no leído y punto rojo sincronizado en Mensajes.
-- **Calidad:** migraciones acumulativas, pruebas backend/frontend, typecheck, lint, build y workflows de CI.
+- Identidad y perfil: registro, inicio/cierre de sesion, perfil editable, idioma,
+  intereses y visibilidad territorial.
+- Privacidad: las proyecciones publicas omiten correo, contrasena, calle, altura y
+  coordenadas exactas; muestran como maximo el nivel territorial permitido.
+- Libros: catalogo, publicaciones offer/want, condicion, imagenes limitadas,
+  ISBN normalizado, disponibilidad, vencimiento, consentimientos y revision
+  editorial minima.
+- Rincones: alta, edicion, normas, horario, consentimiento, visibilidad,
+  aprobacion y pausa/reactivacion reversible.
+- Descubrimiento: mapa y listado real comparten filtros, radio, orden y estados
+  de carga/vacio/error; sin centro valido no se inventa una distancia.
+- Comunidad: feed persistente, historias, seguimiento, likes unicos, comentarios,
+  compartir, Rincones cercanos y sugerencias con enlaces reales a perfiles.
+- Contacto: se puede iniciar una conversacion desde una publicacion o un perfil;
+  el primer mensaje es idempotente y puede llevar un adjunto de libro.
+- Acuerdos: propuesta, contrapropuesta, confirmacion, rechazo, cancelacion,
+  versionado, recordatorio in-app idempotente y resultado completado/no completado
+  por participante. Los resultados no se publican en el feed.
+- Notificaciones: avisos contextuales de mensajes y acuerdos, estado leido/no
+  leido, preferencias in-app y contador accionable.
+- Reportes: recepcion autenticada para contenido, conducta y Rincon inexistente,
+  con motivo, estado, canal y plazo. No se presenta moderacion avanzada.
+- Metricas: eventos append-only y `/api/community/metrics` para publicaciones,
+  contactos, acuerdos, confirmaciones, actividad y tiempo de descubrimiento, con
+  periodo, zona y estado `no_data`.
 
-## Límites conocidos
+## Limites conocidos
 
-- La validación editorial mínima de publicaciones y Rincones cubre contenido inseguro, enlaces sospechosos, duplicados de ofertas y estados persistentes de revisión. La moderación humana avanzada, sanciones y panel operativo completo no forman parte del MVP.
-- Reportes, moderación avanzada, reputación, sanciones y retención/exportación de datos requieren trabajo específico.
-- Los recordatorios de acuerdos, el resultado post-encuentro y las métricas persistentes de impacto no forman todavía un flujo cerrado.
-- El modo demo no prueba persistencia, autorización, rendimiento ni comunicación con PostgreSQL.
-- Email, push, MFA, almacenamiento cloud, escaneo antimalware y recomendación automática no están habilitados como servicios productivos. Las imágenes se manejan como referencias HTTPS o datos inline limitados; no hay almacenamiento de objetos productivo.
-- La composición visual debe verificarse manualmente en navegador real en los tamaños de entrega; las pruebas de frontend no sustituyen esa revisión.
+- La moderacion humana avanzada, sanciones, reputacion, ratings y panel operativo
+  completo estan fuera del MVP.
+- No hay rate limiting de aplicacion, MFA, email/push productivo, almacenamiento
+  de objetos, escaneo antimalware ni recomendacion automatica.
+- `activeCorners` es global cuando se filtra por zona porque el esquema actual no
+  relaciona un Rincon con una ciudad propietaria; esta semantica esta documentada.
+- Backups, restauracion y rollback deben probarse en el entorno de despliegue; la
+  verificacion local no los convierte en una garantia de produccion.
+- La prueba manual de teclado, contraste, responsive y estilo debe repetirse en
+  los viewport de entrega. Vitest/Testing Library no sustituyen esa revision.
 
-## Comprobación manual mínima
+## Comprobacion manual minima
 
-1. Ejecutar migraciones y levantar backend y frontend.
-2. Confirmar que `PUBLIC_API_USE_MOCKS` está omitida o en `false`.
-3. Registrar o iniciar sesión con dos usuarios de prueba.
-4. Crear un Rincón y una publicación, comprobar visibilidad aproximada y recargar.
-5. Buscar desde mapa/listado, iniciar una conversación y enviar un mensaje.
-6. Proponer un acuerdo, confirmar o rechazar y revisar historial y notificaciones.
-7. Comprobar estados vacío, error, permisos de ubicación, teclado, idioma y responsive.
+1. Ejecutar `npm run migrate` sobre una base aislada y arrancar `npm run dev`.
+2. Confirmar `PUBLIC_API_USE_MOCKS=false` u omitida y revisar
+   `document.documentElement.dataset.apiMode === 'real'`.
+3. Cargar el dataset de `backend/scripts/seed-demo-dataset.sql` y recargar las
+   rutas `/community`, `/map`, `/profile/:id`, `/messages` y `/stats`.
+4. Verificar privacidad, contacto, reportes, estados vacio/error, idioma, teclado,
+   responsive, cookies y Socket.IO con la checklist enlazada arriba.
 
-Para problemas de entorno consulta [`troubleshooting.md`](troubleshooting.md). Para recuperación y validación completa consulta [`recovery-baseline.md`](recovery-baseline.md).
+Para recuperacion consulta [`recovery-baseline.md`](recovery-baseline.md); para
+seguridad consulta [`security-runbook.md`](security-runbook.md).
