@@ -371,6 +371,186 @@ describe('user profile API', () => {
   });
 });
 
+describe('global person search API', () => {
+  async function createLoggedInUser(email: string) {
+    await request(app)
+      .post('/api/auth/register')
+      .send({ name: 'Search Viewer', email, password: 'Str0ng!Pass1' })
+      .expect(201);
+    const loginRes = await request(app)
+      .post('/api/auth/login')
+      .send({ email, password: 'Str0ng!Pass1' })
+      .expect(200);
+    return loginRes.headers['set-cookie'][0] as string;
+  }
+
+  async function insertUser(input: {
+    name: string;
+    email: string;
+    alias?: string;
+    role?: string;
+    profileVisibility?: 'public' | 'private';
+    profilePhoto?: string | null;
+  }) {
+    const result = await client.query<{ id: number }>(
+      `INSERT INTO users (
+         name, alias, email, password, role, profile_visibility, profile_photo_url
+       ) VALUES ($1, $2, $3, 'hash', $4, $5, $6)
+       RETURNING id`,
+      [
+        input.name,
+        input.alias ?? input.name,
+        input.email,
+        input.role ?? 'user',
+        input.profileVisibility ?? 'public',
+        input.profilePhoto ?? null,
+      ]
+    );
+    return result.rows[0].id;
+  }
+
+  test('requires authentication and returns an empty result for no query', async () => {
+    await request(app).get('/api/user/search').expect(401);
+
+    const cookie = await createLoggedInUser('search-empty@example.com');
+    await request(app)
+      .get('/api/user/search?q=')
+      .set('Cookie', cookie)
+      .expect(200)
+      .expect([]);
+  });
+
+  test('searches by normalized text, exact id and email while applying privacy filters', async () => {
+    const cookie = await createLoggedInUser('search-viewer@example.com');
+    const viewer = await findUserByEmail('search-viewer@example.com');
+    expect(viewer).not.toBeNull();
+
+    const targetId = await insertUser({
+      name: 'José Lector',
+      alias: 'Lector Curioso',
+      email: 'jose.lector@example.com',
+      profilePhoto: 'https://cdn.example.com/jose.jpg',
+    });
+    const privateId = await insertUser({
+      name: 'José Privado',
+      email: 'jose.private@example.com',
+      profileVisibility: 'private',
+    });
+    const botId = await insertUser({
+      name: 'José Bot',
+      email: 'jose.bot@example.com',
+      role: 'bot',
+    });
+    const blockedByViewerId = await insertUser({
+      name: 'José Bloqueado',
+      email: 'jose.blocked@example.com',
+    });
+    const blockingViewerId = await insertUser({
+      name: 'José Bloqueante',
+      email: 'jose.blocking@example.com',
+    });
+    await client.query(
+      'INSERT INTO user_blocks (blocker_id, blocked_id) VALUES ($1, $2), ($3, $4)',
+      [viewer!.id, blockedByViewerId, blockingViewerId, viewer!.id]
+    );
+    await client.query(
+      'INSERT INTO user_follows (follower_id, followed_id) VALUES ($1, $2)',
+      [viewer!.id, targetId]
+    );
+
+    const book = await client.query<{ id: number }>(
+      "INSERT INTO books (title) VALUES ('Search count book') RETURNING id"
+    );
+    await client.query(
+      `INSERT INTO book_listings (user_id, book_id, type, availability, is_draft)
+       VALUES ($1, $2, 'offer', 'public', false),
+              ($1, $2, 'offer', 'public', true),
+              ($1, $2, 'offer', 'private', false)`,
+      [targetId, book.rows[0].id]
+    );
+    const conversation = await client.query<{ id: number }>(
+      'INSERT INTO conversations DEFAULT VALUES RETURNING id'
+    );
+    await client.query(
+      `INSERT INTO exchange_agreements
+         (conversation_id, proposer_id, participant_id, state)
+       VALUES ($1, $2, $3, 'completed')`,
+      [conversation.rows[0].id, targetId, viewer!.id]
+    );
+
+    const response = await request(app)
+      .get('/api/user/search')
+      .query({ q: 'jose' })
+      .set('Cookie', cookie)
+      .expect(200);
+
+    expect(response.body).toEqual([
+      {
+        id: targetId,
+        name: 'José Lector',
+        alias: 'Lector Curioso',
+        profilePhoto: 'https://cdn.example.com/jose.jpg',
+        booksCount: 1,
+        exchangeCount: 1,
+        isFollowing: true,
+      },
+    ]);
+    expect(response.body[0].email).toBeUndefined();
+    expect(response.body[0].password).toBeUndefined();
+    expect(response.body[0].location).toBeUndefined();
+
+    await request(app)
+      .get('/api/user/search')
+      .query({ q: String(targetId) })
+      .set('Cookie', cookie)
+      .expect(200)
+      .expect(({ body }) => expect(body[0].id).toBe(targetId));
+    await request(app)
+      .get('/api/user/search')
+      .query({ q: ' JOSE.LECTOR@EXAMPLE.COM ' })
+      .set('Cookie', cookie)
+      .expect(200)
+      .expect(({ body }) => expect(body[0].id).toBe(targetId));
+    expect(privateId).not.toBe(targetId);
+    expect(botId).not.toBe(targetId);
+  });
+
+  test('rejects invalid long queries and caps deterministic results', async () => {
+    const cookie = await createLoggedInUser('search-limit@example.com');
+    const names = Array.from(
+      { length: 21 },
+      (_, index) => `Reader ${index + 1}`
+    );
+    for (const [index, name] of names.entries()) {
+      await insertUser({
+        name,
+        email: `reader-${index + 1}@example.com`,
+      });
+    }
+
+    await request(app)
+      .get('/api/user/search')
+      .query({ q: 'x'.repeat(81) })
+      .set('Cookie', cookie)
+      .expect(400)
+      .expect(({ body }) => {
+        expect(body.message).toBe('user.errors.invalid_search');
+      });
+
+    const response = await request(app)
+      .get('/api/user/search')
+      .query({ q: 'reader' })
+      .set('Cookie', cookie)
+      .expect(200);
+    expect(response.body).toHaveLength(20);
+    expect(
+      response.body.map((person: { name: string }) => person.name)
+    ).toEqual(
+      [...names].sort((left, right) => left.localeCompare(right)).slice(0, 20)
+    );
+  });
+});
+
 describe('user block API', () => {
   test('blocks and unblocks another user without exposing the relationship', async () => {
     await request(app)

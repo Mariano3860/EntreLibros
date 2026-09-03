@@ -54,6 +54,17 @@ describe('BooksPage', () => {
     expect(screen.getByText('publishBook.title')).toBeVisible()
   })
 
+  test('opens the people search without changing the publications route', () => {
+    renderWithProviders(<BooksPage />)
+    fireEvent.click(
+      screen.getByRole('button', { name: 'booksPage.personSearch.open' })
+    )
+    expect(screen.getByRole('dialog')).toBeVisible()
+    expect(
+      screen.getByRole('heading', { name: 'booksPage.personSearch.title' })
+    ).toBeVisible()
+  })
+
   test('opens a book detail dialog', async () => {
     renderWithProviders(<BooksPage />)
     fireEvent.click(

@@ -49,6 +49,42 @@
         }
       }
     },
+    "/api/user/search": {
+      "get": {
+        "summary": "Buscar personas visibles para el usuario autenticado",
+        "tags": ["User"],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 80
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resultados de personas sin datos sensibles"
+          },
+          "400": {
+            "description": "Consulta inválida"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "description": "Error al buscar personas"
+          }
+        }
+      }
+    },
     "/api/user/activity": {
       "get": {
         "summary": "Listar la actividad del usuario autenticado",

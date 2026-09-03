@@ -9,6 +9,7 @@ export const RELATIVE_API_ROUTES = {
   USER: {
     PROFILE: `/user/profile`,
     PUBLIC_PROFILE: (id: number) => `/user/profile/${id}`,
+    SEARCH: `/user/search`,
     ACTIVITY: `/user/activity`,
   },
   CONTACT_FORM: {

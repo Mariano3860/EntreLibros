@@ -1,0 +1,249 @@
+@import '@styles/variables';
+
+.modal {
+  width: min(720px, 100%);
+}
+
+.searchPanel {
+  display: grid;
+  gap: 7px;
+}
+
+.searchField {
+  display: grid;
+  gap: 8px;
+  color: var(--prototype-muted);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.searchInputWrap {
+  display: flex;
+  min-height: 46px;
+  align-items: center;
+  gap: 9px;
+  padding: 0 13px;
+  border: 1px solid var(--prototype-teal);
+  border-radius: 10px;
+  background: var(--prototype-surface-raised);
+  box-shadow: 0 0 0 3px rgb(66 215 199 / 10%);
+}
+
+.searchIcon {
+  color: var(--prototype-teal);
+  font-size: 20px;
+  line-height: 1;
+}
+
+.searchInputWrap input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--prototype-text);
+  font: inherit;
+  font-size: 14px;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.hint,
+.state {
+  margin: 0;
+  color: var(--prototype-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.recentSection,
+.resultsSection {
+  display: grid;
+  gap: 12px;
+}
+
+.sectionHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sectionHeading h3 {
+  margin: 0;
+  color: var(--prototype-text);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.clearRecent,
+.removeRecent,
+.profileButton,
+.state button {
+  border: 0;
+  background: transparent;
+  color: var(--prototype-teal);
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.recentList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.recentChip {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--prototype-border);
+  border-radius: 999px;
+  background: var(--prototype-surface-soft);
+  color: var(--prototype-text);
+}
+
+.recentChip > button:first-child {
+  padding: 7px 8px 7px 11px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.removeRecent {
+  padding: 5px 9px 5px 2px;
+  color: var(--prototype-muted);
+}
+
+.peopleList {
+  display: grid;
+  max-height: min(48vh, 380px);
+  overflow-y: auto;
+  gap: 8px;
+  margin: 0;
+  padding: 0 4px 4px 0;
+  list-style: none;
+}
+
+.personRow {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px;
+  border: 1px solid var(--prototype-border);
+  border-radius: 12px;
+  background: var(--prototype-surface-soft);
+}
+
+.personMain {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 12px;
+}
+
+.personCopy {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.personCopy strong,
+.personCopy span,
+.personCopy small,
+.personCopy em {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.personCopy strong {
+  color: var(--prototype-text);
+  font-size: 14px;
+}
+
+.personCopy span,
+.personCopy small {
+  color: var(--prototype-muted);
+  font-size: 11px;
+}
+
+.personCopy em {
+  color: var(--prototype-danger-text);
+  font-size: 10px;
+  font-style: normal;
+}
+
+.personActions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.profileButton {
+  padding: 8px 4px;
+}
+
+.followButton {
+  min-width: 92px;
+}
+
+.state {
+  display: grid;
+  min-height: 110px;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  padding: 12px;
+  border: 1px dashed var(--prototype-border);
+  border-radius: 12px;
+  text-align: center;
+}
+
+.state p {
+  margin: 0;
+}
+
+.spinner {
+  width: 22px;
+  height: 22px;
+  border: 2px solid rgb(66 215 199 / 25%);
+  border-top-color: var(--prototype-teal);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: $breakpoint-mobile) {
+  .modal {
+    width: 100%;
+  }
+
+  .personRow {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .personMain,
+  .personActions {
+    width: 100%;
+  }
+
+  .personActions {
+    justify-content: flex-end;
+  }
+}

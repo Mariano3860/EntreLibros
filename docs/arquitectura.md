@@ -28,6 +28,12 @@ En desarrollo, Rsbuild proxifica `/api` y `/socket.io` al backend. Los Dockerfil
 
 `GET /api/community/feed` proyecta historias y publicaciones visibles respetando perfiles, bloqueos y sesión. Likes, comentarios, seguimiento e historias relevantes tienen persistencia. El mapa consulta Rincones, publicaciones y actividad con filtros de radio y ubicación aproximada; el centro puede venir de la geolocalización del dispositivo o de `GET /api/user/profile` para la zona privada de la persona autenticada. Las respuestas mantienen coordenadas públicas aproximadas y omiten la distancia cuando no existe un centro válido.
 
+`GET /api/user/search?q=` ofrece una búsqueda autenticada y limitada a 20
+personas públicas. Busca nombre o alias sin distinguir mayúsculas ni acentos, o
+ID/email exactos; excluye la cuenta actual, bots, perfiles privados y bloqueos
+bidireccionales. La proyección solo incluye identidad visual, foto, actividad
+resumida y estado de seguimiento.
+
 ## Mensajería
 
 `GET /api/messages` lista conversaciones autenticadas y calcula `unreadCount` desde el cursor de lectura. `GET /api/messages/contacts?search=` busca personas públicas por nombre o alias y respeta seguimiento, visibilidad y bloqueos.

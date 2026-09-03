@@ -14,6 +14,7 @@ import {
   type WantBookSource,
 } from '@components/books/WantBookModal/WantBookModal'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
+import { PersonSearchModal } from '@components/people/PersonSearchModal/PersonSearchModal'
 import { PublishBookModal } from '@components/publish/PublishBookModal/PublishBookModal'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -185,6 +186,7 @@ export const BooksPage = () => {
   const [selectedBook, setSelectedBook] = useState<PrototypeBook | null>(null)
   const [wantBook, setWantBook] = useState<WantBookSource | undefined>()
   const [isWantModalOpen, setIsWantModalOpen] = useState(false)
+  const [isPersonSearchOpen, setIsPersonSearchOpen] = useState(false)
   const [coordinates, setCoordinates] = useState<
     { latitude: number; longitude: number } | undefined
   >()
@@ -486,6 +488,9 @@ export const BooksPage = () => {
           description="Descubri libros cerca tuyo para intercambiar, comprar o sumar a tu lista."
           actions={
             <div className={styles.headerActions}>
+              <PrototypeButton onClick={() => setIsPersonSearchOpen(true)}>
+                {t('booksPage.personSearch.open')}
+              </PrototypeButton>
               <PrototypeButton onClick={() => openWantModal()}>
                 {t('booksPage.want.open')}
               </PrototypeButton>
@@ -783,6 +788,10 @@ export const BooksPage = () => {
           })
           closeWantModal()
         }}
+      />
+      <PersonSearchModal
+        isOpen={isPersonSearchOpen}
+        onClose={() => setIsPersonSearchOpen(false)}
       />
     </BaseLayout>
   )

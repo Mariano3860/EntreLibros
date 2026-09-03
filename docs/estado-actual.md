@@ -26,8 +26,8 @@ La matriz de requisitos y la evidencia se mantienen en
 - Descubrimiento: mapa y listado real comparten filtros, radio, orden y estados
   de carga/vacio/error; sin centro valido no se inventa una distancia.
 - Comunidad: feed persistente, historias, seguimiento, likes unicos, comentarios,
-  compartir, Rincones cercanos, fotos de perfil y sugerencias con enlaces reales a
-  perfiles.
+  compartir, Rincones cercanos, fotos de perfil, sugerencias con enlaces reales a
+  perfiles y búsqueda global de personas con filtros de privacidad/bloqueo.
 - Contacto: se puede iniciar una conversacion desde una publicacion o un perfil;
   el primer mensaje es idempotente y puede llevar un adjunto de libro.
 - Acuerdos: propuesta, contrapropuesta, confirmacion, rechazo, cancelacion,
