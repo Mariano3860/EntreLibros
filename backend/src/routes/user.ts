@@ -2,6 +2,10 @@ import { Router, type Response } from 'express';
 import { authenticate, type AuthenticatedRequest } from '../middleware/auth.js';
 import { listUserActivity } from '../repositories/activityRepository.js';
 import {
+  normalizePersonSearchTerm,
+  searchPeople,
+} from '../repositories/personSearchRepository.js';
+import {
   createUserBlock,
   deleteUserBlock,
   findPublicProfileById,
@@ -53,6 +57,7 @@ const LOCATION_VISIBILITIES = [
   'neighborhood',
 ] as const;
 const MAX_PROFILE_PHOTO_BYTES = 5 * 1024 * 1024;
+const MAX_PERSON_SEARCH_LENGTH = 80;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
@@ -95,6 +100,55 @@ router.get('/profile', authenticate, (req: AuthenticatedRequest, res) => {
     });
   }
   return res.json(req.user);
+});
+
+router.get('/search', authenticate, async (req: AuthenticatedRequest, res) => {
+  if (!req.user) {
+    return res.status(401).json({
+      error: 'Unauthorized',
+      message: 'user.errors.unauthenticated',
+    });
+  }
+
+  if (req.query.q === undefined) {
+    return res.json([]);
+  }
+
+  if (Array.isArray(req.query.q) || typeof req.query.q !== 'string') {
+    return res.status(400).json({
+      error: 'InvalidSearch',
+      message: 'user.errors.invalid_search',
+    });
+  }
+
+  const rawTerm = req.query.q.trim();
+  if (!rawTerm) return res.json([]);
+  if (rawTerm.length > MAX_PERSON_SEARCH_LENGTH) {
+    return res.status(400).json({
+      error: 'InvalidSearch',
+      message: 'user.errors.invalid_search',
+    });
+  }
+
+  const normalizedTerm = normalizePersonSearchTerm(rawTerm);
+  if (!normalizedTerm) return res.json([]);
+  if (
+    !/^\d+$/.test(normalizedTerm) &&
+    !normalizedTerm.includes('@') &&
+    normalizedTerm.length < 2
+  ) {
+    return res.json([]);
+  }
+
+  try {
+    return res.json(await searchPeople(req.user.id, rawTerm));
+  } catch (error) {
+    console.error('Failed to search people', error);
+    return res.status(500).json({
+      error: 'PersonSearchFailed',
+      message: 'user.errors.search_failed',
+    });
+  }
 });
 
 router.get('/profile/:id', async (req, res) => {

@@ -26,6 +26,9 @@ La matriz completa y sus referencias estan en
   formato, build y contrato OpenAPI actualizado.
 - Foto de perfil con recorte cuadrado confirmado, reemplazo repetido, persistencia
   segura y presentación consistente en Perfil y Comunidad.
+- Búsqueda global de personas desde Publicaciones con consulta autenticada,
+  resultados limitados, exclusiones de privacidad/bloqueo, seguimiento y modal
+  responsive con historial local no sensible.
 
 ## Prioridad P0
 

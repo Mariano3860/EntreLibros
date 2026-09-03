@@ -23,6 +23,7 @@ import {
 } from '@src/components/community/corners/CornersMiniMap'
 import { FeedActions } from '@src/components/feed/FeedActions'
 import type { FeedItem } from '@src/components/feed/FeedItem.types'
+import { PersonSearchModal } from '@src/components/people/PersonSearchModal/PersonSearchModal'
 import { useAuth } from '@src/contexts/auth/AuthContext'
 import { usePrototype } from '@src/features/prototype/PrototypeContext'
 import {
@@ -39,8 +40,10 @@ import styles from './CommunityFeedPage.module.scss'
 
 export const CommunityFeedPage = () => {
   const { catalog, socialPosts, publishStory } = usePrototype()
+  const { t } = useTranslation()
   const mockMode = isApiMockMode()
   const [composerOpen, setComposerOpen] = useState(false)
+  const [isPersonSearchOpen, setIsPersonSearchOpen] = useState(false)
   const [storyText, setStoryText] = useState('')
   const [selectedStory, setSelectedStory] = useState<string | null>(null)
   const navigate = useNavigate()
@@ -65,9 +68,17 @@ export const CommunityFeedPage = () => {
             <h1>Comunidad</h1>
             <p>Historias, recomendaciones y encuentros cerca tuyo.</p>
           </div>
-          <PrototypeButton tone="primary" onClick={() => setComposerOpen(true)}>
-            ＋ Publicar
-          </PrototypeButton>
+          <div className={styles.headerActions}>
+            <PrototypeButton onClick={() => setIsPersonSearchOpen(true)}>
+              {t('booksPage.personSearch.open')}
+            </PrototypeButton>
+            <PrototypeButton
+              tone="primary"
+              onClick={() => setComposerOpen(true)}
+            >
+              ＋ Publicar
+            </PrototypeButton>
+          </div>
         </header>
 
         <div className={styles.layout}>
@@ -250,6 +261,10 @@ export const CommunityFeedPage = () => {
             </Panel>
           </div>
         ) : null}
+        <PersonSearchModal
+          isOpen={isPersonSearchOpen}
+          onClose={() => setIsPersonSearchOpen(false)}
+        />
       </PrototypePage>
     </BaseLayout>
   )
@@ -316,6 +331,7 @@ const RealCommunityPage = ({
   const { t } = useTranslation()
   const queryClient = useQueryClient()
   const [composerOpen, setComposerOpen] = useState(false)
+  const [isPersonSearchOpen, setIsPersonSearchOpen] = useState(false)
   const [selectedStory, setSelectedStory] = useState<string | null>(null)
   const feed = useQuery({
     queryKey: ['community', 'feed'],
@@ -415,9 +431,17 @@ const RealCommunityPage = ({
             <h1>Comunidad</h1>
             <p>Historias, recomendaciones y encuentros cerca tuyo.</p>
           </div>
-          <PrototypeButton tone="primary" onClick={() => setComposerOpen(true)}>
-            ＋ Publicar
-          </PrototypeButton>
+          <div className={styles.headerActions}>
+            <PrototypeButton onClick={() => setIsPersonSearchOpen(true)}>
+              {t('booksPage.personSearch.open')}
+            </PrototypeButton>
+            <PrototypeButton
+              tone="primary"
+              onClick={() => setComposerOpen(true)}
+            >
+              ＋ Publicar
+            </PrototypeButton>
+          </div>
         </header>
         <div className={styles.layout}>
           <main className={styles.main}>
@@ -662,6 +686,10 @@ const RealCommunityPage = ({
               queryKey: ['community', 'discovery'],
             })
           }}
+        />
+        <PersonSearchModal
+          isOpen={isPersonSearchOpen}
+          onClose={() => setIsPersonSearchOpen(false)}
         />
       </PrototypePage>
     </BaseLayout>

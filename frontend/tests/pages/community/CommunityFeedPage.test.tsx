@@ -33,6 +33,19 @@ describe('CommunityFeedPage', () => {
     expect(screen.queryByText('publishBook.title')).not.toBeInTheDocument()
   })
 
+  test('opens the people search from Community', () => {
+    renderWithProviders(<CommunityFeedPage />)
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'booksPage.personSearch.open' })
+    )
+
+    expect(screen.getByRole('dialog')).toBeVisible()
+    expect(
+      screen.getByRole('heading', { name: 'booksPage.personSearch.title' })
+    ).toBeVisible()
+  })
+
   test('connects the community mini map with the selected corner in Map', async () => {
     const LocationProbe = () => {
       const location = useLocation()

@@ -153,6 +153,31 @@
       "notesLabel": "Notes",
       "notesPlaceholder": "Edition, language, or details you care about..."
     },
+    "personSearch": {
+      "open": "Find people",
+      "title": "Find people",
+      "subtitle": "Find EntreLibros readers by name, alias, or identifier.",
+      "close": "Close",
+      "fieldLabel": "Search the community",
+      "placeholder": "Name, alias, ID, or email",
+      "hint": "Search by name, alias, exact ID, or exact email.",
+      "recentTitle": "Recent searches",
+      "clearRecent": "Clear all",
+      "removeRecent": "Remove search {{term}}",
+      "recentHint": "Choose a recent search to use it again.",
+      "emptyPrompt": "Start typing to find people.",
+      "loading": "Searching people...",
+      "error": "We couldn't search for people.",
+      "retry": "Try again",
+      "tooShort": "Enter at least two characters to search.",
+      "empty": "No people matched that search.",
+      "activity": "{{books}} books · {{exchanges}} exchanges",
+      "viewProfile": "View profile",
+      "follow": "Follow",
+      "following": "Following",
+      "followingPending": "Saving...",
+      "followError": "Following could not be updated."
+    },
     "loading": "Loading books...",
     "error": "We couldn't load the books. Please try again.",
     "title": "Explore books",
@@ -1100,7 +1125,9 @@
     "errors": {
       "activity_query_failed": "Your activity could not be loaded.",
       "unauthenticated": "You need to sign in.",
-      "profile_update_failed": "Your profile changes could not be saved."
+      "profile_update_failed": "Your profile changes could not be saved.",
+      "invalid_search": "Enter a valid search.",
+      "search_failed": "People could not be searched. Please try again."
     }
   },
   "reports": {

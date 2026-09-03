@@ -4,5 +4,5 @@ export const isPublicFlagEnabled = (value: string | undefined): boolean => {
 }
 
 export const isApiMockMode = (): boolean =>
-  isPublicFlagEnabled(import.meta.env?.PUBLIC_API_USE_MOCKS) ||
-  import.meta.env?.MODE === 'test'
+  isPublicFlagEnabled(import.meta.env.PUBLIC_API_USE_MOCKS) ||
+  import.meta.env.MODE === 'test'

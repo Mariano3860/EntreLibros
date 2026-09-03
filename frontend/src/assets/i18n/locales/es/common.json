@@ -157,6 +157,31 @@
       "notesLabel": "Notas",
       "notesPlaceholder": "Edicion, idioma o detalles que te interesen..."
     },
+    "personSearch": {
+      "open": "Buscar personas",
+      "title": "Buscar personas",
+      "subtitle": "Encontra lectores de EntreLibros por nombre, alias o identificador.",
+      "close": "Cerrar",
+      "fieldLabel": "Buscar en la comunidad",
+      "placeholder": "Nombre, alias, ID o email",
+      "hint": "Podes buscar por nombre, alias, ID exacto o email exacto.",
+      "recentTitle": "Busquedas recientes",
+      "clearRecent": "Limpiar todo",
+      "removeRecent": "Quitar busqueda {{term}}",
+      "recentHint": "Elegi una busqueda reciente para volver a usarla.",
+      "emptyPrompt": "Empeza escribiendo para encontrar personas.",
+      "loading": "Buscando personas...",
+      "error": "No pudimos buscar personas.",
+      "retry": "Reintentar",
+      "tooShort": "Escribi al menos dos caracteres para buscar.",
+      "empty": "No encontramos personas con esa busqueda.",
+      "activity": "{{books}} libros · {{exchanges}} intercambios",
+      "viewProfile": "Ver perfil",
+      "follow": "Seguir",
+      "following": "Siguiendo",
+      "followingPending": "Guardando...",
+      "followError": "No se pudo actualizar el seguimiento."
+    },
     "loading": "Cargando libros...",
     "error": "No pudimos cargar los libros. Intenta nuevamente.",
     "title": "Explorar libros",
@@ -1096,7 +1121,9 @@
     "errors": {
       "activity_query_failed": "No se pudo cargar tu actividad.",
       "unauthenticated": "Necesitás iniciar sesión.",
-      "profile_update_failed": "No se pudieron guardar los cambios del perfil."
+      "profile_update_failed": "No se pudieron guardar los cambios del perfil.",
+      "invalid_search": "Ingresá una búsqueda válida.",
+      "search_failed": "No se pudo buscar personas. Intentá nuevamente."
     }
   },
   "reports": {
