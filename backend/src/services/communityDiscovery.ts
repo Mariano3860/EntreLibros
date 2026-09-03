@@ -5,6 +5,7 @@ const AVATAR_FALLBACK = '/logo.svg';
 type StoryAuthorRow = {
   user_id: number;
   user_name: string;
+  avatar: string | null;
   story_id: number;
   body: string;
   image_url: string | null;
@@ -15,6 +16,7 @@ type StoryAuthorRow = {
 type SuggestionRow = {
   user_id: number;
   user_name: string;
+  avatar: string | null;
   distance_km: number | string | null;
   same_city: boolean;
   common_interests: string[];
@@ -96,6 +98,7 @@ export async function getCommunityDiscovery(
           SELECT
             u.id AS user_id,
             COALESCE(u.alias, u.name) AS user_name,
+            u.profile_photo_url AS avatar,
             s.id AS story_id,
             s.body,
             s.image_url,
@@ -138,6 +141,7 @@ export async function getCommunityDiscovery(
           SELECT DISTINCT ON (candidate.user_id)
             candidate.user_id,
             candidate.user_name,
+            candidate.avatar,
             candidate.story_id,
             candidate.body,
             candidate.image_url,
@@ -172,6 +176,7 @@ export async function getCommunityDiscovery(
           SELECT
             u.id AS user_id,
             COALESCE(u.alias, u.name) AS user_name,
+            u.profile_photo_url AS avatar,
             ARRAY(
               SELECT interest
               FROM unnest(COALESCE(u.interests, ARRAY[]::TEXT[])) AS interest
@@ -220,7 +225,8 @@ export async function getCommunityDiscovery(
                  OR (b.blocker_id = u.id AND b.blocked_id = v.id)
             )
         )
-        SELECT user_id, user_name, distance_km, same_city, common_interests, is_following
+        SELECT user_id, user_name, avatar, distance_km, same_city,
+               common_interests, is_following
         FROM candidate_base
         WHERE has_activity
           AND (
@@ -307,7 +313,7 @@ export async function getCommunityDiscovery(
     id: String(row.user_id),
     storyId: String(row.story_id),
     user: row.user_name,
-    avatar: AVATAR_FALLBACK,
+    avatar: row.avatar ?? AVATAR_FALLBACK,
     body: row.body,
     ...(row.image_url ? { image: row.image_url } : {}),
     time: relativeTime(new Date(row.created_at)),
@@ -322,7 +328,7 @@ export async function getCommunityDiscovery(
     return {
       id: String(row.user_id),
       user: row.user_name,
-      avatar: AVATAR_FALLBACK,
+      avatar: row.avatar ?? AVATAR_FALLBACK,
       reason: isNearby
         ? ('nearby' as const)
         : row.common_interests.length > 0

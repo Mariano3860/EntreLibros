@@ -25,6 +25,7 @@ export type CreateCommunityStoryInput = {
 type StoryRow = {
   id: string;
   user_name: string;
+  avatar: string | null;
   body: string;
   image_url: string | null;
   book_id: string | null;
@@ -53,7 +54,7 @@ const relativeTime = (date: Date): string => {
 const toStory = (row: StoryRow): CommunityStory => ({
   id: `story-${row.id}`,
   user: row.user_name,
-  avatar: AVATAR_FALLBACK,
+  avatar: row.avatar ?? AVATAR_FALLBACK,
   time: relativeTime(new Date(row.created_at)),
   likes: Number(row.likes),
   commentsCount: Number(row.comments_count),
@@ -82,6 +83,7 @@ export async function listCommunityStories(
   const { rows } = await query<StoryRow>(
     `SELECT s.id,
             COALESCE(u.alias, u.name) AS user_name,
+            u.profile_photo_url AS avatar,
             s.body,
             s.image_url,
             b.id::text AS book_id,
@@ -170,6 +172,7 @@ export async function createCommunityStory(
      )
      SELECT i.id,
             COALESCE(u.alias, u.name) AS user_name,
+            u.profile_photo_url AS avatar,
             i.body,
             i.image_url,
             b.id::text AS book_id,

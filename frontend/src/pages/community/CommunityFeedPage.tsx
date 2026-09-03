@@ -403,6 +403,7 @@ const RealCommunityPage = ({
         id: story.id,
         name: story.user,
         initials: story.user.slice(0, 2).toUpperCase(),
+        imageUrl: story.avatar,
         accent: '#42d7c7',
       })) ?? []
 
@@ -441,6 +442,7 @@ const RealCommunityPage = ({
                 >
                   <Avatar
                     initials={story.initials}
+                    imageUrl={story.imageUrl}
                     accent={story.accent}
                     size="large"
                   />
@@ -585,6 +587,7 @@ const RealCommunityPage = ({
                 <article className={styles.suggestion} key={person.id}>
                   <Avatar
                     initials={person.user.slice(0, 2).toUpperCase()}
+                    imageUrl={person.avatar}
                     accent="#ff8b4c"
                     size="small"
                   />
@@ -689,6 +692,7 @@ const RealFeedCard = ({ item }: { item: FeedItem }) => {
       <div className={styles.postHeader}>
         <Avatar
           initials={item.user.slice(0, 2).toUpperCase()}
+          imageUrl={item.avatar}
           accent="#42d7c7"
         />
         <div>

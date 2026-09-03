@@ -36,7 +36,11 @@ Los eventos `conversation:join`, `conversation:leave` y `conversation:message` o
 
 ## Perfil y privacidad
 
-`PATCH /api/user/profile` actualiza los datos editables del usuario autenticado. La calle solo existe en el contexto autorizado; el perfil público puede ocultar la ubicación o mostrar país, ciudad o barrio aproximado con coordenadas redondeadas.
+`PATCH /api/user/profile` actualiza los datos editables del usuario autenticado,
+incluida una foto JPEG, PNG o WebP recortada en el cliente. La calle solo existe
+en el contexto autorizado; el perfil público puede ocultar la ubicación o mostrar
+país, ciudad o barrio aproximado con coordenadas redondeadas. El feed y las
+sugerencias de Comunidad reutilizan esa foto y conservan `/logo.svg` como fallback.
 
 ## Modos del frontend
 

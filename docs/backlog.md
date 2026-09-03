@@ -24,6 +24,8 @@ La matriz completa y sus referencias estan en
   acuerdo, notificaciones, eventos y resultado.
 - Migraciones acumulativas 031-034, pruebas automatizadas, typecheck, lint,
   formato, build y contrato OpenAPI actualizado.
+- Foto de perfil con recorte cuadrado confirmado, reemplazo repetido, persistencia
+  segura y presentación consistente en Perfil y Comunidad.
 
 ## Prioridad P0
 

@@ -54,6 +54,7 @@ export type PersistedCommunityStats = {
 type FeedRow = {
   id: number;
   user_name: string;
+  avatar: string | null;
   title: string;
   author: string | null;
   cover_url: string | null;
@@ -71,6 +72,7 @@ type FeedRow = {
 type ActivityRow = {
   id: number;
   user_name: string;
+  avatar: string | null;
 };
 
 type ContributorRow = {
@@ -112,6 +114,7 @@ export async function getPersistedCommunityFeed(
       SELECT
         p.id,
         COALESCE(u.alias, u.name) AS user_name,
+        u.profile_photo_url AS avatar,
         b.title,
         b.author,
         COALESCE(img.url, b.cover_url) AS cover_url,
@@ -183,7 +186,7 @@ export async function getPersistedCommunityFeed(
     const base = {
       id: String(row.id),
       user: row.user_name,
-      avatar: AVATAR_FALLBACK,
+      avatar: row.avatar ?? AVATAR_FALLBACK,
       time: relativeTime(new Date(row.created_at)),
       likes: Number(row.likes),
       commentsCount: Number(row.comments_count),
@@ -250,7 +253,9 @@ export async function getPersistedCommunityActivity(): Promise<
 > {
   const { rows } = await query<ActivityRow>(
     `
-      SELECT DISTINCT ON (u.id) u.id, COALESCE(u.alias, u.name) AS user_name
+      SELECT DISTINCT ON (u.id) u.id,
+             COALESCE(u.alias, u.name) AS user_name,
+             u.profile_photo_url AS avatar
       FROM users u
       JOIN book_listings p ON p.user_id = u.id
       WHERE ${publicListingWhere('p')}
@@ -262,7 +267,7 @@ export async function getPersistedCommunityActivity(): Promise<
   return rows.map((row) => ({
     id: String(row.id),
     user: row.user_name,
-    avatar: AVATAR_FALLBACK,
+    avatar: row.avatar ?? AVATAR_FALLBACK,
   }));
 }
 
@@ -271,7 +276,9 @@ export async function getPersistedCommunitySuggestions(): Promise<
 > {
   const { rows } = await query<ActivityRow>(
     `
-      SELECT u.id, COALESCE(u.alias, u.name) AS user_name
+      SELECT u.id,
+             COALESCE(u.alias, u.name) AS user_name,
+             u.profile_photo_url AS avatar
       FROM users u
       WHERE EXISTS (
         SELECT 1 FROM book_listings p
@@ -285,7 +292,7 @@ export async function getPersistedCommunitySuggestions(): Promise<
   return rows.map((row) => ({
     id: String(row.id),
     user: row.user_name,
-    avatar: AVATAR_FALLBACK,
+    avatar: row.avatar ?? AVATAR_FALLBACK,
   }));
 }
 
