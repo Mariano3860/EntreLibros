@@ -310,6 +310,31 @@ describe('BookDetailModal', () => {
     confirmSpy.mockRestore()
   })
 
+  test('opens the report modal from the book detail modal', async () => {
+    server.use(
+      http.get(apiRouteMatcher(`${RELATIVE_API_ROUTES.BOOKS.LIST}/:id`), () =>
+        HttpResponse.json({
+          ...generatePublication('1'),
+          ownerId: '2',
+        })
+      )
+    )
+
+    renderModal({ onStartConversation: vi.fn() })
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: /reportar/i })
+    )
+
+    expect(
+      await screen.findByRole('heading', { name: 'reports.report' })
+    ).toBeInTheDocument()
+    const reportBackdrop = screen
+      .getByRole('heading', { name: 'reports.report' })
+      .closest('[role="presentation"]')
+    expect(reportBackdrop).not.toBeNull()
+  })
+
   test('calls onClose when Escape is pressed', async () => {
     const { onClose } = renderModal()
 
