@@ -1,5 +1,6 @@
 import { fetchConversations, messageQueryKeys } from '@api/messages/messages'
 import { LogoEntreLibros } from '@components/logo/LogoEntreLibros'
+import { NotificationBell } from '@components/notifications/NotificationBell'
 import { SidebarLanguageSwitcher } from '@components/sidebar/buttons/SidebarLanguageSwitcher'
 import { SidebarLoginButton } from '@components/sidebar/buttons/SidebarLoginButton'
 import { SidebarThemeButton } from '@components/sidebar/buttons/SidebarThemeButton'
@@ -131,6 +132,7 @@ export const Sidebar = () => {
           })}
         </div>
         <div className={styles.footer}>
+          <NotificationBell />
           <NavLink
             to={`/${HOME_URLS.CONTACT}`}
             onClick={closeMenu}

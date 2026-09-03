@@ -6,6 +6,7 @@ import {
   markNotificationRead,
   setNotificationPreference,
 } from '../repositories/notificationRepository.js';
+import { createAgreementReminderNotifications } from '../services/notifications.js';
 
 const router = Router();
 router.use(authenticate);
@@ -15,6 +16,7 @@ router.get('/', async (req: AuthenticatedRequest, res) => {
     return res
       .status(401)
       .json({ error: 'Unauthorized', message: 'auth.errors.unauthorized' });
+  await createAgreementReminderNotifications().catch(() => undefined);
   return res.json({ notifications: await listNotifications(req.user.id) });
 });
 

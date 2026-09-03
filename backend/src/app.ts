@@ -15,6 +15,7 @@ import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './config/swagger.js';
 import { csrfProtection, getFrontendUrl } from './security.js';
 import notificationsRouter from './routes/notifications.js';
+import reportsRouter from './routes/reports.js';
 import { registerNotificationEvents } from './services/notifications.js';
 
 const app = express();
@@ -62,5 +63,6 @@ app.use('/api/contact', contactRouter);
 app.use('/api/messages', messagesRouter);
 app.use('/api/agreements', agreementsRouter);
 app.use('/api/notifications', notificationsRouter);
+app.use('/api/reports', reportsRouter);
 
 export default app;

@@ -46,6 +46,38 @@
   padding: 15px;
 }
 
+.metricSummary {
+  margin-bottom: 16px;
+}
+
+.metricGrid,
+.funnel {
+  display: grid;
+  gap: 8px;
+}
+
+.metricGrid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.metricGrid span,
+.funnel span {
+  color: var(--prototype-muted);
+  font-size: 9px;
+}
+
+.metricGrid strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--prototype-teal);
+  font-size: 18px;
+}
+
+.funnel {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 15px;
+}
+
 .wide {
   grid-column: span 2;
 }

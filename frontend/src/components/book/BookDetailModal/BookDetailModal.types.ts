@@ -10,4 +10,7 @@ export type BookDetailModalProps = {
   bookId: string | undefined
   onClose: () => void
   bookPreview?: BookDetailModalPreview
+  onStartConversation?: (ownerId: string) => void
+  isStartingConversation?: boolean
+  contactError?: string
 }

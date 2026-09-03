@@ -25,6 +25,14 @@ export type AgreementSnapshot = {
   details: AgreementDetails
   acceptances: number[]
   listingIds: number[]
+  outcomes?: AgreementOutcome[]
+}
+
+export type AgreementOutcome = {
+  userId: number
+  outcome: 'completed' | 'not_completed'
+  reason: string | null
+  recordedAt: string
 }
 
 export type AgreementHistoryEntry = {
@@ -93,6 +101,18 @@ export async function counterProposeAgreement(input: {
 }): Promise<AgreementSnapshot> {
   const response = await apiClient.post<{ agreement: AgreementSnapshot }>(
     RELATIVE_API_ROUTES.AGREEMENTS.VERSION(input.agreementId),
+    input
+  )
+  return response.data.agreement
+}
+
+export async function recordAgreementOutcome(input: {
+  agreementId: number
+  outcome: AgreementOutcome['outcome']
+  reason?: string
+}): Promise<AgreementSnapshot> {
+  const response = await apiClient.post<{ agreement: AgreementSnapshot }>(
+    RELATIVE_API_ROUTES.AGREEMENTS.OUTCOME(input.agreementId),
     input
   )
   return response.data.agreement

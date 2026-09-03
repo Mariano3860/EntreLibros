@@ -4,6 +4,10 @@ import {
   type BookCatalogFilters,
 } from '@api/books/books.service'
 import { fetchUserBooks } from '@api/books/userBooks.service'
+import {
+  createConversation,
+  sendPersistedMessage,
+} from '@api/messages/messages'
 import { BookDetailModal } from '@components/book/BookDetailModal/BookDetailModal'
 import {
   WantBookModal,
@@ -11,7 +15,7 @@ import {
 } from '@components/books/WantBookModal/WantBookModal'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { PublishBookModal } from '@components/publish/PublishBookModal/PublishBookModal'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
@@ -349,6 +353,36 @@ export const BooksPage = () => {
     queryKey: ['prototype', 'book', bookId],
     queryFn: () => fetchBookById(bookId ?? 0),
     enabled: !mockMode && bookId !== null,
+  })
+  const contactMutation = useMutation({
+    mutationFn: async (ownerId: string) => {
+      if (!/^\d+$/.test(ownerId)) throw new Error('invalid_owner')
+      const conversation = await createConversation(Number(ownerId))
+      await sendPersistedMessage({
+        conversationId: conversation.id,
+        clientKey: `first-contact-${conversation.id}`,
+        body: t('bookDetail.firstContactMessage', {
+          title: selectedBook?.title ?? '',
+        }),
+        attachmentMetadata: selectedBook
+          ? {
+              key: `book:${selectedBook.id}`,
+              contentType: 'application/x-entrelibros-book',
+              size: 1,
+              kind: 'book',
+              bookId: selectedBook.id,
+              title: selectedBook.title,
+              author: selectedBook.author,
+              coverUrl: selectedBook.coverUrl ?? '',
+            }
+          : undefined,
+      })
+      return conversation
+    },
+    onSuccess: (conversation) => {
+      setSelectedBook(null)
+      navigate('/messages', { state: { conversationId: conversation.id } })
+    },
   })
   useEffect(() => {
     if (bookId === null) return
@@ -716,6 +750,15 @@ export const BooksPage = () => {
               : undefined
           }
           onClose={() => setSelectedBook(null)}
+          onStartConversation={
+            isAuthenticated
+              ? (ownerId) => contactMutation.mutate(ownerId)
+              : undefined
+          }
+          isStartingConversation={contactMutation.isPending}
+          contactError={
+            contactMutation.isError ? t('bookDetail.contactError') : undefined
+          }
         />
       </PrototypePage>
       {publishMatch ? (

@@ -1,49 +1,40 @@
-# Recuperación y validación del entorno
+# Recuperacion y validacion del entorno
 
-Esta guía reúne el procedimiento actual para comprobar que EntreLibros arranca, conserva datos y funciona en navegador real. Las pruebas automatizadas no sustituyen la revisión de cookies, proxy, caché, permisos de ubicación ni Socket.IO.
+Esta guia comprueba que EntreLibros arranca, conserva datos y funciona con
+navegador real. Las pruebas automatizadas no sustituyen cookies, proxy, cache,
+permisos de ubicacion ni Socket.IO.
 
 ## Puesta en marcha
 
 1. Instala Node `>=22.19.0 <23`, npm y PostgreSQL/PostGIS.
-2. Configura las variables del backend en un archivo `.env` local.
-3. Ejecuta las migraciones sobre una base aislada:
+2. Configura el backend en `.env` local y no lo guardes en Git.
+3. Ejecuta `npm run migrate` sobre una base aislada.
+4. Carga el dataset sintetico:
 
    ```bash
-   npm run migrate
+   psql "$DATABASE_URL" -f backend/scripts/seed-demo-dataset.sql
    ```
 
-4. Levanta backend y frontend:
-
-   ```bash
-   npm run dev
-   ```
-
-5. Usa `PUBLIC_API_USE_MOCKS=false` u omite la variable para validar persistencia real.
+5. Levanta backend y frontend con `npm run dev`.
+6. Usa `PUBLIC_API_USE_MOCKS=false` u omitida para persistencia real.
 
 ## Checklist de navegador
 
-- La aplicación abre en `http://localhost:3000` y las peticiones `/api` llegan al backend.
-- El inicio de sesión conserva la cookie y las rutas protegidas rechazan una sesión ausente.
-- El modo real aparece como `real` en `document.documentElement.dataset.apiMode`.
-- Crear o editar un Rincón y publicar un libro produce respuestas correctas y los datos sobreviven a una recarga.
-- El mapa respeta permisos, radio y ubicación aproximada.
-- Mensajes, adjuntos y acuerdos se guardan, se reciben por Socket.IO y se reconstruyen al recargar.
-- El punto rojo y el contador de Mensajes aumentan con un mensaje entrante y desaparecen al leerlo.
-- Los estados de carga, vacío y error son distinguibles y ofrecen reintento cuando corresponde.
+La checklist detallada esta en [`tfg-browser-checklist.md`](tfg-browser-checklist.md).
+Comprueba que `/api` y `/socket.io` llegan al backend, que el modo resuelto es
+`real`, que una recarga conserva los datos, que el mapa respeta ubicacion
+aproximada, que el contacto/acuerdo/notificacion se reconstruye y que los estados
+de carga, vacio y error ofrecen reintento.
 
-## Comprobacion manual de edicion de Rincones
+## Backup y restauracion
 
-- Crea o usa un Rincon aprobado con una cuenta propietaria y abre `/map` con `PUBLIC_API_USE_MOCKS=false`.
-- Selecciona el Rincon y pulsa `Ver rincon`. Debe aparecer el panel a la derecha del mapa con foto, nombre, anfitrion, zona aproximada, horario, normas, actividad y estado.
-- También puedes abrir ese panel haciendo clic en el pin del Rincon en el mapa o en su entrada del listado lateral.
-- Como propietario, comprueba `Editar rincon`, cambia nombre, normas, horario o visibilidad, guarda y recarga. Los cambios deben persistir.
-- Desde el mismo panel pausa y reactiva el Rincon. El estado debe cambiar y la accion debe conservarse despues de recargar.
-- Como otra cuenta o invitado, comprueba que el detalle sigue siendo visible pero no aparecen los controles de propietario.
-- En todos los casos confirma que nunca aparecen calle, altura, contacto interno ni coordenadas exactas.
+Antes de migrar una base compartida realiza un backup verificable fuera del
+repositorio. Restaura sobre una base aislada, valida PostGIS, tablas, migraciones,
+usuarios sinteticos y rutas principales, y registra fecha, entorno y resultado.
+No edites migraciones aplicadas: crea una migracion acumulativa. El backup/restore
+real del entorno de despliegue queda pendiente de ejecutar y documentar.
 
-## Calidad y recuperación
-
-Antes de revisar una entrega ejecuta:
+## Calidad
 
 ```bash
 npm run test:backend
@@ -52,12 +43,11 @@ npm run typecheck -w backend
 npm run typecheck -w frontend
 npm run build -w backend
 npm run build -w frontend
+npm run complete-check
 ```
-
-Para una base compartida, realiza un backup verificable antes de migrar y conserva su ubicación fuera del repositorio. Comprueba la restauración sobre una base aislada, valida tablas, migraciones y PostGIS, y registra fecha, entorno y resultado. Nunca edites una migración aplicada; crea una migración acumulativa para corregir el esquema.
-
-Si una migración falla, detén el proceso, conserva el error, restaura la copia aislada o aplica una corrección numerada después de entender la causa. No borres datos para hacer pasar una prueba.
 
 ## Datos de prueba
 
-Usa cuentas y publicaciones sintéticas. No copies usuarios reales, correos, direcciones, tokens ni dumps al repositorio o a capturas. La semilla del bot se crea con `015_seed_messaging_bot.sql`; el modo demo con MSW no reemplaza esta verificación.
+Usa solamente las cuentas y publicaciones sinteticas del script de demo. No
+copies usuarios reales, correos, direcciones, tokens, cookies ni dumps en el
+repositorio o en capturas.

@@ -1,5 +1,6 @@
 import { genres } from '@components/publish/PublishBookModal/PublishBookModal.constants'
 import { PublishModal } from '@components/publish/shared/PublishModal/PublishModal'
+import { ReportModal } from '@components/reports/ReportModal'
 import { useBookDetails } from '@hooks/api/useBookDetails'
 import { useUpdateBook } from '@hooks/api/useUpdateBook'
 import { useFocusTrap } from '@hooks/useFocusTrap'
@@ -34,6 +35,9 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
   bookId,
   onClose,
   bookPreview,
+  onStartConversation,
+  isStartingConversation = false,
+  contactError,
 }) => {
   const { t } = useTranslation()
   const { user } = useAuth()
@@ -44,6 +48,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
   const [editedData, setEditedData] = useState<PublicationUpdate>({})
   const [isRetrying, setIsRetrying] = useState(false)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
+  const [reportOpen, setReportOpen] = useState(false)
 
   const {
     data: book,
@@ -1052,28 +1057,70 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
       )
     }
 
+    if (
+      !isOwner &&
+      onStartConversation &&
+      book.ownerId &&
+      /^\d+$/.test(book.ownerId)
+    ) {
+      return (
+        <div className={styles.actions}>
+          <button
+            type="button"
+            onClick={() => onStartConversation(book.ownerId)}
+            className={styles.editButton}
+            disabled={isStartingConversation}
+          >
+            {isStartingConversation
+              ? t('bookDetail.contacting')
+              : t('bookDetail.contact')}
+          </button>
+          <button
+            type="button"
+            onClick={() => setReportOpen(true)}
+            className={styles.cancelButton}
+          >
+            {t('reports.report', { defaultValue: 'Reportar' })}
+          </button>
+          {contactError ? (
+            <p className={styles.contactError} role="alert">
+              {contactError}
+            </p>
+          ) : null}
+        </div>
+      )
+    }
+
     return null
   }
 
   return (
-    <PublishModal
-      ref={modalRef}
-      isOpen={isOpen}
-      title={t('bookDetail.title')}
-      subtitle={
-        isOwner && !isEditing
-          ? t('bookDetail.owner')
-          : !isOwner
-            ? t('bookDetail.readOnly')
-            : undefined
-      }
-      onClose={handleClose}
-      closeLabel={t('bookDetail.close')}
-      footer={renderFooter()}
-      className={styles.bookDetailModal}
-      roleDescription={t('bookDetail.title')}
-    >
-      {renderContent()}
-    </PublishModal>
+    <>
+      <PublishModal
+        ref={modalRef}
+        isOpen={isOpen}
+        title={t('bookDetail.title')}
+        subtitle={
+          isOwner && !isEditing
+            ? t('bookDetail.owner')
+            : !isOwner
+              ? t('bookDetail.readOnly')
+              : undefined
+        }
+        onClose={handleClose}
+        closeLabel={t('bookDetail.close')}
+        footer={renderFooter()}
+        className={styles.bookDetailModal}
+        roleDescription={t('bookDetail.title')}
+      >
+        {renderContent()}
+      </PublishModal>
+      <ReportModal
+        isOpen={reportOpen && Boolean(book)}
+        targetType="content"
+        targetId={book?.id ?? bookId ?? ''}
+        onClose={() => setReportOpen(false)}
+      />
+    </>
   )
 }

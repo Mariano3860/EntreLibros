@@ -3,7 +3,7 @@ import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { FormEvent, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import { fetchActivityItems } from '@src/api/community/activity.service'
 import { fetchCommunityFeed } from '@src/api/community/communityFeed.service'
@@ -312,7 +312,6 @@ const RealCommunityPage = ({
 }: {
   navigate: ReturnType<typeof useNavigate>
 }) => {
-  const { catalog } = usePrototype()
   const { isAuthenticated, isLoading: isAuthLoading, user } = useAuth()
   const { t } = useTranslation()
   const queryClient = useQueryClient()
@@ -386,44 +385,26 @@ const RealCommunityPage = ({
     enabled: composerOpen,
   })
 
-  const realCorners = corners.data?.length
-    ? corners.data.slice(0, 3)
-    : catalog.corners.slice(0, 3).map((corner) => ({
-        id: corner.id,
-        name: corner.name,
-        imageUrl: '',
-        distanceKm: Number.parseFloat(corner.distance),
-        activityLabel: corner.activity,
-      }))
-  const realSuggestions = suggestions.data?.length
-    ? suggestions.data.slice(0, 3).map((suggestion) => ({
-        ...suggestion,
-        isFollowing: false,
-        reason: 'active_reader' as const,
-        commonInterests: [],
-      }))
-    : catalog.stats.contributors.slice(0, 3).map((person, index) => ({
-        id: `prototype-suggestion-${index}`,
-        user: person.name,
-        avatar: '',
-        isFollowing: false,
-        reason: 'active_reader' as const,
-        commonInterests: [],
-      }))
+  const realCorners = corners.data?.slice(0, 3) ?? []
+  const realSuggestions =
+    suggestions.data?.slice(0, 3).map((suggestion) => ({
+      ...suggestion,
+      isFollowing: false,
+      reason: 'active_reader' as const,
+      commonInterests: [],
+    })) ?? []
   const displayedSuggestions = discovery.data
     ? discovery.data.suggestions.slice(0, 3)
     : realSuggestions
-  const hasApiFeed = Boolean(feed.data?.length)
-  const storyChips = discovery.data
-    ? discovery.data.stories
-        .filter((story) => String(user?.id) !== story.id)
-        .map((story) => ({
-          id: story.id,
-          name: story.user,
-          initials: story.user.slice(0, 2).toUpperCase(),
-          accent: '#42d7c7',
-        }))
-    : catalog.stories.filter((story) => story.id !== 'mine')
+  const storyChips =
+    discovery.data?.stories
+      .filter((story) => String(user?.id) !== story.id)
+      .map((story) => ({
+        id: story.id,
+        name: story.user,
+        initials: story.user.slice(0, 2).toUpperCase(),
+        accent: '#42d7c7',
+      })) ?? []
 
   return (
     <BaseLayout id="community-page">
@@ -519,7 +500,11 @@ const RealCommunityPage = ({
                 />
                 <div className={styles.recommendationList}>
                   {discovery.data.recommendedBooks.map((book) => (
-                    <article className={styles.recommendation} key={book.id}>
+                    <Link
+                      className={styles.recommendation}
+                      key={book.id}
+                      to={`/books/${book.id}`}
+                    >
                       {book.cover ? (
                         <img src={book.cover} alt="" />
                       ) : (
@@ -543,7 +528,7 @@ const RealCommunityPage = ({
                           })}
                         </small>
                       </div>
-                    </article>
+                    </Link>
                   ))}
                 </div>
               </Panel>
@@ -554,42 +539,29 @@ const RealCommunityPage = ({
               </div>
             ) : null}
             <div className={styles.feed}>
-              {feed.isError ? (
+              {feed.isLoading ? (
                 <Panel className={styles.post} as="article">
-                  No pudimos cargar la actividad de la comunidad.
+                  Cargando la actividad de la comunidad...
                 </Panel>
-              ) : hasApiFeed ? (
+              ) : feed.isError ? (
+                <Panel className={styles.post} as="article">
+                  <p>No pudimos cargar la actividad de la comunidad.</p>
+                  <PrototypeButton
+                    size="small"
+                    onClick={() => void feed.refetch()}
+                  >
+                    Reintentar
+                  </PrototypeButton>
+                </Panel>
+              ) : feed.data?.length ? (
                 feed.data?.map((item) => (
                   <RealFeedCard item={item} key={item.id} />
                 ))
-              ) : !feed.isLoading ? (
+              ) : (
                 <Panel className={styles.post} as="article">
-                  {catalog.communityPosts.map((post) => (
-                    <div key={post.id}>
-                      <div className={styles.postHeader}>
-                        <Avatar
-                          initials={post.initials}
-                          accent={post.accent}
-                          online={post.online}
-                        />
-                        <div>
-                          <strong>{post.author}</strong>
-                          <small>{post.meta}</small>
-                        </div>
-                      </div>
-                      <p>{post.text}</p>
-                      <img src={post.image} alt={post.imageAlt} />
-                      <FeedActions
-                        initialCommentsCount={parseMockCount(post.comments)}
-                        initialLikes={parseMockCount(post.likes)}
-                      />
-                    </div>
-                  ))}
-                  {!catalog.communityPosts.length
-                    ? 'Todavía no hay actividad para mostrar.'
-                    : null}
+                  No hay actividad para mostrar todavía.
                 </Panel>
-              ) : null}
+              )}
             </div>
           </main>
           <aside className={styles.aside}>
@@ -617,7 +589,9 @@ const RealCommunityPage = ({
                     size="small"
                   />
                   <div>
-                    <strong>{person.user}</strong>
+                    <strong>
+                      <Link to={`/profile/${person.id}`}>{person.user}</Link>
+                    </strong>
                     <small>
                       {person.reason === 'nearby'
                         ? t('community.discovery.nearby', {

@@ -101,6 +101,15 @@
   font-size: 9px;
 }
 
+.notificationPreference {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 15px 0;
+  color: var(--prototype-muted);
+  font-size: 11px;
+}
+
 .metrics {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

@@ -1,53 +1,67 @@
 # Backlog de producto
 
-Última actualización: 2026-09-02.
+Ultima actualizacion: 2026-09-03.
 
-Este backlog reúne únicamente trabajo vigente. El código, las migraciones, los contratos y las pruebas son la fuente de verdad para marcar una tarea como implementada; la clasificación de cierre y su evidencia se mantiene en [`tfg-mvp-trazabilidad.md`](tfg-mvp-trazabilidad.md). Las notas históricas se conservan en Git y no se repiten aquí.
+El codigo, las migraciones, los contratos y las pruebas son la fuente de verdad.
+La matriz completa y sus referencias estan en
+[`tfg-mvp-trazabilidad.md`](tfg-mvp-trazabilidad.md).
 
-## Implementado en código
+## Implementado
 
-- Selección de Rincones desde el pin del mapa o el listado lateral con apertura del panel de detalle en la misma vista.
-- Registro, inicio/cierre de sesión, perfiles editables, intereses, idioma y privacidad básica.
-- Catálogo público, libros propios, publicación/edición, modalidades, condición, ISBN opcional, intereses y vencimiento.
-- Rincones con alta, edición del propietario, foto, normas, consentimiento, zona, visibilidad barrio/ciudad y pausa/reactivación.
-- Búsqueda parametrizada, catálogo unificado, mapa con radio contextual y estados de carga, vacío y error.
-- Orden del mapa por cercanía cuando hay ubicación del dispositivo o zona de perfil; fallback visible sin distancia inventada y medición reproducible bajo dos segundos.
-- Feed de Comunidad, historias relevantes, seguimiento, likes únicos, comentarios y compartir con fallback.
-- Mensajería privada persistente, contactos visibles, adjuntos de libros, propuestas y acuerdos versionados.
-- Notificaciones in-app de mensajes/acuerdos, preferencia básica, deduplicación y contador no leído en Mensajes.
-- Migraciones acumulativas, pruebas automatizadas, comprobaciones de tipos, lint, formato, build y CI.
+- Descubrimiento unificado: mapa y listado real comparten consulta, filtros,
+  radio, orden, seleccion y estados de carga/vacio/error.
+- Contacto desde publicacion y perfil con conversacion reutilizable, bloqueo,
+  plantilla traducible y adjunto de libro.
+- Acuerdos con versionado, concurrencia, recordatorio in-app y resultado por
+  participante sin publicar datos privados.
+- Notificaciones contextuales, preferencias in-app, deduplicacion y contador
+  persistente de no leidos.
+- Reportes autenticados con categorias controladas, estado, canal y plazo.
+- Metricas MVP persistentes, contrato de estadisticas, selector de periodo y
+  estado sin datos.
+- Diseno futuro de recomendaciones separado de las sugerencias actuales.
+- Dataset reproducible con dos usuarios, publicaciones, Rincon, conversacion,
+  acuerdo, notificaciones, eventos y resultado.
+- Migraciones acumulativas 031-034, pruebas automatizadas, typecheck, lint,
+  formato, build y contrato OpenAPI actualizado.
 
-## Prioridad P0 — cerrar el recorrido principal
+## Prioridad P0
 
-- [ ] **P0-01 — Recorrido real completo:** registrar o usar dos perfiles, publicar, descubrir, contactar, acordar y recargar sin perder datos. Verificar con API real y evidencia manual.
-- [ ] **P0-02 — Rincones consistentes:** verificar el sustituto de baja mediante pausa reversible, estados visibles, validaciones y propiedad. Verificar autorización y persistencia.
-- [ ] **P0-03 — Publicaciones válidas:** cerrar campos mínimos, consentimientos, imagen, modalidad, precio, disponibilidad y estados editoriales. Verificar API, UI y búsqueda.
-- [ ] **P0-04 — Privacidad territorial:** asegurar que ningún detalle, mapa o respuesta pública expone dirección o coordenadas exactas. Verificar visibilidad de ciudad/barrio con pruebas de API.
-- [ ] **P0-05 — Descubrimiento unificado:** mantener filtros combinables y la misma consulta para mapa y listado, incluyendo fallback sin geolocalización. Verificar selección, radio, vacío y error.
-- [ ] **P0-06 — Contacto desde el producto:** iniciar conversación desde publicación y perfil visibles, con plantilla opcional, bloqueos y reutilización de conversaciones. Verificar autorización y recarga.
-- [ ] **P0-07 — Acuerdos cerrables:** completar recordatorio, rechazo/cancelación, cambios de fecha y resultado post-encuentro. Verificar historial, concurrencia y notificación a las partes.
-- [ ] **P0-08 — Notificaciones accionables:** mostrar alias, estado y destino de mensaje/acuerdo; mantener punto rojo y contador sincronizados con lectura persistente. Verificar reintentos, Socket.IO y recarga.
-- [ ] **P0-09 — Reportes mínimos:** permitir reportar contenido, conducta o Rincón inexistente y dejar estado, motivo y canal de tratamiento. Documentar límites de moderación.
+- [x] P0-01 Recorrido real persistente: dataset y checklist real con recarga.
+- [x] P0-02 Rincones consistentes: pausa reversible, detalle, privacidad y
+  autorizacion.
+- [x] P0-03 Publicaciones validas: campos, consentimientos, disponibilidad y
+  revision editorial minima.
+- [x] P0-04 Privacidad territorial: proyecciones sin calle, altura ni coordenadas
+  exactas.
+- [x] P0-05 Descubrimiento unificado.
+- [x] P0-06 Contacto desde el producto.
+- [x] P0-07 Acuerdos cerrables.
+- [x] P0-08 Notificaciones accionables.
+- [x] P0-09 Reportes minimos.
 
-## Prioridad P1 — calidad y evidencia de entrega
+## Prioridad P1
 
-- [ ] **P1-01 — Métricas mínimas:** calcular Rincones activos, publicaciones activas, acuerdos confirmados, tiempo de descubrimiento y embudo publicación → contacto → acuerdo → confirmación. Verificar periodo, denominadores y `sin datos`.
-- [ ] **P1-02 — Seguridad del MVP:** auditar autenticación, cookies, CORS/CSRF, cabeceras, rate limiting, autorización, logs y errores traducibles. Registrar riesgos residuales sin afirmar controles no implementados.
-- [ ] **P1-03 — Datos y consentimiento:** documentar retención mínima, revocación de consentimientos, imágenes, mensajes y reportes. Verificar minimización y ausencia de datos personales innecesarios.
-- [x] **P1-04 — Rendimiento:** medir una búsqueda representativa y registrar resultado, entorno y desviaciones frente al objetivo de dos segundos en [`performance-map.md`](performance-map.md).
-- [ ] **P1-05 — Accesibilidad y lenguaje:** revisar teclado, foco, contraste, responsive y español neutro en las rutas principales. Verificar manualmente en navegador real.
-- [ ] **P1-06 — Recuperación:** comprobar backup, restauración, migración desde una base existente y procedimiento de rollback. Verificar que no se editan migraciones aplicadas.
-- [ ] **P1-07 — Evidencia:** preparar dataset sintético, capturas anonimizadas, checklist de navegador y matriz de requisitos para la entrega académica.
+- [x] P1-01 Metricas minimas.
+- [ ] P1-02 Seguridad de despliegue: falta rate limiting de aplicacion y evidencia
+  de TLS/infraestructura.
+- [ ] P1-03 Retencion, anonimización y revocacion integral; la minimizacion y los
+  consentimientos de publicacion ya estan implementados.
+- [x] P1-04 Rendimiento del mapa; resultado reproducible en
+  [`performance-map.md`](performance-map.md).
+- [ ] P1-05 Revision manual completa de accesibilidad, lenguaje, contraste y
+  responsive.
+- [ ] P1-06 Backup, restauracion, migracion de una base existente y rollback.
+- [ ] P1-07 Capturas archivadas y cierre formal de evidencia de entrega.
 
 ## Fuera del MVP
 
-Estas capacidades pueden planificarse después sin bloquear el cierre del producto actual:
-
-- Recomendación automática o modelo de machine learning.
-- Email, push, MFA, recuperación avanzada de contraseña y proveedores cloud productivos.
-- Moderación avanzada, reputación, ratings, sanciones complejas y panel operativo completo.
-- PWA/offline, API pública, importación/exportación masiva y analítica avanzada.
+Recomendacion automatica, email/push, MFA, recuperacion avanzada, almacenamiento
+cloud, moderacion avanzada, reputacion, sanciones complejas, PWA/offline, API
+publica e indicadores avanzados.
 
 ## Criterio de cierre
 
-El MVP se considera listo cuando el recorrido P0 funciona en API real con datos persistentes, las reglas de privacidad y errores están verificadas, pasan las suites del repositorio, existe evidencia manual del navegador y cada capacidad fuera de alcance está declarada como tal.
+El MVP esta funcionalmente listo cuando el recorrido P0 pasa con API real y datos
+persistentes. La entrega academica queda cerrada cuando tambien se archivan la
+checklist de navegador, las capturas anonimizadas y la prueba de recuperacion.

@@ -1086,7 +1086,10 @@
       "title": "Actualización de acuerdo",
       "confirmedWith": "¡Bien! Cerraste el acuerdo con {{name}}",
       "personFallback": "otro usuario",
-      "body": "Un acuerdo de intercambio fue actualizado."
+      "body": "Un acuerdo de intercambio fue actualizado.",
+      "reminderTitle": "Recordatorio de encuentro",
+      "reminderBody": "Tu encuentro con {{name}} es dentro de 24 horas.",
+      "reminderWith": "Encuentro con {{name}} dentro de 24 horas"
     }
   },
   "user": {
@@ -1104,6 +1107,10 @@
     "sending": "Enviando...",
     "submitted": "Reporte recibido. Gracias por avisar.",
     "error": "No se pudo enviar el reporte.",
+    "errors": {
+      "invalid": "Completá una categoría y un motivo válido.",
+      "failed": "No se pudo registrar el reporte."
+    },
     "categories": {
       "content": "Contenido",
       "conduct": "Conducta",

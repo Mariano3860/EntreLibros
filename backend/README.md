@@ -1,31 +1,39 @@
 # Backend de EntreLibros
 
-Servicio Node.js/TypeScript con Express, PostgreSQL/PostGIS y Socket.IO. Expone autenticación, perfiles, libros, Comunidad, Rincones, mapa, mensajería, acuerdos y notificaciones.
+Servicio Node.js/TypeScript con Express, PostgreSQL/PostGIS y Socket.IO. Expone
+autenticacion, perfiles, libros, Comunidad, Rincones, mapa, mensajeria, acuerdos,
+notificaciones, reportes y metricas.
 
 ## Ejecutar
 
-Desde la raíz:
+Desde la raiz:
 
 ```bash
 npm run migrate
 npm run dev:backend
 ```
 
-El servidor escucha normalmente en `http://localhost:4000`. La configuración se carga con `dotenv`; no guardes archivos `.env` ni credenciales en el repositorio.
+El servidor escucha normalmente en `http://localhost:4000`. La configuracion se
+carga con `dotenv`; no guardes `.env` ni credenciales en el repositorio.
 
 ## Migraciones
 
-Las migraciones están en `backend/migrations/` y se ejecutan en orden. Son append-only: para corregir un esquema existente agrega un archivo numerado nuevo. La migración `015_seed_messaging_bot.sql` crea el bot persistente y las migraciones posteriores agregan privacidad, descubrimiento, Comunidad, notificaciones, likes/comentarios, consentimientos y revisión editorial mínima (`029` y `030`).
+Las migraciones se ejecutan en orden y son append-only. Las versiones 031-034
+agregan outcomes privados de acuerdos, reportes, eventos de analitica y
+compatibilidad de esquema de reportes. Para el dataset local usa:
 
 ```bash
-npm run migrate
+psql "$DATABASE_URL" -f backend/scripts/seed-demo-dataset.sql
 ```
 
-La revisión editorial mínima valida contenido inseguro, enlaces sospechosos y duplicados exactos en las publicaciones. Un administrador puede cambiar el estado a `pending`, `needs_correction`, `approved` o `rejected`, con motivo cuando corresponde; los estados no aprobados no aparecen en las superficies públicas. La edición de contenido vuelve a enviar la publicación o el Rincón a revisión. Esto no constituye un sistema de moderación avanzada.
+No ejecutes la semilla sobre una base de produccion.
 
-## Mensajería
+## Rutas relevantes
 
-`GET /api/messages` lista las conversaciones del usuario autenticado. `GET /api/messages/:conversationId/books` devuelve publicaciones disponibles para adjuntar o proponer un intercambio. Socket.IO persiste los mensajes antes de notificar a los clientes; los adjuntos tipados y acuerdos sobreviven a la recarga.
+- `GET /api/messages` y Socket.IO persisten mensajes antes de emitirlos.
+- `POST /api/agreements/:id/outcome` registra el resultado privado de una parte.
+- `POST /api/reports` recibe reportes autenticados con categorias controladas.
+- `GET /api/community/metrics` devuelve el contrato de metricas del MVP.
 
 ## Comandos
 
@@ -38,6 +46,5 @@ npm run build -w backend
 npm run openapi -w backend
 ```
 
-Los errores públicos deben conservar claves de traducción. Los cambios de persistencia deben cubrir autorización, transacciones, reintentos y concurrencia en pruebas.
-
-Las imágenes de publicaciones y Rincones se reciben como referencias HTTPS o datos inline limitados a JPG, PNG o WebP de hasta 5 MB. En este MVP se persiste metadata/referencia; no se presenta un proveedor de almacenamiento de objetos como operativo.
+Las imagenes son referencias HTTPS o datos inline limitados a JPG, PNG o WebP de
+hasta 5 MB; no hay almacenamiento de objetos productivo.

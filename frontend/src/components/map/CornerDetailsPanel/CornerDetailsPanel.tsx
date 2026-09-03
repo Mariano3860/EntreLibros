@@ -14,6 +14,7 @@ type CornerDetailsPanelProps = {
   onRetry?: () => void
   onEdit?: () => void
   onToggleStatus?: () => void
+  onReport?: () => void
 }
 
 export const CornerDetailsPanel = ({
@@ -25,6 +26,7 @@ export const CornerDetailsPanel = ({
   onRetry,
   onEdit,
   onToggleStatus,
+  onReport,
 }: CornerDetailsPanelProps) => {
   const { t } = useTranslation()
 
@@ -148,6 +150,11 @@ export const CornerDetailsPanel = ({
         <p className={styles.error} role="alert">
           {error}
         </p>
+      ) : null}
+      {onReport ? (
+        <PrototypeButton size="small" onClick={onReport}>
+          {t('reports.report', { defaultValue: 'Reportar' })}
+        </PrototypeButton>
       ) : null}
     </Panel>
   )

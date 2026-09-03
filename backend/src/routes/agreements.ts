@@ -6,6 +6,7 @@ import {
   createAgreement,
   getAgreement,
   getAgreementHistory,
+  recordAgreementOutcome,
   type AgreementDetails,
 } from '../repositories/agreementRepository.js';
 import {
@@ -34,7 +35,18 @@ function details(value: unknown): AgreementDetails | null {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
   const candidate = value as Record<string, unknown>;
   const fields = ['meetingPoint', 'area', 'date', 'time', 'bookTitle'];
-  if (!fields.every((field) => typeof candidate[field] === 'string'))
+  if (
+    !fields.every(
+      (field) =>
+        typeof candidate[field] === 'string' &&
+        candidate[field].trim().length > 0 &&
+        candidate[field].length <= 240
+    ) ||
+    typeof candidate.date !== 'string' ||
+    !/^\d{4}-\d{2}-\d{2}$/.test(candidate.date) ||
+    typeof candidate.time !== 'string' ||
+    !/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(candidate.time)
+  )
     return null;
   return {
     meetingPoint: candidate.meetingPoint as string,
@@ -285,6 +297,38 @@ router.post('/:id/commands', async (req: AuthenticatedRequest, res) => {
       const current = await getAgreement(agreementId, req.user.id);
       return res.status(409).json({ ...response.body, agreement: current });
     }
+    return res.status(response.status).json(response.body);
+  }
+});
+
+router.post('/:id/outcome', async (req: AuthenticatedRequest, res) => {
+  if (!req.user)
+    return res
+      .status(401)
+      .json({ error: 'Unauthorized', message: 'auth.errors.unauthorized' });
+  const agreementId = id(req.params.id);
+  const body = asBody(req.body);
+  const outcome = body.outcome;
+  if (
+    !agreementId ||
+    (outcome !== 'completed' && outcome !== 'not_completed') ||
+    (body.reason !== undefined && typeof body.reason !== 'string')
+  ) {
+    return res.status(422).json({
+      error: 'ValidationError',
+      message: 'agreements.errors.invalid_outcome',
+    });
+  }
+  try {
+    const agreement = await recordAgreementOutcome({
+      id: agreementId,
+      actorId: req.user.id,
+      outcome,
+      ...(typeof body.reason === 'string' ? { reason: body.reason } : {}),
+    });
+    return res.json({ agreement });
+  } catch (error) {
+    const response = failure(error);
     return res.status(response.status).json(response.body);
   }
 });
