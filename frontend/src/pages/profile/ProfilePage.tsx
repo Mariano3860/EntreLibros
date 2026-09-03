@@ -483,18 +483,27 @@ export const ProfilePage = () => {
         {editing ? (
           <div className={styles.modalBackdrop}>
             <Panel
-              className={styles.modal}
+              className={`${styles.modal} ${
+                photoCropSource ? styles.modalCropping : ''
+              }`}
               as="div"
               role="dialog"
               aria-modal={true}
               aria-labelledby="profile-edit-title"
             >
-              <header>
+              <header className={styles.modalHeader}>
                 <h2 id="profile-edit-title">
                   {t('profile.edit', { defaultValue: 'Editar perfil' })}
                 </h2>
+                <p className={styles.modalSubtitle}>
+                  {t('profile.editDescription', {
+                    defaultValue:
+                      'Actualizá la información pública y personalizá cómo te ven otros lectores.',
+                  })}
+                </p>
                 <button
                   type="button"
+                  className={styles.modalClose}
                   onClick={closeEditor}
                   aria-label={t('profile.close', { defaultValue: 'Cerrar' })}
                 >
@@ -504,7 +513,11 @@ export const ProfilePage = () => {
               <form onSubmit={save}>
                 <div className={styles.photoField}>
                   <span>{t('profile.photo')}</span>
-                  <div className={styles.photoControls}>
+                  <div
+                    className={`${styles.photoControls} ${
+                      photoCropSource ? styles.photoControlsCropping : ''
+                    }`}
+                  >
                     {photoCropSource ? (
                       <ProfilePhotoCropper
                         source={photoCropSource}
@@ -547,10 +560,10 @@ export const ProfilePage = () => {
                         initials={name.slice(0, 1).toUpperCase() || '?'}
                         imageUrl={profilePhoto}
                         accent="#ff8b4c"
-                        size="large"
+                        size="hero"
                       />
                     )}
-                    <div>
+                    <div className={styles.photoActions}>
                       <label className={styles.fileButton}>
                         {profilePhoto
                           ? t('profile.changePhoto', {
@@ -588,37 +601,57 @@ export const ProfilePage = () => {
                   </div>
                   {photoError ? <p role="alert">{photoError}</p> : null}
                 </div>
-                <label>
-                  {t('profile.name', { defaultValue: 'Nombre' })}
-                  <input
-                    value={name}
-                    onChange={(event) => setName(event.target.value)}
-                  />
-                </label>
-                <label>
-                  Sobre vos
-                  <textarea
-                    value={bio}
-                    onChange={(event) => setBio(event.target.value)}
-                    maxLength={500}
-                  />
-                </label>
-                <fieldset className={styles.interestField}>
-                  <legend>{t('profile.interests')}</legend>
-                  <p>{t('profile.interestsDescription')}</p>
-                  <div className={styles.interestOptions}>
-                    {PROFILE_INTERESTS.map((interest) => (
-                      <label key={interest}>
-                        <input
-                          type="checkbox"
-                          checked={interests.includes(interest)}
-                          onChange={() => toggleInterest(interest)}
-                        />
-                        {t(`profile.interestOptions.${interest}`)}
-                      </label>
-                    ))}
-                  </div>
-                </fieldset>
+                <div className={styles.modalMainGrid}>
+                  <section
+                    className={styles.basicInfoField}
+                    aria-labelledby="profile-basic-info-title"
+                  >
+                    <h3 id="profile-basic-info-title">
+                      <span aria-hidden="true">◈</span>
+                      {t('profile.basicInfo', {
+                        defaultValue: 'Información básica',
+                      })}
+                    </h3>
+                    <label>
+                      {t('profile.name', { defaultValue: 'Nombre' })}
+                      <input
+                        value={name}
+                        onChange={(event) => setName(event.target.value)}
+                      />
+                    </label>
+                    <label>
+                      {t('profile.about', { defaultValue: 'Sobre vos' })}
+                      <textarea
+                        value={bio}
+                        onChange={(event) => setBio(event.target.value)}
+                        maxLength={500}
+                      />
+                    </label>
+                  </section>
+                  <fieldset className={styles.interestField}>
+                    <legend>{t('profile.interests')}</legend>
+                    <p>{t('profile.interestsDescription')}</p>
+                    <div className={styles.interestOptions}>
+                      {PROFILE_INTERESTS.map((interest) => (
+                        <label
+                          className={
+                            interests.includes(interest)
+                              ? styles.interestOptionSelected
+                              : ''
+                          }
+                          key={interest}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={interests.includes(interest)}
+                            onChange={() => toggleInterest(interest)}
+                          />
+                          {t(`profile.interestOptions.${interest}`)}
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
+                </div>
                 <fieldset className={styles.locationField}>
                   <legend>{t('profile.location')}</legend>
                   <label>
@@ -672,16 +705,7 @@ export const ProfilePage = () => {
                       ))}
                     </select>
                   </label>
-                  <label>
-                    {t('profile.street')}
-                    <input
-                      value={street}
-                      maxLength={160}
-                      onChange={(event) => setStreet(event.target.value)}
-                    />
-                    <small>{t('profile.streetPrivate')}</small>
-                  </label>
-                  <label>
+                  <label className={styles.locationVisibilityControl}>
                     {t('profile.locationVisibility')}
                     <select
                       value={locationVisibility}
@@ -700,53 +724,79 @@ export const ProfilePage = () => {
                       ))}
                     </select>
                   </label>
+                  <label className={styles.streetControl}>
+                    {t('profile.street')}
+                    <input
+                      value={street}
+                      maxLength={160}
+                      onChange={(event) => setStreet(event.target.value)}
+                    />
+                    <small>{t('profile.streetPrivate')}</small>
+                  </label>
                   <p className={styles.privacyHint}>
                     {t('profile.publicPreviewDescription')}
                   </p>
                 </fieldset>
-                <label>
-                  {t('profile.visibility')}
-                  <select
-                    value={profileVisibility}
-                    onChange={(event) =>
-                      setProfileVisibility(
-                        event.target.value as ProfileVisibility
-                      )
-                    }
-                  >
-                    {PROFILE_VISIBILITY_OPTIONS.map((option) => (
-                      <option key={option} value={option}>
-                        {t(`profile.${option}`)}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <div className={styles.publicPreview}>
-                  <strong>{t('profile.publicPreview')}</strong>
-                  <span>
-                    {profileVisibility === 'private'
-                      ? t('profile.previewPrivate')
-                      : t(
-                          `profile.previewLocation${locationVisibility
-                            .slice(0, 1)
-                            .toUpperCase()}${locationVisibility.slice(1)}`
-                        )}
-                  </span>
-                </div>
-                <label className={styles.notificationPreference}>
-                  <input
-                    type="checkbox"
-                    checked={mockMode || notificationPreference.data !== false}
-                    disabled={
-                      mockMode || notificationPreference.update.isPending
-                    }
-                    onChange={(event) =>
-                      notificationPreference.update.mutate(event.target.checked)
-                    }
-                  />
-                  {t('profile.inAppNotifications')}
-                </label>
-                <div>
+                <section
+                  className={styles.preferencesField}
+                  aria-labelledby="profile-preferences-title"
+                >
+                  <h3 id="profile-preferences-title">
+                    <span aria-hidden="true">☷</span>
+                    {t('profile.preferences', { defaultValue: 'Preferencias' })}
+                  </h3>
+                  <div className={styles.preferencesGrid}>
+                    <label className={styles.preferenceControl}>
+                      {t('profile.visibility')}
+                      <select
+                        value={profileVisibility}
+                        onChange={(event) =>
+                          setProfileVisibility(
+                            event.target.value as ProfileVisibility
+                          )
+                        }
+                      >
+                        {PROFILE_VISIBILITY_OPTIONS.map((option) => (
+                          <option key={option} value={option}>
+                            {t(`profile.${option}`)}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <div className={styles.publicPreview}>
+                      <strong>{t('profile.publicPreview')}</strong>
+                      <span>
+                        {profileVisibility === 'private'
+                          ? t('profile.previewPrivate')
+                          : t(
+                              `profile.previewLocation${locationVisibility
+                                .slice(0, 1)
+                                .toUpperCase()}${locationVisibility.slice(1)}`
+                            )}
+                      </span>
+                    </div>
+                    <label
+                      className={`${styles.notificationPreference} ${styles.preferenceControl}`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={
+                          mockMode || notificationPreference.data !== false
+                        }
+                        disabled={
+                          mockMode || notificationPreference.update.isPending
+                        }
+                        onChange={(event) =>
+                          notificationPreference.update.mutate(
+                            event.target.checked
+                          )
+                        }
+                      />
+                      {t('profile.inAppNotifications')}
+                    </label>
+                  </div>
+                </section>
+                <div className={styles.modalActions}>
                   <PrototypeButton type="button" onClick={closeEditor}>
                     {t('profile.cancel', { defaultValue: 'Cancelar' })}
                   </PrototypeButton>
@@ -765,7 +815,11 @@ export const ProfilePage = () => {
                   </PrototypeButton>
                 </div>
               </form>
-              {saveError ? <p role="alert">{saveError}</p> : null}
+              {saveError ? (
+                <p className={styles.modalError} role="alert">
+                  {saveError}
+                </p>
+              ) : null}
             </Panel>
           </div>
         ) : null}
