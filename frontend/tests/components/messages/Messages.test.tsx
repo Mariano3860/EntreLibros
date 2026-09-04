@@ -67,11 +67,13 @@ describe('Messages component', () => {
     expect(textarea).toHaveValue('Hola😀')
     fireEvent.click(screen.getByRole('button', { name: 'Enviar mensaje' }))
 
-    expect(sendMessage).not.toHaveBeenCalled()
-    expect(screen.getByText('Borrador')).toBeInTheDocument()
-    expect(screen.getByText('Hola😀')).toBeInTheDocument()
+    await waitFor(() =>
+      expect(sendMessage).toHaveBeenCalledWith('Hola😀', 'Samuel')
+    )
+    await waitFor(() =>
+      expect(screen.queryByText('Borrador')).not.toBeInTheDocument()
+    )
     expect(textarea).toHaveValue('')
-    expect(screen.getAllByText('Hola😀').length).toBeGreaterThan(0)
   })
 
   test('allows attaching a book with contextual note', () => {

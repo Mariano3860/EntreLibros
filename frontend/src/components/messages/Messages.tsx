@@ -667,81 +667,97 @@ export const Messages = () => {
     async (
       body: string,
       attachmentMetadata: ApiMessageDraftAttachment | null = null
-    ) => {
-      if (selectedId === null) return
+    ): Promise<ApiMessageDraft | null> => {
+      if (selectedId === null) return null
       if (useDemoConversations) {
+        const previous = demoDrafts[selectedId]
+        const now = new Date().toISOString()
+        const draft: ApiMessageDraft = {
+          id: previous?.id ?? Date.now(),
+          conversationId: selectedId,
+          authorId: currentUser?.id ?? 1,
+          body: body.trim(),
+          attachmentMetadata,
+          revision: (previous?.revision ?? 0) + 1,
+          createdAt: previous?.createdAt ?? now,
+          updatedAt: now,
+        }
         setDemoDrafts((current) => {
-          const previous = current[selectedId]
-          const now = new Date().toISOString()
           return {
             ...current,
-            [selectedId]: {
-              id: previous?.id ?? Date.now(),
-              conversationId: selectedId,
-              authorId: currentUser?.id ?? 1,
-              body: body.trim(),
-              attachmentMetadata,
-              revision: (previous?.revision ?? 0) + 1,
-              createdAt: previous?.createdAt ?? now,
-              updatedAt: now,
-            },
+            [selectedId]: draft,
           }
+        })
+        return draft
+      }
+      return draftState.save.mutateAsync({ body, attachmentMetadata })
+    },
+    [
+      currentUser?.id,
+      demoDrafts,
+      draftState.save,
+      selectedId,
+      useDemoConversations,
+    ]
+  )
+
+  const discardDraft = useCallback(
+    async (draftOverride?: ApiMessageDraft | null) => {
+      const draft = draftOverride ?? activeDraft
+      if (selectedId === null || !draft) return
+      if (useDemoConversations) {
+        setDemoDrafts((current) => {
+          const next = { ...current }
+          delete next[selectedId]
+          return next
         })
         return
       }
-      await draftState.save.mutateAsync({ body, attachmentMetadata })
+      await draftState.discard.mutateAsync()
     },
-    [currentUser?.id, draftState.save, selectedId, useDemoConversations]
+    [activeDraft, draftState.discard, selectedId, useDemoConversations]
   )
 
-  const discardDraft = useCallback(async () => {
-    if (selectedId === null || !activeDraft) return
-    if (useDemoConversations) {
-      setDemoDrafts((current) => {
-        const next = { ...current }
-        delete next[selectedId]
-        return next
+  const sendDraft = useCallback(
+    async (draftOverride?: ApiMessageDraft | null) => {
+      const draft = draftOverride ?? activeDraft
+      if (selectedId === null || !draft) return
+      if (useDemoConversations) {
+        const attachment = draft.attachmentMetadata
+        const body =
+          draft.body ||
+          (attachment?.kind === 'agreementProposal'
+            ? attachment.details.bookTitle
+            : attachment?.kind === 'book'
+              ? attachment.title
+              : 'Propuesta de intercambio')
+        sendMessage(body, selected?.user.name ?? '')
+        await discardDraft(draft)
+        return
+      }
+      await draftState.send.mutateAsync({
+        clientKey: `${selectedId}-${Date.now()}-${Math.random()}`,
+        revision: draft.revision,
       })
-      return
-    }
-    await draftState.discard.mutateAsync()
-  }, [activeDraft, draftState.discard, selectedId, useDemoConversations])
-
-  const sendDraft = useCallback(async () => {
-    if (selectedId === null || !activeDraft) return
-    if (useDemoConversations) {
-      const attachment = activeDraft.attachmentMetadata
-      const body =
-        activeDraft.body ||
-        (attachment?.kind === 'agreementProposal'
-          ? attachment.details.bookTitle
-          : attachment?.kind === 'book'
-            ? attachment.title
-            : 'Propuesta de intercambio')
-      sendMessage(body, selected?.user.name ?? '')
-      await discardDraft()
-      return
-    }
-    await draftState.send.mutateAsync(
-      `${selectedId}-${Date.now()}-${Math.random()}`
-    )
-    await Promise.all([
-      fetchMessageHistory(selectedId).then((page) => {
-        setServerMessages(page.messages)
-      }),
-      fetchConversations().then((items) => {
-        setConversations(items.map(toConversation))
-      }),
-    ])
-  }, [
-    activeDraft,
-    discardDraft,
-    draftState.send,
-    selected,
-    selectedId,
-    sendMessage,
-    useDemoConversations,
-  ])
+      await Promise.all([
+        fetchMessageHistory(selectedId).then((page) => {
+          setServerMessages(page.messages)
+        }),
+        fetchConversations().then((items) => {
+          setConversations(items.map(toConversation))
+        }),
+      ])
+    },
+    [
+      activeDraft,
+      discardDraft,
+      draftState.send,
+      selected,
+      selectedId,
+      sendMessage,
+      useDemoConversations,
+    ]
+  )
 
   const handleSendText = (draft: string) => {
     if (!draft.trim() || !selected || selectedId === null) return
@@ -760,13 +776,15 @@ export const Messages = () => {
         return
       }
       if (useDemoConversations) {
-        void saveDraft(draft.trim())
+        void saveDraft(draft.trim()).then(sendDraft)
       } else {
         appendMessageToConversation(selectedId, newMessage)
       }
       return
     }
-    void saveDraft(draft.trim()).catch(() => setAttachmentError(true))
+    void saveDraft(draft.trim())
+      .then(sendDraft)
+      .catch(() => setAttachmentError(true))
   }
 
   const handleAttachBook = (bookId: string, note?: string) => {

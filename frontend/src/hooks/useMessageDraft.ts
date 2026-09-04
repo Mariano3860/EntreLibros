@@ -14,6 +14,11 @@ export type MessageDraftValue = {
   attachmentMetadata?: ApiMessageDraftAttachment | null
 }
 
+export type MessageDraftSendValue = {
+  clientKey: string
+  revision?: number
+}
+
 export const useMessageDraft = (
   conversationId: number | null,
   enabled = true
@@ -51,14 +56,19 @@ export const useMessageDraft = (
     },
   })
   const send = useMutation({
-    mutationFn: (clientKey: string) =>
-      sendMessageDraft({
+    mutationFn: (value: string | MessageDraftSendValue) => {
+      const clientKey = typeof value === 'string' ? value : value.clientKey
+      const revision =
+        typeof value === 'string'
+          ? query.data?.revision
+          : (value.revision ?? query.data?.revision)
+
+      return sendMessageDraft({
         conversationId: conversationId ?? 0,
         clientKey,
-        ...(query.data?.revision !== undefined
-          ? { revision: query.data.revision }
-          : {}),
-      }),
+        ...(revision !== undefined ? { revision } : {}),
+      })
+    },
     onSuccess: () => {
       queryClient.setQueryData<ApiMessageDraft | null>(
         messageQueryKeys.draft(conversationId ?? 0),

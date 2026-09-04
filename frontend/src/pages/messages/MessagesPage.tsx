@@ -568,9 +568,10 @@ const MockMessagesPage = () => {
     setMessage('')
   }
 
-  const sendMockDraft = () => {
-    if (!activeDraft) return
-    const attachment = activeDraft.attachmentMetadata
+  const sendMockContent = (
+    body: string,
+    attachment: ApiMessageDraftAttachment | null = null
+  ) => {
     const kind =
       attachment?.kind === 'book'
         ? 'book'
@@ -579,7 +580,7 @@ const MockMessagesPage = () => {
           ? 'proposal'
           : undefined
     const text =
-      activeDraft.body ||
+      body.trim() ||
       (attachment?.kind === 'agreementProposal'
         ? attachment.details.bookTitle
         : attachment?.kind === 'book'
@@ -589,10 +590,15 @@ const MockMessagesPage = () => {
     discardMockDraft()
   }
 
+  const sendMockDraft = () => {
+    if (!activeDraft) return
+    sendMockContent(activeDraft.body, activeDraft.attachmentMetadata)
+  }
+
   const submit = (event: FormEvent) => {
     event.preventDefault()
     if (!message.trim() && !activeDraft?.attachmentMetadata) return
-    saveMockDraft(message, activeDraft?.attachmentMetadata ?? null)
+    sendMockContent(message, activeDraft?.attachmentMetadata ?? null)
   }
 
   const insertEmoji = (emoji: string) => {
@@ -1454,6 +1460,35 @@ const RealMessagesPage = () => {
       })
   }, [historyQuery.data, liveMessages, queryClient, selected])
 
+  const handleSendDraft = async (draftOverride?: ApiMessageDraft | null) => {
+    const draft = draftOverride ?? draftState.query.data
+    if (!draft) return
+    setSendError(null)
+    try {
+      await draftState.send.mutateAsync({
+        clientKey: createClientKey(),
+        revision: draft.revision,
+      })
+      draftAutosaveSignatureRef.current = null
+      setMessage('')
+      setDraftSaveState('idle')
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: messageQueryKeys.history(selected ?? 0),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: messageQueryKeys.conversations(),
+        }),
+      ])
+    } catch {
+      setSendError(
+        t('community.messages.drafts.sendError', {
+          defaultValue: 'No pudimos enviar el borrador. Intentá nuevamente.',
+        })
+      )
+    }
+  }
+
   const submit = (event: FormEvent) => {
     event.preventDefault()
     if (
@@ -1462,17 +1497,23 @@ const RealMessagesPage = () => {
     ) {
       return
     }
+    if (draftSaveTimerRef.current) {
+      clearTimeout(draftSaveTimerRef.current)
+      draftSaveTimerRef.current = null
+    }
     setSendError(null)
     void saveDraft({
       body: message.trim(),
       attachmentMetadata: draftState.query.data?.attachmentMetadata ?? null,
-    }).catch(() => {
-      setSendError(
-        t('community.messages.drafts.saveError', {
-          defaultValue: 'No pudimos guardar el borrador. Intentá nuevamente.',
-        })
-      )
     })
+      .then((draft) => handleSendDraft(draft))
+      .catch(() => {
+        setSendError(
+          t('community.messages.drafts.saveError', {
+            defaultValue: 'No pudimos guardar el borrador. Intentá nuevamente.',
+          })
+        )
+      })
   }
 
   const insertEmoji = (emoji: string) => {
@@ -1736,30 +1777,6 @@ const RealMessagesPage = () => {
       setSendError(
         t('community.messages.drafts.discardError', {
           defaultValue: 'No pudimos descartar el borrador.',
-        })
-      )
-    }
-  }
-
-  const handleSendDraft = async () => {
-    if (!draftState.query.data) return
-    setSendError(null)
-    try {
-      await draftState.send.mutateAsync(createClientKey())
-      setMessage('')
-      setDraftSaveState('idle')
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: messageQueryKeys.history(selected ?? 0),
-        }),
-        queryClient.invalidateQueries({
-          queryKey: messageQueryKeys.conversations(),
-        }),
-      ])
-    } catch {
-      setSendError(
-        t('community.messages.drafts.sendError', {
-          defaultValue: 'No pudimos enviar el borrador. Intentá nuevamente.',
         })
       )
     }

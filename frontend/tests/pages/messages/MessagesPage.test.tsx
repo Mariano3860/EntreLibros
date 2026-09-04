@@ -58,16 +58,26 @@ describe('MessagesPage', () => {
 
   test('recovers a draft after remount and keeps it isolated by conversation', async () => {
     localStorage.clear()
-    const firstRender = renderWithProviders(<MessagesPage />)
-    const input = screen.getByPlaceholderText(/Escrib.*mensaje/)
-    fireEvent.change(input, { target: { value: 'Borrador persistente' } })
-    fireEvent.click(screen.getByRole('button', { name: 'Enviar mensaje' }))
-    await waitFor(() =>
-      expect(screen.getByText('Borrador persistente')).toBeVisible()
+    localStorage.setItem(
+      'entrelibros:prototype:message-drafts:mariano',
+      JSON.stringify({
+        lucia: {
+          id: 1,
+          conversationId: 2,
+          authorId: 1,
+          body: 'Borrador persistente',
+          attachmentMetadata: null,
+          revision: 1,
+          createdAt: '2026-09-04T10:00:00.000Z',
+          updatedAt: '2026-09-04T10:00:00.000Z',
+        },
+      })
     )
+    const firstRender = renderWithProviders(<MessagesPage />)
+    expect(await screen.findByText('Borrador persistente')).toBeVisible()
     firstRender.unmount()
     renderWithProviders(<MessagesPage />)
-    expect(screen.getByText('Borrador persistente')).toBeVisible()
+    expect(await screen.findByText('Borrador persistente')).toBeVisible()
 
     fireEvent.click(screen.getByRole('button', { name: /Sofia/i }))
     expect(screen.queryByText('Borrador persistente')).not.toBeInTheDocument()
@@ -75,20 +85,41 @@ describe('MessagesPage', () => {
     expect(screen.getByText('Borrador persistente')).toBeVisible()
   })
 
-  test('sends and removes a saved mock draft', async () => {
+  test('sends the current draft from the composer submit button', async () => {
     localStorage.clear()
     renderWithProviders(<MessagesPage />)
     const input = screen.getByPlaceholderText(/Escrib.*mensaje/)
-    fireEvent.change(input, { target: { value: 'Mensaje para enviar' } })
-    fireEvent.click(screen.getByRole('button', { name: 'Enviar mensaje' }))
+    fireEvent.change(input, { target: { value: 'Mensaje desde submit' } })
+    fireEvent.submit(input.closest('form')!)
 
-    const draftCard = await screen.findByRole('article', {
-      name: 'Borrador: Mensaje',
-    })
-    fireEvent.click(within(draftCard).getByRole('button', { name: 'Enviar' }))
     await waitFor(() =>
       expect(
         screen.queryByRole('article', { name: 'Borrador: Mensaje' })
+      ).not.toBeInTheDocument()
+    )
+    expect(screen.getByText('Mensaje desde submit')).toBeVisible()
+  })
+
+  test('sends and removes a saved mock draft from the card button', async () => {
+    localStorage.clear()
+    renderWithProviders(<MessagesPage />)
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Más opciones de mensaje' })
+    )
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Adjuntar libro' }))
+    fireEvent.click(
+      await screen.findByRole('button', { name: /Ecos del Viento Norte/ })
+    )
+
+    const draftCard = await screen.findByRole('article', {
+      name: 'Borrador: Libro adjunto',
+    })
+    fireEvent.click(within(draftCard).getByRole('button', { name: 'Enviar' }))
+
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('article', { name: 'Borrador: Libro adjunto' })
       ).not.toBeInTheDocument()
     )
   })

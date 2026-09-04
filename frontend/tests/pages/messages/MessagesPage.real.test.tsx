@@ -274,6 +274,60 @@ describe('MessagesPage in real API mode', () => {
     expect(mocks.fetchMessageHistory).toHaveBeenCalledWith(conversation.id)
   })
 
+  test('saves and sends the draft from the composer submit button', async () => {
+    mocks.fetchConversations.mockResolvedValue([conversation])
+    mocks.fetchMessageHistory.mockResolvedValue({ messages: [], nextAfter: 0 })
+    mocks.fetchMessageDraft.mockResolvedValue(null)
+    mocks.saveMessageDraft.mockResolvedValue({
+      id: 10,
+      conversationId: conversation.id,
+      authorId: 7,
+      body: 'Enviado desde submit',
+      attachmentMetadata: null,
+      revision: 4,
+      createdAt: '2026-08-31T10:00:00.000Z',
+      updatedAt: '2026-08-31T10:01:00.000Z',
+    })
+    mocks.sendMessageDraft.mockResolvedValue({
+      id: 31,
+      conversationId: conversation.id,
+      senderId: 7,
+      sequence: 1,
+      clientKey: 'draft-client-submit',
+      body: 'Enviado desde submit',
+      attachmentMetadata: null,
+      createdAt: '2026-08-31T10:02:00.000Z',
+    })
+
+    renderWithProviders(<MessagesPage />)
+
+    await screen.findByText('No hay mensajes todavía.')
+    const input = await screen.findByPlaceholderText('Escribí un mensaje...')
+    fireEvent.change(input, { target: { value: 'Enviado desde submit' } })
+    expect(input).toHaveValue('Enviado desde submit')
+    const submitButton = screen.getByRole('button', { name: 'Enviar mensaje' })
+    expect(submitButton).not.toBeDisabled()
+    fireEvent.click(submitButton)
+
+    await waitFor(() =>
+      expect(mocks.saveMessageDraft).toHaveBeenCalledWith({
+        conversationId: conversation.id,
+        body: 'Enviado desde submit',
+        attachmentMetadata: null,
+      })
+    )
+    await waitFor(() =>
+      expect(mocks.sendMessageDraft).toHaveBeenCalledWith({
+        conversationId: conversation.id,
+        clientKey: expect.any(String),
+        revision: 4,
+      })
+    )
+    expect(
+      screen.queryByRole('article', { name: 'Borrador: Mensaje' })
+    ).not.toBeInTheDocument()
+  })
+
   test('discards a persisted draft using its current revision', async () => {
     mocks.fetchConversations.mockResolvedValue([conversation])
     mocks.fetchMessageHistory.mockResolvedValue({ messages: [], nextAfter: 0 })
