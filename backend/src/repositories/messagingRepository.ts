@@ -32,6 +32,7 @@ export interface MessageBookAttachment {
   author: string;
   coverUrl: string;
   ownerId?: number;
+  condition?: string | null;
 }
 
 export interface MessageAgreementDetails {
@@ -59,6 +60,7 @@ export type MessageAttachment = MessageAttachmentBase &
         author: string;
         coverUrl: string;
         ownerId?: number;
+        condition?: string | null;
       }
     | {
         kind: 'swap';
@@ -504,7 +506,7 @@ function asListingId(value: string): number | null {
   return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : null;
 }
 
-async function validateMessageAttachment(
+export async function validateMessageAttachment(
   client: DbClient,
   input: {
     conversationId: number;
@@ -512,6 +514,19 @@ async function validateMessageAttachment(
     attachmentMetadata: MessageAttachment;
   }
 ): Promise<void> {
+  const attachment = input.attachmentMetadata;
+  if (
+    !attachment.key.trim() ||
+    attachment.key.length > 240 ||
+    !attachment.contentType.trim() ||
+    attachment.contentType.length > 240 ||
+    !Number.isSafeInteger(attachment.size) ||
+    attachment.size < 1 ||
+    attachment.size > 10_000_000 ||
+    (attachment.name !== undefined && attachment.name.length > 240)
+  ) {
+    throw new Error('messaging.errors.invalid_attachment');
+  }
   const participants = await client.query<{ user_id: number }>(
     `SELECT user_id
      FROM conversation_participants
@@ -616,7 +631,22 @@ export interface SendMessageResult {
   created: boolean;
 }
 
-export async function sendMessageWithStatus(
+export async function findMessageWithClient(
+  client: DbClient,
+  input: { conversationId: number; senderId: number; clientKey: string }
+): Promise<PersistedMessage | null> {
+  const { rows } = await client.query<MessageRow>(
+    `SELECT id, conversation_id, sender_id, sequence, client_key, body,
+            attachment_metadata, created_at
+     FROM messages
+     WHERE conversation_id = $1 AND sender_id = $2 AND client_key = $3`,
+    [input.conversationId, input.senderId, input.clientKey]
+  );
+  return rows[0] ? mapMessage(rows[0]) : null;
+}
+
+export async function sendMessageWithClient(
+  client: DbClient,
   input: SendMessageInput
 ): Promise<SendMessageResult> {
   const body = input.body.trim();
@@ -627,69 +657,71 @@ export async function sendMessageWithStatus(
     throw new Error('messaging.errors.client_key_required');
   }
 
-  return withTransaction(async (client) => {
-    const membership = await client.query<{ exists: boolean }>(
-      `SELECT EXISTS (
-         SELECT 1 FROM conversation_participants
-         WHERE conversation_id = $1 AND user_id = $2
-       ) AS exists`,
-      [input.conversationId, input.senderId]
-    );
-    if (!membership.rows[0]?.exists) {
-      throw new Error('messaging.errors.forbidden');
-    }
+  const membership = await client.query<{ exists: boolean }>(
+    `SELECT EXISTS (
+       SELECT 1 FROM conversation_participants
+       WHERE conversation_id = $1 AND user_id = $2
+     ) AS exists`,
+    [input.conversationId, input.senderId]
+  );
+  if (!membership.rows[0]?.exists) {
+    throw new Error('messaging.errors.forbidden');
+  }
 
-    const existing = await client.query<MessageRow>(
-      `SELECT id, conversation_id, sender_id, sequence, client_key, body,
-              attachment_metadata, created_at
-       FROM messages
-       WHERE conversation_id = $1 AND sender_id = $2 AND client_key = $3`,
-      [input.conversationId, input.senderId, input.clientKey]
-    );
-    if (existing.rows[0]) {
-      return { message: mapMessage(existing.rows[0]), created: false };
-    }
+  const existing = await findMessageWithClient(client, input);
+  if (existing) {
+    return { message: existing, created: false };
+  }
 
-    if (input.attachmentMetadata) {
-      await validateMessageAttachment(client, {
-        conversationId: input.conversationId,
-        senderId: input.senderId,
-        attachmentMetadata: input.attachmentMetadata,
-      });
-    }
+  if (input.attachmentMetadata) {
+    await validateMessageAttachment(client, {
+      conversationId: input.conversationId,
+      senderId: input.senderId,
+      attachmentMetadata: input.attachmentMetadata,
+    });
+  }
 
-    const conversation = await client.query<{ last_message_sequence: string }>(
-      `SELECT last_message_sequence
-       FROM conversations WHERE id = $1 FOR UPDATE`,
-      [input.conversationId]
-    );
-    if (!conversation.rows[0]) {
-      throw new Error('messaging.errors.not_found');
-    }
-    const sequence = Number(conversation.rows[0].last_message_sequence) + 1;
-    await client.query(
-      `UPDATE conversations
-       SET last_message_sequence = $2, updated_at = NOW()
-       WHERE id = $1`,
-      [input.conversationId, sequence]
-    );
-    const { rows } = await client.query<MessageRow>(
-      `INSERT INTO messages (
-         conversation_id, sender_id, sequence, client_key, body, attachment_metadata
-       ) VALUES ($1, $2, $3, $4, $5, $6)
-       RETURNING id, conversation_id, sender_id, sequence, client_key, body,
-                 attachment_metadata, created_at`,
-      [
-        input.conversationId,
-        input.senderId,
-        sequence,
-        input.clientKey,
-        body,
-        input.attachmentMetadata ?? null,
-      ]
-    );
-    return { message: mapMessage(rows[0]), created: true };
-  });
+  const conversation = await client.query<{ last_message_sequence: string }>(
+    `SELECT last_message_sequence
+     FROM conversations WHERE id = $1 FOR UPDATE`,
+    [input.conversationId]
+  );
+  if (!conversation.rows[0]) {
+    throw new Error('messaging.errors.not_found');
+  }
+  const existingAfterLock = await findMessageWithClient(client, input);
+  if (existingAfterLock) {
+    return { message: existingAfterLock, created: false };
+  }
+  const sequence = Number(conversation.rows[0].last_message_sequence) + 1;
+  await client.query(
+    `UPDATE conversations
+     SET last_message_sequence = $2, updated_at = NOW()
+     WHERE id = $1`,
+    [input.conversationId, sequence]
+  );
+  const { rows } = await client.query<MessageRow>(
+    `INSERT INTO messages (
+       conversation_id, sender_id, sequence, client_key, body, attachment_metadata
+     ) VALUES ($1, $2, $3, $4, $5, $6)
+     RETURNING id, conversation_id, sender_id, sequence, client_key, body,
+               attachment_metadata, created_at`,
+    [
+      input.conversationId,
+      input.senderId,
+      sequence,
+      input.clientKey,
+      body,
+      input.attachmentMetadata ?? null,
+    ]
+  );
+  return { message: mapMessage(rows[0]), created: true };
+}
+
+export async function sendMessageWithStatus(
+  input: SendMessageInput
+): Promise<SendMessageResult> {
+  return withTransaction((client) => sendMessageWithClient(client, input));
 }
 
 export async function sendMessage(

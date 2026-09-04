@@ -19,6 +19,12 @@ Los mensajes pueden incluir metadata tipada para:
 
 El backend comprueba participantes, propietarios, disponibilidad y pertenencia del acuerdo. Las propuestas y contraofertas se conservan en el historial, y no se crea un segundo acuerdo para la misma conversación.
 
+## Borradores enriquecidos
+
+`GET`, `PUT` y `DELETE /api/messages/:conversationId/draft` gestionan un único borrador privado por autor y conversación. El borrador puede contener texto, un libro, un intercambio o una propuesta de acuerdo; se guarda con revisión para detectar ediciones obsoletas y se conserva al recargar la sesión.
+
+`POST /api/messages/:conversationId/draft/send` valida nuevamente el contenido, crea el acuerdo cuando corresponde, persiste un único mensaje normal y elimina el borrador en la misma transacción. Hasta ese momento no aparece en el historial, no incrementa no leídos ni envía notificaciones. Contactar desde una publicación crea una conversación silenciosa y guarda el texto inicial junto con el libro como borrador.
+
 ## Contactos y no leídos
 
 `GET /api/messages/contacts?search=` busca personas públicas por nombre o alias, prioriza contactos seguidos y excluye al usuario actual y relaciones bloqueadas. `POST /api/messages/conversations` vuelve a validar visibilidad, existencia y bloqueos en el servidor.

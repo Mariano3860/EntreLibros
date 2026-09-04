@@ -806,6 +806,10 @@
                   "participantId": {
                     "type": "integer",
                     "minimum": 1
+                  },
+                  "silent": {
+                    "type": "boolean",
+                    "description": "Prepara el contacto sin registrar analitica de inicio"
                   }
                 }
               }
@@ -821,6 +825,185 @@
           },
           "422": {
             "description": "Localized validation error"
+          }
+        }
+      }
+    },
+    "/api/messages/{conversationId}/draft": {
+      "get": {
+        "summary": "Leer el borrador privado del participante autenticado",
+        "tags": ["Messaging"],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ConversationId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Borrador propio o null para la contraparte"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "description": "La persona no participa en la conversacion"
+          }
+        }
+      },
+      "put": {
+        "summary": "Crear o actualizar un borrador privado",
+        "tags": ["Messaging"],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ConversationId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["body"],
+                "properties": {
+                  "body": {
+                    "type": "string",
+                    "maxLength": 4000
+                  },
+                  "revision": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "attachmentMetadata": {
+                    "type": "object",
+                    "description": "Adjunto book, swap o agreementProposal"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Borrador guardado con nueva revision"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "description": "La persona no participa en la conversacion"
+          },
+          "409": {
+            "description": "Revision obsoleta"
+          },
+          "422": {
+            "description": "Borrador invalido"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Descartar el borrador privado propio",
+        "tags": ["Messaging"],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ConversationId"
+          },
+          {
+            "name": "revision",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Borrador descartado"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "description": "La persona no participa en la conversacion"
+          },
+          "404": {
+            "description": "Borrador no encontrado"
+          },
+          "409": {
+            "description": "Revision obsoleta"
+          }
+        }
+      }
+    },
+    "/api/messages/{conversationId}/draft/send": {
+      "post": {
+        "summary": "Enviar un borrador de forma idempotente",
+        "tags": ["Messaging"],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ConversationId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["clientKey"],
+                "properties": {
+                  "clientKey": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "revision": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Mensaje persistido una sola vez"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "description": "La persona no participa en la conversacion"
+          },
+          "404": {
+            "description": "Borrador no encontrado"
+          },
+          "409": {
+            "description": "Revision obsoleta o conflicto de acuerdo"
+          },
+          "422": {
+            "description": "Borrador invalido o adjunto no disponible"
           }
         }
       }
@@ -3635,6 +3818,17 @@
         "type": "apiKey",
         "in": "cookie",
         "name": "sessionToken"
+      }
+    },
+    "parameters": {
+      "ConversationId": {
+        "name": "conversationId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "integer",
+          "minimum": 1
+        }
       }
     },
     "responses": {

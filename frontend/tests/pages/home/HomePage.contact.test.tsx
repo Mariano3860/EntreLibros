@@ -32,7 +32,7 @@ describe('HomePage book contact', () => {
 
   test('shows publisher attribution and opens contact for a recommended book', async () => {
     setLoggedInState(true)
-    let sentMessages = 0
+    let savedDrafts = 0
     server.use(
       http.get(
         apiRouteMatcher(`${RELATIVE_API_ROUTES.BOOKS.LIST}/:id`),
@@ -59,24 +59,21 @@ describe('HomePage book contact', () => {
             },
           })
       ),
-      http.post(
-        apiRouteMatcher(RELATIVE_API_ROUTES.MESSAGES.HISTORY(42)),
-        () => {
-          sentMessages += 1
-          return HttpResponse.json({
-            message: {
-              id: 1,
-              conversationId: 42,
-              senderId: 1,
-              sequence: 1,
-              clientKey: 'first-contact-42',
-              body: 'Hola',
-              attachmentMetadata: null,
-              createdAt: new Date().toISOString(),
-            },
-          })
-        }
-      )
+      http.put(apiRouteMatcher(RELATIVE_API_ROUTES.MESSAGES.DRAFT(42)), () => {
+        savedDrafts += 1
+        return HttpResponse.json({
+          draft: {
+            id: 1,
+            conversationId: 42,
+            authorId: 1,
+            body: 'Hola',
+            attachmentMetadata: null,
+            revision: 1,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+        })
+      })
     )
 
     renderWithProviders(<HomePage />)
@@ -89,7 +86,7 @@ describe('HomePage book contact', () => {
     fireEvent.click(screen.getByRole('button', { name: 'bookDetail.contact' }))
 
     await waitFor(() => {
-      expect(sentMessages).toBe(1)
+      expect(savedDrafts).toBe(1)
       expect(
         screen.queryByRole('button', { name: 'bookDetail.contact' })
       ).not.toBeInTheDocument()
@@ -162,19 +159,8 @@ describe('HomePage book contact', () => {
           })
         }
       ),
-      http.post(apiRouteMatcher(RELATIVE_API_ROUTES.MESSAGES.HISTORY(43)), () =>
-        HttpResponse.json({
-          message: {
-            id: 2,
-            conversationId: 43,
-            senderId: 1,
-            sequence: 1,
-            clientKey: 'first-contact-43',
-            body: 'Hola',
-            attachmentMetadata: null,
-            createdAt: new Date().toISOString(),
-          },
-        })
+      http.put(apiRouteMatcher(RELATIVE_API_ROUTES.MESSAGES.DRAFT(43)), () =>
+        HttpResponse.json({ draft: null })
       )
     )
 

@@ -67,11 +67,13 @@ describe('Messages component', () => {
     expect(textarea).toHaveValue('Hola😀')
     fireEvent.click(screen.getByRole('button', { name: 'Enviar mensaje' }))
 
-    await waitFor(() => {
+    await waitFor(() =>
       expect(sendMessage).toHaveBeenCalledWith('Hola😀', 'Samuel')
-    })
+    )
+    await waitFor(() =>
+      expect(screen.queryByText('Borrador')).not.toBeInTheDocument()
+    )
     expect(textarea).toHaveValue('')
-    expect(screen.getAllByText('Hola😀').length).toBeGreaterThan(0)
   })
 
   test('allows attaching a book with contextual note', () => {
@@ -101,7 +103,7 @@ describe('Messages component', () => {
     expect(screen.getByText('¡Te va a gustar!')).toBeInTheDocument()
   })
 
-  test('creates swap and agreement proposals through modals', () => {
+  test('creates swap and agreement proposals through modals', async () => {
     useChatSocketMock.mockReturnValue({
       messages: [],
       sendMessage: vi.fn(),
@@ -166,9 +168,15 @@ describe('Messages component', () => {
       within(agreementModal).getByRole('button', { name: 'Enviar propuesta' })
     )
 
-    expect(
-      screen.getByText('Biblioteca central — Centro', { exact: false })
-    ).toBeInTheDocument()
-    expect(screen.getByText('Viernes 14 · 18:00')).toBeInTheDocument()
+    await waitFor(() => {
+      const draftCard = screen.getByRole('article', { name: /Borrador/ })
+      expect(
+        within(draftCard).getByText(/Biblioteca central/)
+      ).toBeInTheDocument()
+      expect(within(draftCard).getByText(/Centro/)).toBeInTheDocument()
+      expect(
+        within(draftCard).getByText('Viernes 14 · 18:00')
+      ).toBeInTheDocument()
+    })
   })
 })

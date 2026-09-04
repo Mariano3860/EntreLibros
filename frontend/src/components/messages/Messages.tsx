@@ -1,7 +1,5 @@
 import {
   commandAgreement,
-  counterProposeAgreement,
-  createAgreement,
   fetchAgreement,
   fetchAgreementHistory,
   type AgreementSnapshot,
@@ -11,14 +9,16 @@ import {
   fetchConversations,
   fetchConversationBooks,
   fetchMessageHistory,
-  sendPersistedMessage,
   type ApiConversation,
   type ApiMessage,
+  type ApiMessageDraft,
+  type ApiMessageDraftAttachment,
   type ConversationBook,
 } from '@api/messages/messages'
 import { mockConversations } from '@components/messages/Messages.mock'
 import { useNotifications } from '@hooks/api/useNotifications'
 import { useChatSocket } from '@hooks/socket/useChatSocket'
+import { useMessageDraft } from '@hooks/useMessageDraft'
 import { isApiMockMode } from '@utils/runtimeEnv'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -34,6 +34,7 @@ import { ConfirmAgreementModal } from './components/BubbleAgreement/ConfirmAgree
 import { BubbleSwapProposal } from './components/BubbleSwap/BubbleSwapProposal'
 import { BubbleText } from './components/BubbleText/BubbleText'
 import { AgreementProposalModal } from './composer/AgreementProposalModal'
+import { MessageDraftCard } from './drafts/MessageDraftCard'
 import { MessageComposer } from './MessageComposer'
 import styles from './Messages.module.scss'
 import {
@@ -246,6 +247,10 @@ export const Messages = () => {
     error,
   } = useChatSocket()
   const [serverMessages, setServerMessages] = useState<ApiMessage[]>([])
+  const [demoDrafts, setDemoDrafts] = useState<Record<number, ApiMessageDraft>>(
+    {}
+  )
+  const [composerDraftSeed, setComposerDraftSeed] = useState('')
   const [attachmentError, setAttachmentError] = useState(false)
   const messagesRef = useRef<HTMLDivElement>(null)
   const [conversationBooksStatus, setConversationBooksStatus] = useState<
@@ -257,6 +262,14 @@ export const Messages = () => {
     Awaited<ReturnType<typeof fetchAgreementHistory>>
   >([])
   const selected = conversations.find((c) => c.id === selectedId)
+  const isBotConversation = selected?.isBot === true
+  const draftState = useMessageDraft(
+    selectedId,
+    !useDemoConversations && !isBotConversation
+  )
+  const activeDraft = useDemoConversations
+    ? (demoDrafts[selectedId ?? 0] ?? null)
+    : draftState.query.data
 
   const { getVersion, proposeVersion, confirmVersion, cancelVersion } =
     useAgreementStore(conversations)
@@ -296,8 +309,6 @@ export const Messages = () => {
       active = false
     }
   }, [conversationReloadKey, location.state, useDemoConversations])
-
-  const isBotConversation = selected?.isBot === true
 
   useEffect(() => {
     if (useDemoConversations || selectedId === null) return
@@ -652,6 +663,102 @@ export const Messages = () => {
     }
   }
 
+  const saveDraft = useCallback(
+    async (
+      body: string,
+      attachmentMetadata: ApiMessageDraftAttachment | null = null
+    ): Promise<ApiMessageDraft | null> => {
+      if (selectedId === null) return null
+      if (useDemoConversations) {
+        const previous = demoDrafts[selectedId]
+        const now = new Date().toISOString()
+        const draft: ApiMessageDraft = {
+          id: previous?.id ?? Date.now(),
+          conversationId: selectedId,
+          authorId: currentUser?.id ?? 1,
+          body: body.trim(),
+          attachmentMetadata,
+          revision: (previous?.revision ?? 0) + 1,
+          createdAt: previous?.createdAt ?? now,
+          updatedAt: now,
+        }
+        setDemoDrafts((current) => {
+          return {
+            ...current,
+            [selectedId]: draft,
+          }
+        })
+        return draft
+      }
+      return draftState.save.mutateAsync({ body, attachmentMetadata })
+    },
+    [
+      currentUser?.id,
+      demoDrafts,
+      draftState.save,
+      selectedId,
+      useDemoConversations,
+    ]
+  )
+
+  const discardDraft = useCallback(
+    async (draftOverride?: ApiMessageDraft | null) => {
+      const draft = draftOverride ?? activeDraft
+      if (selectedId === null || !draft) return
+      if (useDemoConversations) {
+        setDemoDrafts((current) => {
+          const next = { ...current }
+          delete next[selectedId]
+          return next
+        })
+        return
+      }
+      await draftState.discard.mutateAsync()
+    },
+    [activeDraft, draftState.discard, selectedId, useDemoConversations]
+  )
+
+  const sendDraft = useCallback(
+    async (draftOverride?: ApiMessageDraft | null) => {
+      const draft = draftOverride ?? activeDraft
+      if (selectedId === null || !draft) return
+      if (useDemoConversations) {
+        const attachment = draft.attachmentMetadata
+        const body =
+          draft.body ||
+          (attachment?.kind === 'agreementProposal'
+            ? attachment.details.bookTitle
+            : attachment?.kind === 'book'
+              ? attachment.title
+              : 'Propuesta de intercambio')
+        sendMessage(body, selected?.user.name ?? '')
+        await discardDraft(draft)
+        return
+      }
+      await draftState.send.mutateAsync({
+        clientKey: `${selectedId}-${Date.now()}-${Math.random()}`,
+        revision: draft.revision,
+      })
+      await Promise.all([
+        fetchMessageHistory(selectedId).then((page) => {
+          setServerMessages(page.messages)
+        }),
+        fetchConversations().then((items) => {
+          setConversations(items.map(toConversation))
+        }),
+      ])
+    },
+    [
+      activeDraft,
+      discardDraft,
+      draftState.send,
+      selected,
+      selectedId,
+      sendMessage,
+      useDemoConversations,
+    ]
+  )
+
   const handleSendText = (draft: string) => {
     if (!draft.trim() || !selected || selectedId === null) return
 
@@ -668,17 +775,16 @@ export const Messages = () => {
         sendConversationMessage(selectedId, clientKey, draft.trim())
         return
       }
-      appendMessageToConversation(selectedId, newMessage)
-      sendMessage(draft.trim(), selected.user.name)
+      if (useDemoConversations) {
+        void saveDraft(draft.trim()).then(sendDraft)
+      } else {
+        appendMessageToConversation(selectedId, newMessage)
+      }
       return
     }
-
-    const clientKey = `${selectedId}-${Date.now()}-${Math.random()}`
-    void sendPersistedMessage({
-      conversationId: selectedId,
-      clientKey,
-      body: draft.trim(),
-    }).then((message) => setServerMessages((prev) => [...prev, message]))
+    void saveDraft(draft.trim())
+      .then(sendDraft)
+      .catch(() => setAttachmentError(true))
   }
 
   const handleAttachBook = (bookId: string, note?: string) => {
@@ -694,7 +800,23 @@ export const Messages = () => {
     const ownerId = selected.myBooks.some((item) => item.id === book.id)
       ? currentUser?.id
       : selected.participantIds?.find((id) => id !== currentUser?.id)
-    if (useDemoConversations || isBotConversation) {
+    const attachmentMetadata: ApiMessageDraftAttachment = {
+      key: `book:${book.id}`,
+      contentType: 'application/x-entrelibros-book',
+      size: 1,
+      name: book.title,
+      kind: 'book',
+      bookId: book.id ?? '',
+      title: book.title,
+      author: book.author,
+      coverUrl: book.cover,
+      ...(ownerId ? { ownerId } : {}),
+    }
+    if (useDemoConversations) {
+      void saveDraft(note?.trim() || book.title, attachmentMetadata)
+      return
+    }
+    if (isBotConversation) {
       const baseMessage = createBaseMessage(selected)
       appendMessageToConversation(selectedId, {
         ...baseMessage,
@@ -705,64 +827,47 @@ export const Messages = () => {
       return
     }
 
-    const clientKey = `${selectedId}-${Date.now()}-${Math.random()}`
-    void sendPersistedMessage({
-      conversationId: selectedId,
-      clientKey,
-      body: note?.trim() || `Compartí ${book.title}`,
-      attachmentMetadata: {
-        key: `book:${book.id}`,
-        contentType: 'application/x-entrelibros-book',
-        size: 1,
-        name: book.title,
-        kind: 'book',
-        bookId: book.id ?? '',
-        title: book.title,
-        author: book.author,
-        coverUrl: book.cover,
-        ...(ownerId ? { ownerId } : {}),
-      },
-    })
-      .then((message) => setServerMessages((prev) => [...prev, message]))
-      .catch(() => setAttachmentError(true))
+    void saveDraft(
+      note?.trim() || `Compartí ${book.title}`,
+      attachmentMetadata
+    ).catch(() => setAttachmentError(true))
   }
 
   const handleSwapProposal = (details: SwapProposalDetails) => {
     if (!selected || selectedId === null) return
 
-    if (!useDemoConversations && !isBotConversation) {
-      const clientKey = `${selectedId}-${Date.now()}-${Math.random()}`
-      const counterpartId = selected.participantIds?.find(
-        (id) => id !== currentUser?.id
+    const counterpartId = selected.participantIds?.find(
+      (id) => id !== currentUser?.id
+    )
+    const attachmentMetadata: ApiMessageDraftAttachment = {
+      key: `swap:${details.offered.id}:${details.requested.id}`,
+      contentType: 'application/x-entrelibros-swap',
+      size: 1,
+      kind: 'swap',
+      offered: {
+        id: details.offered.id ?? '',
+        title: details.offered.title,
+        author: details.offered.author,
+        coverUrl: details.offered.cover,
+        ...(currentUser?.id ? { ownerId: currentUser.id } : {}),
+      },
+      requested: {
+        id: details.requested.id ?? '',
+        title: details.requested.title,
+        author: details.requested.author,
+        coverUrl: details.requested.cover,
+        ...(counterpartId ? { ownerId: counterpartId } : {}),
+      },
+      ...(details.note ? { note: details.note } : {}),
+    }
+    if (useDemoConversations) {
+      void saveDraft(details.note ?? '', attachmentMetadata)
+      return
+    }
+    if (!isBotConversation) {
+      void saveDraft(details.note ?? '', attachmentMetadata).catch(() =>
+        setAttachmentError(true)
       )
-      void sendPersistedMessage({
-        conversationId: selectedId,
-        clientKey,
-        body: details.note ?? '',
-        attachmentMetadata: {
-          key: `swap:${details.offered.id}:${details.requested.id}`,
-          contentType: 'application/x-entrelibros-swap',
-          size: 1,
-          kind: 'swap',
-          offered: {
-            id: details.offered.id ?? '',
-            title: details.offered.title,
-            author: details.offered.author,
-            coverUrl: details.offered.cover,
-            ...(currentUser?.id ? { ownerId: currentUser.id } : {}),
-          },
-          requested: {
-            id: details.requested.id ?? '',
-            title: details.requested.title,
-            author: details.requested.author,
-            coverUrl: details.requested.cover,
-            ...(counterpartId ? { ownerId: counterpartId } : {}),
-          },
-          ...(details.note ? { note: details.note } : {}),
-        },
-      })
-        .then((message) => setServerMessages((prev) => [...prev, message]))
-        .catch(() => setAttachmentError(true))
       return
     }
 
@@ -778,18 +883,7 @@ export const Messages = () => {
   const handleAgreementProposal = (proposal: AgreementDetails) => {
     if (!selected || selectedId === null) return
 
-    if (!useDemoConversations && !isBotConversation) {
-      const participantId = selected.participantIds?.find(
-        (id) => id !== currentUser?.id
-      )
-      if (!participantId) {
-        setAgreementError(
-          t('community.messages.agreement.errors.notFound', {
-            defaultValue: 'No se encontró la otra parte del acuerdo.',
-          })
-        )
-        return
-      }
+    if (!isBotConversation) {
       const matchingBooks = [
         ...selected.myBooks,
         ...selected.theirBooks,
@@ -800,28 +894,35 @@ export const Messages = () => {
         selectedBook?.id && /^\d+$/.test(selectedBook.id)
           ? Number(selectedBook.id)
           : undefined
-      void createAgreement({
-        conversationId: selected.id,
-        participantId,
+      if (!useDemoConversations && !listingId) {
+        setAgreementError(
+          t('community.messages.drafts.agreementBookRequired', {
+            defaultValue: 'Elegí un libro válido de la conversación.',
+          })
+        )
+        return
+      }
+      const attachmentMetadata: ApiMessageDraftAttachment = {
+        key: `agreement-proposal:${selected.id}:${listingId ?? 'mock'}`,
+        contentType: 'application/x-entrelibros-agreement-proposal',
+        size: 1,
+        kind: 'agreementProposal',
+        listingIds: listingId ? [listingId] : [],
         details: proposal,
-        ...(listingId ? { listingIds: [listingId] } : {}),
-      })
-        .then((agreement) => {
-          setServerAgreement(agreement)
-          setConversations((items) =>
-            items.map((item) =>
-              item.id === selected.id
-                ? { ...item, agreementId: agreement.id }
-                : item
-            )
-          )
-          return fetchAgreementHistory(agreement.id)
-        })
-        .then((history) => setServerAgreementHistory(history))
+        ...(serverAgreement
+          ? {
+              agreementId: serverAgreement.id,
+              expectedVersion: serverAgreement.currentVersion,
+            }
+          : {}),
+      }
+      void saveDraft('', attachmentMetadata)
+        .then(() => setAgreementError(null))
         .catch(() =>
           setAgreementError(
-            t('community.messages.agreement.errors.generic', {
-              defaultValue: 'No se pudo crear el acuerdo.',
+            t('community.messages.drafts.saveError', {
+              defaultValue:
+                'No pudimos guardar el borrador. Intentá nuevamente.',
             })
           )
         )
@@ -900,42 +1001,45 @@ export const Messages = () => {
       return
     }
 
-    if (
-      !useDemoConversations &&
-      !conversation.isBot &&
-      conversation.agreementId
-    ) {
-      void counterProposeAgreement({
-        agreementId: conversation.agreementId,
-        expectedVersion: serverAgreement?.currentVersion ?? 1,
+    if (!conversation.isBot) {
+      const matchingBooks = [
+        ...conversation.myBooks,
+        ...conversation.theirBooks,
+      ].filter((book) => book.title === details.bookTitle)
+      const selectedBook =
+        matchingBooks.length === 1 ? matchingBooks[0] : undefined
+      const listingId =
+        selectedBook?.id && /^\d+$/.test(selectedBook.id)
+          ? Number(selectedBook.id)
+          : undefined
+      if (!useDemoConversations && !listingId) {
+        setAgreementError(
+          t('community.messages.drafts.agreementBookRequired', {
+            defaultValue: 'Elegí un libro válido de la conversación.',
+          })
+        )
+        return
+      }
+      void saveDraft('', {
+        key: `agreement-proposal:${conversation.id}:${listingId ?? 'mock'}`,
+        contentType: 'application/x-entrelibros-agreement-proposal',
+        size: 1,
+        kind: 'agreementProposal',
+        listingIds: listingId ? [listingId] : [],
         details,
       })
-        .then((agreement) => {
-          setServerAgreement(agreement)
-          return fetchAgreementHistory(agreement.id)
-        })
-        .then((history) => {
-          setServerAgreementHistory(history)
+        .then(() => {
           setAgreementError(null)
           handleCloseChangeModal()
         })
-        .catch((error: unknown) => {
-          const status = (error as { response?: { status?: number } }).response
-            ?.status
+        .catch(() =>
           setAgreementError(
-            t(
-              status === 409
-                ? 'community.messages.agreement.errors.conflict'
-                : 'community.messages.agreement.errors.generic',
-              {
-                defaultValue:
-                  status === 409
-                    ? 'El acuerdo cambió. Actualizá la vista e intentá de nuevo.'
-                    : 'No se pudo enviar la contrapropuesta.',
-              }
-            )
+            t('community.messages.drafts.saveError', {
+              defaultValue:
+                'No pudimos guardar el borrador. Intentá nuevamente.',
+            })
           )
-        })
+        )
       return
     }
 
@@ -1643,6 +1747,16 @@ export const Messages = () => {
                   />
                 )
               })}
+              {activeDraft ? (
+                <MessageDraftCard
+                  draft={activeDraft}
+                  onEdit={() => setComposerDraftSeed(activeDraft.body)}
+                  onDiscard={() => void discardDraft()}
+                  onSend={() => void sendDraft()}
+                  isDiscarding={draftState.discard.isPending}
+                  isSending={draftState.send.isPending}
+                />
+              ) : null}
             </div>
             <MessageComposer
               className={styles.inputArea}
@@ -1655,6 +1769,7 @@ export const Messages = () => {
               theirBooks={selected.theirBooks}
               counterpartName={selected.user.name}
               conversationId={selected.id}
+              draftSeed={composerDraftSeed}
               booksLoading={conversationBooksStatus === 'loading'}
               booksError={conversationBooksStatus === 'error'}
               onRetryBooks={retryConversationBooks}

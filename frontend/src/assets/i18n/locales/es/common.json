@@ -736,6 +736,33 @@
           "saved": "Tu último resultado quedó guardado."
         }
       },
+      "drafts": {
+        "label": "Borrador",
+        "private": "Solo vos ves este borrador hasta enviarlo",
+        "ariaLabel": "Borrador: {{title}}",
+        "textTitle": "Mensaje",
+        "bookTitle": "Libro adjunto",
+        "swapTitle": "Propuesta de intercambio",
+        "agreementTitle": "Propuesta de acuerdo",
+        "book": "Libro",
+        "bookAttached": "Libro adjunto",
+        "offered": "Ofrecés",
+        "requested": "Querés recibir",
+        "agreementBookRequired": "Elegí un libro válido de la conversación.",
+        "swapBooksRequired": "Elegí un libro propio y uno de la otra persona.",
+        "edit": "Editar",
+        "discard": "Descartar",
+        "send": "Enviar",
+        "sendProposal": "Enviar propuesta",
+        "sending": "Enviando…",
+        "saving": "Guardando borrador…",
+        "saved": "Borrador guardado",
+        "saveError": "No pudimos guardar el borrador. Intentá nuevamente.",
+        "discardError": "No pudimos descartar el borrador. Intentá nuevamente.",
+        "sendError": "No pudimos enviar el borrador. Intentá nuevamente.",
+        "saveChanges": "Guardar cambios",
+        "saveAgreement": "Guardar borrador"
+      },
       "snippets": {
         "sharedBook": "Compartió un libro"
       }

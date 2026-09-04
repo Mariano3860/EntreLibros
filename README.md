@@ -41,7 +41,9 @@ psql "$DATABASE_URL" -f backend/scripts/seed-demo-dataset.sql
 ```
 
 El script crea dos usuarios sinteticos, publicaciones, un Rincon, conversacion,
-acuerdo, notificaciones, eventos y un resultado. No lo ejecutes sobre produccion.
+acuerdo, notificaciones, eventos y un resultado. Los borradores reales se
+guardan en `message_drafts` y no forman parte del historial hasta enviarlos. No
+lo ejecutes sobre produccion.
 La ruta `/profile/:id`, el contacto desde publicacion/perfil, los reportes y
 `/stats` forman parte del recorrido real.
 

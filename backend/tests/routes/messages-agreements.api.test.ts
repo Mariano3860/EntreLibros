@@ -317,6 +317,89 @@ describe('messaging and agreements API', () => {
       );
   });
 
+  test('keeps drafts private, supports revisions and sends them exactly once', async () => {
+    const first = await registerAndLogin('draft-route-a');
+    const second = await registerAndLogin('draft-route-b');
+    const outsider = await registerAndLogin('draft-route-outsider');
+    const conversationResponse = await request(app)
+      .post('/api/messages/conversations')
+      .set('Cookie', first.cookie)
+      .send({ participantId: second.id, silent: true })
+      .expect(201);
+    const conversationId = conversationResponse.body.conversation.id as number;
+
+    const analytics = await client.query<{ count: number }>(
+      `SELECT COUNT(*)::int AS count
+       FROM analytics_events
+       WHERE event_type = 'contact_started'
+         AND entity_type = 'conversation'
+         AND entity_id = $1`,
+      [String(conversationId)]
+    );
+    expect(analytics.rows[0].count).toBe(0);
+
+    const saved = await request(app)
+      .put(`/api/messages/${conversationId}/draft`)
+      .set('Cookie', first.cookie)
+      .send({ body: 'Mensaje preparado', attachmentMetadata: null })
+      .expect(200);
+    expect(saved.body.draft).toEqual(
+      expect.objectContaining({
+        conversationId,
+        authorId: first.id,
+        body: 'Mensaje preparado',
+        revision: 1,
+      })
+    );
+
+    await request(app)
+      .get(`/api/messages/${conversationId}/draft`)
+      .set('Cookie', second.cookie)
+      .expect(200)
+      .expect(({ body }) => expect(body.draft).toBeNull());
+    await request(app)
+      .get(`/api/messages/${conversationId}/draft`)
+      .set('Cookie', outsider.cookie)
+      .expect(403)
+      .expect(({ body }) =>
+        expect(body.message).toBe('messaging.errors.forbidden')
+      );
+    await request(app)
+      .put(`/api/messages/${conversationId}/draft`)
+      .set('Cookie', first.cookie)
+      .send({ body: 'Edición obsoleta', revision: 0 })
+      .expect(409)
+      .expect(({ body }) =>
+        expect(body.message).toBe('messaging.errors.draft_conflict')
+      );
+
+    const sent = await request(app)
+      .post(`/api/messages/${conversationId}/draft/send`)
+      .set('Cookie', first.cookie)
+      .send({ clientKey: 'draft-route-send-1', revision: 1 })
+      .expect(201);
+    const retry = await request(app)
+      .post(`/api/messages/${conversationId}/draft/send`)
+      .set('Cookie', first.cookie)
+      .send({ clientKey: 'draft-route-send-1' })
+      .expect(201);
+    expect(retry.body.message.id).toBe(sent.body.message.id);
+
+    await request(app)
+      .get(`/api/messages/${conversationId}/draft`)
+      .set('Cookie', first.cookie)
+      .expect(200)
+      .expect(({ body }) => expect(body.draft).toBeNull());
+    await request(app)
+      .get(`/api/messages/${conversationId}/messages`)
+      .set('Cookie', second.cookie)
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body.messages).toHaveLength(1);
+        expect(body.messages[0].body).toBe('Mensaje preparado');
+      });
+  });
+
   test('returns eligible books for each conversation participant', async () => {
     const first = await registerAndLogin('books-a');
     const second = await registerAndLogin('books-b');
