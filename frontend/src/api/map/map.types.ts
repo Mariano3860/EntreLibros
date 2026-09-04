@@ -78,6 +78,12 @@ export interface MapQueryInput {
 export interface MapResponseMeta {
   bbox: MapBoundingBox
   generatedAt: string
+  truncated?: boolean
+  limits?: {
+    corners: number
+    publications: number
+    activity: number
+  }
 }
 
 export interface MapResponse {

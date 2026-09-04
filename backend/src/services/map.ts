@@ -73,6 +73,12 @@ export interface MapQuery {
 export interface MapResponseMeta {
   bbox: MapBoundingBox;
   generatedAt: string;
+  truncated: boolean;
+  limits: {
+    corners: number;
+    publications: number;
+    activity: number;
+  };
 }
 
 export interface MapResponse {
@@ -443,29 +449,7 @@ export async function getMapData(query: MapQuery): Promise<MapResponse> {
   };
   const filteringCenter =
     query.center ?? (query.filters.distanceKm === null ? null : viewportCenter);
-  let corners: CommunityCornerEntity[] = [];
-  try {
-    corners = await listCornersForMap(searchBounds, query.center);
-  } catch (error) {
-    const message =
-      error instanceof Error ? error.message : String(error ?? 'unknown error');
-    console.warn(
-      'Falling back to unbounded corner query after bounded lookup failed',
-      message
-    );
-
-    try {
-      corners = await listCornersForMap(undefined, query.center);
-    } catch (fallbackError) {
-      if (fallbackError instanceof DatabaseError) {
-        console.error(
-          'Unbounded community corner lookup failed',
-          fallbackError.message
-        );
-      }
-      throw fallbackError;
-    }
-  }
+  const corners = await listCornersForMap(searchBounds, query.center);
 
   const displayCoordinates = new Map<string, DisplayCoordinates>();
 
@@ -507,25 +491,32 @@ export async function getMapData(query: MapQuery): Promise<MapResponse> {
     return isVisible;
   });
 
-  const orderedCorners = query.center
-    ? [...spatialCorners].sort((left, right) => {
-        const leftDistance = calculateHaversineDistanceKm(
-          {
-            lat: left.coordinates.latitude,
-            lon: left.coordinates.longitude,
-          },
-          { lat: query.center!.latitude, lon: query.center!.longitude }
-        );
-        const rightDistance = calculateHaversineDistanceKm(
-          {
-            lat: right.coordinates.latitude,
-            lon: right.coordinates.longitude,
-          },
-          { lat: query.center!.latitude, lon: query.center!.longitude }
-        );
-        return leftDistance - rightDistance;
-      })
-    : spatialCorners;
+  const orderedCorners = [...spatialCorners].sort((left, right) => {
+    if (query.center) {
+      const leftDistance = calculateHaversineDistanceKm(
+        {
+          lat: left.coordinates.latitude,
+          lon: left.coordinates.longitude,
+        },
+        { lat: query.center.latitude, lon: query.center.longitude }
+      );
+      const rightDistance = calculateHaversineDistanceKm(
+        {
+          lat: right.coordinates.latitude,
+          lon: right.coordinates.longitude,
+        },
+        { lat: query.center.latitude, lon: query.center.longitude }
+      );
+      if (leftDistance !== rightDistance) return leftDistance - rightDistance;
+    }
+
+    const leftActivity = left.metrics.lastActivityAt ?? '';
+    const rightActivity = right.metrics.lastActivityAt ?? '';
+    if (leftActivity !== rightActivity) {
+      return rightActivity.localeCompare(leftActivity);
+    }
+    return left.id.localeCompare(right.id);
+  });
 
   const candidateCornerLookup = new Map(
     orderedCorners.map((corner) => [corner.id, corner])
@@ -578,13 +569,25 @@ export async function getMapData(query: MapQuery): Promise<MapResponse> {
     filteredCornerIds.has(publication.cornerId)
   );
 
+  const limitedFilteredCorners = filteredCorners.slice(0, 50);
+  const limitedCornerIds = new Set(
+    limitedFilteredCorners.map((corner) => corner.id)
+  );
+  const limitedPublications = publications.filter((publication) =>
+    limitedCornerIds.has(publication.cornerId)
+  );
   const activity =
     query.layers.has('activity') && query.filters.recentActivity
-      ? buildActivityPoints(filteredCorners, displayCoordinates)
+      ? buildActivityPoints(limitedFilteredCorners, displayCoordinates)
       : [];
+  const limitedActivity = activity.slice(0, 100);
+  const truncated =
+    filteredCorners.length > 50 ||
+    publications.length > 100 ||
+    activity.length > 100;
 
   const cornerPins = query.layers.has('corners')
-    ? filteredCorners.map((corner) =>
+    ? limitedFilteredCorners.map((corner) =>
         buildCornerPin(
           corner,
           displayCoordinates.get(corner.id) ?? getDisplayCoordinates(corner),
@@ -608,11 +611,13 @@ export async function getMapData(query: MapQuery): Promise<MapResponse> {
 
   return {
     corners: cornerPins,
-    publications,
-    activity,
+    publications: limitedPublications.slice(0, 100),
+    activity: limitedActivity,
     meta: {
       bbox: query.bbox,
       generatedAt: new Date().toISOString(),
+      truncated,
+      limits: { corners: 50, publications: 100, activity: 100 },
     },
   };
 }

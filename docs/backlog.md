@@ -38,6 +38,9 @@ La matriz completa y sus referencias estan en
 - Borradores privados de mensajes con texto, libros adjuntos, intercambios y
   propuestas de acuerdo; guardado con revision, envio idempotente y tarjeta
   responsive compartida.
+- Mapa sincronizado con el bbox real del viewport, radios centrados en la
+  ubicacion disponible y limites server-side de 50 rincones, 100 publicaciones
+  y 100 actividades con metadatos de truncamiento.
 
 ## Prioridad P0
 

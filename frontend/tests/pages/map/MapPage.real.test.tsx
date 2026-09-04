@@ -134,10 +134,13 @@ describe('MapPage in real API mode', () => {
       await waitFor(() =>
         expect(useMapDataMock.mock.calls.at(-1)?.[0]).toEqual(
           expect.objectContaining({
-            center: profile.location,
             filters: expect.objectContaining({ distanceKm: null }),
           })
         )
+      )
+      expect(useMapDataMock.mock.calls.at(-1)?.[0]).toHaveProperty(
+        'center',
+        undefined
       )
     } finally {
       if (original) Object.defineProperty(navigator, 'geolocation', original)

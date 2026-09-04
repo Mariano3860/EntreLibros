@@ -7,7 +7,7 @@ import type {
   MapPublicationPin,
 } from '@api/map/map.types'
 import { useTheme } from '@contexts/theme/ThemeContext'
-import { divIcon } from 'leaflet'
+import { divIcon, type Map as LeafletMap } from 'leaflet'
 import { useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
@@ -56,17 +56,76 @@ type MapCanvasProps = {
   isEmpty: boolean
   userLocation?: { latitude: number; longitude: number } | null
   radiusKm?: number | null
+  onViewportChange?: (bbox: MapBoundingBox) => void
   className?: string
 }
 
-const BoundsController = ({ bbox }: { bbox: MapBoundingBox }) => {
+const areBoundsEquivalent = (left: MapBoundingBox, right: MapBoundingBox) =>
+  Math.abs(left.north - right.north) < 0.00001 &&
+  Math.abs(left.south - right.south) < 0.00001 &&
+  Math.abs(left.east - right.east) < 0.00001 &&
+  Math.abs(left.west - right.west) < 0.00001
+
+const getMapBounds = (map: LeafletMap): MapBoundingBox | null => {
+  if (typeof map.getBounds !== 'function') return null
+  const bounds = map.getBounds()
+  return {
+    north: bounds.getNorth(),
+    south: bounds.getSouth(),
+    east: bounds.getEast(),
+    west: bounds.getWest(),
+  }
+}
+
+const BoundsController = ({
+  bbox,
+  onViewportChange,
+}: {
+  bbox: MapBoundingBox
+  onViewportChange?: (bbox: MapBoundingBox) => void
+}) => {
   const map = useMap()
+  const lastAppliedBboxRef = useRef<MapBoundingBox | null>(null)
+  const ignoreNextViewportRef = useRef(false)
 
   useEffect(() => {
+    const currentBbox = getMapBounds(map)
+    const lastAppliedBbox = lastAppliedBboxRef.current
+    const shouldFit =
+      lastAppliedBbox === null ||
+      (currentBbox !== null &&
+        !areBoundsEquivalent(currentBbox, bbox) &&
+        !areBoundsEquivalent(lastAppliedBbox, bbox))
+
+    if (!shouldFit) {
+      lastAppliedBboxRef.current = bbox
+      return
+    }
+
     const southWest: [number, number] = [bbox.south, bbox.west]
     const northEast: [number, number] = [bbox.north, bbox.east]
+    ignoreNextViewportRef.current = true
     map.fitBounds([southWest, northEast], { padding: [16, 16] })
+    lastAppliedBboxRef.current = bbox
   }, [map, bbox])
+
+  useEffect(() => {
+    if (!onViewportChange || typeof map.on !== 'function') return
+    const report = () => {
+      if (ignoreNextViewportRef.current) {
+        ignoreNextViewportRef.current = false
+        return
+      }
+      const nextBbox = getMapBounds(map)
+      if (!nextBbox) return
+      lastAppliedBboxRef.current = nextBbox
+      onViewportChange(nextBbox)
+    }
+    map.on('moveend zoomend', report)
+    return () => {
+      map.off('moveend zoomend', report)
+    }
+  }, [map, onViewportChange])
 
   return null
 }
@@ -195,6 +254,7 @@ export const MapCanvas = ({
   isEmpty,
   userLocation = null,
   radiusKm = null,
+  onViewportChange,
   className = '',
 }: MapCanvasProps) => {
   const { t } = useTranslation()
@@ -340,7 +400,7 @@ export const MapCanvas = ({
         zoomControl={false}
         scrollWheelZoom
       >
-        <BoundsController bbox={bbox} />
+        <BoundsController bbox={bbox} onViewportChange={onViewportChange} />
         <LocationController userLocation={userLocation} />
         <SelectedPinController
           selectedPin={selectedPin}

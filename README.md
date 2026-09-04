@@ -32,6 +32,13 @@ cambiar `.env` o `.env.local`. Comprueba el modo con:
 document.documentElement.dataset.apiMode;
 ```
 
+## Mapa y viewport
+
+`GET /api/map` recibe el bbox actual del viewport. `Sin limite` filtra por esa
+ventana y los radios numericos conservan el centro del dispositivo o del perfil.
+La respuesta limita a 50 rincones, 100 publicaciones y 100 actividades e
+incluye metadatos de truncamiento.
+
 ## Dataset de demo real
 
 Sobre una base aislada y ya migrada:

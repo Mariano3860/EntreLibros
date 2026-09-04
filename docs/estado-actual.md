@@ -24,7 +24,10 @@ La matriz de requisitos y la evidencia se mantienen en
 - Rincones: alta, edicion, normas, horario, consentimiento, visibilidad,
   aprobacion y pausa/reactivacion reversible.
 - Descubrimiento: mapa y listado real comparten filtros, radio, orden y estados
-  de carga/vacio/error; sin centro valido no se inventa una distancia.
+  de carga/vacio/error; `Sin limite` usa el bbox real del viewport y los radios
+  numericos usan el centro del dispositivo/perfil; sin centro valido no se
+  inventa una distancia. El mapa limita 50 rincones, 100 publicaciones y 100
+  actividades e informa truncamiento.
 - Comunidad: feed persistente, historias, seguimiento, likes unicos, comentarios,
   compartir, Rincones cercanos, fotos de perfil, sugerencias con enlaces reales a
   perfiles y búsqueda global de personas con filtros de privacidad/bloqueo.

@@ -68,6 +68,7 @@ const MAP_BOUNDS: MapBoundingBox = {
 
 const MIN_MAP_RADIUS_KM = 5.55
 const MOCK_MAP_REFERENCE_DATE = '2025-01-15T12:00:00.000Z'
+const MAP_RESULT_LIMITS = { corners: 50, publications: 100, activity: 100 }
 
 const parseRequestedRadius = (value: string | null): MapRadiusKm | null => {
   if (value === null) return null
@@ -114,7 +115,7 @@ export const MapPage = () => {
   )
   const [category, setCategory] = useState('Todo')
   const [search, setSearch] = useState('')
-  const [bbox, setBbox] = useState<MapBoundingBox>(MAP_BOUNDS)
+  const [viewportBbox, setViewportBbox] = useState<MapBoundingBox>(MAP_BOUNDS)
   const [location, setLocation] = useState<UserLocation | null>(null)
   const [locationDenied, setLocationDenied] = useState(false)
   const [openNow, setOpenNow] = useState(false)
@@ -176,11 +177,29 @@ export const MapPage = () => {
           intensity: Math.max(1, 4 - index),
         }
       }),
-      meta: { bbox: MAP_BOUNDS, generatedAt: MOCK_MAP_REFERENCE_DATE },
+      meta: {
+        bbox: MAP_BOUNDS,
+        generatedAt: MOCK_MAP_REFERENCE_DATE,
+        truncated: false,
+        limits: MAP_RESULT_LIMITS,
+      },
     }),
     [catalog.corners]
   )
   const effectiveDistance = discoveryLocation ? distance : null
+  const radialBbox = useMemo(
+    () =>
+      effectiveDistance !== null && discoveryLocation
+        ? boundingBoxFromCenter(
+            discoveryLocation.latitude,
+            discoveryLocation.longitude,
+            effectiveDistance,
+            { minDistanceKm: MIN_MAP_RADIUS_KM }
+          )
+        : null,
+    [discoveryLocation, effectiveDistance]
+  )
+  const mapBbox = radialBbox ?? viewportBbox
   const mockFilteredMapData = useMemo<MapResponse>(() => {
     const normalizedSearch = search.trim().toLowerCase()
     const getDistanceKm = (corner: MapCornerPin) =>
@@ -202,6 +221,13 @@ export const MapPage = () => {
         { latitude, longitude },
         effectiveDistance
       )
+    const matchesViewport = (latitude: number, longitude: number) =>
+      effectiveDistance !== null ||
+      (latitude >= viewportBbox.south &&
+        latitude <= viewportBbox.north &&
+        (viewportBbox.east >= viewportBbox.west
+          ? longitude >= viewportBbox.west && longitude <= viewportBbox.east
+          : longitude >= viewportBbox.west || longitude <= viewportBbox.east))
     const matchesSearch = (value: string) =>
       normalizedSearch.length === 0 ||
       value.toLowerCase().includes(normalizedSearch)
@@ -220,7 +246,8 @@ export const MapPage = () => {
             matchesSearch(corner.city)) &&
           matchesCategory(corner.themes) &&
           (!openNow || corner.isOpenNow !== false) &&
-          matchesDistance(corner.lat, corner.lon)
+          matchesDistance(corner.lat, corner.lon) &&
+          matchesViewport(corner.lat, corner.lon)
       )
       .map((corner) => ({
         ...corner,
@@ -233,7 +260,8 @@ export const MapPage = () => {
           (right.distanceKm ?? Number.POSITIVE_INFINITY)
       )
     }
-    const visibleCornerIds = new Set(visibleCorners.map((corner) => corner.id))
+    const limitedCorners = visibleCorners.slice(0, MAP_RESULT_LIMITS.corners)
+    const visibleCornerIds = new Set(limitedCorners.map((corner) => corner.id))
     const visiblePublications = mockMapData.publications.filter(
       (publication) => {
         const corner = mockMapData.corners.find(
@@ -247,7 +275,8 @@ export const MapPage = () => {
             publication.authors.some(matchesSearch)) &&
           latitude !== undefined &&
           longitude !== undefined &&
-          matchesDistance(latitude, longitude)
+          matchesDistance(latitude, longitude) &&
+          matchesViewport(latitude, longitude)
         )
       }
     )
@@ -258,26 +287,44 @@ export const MapPage = () => {
             matchesDistance(point.lat, point.lon)
         )
       : []
+    const limitedPublications = visiblePublications.slice(
+      0,
+      MAP_RESULT_LIMITS.publications
+    )
+    const limitedActivity = visibleActivity.slice(0, MAP_RESULT_LIMITS.activity)
 
     return {
       ...mockMapData,
-      corners: visibleCorners,
-      publications: visiblePublications,
-      activity: visibleActivity,
+      corners: limitedCorners,
+      publications: limitedPublications,
+      activity: limitedActivity,
+      meta: {
+        ...mockMapData.meta,
+        bbox: mapBbox,
+        truncated:
+          visibleCorners.length > MAP_RESULT_LIMITS.corners ||
+          visiblePublications.length > MAP_RESULT_LIMITS.publications ||
+          visibleActivity.length > MAP_RESULT_LIMITS.activity,
+      },
     }
   }, [
     category,
     effectiveDistance,
     discoveryLocation,
+    mapBbox,
     mockMapData,
     openNow,
     recentActivity,
     search,
+    viewportBbox,
   ])
   const mapQuery = useMapData(
     {
-      bbox,
-      center: discoveryLocation ?? undefined,
+      bbox: mapBbox,
+      center:
+        effectiveDistance !== null
+          ? (discoveryLocation ?? undefined)
+          : undefined,
       searchTerm: search.trim() || undefined,
       filters: {
         distanceKm: effectiveDistance,
@@ -291,6 +338,7 @@ export const MapPage = () => {
     { enabled: !mockMode }
   )
   const mapData = mockMode ? mockFilteredMapData : mapQuery.data
+  const mapResultsTruncated = mapData?.meta.truncated === true
   const mapCorners = useMemo(() => mapData?.corners ?? [], [mapData])
   const mapPublications = useMemo(() => mapData?.publications ?? [], [mapData])
   const mapActivity = useMemo(() => mapData?.activity ?? [], [mapData])
@@ -424,22 +472,15 @@ export const MapPage = () => {
   }, [])
 
   useEffect(() => {
-    if (!discoveryLocation) return
-    setBbox(
-      distance === null
-        ? MAP_BOUNDS
-        : boundingBoxFromCenter(
-            discoveryLocation.latitude,
-            discoveryLocation.longitude,
-            distance,
-            { minDistanceKm: MIN_MAP_RADIUS_KM }
-          )
-    )
-  }, [distance, discoveryLocation])
-
-  useEffect(() => {
     locate()
   }, [locate])
+
+  const handleViewportChange = useCallback(
+    (nextBbox: MapBoundingBox) => {
+      if (effectiveDistance === null) setViewportBbox(nextBbox)
+    },
+    [effectiveDistance]
+  )
 
   const handleDistanceChange = useCallback(
     (nextDistance: MapRadiusKm | null) => {
@@ -691,7 +732,7 @@ export const MapPage = () => {
             aria-label={`Mapa ${theme === 'dark' ? 'oscuro' : 'claro'} con rincones en un radio ${distance === null ? 'sin límite' : `de hasta ${distance} kilómetros`}`}
           >
             <MapCanvas
-              bbox={bbox}
+              bbox={mapBbox}
               corners={mapCorners}
               publications={mapPublications}
               activity={mapActivity}
@@ -704,8 +745,15 @@ export const MapPage = () => {
               isEmpty={isMapEmpty}
               userLocation={discoveryLocation}
               radiusKm={effectiveDistance}
+              onViewportChange={handleViewportChange}
               className={styles.leafletCanvas}
             />
+            {mapResultsTruncated ? (
+              <div className={styles.locationNotice} role="status">
+                Mostrando una selección de resultados. Acercá el mapa para ver
+                más rincones.
+              </div>
+            ) : null}
             <Panel className={styles.placeCard} as="article">
               <div className={styles.placeImage}>
                 <span>☕</span>
