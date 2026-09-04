@@ -60,4 +60,15 @@ Para el recorrido reproducible, carga solamente en una base aislada:
 psql "$DATABASE_URL" -f backend/scripts/seed-demo-dataset.sql
 ```
 
+Para una base local con datos visuales completos y textos normalizados, usa el
+dataset curado:
+
+```bash
+psql "$DATABASE_URL" -f backend/scripts/seed-realistic-local-dataset.sql
+```
+
+Es una carga idempotente de desarrollo, no una migracion: actualiza el catalogo
+local, completa imagenes de libros, perfiles y Rincones, y no debe ejecutarse
+en produccion.
+
 No compartas dumps con datos personales ni credenciales en documentacion o tickets.

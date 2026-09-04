@@ -45,6 +45,18 @@ acuerdo, notificaciones, eventos y un resultado. No lo ejecutes sobre produccion
 La ruta `/profile/:id`, el contacto desde publicacion/perfil, los reportes y
 `/stats` forman parte del recorrido real.
 
+Para completar el catalogo visual de una base local ya migrada, cargar el
+dataset curado:
+
+```bash
+psql "$DATABASE_URL" -f backend/scripts/seed-realistic-local-dataset.sql
+```
+
+Este script corrige textos con codificacion rota, agrega portadas a todas las
+publicaciones, asigna avatares de desarrollo y reemplaza las fotos de los
+Rincones por imagenes publicas. Conserva ids, relaciones, contrasenas y el
+avatar subido existente. Ejecutalo solamente sobre la base de desarrollo.
+
 ## Verificacion
 
 ```bash

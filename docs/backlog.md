@@ -23,6 +23,8 @@ La matriz completa y sus referencias estan en
 - Dataset reproducible con dos usuarios, publicaciones, Rincon, conversacion,
   acuerdo, notificaciones, eventos y resultado.
 - Migraciones acumulativas 031-034, pruebas automatizadas, typecheck, lint,
+- Dataset visual local curado con portadas, avatares, fotos de Rincones y textos
+  bibliograficos normalizados para el recorrido real.
   formato, build y contrato OpenAPI actualizado.
 - Foto de perfil con recorte cuadrado confirmado, reemplazo repetido, persistencia
   segura y presentación consistente en Perfil y Comunidad.
