@@ -1,6 +1,6 @@
 # Hoja de ruta
 
-Fecha de referencia: 2026-09-03. El estado verificable se mantiene en
+Fecha de referencia: 2026-09-04. El estado verificable se mantiene en
 [`tfg-mvp-trazabilidad.md`](tfg-mvp-trazabilidad.md).
 
 ## Cierre inmediato
@@ -15,8 +15,9 @@ Fecha de referencia: 2026-09-03. El estado verificable se mantiene en
 
 El recorrido funcional de publicacion, descubrimiento, contacto, acuerdo,
 notificacion, reporte y metricas ya esta implementado y cubierto por pruebas de
-servicio y frontend. Los puntos anteriores son evidencia y operacion pendiente,
-no nuevos contratos de producto.
+servicio y frontend. El contacto puede quedar como borrador privado antes del
+envio y las propuestas enriquecidas se validan al enviarse. Los puntos
+anteriores son evidencia y operacion pendiente, no nuevos contratos de producto.
 
 ## Evolucion posterior
 

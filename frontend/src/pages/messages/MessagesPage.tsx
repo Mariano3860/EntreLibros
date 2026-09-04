@@ -1,7 +1,5 @@
 import {
   commandAgreement,
-  counterProposeAgreement,
-  createAgreement,
   fetchAgreement,
   recordAgreementOutcome,
   type AgreementDetails,
@@ -16,16 +14,18 @@ import {
   fetchMessageHistory,
   markMessagesRead,
   messageQueryKeys,
-  sendPersistedMessage,
   type ConversationBook,
   type MessagingContact,
+  type ApiMessageDraft,
+  type ApiMessageDraftAttachment,
 } from '@api/messages/messages'
 import { notificationKeys } from '@api/notifications/notifications'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
+import { MessageDraftCard } from '@components/messages/drafts/MessageDraftCard'
 import { useAuth } from '@contexts/auth/AuthContext'
 import { useFocusTrap } from '@hooks/useFocusTrap'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { FormEvent, useEffect, useRef, useState } from 'react'
+import { FormEvent, useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 
@@ -47,6 +47,7 @@ import {
   toPrototypeConversation,
 } from '@src/features/prototype/realData.adapters'
 import { useChatSocket } from '@src/hooks/socket/useChatSocket'
+import { useMessageDraft } from '@src/hooks/useMessageDraft'
 import { isApiMockMode } from '@src/utils/runtimeEnv'
 
 import styles from './MessagesPage.module.scss'
@@ -466,9 +467,31 @@ const MockMessagesPage = () => {
   const [search, setSearch] = useState('')
   const [unreadOnly, setUnreadOnly] = useState(false)
   const [message, setMessage] = useState('')
+  const [mockDrafts, setMockDrafts] = useState<Record<string, ApiMessageDraft>>(
+    () => {
+      try {
+        const stored = localStorage.getItem(
+          `entrelibros:prototype:message-drafts:${catalog.user.id}`
+        )
+        return stored
+          ? (JSON.parse(stored) as Record<string, ApiMessageDraft>)
+          : {}
+      } catch {
+        return {}
+      }
+    }
+  )
   const [bookPicker, setBookPicker] = useState<'attach' | 'proposal' | null>(
     null
   )
+  const [agreementOpen, setAgreementOpen] = useState(false)
+  const [agreementForm, setAgreementForm] = useState({
+    meetingPoint: 'Biblioteca Literaria',
+    area: 'Palermo',
+    date: '2026-09-10',
+    time: '18:30',
+    bookTitle: catalog.books[0]?.title ?? '',
+  })
   const [composerMenuOpen, setComposerMenuOpen] = useState(false)
   const [emojiPickerOpen, setEmojiPickerOpen] = useState(false)
   const messageInputRef = useRef<HTMLInputElement>(null)
@@ -477,6 +500,12 @@ const MockMessagesPage = () => {
     catalog.conversations.find(
       (conversation) => conversation.id === selected
     ) ?? catalog.conversations[1]
+  const mockConversationId = Math.max(
+    catalog.conversations.findIndex(
+      (conversation) => conversation.id === selected
+    ) + 1,
+    1
+  )
   const conversations = catalog.conversations
     .map((conversation) =>
       readConversationIds.has(conversation.id)
@@ -487,6 +516,18 @@ const MockMessagesPage = () => {
       conversation.name.toLowerCase().includes(search.toLowerCase())
     )
     .filter((conversation) => !unreadOnly || Boolean(conversation.unread))
+  const activeDraft = mockDrafts[selected] ?? null
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        `entrelibros:prototype:message-drafts:${catalog.user.id}`,
+        JSON.stringify(mockDrafts)
+      )
+    } catch {
+      // La vista mock sigue funcionando aunque el navegador bloquee el almacenamiento.
+    }
+  }, [catalog.user.id, mockDrafts])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView?.({ block: 'end' })
@@ -495,11 +536,69 @@ const MockMessagesPage = () => {
     markConversationRead(selected)
   }, [markConversationRead, selected])
 
+  const saveMockDraft = (
+    body: string,
+    attachmentMetadata: ApiMessageDraftAttachment | null = null
+  ) => {
+    setMockDrafts((current) => {
+      const previous = current[selected]
+      const now = new Date().toISOString()
+      return {
+        ...current,
+        [selected]: {
+          id: previous?.id ?? Date.now(),
+          conversationId: mockConversationId,
+          authorId: 1,
+          body: body.trim(),
+          attachmentMetadata,
+          revision: (previous?.revision ?? 0) + 1,
+          createdAt: previous?.createdAt ?? now,
+          updatedAt: now,
+        },
+      }
+    })
+  }
+
+  const discardMockDraft = () => {
+    setMockDrafts((current) => {
+      const next = { ...current }
+      delete next[selected]
+      return next
+    })
+    setMessage('')
+  }
+
+  const sendMockContent = (
+    body: string,
+    attachment: ApiMessageDraftAttachment | null = null
+  ) => {
+    const kind =
+      attachment?.kind === 'book'
+        ? 'book'
+        : attachment?.kind === 'swap' ||
+            attachment?.kind === 'agreementProposal'
+          ? 'proposal'
+          : undefined
+    const text =
+      body.trim() ||
+      (attachment?.kind === 'agreementProposal'
+        ? attachment.details.bookTitle
+        : attachment?.kind === 'book'
+          ? attachment.title
+          : 'Propuesta de intercambio')
+    sendMessage(text, kind)
+    discardMockDraft()
+  }
+
+  const sendMockDraft = () => {
+    if (!activeDraft) return
+    sendMockContent(activeDraft.body, activeDraft.attachmentMetadata)
+  }
+
   const submit = (event: FormEvent) => {
     event.preventDefault()
-    if (!message.trim()) return
-    sendMessage(message.trim())
-    setMessage('')
+    if (!message.trim() && !activeDraft?.attachmentMetadata) return
+    sendMockContent(message, activeDraft?.attachmentMetadata ?? null)
   }
 
   const insertEmoji = (emoji: string) => {
@@ -670,6 +769,29 @@ const MockMessagesPage = () => {
                   </div>
                 )
               )}
+              {activeDraft ? (
+                <MessageDraftCard
+                  draft={activeDraft}
+                  onEdit={() => {
+                    setMessage(activeDraft.body)
+                    if (activeDraft.attachmentMetadata?.kind === 'book') {
+                      setBookPicker('attach')
+                    } else if (
+                      activeDraft.attachmentMetadata?.kind === 'swap'
+                    ) {
+                      setBookPicker('proposal')
+                    } else if (
+                      activeDraft.attachmentMetadata?.kind ===
+                      'agreementProposal'
+                    ) {
+                      setAgreementForm(activeDraft.attachmentMetadata.details)
+                      setAgreementOpen(true)
+                    }
+                  }}
+                  onDiscard={discardMockDraft}
+                  onSend={sendMockDraft}
+                />
+              ) : null}
               <div ref={messagesEndRef} />
             </div>
 
@@ -698,6 +820,10 @@ const MockMessagesPage = () => {
                   onProposeSwap={() => {
                     setComposerMenuOpen(false)
                     setBookPicker('proposal')
+                  }}
+                  onPrepareAgreement={() => {
+                    setComposerMenuOpen(false)
+                    setAgreementOpen(true)
                   }}
                 />
               ) : null}
@@ -740,12 +866,52 @@ const MockMessagesPage = () => {
                   <button
                     key={book.id}
                     onClick={() => {
-                      sendMessage(
-                        bookPicker === 'attach'
-                          ? book.title
-                          : `Propuesta de intercambio · ${book.title}`,
-                        bookPicker === 'attach' ? 'book' : 'proposal'
-                      )
+                      if (bookPicker === 'attach') {
+                        saveMockDraft(message || book.title, {
+                          key: `book:${book.id}`,
+                          contentType: 'application/x-entrelibros-book',
+                          size: 1,
+                          kind: 'book',
+                          bookId: book.id,
+                          title: book.title,
+                          author: book.author,
+                          coverUrl:
+                            'coverUrl' in book &&
+                            typeof book.coverUrl === 'string'
+                              ? book.coverUrl
+                              : '',
+                        })
+                      } else {
+                        const offered = catalog.userBooks[0] ?? book
+                        const requested = catalog.books[0] ?? book
+                        saveMockDraft(message, {
+                          key: `swap:${offered.id}:${requested.id}`,
+                          contentType: 'application/x-entrelibros-swap',
+                          size: 1,
+                          kind: 'swap',
+                          offered: {
+                            id: offered.id,
+                            title: offered.title,
+                            author: offered.author,
+                            coverUrl:
+                              'coverUrl' in offered &&
+                              typeof offered.coverUrl === 'string'
+                                ? offered.coverUrl
+                                : '',
+                          },
+                          requested: {
+                            id: requested.id,
+                            title: requested.title,
+                            author: requested.author,
+                            coverUrl:
+                              'coverUrl' in requested &&
+                              typeof requested.coverUrl === 'string'
+                                ? requested.coverUrl
+                                : '',
+                          },
+                          ...(message.trim() ? { note: message.trim() } : {}),
+                        })
+                      }
                       setBookPicker(null)
                     }}
                   >
@@ -760,6 +926,166 @@ const MockMessagesPage = () => {
                   </button>
                 ))}
               </div>
+            </Panel>
+          </div>
+        ) : null}
+        {agreementOpen ? (
+          <div className={styles.modalBackdrop}>
+            <Panel className={styles.bookPicker} as="div">
+              <header>
+                <div>
+                  <span>
+                    {t('community.messages.drafts.agreementTitle', {
+                      defaultValue: 'Propuesta de acuerdo',
+                    })}
+                  </span>
+                  <h2>
+                    {t('community.messages.composer.agreementModal.title', {
+                      defaultValue: 'Propuesta de acuerdo',
+                    })}
+                  </h2>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setAgreementOpen(false)}
+                  aria-label={t('community.messages.composer.close', {
+                    defaultValue: 'Cerrar',
+                  })}
+                >
+                  ×
+                </button>
+              </header>
+              <form
+                className={styles.newConversationForm}
+                onSubmit={(event) => {
+                  event.preventDefault()
+                  saveMockDraft('', {
+                    key: `agreement-proposal:${selected}`,
+                    contentType: 'application/x-entrelibros-agreement-proposal',
+                    size: 1,
+                    kind: 'agreementProposal',
+                    listingIds: [1],
+                    details: agreementForm,
+                  })
+                  setAgreementOpen(false)
+                }}
+              >
+                <label className={styles.newConversationField}>
+                  <span>
+                    {t('community.messages.composer.agreementModal.bookLabel', {
+                      defaultValue: 'Libro a intercambiar',
+                    })}
+                  </span>
+                  <select
+                    aria-label={t(
+                      'community.messages.composer.agreementModal.bookLabel',
+                      { defaultValue: 'Libro a intercambiar' }
+                    )}
+                    value={agreementForm.bookTitle}
+                    onChange={(event) =>
+                      setAgreementForm((current) => ({
+                        ...current,
+                        bookTitle: event.target.value,
+                      }))
+                    }
+                  >
+                    {catalog.books.map((book) => (
+                      <option key={book.id} value={book.title}>
+                        {book.title}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className={styles.newConversationField}>
+                  <span>
+                    {t(
+                      'community.messages.composer.agreementModal.meetingLabel',
+                      { defaultValue: 'Punto de encuentro' }
+                    )}
+                  </span>
+                  <input
+                    value={agreementForm.meetingPoint}
+                    onChange={(event) =>
+                      setAgreementForm((current) => ({
+                        ...current,
+                        meetingPoint: event.target.value,
+                      }))
+                    }
+                  />
+                </label>
+                <label className={styles.newConversationField}>
+                  <span>
+                    {t('community.messages.composer.agreementModal.areaLabel', {
+                      defaultValue: 'Zona o barrio',
+                    })}
+                  </span>
+                  <input
+                    value={agreementForm.area}
+                    onChange={(event) =>
+                      setAgreementForm((current) => ({
+                        ...current,
+                        area: event.target.value,
+                      }))
+                    }
+                  />
+                </label>
+                <div className={styles.agreementFields}>
+                  <label className={styles.newConversationField}>
+                    <span>
+                      {t(
+                        'community.messages.composer.agreementModal.dateLabel',
+                        {
+                          defaultValue: 'Día sugerido',
+                        }
+                      )}
+                    </span>
+                    <input
+                      type="date"
+                      value={agreementForm.date}
+                      onChange={(event) =>
+                        setAgreementForm((current) => ({
+                          ...current,
+                          date: event.target.value,
+                        }))
+                      }
+                    />
+                  </label>
+                  <label className={styles.newConversationField}>
+                    <span>
+                      {t(
+                        'community.messages.composer.agreementModal.timeLabel',
+                        {
+                          defaultValue: 'Horario',
+                        }
+                      )}
+                    </span>
+                    <input
+                      type="time"
+                      value={agreementForm.time}
+                      onChange={(event) =>
+                        setAgreementForm((current) => ({
+                          ...current,
+                          time: event.target.value,
+                        }))
+                      }
+                    />
+                  </label>
+                </div>
+                <div className={styles.newConversationActions}>
+                  <button
+                    type="button"
+                    className={styles.newConversationCancel}
+                    onClick={() => setAgreementOpen(false)}
+                  >
+                    {t('community.messages.composer.cancel', {
+                      defaultValue: 'Cancelar',
+                    })}
+                  </button>
+                  <PrototypeButton type="submit" tone="primary">
+                    Guardar borrador
+                  </PrototypeButton>
+                </div>
+              </form>
             </Panel>
           </div>
         ) : null}
@@ -817,6 +1143,12 @@ const RealMessagesPage = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const modalRef = useRef<HTMLDivElement>(null)
   const lastReadSequenceRef = useRef(new Map<number, number>())
+  const hydratedDraftConversationRef = useRef<number | null>(null)
+  const draftSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const draftAutosaveSignatureRef = useRef<string | null>(null)
+  const [draftSaveState, setDraftSaveState] = useState<
+    'idle' | 'pending' | 'saved' | 'error'
+  >('idle')
   const conversationsQuery = useQuery({
     queryKey: messageQueryKeys.conversations(),
     queryFn: fetchConversations,
@@ -837,6 +1169,7 @@ const RealMessagesPage = () => {
     queryFn: () => fetchMessageHistory(selected ?? 0),
     enabled: selected !== null,
   })
+  const draftState = useMessageDraft(selected)
   const booksQuery = useQuery({
     queryKey: messageQueryKeys.books(selected ?? 0),
     queryFn: () => fetchConversationBooks(selected ?? 0),
@@ -852,6 +1185,31 @@ const RealMessagesPage = () => {
   const isCounterProposal =
     activeAgreement?.state === 'proposed' ||
     activeAgreement?.state === 'partially_confirmed'
+  const saveDraft = useCallback(
+    async (value: {
+      body: string
+      attachmentMetadata?: ApiMessageDraftAttachment | null
+    }) => {
+      if (selected === null) return Promise.resolve(null)
+      const draftValue = {
+        body: value.body,
+        attachmentMetadata: value.attachmentMetadata ?? null,
+      }
+      draftAutosaveSignatureRef.current = JSON.stringify(draftValue)
+      setDraftSaveState('pending')
+      return draftState.save
+        .mutateAsync(draftValue)
+        .then((draft) => {
+          setDraftSaveState('saved')
+          return draft
+        })
+        .catch((error: unknown) => {
+          setDraftSaveState('error')
+          throw error
+        })
+    },
+    [draftState.save, selected]
+  )
   type AgreementMutationInput = {
     command: 'confirm' | 'reject' | 'cancel'
     reason?: string
@@ -914,39 +1272,43 @@ const RealMessagesPage = () => {
         defaultValue: 'El acuerdo fue cancelado.',
       }),
     })
-  const agreementCreateMutation = useMutation({
-    mutationFn: async (details: AgreementDetails) => {
-      if (!selected || !activeConversation || !user) {
-        throw new Error('conversation_unavailable')
-      }
-      const participantId = activeConversation.participantIds.find(
-        (id) => id !== user.id
-      )
-      if (!participantId) throw new Error('participant_unavailable')
-      if (activeConversation.agreementId !== null) {
-        if (!activeAgreement || !isCounterProposal) {
-          throw new Error('agreement_unavailable')
-        }
-        return counterProposeAgreement({
-          agreementId: activeAgreement.id,
-          expectedVersion: activeAgreement.currentVersion,
-          details,
+  const saveAgreementDraft = async (details: AgreementDetails) => {
+    if (!selected) return
+    const selectedBook = [
+      ...(booksQuery.data?.myBooks ?? []),
+      ...(booksQuery.data?.theirBooks ?? []),
+    ].find((book) => book.title === details.bookTitle)
+    const listingId =
+      selectedBook?.id && /^\d+$/.test(selectedBook.id)
+        ? Number(selectedBook.id)
+        : null
+    if (!listingId) {
+      setAttachError(
+        t('community.messages.drafts.agreementBookRequired', {
+          defaultValue: 'Elegí un libro válido de la conversación.',
         })
-      }
-      const matchingBooks = (booksQuery.data?.myBooks ?? [])
-        .concat(booksQuery.data?.theirBooks ?? [])
-        .filter((item) => item.title === details.bookTitle)
-      const book = matchingBooks.length === 1 ? matchingBooks[0] : null
-      const listingId =
-        book?.id && /^\d+$/.test(book.id) ? Number(book.id) : null
-      return createAgreement({
-        conversationId: selected,
-        participantId,
-        details,
-        ...(listingId ? { listingIds: [listingId] } : {}),
+      )
+      return
+    }
+    setAttachError(null)
+    try {
+      await saveDraft({
+        body: '',
+        attachmentMetadata: {
+          key: `agreement-proposal:${selected}:${listingId}`,
+          contentType: 'application/x-entrelibros-agreement-proposal',
+          size: 1,
+          kind: 'agreementProposal',
+          listingIds: [listingId],
+          details,
+          ...(isCounterProposal && activeAgreement
+            ? {
+                agreementId: activeAgreement.id,
+                expectedVersion: activeAgreement.currentVersion,
+              }
+            : {}),
+        },
       })
-    },
-    onSuccess: async (agreement) => {
       setAgreementOpen(false)
       setAgreementForm({
         meetingPoint: '',
@@ -955,18 +1317,14 @@ const RealMessagesPage = () => {
         time: '',
         bookTitle: '',
       })
-      queryClient.setQueryData(
-        ['prototype', 'agreement', agreement.id],
-        agreement
+    } catch {
+      setAttachError(
+        t('community.messages.drafts.saveError', {
+          defaultValue: 'No pudimos guardar el borrador. Intentá nuevamente.',
+        })
       )
-      await queryClient.invalidateQueries({
-        queryKey: messageQueryKeys.history(agreement.conversationId),
-      })
-      await queryClient.invalidateQueries({
-        queryKey: messageQueryKeys.conversations(),
-      })
-    },
-  })
+    }
+  }
   const conversationMutation = useMutation({
     mutationFn: async () => {
       if (
@@ -1016,6 +1374,61 @@ const RealMessagesPage = () => {
     }
   }, [conversations])
   useEffect(() => {
+    if (selected === null) {
+      hydratedDraftConversationRef.current = null
+      draftAutosaveSignatureRef.current = null
+      setMessage('')
+      setDraftSaveState('idle')
+      return
+    }
+    if (draftState.query.isLoading) return
+    if (hydratedDraftConversationRef.current === selected) return
+    hydratedDraftConversationRef.current = selected
+    draftAutosaveSignatureRef.current = null
+    setMessage(draftState.query.data?.body ?? '')
+    setDraftSaveState(draftState.query.data ? 'saved' : 'idle')
+  }, [draftState.query.data, draftState.query.isLoading, selected])
+  useEffect(() => {
+    const attachmentMetadata = draftState.query.data?.attachmentMetadata ?? null
+    const currentValue = { body: message, attachmentMetadata }
+    const currentSignature = JSON.stringify(currentValue)
+    const savedSignature = JSON.stringify({
+      body: draftState.query.data?.body ?? '',
+      attachmentMetadata,
+    })
+    if (
+      selected === null ||
+      draftState.query.isLoading ||
+      hydratedDraftConversationRef.current !== selected ||
+      (!message.trim() && !attachmentMetadata) ||
+      currentSignature === savedSignature ||
+      draftAutosaveSignatureRef.current === currentSignature ||
+      draftState.save.isPending
+    ) {
+      return
+    }
+    setDraftSaveState('pending')
+    if (draftSaveTimerRef.current) clearTimeout(draftSaveTimerRef.current)
+    draftSaveTimerRef.current = setTimeout(() => {
+      draftAutosaveSignatureRef.current = currentSignature
+      void saveDraft(currentValue).catch(() => undefined)
+      draftSaveTimerRef.current = null
+    }, 500)
+    return () => {
+      if (draftSaveTimerRef.current) {
+        clearTimeout(draftSaveTimerRef.current)
+        draftSaveTimerRef.current = null
+      }
+    }
+  }, [
+    draftState.query.data,
+    draftState.query.isLoading,
+    draftState.save.isPending,
+    message,
+    saveDraft,
+    selected,
+  ])
+  useEffect(() => {
     if (selected === null || !isConnected) return
     joinConversation(selected, historyQuery.data?.nextAfter ?? 0)
   }, [historyQuery.data?.nextAfter, isConnected, joinConversation, selected])
@@ -1047,27 +1460,60 @@ const RealMessagesPage = () => {
       })
   }, [historyQuery.data, liveMessages, queryClient, selected])
 
-  const submit = async (event: FormEvent) => {
-    event.preventDefault()
-    if (!selected || !message.trim()) return
+  const handleSendDraft = async (draftOverride?: ApiMessageDraft | null) => {
+    const draft = draftOverride ?? draftState.query.data
+    if (!draft) return
     setSendError(null)
     try {
-      await sendPersistedMessage({
-        conversationId: selected,
+      await draftState.send.mutateAsync({
         clientKey: createClientKey(),
-        body: message.trim(),
+        revision: draft.revision,
       })
+      draftAutosaveSignatureRef.current = null
       setMessage('')
-      await queryClient.invalidateQueries({
-        queryKey: messageQueryKeys.all,
-      })
+      setDraftSaveState('idle')
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: messageQueryKeys.history(selected ?? 0),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: messageQueryKeys.conversations(),
+        }),
+      ])
     } catch {
       setSendError(
-        t('community.messages.states.sendError', {
-          defaultValue: 'No pudimos enviar el mensaje. Intentá nuevamente.',
+        t('community.messages.drafts.sendError', {
+          defaultValue: 'No pudimos enviar el borrador. Intentá nuevamente.',
         })
       )
     }
+  }
+
+  const submit = (event: FormEvent) => {
+    event.preventDefault()
+    if (
+      !selected ||
+      (!message.trim() && !draftState.query.data?.attachmentMetadata)
+    ) {
+      return
+    }
+    if (draftSaveTimerRef.current) {
+      clearTimeout(draftSaveTimerRef.current)
+      draftSaveTimerRef.current = null
+    }
+    setSendError(null)
+    void saveDraft({
+      body: message.trim(),
+      attachmentMetadata: draftState.query.data?.attachmentMetadata ?? null,
+    })
+      .then((draft) => handleSendDraft(draft))
+      .catch(() => {
+        setSendError(
+          t('community.messages.drafts.saveError', {
+            defaultValue: 'No pudimos guardar el borrador. Intentá nuevamente.',
+          })
+        )
+      })
   }
 
   const insertEmoji = (emoji: string) => {
@@ -1091,10 +1537,8 @@ const RealMessagesPage = () => {
     setSendError(null)
     setAttachError(null)
     try {
-      await sendPersistedMessage({
-        conversationId: selected,
-        clientKey: createClientKey(),
-        body: book.title,
+      await saveDraft({
+        body: message.trim() || book.title,
         attachmentMetadata: {
           key: `book:${book.id}`,
           contentType: 'application/x-entrelibros-book',
@@ -1105,14 +1549,12 @@ const RealMessagesPage = () => {
           author: book.author,
           coverUrl: book.coverUrl,
           ...(book.ownerId ? { ownerId: book.ownerId } : {}),
+          ...(book.condition ? { condition: book.condition } : {}),
         },
       })
       setBookPickerMode(null)
       setComposerMenuOpen(false)
       setAttachError(null)
-      await queryClient.invalidateQueries({
-        queryKey: messageQueryKeys.history(selected),
-      })
     } catch {
       setAttachError(
         t('community.messages.states.attachError', {
@@ -1131,22 +1573,32 @@ const RealMessagesPage = () => {
       (book) => book.id === requestedId
     )
     if (!offered || !requested) {
-      setAttachError('Elegí un libro propio y uno de la otra persona.')
+      setAttachError(
+        t('community.messages.drafts.swapBooksRequired', {
+          defaultValue: 'Elegí un libro propio y uno de la otra persona.',
+        })
+      )
       return
     }
     setAttachError(null)
     try {
-      await sendPersistedMessage({
-        conversationId: selected,
-        clientKey: createClientKey(),
+      await saveDraft({
         body: swapNote.trim(),
         attachmentMetadata: {
           key: `swap:${offered.id}:${requested.id}`,
           contentType: 'application/x-entrelibros-swap',
           size: 1,
           kind: 'swap',
-          offered: { ...offered, ownerId: user.id },
-          requested: { ...requested, ownerId: counterpartId },
+          offered: {
+            ...offered,
+            ownerId: user.id,
+            ...(offered.condition ? { condition: offered.condition } : {}),
+          },
+          requested: {
+            ...requested,
+            ownerId: counterpartId,
+            ...(requested.condition ? { condition: requested.condition } : {}),
+          },
           ...(swapNote.trim() ? { note: swapNote.trim() } : {}),
         },
       })
@@ -1155,9 +1607,6 @@ const RealMessagesPage = () => {
       setOfferedId('')
       setRequestedId('')
       setSwapNote('')
-      await queryClient.invalidateQueries({
-        queryKey: messageQueryKeys.history(selected),
-      })
     } catch {
       setAttachError(
         t('community.messages.states.attachError', {
@@ -1297,6 +1746,40 @@ const RealMessagesPage = () => {
         </span>
       </button>
     )
+  }
+
+  const handleEditDraft = () => {
+    const draft = draftState.query.data
+    if (!draft) return
+    const attachment = draft.attachmentMetadata
+    setMessage(draft.body)
+    if (!attachment) {
+      messageInputRef.current?.focus()
+    } else if (attachment.kind === 'book') {
+      openBookPicker('attach')
+    } else if (attachment.kind === 'swap') {
+      setOfferedId(attachment.offered.id)
+      setRequestedId(attachment.requested.id)
+      setSwapNote(attachment.note ?? draft.body)
+      openBookPicker('swap')
+    } else {
+      setAgreementForm(attachment.details)
+      setAgreementOpen(true)
+    }
+  }
+
+  const handleDiscardDraft = async () => {
+    try {
+      await draftState.discard.mutateAsync()
+      setMessage('')
+      setDraftSaveState('idle')
+    } catch {
+      setSendError(
+        t('community.messages.drafts.discardError', {
+          defaultValue: 'No pudimos descartar el borrador.',
+        })
+      )
+    }
   }
 
   useFocusTrap({
@@ -1566,6 +2049,16 @@ const RealMessagesPage = () => {
                       </span>
                     </div>
                   )}
+                  {draftState.query.data ? (
+                    <MessageDraftCard
+                      draft={draftState.query.data}
+                      onEdit={handleEditDraft}
+                      onDiscard={() => void handleDiscardDraft()}
+                      onSend={() => void handleSendDraft()}
+                      isDiscarding={draftState.discard.isPending}
+                      isSending={draftState.send.isPending}
+                    />
+                  ) : null}
                   <div ref={messagesEndRef} />
                 </div>
                 {agreementQuery.data &&
@@ -1688,6 +2181,25 @@ const RealMessagesPage = () => {
                       !
                     </span>
                     <span>{sendError}</span>
+                  </div>
+                ) : null}
+                {draftSaveState !== 'idle' ? (
+                  <div
+                    className={styles.draftSaveStatus}
+                    role={draftSaveState === 'error' ? 'alert' : 'status'}
+                  >
+                    {draftSaveState === 'pending'
+                      ? t('community.messages.drafts.saving', {
+                          defaultValue: 'Guardando borrador…',
+                        })
+                      : draftSaveState === 'error'
+                        ? t('community.messages.drafts.saveError', {
+                            defaultValue:
+                              'No pudimos guardar el borrador. Intentá nuevamente.',
+                          })
+                        : t('community.messages.drafts.saved', {
+                            defaultValue: 'Borrador guardado',
+                          })}
                   </div>
                 ) : null}
               </>
@@ -1912,14 +2424,21 @@ const RealMessagesPage = () => {
                 <header className={styles.newConversationHeader}>
                   <div className={styles.newConversationTitle}>
                     <span className={styles.newConversationEyebrow}>
-                      PROPUESTA DE ACUERDO
+                      {t('community.messages.drafts.agreementTitle', {
+                        defaultValue: 'Propuesta de acuerdo',
+                      })}
                     </span>
                     <h2 id="agreement-title">
                       {isCounterProposal
                         ? t('community.messages.agreement.change.modalTitle', {
                             defaultValue: 'Proponer cambios',
                           })
-                        : 'Coordiná el intercambio'}
+                        : t(
+                            'community.messages.composer.agreementModal.title',
+                            {
+                              defaultValue: 'Propuesta de acuerdo',
+                            }
+                          )}
                     </h2>
                     <p>
                       {isCounterProposal
@@ -1930,14 +2449,22 @@ const RealMessagesPage = () => {
                                 'Ajustá la propuesta actualizando al menos un dato.',
                             }
                           )
-                        : 'Definí los datos del encuentro para que queden guardados en la conversación.'}
+                        : t(
+                            'community.messages.composer.agreementModal.description',
+                            {
+                              defaultValue:
+                                'Definí los datos del encuentro para que queden guardados en la conversación.',
+                            }
+                          )}
                     </p>
                   </div>
                   <button
                     type="button"
                     className={styles.modalCloseButton}
                     onClick={() => setAgreementOpen(false)}
-                    aria-label="Cerrar"
+                    aria-label={t('community.messages.composer.close', {
+                      defaultValue: 'Cerrar',
+                    })}
                   >
                     ×
                   </button>
@@ -1953,14 +2480,24 @@ const RealMessagesPage = () => {
                       agreementForm.date &&
                       agreementForm.time
                     ) {
-                      agreementCreateMutation.mutate(agreementForm)
+                      void saveAgreementDraft(agreementForm)
                     }
                   }}
                 >
                   <label className={styles.newConversationField}>
-                    <span>Libro del acuerdo</span>
+                    <span>
+                      {t(
+                        'community.messages.composer.agreementModal.bookLabel',
+                        {
+                          defaultValue: 'Libro a intercambiar',
+                        }
+                      )}
+                    </span>
                     <select
-                      aria-label="Libro del acuerdo"
+                      aria-label={t(
+                        'community.messages.composer.agreementModal.bookLabel',
+                        { defaultValue: 'Libro a intercambiar' }
+                      )}
                       value={agreementForm.bookTitle}
                       disabled={isCounterProposal}
                       onChange={(event) =>
@@ -1971,7 +2508,12 @@ const RealMessagesPage = () => {
                       }
                     >
                       <option value="">
-                        Elegí un libro de la conversación
+                        {t(
+                          'community.messages.composer.agreementModal.noBooks',
+                          {
+                            defaultValue: 'Elegí un libro de la conversación',
+                          }
+                        )}
                       </option>
                       {pickerBooks.map((book) => (
                         <option key={book.id} value={book.title}>
@@ -1981,9 +2523,17 @@ const RealMessagesPage = () => {
                     </select>
                   </label>
                   <label className={styles.newConversationField}>
-                    <span>Punto de encuentro</span>
+                    <span>
+                      {t(
+                        'community.messages.composer.agreementModal.meetingLabel',
+                        { defaultValue: 'Punto de encuentro' }
+                      )}
+                    </span>
                     <input
-                      aria-label="Punto de encuentro"
+                      aria-label={t(
+                        'community.messages.composer.agreementModal.meetingLabel',
+                        { defaultValue: 'Punto de encuentro' }
+                      )}
                       value={agreementForm.meetingPoint}
                       onChange={(event) =>
                         setAgreementForm((form) => ({
@@ -1991,13 +2541,26 @@ const RealMessagesPage = () => {
                           meetingPoint: event.target.value,
                         }))
                       }
-                      placeholder="Ej. Café de la esquina"
+                      placeholder={t(
+                        'community.messages.composer.agreementModal.meetingPlaceholder',
+                        { defaultValue: 'Ej. Café de la esquina' }
+                      )}
                     />
                   </label>
                   <label className={styles.newConversationField}>
-                    <span>Zona</span>
+                    <span>
+                      {t(
+                        'community.messages.composer.agreementModal.areaLabel',
+                        {
+                          defaultValue: 'Zona o barrio',
+                        }
+                      )}
+                    </span>
                     <input
-                      aria-label="Zona"
+                      aria-label={t(
+                        'community.messages.composer.agreementModal.areaLabel',
+                        { defaultValue: 'Zona o barrio' }
+                      )}
                       value={agreementForm.area}
                       onChange={(event) =>
                         setAgreementForm((form) => ({
@@ -2005,14 +2568,25 @@ const RealMessagesPage = () => {
                           area: event.target.value,
                         }))
                       }
-                      placeholder="Ej. Palermo"
+                      placeholder={t(
+                        'community.messages.composer.agreementModal.areaPlaceholder',
+                        { defaultValue: 'Ej. Palermo' }
+                      )}
                     />
                   </label>
                   <div className={styles.agreementFields}>
                     <label className={styles.newConversationField}>
-                      <span>Fecha</span>
+                      <span>
+                        {t(
+                          'community.messages.composer.agreementModal.dateLabel',
+                          { defaultValue: 'Día sugerido' }
+                        )}
+                      </span>
                       <input
-                        aria-label="Fecha"
+                        aria-label={t(
+                          'community.messages.composer.agreementModal.dateLabel',
+                          { defaultValue: 'Día sugerido' }
+                        )}
                         type="date"
                         value={agreementForm.date}
                         onChange={(event) =>
@@ -2024,9 +2598,19 @@ const RealMessagesPage = () => {
                       />
                     </label>
                     <label className={styles.newConversationField}>
-                      <span>Hora</span>
+                      <span>
+                        {t(
+                          'community.messages.composer.agreementModal.timeLabel',
+                          {
+                            defaultValue: 'Horario',
+                          }
+                        )}
+                      </span>
                       <input
-                        aria-label="Hora"
+                        aria-label={t(
+                          'community.messages.composer.agreementModal.timeLabel',
+                          { defaultValue: 'Horario' }
+                        )}
                         type="time"
                         value={agreementForm.time}
                         onChange={(event) =>
@@ -2038,9 +2622,9 @@ const RealMessagesPage = () => {
                       />
                     </label>
                   </div>
-                  {agreementCreateMutation.isError ? (
+                  {attachError ? (
                     <p className={styles.bookPickerError} role="alert">
-                      No pudimos crear el acuerdo. Intentá nuevamente.
+                      {attachError}
                     </p>
                   ) : null}
                   <div className={styles.newConversationActions}>
@@ -2049,13 +2633,15 @@ const RealMessagesPage = () => {
                       className={styles.newConversationCancel}
                       onClick={() => setAgreementOpen(false)}
                     >
-                      Cancelar
+                      {t('community.messages.composer.cancel', {
+                        defaultValue: 'Cancelar',
+                      })}
                     </button>
                     <PrototypeButton
                       type="submit"
                       tone="primary"
                       disabled={
-                        agreementCreateMutation.isPending ||
+                        draftState.save.isPending ||
                         !agreementForm.bookTitle ||
                         !agreementForm.meetingPoint ||
                         !agreementForm.area ||
@@ -2064,10 +2650,12 @@ const RealMessagesPage = () => {
                       }
                     >
                       {isCounterProposal
-                        ? t('community.messages.agreement.change.modalSubmit', {
-                            defaultValue: 'Enviar cambios',
+                        ? t('community.messages.drafts.saveChanges', {
+                            defaultValue: 'Guardar cambios',
                           })
-                        : 'Crear acuerdo'}
+                        : t('community.messages.drafts.saveAgreement', {
+                            defaultValue: 'Guardar borrador',
+                          })}
                     </PrototypeButton>
                   </div>
                 </form>

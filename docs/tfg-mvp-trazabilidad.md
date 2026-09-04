@@ -1,34 +1,36 @@
 # Matriz de trazabilidad del MVP del TFG
 
-Fecha de referencia: 2026-09-03.
+Fecha de referencia: 2026-09-04.
 
-## Cierre de implementacion 2026-09-03
+## Cierre de implementacion 2026-09-04
 
 Esta seccion prevalece sobre las tablas de auditoria historica que conservan el
 corte anterior. El codigo y las pruebas ya cierran el comportamiento funcional
 de las tareas 3.2, 3.5, 4.1, 4.2, 4.4-4.8, 5.1-5.5, 6.1-6.4 y 7.1-7.4.
 
-| Tarea | Estado actual | Referencia principal |
-| --- | --- | --- |
-| 3.2 | hecho | `BooksPage`, `MapPage`, `community.ts` y pruebas de mapa/listado. |
-| 3.5 | hecho | Rutas `/profile/:id`, `/books`, `/community`, `/map`, `/messages` y enlaces de perfil/libro. |
-| 4.1-4.2 | hecho | Contacto idempotente desde publicacion/perfil, plantilla traducible y adjunto de libro. |
-| 4.4-4.5 | hecho | Recordatorio idempotente, outcomes privados, concurrencia y estado `completed`. |
-| 4.6-4.8 | hecho | Avisos contextuales, contador persistente, Socket.IO y preferencia in-app. |
-| 5.1-5.2 | hecho | `POST /api/reports`, categorias controladas, estado/canal/plazo y limites de moderacion. |
+| Tarea   | Estado actual      | Referencia principal                                                                                                                                                                |
+| ------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 3.2     | hecho              | `BooksPage`, `MapPage`, `community.ts` y pruebas de mapa/listado.                                                                                                                   |
+| 3.5     | hecho              | Rutas `/profile/:id`, `/books`, `/community`, `/map`, `/messages` y enlaces de perfil/libro.                                                                                        |
+| 4.1-4.2 | hecho              | Contacto idempotente desde publicacion/perfil, plantilla traducible, borrador inicial y adjunto de libro.                                                                           |
+| 4.4-4.5 | hecho              | Recordatorio idempotente, outcomes privados, concurrencia y estado `completed`.                                                                                                     |
+| 4.6-4.8 | hecho              | Avisos contextuales, contador persistente, Socket.IO y preferencia in-app.                                                                                                          |
+| 5.1-5.2 | hecho              | `POST /api/reports`, categorias controladas, estado/canal/plazo y limites de moderacion.                                                                                            |
 | 5.3-5.5 | parcial controlado | Auth, cookies, CORS/CSRF, headers, autorizacion, minimizacion y consentimientos; rate limiting, TLS de despliegue y retencion integral quedan como riesgos residuales documentados. |
-| 6.1-6.3 | hecho | `analytics_events`, `mvpMetrics`, `/api/community/metrics` y panel de estadisticas. |
-| 6.4 | hecho | [`recommendations-design.md`](recommendations-design.md), sin recomendador automatico. |
-| 7.1-7.4 | hecho | READMEs, guias, migraciones 031-034, OpenAPI, semilla y suites automatizadas. |
-| 7.5 | parcial | Se verificaron rutas reales, privacidad, mapa, reportes y metricas en navegador; faltan viewport definitivos, teclado, contraste, idioma completo y Socket.IO manual. |
-| 7.6 | pendiente | La checklist esta en [`tfg-browser-checklist.md`](tfg-browser-checklist.md); faltan capturas binarias archivadas y enlazadas. |
-| 7.7 | parcial | El estado, riesgos y fuera de alcance estan documentados; queda cerrar 7.5-7.6 y backup/restore. |
+| 6.1-6.3 | hecho              | `analytics_events`, `mvpMetrics`, `/api/community/metrics` y panel de estadisticas.                                                                                                 |
+| 6.4     | hecho              | [`recommendations-design.md`](recommendations-design.md), sin recomendador automatico.                                                                                              |
+| 7.1-7.4 | hecho              | READMEs, guias, migraciones 031-035, OpenAPI, semilla y suites automatizadas.                                                                                                       |
+| 7.5     | parcial            | Se verificaron rutas reales, privacidad, mapa, reportes y metricas en navegador; faltan viewport definitivos, teclado, contraste, idioma completo y Socket.IO manual.               |
+| 7.6     | pendiente          | La checklist esta en [`tfg-browser-checklist.md`](tfg-browser-checklist.md); faltan capturas binarias archivadas y enlazadas.                                                       |
+| 7.7     | parcial            | El estado, riesgos y fuera de alcance estan documentados; queda cerrar 7.5-7.6 y backup/restore.                                                                                    |
 
 ## Riesgos residuales declarados
 
 - La base local de pruebas historica `entrelibros_test` tiene una linea de
-  migraciones distinta. No se alteraron sus hashes; la suite backend se ejecuto
-  sobre una base PostgreSQL/PostGIS limpia y aislada.
+  migraciones distinta. No se alteraron sus hashes; la suite backend canónica
+  queda bloqueada antes de iniciar por ese desvío y las pruebas específicas de
+  borradores se ejecutaron sobre una base PostgreSQL/PostGIS aislada con la
+  migración 035 aplicada.
 - `activeCorners` es global con filtro de zona porque el esquema no asocia el
   Rincon a una ciudad propietaria.
 - No hay rate limiting de aplicacion, email/push, MFA, almacenamiento de objetos,
@@ -134,7 +136,7 @@ La auditoría se realizó sobre las rutas y servicios actuales, las migraciones 
 | F-3.1 Publicación de libros | parcial | P0        | Alta/edición, consentimientos, imágenes limitadas y revisión editorial mínima implementados; faltan campos completos del anexo y evidencia manual |
 | F-3.2 Búsqueda con filtros  | parcial | P0        | Filtros base implementados; falta consolidación de tema, interés y distancia                                                                      |
 | F-4.1 Mapa y listados       | parcial | P0        | Mapa real y listado existen; sincronización completa pendiente                                                                                    |
-| F-5.1 Mensajería 1:1        | parcial | P0        | Mensajería real persistente; accesos contextuales y plantillas pendientes de cierre                                                               |
+| F-5.1 Mensajería 1:1        | parcial | P0        | Mensajería real persistente, accesos contextuales y borradores enriquecidos; queda evidencia manual integral                                      |
 | F-5.2 Acuerdos              | parcial | P0        | Estados principales y concurrencia cubiertos; recordatorio y resultado pendientes                                                                 |
 | F-5.3 Notificaciones        | parcial | P1        | Avisos in-app y preferencia existen; falta verificación integral del indicador                                                                    |
 
