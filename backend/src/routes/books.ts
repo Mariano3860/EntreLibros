@@ -1120,6 +1120,7 @@ function toPublicBookListing(listing: BookListing) {
     isForDonation: listing.donation,
     isInterested: listing.isInterested ?? false,
     ownerId: String(listing.userId),
+    ownerName: listing.ownerName,
   };
 }
 

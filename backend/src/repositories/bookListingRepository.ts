@@ -30,6 +30,7 @@ export interface BookListingDelivery {
 export interface BookListing {
   id: number;
   userId: number;
+  ownerName: string | null;
   bookId: number;
   title: string;
   author: string | null;
@@ -85,6 +86,7 @@ export interface BookListingImage {
 interface BookListingRow {
   id: number;
   user_id: number;
+  owner_name: string | null;
   book_id: number;
   status: BookListingStatus;
   type: BookListingType;
@@ -216,6 +218,7 @@ const BOOK_LISTING_SELECT = `
   SELECT
     p.id,
     p.user_id,
+    COALESCE(NULLIF(TRIM(u.alias), ''), NULLIF(TRIM(u.name), '')) AS owner_name,
     p.book_id,
     p.status,
     p.type,
@@ -253,6 +256,7 @@ const BOOK_LISTING_SELECT = `
     img.url AS primary_image_url
   FROM book_listings p
          JOIN books b ON p.book_id = b.id
+         LEFT JOIN users u ON u.id = p.user_id
          LEFT JOIN LATERAL (
     SELECT url
     FROM book_listing_images
@@ -272,6 +276,7 @@ function mapRow(row: BookListingRow): BookListing {
   return {
     id: row.id,
     userId: row.user_id,
+    ownerName: row.owner_name,
     bookId: row.book_id,
     title: row.title,
     author: row.author,
@@ -1137,8 +1142,7 @@ export async function listPublicBookListings(
   params.push(limit, offset);
   const orderClause = getPublicListingOrder(filters.sort, distanceExpression);
   const listings = await fetchBookListings(
-    `JOIN users u ON u.id = p.user_id
-     LEFT JOIN community_corners c ON c.id::text = p.corner_id
+    `LEFT JOIN community_corners c ON c.id::text = p.corner_id
      WHERE ${conditions.join(' AND ')}`,
     params,
     `${orderClause} LIMIT $${params.length - 1} OFFSET $${params.length}`
@@ -1191,8 +1195,7 @@ export async function listHomeBookListings(
   const safeLimit = Math.min(Math.max(Math.trunc(options.limit ?? 5), 1), 5);
   const safeOffset = Math.max(Math.trunc(options.offset ?? 0), 0);
   const listings = await fetchBookListings(
-    `JOIN users u ON u.id = p.user_id
-     WHERE p.availability = 'public'
+    `WHERE p.availability = 'public'
        AND p.is_draft = false
        AND p.status NOT IN ('completed', 'sold', 'exchanged', 'inactive')
        AND p.editorial_status = 'approved'

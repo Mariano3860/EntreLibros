@@ -1034,6 +1034,8 @@
     "contacting": "Abriendo conversación...",
     "contactError": "No se pudo abrir la conversación.",
     "firstContactMessage": "Hola, me interesa tu publicación «{{title}}». ¿Todavía está disponible?",
+    "publishedBy": "Publicado por",
+    "publisherFallback": "Miembro de EntreLibros",
     "confirmClose": "Hay cambios sin guardar. ¿Querés salir igualmente?",
     "readOnly": "Solo lectura",
     "owner": "Tu publicación",

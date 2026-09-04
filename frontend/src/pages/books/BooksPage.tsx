@@ -4,10 +4,6 @@ import {
   type BookCatalogFilters,
 } from '@api/books/books.service'
 import { fetchUserBooks } from '@api/books/userBooks.service'
-import {
-  createConversation,
-  sendPersistedMessage,
-} from '@api/messages/messages'
 import { BookDetailModal } from '@components/book/BookDetailModal/BookDetailModal'
 import {
   WantBookModal,
@@ -15,7 +11,7 @@ import {
 } from '@components/books/WantBookModal/WantBookModal'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { PublishBookModal } from '@components/publish/PublishBookModal/PublishBookModal'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
@@ -38,6 +34,7 @@ import {
   PrototypePage,
 } from '@src/features/prototype/PrototypeUI'
 import { toPrototypeBook } from '@src/features/prototype/realData.adapters'
+import { useBookContact } from '@src/hooks/useBookContact'
 import { isApiMockMode } from '@src/utils/runtimeEnv'
 
 import styles from './BooksPage.module.scss'
@@ -354,31 +351,7 @@ export const BooksPage = () => {
     queryFn: () => fetchBookById(bookId ?? 0),
     enabled: !mockMode && bookId !== null,
   })
-  const contactMutation = useMutation({
-    mutationFn: async (ownerId: string) => {
-      if (!/^\d+$/.test(ownerId)) throw new Error('invalid_owner')
-      const conversation = await createConversation(Number(ownerId))
-      await sendPersistedMessage({
-        conversationId: conversation.id,
-        clientKey: `first-contact-${conversation.id}`,
-        body: t('bookDetail.firstContactMessage', {
-          title: selectedBook?.title ?? '',
-        }),
-        attachmentMetadata: selectedBook
-          ? {
-              key: `book:${selectedBook.id}`,
-              contentType: 'application/x-entrelibros-book',
-              size: 1,
-              kind: 'book',
-              bookId: selectedBook.id,
-              title: selectedBook.title,
-              author: selectedBook.author,
-              coverUrl: selectedBook.coverUrl ?? '',
-            }
-          : undefined,
-      })
-      return conversation
-    },
+  const contactMutation = useBookContact({
     onSuccess: (conversation) => {
       setSelectedBook(null)
       navigate('/messages', { state: { conversationId: conversation.id } })
@@ -746,13 +719,17 @@ export const BooksPage = () => {
                     selectedBook.coverUrl ??
                     `/prototype/book-cover.svg?book=${selectedBook.id}`,
                   isSeeking: selectedBook.mode === 'Buscado',
+                  ownerName: selectedBook.owner,
                 }
               : undefined
           }
           onClose={() => setSelectedBook(null)}
           onStartConversation={
             isAuthenticated
-              ? (ownerId) => contactMutation.mutate(ownerId)
+              ? (ownerId) =>
+                  selectedBook
+                    ? contactMutation.mutate({ ownerId, book: selectedBook })
+                    : undefined
               : undefined
           }
           isStartingConversation={contactMutation.isPending}

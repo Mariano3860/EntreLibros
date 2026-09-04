@@ -51,6 +51,7 @@ export type Publication = {
   }
   cornerId?: string | null
   ownerId: string
+  ownerName?: string | null
   createdAt: string
   updatedAt: string
 }

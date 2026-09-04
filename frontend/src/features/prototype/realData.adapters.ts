@@ -74,7 +74,8 @@ export const toPrototypeBook = (
     id: String(book.id),
     title: book.title,
     author: book.author || 'Autor desconocido',
-    owner: options.owner ?? 'Miembro de EntreLibros',
+    owner: options.owner ?? book.ownerName ?? 'Miembro de EntreLibros',
+    ...(book.ownerId ? { ownerId: String(book.ownerId) } : {}),
     distance: options.distance ?? 'Ubicación disponible',
     mode,
     ...(book.price !== undefined && book.price !== null

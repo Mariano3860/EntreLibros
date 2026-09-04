@@ -3,6 +3,7 @@ export type PrototypeBook = {
   title: string
   author: string
   owner: string
+  ownerId?: string
   distance: string
   mode: 'Intercambio' | 'Venta' | 'Buscado'
   price?: string

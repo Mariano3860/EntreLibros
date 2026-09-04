@@ -111,6 +111,7 @@ export const generatePublication = (id: string): Publication => {
       },
       cornerId: faker.datatype.boolean() ? faker.string.uuid() : null,
       ownerId: 'u_1',
+      ownerName: 'Lucía',
       createdAt: faker.date.recent({ days: 30 }).toISOString(),
       updatedAt: faker.date.recent({ days: 7 }).toISOString(),
     }
@@ -171,6 +172,7 @@ export const generatePublication = (id: string): Publication => {
     },
     cornerId: faker.datatype.boolean() ? faker.string.uuid() : null,
     ownerId: 'u_1',
+    ownerName: 'Lucía',
     createdAt: faker.date.recent({ days: 30 }).toISOString(),
     updatedAt: faker.date.recent({ days: 7 }).toISOString(),
   }

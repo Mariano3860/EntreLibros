@@ -1038,6 +1038,8 @@
     "contacting": "Opening conversation...",
     "contactError": "The conversation could not be opened.",
     "firstContactMessage": "Hi, I’m interested in your listing “{{title}}”. Is it still available?",
+    "publishedBy": "Published by",
+    "publisherFallback": "EntreLibros member",
     "confirmClose": "You have unsaved changes. Do you want to leave anyway?",
     "readOnly": "Read-only",
     "owner": "Your publication",

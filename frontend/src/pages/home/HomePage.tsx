@@ -4,8 +4,10 @@ import { fetchUserActivity } from '@api/user/activity.service'
 import { BookDetailModal } from '@components/book/BookDetailModal/BookDetailModal'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { useAuth } from '@contexts/auth/AuthContext'
+import { useBookContact } from '@hooks/useBookContact'
 import { useQuery } from '@tanstack/react-query'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
 import { HOME_URLS } from '@src/constants/constants'
@@ -26,7 +28,8 @@ import { isApiMockMode } from '@src/utils/runtimeEnv'
 import styles from './HomePage.module.scss'
 
 export const HomePage = () => {
-  const { isLoading, user } = useAuth()
+  const { isAuthenticated, isLoading, user } = useAuth()
+  const { t } = useTranslation()
   const { catalog } = usePrototype()
   const mockMode = isApiMockMode()
   const navigate = useNavigate()
@@ -35,6 +38,14 @@ export const HomePage = () => {
   const [railDirection, setRailDirection] = useState<'next' | 'previous'>(
     'next'
   )
+  const handleContactSuccess = useCallback(
+    (conversation: { id: number }) => {
+      setSelectedBook(null)
+      navigate('/messages', { state: { conversationId: conversation.id } })
+    },
+    [navigate]
+  )
+  const contactMutation = useBookContact({ onSuccess: handleContactSuccess })
   const booksQuery = useQuery({
     queryKey: ['prototype', 'home', 'books', recommendationOffset],
     queryFn: () => fetchHomeBooks(recommendationOffset),
@@ -212,10 +223,21 @@ export const HomePage = () => {
                     selectedBook.coverUrl ??
                     `/prototype/book-cover.svg?book=${selectedBook.id}`,
                   isSeeking: selectedBook.mode === 'Buscado',
+                  ownerName: selectedBook.owner,
                 }
               : undefined
           }
           onClose={() => setSelectedBook(null)}
+          onStartConversation={
+            isAuthenticated && selectedBook
+              ? (ownerId) =>
+                  contactMutation.mutate({ ownerId, book: selectedBook })
+              : undefined
+          }
+          isStartingConversation={contactMutation.isPending}
+          contactError={
+            contactMutation.isError ? t('bookDetail.contactError') : undefined
+          }
         />
       </PrototypePage>
     </BaseLayout>

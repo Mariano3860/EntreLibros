@@ -29,6 +29,23 @@ describe('prototype real-data adapters', () => {
     })
   })
 
+  it('keeps the public publisher separate from the bibliographic author', () => {
+    expect(
+      toPrototypeBook({
+        id: 'book-2',
+        title: 'Otra novela',
+        author: 'Autora del libro',
+        coverUrl: '/cover.jpg',
+        ownerId: '42',
+        ownerName: 'Lectora pública',
+      })
+    ).toMatchObject({
+      author: 'Autora del libro',
+      owner: 'Lectora pública',
+      ownerId: '42',
+    })
+  })
+
   it('maps profile privacy-safe display fields without requiring extended mock metrics', () => {
     expect(
       toPrototypeProfile({
