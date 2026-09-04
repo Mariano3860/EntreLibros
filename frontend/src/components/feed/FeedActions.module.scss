@@ -120,8 +120,13 @@
 }
 
 .comment img {
+  display: block;
+  flex: 0 0 rem(24px);
   width: rem(24px);
   height: rem(24px);
+  min-width: rem(24px);
+  min-height: rem(24px);
+  aspect-ratio: 1;
   border-radius: 50%;
   object-fit: cover;
 }
