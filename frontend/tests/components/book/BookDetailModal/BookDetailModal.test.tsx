@@ -333,6 +333,28 @@ describe('BookDetailModal', () => {
     expect(reportBackdrop).not.toBeNull()
   })
 
+  test('shows the public publisher and sends contact to that owner', async () => {
+    const onStartConversation = vi.fn()
+    server.use(
+      http.get(apiRouteMatcher(`${RELATIVE_API_ROUTES.BOOKS.LIST}/:id`), () =>
+        HttpResponse.json({
+          ...generatePublication('1'),
+          ownerId: '2',
+          ownerName: 'Lectora pública',
+        })
+      )
+    )
+
+    renderModal({ onStartConversation })
+
+    expect(await screen.findByText('Lectora pública')).toBeInTheDocument()
+    expect(screen.getByText('bookDetail.publishedBy')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: 'bookDetail.contact' }))
+
+    expect(onStartConversation).toHaveBeenCalledWith('2')
+  })
+
   test('calls onClose when Escape is pressed', async () => {
     const { onClose } = renderModal()
 

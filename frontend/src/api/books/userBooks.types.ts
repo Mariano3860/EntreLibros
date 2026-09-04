@@ -23,4 +23,6 @@ export type ApiUserBook = {
   isbn?: string
   draft?: boolean
   isInterested?: boolean
+  ownerId?: string
+  ownerName?: string | null
 }

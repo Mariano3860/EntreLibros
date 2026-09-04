@@ -68,6 +68,8 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
   const isOwner = Boolean(
     book && normalizedCurrentUserId && book.ownerId === normalizedCurrentUserId
   )
+  const publisherName =
+    book?.ownerName?.trim() || bookPreview?.ownerName?.trim() || null
 
   const isLoadingState = isLoading || isRetrying || (isFetching && !book)
 
@@ -534,6 +536,15 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
               <span className={styles.ownerBadge}>{t('bookDetail.owner')}</span>
             )}
           </div>
+
+          {!isOwner ? (
+            <div className={styles.publisherAttribution}>
+              <span>{t('bookDetail.publishedBy')}</span>
+              <strong>
+                {publisherName ?? t('bookDetail.publisherFallback')}
+              </strong>
+            </div>
+          ) : null}
 
           <div className={styles.metadataGrid}>
             <div className={styles.field}>

@@ -303,6 +303,31 @@
   font-weight: $font-weight-medium;
 }
 
+.publisherAttribution {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 5px;
+  padding: 8px 10px;
+  border: 1px solid rgb(66 215 199 / 20%);
+  border-radius: 10px;
+  background: rgb(66 215 199 / 6%);
+  color: var(--prototype-muted);
+  font-size: 0.68rem;
+
+  span {
+    font-weight: 600;
+  }
+
+  strong {
+    min-width: 0;
+    color: var(--prototype-teal);
+    font-weight: 750;
+    overflow-wrap: anywhere;
+  }
+}
+
 .metadataGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

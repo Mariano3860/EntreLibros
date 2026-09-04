@@ -63,6 +63,7 @@ export interface Publication {
   offer: PublicationOffer;
   cornerId?: string | null;
   ownerId: string;
+  ownerName: string | null;
   createdAt: string;
   updatedAt: string;
   editorialStatus: 'pending' | 'needs_correction' | 'approved' | 'rejected';
@@ -276,6 +277,7 @@ function toPublication(listing: BookListing): Publication {
     },
     cornerId: listing.cornerId,
     ownerId: String(listing.userId),
+    ownerName: listing.ownerName,
     createdAt: listing.createdAt.toISOString(),
     updatedAt: listing.updatedAt.toISOString(),
     editorialStatus: listing.editorialStatus,

@@ -25,14 +25,15 @@ afterEach(async () => {
 });
 
 const insertUser = async (
-  overrides: Partial<{ name: string; email: string }>
+  overrides: Partial<{ name: string; alias: string; email: string }>
 ): Promise<number> => {
   const name = overrides.name ?? 'User';
+  const alias = overrides.alias ?? name;
   const email =
     overrides.email ?? `${Math.random().toString(36).slice(2)}@example.com`;
   const { rows } = await client.query(
-    "INSERT INTO users (name, email, password, role) VALUES ($1, $2, 'hash', 'user') RETURNING id",
-    [name, email]
+    "INSERT INTO users (name, alias, email, password, role) VALUES ($1, $2, $3, 'hash', 'user') RETURNING id",
+    [name, alias, email]
   );
   return rows[0].id as number;
 };
@@ -239,7 +240,10 @@ describe('books API legacy endpoints', () => {
 
 describe('books API listing projections', () => {
   test('returns UI status in public listings', async () => {
-    const userId = await insertUser({ name: 'Publicador' });
+    const userId = await insertUser({
+      name: 'Nombre del lector',
+      alias: 'Alias público',
+    });
     const bookId = await insertBook();
     await insertListing({ userId, bookId, status: 'available' });
 
@@ -250,6 +254,25 @@ describe('books API listing projections', () => {
     expect(res.body[0]).toMatchObject({
       status: 'available',
       bookListingStatus: 'available',
+      ownerId: String(userId),
+      ownerName: 'Alias público',
+    });
+    expect(res.body[0]).not.toHaveProperty('email');
+  });
+
+  test('falls back to the account name when the public alias is blank', async () => {
+    const userId = await insertUser({
+      name: 'Nombre visible',
+      alias: '',
+    });
+    const bookId = await insertBook();
+    await insertListing({ userId, bookId });
+
+    const res = await request(app).get('/api/books').expect(200);
+
+    expect(res.body[0]).toMatchObject({
+      ownerId: String(userId),
+      ownerName: 'Nombre visible',
     });
   });
 
@@ -316,6 +339,10 @@ describe('books API listing projections', () => {
     expect(ids).not.toContain(String(privateListingId));
     expect(ids).not.toContain(String(expiredListingId));
     expect(ids).not.toContain(String(blockedListingId));
+    expect(res.body.items[0]).toMatchObject({
+      ownerId: String(followedId),
+      ownerName: 'Followed reader',
+    });
     expect(res.body.page).toMatchObject({
       limit: 5,
       offset: 0,
@@ -1001,6 +1028,7 @@ describe('books API publication detail', () => {
       condition: 'good',
       status: 'available',
       ownerId: String(userId),
+      ownerName: 'Alice',
       cornerId: 'corner-1',
       offer: {
         sale: true,

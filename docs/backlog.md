@@ -1,6 +1,6 @@
 # Backlog de producto
 
-Ultima actualizacion: 2026-09-03.
+Ultima actualizacion: 2026-09-04.
 
 El codigo, las migraciones, los contratos y las pruebas son la fuente de verdad.
 La matriz completa y sus referencias estan en
@@ -29,6 +29,9 @@ La matriz completa y sus referencias estan en
 - Búsqueda global de personas desde Publicaciones con consulta autenticada,
   resultados limitados, exclusiones de privacidad/bloqueo, seguimiento y modal
   responsive con historial local no sensible.
+- Atribucion publica del usuario que publico cada libro recomendado y contacto
+  reutilizable desde el detalle de Home, manteniendo separado el autor
+  bibliografico.
 
 ## Prioridad P0
 

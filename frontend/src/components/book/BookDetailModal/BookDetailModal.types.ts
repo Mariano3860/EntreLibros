@@ -3,6 +3,7 @@ export type BookDetailModalPreview = {
   author: string
   coverUrl?: string
   isSeeking?: boolean
+  ownerName?: string | null
 }
 
 export type BookDetailModalProps = {
