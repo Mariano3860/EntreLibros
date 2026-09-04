@@ -23,6 +23,7 @@ import {
 
 import type { ApiBook } from '@src/api/books/books.types'
 import { useAuth } from '@src/contexts/auth/AuthContext'
+import { useAuthRequired } from '@src/contexts/auth/AuthRequiredContext'
 import type { PrototypeBook } from '@src/features/prototype/catalog'
 import { usePrototype } from '@src/features/prototype/PrototypeContext'
 import {
@@ -170,6 +171,7 @@ const BookResults = ({
 
 export const BooksPage = () => {
   const { isAuthenticated } = useAuth()
+  const { runIfAuthenticated } = useAuthRequired()
   const { catalog } = usePrototype()
   const { t } = useTranslation()
   const mockMode = isApiMockMode()
@@ -202,7 +204,6 @@ export const BooksPage = () => {
   const selectedTrade = searchParams.get('trade') === 'true'
   const selectedSale = searchParams.get('sale') === 'true'
   const hasActiveFilters = hasFilterValue(searchParams)
-
   const updateParams = useCallback(
     (updates: Record<string, string | undefined>) => {
       setSearchParams((current) => {
@@ -288,8 +289,7 @@ export const BooksPage = () => {
   const publicBooksQuery = useQuery({
     queryKey: ['prototype', 'books', active, catalogFilters],
     queryFn: () => fetchBooks(catalogFilters),
-    enabled:
-      !mockMode && active !== 'mine' && active !== 'all' && bookId === null,
+    enabled: !mockMode && active !== 'mine' && bookId === null,
   })
   const ownBooksQuery = useQuery({
     queryKey: ['prototype', 'books', 'mine'],
@@ -302,11 +302,8 @@ export const BooksPage = () => {
   })
 
   const mockBooks = useMemo(() => {
-    let result: PrototypeBook[] = [
-      ...(active === 'mine' || active === 'all'
-        ? catalog.userBooks
-        : catalog.books),
-    ]
+    let result: PrototypeBook[] =
+      active === 'mine' && isAuthenticated ? catalog.userBooks : catalog.books
     const localFilters = {
       condition: selectedCondition ?? undefined,
       status: selectedStatus ?? undefined,
@@ -338,6 +335,7 @@ export const BooksPage = () => {
     active,
     catalog.books,
     catalog.userBooks,
+    isAuthenticated,
     search,
     selectedCondition,
     selectedSale,
@@ -370,10 +368,10 @@ export const BooksPage = () => {
 
   const realBooks = useMemo<ApiBook[]>(
     () =>
-      active === 'mine' || active === 'all'
+      active === 'mine' || (active === 'all' && isAuthenticated)
         ? (ownBooksQuery.data ?? [])
         : (publicBooksQuery.data ?? []),
-    [active, ownBooksQuery.data, publicBooksQuery.data]
+    [active, isAuthenticated, ownBooksQuery.data, publicBooksQuery.data]
   )
 
   const books = mockMode
@@ -398,11 +396,11 @@ export const BooksPage = () => {
     (activePage + 1) * BOOKS_PER_PAGE
   )
   const activeIsLoading =
-    active === 'mine' || active === 'all'
+    active === 'mine' || (active === 'all' && isAuthenticated)
       ? ownBooksQuery.isLoading
       : publicBooksQuery.isLoading
   const activeHasError =
-    active === 'mine' || active === 'all'
+    active === 'mine' || (active === 'all' && isAuthenticated)
       ? ownBooksQuery.isError
       : publicBooksQuery.isError
 
@@ -459,12 +457,14 @@ export const BooksPage = () => {
           description="Descubri libros cerca tuyo para intercambiar, comprar o sumar a tu lista."
           actions={
             <div className={styles.headerActions}>
-              <PrototypeButton onClick={() => openWantModal()}>
+              <PrototypeButton
+                onClick={() => runIfAuthenticated(() => openWantModal())}
+              >
                 {t('booksPage.want.open')}
               </PrototypeButton>
               <PrototypeButton
                 tone="primary"
-                onClick={() => navigate('/books/new')}
+                onClick={() => runIfAuthenticated(() => navigate('/books/new'))}
               >
                 + Publicar un libro
               </PrototypeButton>
@@ -640,7 +640,10 @@ export const BooksPage = () => {
           aria-label="Tipos de libros"
           aria-orientation="horizontal"
         >
-          {tabs.map((tab) => (
+          {(isAuthenticated
+            ? tabs
+            : tabs.filter((tab) => tab.key !== 'mine')
+          ).map((tab) => (
             <button
               key={tab.key}
               role="tab"
@@ -725,11 +728,11 @@ export const BooksPage = () => {
           }
           onClose={() => setSelectedBook(null)}
           onStartConversation={
-            isAuthenticated
+            selectedBook
               ? (ownerId) =>
-                  selectedBook
-                    ? contactMutation.mutate({ ownerId, book: selectedBook })
-                    : undefined
+                  runIfAuthenticated(() =>
+                    contactMutation.mutate({ ownerId, book: selectedBook })
+                  )
               : undefined
           }
           isStartingConversation={contactMutation.isPending}

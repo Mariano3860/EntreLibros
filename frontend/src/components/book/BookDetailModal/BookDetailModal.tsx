@@ -14,6 +14,7 @@ import type {
 } from '@src/api/books/publication.types'
 import { MAX_IMAGES_UPLOAD } from '@src/constants/constants'
 import { useAuth } from '@src/contexts/auth/AuthContext'
+import { useAuthRequired } from '@src/contexts/auth/AuthRequiredContext'
 
 import styles from './BookDetailModal.module.scss'
 import { BookDetailModalProps } from './BookDetailModal.types'
@@ -41,6 +42,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
 }) => {
   const { t } = useTranslation()
   const { user } = useAuth()
+  const { runIfAuthenticated } = useAuthRequired()
   const modalRef = useRef<HTMLDivElement>(null)
   const retryTimeoutRef = useRef<number | null>(null)
   const [isEditing, setIsEditing] = useState(false)
@@ -1068,17 +1070,14 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
       )
     }
 
-    if (
-      !isOwner &&
-      onStartConversation &&
-      book.ownerId &&
-      /^\d+$/.test(book.ownerId)
-    ) {
+    if (!isOwner && onStartConversation && book.ownerId) {
       return (
         <div className={styles.actions}>
           <button
             type="button"
-            onClick={() => onStartConversation(book.ownerId)}
+            onClick={() =>
+              runIfAuthenticated(() => onStartConversation(book.ownerId))
+            }
             className={styles.editButton}
             disabled={isStartingConversation}
           >
@@ -1088,7 +1087,7 @@ export const BookDetailModal: React.FC<BookDetailModalProps> = ({
           </button>
           <button
             type="button"
-            onClick={() => setReportOpen(true)}
+            onClick={() => runIfAuthenticated(() => setReportOpen(true))}
             className={styles.cancelButton}
           >
             {t('reports.report', { defaultValue: 'Reportar' })}

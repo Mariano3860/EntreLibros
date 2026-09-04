@@ -1,9 +1,11 @@
 import { fetchHomeBooks } from '@api/books/books.service'
+import { fetchActivityItems } from '@api/community/activity.service'
 import { fetchCommunityStats } from '@api/community/communityStats.service'
 import { fetchUserActivity } from '@api/user/activity.service'
 import { BookDetailModal } from '@components/book/BookDetailModal/BookDetailModal'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { useAuth } from '@contexts/auth/AuthContext'
+import { useAuthRequired } from '@contexts/auth/AuthRequiredContext'
 import { useBookContact } from '@hooks/useBookContact'
 import { useQuery } from '@tanstack/react-query'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -29,6 +31,7 @@ import styles from './HomePage.module.scss'
 
 export const HomePage = () => {
   const { isAuthenticated, isLoading, user } = useAuth()
+  const { runIfAuthenticated } = useAuthRequired()
   const { t } = useTranslation()
   const { catalog } = usePrototype()
   const mockMode = isApiMockMode()
@@ -52,10 +55,15 @@ export const HomePage = () => {
     enabled: !mockMode,
     placeholderData: (previousData) => previousData,
   })
-  const activityQuery = useQuery({
-    queryKey: ['prototype', 'home', 'activity'],
+  const privateActivityQuery = useQuery({
+    queryKey: ['prototype', 'home', 'activity', 'private'],
     queryFn: fetchUserActivity,
-    enabled: !mockMode,
+    enabled: !mockMode && isAuthenticated,
+  })
+  const publicActivityQuery = useQuery({
+    queryKey: ['prototype', 'home', 'activity', 'public'],
+    queryFn: fetchActivityItems,
+    enabled: !mockMode && !isAuthenticated,
   })
   const statsQuery = useQuery({
     queryKey: ['prototype', 'home', 'stats'],
@@ -71,7 +79,34 @@ export const HomePage = () => {
     ? { hasNext: false, hasPrevious: false }
     : (booksQuery.data?.page ?? { hasNext: false, hasPrevious: false })
   const kpis = mockMode
-    ? catalog.homeKpis
+    ? isAuthenticated
+      ? catalog.homeKpis
+      : [
+          {
+            icon: '↔',
+            value: '134',
+            label: 'intercambios hoy',
+            tone: 'teal',
+          },
+          {
+            icon: '⌂',
+            value: '52',
+            label: 'rincones activos',
+            tone: 'orange',
+          },
+          {
+            icon: '◉',
+            value: '248',
+            label: 'lectores activos',
+            tone: 'purple',
+          },
+          {
+            icon: '✦',
+            value: '1.327',
+            label: 'libros publicados',
+            tone: 'blue',
+          },
+        ]
     : statsQuery.data
       ? [
           {
@@ -101,13 +136,27 @@ export const HomePage = () => {
         ]
       : []
   const activities = mockMode
-    ? catalog.activity
-    : (activityQuery.data ?? []).map((item) => ({
-        icon: item.action === 'exchanged' ? '✓' : '↔',
-        title: `${item.action === 'exchanged' ? 'Completaste un intercambio de' : 'Ofreciste'} “${item.bookTitle}”`,
-        meta: new Date(item.timestamp).toLocaleString('es-AR'),
-        tone: item.action === 'exchanged' ? 'purple' : 'teal',
-      }))
+    ? isAuthenticated
+      ? catalog.activity
+      : catalog.communityPosts.map((post) => ({
+          icon: '↔',
+          title: `${post.author} compartió una historia`,
+          meta: post.meta,
+          tone: 'teal',
+        }))
+    : isAuthenticated
+      ? (privateActivityQuery.data ?? []).map((item) => ({
+          icon: item.action === 'exchanged' ? '✓' : '↔',
+          title: `${item.action === 'exchanged' ? 'Completaste un intercambio de' : 'Ofreciste'} “${item.bookTitle}”`,
+          meta: new Date(item.timestamp).toLocaleString('es-AR'),
+          tone: item.action === 'exchanged' ? 'purple' : 'teal',
+        }))
+      : (publicActivityQuery.data ?? []).map((item) => ({
+          icon: '↔',
+          title: `${item.user} participa en la comunidad`,
+          meta: 'Actividad pública reciente',
+          tone: 'teal',
+        }))
 
   const showNextRecommendations = () => {
     setRailDirection('next')
@@ -123,17 +172,40 @@ export const HomePage = () => {
       <PrototypePage>
         <section className={styles.hero}>
           <div className={styles.heroContent}>
-            <h1>
-              ¡Bienvenido de nuevo,{' '}
-              <em>{mockMode ? 'Mariano' : (user?.name ?? 'lector')}!</em>
-            </h1>
-            <p>Hay nuevas historias, libros y rincones esperando cerca tuyo.</p>
+            {isAuthenticated ? (
+              <>
+                <h1>
+                  ¡Bienvenido de nuevo,{' '}
+                  <em>{mockMode ? 'Mariano' : (user?.name ?? 'lector')}!</em>
+                </h1>
+                <p>
+                  Hay nuevas historias, libros y rincones esperando cerca tuyo.
+                </p>
+              </>
+            ) : (
+              <>
+                <h1>Encontrá tu próxima historia.</h1>
+                <p>
+                  Descubrí libros cerca tuyo, conectá con otros lectores e
+                  intercambiá los que ya terminaste.
+                </p>
+              </>
+            )}
             <PrototypeButton
               tone="primary"
               onClick={() => navigate(`/${HOME_URLS.BOOKS}`)}
             >
-              Explorar libros <span aria-hidden="true">→</span>
+              {t('home.explore_books', { defaultValue: 'Explorar libros' })}{' '}
+              <span aria-hidden="true">→</span>
             </PrototypeButton>
+            {!isAuthenticated ? (
+              <PrototypeButton
+                tone="ghost"
+                onClick={() => navigate(`/${HOME_URLS.REGISTER}`)}
+              >
+                {t('auth.required.register')}
+              </PrototypeButton>
+            ) : null}
           </div>
         </section>
         {mockMode ? (
@@ -156,9 +228,11 @@ export const HomePage = () => {
               <PrototypeButton
                 tone="ghost"
                 size="small"
-                onClick={() => navigate('/books/mine')}
+                onClick={() =>
+                  navigate(isAuthenticated ? '/books/mine' : '/books')
+                }
               >
-                Ver mis libros →
+                {isAuthenticated ? 'Ver mis libros →' : 'Ver catálogo →'}
               </PrototypeButton>
             }
           />
@@ -203,9 +277,17 @@ export const HomePage = () => {
             <FixtureState region="activity">
               <ActivityRegion items={activities} />
             </FixtureState>
-          ) : activityQuery.isLoading ? (
+          ) : (
+              isAuthenticated
+                ? privateActivityQuery.isLoading
+                : publicActivityQuery.isLoading
+            ) ? (
             <div className={styles.state}>Cargando actividad…</div>
-          ) : activityQuery.isError ? (
+          ) : (
+              isAuthenticated
+                ? privateActivityQuery.isError
+                : publicActivityQuery.isError
+            ) ? (
             <div className={styles.state}>No pudimos cargar la actividad.</div>
           ) : (
             <ActivityRegion items={activities} />
@@ -229,9 +311,11 @@ export const HomePage = () => {
           }
           onClose={() => setSelectedBook(null)}
           onStartConversation={
-            isAuthenticated && selectedBook
+            selectedBook
               ? (ownerId) =>
-                  contactMutation.mutate({ ownerId, book: selectedBook })
+                  runIfAuthenticated(() =>
+                    contactMutation.mutate({ ownerId, book: selectedBook })
+                  )
               : undefined
           }
           isStartingConversation={contactMutation.isPending}

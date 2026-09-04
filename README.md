@@ -32,6 +32,14 @@ cambiar `.env` o `.env.local`. Comprueba el modo con:
 document.documentElement.dataset.apiMode;
 ```
 
+## Descubrimiento publico
+
+Las personas visitantes pueden leer Inicio, Explorar libros, Comunidad, Mapa,
+Ayuda, perfiles publicos y detalles de publicaciones sin cargar consultas
+privadas. Publicar, contactar, guardar, reaccionar, comentar, seguir, crear
+rincones y proponer intercambios usan una unica modal de autenticacion; el
+retorno a login/registro conserva solamente rutas locales seguras.
+
 ## Dataset de demo real
 
 Sobre una base aislada y ya migrada:

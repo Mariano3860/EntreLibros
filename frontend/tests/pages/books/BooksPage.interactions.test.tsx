@@ -55,16 +55,23 @@ describe('BooksPage discovery interactions', () => {
       await screen.findByRole('button', { name: 'booksPage.want.open' })
     )
 
-    expect(screen.getByText('booksPage.want.title')).toBeVisible()
+    expect(await screen.findByText('booksPage.want.title')).toBeVisible()
     expect(screen.getByLabelText('booksPage.want.titleLabel')).toHaveValue('')
 
     createWantBook.mockResolvedValue({ id: 'want-created' })
-    fireEvent.change(screen.getByLabelText('booksPage.want.titleLabel'), {
+    const titleInput = screen.getByLabelText('booksPage.want.titleLabel')
+    fireEvent.change(titleInput, {
       target: { value: 'Libro buscado desde el encabezado' },
     })
-    fireEvent.click(
-      screen.getByRole('button', { name: 'booksPage.want.submit' })
+    fireEvent.input(titleInput, {
+      target: { value: 'Libro buscado desde el encabezado' },
+    })
+    await waitFor(() =>
+      expect(titleInput).toHaveValue('Libro buscado desde el encabezado')
     )
+    const submit = screen.getByRole('button', { name: 'booksPage.want.submit' })
+    await waitFor(() => expect(submit).toBeEnabled())
+    fireEvent.click(submit)
 
     await waitFor(() => {
       expect(createWantBook).toHaveBeenCalledWith(

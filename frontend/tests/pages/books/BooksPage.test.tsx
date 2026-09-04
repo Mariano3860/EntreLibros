@@ -16,10 +16,13 @@ describe('BooksPage', () => {
     const tablist = screen.getByRole('tablist', { name: 'Tipos de libros' })
 
     expect(tablist).toHaveAttribute('aria-orientation', 'horizontal')
-    expect(tablist.querySelectorAll('[role="tab"]')).toHaveLength(5)
+    expect(tablist.querySelectorAll('[role="tab"]')).toHaveLength(4)
+    expect(
+      screen.queryByRole('tab', { name: 'Mis libros' })
+    ).not.toBeInTheDocument()
   })
 
-  test('renders Todos with the user books', () => {
+  test('renders Todos with the public catalog for visitors', () => {
     renderWithProviders(<BooksPage />)
 
     expect(screen.getByRole('tab', { name: 'Todos' })).toHaveAttribute(
@@ -27,17 +30,12 @@ describe('BooksPage', () => {
       'true'
     )
     expect(
-      screen.getByRole('button', { name: 'Ver El nombre del viento' })
+      screen.getByRole('button', { name: 'Ver Ecos del Viento Norte' })
     ).toBeVisible()
   })
 
   test('keeps public books out of Todos while public tabs can explore them', () => {
     renderWithProviders(<BooksPage />)
-
-    fireEvent.click(screen.getByRole('tab', { name: 'Mis libros' }))
-    expect(
-      screen.getByRole('button', { name: 'Ver El nombre del viento' })
-    ).toBeVisible()
 
     fireEvent.click(
       screen.getByRole('tab', { name: 'Disponibles para intercambio' })
@@ -48,10 +46,10 @@ describe('BooksPage', () => {
     expect(screen.getAllByRole('button', { name: /^Ver / })).toHaveLength(1)
   })
 
-  test('opens the real publish modal from the page action', () => {
+  test('gates the publish action for a visitor', async () => {
     renderWithProviders(<BooksPage />)
     fireEvent.click(screen.getByRole('button', { name: /Publicar un libro/ }))
-    expect(screen.getByText('publishBook.title')).toBeVisible()
+    expect(await screen.findByRole('dialog')).toBeVisible()
   })
 
   test('opens a book detail dialog', async () => {
@@ -66,9 +64,10 @@ describe('BooksPage', () => {
       screen.getByRole('button', { name: 'bookDetail.close' })
     ).toBeVisible()
     expect(await screen.findByText('bookDetail.offer.title')).toBeVisible()
-    expect(
-      screen.queryByRole('button', { name: /Contactar a Lucia/ })
-    ).not.toBeInTheDocument()
+    const contact = screen.getByRole('button', { name: 'bookDetail.contact' })
+    expect(contact).toBeVisible()
+    fireEvent.click(contact)
+    expect(await screen.findByText('auth.required.title')).toBeVisible()
 
     fireEvent.click(screen.getByRole('button', { name: 'bookDetail.close' }))
     expect(

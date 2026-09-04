@@ -7,18 +7,17 @@ import { FeedActions } from '@src/components/feed/FeedActions'
 import { renderWithProviders } from '../../test-utils'
 
 describe('FeedActions', () => {
-  test('toggles like count', async () => {
+  test('requires authentication before toggling a like', async () => {
     await i18n.changeLanguage('en')
     renderWithProviders(<FeedActions initialLikes={1} />)
     const likeBtn = screen.getByLabelText(/like/i)
     expect(screen.getByText(/^1/)).toBeInTheDocument()
     fireEvent.click(likeBtn)
-    expect(screen.getByText(/^2/)).toBeInTheDocument()
-    fireEvent.click(likeBtn)
     expect(screen.getByText(/^1/)).toBeInTheDocument()
+    expect(await screen.findByRole('dialog')).toBeVisible()
   })
 
-  test('adds a comment in the local experience', async () => {
+  test('requires authentication before adding a comment', async () => {
     renderWithProviders(<FeedActions initialCommentsCount={0} />)
 
     fireEvent.click(screen.getByRole('button', { name: /comment/i }))
@@ -27,8 +26,10 @@ describe('FeedActions', () => {
     })
     fireEvent.click(screen.getByRole('button', { name: /commentSubmit/i }))
 
-    expect(screen.getByText('Una lectura imperdible.')).toBeVisible()
-    expect(screen.getByText(/^1 /)).toBeInTheDocument()
+    expect(await screen.findByRole('dialog')).toBeVisible()
+    expect(
+      screen.queryByText('Una lectura imperdible.')
+    ).not.toBeInTheDocument()
   })
 
   test('falls back to the canonical URL when sharing is unavailable', async () => {

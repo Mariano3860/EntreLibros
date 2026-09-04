@@ -28,7 +28,7 @@ import styles from './Sidebar.module.scss'
 export const Sidebar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { t } = useTranslation()
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, isLoading } = useAuth()
   const { catalog, readConversationIds } = usePrototype()
   const mockMode = isApiMockMode()
   const conversationsQuery = useQuery({
@@ -36,9 +36,10 @@ export const Sidebar = () => {
     queryFn: fetchConversations,
     staleTime: 15_000,
     refetchInterval: 15_000,
-    enabled: isAuthenticated && !mockMode,
+    enabled: !isLoading && isAuthenticated && !mockMode,
   })
   const hasUnreadMessages =
+    !isLoading &&
     isAuthenticated &&
     (mockMode
       ? catalog.conversations.some(
@@ -50,7 +51,7 @@ export const Sidebar = () => {
           (conversation) => conversation.unreadCount > 0
         ))
 
-  const navItems: NavItem[] = [
+  const publicNavItems: NavItem[] = [
     {
       path: `/${HOME_URLS.HOME}`,
       icon: Home,
@@ -59,7 +60,7 @@ export const Sidebar = () => {
     {
       path: `/${HOME_URLS.BOOKS}`,
       icon: Books,
-      label: t('pages.books'),
+      label: t('pages.exploreBooks'),
     },
     {
       path: `/${HOME_URLS.COMMUNITY}`,
@@ -71,6 +72,8 @@ export const Sidebar = () => {
       icon: MapIcon,
       label: t('pages.map'),
     },
+  ]
+  const privateNavItems: NavItem[] = [
     {
       path: `/${HOME_URLS.MESSAGES}`,
       icon: Messages,
@@ -87,6 +90,10 @@ export const Sidebar = () => {
       label: t('pages.profile', { defaultValue: 'Perfil' }),
     },
   ]
+  const navItems =
+    !isLoading && isAuthenticated
+      ? [...publicNavItems, ...privateNavItems]
+      : publicNavItems
 
   const toggleMenu = () => setIsMenuOpen((prev) => !prev)
   const closeMenu = () => setIsMenuOpen(false)
@@ -132,7 +139,7 @@ export const Sidebar = () => {
           })}
         </div>
         <div className={styles.footer}>
-          <NotificationBell />
+          {!isLoading && isAuthenticated ? <NotificationBell /> : null}
           <NavLink
             to={`/${HOME_URLS.CONTACT}`}
             onClick={closeMenu}
@@ -141,18 +148,33 @@ export const Sidebar = () => {
             }
           >
             <Contact className={styles.icon} />
-            <span className={styles.label}>Ayuda</span>
+            <span className={styles.label}>{t('pages.help')}</span>
           </NavLink>
           <SidebarLanguageSwitcher />
           <SidebarThemeButton />
           <SidebarLoginButton />
-          <NavLink to="/profile" className={styles.userSummary}>
-            <span className={styles.userAvatar}>M</span>
-            <span>
-              <strong>Mariano</strong>
-              <small>@mariano</small>
-            </span>
-          </NavLink>
+          {!isLoading && !isAuthenticated ? (
+            <NavLink
+              to={`/${HOME_URLS.REGISTER}`}
+              onClick={closeMenu}
+              className={styles.registerCta}
+            >
+              {t('auth.required.register')}
+            </NavLink>
+          ) : null}
+          {!isLoading && isAuthenticated ? (
+            <NavLink
+              to="/profile"
+              onClick={closeMenu}
+              className={styles.userSummary}
+            >
+              <span className={styles.userAvatar}>M</span>
+              <span>
+                <strong>Mariano</strong>
+                <small>@mariano</small>
+              </span>
+            </NavLink>
+          ) : null}
         </div>
       </nav>
       {isMenuOpen && <div className={styles.overlay} onClick={closeMenu} />}

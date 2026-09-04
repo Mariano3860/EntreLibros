@@ -25,6 +25,7 @@ import { FeedActions } from '@src/components/feed/FeedActions'
 import type { FeedItem } from '@src/components/feed/FeedItem.types'
 import { PersonSearchModal } from '@src/components/people/PersonSearchModal/PersonSearchModal'
 import { useAuth } from '@src/contexts/auth/AuthContext'
+import { useAuthRequired } from '@src/contexts/auth/AuthRequiredContext'
 import { usePrototype } from '@src/features/prototype/PrototypeContext'
 import {
   Avatar,
@@ -41,6 +42,7 @@ import styles from './CommunityFeedPage.module.scss'
 export const CommunityFeedPage = () => {
   const { catalog, socialPosts, publishStory } = usePrototype()
   const { t } = useTranslation()
+  const { runIfAuthenticated } = useAuthRequired()
   const mockMode = isApiMockMode()
   const [composerOpen, setComposerOpen] = useState(false)
   const [isPersonSearchOpen, setIsPersonSearchOpen] = useState(false)
@@ -74,7 +76,7 @@ export const CommunityFeedPage = () => {
             </PrototypeButton>
             <PrototypeButton
               tone="primary"
-              onClick={() => setComposerOpen(true)}
+              onClick={() => runIfAuthenticated(() => setComposerOpen(true))}
             >
               ＋ Publicar
             </PrototypeButton>
@@ -87,7 +89,7 @@ export const CommunityFeedPage = () => {
               <button
                 className={styles.createStory}
                 type="button"
-                onClick={() => setComposerOpen(true)}
+                onClick={() => runIfAuthenticated(() => setComposerOpen(true))}
               >
                 <Avatar initials="+" accent="#42d7c7" size="large" />
                 <span>Tu historia</span>
@@ -118,27 +120,49 @@ export const CommunityFeedPage = () => {
             <Panel className={styles.composer}>
               <div className={styles.composerTop}>
                 <Avatar initials="M" accent="#ff8b4c" />
-                <button onClick={() => setComposerOpen(true)}>
+                <button
+                  onClick={() =>
+                    runIfAuthenticated(() => setComposerOpen(true))
+                  }
+                >
                   ¿Qué estás leyendo, Mariano?
                 </button>
               </div>
               <div className={styles.composerActions}>
-                <button onClick={() => setComposerOpen(true)}>
+                <button
+                  onClick={() =>
+                    runIfAuthenticated(() => setComposerOpen(true))
+                  }
+                >
                   ▧ Foto/Video
                 </button>
-                <button onClick={() => setComposerOpen(true)}>
+                <button
+                  onClick={() =>
+                    runIfAuthenticated(() => setComposerOpen(true))
+                  }
+                >
                   ▤ Ofrecer libro
                 </button>
-                <button onClick={() => setComposerOpen(true)}>
+                <button
+                  onClick={() =>
+                    runIfAuthenticated(() => setComposerOpen(true))
+                  }
+                >
                   ↔ Proponer intercambio
                 </button>
-                <button onClick={() => setComposerOpen(true)}>
+                <button
+                  onClick={() =>
+                    runIfAuthenticated(() => setComposerOpen(true))
+                  }
+                >
                   ☷ Encuesta
                 </button>
                 <PrototypeButton
                   tone="primary"
                   size="small"
-                  onClick={() => setComposerOpen(true)}
+                  onClick={() =>
+                    runIfAuthenticated(() => setComposerOpen(true))
+                  }
                 >
                   Publicar
                 </PrototypeButton>
@@ -328,6 +352,7 @@ const RealCommunityPage = ({
   navigate: ReturnType<typeof useNavigate>
 }) => {
   const { isAuthenticated, isLoading: isAuthLoading, user } = useAuth()
+  const { runIfAuthenticated } = useAuthRequired()
   const { t } = useTranslation()
   const queryClient = useQueryClient()
   const [composerOpen, setComposerOpen] = useState(false)
@@ -398,7 +423,7 @@ const RealCommunityPage = ({
   const books = useQuery({
     queryKey: ['userBooks'],
     queryFn: fetchUserBooks,
-    enabled: composerOpen,
+    enabled: composerOpen && isAuthenticated,
   })
 
   const realCorners = corners.data?.slice(0, 3) ?? []
@@ -437,7 +462,7 @@ const RealCommunityPage = ({
             </PrototypeButton>
             <PrototypeButton
               tone="primary"
-              onClick={() => setComposerOpen(true)}
+              onClick={() => runIfAuthenticated(() => setComposerOpen(true))}
             >
               ＋ Publicar
             </PrototypeButton>
@@ -449,7 +474,7 @@ const RealCommunityPage = ({
               <button
                 className={styles.createStory}
                 type="button"
-                onClick={() => setComposerOpen(true)}
+                onClick={() => runIfAuthenticated(() => setComposerOpen(true))}
               >
                 <Avatar initials="+" accent="#42d7c7" size="large" />
                 <span>
@@ -491,27 +516,49 @@ const RealCommunityPage = ({
             <Panel className={styles.composer}>
               <div className={styles.composerTop}>
                 <Avatar initials="M" accent="#ff8b4c" />
-                <button onClick={() => setComposerOpen(true)}>
+                <button
+                  onClick={() =>
+                    runIfAuthenticated(() => setComposerOpen(true))
+                  }
+                >
                   ¿Qué estás leyendo, Mariano?
                 </button>
               </div>
               <div className={styles.composerActions}>
-                <button onClick={() => setComposerOpen(true)}>
+                <button
+                  onClick={() =>
+                    runIfAuthenticated(() => setComposerOpen(true))
+                  }
+                >
                   ▧ Foto/Video
                 </button>
-                <button onClick={() => setComposerOpen(true)}>
+                <button
+                  onClick={() =>
+                    runIfAuthenticated(() => setComposerOpen(true))
+                  }
+                >
                   ▤ Ofrecer libro
                 </button>
-                <button onClick={() => setComposerOpen(true)}>
+                <button
+                  onClick={() =>
+                    runIfAuthenticated(() => setComposerOpen(true))
+                  }
+                >
                   ↔ Proponer intercambio
                 </button>
-                <button onClick={() => setComposerOpen(true)}>
+                <button
+                  onClick={() =>
+                    runIfAuthenticated(() => setComposerOpen(true))
+                  }
+                >
                   ☷ Encuesta
                 </button>
                 <PrototypeButton
                   tone="primary"
                   size="small"
-                  onClick={() => setComposerOpen(true)}
+                  onClick={() =>
+                    runIfAuthenticated(() => setComposerOpen(true))
+                  }
                 >
                   Publicar
                 </PrototypeButton>
@@ -635,12 +682,14 @@ const RealCommunityPage = ({
                   </div>
                   <button
                     type="button"
-                    disabled={!isAuthenticated || followMutation.isPending}
+                    disabled={followMutation.isPending}
                     onClick={() =>
-                      followMutation.mutate({
-                        userId: person.id,
-                        following: person.isFollowing,
-                      })
+                      runIfAuthenticated(() =>
+                        followMutation.mutate({
+                          userId: person.id,
+                          following: person.isFollowing,
+                        })
+                      )
                     }
                   >
                     {person.isFollowing

@@ -4,11 +4,13 @@ import type { PublicProfile } from '@api/user/profile.types'
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { ReportModal } from '@components/reports/ReportModal'
 import { useAuth } from '@contexts/auth/AuthContext'
+import { useAuthRequired } from '@contexts/auth/AuthRequiredContext'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router-dom'
 
+import { usePrototype } from '@src/features/prototype/PrototypeContext'
 import {
   Avatar,
   Panel,
@@ -33,9 +35,11 @@ export const PublicProfilePage = () => {
   const { id: rawId } = useParams<{ id: string }>()
   const profileId = toProfileId(rawId)
   const mockMode = isApiMockMode()
+  const { catalog } = usePrototype()
   const navigate = useNavigate()
   const { t } = useTranslation()
   const { isAuthenticated, user } = useAuth()
+  const { runIfAuthenticated } = useAuthRequired()
   const [reportOpen, setReportOpen] = useState(false)
   const profileQuery = useQuery({
     queryKey: ['prototype', 'public-profile', profileId],
@@ -48,6 +52,21 @@ export const PublicProfilePage = () => {
       navigate('/messages', { state: { conversationId: conversation.id } })
     },
   })
+
+  const mockProfile: PublicProfile = {
+    id: profileId ?? 1,
+    alias: 'Lucía Fernández',
+    profileDescription: 'Lectora y anfitriona de rincones de lectura.',
+    profilePhoto: null,
+    language: 'es',
+    location: null,
+    interests: ['fiction', 'poetry'],
+    country: 'Argentina',
+    city: 'Buenos Aires',
+    publicationCount: catalog.communityPosts.length,
+    exchangeCount: 12,
+    publications: [],
+  }
 
   const renderState = (text: string, error = false) => (
     <BaseLayout id="public-profile-page">
@@ -63,14 +82,14 @@ export const PublicProfilePage = () => {
     </BaseLayout>
   )
 
-  if (mockMode || profileId === null || profileQuery.isError) {
+  if (profileId === null || (!mockMode && profileQuery.isError)) {
     return renderState(t('publicProfile.notFound'), true)
   }
-  if (profileQuery.isLoading || !profileQuery.data) {
+  if (!mockMode && (profileQuery.isLoading || !profileQuery.data)) {
     return renderState(t('publicProfile.loading'))
   }
 
-  const profile = profileQuery.data
+  const profile = mockMode ? mockProfile : profileQuery.data!
   const location = [profile.neighborhood, profile.city, profile.country]
     .filter(Boolean)
     .join(' · ')
@@ -87,18 +106,18 @@ export const PublicProfilePage = () => {
           <div className={styles.actions}>
             <PrototypeButton
               tone="primary"
-              onClick={() => contactMutation.mutate()}
-              disabled={
-                !isAuthenticated ||
-                user?.id === profile.id ||
-                contactMutation.isPending
-              }
+              onClick={() => runIfAuthenticated(() => contactMutation.mutate())}
+              disabled={user?.id === profile.id || contactMutation.isPending}
             >
               {contactMutation.isPending
                 ? t('publicProfile.contacting')
-                : t('publicProfile.contact')}
+                : isAuthenticated
+                  ? t('publicProfile.contact')
+                  : t('auth.required.loginContact')}
             </PrototypeButton>
-            <PrototypeButton onClick={() => setReportOpen(true)}>
+            <PrototypeButton
+              onClick={() => runIfAuthenticated(() => setReportOpen(true))}
+            >
               {t('reports.report', { defaultValue: 'Reportar' })}
             </PrototypeButton>
           </div>
@@ -143,8 +162,42 @@ export const PublicProfilePage = () => {
                 </div>
               </>
             ) : null}
+            <div className={styles.stats}>
+              <span>
+                <strong>{profile.publicationCount ?? 0}</strong>
+                {t('publicProfile.publications')}
+              </span>
+              <span>
+                <strong>{profile.exchangeCount ?? 0}</strong>
+                {t('publicProfile.exchanges')}
+              </span>
+            </div>
           </Panel>
         </div>
+        {profile.publications?.length ? (
+          <section className={styles.publications}>
+            <SectionHeading title={t('publicProfile.publicationsTitle')} />
+            <div className={styles.publicationList}>
+              {profile.publications.map((publication) => (
+                <button
+                  type="button"
+                  key={publication.id}
+                  onClick={() => navigate(`/books/${publication.id}`)}
+                >
+                  {publication.coverUrl ? (
+                    <img src={publication.coverUrl} alt="" />
+                  ) : null}
+                  <span>
+                    <strong>{publication.title}</strong>
+                    <small>
+                      {publication.author || t('publicProfile.unknownAuthor')}
+                    </small>
+                  </span>
+                </button>
+              ))}
+            </div>
+          </section>
+        ) : null}
       </PrototypePage>
       <ReportModal
         isOpen={reportOpen}
