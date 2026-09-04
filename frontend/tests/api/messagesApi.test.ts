@@ -5,8 +5,11 @@ import {
   createConversation,
   fetchConversations,
   fetchMessagingContacts,
+  fetchMessageDraft,
   fetchMessageHistory,
   messageQueryKeys,
+  saveMessageDraft,
+  sendMessageDraft,
   sendPersistedMessage,
 } from '@api/messages/messages'
 
@@ -95,5 +98,62 @@ describe('messaging API client', () => {
         body: 'Hola',
       })
     ).resolves.toEqual(message)
+  })
+
+  it('reads and saves a conversation draft with its revision', async () => {
+    const draft = {
+      id: 8,
+      conversationId: 4,
+      authorId: 2,
+      body: 'Hola, ¿te interesa?',
+      attachmentMetadata: null,
+      revision: 3,
+      createdAt: '2026-08-28T00:00:00.000Z',
+      updatedAt: '2026-08-28T00:01:00.000Z',
+    }
+    vi.spyOn(apiClient, 'get').mockResolvedValueOnce({ data: { draft } })
+    vi.spyOn(apiClient, 'put').mockResolvedValueOnce({ data: { draft } })
+
+    await expect(fetchMessageDraft(4)).resolves.toEqual(draft)
+    await expect(
+      saveMessageDraft({
+        conversationId: 4,
+        body: draft.body,
+        revision: draft.revision,
+      })
+    ).resolves.toEqual(draft)
+    expect(apiClient.get).toHaveBeenCalledWith('/messages/4/draft')
+    expect(apiClient.put).toHaveBeenCalledWith('/messages/4/draft', {
+      body: draft.body,
+      attachmentMetadata: null,
+      revision: draft.revision,
+    })
+    expect(messageQueryKeys.draft(4)).toEqual(['messages', 'draft', 4])
+  })
+
+  it('sends a draft through the dedicated idempotent endpoint', async () => {
+    const message = {
+      id: 9,
+      conversationId: 4,
+      senderId: 2,
+      sequence: 2,
+      clientKey: 'draft-client-1',
+      body: 'Hola',
+      attachmentMetadata: null,
+      createdAt: '2026-08-28T00:02:00.000Z',
+    }
+    vi.spyOn(apiClient, 'post').mockResolvedValueOnce({ data: { message } })
+
+    await expect(
+      sendMessageDraft({
+        conversationId: 4,
+        clientKey: 'draft-client-1',
+        revision: 3,
+      })
+    ).resolves.toEqual(message)
+    expect(apiClient.post).toHaveBeenCalledWith('/messages/4/draft/send', {
+      clientKey: 'draft-client-1',
+      revision: 3,
+    })
   })
 })

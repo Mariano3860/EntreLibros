@@ -54,8 +54,15 @@ sugerencias de Comunidad reutilizan esa foto y conservan `/logo.svg` como fallba
 
 ## Cierre funcional del MVP
 
+Los borradores usan `GET|PUT|DELETE /api/messages/:conversationId/draft` y
+`POST /api/messages/:conversationId/draft/send`. Son privados por autor, se
+guardan con revisiones y no participan en historial, no leidos, notificaciones
+ni Socket.IO hasta el envio. El contacto desde una publicacion prepara una
+conversacion silenciosa y un borrador con el texto inicial y el libro adjunto.
+
 El contacto desde publicacion y perfil reutiliza conversaciones idempotentes y
-persiste plantillas con adjuntos de libro. Los acuerdos mantienen versiones,
+persiste el primer contacto como borrador con adjunto de libro; el mensaje solo
+se publica cuando la persona lo envia. Los acuerdos mantienen versiones,
 confirmaciones, recordatorios y resultados privados por participante.
 
 `POST /api/reports` recibe reportes autenticados de contenido, conducta o Rincon
@@ -63,7 +70,8 @@ inexistente. `GET /api/community/metrics` expone el contrato de metricas del MVP
 Los eventos de funnel se guardan en `analytics_events` con clave idempotente.
 
 Las migraciones 031-034 agregan resultados de acuerdos, reportes, eventos
-analiticos y compatibilidad con bases que ya tenian columnas de reportes. El
+analiticos y compatibilidad con bases que ya tenian columnas de reportes; la
+migracion 035 agrega borradores privados de mensajeria. El
 dataset reproducible esta en `backend/scripts/seed-demo-dataset.sql`.
 
 No se presupone rate limiting de aplicacion, email/push, MFA, almacenamiento de

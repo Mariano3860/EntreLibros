@@ -1,6 +1,6 @@
 # Estado actual
 
-Fecha de referencia: 2026-09-03.
+Fecha de referencia: 2026-09-04.
 
 ## Resumen de cierre
 
@@ -29,7 +29,11 @@ La matriz de requisitos y la evidencia se mantienen en
   compartir, Rincones cercanos, fotos de perfil, sugerencias con enlaces reales a
   perfiles y búsqueda global de personas con filtros de privacidad/bloqueo.
 - Contacto: se puede iniciar una conversacion desde una publicacion o un perfil;
-  el primer mensaje es idempotente y puede llevar un adjunto de libro.
+  el contacto desde una publicacion crea un borrador inicial privado con texto y
+  libro adjunto, que puede editarse y enviarse despues.
+- Mensajeria: los borradores de texto, libro, intercambio y acuerdo persisten por
+  conversacion y autor, soportan revisiones, descarte, autosave y envio
+  idempotente; no generan historial, no leidos ni notificaciones hasta enviarse.
 - Acuerdos: propuesta, contrapropuesta, confirmacion, rechazo, cancelacion,
   versionado, recordatorio in-app idempotente y resultado completado/no completado
   por participante. Los resultados no se publican en el feed.
@@ -61,7 +65,10 @@ La matriz de requisitos y la evidencia se mantienen en
    `document.documentElement.dataset.apiMode === 'real'`.
 3. Cargar el dataset de `backend/scripts/seed-demo-dataset.sql` y recargar las
    rutas `/community`, `/map`, `/profile/:id`, `/messages` y `/stats`.
-4. Verificar privacidad, contacto, reportes, estados vacio/error, idioma, teclado,
+4. En `/messages`, crear un borrador de cada tipo, recargar, cambiar de
+   conversacion, descartar y enviar uno; verificar que el destinatario no ve el
+   borrador antes del envio y que el mensaje aparece una sola vez despues.
+5. Verificar privacidad, contacto, reportes, estados vacio/error, idioma, teclado,
    responsive, cookies y Socket.IO con la checklist enlazada arriba.
 
 Para recuperacion consulta [`recovery-baseline.md`](recovery-baseline.md); para

@@ -732,6 +732,33 @@
           "saved": "Your latest outcome was saved."
         }
       },
+      "drafts": {
+        "label": "Draft",
+        "private": "Only you can see this draft until you send it",
+        "ariaLabel": "Draft: {{title}}",
+        "textTitle": "Message",
+        "bookTitle": "Attached book",
+        "swapTitle": "Swap proposal",
+        "agreementTitle": "Agreement proposal",
+        "book": "Book",
+        "bookAttached": "Attached book",
+        "offered": "You offer",
+        "requested": "You request",
+        "agreementBookRequired": "Choose a valid book from the conversation.",
+        "swapBooksRequired": "Choose one of your books and one from the other person.",
+        "edit": "Edit",
+        "discard": "Discard",
+        "send": "Send",
+        "sendProposal": "Send proposal",
+        "sending": "Sending…",
+        "saving": "Saving draft…",
+        "saved": "Draft saved",
+        "saveError": "We couldn't save the draft. Try again.",
+        "discardError": "We couldn't discard the draft. Try again.",
+        "sendError": "We couldn't send the draft. Try again.",
+        "saveChanges": "Save changes",
+        "saveAgreement": "Save draft"
+      },
       "snippets": {
         "sharedBook": "Shared a book"
       }

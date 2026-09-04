@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
 vi.mock('@src/api/auth/me.service', () => ({
@@ -35,7 +35,7 @@ describe('MessagesPage', () => {
       .find((button) => button.textContent?.includes('Ecos del Viento Norte'))
     expect(choice).toBeDefined()
     fireEvent.click(choice!)
-    expect(screen.getByText('Libro adjunto')).toBeVisible()
+    expect(screen.getAllByText('Libro adjunto').length).toBeGreaterThan(0)
   })
 
   test('creates an exchange proposal in the chat', () => {
@@ -54,5 +54,42 @@ describe('MessagesPage', () => {
     expect(
       screen.getAllByText('Propuesta de intercambio').length
     ).toBeGreaterThan(0)
+  })
+
+  test('recovers a draft after remount and keeps it isolated by conversation', async () => {
+    localStorage.clear()
+    const firstRender = renderWithProviders(<MessagesPage />)
+    const input = screen.getByPlaceholderText(/Escrib.*mensaje/)
+    fireEvent.change(input, { target: { value: 'Borrador persistente' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar mensaje' }))
+    await waitFor(() =>
+      expect(screen.getByText('Borrador persistente')).toBeVisible()
+    )
+    firstRender.unmount()
+    renderWithProviders(<MessagesPage />)
+    expect(screen.getByText('Borrador persistente')).toBeVisible()
+
+    fireEvent.click(screen.getByRole('button', { name: /Sofia/i }))
+    expect(screen.queryByText('Borrador persistente')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /Lucia/ }))
+    expect(screen.getByText('Borrador persistente')).toBeVisible()
+  })
+
+  test('sends and removes a saved mock draft', async () => {
+    localStorage.clear()
+    renderWithProviders(<MessagesPage />)
+    const input = screen.getByPlaceholderText(/Escrib.*mensaje/)
+    fireEvent.change(input, { target: { value: 'Mensaje para enviar' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Enviar mensaje' }))
+
+    const draftCard = await screen.findByRole('article', {
+      name: 'Borrador: Mensaje',
+    })
+    fireEvent.click(within(draftCard).getByRole('button', { name: 'Enviar' }))
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('article', { name: 'Borrador: Mensaje' })
+      ).not.toBeInTheDocument()
+    )
   })
 })

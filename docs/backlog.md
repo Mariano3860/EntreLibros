@@ -11,7 +11,7 @@ La matriz completa y sus referencias estan en
 - Descubrimiento unificado: mapa y listado real comparten consulta, filtros,
   radio, orden, seleccion y estados de carga/vacio/error.
 - Contacto desde publicacion y perfil con conversacion reutilizable, bloqueo,
-  plantilla traducible y adjunto de libro.
+  plantilla traducible y borrador inicial con adjunto de libro.
 - Acuerdos con versionado, concurrencia, recordatorio in-app y resultado por
   participante sin publicar datos privados.
 - Notificaciones contextuales, preferencias in-app, deduplicacion y contador
@@ -22,7 +22,7 @@ La matriz completa y sus referencias estan en
 - Diseno futuro de recomendaciones separado de las sugerencias actuales.
 - Dataset reproducible con dos usuarios, publicaciones, Rincon, conversacion,
   acuerdo, notificaciones, eventos y resultado.
-- Migraciones acumulativas 031-034, pruebas automatizadas, typecheck, lint,
+- Migraciones acumulativas 031-035, pruebas automatizadas, typecheck, lint,
   formato, build y contrato OpenAPI actualizado.
 - Foto de perfil con recorte cuadrado confirmado, reemplazo repetido, persistencia
   segura y presentación consistente en Perfil y Comunidad.
@@ -32,16 +32,19 @@ La matriz completa y sus referencias estan en
 - Atribucion publica del usuario que publico cada libro recomendado y contacto
   reutilizable desde el detalle de Home, manteniendo separado el autor
   bibliografico.
+- Borradores privados de mensajes con texto, libros adjuntos, intercambios y
+  propuestas de acuerdo; guardado con revision, envio idempotente y tarjeta
+  responsive compartida.
 
 ## Prioridad P0
 
 - [x] P0-01 Recorrido real persistente: dataset y checklist real con recarga.
 - [x] P0-02 Rincones consistentes: pausa reversible, detalle, privacidad y
-  autorizacion.
+      autorizacion.
 - [x] P0-03 Publicaciones validas: campos, consentimientos, disponibilidad y
-  revision editorial minima.
+      revision editorial minima.
 - [x] P0-04 Privacidad territorial: proyecciones sin calle, altura ni coordenadas
-  exactas.
+      exactas.
 - [x] P0-05 Descubrimiento unificado.
 - [x] P0-06 Contacto desde el producto.
 - [x] P0-07 Acuerdos cerrables.
@@ -52,13 +55,13 @@ La matriz completa y sus referencias estan en
 
 - [x] P1-01 Metricas minimas.
 - [ ] P1-02 Seguridad de despliegue: falta rate limiting de aplicacion y evidencia
-  de TLS/infraestructura.
+      de TLS/infraestructura.
 - [ ] P1-03 Retencion, anonimización y revocacion integral; la minimizacion y los
-  consentimientos de publicacion ya estan implementados.
+      consentimientos de publicacion ya estan implementados.
 - [x] P1-04 Rendimiento del mapa; resultado reproducible en
-  [`performance-map.md`](performance-map.md).
+      [`performance-map.md`](performance-map.md).
 - [ ] P1-05 Revision manual completa de accesibilidad, lenguaje, contraste y
-  responsive.
+      responsive.
 - [ ] P1-06 Backup, restauracion, migracion de una base existente y rollback.
 - [ ] P1-07 Capturas archivadas y cierre formal de evidencia de entrega.
 

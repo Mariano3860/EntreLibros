@@ -9,6 +9,10 @@ const { mocks, messageQueryKeys } = vi.hoisted(() => ({
     fetchMessageHistory: vi.fn(),
     fetchConversationBooks: vi.fn(),
     sendPersistedMessage: vi.fn(),
+    fetchMessageDraft: vi.fn(),
+    saveMessageDraft: vi.fn(),
+    deleteMessageDraft: vi.fn(),
+    sendMessageDraft: vi.fn(),
     fetchAgreement: vi.fn(),
     counterProposeAgreement: vi.fn(),
     createAgreement: vi.fn(),
@@ -24,6 +28,8 @@ const { mocks, messageQueryKeys } = vi.hoisted(() => ({
       ['messages', 'history', conversationId, after] as const,
     books: (conversationId: number) =>
       ['messages', 'books', conversationId] as const,
+    draft: (conversationId: number) =>
+      ['messages', 'draft', conversationId] as const,
   },
 }))
 
@@ -38,6 +44,10 @@ vi.mock('@src/api/messages/messages', () => ({
   fetchMessageHistory: mocks.fetchMessageHistory,
   fetchConversationBooks: mocks.fetchConversationBooks,
   sendPersistedMessage: mocks.sendPersistedMessage,
+  fetchMessageDraft: mocks.fetchMessageDraft,
+  saveMessageDraft: mocks.saveMessageDraft,
+  deleteMessageDraft: mocks.deleteMessageDraft,
+  sendMessageDraft: mocks.sendMessageDraft,
   markMessagesRead: mocks.markMessagesRead,
   messageQueryKeys,
 }))
@@ -48,6 +58,10 @@ vi.mock('@api/messages/messages', () => ({
   fetchMessageHistory: mocks.fetchMessageHistory,
   fetchConversationBooks: mocks.fetchConversationBooks,
   sendPersistedMessage: mocks.sendPersistedMessage,
+  fetchMessageDraft: mocks.fetchMessageDraft,
+  saveMessageDraft: mocks.saveMessageDraft,
+  deleteMessageDraft: mocks.deleteMessageDraft,
+  sendMessageDraft: mocks.sendMessageDraft,
   markMessagesRead: mocks.markMessagesRead,
   messageQueryKeys,
 }))
@@ -102,6 +116,10 @@ describe('MessagesPage in real API mode', () => {
     mocks.fetchMessageHistory.mockReset()
     mocks.fetchConversationBooks.mockReset()
     mocks.sendPersistedMessage.mockReset()
+    mocks.fetchMessageDraft.mockReset()
+    mocks.saveMessageDraft.mockReset()
+    mocks.deleteMessageDraft.mockReset()
+    mocks.sendMessageDraft.mockReset()
     mocks.fetchAgreement.mockReset()
     mocks.counterProposeAgreement.mockReset()
     mocks.createAgreement.mockReset()
@@ -109,6 +127,19 @@ describe('MessagesPage in real API mode', () => {
     mocks.markMessagesRead.mockReset()
     mocks.joinConversation.mockReset()
     mocks.fetchAgreement.mockResolvedValue(null)
+    mocks.fetchMessageDraft.mockResolvedValue(null)
+    mocks.saveMessageDraft.mockResolvedValue({
+      id: 1,
+      conversationId: conversation.id,
+      authorId: 7,
+      body: 'Borrador',
+      attachmentMetadata: null,
+      revision: 1,
+      createdAt: '2026-08-31T10:00:00.000Z',
+      updatedAt: '2026-08-31T10:00:00.000Z',
+    })
+    mocks.deleteMessageDraft.mockResolvedValue(undefined)
+    mocks.sendMessageDraft.mockResolvedValue({})
     mocks.markMessagesRead.mockResolvedValue(undefined)
   })
 
@@ -136,7 +167,7 @@ describe('MessagesPage in real API mode', () => {
       myBooks: [book],
       theirBooks: [],
     })
-    mocks.sendPersistedMessage.mockRejectedValue(new Error('unauthorized'))
+    mocks.saveMessageDraft.mockRejectedValue(new Error('unauthorized'))
 
     renderWithProviders(<MessagesPage />)
 
@@ -148,15 +179,20 @@ describe('MessagesPage in real API mode', () => {
     fireEvent.click(
       await screen.findByRole('button', { name: /Ecos del Viento Norte/ })
     )
-    expect(mocks.sendPersistedMessage).toHaveBeenCalledWith(
-      expect.objectContaining({
-        conversationId: conversation.id,
-        attachmentMetadata: expect.objectContaining({ bookId: book.id }),
-      })
+    await waitFor(() =>
+      expect(mocks.saveMessageDraft).toHaveBeenCalledWith(
+        expect.objectContaining({
+          conversationId: conversation.id,
+          attachmentMetadata: expect.objectContaining({ bookId: book.id }),
+        })
+      )
     )
-    const alert = await screen.findByRole('alert')
-    expect(alert).toHaveTextContent(/No pudimos adjuntar este libro/)
-    expect(alert).toHaveClass(styles.bookPickerError)
+    const alerts = await screen.findAllByRole('alert')
+    const pickerAlert = alerts.find((item) =>
+      item.className.includes(styles.bookPickerError)
+    )
+    expect(pickerAlert).toBeDefined()
+    expect(pickerAlert).toHaveTextContent(/No pudimos adjuntar este libro/)
     expect(screen.getByText('Elegí un libro')).toBeVisible()
   })
 
@@ -193,6 +229,82 @@ describe('MessagesPage in real API mode', () => {
     expect(screen.getByText(book.title)).toBeVisible()
   })
 
+  test('sends a persisted draft with its revision and refreshes the history', async () => {
+    mocks.fetchConversations.mockResolvedValue([conversation])
+    mocks.fetchMessageHistory.mockResolvedValue({ messages: [], nextAfter: 0 })
+    mocks.fetchMessageDraft.mockResolvedValue({
+      id: 8,
+      conversationId: conversation.id,
+      authorId: 7,
+      body: 'Borrador listo',
+      attachmentMetadata: null,
+      revision: 3,
+      createdAt: '2026-08-31T10:00:00.000Z',
+      updatedAt: '2026-08-31T10:01:00.000Z',
+    })
+    mocks.sendMessageDraft.mockResolvedValue({
+      id: 30,
+      conversationId: conversation.id,
+      senderId: 7,
+      sequence: 1,
+      clientKey: 'draft-client-1',
+      body: 'Borrador listo',
+      attachmentMetadata: null,
+      createdAt: '2026-08-31T10:02:00.000Z',
+    })
+
+    renderWithProviders(<MessagesPage />)
+
+    const draftCard = await screen.findByRole('article', {
+      name: 'Borrador: Mensaje',
+    })
+    fireEvent.click(within(draftCard).getByRole('button', { name: 'Editar' }))
+    expect(screen.getByPlaceholderText('Escribí un mensaje...')).toHaveValue(
+      'Borrador listo'
+    )
+    fireEvent.click(within(draftCard).getByRole('button', { name: 'Enviar' }))
+
+    await waitFor(() =>
+      expect(mocks.sendMessageDraft).toHaveBeenCalledWith({
+        conversationId: conversation.id,
+        clientKey: expect.any(String),
+        revision: 3,
+      })
+    )
+    expect(mocks.fetchMessageHistory).toHaveBeenCalledWith(conversation.id)
+  })
+
+  test('discards a persisted draft using its current revision', async () => {
+    mocks.fetchConversations.mockResolvedValue([conversation])
+    mocks.fetchMessageHistory.mockResolvedValue({ messages: [], nextAfter: 0 })
+    mocks.fetchMessageDraft.mockResolvedValue({
+      id: 9,
+      conversationId: conversation.id,
+      authorId: 7,
+      body: 'Borrador descartable',
+      attachmentMetadata: null,
+      revision: 5,
+      createdAt: '2026-08-31T10:00:00.000Z',
+      updatedAt: '2026-08-31T10:01:00.000Z',
+    })
+
+    renderWithProviders(<MessagesPage />)
+
+    const draftCard = await screen.findByRole('article', {
+      name: 'Borrador: Mensaje',
+    })
+    fireEvent.click(
+      within(draftCard).getByRole('button', { name: 'Descartar' })
+    )
+
+    await waitFor(() =>
+      expect(mocks.deleteMessageDraft).toHaveBeenCalledWith(conversation.id, 5)
+    )
+    expect(
+      screen.queryByRole('article', { name: 'Borrador: Mensaje' })
+    ).not.toBeInTheDocument()
+  })
+
   test('inserts an emoji from the composer menu without sending it', async () => {
     mocks.fetchConversations.mockResolvedValue([conversation])
     mocks.fetchMessageHistory.mockResolvedValue({ messages: [], nextAfter: 0 })
@@ -223,7 +335,7 @@ describe('MessagesPage in real API mode', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Insertar emoji 😀' }))
 
     expect(input).toHaveValue('😀')
-    expect(mocks.sendPersistedMessage).not.toHaveBeenCalled()
+    expect(mocks.saveMessageDraft).not.toHaveBeenCalled()
   })
 
   test('allows attaching a book from the other participant', async () => {
@@ -239,7 +351,16 @@ describe('MessagesPage in real API mode', () => {
       myBooks: [book],
       theirBooks: [otherBook],
     })
-    mocks.sendPersistedMessage.mockResolvedValue({})
+    mocks.saveMessageDraft.mockResolvedValue({
+      id: 1,
+      conversationId: conversation.id,
+      authorId: 7,
+      body: otherBook.title,
+      attachmentMetadata: null,
+      revision: 1,
+      createdAt: '2026-08-31T10:00:00.000Z',
+      updatedAt: '2026-08-31T10:00:00.000Z',
+    })
 
     renderWithProviders(<MessagesPage />)
 
@@ -255,7 +376,7 @@ describe('MessagesPage in real API mode', () => {
     )
 
     await waitFor(() =>
-      expect(mocks.sendPersistedMessage).toHaveBeenCalledWith(
+      expect(mocks.saveMessageDraft).toHaveBeenCalledWith(
         expect.objectContaining({
           conversationId: conversation.id,
           body: otherBook.title,
@@ -318,7 +439,16 @@ describe('MessagesPage in real API mode', () => {
         { ...book, id: 'book-2', title: 'El libro de Lucia', ownerId: 8 },
       ],
     })
-    mocks.sendPersistedMessage.mockResolvedValue({})
+    mocks.saveMessageDraft.mockResolvedValue({
+      id: 1,
+      conversationId: conversation.id,
+      authorId: 7,
+      body: '',
+      attachmentMetadata: null,
+      revision: 1,
+      createdAt: '2026-08-31T10:00:00.000Z',
+      updatedAt: '2026-08-31T10:00:00.000Z',
+    })
 
     renderWithProviders(<MessagesPage />)
 
@@ -343,7 +473,7 @@ describe('MessagesPage in real API mode', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Enviar propuesta' }))
 
     await waitFor(() =>
-      expect(mocks.sendPersistedMessage).toHaveBeenCalledWith(
+      expect(mocks.saveMessageDraft).toHaveBeenCalledWith(
         expect.objectContaining({
           conversationId: conversation.id,
           attachmentMetadata: expect.objectContaining({ kind: 'swap' }),
@@ -353,28 +483,12 @@ describe('MessagesPage in real API mode', () => {
   })
 
   test('creates an agreement from the composer menu with the selected book', async () => {
+    const agreementBook = { ...book, id: '1' }
     mocks.fetchConversations.mockResolvedValue([conversation])
     mocks.fetchMessageHistory.mockResolvedValue({ messages: [], nextAfter: 0 })
     mocks.fetchConversationBooks.mockResolvedValue({
-      myBooks: [book],
+      myBooks: [agreementBook],
       theirBooks: [],
-    })
-    mocks.createAgreement.mockResolvedValue({
-      id: 21,
-      conversationId: conversation.id,
-      proposerId: 7,
-      participantId: 8,
-      state: 'proposed',
-      currentVersion: 1,
-      details: {
-        meetingPoint: 'Biblioteca',
-        area: 'Centro',
-        date: '2026-09-01',
-        time: '18:00',
-        bookTitle: book.title,
-      },
-      acceptances: [],
-      listingIds: [1],
     })
 
     renderWithProviders(<MessagesPage />)
@@ -388,7 +502,7 @@ describe('MessagesPage in real API mode', () => {
       await screen.findByRole('option', { name: book.title })
     ).toBeVisible()
     fireEvent.change(
-      screen.getByRole('combobox', { name: 'Libro del acuerdo' }),
+      screen.getByRole('combobox', { name: 'Libro a intercambiar' }),
       {
         target: { value: book.title },
       }
@@ -399,34 +513,40 @@ describe('MessagesPage in real API mode', () => {
     fireEvent.change(screen.getByPlaceholderText('Ej. Palermo'), {
       target: { value: 'Centro' },
     })
-    fireEvent.change(screen.getByLabelText('Fecha'), {
+    fireEvent.change(screen.getByLabelText('Día sugerido'), {
       target: { value: '2026-09-01' },
     })
-    fireEvent.change(screen.getByLabelText('Hora'), {
+    fireEvent.change(screen.getByLabelText('Horario'), {
       target: { value: '18:00' },
     })
     expect(
-      screen.getByRole('combobox', { name: 'Libro del acuerdo' })
+      screen.getByRole('combobox', { name: 'Libro a intercambiar' })
     ).toHaveValue(book.title)
     expect(
       screen.getByRole('textbox', { name: 'Punto de encuentro' })
     ).toHaveValue('Biblioteca')
-    expect(screen.getByRole('textbox', { name: 'Zona' })).toHaveValue('Centro')
-    expect(screen.getByLabelText('Fecha')).toHaveValue('2026-09-01')
-    expect(screen.getByLabelText('Hora')).toHaveValue('18:00')
+    expect(screen.getByRole('textbox', { name: 'Zona o barrio' })).toHaveValue(
+      'Centro'
+    )
+    expect(screen.getByLabelText('Día sugerido')).toHaveValue('2026-09-01')
+    expect(screen.getByLabelText('Horario')).toHaveValue('18:00')
     await waitFor(() =>
       expect(
-        screen.getByRole('button', { name: 'Crear acuerdo' })
+        screen.getByRole('button', { name: 'Guardar borrador' })
       ).toBeEnabled()
     )
-    fireEvent.click(screen.getByRole('button', { name: 'Crear acuerdo' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar borrador' }))
 
     await waitFor(() =>
-      expect(mocks.createAgreement).toHaveBeenCalledWith(
+      expect(mocks.saveMessageDraft).toHaveBeenCalledWith(
         expect.objectContaining({
           conversationId: conversation.id,
-          participantId: 8,
-          details: expect.objectContaining({ bookTitle: book.title }),
+          body: '',
+          attachmentMetadata: expect.objectContaining({
+            kind: 'agreementProposal',
+            listingIds: [1],
+            details: expect.objectContaining({ bookTitle: book.title }),
+          }),
         })
       )
     )
@@ -499,6 +619,7 @@ describe('MessagesPage in real API mode', () => {
   })
 
   test('sends a counterproposal when the conversation already has an active agreement', async () => {
+    const agreementBook = { ...book, id: '1' }
     const agreement = {
       id: 23,
       conversationId: conversation.id,
@@ -524,18 +645,10 @@ describe('MessagesPage in real API mode', () => {
       nextAfter: 0,
     })
     mocks.fetchConversationBooks.mockResolvedValue({
-      myBooks: [book],
+      myBooks: [agreementBook],
       theirBooks: [],
     })
     mocks.fetchAgreement.mockResolvedValue(agreement)
-    mocks.counterProposeAgreement.mockResolvedValue({
-      ...agreement,
-      currentVersion: 3,
-      details: {
-        ...agreement.details,
-        meetingPoint: 'Biblioteca municipal',
-      },
-    })
 
     renderWithProviders(<MessagesPage />)
 
@@ -555,18 +668,24 @@ describe('MessagesPage in real API mode', () => {
     fireEvent.change(screen.getByLabelText('Punto de encuentro'), {
       target: { value: 'Biblioteca municipal' },
     })
-    fireEvent.click(screen.getByRole('button', { name: 'Enviar cambios' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar cambios' }))
 
     await waitFor(() =>
-      expect(mocks.counterProposeAgreement).toHaveBeenCalledWith({
-        agreementId: agreement.id,
-        expectedVersion: agreement.currentVersion,
-        details: {
-          ...agreement.details,
-          meetingPoint: 'Biblioteca municipal',
-        },
-      })
+      expect(mocks.saveMessageDraft).toHaveBeenCalledWith(
+        expect.objectContaining({
+          conversationId: conversation.id,
+          body: '',
+          attachmentMetadata: expect.objectContaining({
+            kind: 'agreementProposal',
+            details: {
+              ...agreement.details,
+              meetingPoint: 'Biblioteca municipal',
+            },
+          }),
+        })
+      )
     )
+    expect(mocks.counterProposeAgreement).not.toHaveBeenCalled()
     expect(mocks.createAgreement).not.toHaveBeenCalled()
   })
 

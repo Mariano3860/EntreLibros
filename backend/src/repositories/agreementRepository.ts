@@ -1,6 +1,5 @@
-import { query, withTransaction } from '../db.js';
+import { query, withTransaction, type DbClient } from '../db.js';
 import { EventEmitter } from 'node:events';
-import { areUsersBlocked } from './messagingRepository.js';
 import { recordAnalyticsEvent } from './analyticsRepository.js';
 import {
   transitionAgreement,
@@ -249,93 +248,112 @@ export async function recordAgreementOutcome(input: {
   return agreement;
 }
 
-export async function createAgreement(input: {
+export type CreateAgreementInput = {
   conversationId: number;
   proposerId: number;
   participantId: number;
   details: AgreementDetails;
   listingIds?: number[];
-}): Promise<AgreementSnapshot> {
-  if (await areUsersBlocked(input.proposerId, input.participantId)) {
+};
+
+export async function createAgreementWithClient(
+  client: DbClient,
+  input: CreateAgreementInput
+): Promise<AgreementSnapshot> {
+  const blocked = await client.query<{ blocked: boolean }>(
+    `SELECT EXISTS (
+       SELECT 1 FROM user_blocks
+       WHERE (blocker_id = $1 AND blocked_id = $2)
+          OR (blocker_id = $2 AND blocked_id = $1)
+     ) AS blocked`,
+    [input.proposerId, input.participantId]
+  );
+  if (blocked.rows[0]?.blocked) {
     throw new Error('agreements.errors.forbidden');
   }
-  const agreement = await withTransaction(async (client) => {
-    const conversation = await client.query<{ user_id: number }>(
-      `SELECT user_id FROM conversation_participants
-       WHERE conversation_id = $1 ORDER BY user_id`,
-      [input.conversationId]
-    );
-    const participants = conversation.rows.map((row) => row.user_id);
-    if (
-      participants.length !== 2 ||
-      !participants.includes(input.proposerId) ||
-      !participants.includes(input.participantId) ||
-      input.proposerId === input.participantId
-    ) {
-      throw new Error('agreements.errors.participants_invalid');
-    }
-    const listingIds = [...new Set(input.listingIds ?? [])];
-    if (listingIds.length > 2) {
-      throw new Error('agreements.errors.listings_invalid');
-    }
-    const listings = listingIds.length
-      ? await client.query<{
-          id: number;
-          user_id: number;
-          status: string;
-          availability: string;
-          is_draft: boolean;
-        }>(
-          `SELECT id, user_id, status, availability, is_draft
-             FROM book_listings
-           WHERE id = ANY($1::integer[]) FOR UPDATE`,
-          [listingIds]
-        )
-      : { rows: [] };
-    if (
-      listings.rows.length !== listingIds.length ||
-      listings.rows.some(
-        (listing) =>
-          listing.status !== 'available' ||
-          listing.availability !== 'public' ||
-          listing.is_draft ||
-          ![input.proposerId, input.participantId].includes(listing.user_id)
+  const conversation = await client.query<{ user_id: number }>(
+    `SELECT user_id FROM conversation_participants
+     WHERE conversation_id = $1 ORDER BY user_id`,
+    [input.conversationId]
+  );
+  const participants = conversation.rows.map((row) => row.user_id);
+  if (
+    participants.length !== 2 ||
+    !participants.includes(input.proposerId) ||
+    !participants.includes(input.participantId) ||
+    input.proposerId === input.participantId
+  ) {
+    throw new Error('agreements.errors.participants_invalid');
+  }
+  const listingIds = [...new Set(input.listingIds ?? [])];
+  if (listingIds.length > 2) {
+    throw new Error('agreements.errors.listings_invalid');
+  }
+  const listings = listingIds.length
+    ? await client.query<{
+        id: number;
+        user_id: number;
+        status: string;
+        availability: string;
+        is_draft: boolean;
+      }>(
+        `SELECT id, user_id, status, availability, is_draft
+           FROM book_listings
+         WHERE id = ANY($1::integer[]) FOR UPDATE`,
+        [listingIds]
       )
-    ) {
-      throw new Error('agreements.errors.listing_unavailable');
-    }
-    const agreementResult = await client.query<{ id: number }>(
-      `INSERT INTO exchange_agreements
-       (conversation_id, proposer_id, participant_id)
-       VALUES ($1, $2, $3) RETURNING id`,
-      [input.conversationId, input.proposerId, input.participantId]
-    );
-    const id = agreementResult.rows[0].id;
+    : { rows: [] };
+  if (
+    listings.rows.length !== listingIds.length ||
+    listings.rows.some(
+      (listing) =>
+        listing.status !== 'available' ||
+        listing.availability !== 'public' ||
+        listing.is_draft ||
+        ![input.proposerId, input.participantId].includes(listing.user_id)
+    )
+  ) {
+    throw new Error('agreements.errors.listing_unavailable');
+  }
+  const agreementResult = await client.query<{ id: number }>(
+    `INSERT INTO exchange_agreements
+     (conversation_id, proposer_id, participant_id)
+     VALUES ($1, $2, $3) RETURNING id`,
+    [input.conversationId, input.proposerId, input.participantId]
+  );
+  const id = agreementResult.rows[0].id;
+  await client.query(
+    `INSERT INTO exchange_agreement_versions
+     (agreement_id, version, actor_id, details)
+     VALUES ($1, 1, $2, $3)`,
+    [id, input.proposerId, JSON.stringify(input.details)]
+  );
+  for (const listing of listings.rows) {
     await client.query(
-      `INSERT INTO exchange_agreement_versions
-       (agreement_id, version, actor_id, details)
+      `INSERT INTO exchange_agreement_items
+       (agreement_id, version, listing_id, owner_id)
        VALUES ($1, 1, $2, $3)`,
-      [id, input.proposerId, JSON.stringify(input.details)]
+      [id, listing.id, listing.user_id]
     );
-    for (const listing of listings.rows) {
-      await client.query(
-        `INSERT INTO exchange_agreement_items
-         (agreement_id, version, listing_id, owner_id)
-         VALUES ($1, 1, $2, $3)`,
-        [id, listing.id, listing.user_id]
-      );
-    }
-    await client.query(
-      `INSERT INTO agreement_events (agreement_id, version, actor_id, event_type)
-       VALUES ($1, 1, $2, 'proposal')`,
-      [id, input.proposerId]
-    );
-    const { rows } = await client.query<AgreementRow>(
-      `${AGREEMENT_SELECT} WHERE a.id = $1 GROUP BY a.id, v.details`,
-      [id]
-    );
-    return mapRow(rows[0]);
-  });
+  }
+  await client.query(
+    `INSERT INTO agreement_events (agreement_id, version, actor_id, event_type)
+     VALUES ($1, 1, $2, 'proposal')`,
+    [id, input.proposerId]
+  );
+  const { rows } = await client.query<AgreementRow>(
+    `${AGREEMENT_SELECT} WHERE a.id = $1 GROUP BY a.id, v.details`,
+    [id]
+  );
+  return mapRow(rows[0]);
+}
+
+export async function createAgreement(
+  input: CreateAgreementInput
+): Promise<AgreementSnapshot> {
+  const agreement = await withTransaction((client) =>
+    createAgreementWithClient(client, input)
+  );
   agreementEvents.emit('committed', agreement);
   await recordAnalyticsEvent({
     eventType: 'agreement_created',
@@ -499,70 +517,88 @@ export async function commandAgreement(input: {
   return agreement;
 }
 
-export async function counterProposeAgreement(input: {
+export type CounterProposeAgreementInput = {
   id: number;
   actorId: number;
   expectedVersion: number;
   details: AgreementDetails;
-}): Promise<AgreementSnapshot> {
-  const agreement = await withTransaction(async (client) => {
-    const current = await client.query<AgreementRow>(
-      `SELECT a.id, a.conversation_id, a.proposer_id, a.participant_id,
+  conversationId?: number;
+};
+
+export async function counterProposeAgreementWithClient(
+  client: DbClient,
+  input: CounterProposeAgreementInput
+): Promise<AgreementSnapshot> {
+  const current = await client.query<AgreementRow>(
+    `SELECT a.id, a.conversation_id, a.proposer_id, a.participant_id,
               a.state, a.current_version,
               '{}'::integer[] AS acceptances, '{}'::integer[] AS listing_ids
        FROM exchange_agreements a
        WHERE a.id = $1 AND (a.proposer_id = $2 OR a.participant_id = $2)
        FOR UPDATE OF a`,
-      [input.id, input.actorId]
-    );
-    const row = current.rows[0];
-    if (!row) throw new Error('agreements.errors.forbidden');
-    if (row.current_version !== input.expectedVersion) {
-      throw new Error('agreements.errors.conflict');
-    }
-    const version = await client.query<{ details: AgreementDetails }>(
-      `SELECT details FROM exchange_agreement_versions
+    [input.id, input.actorId]
+  );
+  const row = current.rows[0];
+  if (!row) throw new Error('agreements.errors.forbidden');
+  if (
+    input.conversationId !== undefined &&
+    Number(row.conversation_id) !== input.conversationId
+  ) {
+    throw new Error('agreements.errors.forbidden');
+  }
+  if (row.current_version !== input.expectedVersion) {
+    throw new Error('agreements.errors.conflict');
+  }
+  const version = await client.query<{ details: AgreementDetails }>(
+    `SELECT details FROM exchange_agreement_versions
        WHERE agreement_id = $1 AND version = $2`,
-      [input.id, row.current_version]
-    );
-    if (!version.rows[0]) throw new Error('agreements.errors.not_found');
-    row.details = version.rows[0].details;
-    const nextVersion = row.current_version + 1;
-    const updated = await client.query(
-      `UPDATE exchange_agreements
+    [input.id, row.current_version]
+  );
+  if (!version.rows[0]) throw new Error('agreements.errors.not_found');
+  row.details = version.rows[0].details;
+  const nextVersion = row.current_version + 1;
+  const updated = await client.query(
+    `UPDATE exchange_agreements
        SET state = 'proposed', current_version = $2, updated_at = NOW()
        WHERE id = $1 AND current_version = $3`,
-      [input.id, nextVersion, input.expectedVersion]
-    );
-    if (updated.rowCount !== 1) {
-      throw new Error('agreements.errors.conflict');
-    }
-    await client.query(
-      `INSERT INTO exchange_agreement_versions
+    [input.id, nextVersion, input.expectedVersion]
+  );
+  if (updated.rowCount !== 1) {
+    throw new Error('agreements.errors.conflict');
+  }
+  await client.query(
+    `INSERT INTO exchange_agreement_versions
        (agreement_id, version, actor_id, state, details)
        VALUES ($1, $2, $3, 'proposed', $4)`,
-      [input.id, nextVersion, input.actorId, JSON.stringify(input.details)]
-    );
-    await client.query(
-      `INSERT INTO exchange_agreement_items
+    [input.id, nextVersion, input.actorId, JSON.stringify(input.details)]
+  );
+  await client.query(
+    `INSERT INTO exchange_agreement_items
        (agreement_id, version, listing_id, owner_id)
        SELECT agreement_id, $2, listing_id, owner_id
        FROM exchange_agreement_items
-       WHERE agreement_id = $1 AND version = $3`,
-      [input.id, nextVersion, row.current_version]
-    );
-    await client.query(
-      `INSERT INTO agreement_events
+      WHERE agreement_id = $1 AND version = $3`,
+    [input.id, nextVersion, row.current_version]
+  );
+  await client.query(
+    `INSERT INTO agreement_events
        (agreement_id, version, actor_id, event_type)
        VALUES ($1, $2, $3, 'counterproposal')`,
-      [input.id, nextVersion, input.actorId]
-    );
-    const { rows } = await client.query<AgreementRow>(
-      `${AGREEMENT_SELECT} WHERE a.id = $1 GROUP BY a.id, v.details`,
-      [input.id]
-    );
-    return mapRow(rows[0]);
-  });
+    [input.id, nextVersion, input.actorId]
+  );
+  const { rows } = await client.query<AgreementRow>(
+    `${AGREEMENT_SELECT} WHERE a.id = $1 GROUP BY a.id, v.details`,
+    [input.id]
+  );
+  return mapRow(rows[0]);
+}
+
+export async function counterProposeAgreement(
+  input: CounterProposeAgreementInput
+): Promise<AgreementSnapshot> {
+  const agreement = await withTransaction((client) =>
+    counterProposeAgreementWithClient(client, input)
+  );
   agreementEvents.emit('committed', agreement);
   return agreement;
 }

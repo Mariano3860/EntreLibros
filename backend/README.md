@@ -20,7 +20,8 @@ carga con `dotenv`; no guardes `.env` ni credenciales en el repositorio.
 
 Las migraciones se ejecutan en orden y son append-only. Las versiones 031-034
 agregan outcomes privados de acuerdos, reportes, eventos de analitica y
-compatibilidad de esquema de reportes. Para el dataset local usa:
+compatibilidad de esquema de reportes; la 035 agrega borradores privados de
+mensajeria con revision y adjuntos tipados. Para el dataset local usa:
 
 ```bash
 psql "$DATABASE_URL" -f backend/scripts/seed-demo-dataset.sql
@@ -31,6 +32,13 @@ No ejecutes la semilla sobre una base de produccion.
 ## Rutas relevantes
 
 - `GET /api/messages` y Socket.IO persisten mensajes antes de emitirlos.
+- `GET|PUT|DELETE /api/messages/:conversationId/draft` permite recuperar,
+  guardar y descartar el borrador privado del participante autenticado.
+- `POST /api/messages/:conversationId/draft/send` valida y envia el borrador de
+  forma idempotente; las propuestas de acuerdo se crean dentro de la misma
+  transaccion que el mensaje.
+- `POST /api/messages/conversations` acepta `silent: true` para preparar un
+  contacto sin analitica ni notificacion hasta que la persona lo envie.
 - `POST /api/agreements/:id/outcome` registra el resultado privado de una parte.
 - `POST /api/reports` recibe reportes autenticados con categorias controladas.
 - `GET /api/community/metrics` devuelve el contrato de metricas del MVP.
@@ -48,3 +56,9 @@ npm run openapi -w backend
 
 Las imagenes son referencias HTTPS o datos inline limitados a JPG, PNG o WebP de
 hasta 5 MB; no hay almacenamiento de objetos productivo.
+
+Los borradores se conservan en `message_drafts` y solo se exponen a su autor;
+el destinatario no puede descubrir su existencia. La migracion 035 es aditiva y
+no tiene down-migration: para revertir la aplicacion, vuelve a una version de
+backend anterior y conserva la tabla hasta planificar su eliminacion con una
+backup verificada.

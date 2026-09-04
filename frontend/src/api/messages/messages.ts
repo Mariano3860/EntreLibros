@@ -25,6 +25,7 @@ export type ApiMessageBookAttachment = {
   author: string
   coverUrl: string
   ownerId?: number
+  condition?: string | null
 }
 
 export type ApiMessageAgreementDetails = {
@@ -47,6 +48,7 @@ export type ApiMessageAttachment =
       author: string
       coverUrl: string
       ownerId?: number
+      condition?: string | null
     }
   | {
       key: string
@@ -79,6 +81,21 @@ export type ApiMessageAttachment =
       reason?: string
     }
 
+export type ApiMessageDraftAttachment =
+  | Extract<ApiMessageAttachment, { kind: 'book' }>
+  | Extract<ApiMessageAttachment, { kind: 'swap' }>
+  | {
+      key: string
+      contentType: string
+      size: number
+      name?: string
+      kind: 'agreementProposal'
+      listingIds: number[]
+      details: ApiMessageAgreementDetails
+      agreementId?: number
+      expectedVersion?: number
+    }
+
 export type ApiMessage = {
   id: number
   conversationId: number
@@ -88,6 +105,17 @@ export type ApiMessage = {
   body: string
   attachmentMetadata: ApiMessageAttachment | null
   createdAt: string
+}
+
+export type ApiMessageDraft = {
+  id: number
+  conversationId: number
+  authorId: number
+  body: string
+  attachmentMetadata: ApiMessageDraftAttachment | null
+  revision: number
+  createdAt: string
+  updatedAt: string
 }
 
 export type MessagePage = {
@@ -101,6 +129,7 @@ export type ConversationBook = {
   author: string
   coverUrl: string
   ownerId?: number
+  condition?: string | null
 }
 
 export type ConversationBooks = {
@@ -117,6 +146,8 @@ export const messageQueryKeys = {
     [...messageQueryKeys.all, 'history', conversationId, after] as const,
   books: (conversationId: number) =>
     [...messageQueryKeys.all, 'books', conversationId] as const,
+  draft: (conversationId: number) =>
+    [...messageQueryKeys.all, 'draft', conversationId] as const,
 }
 
 export async function fetchConversations(): Promise<ApiConversation[]> {
@@ -137,13 +168,67 @@ export async function fetchMessagingContacts(
 }
 
 export async function createConversation(
-  participantId: number
+  participantId: number,
+  options?: { silent?: boolean }
 ): Promise<ApiConversation> {
   const response = await apiClient.post<{ conversation: ApiConversation }>(
     RELATIVE_API_ROUTES.MESSAGES.CREATE_CONVERSATION,
-    { participantId }
+    {
+      participantId,
+      ...(options?.silent ? { silent: true } : {}),
+    }
   )
   return response.data.conversation
+}
+
+export async function fetchMessageDraft(
+  conversationId: number
+): Promise<ApiMessageDraft | null> {
+  const response = await apiClient.get<{ draft: ApiMessageDraft | null }>(
+    RELATIVE_API_ROUTES.MESSAGES.DRAFT(conversationId)
+  )
+  return response.data.draft
+}
+
+export async function saveMessageDraft(input: {
+  conversationId: number
+  body: string
+  attachmentMetadata?: ApiMessageDraftAttachment | null
+  revision?: number
+}): Promise<ApiMessageDraft> {
+  const response = await apiClient.put<{ draft: ApiMessageDraft }>(
+    RELATIVE_API_ROUTES.MESSAGES.DRAFT(input.conversationId),
+    {
+      body: input.body,
+      attachmentMetadata: input.attachmentMetadata ?? null,
+      ...(input.revision !== undefined ? { revision: input.revision } : {}),
+    }
+  )
+  return response.data.draft
+}
+
+export async function deleteMessageDraft(
+  conversationId: number,
+  revision?: number
+): Promise<void> {
+  await apiClient.delete(RELATIVE_API_ROUTES.MESSAGES.DRAFT(conversationId), {
+    ...(revision !== undefined ? { params: { revision } } : {}),
+  })
+}
+
+export async function sendMessageDraft(input: {
+  conversationId: number
+  clientKey: string
+  revision?: number
+}): Promise<ApiMessage> {
+  const response = await apiClient.post<{ message: ApiMessage }>(
+    RELATIVE_API_ROUTES.MESSAGES.SEND_DRAFT(input.conversationId),
+    {
+      clientKey: input.clientKey,
+      ...(input.revision !== undefined ? { revision: input.revision } : {}),
+    }
+  )
+  return response.data.message
 }
 
 export async function fetchMessageHistory(

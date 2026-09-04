@@ -15,6 +15,13 @@ import {
   type MessageAttachment,
 } from '../repositories/messagingRepository.js';
 import {
+  deleteMessageDraft,
+  getMessageDraft,
+  sendMessageDraft,
+  upsertMessageDraft,
+  type MessageDraftAttachment,
+} from '../repositories/messageDraftRepository.js';
+import {
   listPublicBookListingsForUser,
   type BookListing,
 } from '../repositories/bookListingRepository.js';
@@ -59,6 +66,9 @@ function asMessageBookAttachment(value: unknown): MessageBookAttachment | null {
     coverUrl: book.coverUrl,
     ...(typeof book.ownerId === 'number' && Number.isSafeInteger(book.ownerId)
       ? { ownerId: book.ownerId }
+      : {}),
+    ...(typeof book.condition === 'string'
+      ? { condition: book.condition }
       : {}),
   };
 }
@@ -114,6 +124,9 @@ function asAttachmentMetadata(value: unknown): MessageAttachment | null {
       ...(typeof metadata.ownerId === 'number' &&
       Number.isSafeInteger(metadata.ownerId)
         ? { ownerId: metadata.ownerId }
+        : {}),
+      ...(typeof metadata.condition === 'string'
+        ? { condition: metadata.condition }
         : {}),
     };
   }
@@ -181,6 +194,66 @@ function asAttachmentMetadata(value: unknown): MessageAttachment | null {
   return null;
 }
 
+function asDraftAttachment(value: unknown): MessageDraftAttachment | null {
+  const attachment = asAttachmentMetadata(value);
+  if (attachment && attachment.kind !== 'agreement') return attachment;
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const metadata = value as Record<string, unknown>;
+  if (
+    typeof metadata.key !== 'string' ||
+    typeof metadata.contentType !== 'string' ||
+    typeof metadata.size !== 'number' ||
+    !Number.isSafeInteger(metadata.size) ||
+    metadata.size < 1 ||
+    metadata.kind !== 'agreementProposal'
+  ) {
+    return null;
+  }
+  const rawListingIds = metadata.listingIds;
+  const details = asAgreementDetails(metadata.details);
+  if (
+    !Array.isArray(rawListingIds) ||
+    rawListingIds.length < 1 ||
+    rawListingIds.length > 2 ||
+    !rawListingIds.every(
+      (listingId) =>
+        typeof listingId === 'number' &&
+        Number.isSafeInteger(listingId) &&
+        listingId > 0
+    ) ||
+    !details ||
+    (typeof metadata.name !== 'undefined' &&
+      typeof metadata.name !== 'string') ||
+    (typeof metadata.agreementId !== 'undefined' &&
+      (typeof metadata.agreementId !== 'number' ||
+        !Number.isSafeInteger(metadata.agreementId) ||
+        metadata.agreementId < 1)) ||
+    (typeof metadata.expectedVersion !== 'undefined' &&
+      (typeof metadata.expectedVersion !== 'number' ||
+        !Number.isSafeInteger(metadata.expectedVersion) ||
+        metadata.expectedVersion < 1)) ||
+    (typeof metadata.agreementId !== 'undefined') !==
+      (typeof metadata.expectedVersion !== 'undefined')
+  ) {
+    return null;
+  }
+  return {
+    key: metadata.key,
+    contentType: metadata.contentType,
+    size: metadata.size,
+    name: typeof metadata.name === 'string' ? metadata.name : undefined,
+    kind: 'agreementProposal',
+    listingIds: [...new Set(rawListingIds as number[])],
+    details,
+    ...(typeof metadata.agreementId === 'number'
+      ? { agreementId: metadata.agreementId }
+      : {}),
+    ...(typeof metadata.expectedVersion === 'number'
+      ? { expectedVersion: metadata.expectedVersion }
+      : {}),
+  };
+}
+
 function hasAttachmentMetadata(value: unknown): boolean {
   return value !== undefined && value !== null;
 }
@@ -192,20 +265,29 @@ function toConversationBook(listing: BookListing) {
     author: listing.author ?? '',
     coverUrl: listing.coverUrl,
     ownerId: listing.userId,
+    condition: listing.condition,
   };
 }
 
 function errorResponse(error: unknown) {
   const message = error instanceof Error ? error.message : '';
-  const key = /^messaging\.errors\.[a-z_]+$/.test(message)
+  const key = /^(?:messaging|agreements)\.errors\.[a-z_]+$/.test(message)
     ? message
     : 'messaging.errors.failed';
   const status =
-    key === 'messaging.errors.forbidden'
+    key === 'messaging.errors.forbidden' ||
+    key === 'agreements.errors.forbidden'
       ? 403
-      : key === 'messaging.errors.failed'
-        ? 500
-        : 422;
+      : key === 'messaging.errors.draft_not_found'
+        ? 404
+        : key === 'messaging.errors.draft_conflict' ||
+            key === 'agreements.errors.conflict'
+          ? 409
+          : key === 'agreements.errors.not_found'
+            ? 404
+            : key === 'messaging.errors.failed'
+              ? 500
+              : 422;
   return { status, body: { error: 'MessagingError', message: key } };
 }
 
@@ -280,19 +362,188 @@ router.post('/conversations', async (req: AuthenticatedRequest, res) => {
       [req.user.id, participantId],
       req.user.id
     );
-    await recordAnalyticsEvent({
-      eventType: 'contact_started',
-      actorId: req.user.id,
-      entityType: 'conversation',
-      entityId: String(conversation.id),
-      idempotencyKey: `contact-started:${conversation.id}:${req.user.id}`,
-    });
+    if (body.silent !== true) {
+      await recordAnalyticsEvent({
+        eventType: 'contact_started',
+        actorId: req.user.id,
+        entityType: 'conversation',
+        entityId: String(conversation.id),
+        idempotencyKey: `contact-started:${conversation.id}:${req.user.id}`,
+      });
+    }
     return res.status(201).json({ conversation });
   } catch (error) {
     const response = errorResponse(error);
     return res.status(response.status).json(response.body);
   }
 });
+
+router.get('/:conversationId/draft', async (req: AuthenticatedRequest, res) => {
+  if (!req.user) {
+    return res
+      .status(401)
+      .json({ error: 'Unauthorized', message: 'auth.errors.unauthorized' });
+  }
+  const conversationId = asPositiveInteger(req.params.conversationId);
+  if (!conversationId) {
+    return res.status(422).json({
+      error: 'ValidationError',
+      message: 'messaging.errors.conversation_required',
+    });
+  }
+  try {
+    return res.json({
+      draft: await getMessageDraft(conversationId, req.user.id),
+    });
+  } catch (error) {
+    const response = errorResponse(error);
+    return res.status(response.status).json(response.body);
+  }
+});
+
+router.put('/:conversationId/draft', async (req: AuthenticatedRequest, res) => {
+  if (!req.user) {
+    return res
+      .status(401)
+      .json({ error: 'Unauthorized', message: 'auth.errors.unauthorized' });
+  }
+  const conversationId = asPositiveInteger(req.params.conversationId);
+  const body = asBody(req.body);
+  const draftBody = body.body;
+  const revision = body.revision;
+  const hasAttachment = body.attachmentMetadata !== undefined;
+  const attachmentMetadata = hasAttachment
+    ? body.attachmentMetadata === null
+      ? null
+      : asDraftAttachment(body.attachmentMetadata)
+    : null;
+  if (
+    !conversationId ||
+    typeof draftBody !== 'string' ||
+    (revision !== undefined &&
+      (typeof revision !== 'number' ||
+        !Number.isSafeInteger(revision) ||
+        revision < 0)) ||
+    (hasAttachment && body.attachmentMetadata !== null && !attachmentMetadata)
+  ) {
+    return res.status(422).json({
+      error: 'ValidationError',
+      message: 'messaging.errors.invalid_draft',
+    });
+  }
+  try {
+    const draft = await upsertMessageDraft({
+      conversationId,
+      authorId: req.user.id,
+      body: draftBody,
+      attachmentMetadata,
+      ...(revision !== undefined ? { revision } : {}),
+    });
+    return res.json({ draft });
+  } catch (error) {
+    const response = errorResponse(error);
+    return res.status(response.status).json(response.body);
+  }
+});
+
+router.delete(
+  '/:conversationId/draft',
+  async (req: AuthenticatedRequest, res) => {
+    if (!req.user) {
+      return res
+        .status(401)
+        .json({ error: 'Unauthorized', message: 'auth.errors.unauthorized' });
+    }
+    const conversationId = asPositiveInteger(req.params.conversationId);
+    const rawRevision = req.query.revision;
+    const revision =
+      rawRevision === undefined ? undefined : Number(rawRevision);
+    if (
+      !conversationId ||
+      (revision !== undefined &&
+        (!Number.isSafeInteger(revision) || revision < 1))
+    ) {
+      return res.status(422).json({
+        error: 'ValidationError',
+        message: 'messaging.errors.invalid_draft',
+      });
+    }
+    try {
+      await deleteMessageDraft(conversationId, req.user.id, revision);
+      return res.status(204).send();
+    } catch (error) {
+      const response = errorResponse(error);
+      return res.status(response.status).json(response.body);
+    }
+  }
+);
+
+router.post(
+  '/:conversationId/draft/send',
+  async (req: AuthenticatedRequest, res) => {
+    if (!req.user) {
+      return res
+        .status(401)
+        .json({ error: 'Unauthorized', message: 'auth.errors.unauthorized' });
+    }
+    const conversationId = asPositiveInteger(req.params.conversationId);
+    const body = asBody(req.body);
+    const revision = body.revision;
+    if (
+      !conversationId ||
+      typeof body.clientKey !== 'string' ||
+      (revision !== undefined &&
+        (typeof revision !== 'number' ||
+          !Number.isSafeInteger(revision) ||
+          revision < 1))
+    ) {
+      return res.status(422).json({
+        error: 'ValidationError',
+        message: 'messaging.errors.invalid_draft',
+      });
+    }
+    try {
+      const result = await sendMessageDraft({
+        conversationId,
+        authorId: req.user.id,
+        clientKey: body.clientKey,
+        ...(revision !== undefined ? { revision } : {}),
+      });
+      if (result.created) {
+        const attachment = result.message.attachmentMetadata;
+        if (attachment?.kind === 'book') {
+          await recordAnalyticsEvent({
+            eventType: 'contact_started',
+            actorId: req.user.id,
+            entityType: 'listing',
+            entityId: attachment.bookId,
+            metadata: { conversationId },
+            idempotencyKey: `contact-listing:${conversationId}:${attachment.bookId}:${req.user.id}`,
+          });
+        }
+        if (result.agreementId) {
+          await recordAnalyticsEvent({
+            eventType: 'agreement_created',
+            actorId: req.user.id,
+            entityType: 'agreement',
+            entityId: String(result.agreementId),
+            idempotencyKey: `agreement-created:${result.agreementId}`,
+          });
+        }
+        await notifyMessageRecipients({
+          messageId: result.message.id,
+          conversationId,
+          senderId: req.user.id,
+        });
+        publishMessage(result.message);
+      }
+      return res.status(201).json({ message: result.message });
+    } catch (error) {
+      const response = errorResponse(error);
+      return res.status(response.status).json(response.body);
+    }
+  }
+);
 
 router.get('/:conversationId/books', async (req: AuthenticatedRequest, res) => {
   if (!req.user) {

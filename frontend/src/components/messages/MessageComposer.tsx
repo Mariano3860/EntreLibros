@@ -29,6 +29,7 @@ type MessageComposerProps = {
   theirBooks: Book[]
   counterpartName: string
   conversationId: number
+  draftSeed?: string
   booksLoading?: boolean
   booksError?: boolean
   onRetryBooks?: () => void
@@ -47,6 +48,7 @@ export const MessageComposer = ({
   theirBooks,
   counterpartName,
   conversationId,
+  draftSeed = '',
   booksLoading = false,
   booksError = false,
   onRetryBooks,
@@ -190,7 +192,8 @@ export const MessageComposer = ({
   useEffect(() => {
     closeEmojiPicker()
     setActiveModal(null)
-  }, [conversationId])
+    setDraft(draftSeed)
+  }, [conversationId, draftSeed])
 
   const hasDraft = draft.trim().length > 0
 

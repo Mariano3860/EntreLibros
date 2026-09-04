@@ -1,6 +1,6 @@
 import {
   createConversation,
-  sendPersistedMessage,
+  saveMessageDraft,
   type ApiConversation,
 } from '@api/messages/messages'
 import { useMutation } from '@tanstack/react-query'
@@ -12,6 +12,7 @@ export type BookContactDetails = {
   title: string
   author: string
   coverUrl?: string
+  condition?: string
 }
 
 type BookContactInput = {
@@ -32,10 +33,11 @@ export const startBookConversation = async ({
 }): Promise<ApiConversation> => {
   if (!/^\d+$/.test(ownerId)) throw new Error('invalid_owner')
 
-  const conversation = await createConversation(Number(ownerId))
-  await sendPersistedMessage({
+  const conversation = await createConversation(Number(ownerId), {
+    silent: true,
+  })
+  await saveMessageDraft({
     conversationId: conversation.id,
-    clientKey: `first-contact-${conversation.id}`,
     body: firstContactMessage,
     attachmentMetadata: {
       key: `book:${book.id}`,
@@ -46,6 +48,7 @@ export const startBookConversation = async ({
       title: book.title,
       author: book.author,
       coverUrl: book.coverUrl ?? '',
+      ...(book.condition ? { condition: book.condition } : {}),
     },
   })
 

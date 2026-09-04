@@ -599,6 +599,18 @@ main.layoutMain {
   font-size: 9px;
 }
 
+.draftSaveStatus {
+  min-height: 25px;
+  padding: 0 14px 8px;
+  color: var(--prototype-muted);
+  font-size: 9px;
+  line-height: 1.35;
+}
+
+.draftSaveStatus[role='alert'] {
+  color: var(--prototype-orange);
+}
+
 .modalBackdrop {
   position: fixed;
   inset: 0;
@@ -1182,6 +1194,10 @@ main.layoutMain {
 }
 
 @media (max-width: $breakpoint-tablet) {
+  .conversationHeader {
+    padding-left: 60px;
+  }
+
   .layoutMain {
     height: auto;
     overflow: visible;
