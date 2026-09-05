@@ -13,7 +13,7 @@
 
 .period span {
   color: var(--prototype-muted);
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .period select {
@@ -63,7 +63,7 @@
 .metricGrid span,
 .funnel span {
   color: var(--prototype-muted);
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .metricGrid strong {
@@ -84,7 +84,7 @@
 
 .growth {
   color: var(--prototype-teal);
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .legend {
@@ -92,7 +92,7 @@
   justify-content: space-between;
   margin-bottom: 4px;
   color: var(--prototype-teal);
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .legend small {
@@ -119,7 +119,7 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   color: var(--prototype-muted);
-  font-size: 8px;
+  font-size: 10px;
   text-align: center;
 }
 
@@ -164,7 +164,7 @@
 
 .barChart small {
   color: var(--prototype-muted);
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .ranking {
@@ -192,7 +192,7 @@
   border-radius: 8px;
   background: rgb(66 215 199 / 12%);
   color: var(--prototype-teal);
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .ranking strong,
@@ -207,7 +207,7 @@
 .ranking small {
   margin-top: 2px;
   color: var(--prototype-muted);
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .ranking em {
@@ -240,18 +240,18 @@
 }
 
 .contributors strong {
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .contributors small {
   margin-top: 2px;
   color: var(--prototype-muted);
-  font-size: 7px;
+  font-size: 10px;
 }
 
 .position {
   color: var(--prototype-muted);
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .badge {
@@ -259,7 +259,7 @@
   top: 4px;
   right: 5px;
   color: var(--prototype-orange);
-  font-size: 6px;
+  font-size: 10px;
 }
 
 @media (width <= 1050px) {

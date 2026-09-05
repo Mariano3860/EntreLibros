@@ -47,7 +47,7 @@
 
 .identityCopy small {
   color: var(--prototype-muted);
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .bio {
@@ -80,7 +80,7 @@
   display: block;
   margin-bottom: 8px;
   color: var(--prototype-muted);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 650;
 }
 
@@ -90,7 +90,7 @@
   border-radius: 999px;
   background: rgb(66 215 199 / 8%);
   color: var(--prototype-teal);
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .saved {
@@ -98,7 +98,7 @@
   right: 20px;
   bottom: 17px;
   color: var(--prototype-teal);
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .notificationPreference {
@@ -146,7 +146,7 @@
 .metrics span {
   overflow: hidden;
   color: var(--prototype-muted);
-  font-size: 8px;
+  font-size: 10px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -177,7 +177,7 @@
   border: 0;
   background: transparent;
   color: var(--prototype-teal);
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .preferenceGrid {
@@ -200,13 +200,13 @@
 
 .preferenceGrid strong {
   display: block;
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .preferenceGrid p {
   margin: 3px 0 0;
   color: var(--prototype-muted);
-  font-size: 8px;
+  font-size: 10px;
   line-height: 1.45;
 }
 
@@ -237,12 +237,12 @@
 }
 
 .achievements strong {
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .achievements small {
   color: var(--prototype-muted);
-  font-size: 6px;
+  font-size: 10px;
 }
 
 .goalRing {
@@ -270,7 +270,7 @@
 
 .goalRing small {
   color: var(--prototype-muted);
-  font-size: 7px;
+  font-size: 10px;
 }
 
 .progress {
@@ -289,7 +289,7 @@
 
 .goal > p {
   color: var(--prototype-muted);
-  font-size: 8px;
+  font-size: 10px;
   text-align: center;
 }
 
@@ -318,7 +318,7 @@
 .streak p {
   margin: 3px 0;
   color: var(--prototype-muted);
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .week {
@@ -335,7 +335,7 @@
   border-radius: 50%;
   background: var(--prototype-surface-soft);
   color: var(--prototype-muted);
-  font-size: 7px;
+  font-size: 10px;
 }
 
 .week .done {
@@ -449,7 +449,7 @@
 
 .photoField {
   color: var(--prototype-muted);
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .photoControls {
@@ -520,7 +520,7 @@
 .privacyHint {
   margin: 0;
   color: var(--prototype-muted);
-  font-size: 8px;
+  font-size: 10px;
   line-height: 1.4;
 }
 
@@ -539,7 +539,7 @@
   border-radius: 12px;
   background: rgb(66 215 199 / 5%);
   color: var(--prototype-muted);
-  font-size: 9px;
+  font-size: 10px;
 
   strong {
     color: var(--prototype-input-text);
@@ -588,7 +588,7 @@
     min-width: 0;
     gap: 3px;
     color: var(--prototype-muted);
-    font-size: 8px;
+    font-size: 10px;
   }
 
   input {
@@ -613,7 +613,7 @@
     background: transparent;
     color: var(--prototype-teal);
     cursor: pointer;
-    font-size: 8px;
+    font-size: 10px;
   }
 
   button:last-child {
@@ -689,12 +689,12 @@
 
 .publicPreview strong {
   color: var(--prototype-teal);
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .publicPreview span {
   color: var(--prototype-muted);
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .modalMainGrid,
