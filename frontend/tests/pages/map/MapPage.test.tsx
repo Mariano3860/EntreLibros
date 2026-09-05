@@ -56,7 +56,7 @@ describe('MapPage', () => {
     fetchMe.mockRejectedValue(new Error('unauthenticated'))
   })
 
-  test('requests location automatically and renders the expanded map', async () => {
+  test('does not request location automatically for visitors', async () => {
     const original = Object.getOwnPropertyDescriptor(navigator, 'geolocation')
     const getCurrentPosition = vi.fn((success) =>
       success({ coords: { latitude: -34.58, longitude: -58.42 } })
@@ -68,11 +68,12 @@ describe('MapPage', () => {
 
     renderWithProviders(<MapPage />)
 
-    await waitFor(() => expect(getCurrentPosition).toHaveBeenCalled())
+    await screen.findByRole('img', { name: /Mapa oscuro/ })
+    expect(getCurrentPosition).not.toHaveBeenCalled()
     expect(screen.getByRole('img', { name: /Mapa oscuro/ })).toBeVisible()
     expect(
-      screen.getByRole('button', { name: 'Tu ubicación aproximada' })
-    ).toBeVisible()
+      screen.queryByRole('button', { name: 'Tu ubicación aproximada' })
+    ).not.toBeInTheDocument()
 
     if (original) Object.defineProperty(navigator, 'geolocation', original)
     else Reflect.deleteProperty(navigator, 'geolocation')
@@ -176,8 +177,6 @@ describe('MapPage', () => {
 
     mapCanvasRender.mockClear()
     renderWithProviders(<MapPage />)
-    await waitFor(() => expect(getCurrentPosition).toHaveBeenCalled())
-
     fireEvent.click(
       screen.getByRole('button', { name: 'Biblioteca de Palermo' })
     )
@@ -185,7 +184,7 @@ describe('MapPage', () => {
       .focusRequest as number
 
     fireEvent.click(screen.getByRole('button', { name: /Mi ubicación/ }))
-    await waitFor(() => expect(getCurrentPosition).toHaveBeenCalledTimes(2))
+    await waitFor(() => expect(getCurrentPosition).toHaveBeenCalledTimes(1))
 
     const focusRequestAfterLocate = mapCanvasRender.mock.calls.at(-1)?.[0]
       .focusRequest as number
@@ -219,6 +218,7 @@ describe('MapPage', () => {
 
     mapCanvasRender.mockClear()
     renderWithProviders(<MapPage />)
+    fireEvent.click(screen.getByRole('button', { name: /Mi ubicación/ }))
     await waitFor(() =>
       expect(mapCanvasRender.mock.calls.at(-1)?.[0].userLocation).toEqual({
         latitude: -34.58,
@@ -244,6 +244,7 @@ describe('MapPage', () => {
       value: { getCurrentPosition: vi.fn((_success, error) => error()) },
     })
     renderWithProviders(<MapPage />)
+    fireEvent.click(screen.getByRole('button', { name: /Mi ubicación/ }))
     expect(await screen.findByText(/Mostramos Buenos Aires/)).toBeVisible()
   })
 
@@ -253,6 +254,7 @@ describe('MapPage', () => {
 
     try {
       renderWithProviders(<MapPage />)
+      fireEvent.click(screen.getByRole('button', { name: /Mi ubicación/ }))
       expect(await screen.findByText(/sin ordenar por distancia/)).toBeVisible()
     } finally {
       if (original) Object.defineProperty(navigator, 'geolocation', original)

@@ -39,6 +39,14 @@ En `Sin limite`, el mapa consulta el bbox real después de cada pan o zoom. Los
 radios numéricos conservan el centro de dispositivo o perfil; si no hay centro
 válido no se inventa una distancia.
 
+## Acceso publico y rutas privadas
+
+Inicio, libros, detalles, Comunidad, Mapa, Ayuda y perfiles publicos se pueden
+leer sin sesion. Las mutaciones muestran la modal comun de autenticacion y
+conservan un `returnTo` local seguro al ir a login o registro. Las rutas
+`/books/new`, `/books/mine`, `/messages`, `/profile` y `/stats` requieren sesion
+y redirigen a login mientras explican el motivo del acceso.
+
 ## Recorridos MVP
 
 Las rutas `/profile/:id`, `/messages`, `/map`, `/community` y `/stats` consumen

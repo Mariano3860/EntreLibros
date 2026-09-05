@@ -41,6 +41,10 @@ La matriz completa y sus referencias estan en
 - Mapa sincronizado con el bbox real del viewport, radios centrados en la
   ubicacion disponible y limites server-side de 50 rincones, 100 publicaciones
   y 100 actividades con metadatos de truncamiento.
+- Experiencia publica de lectura para visitantes en Inicio, libros, Comunidad,
+  Mapa, Ayuda y perfiles, con una modal comun para las acciones autenticadas y
+  retorno local seguro a login/registro; la matriz de alcance esta en
+  [`public-visitor-matrix.md`](public-visitor-matrix.md).
 
 ## Prioridad P0
 

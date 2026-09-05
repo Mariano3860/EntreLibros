@@ -28,6 +28,19 @@
       "cancel": "Cancel",
       "confirm": "Log out",
       "confirming": "Logging out..."
+    },
+    "required": {
+      "eyebrow": "Join the community",
+      "title": "Sign in to continue",
+      "description": "You need an account to contact readers, publish books, and exchange them.",
+      "register": "Sign up",
+      "or": "or",
+      "login": "Log in",
+      "close": "Close",
+      "illustrationAlt": "Books in a reading corner",
+      "community": "Join a community that shares stories",
+      "loginNotice": "Sign in to access this section.",
+      "loginContact": "Log in to contact"
     }
   },
   "theme": {
@@ -39,11 +52,13 @@
   "pages": {
     "home": "Home",
     "books": "My Books",
+    "exploreBooks": "Explore books",
     "community": "Community",
     "map": "Map",
     "messages": "Messages",
     "stats": "Stats",
-    "contact": "Contact"
+    "contact": "Contact",
+    "help": "Help"
   },
   "contact": {
     "title": "Contact Us",
@@ -1183,7 +1198,11 @@
     "member": "EntreLibros member",
     "contact": "Send message",
     "contacting": "Opening conversation...",
-    "contactError": "The conversation could not be opened."
+    "contactError": "The conversation could not be opened.",
+    "publicationsTitle": "Public publications",
+    "unknownAuthor": "Author not provided",
+    "publications": "Published books",
+    "exchanges": "Exchanges"
   },
   "profile": {
     "title": "My profile",

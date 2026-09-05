@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 320" role="img">
+  <defs>
+    <linearGradient id="bookA" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#5b9ab1" />
+      <stop offset="1" stop-color="#315d78" />
+    </linearGradient>
+    <linearGradient id="bookB" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#d78165" />
+      <stop offset="1" stop-color="#9d4f50" />
+    </linearGradient>
+    <linearGradient id="bookC" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#dfb06e" />
+      <stop offset="1" stop-color="#9e704e" />
+    </linearGradient>
+    <linearGradient id="pot" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#d98968" />
+      <stop offset="1" stop-color="#9d4f50" />
+    </linearGradient>
+    <radialGradient id="halo">
+      <stop offset="0" stop-color="#58d3c3" stop-opacity=".22" />
+      <stop offset="1" stop-color="#58d3c3" stop-opacity="0" />
+    </radialGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#020b13" flood-opacity=".48" />
+    </filter>
+  </defs>
+
+  <ellipse cx="380" cy="236" rx="286" ry="66" fill="url(#halo)" />
+  <ellipse cx="380" cy="274" rx="254" ry="18" fill="#020b13" opacity=".4" />
+
+  <g filter="url(#shadow)">
+    <g transform="rotate(-7 230 214)">
+      <rect x="105" y="204" width="258" height="34" rx="7" fill="url(#bookA)" />
+      <path d="M129 211h210" stroke="#b4d7d7" stroke-opacity=".45" stroke-width="3" />
+      <rect x="120" y="238" width="258" height="29" rx="6" fill="url(#bookB)" />
+      <path d="M143 245h209" stroke="#f2c9a0" stroke-opacity=".45" stroke-width="3" />
+      <rect x="98" y="266" width="286" height="27" rx="6" fill="url(#bookC)" />
+    </g>
+
+    <g transform="rotate(-12 286 142)">
+      <path d="M178 176 200 73q2-10 12-8l119 24q10 2 8 12l-21 103z" fill="#e4d6ba" />
+      <path d="m200 73 12 128-34-25 22-103z" fill="#b5a58c" />
+      <path d="M220 91 312 110" stroke="#8e6e5d" stroke-width="5" stroke-linecap="round" />
+      <path d="M216 111 300 128M212 130l76 15" stroke="#c59a7c" stroke-width="3" stroke-linecap="round" />
+    </g>
+
+    <g>
+      <ellipse cx="405" cy="217" rx="62" ry="12" fill="#020b13" opacity=".35" />
+      <rect x="365" y="126" width="82" height="95" rx="13" fill="#e6d8bf" />
+      <path d="M371 139h70v69h-70z" fill="#b99b78" opacity=".28" />
+      <path d="M384 126q22-13 44 0" fill="none" stroke="#f0e8d8" stroke-width="8" />
+      <path d="M406 111c-16-19 5-29 3-44 20 18 15 34-3 44z" fill="#e7a45d" />
+      <path d="M406 105c-7-10 2-16 3-23 8 9 6 16-3 23z" fill="#ffe6a2" />
+    </g>
+
+    <g>
+      <path d="M561 213c-4-57 3-94 25-124M576 175c-22-28-31-51-32-74M578 151c31-23 45-45 50-70" fill="none" stroke="#5a8066" stroke-width="8" stroke-linecap="round" />
+      <path d="M562 128c-27 5-39-9-43-29 24-7 40 2 43 29zM551 105c-26-13-28-31-21-49 23 7 30 24 21 49zM621 99c7-25 24-35 46-34-2 23-18 35-46 34zM584 167c21-20 40-20 57-9-14 19-33 22-57 9zM579 181c-22-4-34 6-41 21 20 7 36 0 41-21z" fill="#78ae7e" />
+      <path d="m527 210 16-45h76l16 45q-43 18-108 0z" fill="url(#pot)" />
+      <ellipse cx="581" cy="166" rx="39" ry="9" fill="#714743" />
+    </g>
+
+    <g transform="rotate(7 670 219)">
+      <path d="M638 177h58v43h-58z" fill="#d8c5a4" />
+      <path d="M696 187q34-5 30 20-4 20-30 11" fill="none" stroke="#d8c5a4" stroke-width="10" />
+      <path d="M643 179h48" stroke="#f2e7d1" stroke-width="6" />
+    </g>
+  </g>
+</svg>

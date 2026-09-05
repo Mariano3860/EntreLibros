@@ -6,16 +6,19 @@ import { Sidebar } from '@src/components/sidebar/Sidebar'
 import { renderWithProviders } from '../../test-utils'
 
 describe('Sidebar', () => {
-  test('toggles menu and closes with link', () => {
+  test('toggles menu and closes with link', async () => {
     renderWithProviders(<Sidebar />)
     const toggle = screen.getByRole('button', { name: 'Toggle navigation' })
     fireEvent.click(toggle)
     expect(screen.getByRole('navigation').className).toMatch(/open/)
     expect(
-      screen.getByRole('link', { name: 'pages.messages' })
-    ).toBeInTheDocument()
+      screen.queryByRole('link', { name: 'pages.messages' })
+    ).not.toBeInTheDocument()
     expect(
-      screen.getByRole('link', { name: 'pages.stats' })
+      screen.queryByRole('link', { name: 'pages.stats' })
+    ).not.toBeInTheDocument()
+    expect(
+      await screen.findByRole('link', { name: 'auth.required.register' })
     ).toBeInTheDocument()
     fireEvent.click(screen.getByRole('link', { name: 'pages.home' }))
     expect(screen.getByRole('navigation').className).not.toMatch(/open/)

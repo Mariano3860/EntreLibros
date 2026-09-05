@@ -28,6 +28,11 @@ La matriz de requisitos y la evidencia se mantienen en
   numericos usan el centro del dispositivo/perfil; sin centro valido no se
   inventa una distancia. El mapa limita 50 rincones, 100 publicaciones y 100
   actividades e informa truncamiento.
+- Experiencia publica: visitantes pueden leer las superficies de descubrimiento,
+  Comunidad, perfiles y ayuda; las mutaciones se detienen en una modal comun y
+  las rutas privadas exigen sesion con retorno local validado. La matriz de
+  rutas, consultas y acciones esta en
+  [`public-visitor-matrix.md`](public-visitor-matrix.md).
 - Comunidad: feed persistente, historias, seguimiento, likes unicos, comentarios,
   compartir, Rincones cercanos, fotos de perfil, sugerencias con enlaces reales a
   perfiles y búsqueda global de personas con filtros de privacidad/bloqueo.

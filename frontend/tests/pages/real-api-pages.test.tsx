@@ -106,6 +106,10 @@ describe('prototype pages in real API mode', () => {
       new Error('discovery unavailable')
     )
     renderWithProviders(<CommunityFeedPage />)
+    await waitFor(() => expect(fetchCommunityDiscovery).toHaveBeenCalled())
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Logout' })).toBeVisible()
+    )
     expect(
       screen.queryByRole('button', { name: 'Red tea' })
     ).not.toBeInTheDocument()
@@ -139,6 +143,7 @@ describe('prototype pages in real API mode', () => {
   })
 
   test('renders personalized stories and recommendations and follows a reader', async () => {
+    vi.mocked(fetchCommunityDiscovery).mockReset()
     vi.mocked(fetchCommunityDiscovery).mockResolvedValueOnce({
       stories: [
         {

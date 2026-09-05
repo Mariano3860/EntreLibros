@@ -39,6 +39,14 @@ ventana y los radios numericos conservan el centro del dispositivo o del perfil.
 La respuesta limita a 50 rincones, 100 publicaciones y 100 actividades e
 incluye metadatos de truncamiento.
 
+## Descubrimiento publico
+
+Las personas visitantes pueden leer Inicio, Explorar libros, Comunidad, Mapa,
+Ayuda, perfiles publicos y detalles de publicaciones sin cargar consultas
+privadas. Publicar, contactar, guardar, reaccionar, comentar, seguir, crear
+rincones y proponer intercambios usan una unica modal de autenticacion; el
+retorno a login/registro conserva solamente rutas locales seguras.
+
 ## Dataset de demo real
 
 Sobre una base aislada y ya migrada:

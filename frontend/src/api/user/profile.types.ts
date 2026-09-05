@@ -40,6 +40,15 @@ export type PublicProfile = {
   country?: ProfileCountry
   city?: string
   neighborhood?: string
+  publicationCount?: number
+  exchangeCount?: number
+  publications?: Array<{
+    id: string
+    title: string
+    author: string | null
+    coverUrl: string | null
+    type: 'offer' | 'want'
+  }>
 }
 
 export type UpdateProfileRequest = {

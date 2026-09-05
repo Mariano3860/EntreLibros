@@ -28,6 +28,19 @@
       "cancel": "Cancelar",
       "confirm": "Cerrar sesión",
       "confirming": "Cerrando sesión..."
+    },
+    "required": {
+      "eyebrow": "Participá en la comunidad",
+      "title": "Ingresá para continuar",
+      "description": "Necesitás una cuenta para contactar lectores, publicar libros e intercambiar.",
+      "register": "Registrarte",
+      "or": "o",
+      "login": "Iniciar sesión",
+      "close": "Cerrar",
+      "illustrationAlt": "Libros en un rincón de lectura",
+      "community": "Unite a una comunidad que comparte historias",
+      "loginNotice": "Iniciá sesión para acceder a esta sección.",
+      "loginContact": "Iniciar sesión para contactar"
     }
   },
   "theme": {
@@ -39,11 +52,13 @@
   "pages": {
     "home": "Inicio",
     "books": "Mis Libros",
+    "exploreBooks": "Explorar libros",
     "community": "Comunidad",
     "map": "Mapa",
     "messages": "Mensajes",
     "stats": "Estadísticas",
-    "contact": "Contacto"
+    "contact": "Contacto",
+    "help": "Ayuda"
   },
   "contact": {
     "title": "Contáctanos",
@@ -1179,7 +1194,11 @@
     "member": "Miembro de EntreLibros",
     "contact": "Enviar mensaje",
     "contacting": "Abriendo conversación...",
-    "contactError": "No se pudo abrir la conversación."
+    "contactError": "No se pudo abrir la conversación.",
+    "publicationsTitle": "Publicaciones públicas",
+    "unknownAuthor": "Autor no informado",
+    "publications": "Libros publicados",
+    "exchanges": "Intercambios"
   },
   "profile": {
     "title": "Mi perfil",

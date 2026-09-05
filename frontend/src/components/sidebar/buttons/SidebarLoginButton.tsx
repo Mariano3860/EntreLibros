@@ -1,11 +1,11 @@
 import { LogoutConfirmModal } from '@components/auth/LogoutConfirmModal'
-import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
 import { ReactComponent as LogoutIcon } from '@src/assets/icons/logout.svg'
-import { AuthQueryKeys, HOME_URLS } from '@src/constants/constants'
+import { HOME_URLS } from '@src/constants/constants'
+import { useAuth } from '@src/contexts/auth/AuthContext'
 import { useLogout } from '@src/hooks/api/useLogout'
 
 import styles from '../Sidebar.module.scss'
@@ -13,16 +13,13 @@ import styles from '../Sidebar.module.scss'
 export const SidebarLoginButton = () => {
   const { t } = useTranslation()
   const [isConfirmOpen, setConfirmOpen] = useState(false)
-  const queryClient = useQueryClient()
   const navigate = useNavigate()
   const { mutate: logout, isPending } = useLogout()
-
-  const authData = queryClient.getQueryData([AuthQueryKeys.AUTH])
-  const isLoggedIn = Boolean(authData)
+  const { isAuthenticated, isLoading } = useAuth()
 
   return (
     <>
-      {isLoggedIn ? (
+      {!isLoading && isAuthenticated ? (
         <button
           onClick={() => setConfirmOpen(true)}
           className={styles.logoutButton}

@@ -7,6 +7,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
+import { useAuthRequired } from '@src/contexts/auth/AuthRequiredContext'
 import { Avatar, PrototypeButton } from '@src/features/prototype/PrototypeUI'
 
 import styles from './PersonSearchModal.module.scss'
@@ -69,6 +70,7 @@ export const PersonSearchModal = ({
   const { t } = useTranslation()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { runIfAuthenticated } = useAuthRequired()
   const modalRef = useRef<HTMLDivElement>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const [search, setSearch] = useState('')
@@ -331,7 +333,9 @@ export const PersonSearchModal = ({
                       tone={person.isFollowing ? 'ghost' : 'primary'}
                       className={styles.followButton}
                       disabled={followMutation.isPending}
-                      onClick={() => followMutation.mutate(person)}
+                      onClick={() =>
+                        runIfAuthenticated(() => followMutation.mutate(person))
+                      }
                       aria-pressed={person.isFollowing}
                     >
                       {isPending
