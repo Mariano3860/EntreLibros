@@ -1,7 +1,8 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import type {
+  MapBoundingBox,
   MapCornerPin,
   MapQueryInput,
   MapResponse,
@@ -11,11 +12,16 @@ vi.mock('@src/utils/runtimeEnv', () => ({
   isApiMockMode: () => false,
 }))
 
-const { fetchMe, fetchProfile, useMapDataMock } = vi.hoisted(() => ({
-  fetchMe: vi.fn(),
-  fetchProfile: vi.fn(),
-  useMapDataMock: vi.fn(),
-}))
+const { fetchMe, fetchProfile, useMapDataMock, viewportHandler } = vi.hoisted(
+  () => ({
+    fetchMe: vi.fn(),
+    fetchProfile: vi.fn(),
+    useMapDataMock: vi.fn(),
+    viewportHandler: {
+      current: null as ((bbox: MapBoundingBox) => void) | null,
+    },
+  })
+)
 
 vi.mock('@src/api/auth/me.service', () => ({ fetchMe }))
 vi.mock('@src/api/user/profile.service', () => ({ fetchProfile }))
@@ -36,28 +42,33 @@ vi.mock('@components/map/MapCanvas/MapCanvas', () => ({
     corners,
     userLocation,
     onSelectPin,
+    onViewportChange,
   }: {
     corners: MapCornerPin[]
     userLocation?: { latitude: number; longitude: number } | null
     onSelectPin: (pin: { type: 'corner'; data: MapCornerPin }) => void
-  }) => (
-    <div data-testid="map-canvas">
-      {userLocation ? (
-        <span data-testid="profile-location">
-          {userLocation.latitude},{userLocation.longitude}
-        </span>
-      ) : null}
-      {corners.map((corner) => (
-        <button
-          key={corner.id}
-          type="button"
-          onClick={() => onSelectPin({ type: 'corner', data: corner })}
-        >
-          {corner.name}
-        </button>
-      ))}
-    </div>
-  ),
+    onViewportChange?: (bbox: MapBoundingBox) => void
+  }) => {
+    viewportHandler.current = onViewportChange ?? null
+    return (
+      <div data-testid="map-canvas">
+        {userLocation ? (
+          <span data-testid="profile-location">
+            {userLocation.latitude},{userLocation.longitude}
+          </span>
+        ) : null}
+        {corners.map((corner) => (
+          <button
+            key={corner.id}
+            type="button"
+            onClick={() => onSelectPin({ type: 'corner', data: corner })}
+          >
+            {corner.name}
+          </button>
+        ))}
+      </div>
+    )
+  },
 }))
 
 import { MapPage } from '@src/pages/map/MapPage'
@@ -111,6 +122,7 @@ describe('MapPage in real API mode', () => {
     fetchMe.mockReset()
     fetchProfile.mockReset()
     useMapDataMock.mockClear()
+    viewportHandler.current = null
     fetchMe.mockResolvedValue({ id: profile.id, email: profile.email })
     fetchProfile.mockResolvedValue(profile)
   })
@@ -172,6 +184,90 @@ describe('MapPage in real API mode', () => {
             filters: expect.objectContaining({ distanceKm: 5 }),
           })
         )
+      )
+    } finally {
+      if (original) Object.defineProperty(navigator, 'geolocation', original)
+      else Reflect.deleteProperty(navigator, 'geolocation')
+    }
+  })
+
+  test('uses the latest bbox after rapid pan and zoom updates without a center', async () => {
+    const original = Object.getOwnPropertyDescriptor(navigator, 'geolocation')
+    Object.defineProperty(navigator, 'geolocation', {
+      configurable: true,
+      value: { getCurrentPosition: vi.fn((_success, error) => error()) },
+    })
+
+    try {
+      renderWithProviders(<MapPage />)
+      await screen.findByTestId('profile-location')
+
+      const pannedBbox: MapBoundingBox = {
+        north: -34.4,
+        south: -34.6,
+        east: -58.1,
+        west: -58.4,
+      }
+      const zoomedBbox: MapBoundingBox = {
+        north: -34.48,
+        south: -34.54,
+        east: -58.2,
+        west: -58.3,
+      }
+
+      await waitFor(() => expect(viewportHandler.current).not.toBeNull())
+      act(() => {
+        viewportHandler.current?.(pannedBbox)
+        viewportHandler.current?.(zoomedBbox)
+      })
+
+      await waitFor(() =>
+        expect(useMapDataMock.mock.calls.at(-1)?.[0]).toEqual(
+          expect.objectContaining({
+            bbox: zoomedBbox,
+            center: undefined,
+            filters: expect.objectContaining({ distanceKm: null }),
+          })
+        )
+      )
+    } finally {
+      if (original) Object.defineProperty(navigator, 'geolocation', original)
+      else Reflect.deleteProperty(navigator, 'geolocation')
+    }
+  })
+
+  test('keeps the radial query when the viewport changes with a radius selected', async () => {
+    const original = Object.getOwnPropertyDescriptor(navigator, 'geolocation')
+    Object.defineProperty(navigator, 'geolocation', {
+      configurable: true,
+      value: { getCurrentPosition: vi.fn((_success, error) => error()) },
+    })
+
+    try {
+      renderWithProviders(<MapPage />, {
+        initialEntries: ['/map?radius=5'],
+      })
+      await screen.findByTestId('profile-location')
+      await waitFor(() =>
+        expect(useMapDataMock.mock.calls.at(-1)?.[0]).toEqual(
+          expect.objectContaining({
+            center: profile.location,
+            filters: expect.objectContaining({ distanceKm: 5 }),
+          })
+        )
+      )
+
+      const radialQuery = useMapDataMock.mock.calls.at(-1)?.[0]
+      const viewportBbox: MapBoundingBox = {
+        north: -34.4,
+        south: -34.6,
+        east: -58.1,
+        west: -58.4,
+      }
+      act(() => viewportHandler.current?.(viewportBbox))
+
+      await waitFor(() =>
+        expect(useMapDataMock.mock.calls.at(-1)?.[0]).toEqual(radialQuery)
       )
     } finally {
       if (original) Object.defineProperty(navigator, 'geolocation', original)

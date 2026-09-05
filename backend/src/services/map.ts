@@ -3,7 +3,10 @@ import { createHash } from 'node:crypto';
 import { DatabaseError } from 'pg';
 
 import { clamp } from '../utils/math.js';
-import { listPublicBookListings } from '../repositories/bookListingRepository.js';
+import {
+  listPublicBookListings,
+  type PublicBookListingFilters,
+} from '../repositories/bookListingRepository.js';
 import {
   listCornersForMap,
   type CommunityCornerEntity,
@@ -263,6 +266,11 @@ const buildActivityPoints = (
     })
     .filter((point): point is MapActivityPoint => point !== null);
 
+type FetchedPublications = {
+  pins: MapPublicationPin[];
+  hasMore: boolean;
+};
+
 const fetchPublications = async (
   cornerLookup: Map<string, CommunityCornerEntity>,
   displayCoordinates: Map<string, DisplayCoordinates>,
@@ -271,21 +279,20 @@ const fetchPublications = async (
   center: { lat: number; lon: number } | null,
   filteringCenter: { lat: number; lon: number } | null,
   maxDistanceKm: MapFilters['distanceKm']
-): Promise<MapPublicationPin[]> => {
+): Promise<FetchedPublications> => {
   if (cornerLookup.size === 0) {
-    return [];
+    return { pins: [], hasMore: false };
   }
 
   const cornerIds = [...cornerLookup.keys()];
   if (cornerIds.length === 0) {
-    return [];
+    return { pins: [], hasMore: false };
   }
 
-  const rows = await listPublicBookListings({
+  const listingFilters: PublicBookListingFilters = {
     text: search || undefined,
     cornerIds,
     sort: center ? 'nearby' : 'recent',
-    limit: 100,
     ...(filteringCenter
       ? {
           latitude: filteringCenter.lat,
@@ -293,7 +300,17 @@ const fetchPublications = async (
           radiusKm: maxDistanceKm ?? undefined,
         }
       : {}),
-  });
+  };
+  const rows = await listPublicBookListings({ ...listingFilters, limit: 100 });
+  const hasMore =
+    rows.length === 100 &&
+    (
+      await listPublicBookListings({
+        ...listingFilters,
+        limit: 1,
+        offset: 100,
+      })
+    ).length > 0;
 
   const pins: MapPublicationPin[] = [];
 
@@ -359,7 +376,7 @@ const fetchPublications = async (
     });
   }
 
-  return pins;
+  return { pins, hasMore };
 };
 
 const MAP_FETCH_PADDING_METERS = 1_500;
@@ -523,10 +540,11 @@ export async function getMapData(query: MapQuery): Promise<MapResponse> {
   );
 
   let candidatePublications: MapPublicationPin[] = [];
+  let publicationsHaveMore = false;
   let publications: MapPublicationPin[] = [];
   if (query.layers.has('publications')) {
     try {
-      candidatePublications = await fetchPublications(
+      const fetchedPublications = await fetchPublications(
         candidateCornerLookup,
         displayCoordinates,
         normalizedSearch,
@@ -545,6 +563,8 @@ export async function getMapData(query: MapQuery): Promise<MapResponse> {
           : null,
         query.filters.distanceKm
       );
+      candidatePublications = fetchedPublications.pins;
+      publicationsHaveMore = fetchedPublications.hasMore;
     } catch (error) {
       if (error instanceof DatabaseError) {
         console.warn('Failed to load publications for map view', error.message);
@@ -583,7 +603,7 @@ export async function getMapData(query: MapQuery): Promise<MapResponse> {
   const limitedActivity = activity.slice(0, 100);
   const truncated =
     filteredCorners.length > 50 ||
-    publications.length > 100 ||
+    publicationsHaveMore ||
     activity.length > 100;
 
   const cornerPins = query.layers.has('corners')
