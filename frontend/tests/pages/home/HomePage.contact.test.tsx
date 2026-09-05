@@ -121,7 +121,7 @@ describe('HomePage book contact', () => {
     ).not.toBeInTheDocument()
   })
 
-  test('does not expose contact to an unauthenticated visitor', async () => {
+  test('gates contact for an unauthenticated visitor', async () => {
     useThirdPartyBookDetail()
 
     renderWithProviders(<HomePage />)
@@ -130,9 +130,12 @@ describe('HomePage book contact', () => {
     )
 
     expect(await screen.findByText('Lucía pública')).toBeVisible()
-    expect(
-      screen.queryByRole('button', { name: 'bookDetail.contact' })
-    ).not.toBeInTheDocument()
+    const contactButton = screen.getByRole('button', {
+      name: 'bookDetail.contact',
+    })
+    fireEvent.click(contactButton)
+    expect(await screen.findByText('auth.required.title')).toBeVisible()
+    expect(screen.queryByText('bookDetail.contacting')).not.toBeInTheDocument()
   })
 
   test('ignores a second contact click while the first request is pending', async () => {

@@ -38,7 +38,7 @@ describe('index.tsx', () => {
       await import('@src/index')
     })
 
-    expect(await screen.findByText(/¡Bienvenido de nuevo/)).toBeTruthy()
+    expect(await screen.findByText(/Encontr/)).toBeTruthy()
 
     document.body.removeChild(rootElement)
   }, 30000)
@@ -84,7 +84,7 @@ describe('index.tsx', () => {
       await import('@src/index')
     })
 
-    expect(await screen.findByText(/¡Bienvenido de nuevo/)).toBeTruthy()
+    expect(await screen.findByText(/Encontr/)).toBeTruthy()
     expect(enableMockingMock).toHaveBeenCalledTimes(1)
 
     document.body.removeChild(rootElement)

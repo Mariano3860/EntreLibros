@@ -33,6 +33,14 @@ PUBLIC_API_BASE_URL=http://localhost:4000/api
 `mock` indica MSW y `real` indica API/Socket.IO. Comprueba
 `document.documentElement.dataset.apiMode` y reinicia tras cambiar variables.
 
+## Acceso publico y rutas privadas
+
+Inicio, libros, detalles, Comunidad, Mapa, Ayuda y perfiles publicos se pueden
+leer sin sesion. Las mutaciones muestran la modal comun de autenticacion y
+conservan un `returnTo` local seguro al ir a login o registro. Las rutas
+`/books/new`, `/books/mine`, `/messages`, `/profile` y `/stats` requieren sesion
+y redirigen a login mientras explican el motivo del acceso.
+
 ## Recorridos MVP
 
 Las rutas `/profile/:id`, `/messages`, `/map`, `/community` y `/stats` consumen

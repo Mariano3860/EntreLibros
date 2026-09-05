@@ -22,12 +22,14 @@ vi.mock('@api/reports/reports', () => ({ createReport }))
 vi.mock('@api/user/profile.service', () => ({ fetchPublicProfile }))
 
 import { PublicProfilePage } from '@src/pages/profile/PublicProfilePage'
+import { setLoggedInState } from '@mocks/handlers/auth/me.handler'
 
 import { renderWithProviders } from '../../test-utils'
 
 describe('PublicProfilePage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    setLoggedInState(true)
     fetchPublicProfile.mockResolvedValue({
       id: 7,
       alias: 'Lectora visible',
@@ -44,6 +46,7 @@ describe('PublicProfilePage', () => {
   })
 
   afterEach(() => {
+    setLoggedInState(false)
     vi.restoreAllMocks()
   })
 

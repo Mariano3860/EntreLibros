@@ -30,6 +30,7 @@ import {
 import { mapKeys } from '@src/api/map/mapApi'
 import { fetchProfile } from '@src/api/user/profile.service'
 import { useAuth } from '@src/contexts/auth/AuthContext'
+import { useAuthRequired } from '@src/contexts/auth/AuthRequiredContext'
 import { useTheme } from '@src/contexts/theme/ThemeContext'
 import { usePrototype } from '@src/features/prototype/PrototypeContext'
 import {
@@ -103,7 +104,8 @@ export const MapPage = () => {
   const { catalog } = usePrototype()
   const { theme } = useTheme()
   const { t } = useTranslation()
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
+  const { runIfAuthenticated } = useAuthRequired()
   const mockMode = isApiMockMode()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -438,8 +440,8 @@ export const MapPage = () => {
   }, [distance, discoveryLocation])
 
   useEffect(() => {
-    locate()
-  }, [locate])
+    if (!isAuthLoading && isAuthenticated) locate()
+  }, [isAuthLoading, isAuthenticated, locate])
 
   const handleDistanceChange = useCallback(
     (nextDistance: MapRadiusKm | null) => {
@@ -596,7 +598,10 @@ export const MapPage = () => {
           </div>
           <div>
             <PrototypeButton onClick={locate}>⌖ Mi ubicación</PrototypeButton>
-            <PrototypeButton tone="primary" onClick={() => setCreateOpen(true)}>
+            <PrototypeButton
+              tone="primary"
+              onClick={() => runIfAuthenticated(() => setCreateOpen(true))}
+            >
               ＋ Crear rincón
             </PrototypeButton>
           </div>
@@ -774,7 +779,9 @@ export const MapPage = () => {
                   : undefined
               }
               onToggleStatus={handleToggleCornerStatus}
-              onReport={() => setCornerReportOpen(true)}
+              onReport={() =>
+                runIfAuthenticated(() => setCornerReportOpen(true))
+              }
             />
           ) : null}
         </div>

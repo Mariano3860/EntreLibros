@@ -38,6 +38,10 @@ La matriz completa y sus referencias estan en
 - Borradores privados de mensajes con texto, libros adjuntos, intercambios y
   propuestas de acuerdo; guardado con revision, envio idempotente y tarjeta
   responsive compartida.
+- Experiencia publica de lectura para visitantes en Inicio, libros, Comunidad,
+  Mapa, Ayuda y perfiles, con una modal comun para las acciones autenticadas y
+  retorno local seguro a login/registro; la matriz de alcance esta en
+  [`public-visitor-matrix.md`](public-visitor-matrix.md).
 
 ## Prioridad P0
 

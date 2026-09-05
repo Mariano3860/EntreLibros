@@ -1,9 +1,10 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
 import { useLocation } from 'react-router-dom'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { server } from '@mocks/server'
+import { setLoggedInState } from '@mocks/handlers/auth/me.handler'
 import { apiRouteMatcher } from '@mocks/handlers/utils'
 import { RELATIVE_API_ROUTES } from '@src/api/routes'
 import { PersonSearchModal } from '@components/people/PersonSearchModal/PersonSearchModal'
@@ -17,6 +18,10 @@ const LocationProbe = () => (
 describe('PersonSearchModal', () => {
   beforeEach(() => {
     window.localStorage.clear()
+  })
+
+  afterEach(() => {
+    setLoggedInState(false)
   })
 
   test('opens with focus in the search field and renders matching people', async () => {
@@ -58,6 +63,7 @@ describe('PersonSearchModal', () => {
   })
 
   test('updates follow state only after success and keeps it on failure', async () => {
+    setLoggedInState(true)
     renderWithProviders(<PersonSearchModal isOpen onClose={() => {}} />)
     fireEvent.change(screen.getByRole('textbox'), {
       target: { value: 'bruno' },

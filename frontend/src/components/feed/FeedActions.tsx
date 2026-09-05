@@ -12,6 +12,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { FormEvent, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { useAuthRequired } from '@src/contexts/auth/AuthRequiredContext'
 import { isApiMockMode } from '@src/utils/runtimeEnv'
 
 import styles from './FeedActions.module.scss'
@@ -37,6 +38,7 @@ export const FeedActions = ({
   const { t } = useTranslation()
   const queryClient = useQueryClient()
   const mockMode = isApiMockMode()
+  const { runIfAuthenticated } = useAuthRequired()
   const enhanced =
     post !== undefined ||
     initialCommentsCount !== undefined ||
@@ -99,39 +101,43 @@ export const FeedActions = ({
   })
 
   const handleLikeClick = () => {
-    if (post && !mockMode) {
-      if (!likeMutation.isPending) likeMutation.mutate()
-      return
-    }
-    if (liked) {
-      setLikes((l) => l - 1)
-      setLiked(false)
-    } else {
-      setLikes((l) => l + 1)
-      setLiked(true)
-    }
+    runIfAuthenticated(() => {
+      if (post && !mockMode) {
+        if (!likeMutation.isPending) likeMutation.mutate()
+        return
+      }
+      if (liked) {
+        setLikes((l) => l - 1)
+        setLiked(false)
+      } else {
+        setLikes((l) => l + 1)
+        setLiked(true)
+      }
+    })
   }
 
   const handleCommentSubmit = (event: FormEvent) => {
     event.preventDefault()
     const body = commentBody.trim()
     if (!body || commentMutation.isPending) return
-    if (post && !mockMode) {
-      commentMutation.mutate(body)
-      return
-    }
-    setLocalComments((current) => [
-      ...current,
-      {
-        id: `local-comment-${Date.now()}`,
-        author: 'Mariano',
-        avatar: '/logo.svg',
-        body,
-        createdAt: new Date().toISOString(),
-      },
-    ])
-    setCommentsCount((current) => (current ?? 0) + 1)
-    setCommentBody('')
+    runIfAuthenticated(() => {
+      if (post && !mockMode) {
+        commentMutation.mutate(body)
+        return
+      }
+      setLocalComments((current) => [
+        ...current,
+        {
+          id: `local-comment-${Date.now()}`,
+          author: 'Mariano',
+          avatar: '/logo.svg',
+          body,
+          createdAt: new Date().toISOString(),
+        },
+      ])
+      setCommentsCount((current) => (current ?? 0) + 1)
+      setCommentBody('')
+    })
   }
 
   const handleShare = async () => {

@@ -4,4 +4,5 @@ export type LoginFormProps = {
   onSubmit: (credentials: LoginResponse) => void
   isLoading?: boolean
   errorMessage?: string
+  redirectTo?: string
 }

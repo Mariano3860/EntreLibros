@@ -4,6 +4,7 @@ import { ReactElement, ReactNode } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 
 import { AuthProvider } from '@src/contexts/auth/AuthContext'
+import { AuthRequiredProvider } from '@src/contexts/auth/AuthRequiredContext'
 import { ThemeProvider } from '@src/contexts/theme/ThemeContext'
 import { PrototypeProvider } from '@src/features/prototype/PrototypeContext'
 
@@ -23,9 +24,11 @@ export const createWrapper = (options?: WrapperOptions) => {
     <MemoryRouter initialEntries={options?.initialEntries}>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <ThemeProvider>
-            <PrototypeProvider>{children}</PrototypeProvider>
-          </ThemeProvider>
+          <AuthRequiredProvider>
+            <ThemeProvider>
+              <PrototypeProvider>{children}</PrototypeProvider>
+            </ThemeProvider>
+          </AuthRequiredProvider>
         </AuthProvider>
       </QueryClientProvider>
     </MemoryRouter>

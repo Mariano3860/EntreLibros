@@ -13,15 +13,12 @@ describe('HomePage', () => {
   test('renders the complete prototype home', async () => {
     renderWithProviders(<HomePage />)
 
-    expect(await screen.findByText(/¡Bienvenido de nuevo/)).toBeVisible()
+    expect(await screen.findByText(/Encontr/)).toBeVisible()
     expect(screen.getByText('134')).toBeVisible()
     expect(screen.getByText('52')).toBeVisible()
-    const myBooks = screen.getByRole('button', { name: /Ver mis libros/ })
-    expect(
-      screen
-        .getAllByRole('button', { name: /^Ver / })
-        .filter((button) => button !== myBooks)
-    ).toHaveLength(5)
+    expect(screen.getByRole('button', { name: /Ver cat/ })).toBeVisible()
+    expect(screen.queryByText(/Mi actividad/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Mis libros/)).not.toBeInTheDocument()
     expect(
       screen.queryByRole('button', { name: 'Ver más recomendaciones' })
     ).not.toBeInTheDocument()

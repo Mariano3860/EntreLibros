@@ -20,17 +20,12 @@ describe('CommunityFeedPage', () => {
     expect(screen.getByText('Sugerencias para vos')).toBeVisible()
   })
 
-  test('publishes a community story instead of a book', () => {
+  test('gates community publication for a visitor', async () => {
     renderWithProviders(<CommunityFeedPage />)
 
     fireEvent.click(screen.getAllByRole('button', { name: 'Publicar' })[0])
-    fireEvent.change(screen.getByRole('textbox'), {
-      target: { value: 'Terminé una novela increíble.' },
-    })
-    fireEvent.click(screen.getByRole('button', { name: 'Publicar historia' }))
-
-    expect(screen.getByText('Terminé una novela increíble.')).toBeVisible()
-    expect(screen.queryByText('publishBook.title')).not.toBeInTheDocument()
+    expect(await screen.findByRole('dialog')).toBeVisible()
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
   })
 
   test('opens the people search from Community', () => {

@@ -1,6 +1,7 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react'
-import { describe, expect, test, vi } from 'vitest'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
+const fetchMe = vi.hoisted(() => vi.fn())
 const fetchBooks = vi.hoisted(() => vi.fn())
 const createWantBook = vi.hoisted(() => vi.fn())
 
@@ -9,7 +10,7 @@ vi.mock('@src/utils/runtimeEnv', () => ({
 }))
 
 vi.mock('@src/api/auth/me.service', () => ({
-  fetchMe: vi.fn().mockResolvedValue({ id: 1, name: 'Reader' }),
+  fetchMe,
 }))
 
 vi.mock('@api/books/books.service', () => ({
@@ -44,6 +45,14 @@ const discoveryBook = {
 }
 
 describe('BooksPage discovery interactions', () => {
+  beforeEach(() => {
+    fetchMe.mockReset()
+    fetchMe.mockResolvedValue({ id: 1, name: 'Reader' })
+    fetchBooks.mockReset()
+    fetchBooks.mockResolvedValue([])
+    createWantBook.mockReset()
+  })
+
   test('opens a blank want form from the header action', async () => {
     fetchBooks.mockResolvedValue([])
 
@@ -55,16 +64,23 @@ describe('BooksPage discovery interactions', () => {
       await screen.findByRole('button', { name: 'booksPage.want.open' })
     )
 
-    expect(screen.getByText('booksPage.want.title')).toBeVisible()
+    expect(await screen.findByText('booksPage.want.title')).toBeVisible()
     expect(screen.getByLabelText('booksPage.want.titleLabel')).toHaveValue('')
 
     createWantBook.mockResolvedValue({ id: 'want-created' })
-    fireEvent.change(screen.getByLabelText('booksPage.want.titleLabel'), {
+    const titleInput = screen.getByLabelText('booksPage.want.titleLabel')
+    fireEvent.change(titleInput, {
       target: { value: 'Libro buscado desde el encabezado' },
     })
-    fireEvent.click(
-      screen.getByRole('button', { name: 'booksPage.want.submit' })
+    fireEvent.input(titleInput, {
+      target: { value: 'Libro buscado desde el encabezado' },
+    })
+    await waitFor(() =>
+      expect(titleInput).toHaveValue('Libro buscado desde el encabezado')
     )
+    const submit = screen.getByRole('button', { name: 'booksPage.want.submit' })
+    await waitFor(() => expect(submit).toBeEnabled())
+    fireEvent.click(submit)
 
     await waitFor(() => {
       expect(createWantBook).toHaveBeenCalledWith(
@@ -129,6 +145,35 @@ describe('BooksPage discovery interactions', () => {
         expect.objectContaining({ condition: undefined, trade: true })
       )
     })
+  })
+
+  test('does not render want listings in the visitor Todos catalog', async () => {
+    fetchMe.mockRejectedValueOnce(new Error('unauthenticated'))
+    fetchBooks.mockResolvedValue([
+      discoveryBook,
+      {
+        ...discoveryBook,
+        id: 'visitor-seeking-book',
+        title: 'Libro que alguien busca',
+        isForTrade: false,
+        isSeeking: true,
+      },
+    ])
+
+    renderWithProviders(<BooksPage />, {
+      initialEntries: ['/books'],
+    })
+
+    expect(
+      await screen.findByRole('button', { name: 'Ver Libro de descubrimiento' })
+    ).toBeVisible()
+    expect(
+      screen.queryByRole('button', { name: 'Ver Libro que alguien busca' })
+    ).not.toBeInTheDocument()
+    expect(screen.queryByText('Buscando')).not.toBeInTheDocument()
+    expect(fetchBooks).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'offer' })
+    )
   })
 
   test('renders want listings as searching without offer actions', async () => {

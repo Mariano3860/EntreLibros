@@ -98,6 +98,15 @@ export type PublicProfile = {
   country?: ProfileCountry;
   city?: ProfileCity;
   neighborhood?: string;
+  publicationCount: number;
+  exchangeCount: number;
+  publications: Array<{
+    id: string;
+    title: string;
+    author: string | null;
+    coverUrl: string | null;
+    type: 'offer' | 'want';
+  }>;
 };
 
 export function toPublicUser(user: User): PublicUser {
@@ -236,6 +245,54 @@ export async function findPublicProfileById(
   if (!user || user.profileVisibility === 'private') {
     return null;
   }
+  const [publicationSummary, exchangeSummary, publicationsResult] =
+    await Promise.all([
+      query<{ count: string }>(
+        `SELECT COUNT(*)::text AS count
+         FROM book_listings
+         WHERE user_id = $1
+           AND availability = 'public'
+           AND is_draft = false
+           AND status NOT IN ('completed', 'sold', 'exchanged', 'inactive')
+           AND editorial_status = 'approved'
+           AND (expires_at IS NULL OR expires_at > NOW())`,
+        [id]
+      ),
+      query<{ count: string }>(
+        `SELECT COUNT(*)::text AS count
+         FROM exchange_agreements
+         WHERE state = 'completed'
+           AND (proposer_id = $1 OR participant_id = $1)`,
+        [id]
+      ),
+      query<{
+        id: number;
+        title: string;
+        author: string | null;
+        cover_url: string | null;
+        type: 'offer' | 'want';
+      }>(
+        `SELECT p.id, b.title, b.author, COALESCE(img.url, b.cover_url) AS cover_url, p.type
+         FROM book_listings p
+         JOIN books b ON b.id = p.book_id
+         LEFT JOIN LATERAL (
+           SELECT url
+           FROM book_listing_images
+           WHERE book_listing_id = p.id
+           ORDER BY is_primary DESC, id ASC
+           LIMIT 1
+         ) img ON true
+         WHERE p.user_id = $1
+           AND p.availability = 'public'
+           AND p.is_draft = false
+           AND p.status NOT IN ('completed', 'sold', 'exchanged', 'inactive')
+           AND p.editorial_status = 'approved'
+           AND (p.expires_at IS NULL OR p.expires_at > NOW())
+         ORDER BY p.created_at DESC, p.id DESC
+         LIMIT 12`,
+        [id]
+      ),
+    ]);
   const locationVisibility = user.locationVisibility ?? 'city';
   return {
     id: user.id,
@@ -245,6 +302,15 @@ export async function findPublicProfileById(
     language: user.language,
     location: roundLocation(user.location, locationVisibility),
     interests: user.interests,
+    publicationCount: Number(publicationSummary.rows[0]?.count ?? 0),
+    exchangeCount: Number(exchangeSummary.rows[0]?.count ?? 0),
+    publications: publicationsResult.rows.map((publication) => ({
+      id: String(publication.id),
+      title: publication.title,
+      author: publication.author,
+      coverUrl: publication.cover_url,
+      type: publication.type,
+    })),
     ...(locationVisibility !== 'none' && user.country
       ? { country: user.country }
       : {}),
