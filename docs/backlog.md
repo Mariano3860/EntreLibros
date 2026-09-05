@@ -1,6 +1,6 @@
 # Backlog de producto
 
-Ultima actualizacion: 2026-09-04.
+Ultima actualizacion: 2026-09-05.
 
 El codigo, las migraciones, los contratos y las pruebas son la fuente de verdad.
 La matriz completa y sus referencias estan en
@@ -45,6 +45,9 @@ La matriz completa y sus referencias estan en
   Mapa, Ayuda y perfiles, con una modal comun para las acciones autenticadas y
   retorno local seguro a login/registro; la matriz de alcance esta en
   [`public-visitor-matrix.md`](public-visitor-matrix.md).
+- Catálogo `Todos` agregado por publicación: combina fuentes propias y públicas
+  sin duplicar listings, aplica filtros/orden/paginación sobre el conjunto final
+  y devuelve el total estable para la interfaz real y mock.
 
 ## Prioridad P0
 

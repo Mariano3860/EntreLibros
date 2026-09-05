@@ -15,6 +15,22 @@ const books = vi.hoisted(() =>
     price: null,
   }))
 )
+const fetchAllBooks = vi.hoisted(() =>
+  vi.fn().mockImplementation(({ offset = 0 }: { offset?: number } = {}) => {
+    const limit = 5
+    return Promise.resolve({
+      items: books.slice(offset, offset + limit),
+      page: {
+        limit,
+        offset,
+        total: books.length,
+        hasNext: offset + limit < books.length,
+        hasPrevious: offset > 0,
+      },
+    })
+  })
+)
+const fetchUserBooks = vi.hoisted(() => vi.fn().mockResolvedValue([]))
 
 vi.mock('@src/utils/runtimeEnv', () => ({
   isApiMockMode: () => false,
@@ -25,6 +41,7 @@ vi.mock('@src/api/auth/me.service', () => ({
 }))
 
 vi.mock('@api/books/books.service', () => ({
+  fetchAllBooks,
   fetchBooks: vi.fn().mockResolvedValue([
     {
       id: 'random-public-book',
@@ -43,7 +60,7 @@ vi.mock('@api/books/books.service', () => ({
 }))
 
 vi.mock('@api/books/userBooks.service', () => ({
-  fetchUserBooks: vi.fn().mockResolvedValue(books),
+  fetchUserBooks,
 }))
 
 import { BooksPage } from '@src/pages/books/BooksPage'
@@ -57,6 +74,10 @@ describe('BooksPage pagination', () => {
     expect(
       await screen.findByRole('button', { name: 'Ver Book 1' })
     ).toBeInTheDocument()
+    expect(fetchAllBooks).toHaveBeenCalledWith(
+      expect.objectContaining({ limit: 5, offset: 0 })
+    )
+    expect(fetchUserBooks).not.toHaveBeenCalled()
     const nextButton = screen.getByRole('button', {
       name: 'booksPage.pagination.next',
     })
@@ -71,6 +92,9 @@ describe('BooksPage pagination', () => {
     expect(
       await screen.findByRole('button', { name: 'Ver Book 6' })
     ).toBeInTheDocument()
+    expect(fetchAllBooks).toHaveBeenLastCalledWith(
+      expect.objectContaining({ limit: 5, offset: 5 })
+    )
     expect(
       screen.queryByRole('button', { name: 'Ver Book 1' })
     ).not.toBeInTheDocument()

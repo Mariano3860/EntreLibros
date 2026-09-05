@@ -1,6 +1,6 @@
 # Hoja de ruta
 
-Fecha de referencia: 2026-09-04. El estado verificable se mantiene en
+Fecha de referencia: 2026-09-05. El estado verificable se mantiene en
 [`tfg-mvp-trazabilidad.md`](tfg-mvp-trazabilidad.md).
 
 ## Cierre inmediato
@@ -13,8 +13,8 @@ Fecha de referencia: 2026-09-04. El estado verificable se mantiene en
 4. Mantener la matriz, el backlog y los READMEs sincronizados con las rutas,
    migraciones y variables reales.
 
-El recorrido funcional de publicacion, descubrimiento publico con bbox de
-viewport, contacto, acuerdo,
+El recorrido funcional de publicación, catálogo agregado de libros, descubrimiento
+público con bbox de viewport, contacto, acuerdo,
 notificacion, reporte y metricas ya esta implementado y cubierto por pruebas de
 servicio y frontend. El contacto puede quedar como borrador privado antes del
 envio y las propuestas enriquecidas se validan al enviarse. Los puntos

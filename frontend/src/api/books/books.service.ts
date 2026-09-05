@@ -1,7 +1,7 @@
 import { apiClient } from '@src/api/axios'
 import { RELATIVE_API_ROUTES } from '@src/api/routes'
 
-import { ApiBook, ApiHomeBooksPage } from './books.types'
+import { ApiBook, ApiBookCatalogPage, ApiHomeBooksPage } from './books.types'
 import { PublishBookPayload, PublishBookResponse } from './publishBook.types'
 export {
   createWantBook,
@@ -30,6 +30,27 @@ export type BookCatalogFilters = {
   offset?: number
 }
 
+const hasValidCatalogPage = (value: unknown): value is ApiBookCatalogPage => {
+  if (!value || typeof value !== 'object') return false
+  const page = (value as { page?: unknown }).page
+  if (!page || typeof page !== 'object') return false
+  const pageData = page as Partial<ApiBookCatalogPage['page']>
+  return (
+    Array.isArray((value as { items?: unknown }).items) &&
+    typeof pageData.limit === 'number' &&
+    Number.isInteger(pageData.limit) &&
+    pageData.limit > 0 &&
+    typeof pageData.offset === 'number' &&
+    Number.isInteger(pageData.offset) &&
+    pageData.offset >= 0 &&
+    typeof pageData.total === 'number' &&
+    Number.isInteger(pageData.total) &&
+    pageData.total >= 0 &&
+    typeof pageData.hasNext === 'boolean' &&
+    typeof pageData.hasPrevious === 'boolean'
+  )
+}
+
 export const fetchBooks = async (
   filters: BookCatalogFilters = {}
 ): Promise<ApiBook[]> => {
@@ -43,6 +64,24 @@ export const fetchBooks = async (
   )
 
   if (!Array.isArray(response.data)) {
+    throw new Error('Invalid books response')
+  }
+
+  return response.data
+}
+
+export const fetchAllBooks = async (
+  filters: BookCatalogFilters = {}
+): Promise<ApiBookCatalogPage> => {
+  const params = new URLSearchParams({ scope: 'all' })
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== '') params.set(key, String(value))
+  })
+  const response = await apiClient.get<ApiBookCatalogPage>(
+    `${RELATIVE_API_ROUTES.BOOKS.LIST}?${params.toString()}`
+  )
+
+  if (!hasValidCatalogPage(response.data)) {
     throw new Error('Invalid books response')
   }
 

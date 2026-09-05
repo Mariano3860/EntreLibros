@@ -1,4 +1,5 @@
 import {
+  fetchAllBooks,
   fetchBookById,
   fetchBooks,
   type BookCatalogFilters,
@@ -81,6 +82,17 @@ const sortOptions: Array<{ value: Sort; label: string }> = [
 
 const hasFilterValue = (searchParams: URLSearchParams) =>
   filterKeys.some((key) => searchParams.has(key))
+
+const mergePrototypeBooks = (
+  ...sources: ReadonlyArray<ReadonlyArray<PrototypeBook>>
+): PrototypeBook[] =>
+  Array.from(
+    new Map(
+      sources
+        .flatMap((source) => source)
+        .map((book) => [String(book.id), book] as const)
+    ).values()
+  )
 
 const toNumber = (value: string | null) => {
   if (!value) return undefined
@@ -204,6 +216,7 @@ export const BooksPage = () => {
   const selectedRadius = searchParams.get('radiusKm')
   const selectedTrade = searchParams.get('trade') === 'true'
   const selectedSale = searchParams.get('sale') === 'true'
+  const currentPage = Math.max(0, (toNumber(searchParams.get('page')) ?? 1) - 1)
   const visitorSeekingSelection =
     !isLoading &&
     !isAuthenticated &&
@@ -261,7 +274,8 @@ export const BooksPage = () => {
     const type =
       active === 'seeking'
         ? 'want'
-        : (effectiveSelectedType ?? ('offer' as const))
+        : (effectiveSelectedType ??
+          (active === 'all' && isAuthenticated ? undefined : 'offer'))
     return {
       q: search.trim() || undefined,
       topic: selectedTopic.trim() || undefined,
@@ -293,6 +307,7 @@ export const BooksPage = () => {
     selectedStatus,
     selectedTrade,
     effectiveSelectedType,
+    isAuthenticated,
   ])
 
   useEffect(() => {
@@ -320,21 +335,37 @@ export const BooksPage = () => {
   const publicBooksQuery = useQuery({
     queryKey: ['prototype', 'books', active, catalogFilters],
     queryFn: () => fetchBooks(catalogFilters),
-    enabled: !mockMode && !isLoading && active !== 'mine' && bookId === null,
+    enabled:
+      !mockMode &&
+      !isLoading &&
+      active !== 'mine' &&
+      active !== 'all' &&
+      bookId === null,
+  })
+  const allBooksQuery = useQuery({
+    queryKey: ['prototype', 'books', 'all', catalogFilters, currentPage],
+    queryFn: () =>
+      fetchAllBooks({
+        ...catalogFilters,
+        limit: BOOKS_PER_PAGE,
+        offset: currentPage * BOOKS_PER_PAGE,
+      }),
+    enabled: !mockMode && !isLoading && active === 'all' && bookId === null,
   })
   const ownBooksQuery = useQuery({
     queryKey: ['prototype', 'books', 'mine'],
     queryFn: fetchUserBooks,
     enabled:
-      !mockMode &&
-      isAuthenticated &&
-      (active === 'mine' || active === 'all') &&
-      bookId === null,
+      !mockMode && isAuthenticated && active === 'mine' && bookId === null,
   })
 
   const mockBooks = useMemo(() => {
     let result: PrototypeBook[] =
-      active === 'mine' && isAuthenticated ? catalog.userBooks : catalog.books
+      active === 'mine' && isAuthenticated
+        ? catalog.userBooks
+        : active === 'all' && isAuthenticated
+          ? mergePrototypeBooks(catalog.books, catalog.userBooks)
+          : catalog.books
     const localFilters = {
       condition: selectedCondition ?? undefined,
       status: selectedStatus ?? undefined,
@@ -400,19 +431,18 @@ export const BooksPage = () => {
     }
   }, [bookId, detailQuery.data, mockMode, mockBooks])
 
-  const realBooks = useMemo<ApiBook[]>(
-    () =>
-      active === 'mine' || (active === 'all' && isAuthenticated)
-        ? (ownBooksQuery.data ?? [])
-        : (publicBooksQuery.data ?? []),
-    [active, isAuthenticated, ownBooksQuery.data, publicBooksQuery.data]
-  )
+  const realBooks = useMemo<ApiBook[]>(() => {
+    if (active === 'mine') return ownBooksQuery.data ?? []
+    if (active === 'all') return allBooksQuery.data?.items ?? []
+    return publicBooksQuery.data ?? []
+  }, [active, allBooksQuery.data, ownBooksQuery.data, publicBooksQuery.data])
 
   const books = mockMode
     ? mockBooks
     : realBooks
-        .filter((book) =>
-          isBookMatchingFilters(toPrototypeBook(book), {
+        .filter((book) => {
+          if (active === 'all') return true
+          return isBookMatchingFilters(toPrototypeBook(book), {
             condition: selectedCondition ?? undefined,
             status: selectedStatus ?? undefined,
             type:
@@ -423,31 +453,42 @@ export const BooksPage = () => {
             trade: active === 'trade' || selectedTrade,
             sale: active === 'sale' || selectedSale,
           })
-        )
+        })
         .map((book) => toPrototypeBook(book))
   const visibleCatalogBooks = isAuthenticated
     ? books
     : books.filter((book) => book.mode !== 'Buscado')
 
-  const currentPage = Math.max(0, (toNumber(searchParams.get('page')) ?? 1) - 1)
+  const isServerPaginatedAll = !mockMode && active === 'all'
+  const serverTotal = allBooksQuery.data?.page.total
   const totalPages = Math.max(
     1,
-    Math.ceil(visibleCatalogBooks.length / BOOKS_PER_PAGE)
+    isServerPaginatedAll && serverTotal !== undefined
+      ? Math.ceil(serverTotal / BOOKS_PER_PAGE)
+      : isServerPaginatedAll
+        ? currentPage + 1
+        : Math.ceil(visibleCatalogBooks.length / BOOKS_PER_PAGE)
   )
   const activePage = Math.min(currentPage, totalPages - 1)
-  const visibleBooks = visibleCatalogBooks.slice(
-    activePage * BOOKS_PER_PAGE,
-    (activePage + 1) * BOOKS_PER_PAGE
-  )
+  const visibleBooks = isServerPaginatedAll
+    ? visibleCatalogBooks
+    : visibleCatalogBooks.slice(
+        activePage * BOOKS_PER_PAGE,
+        (activePage + 1) * BOOKS_PER_PAGE
+      )
   const activeIsLoading =
     (!mockMode && isLoading) ||
-    (active === 'mine' || (active === 'all' && isAuthenticated)
+    (active === 'mine'
       ? ownBooksQuery.isLoading
-      : publicBooksQuery.isLoading)
+      : active === 'all'
+        ? allBooksQuery.isLoading
+        : publicBooksQuery.isLoading)
   const activeHasError =
-    active === 'mine' || (active === 'all' && isAuthenticated)
+    active === 'mine'
       ? ownBooksQuery.isError
-      : publicBooksQuery.isError
+      : active === 'all'
+        ? allBooksQuery.isError
+        : publicBooksQuery.isError
 
   useEffect(() => {
     if (currentPage > totalPages - 1) {

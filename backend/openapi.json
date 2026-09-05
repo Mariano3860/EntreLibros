@@ -191,6 +191,32 @@
             }
           },
           {
+            "name": "scope",
+            "in": "query",
+            "description": "Use all to return the aggregated catalog with pagination metadata.",
+            "schema": {
+              "type": "string",
+              "enum": ["all"]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          {
             "name": "condition",
             "in": "query",
             "schema": {
@@ -274,62 +300,108 @@
         ],
         "responses": {
           "200": {
-            "description": "Array of public publications",
+            "description": "Array of public publications, or the paginated aggregated catalog when scope=all",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "string"
-                      },
-                      "title": {
-                        "type": "string"
-                      },
-                      "author": {
-                        "type": "string"
-                      },
-                      "coverUrl": {
-                        "type": "string"
-                      },
-                      "condition": {
-                        "type": ["string", "null"]
-                      },
-                      "status": {
-                        "type": "string"
-                      },
-                      "publicationStatus": {
-                        "type": "string"
-                      },
-                      "type": {
-                        "type": "string",
-                        "enum": ["offer", "want"]
-                      },
-                      "isForSale": {
-                        "type": "boolean"
-                      },
-                      "price": {
-                        "type": ["number", "null"]
-                      },
-                      "priceCurrency": {
-                        "type": ["string", "null"]
-                      },
-                      "isForTrade": {
-                        "type": "boolean"
-                      },
-                      "isSeeking": {
-                        "type": "boolean"
-                      },
-                      "isForDonation": {
-                        "type": "boolean"
-                      },
-                      "isInterested": {
-                        "type": "boolean"
+                  "oneOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "author": {
+                            "type": "string"
+                          },
+                          "coverUrl": {
+                            "type": "string"
+                          },
+                          "condition": {
+                            "type": ["string", "null"]
+                          },
+                          "status": {
+                            "type": "string"
+                          },
+                          "publicationStatus": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": ["offer", "want"]
+                          },
+                          "isForSale": {
+                            "type": "boolean"
+                          },
+                          "price": {
+                            "type": ["number", "null"]
+                          },
+                          "priceCurrency": {
+                            "type": ["string", "null"]
+                          },
+                          "isForTrade": {
+                            "type": "boolean"
+                          },
+                          "isSeeking": {
+                            "type": "boolean"
+                          },
+                          "isForDonation": {
+                            "type": "boolean"
+                          },
+                          "isInterested": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": ["items", "page"],
+                      "properties": {
+                        "items": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        },
+                        "page": {
+                          "type": "object",
+                          "required": [
+                            "limit",
+                            "offset",
+                            "total",
+                            "hasNext",
+                            "hasPrevious"
+                          ],
+                          "properties": {
+                            "limit": {
+                              "type": "integer",
+                              "minimum": 1
+                            },
+                            "offset": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            "total": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            "hasNext": {
+                              "type": "boolean"
+                            },
+                            "hasPrevious": {
+                              "type": "boolean"
+                            }
+                          }
+                        }
                       }
                     }
-                  }
+                  ]
                 }
               }
             }

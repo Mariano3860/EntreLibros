@@ -266,6 +266,11 @@ const BOOK_LISTING_SELECT = `
     ) img ON true
 `;
 
+const BOOK_LISTING_SELECT_WITH_TOTAL = BOOK_LISTING_SELECT.replace(
+  '  SELECT\n',
+  '  SELECT\n    COUNT(*) OVER() AS total_count,\n'
+);
+
 function mapRow(row: BookListingRow): BookListing {
   const priceAmount = row.price_amount ? Number(row.price_amount) : null;
   const tradePreferences = row.trade_preferences ?? [];
@@ -361,6 +366,36 @@ async function fetchBookListings(
     params
   );
   return rows.map(mapRow);
+}
+
+async function fetchBookListingsWithTotal(
+  whereClause: string,
+  params: unknown[],
+  orderClause: string
+): Promise<{ listings: BookListing[]; total: number }> {
+  const { rows } = await query<BookListingRow & { total_count: string }>(
+    `${BOOK_LISTING_SELECT_WITH_TOTAL} ${whereClause} ${orderClause}`,
+    params
+  );
+
+  if (rows.length > 0) {
+    return {
+      listings: rows.map(mapRow),
+      total: Number(rows[0].total_count),
+    };
+  }
+
+  const countParams = params.slice(0, -2);
+  const { rows: countRows } = await query<{ total_count: string }>(
+    `SELECT COUNT(*) AS total_count
+     FROM (${BOOK_LISTING_SELECT} ${whereClause}) AS filtered_listings`,
+    countParams
+  );
+
+  return {
+    listings: [],
+    total: Number(countRows[0]?.total_count ?? 0),
+  };
 }
 
 async function fetchBookListingsWithClient(
@@ -1072,11 +1107,17 @@ export interface PublicBookListingFilters {
   cornerIds?: string[];
 }
 
-export async function listPublicBookListings(
-  filters: PublicBookListingFilters = {},
+type CatalogQueryParts = {
+  conditions: string[];
+  params: unknown[];
+  distanceExpression: string | null;
+};
+
+function buildCatalogQuery(
+  filters: PublicBookListingFilters,
   viewerId?: number
-): Promise<BookListing[]> {
-  const conditions = [
+): CatalogQueryParts {
+  const publicConditions = [
     "p.availability = 'public'",
     'p.is_draft = false',
     "p.status NOT IN ('completed', 'sold', 'exchanged', 'inactive')",
@@ -1084,6 +1125,15 @@ export async function listPublicBookListings(
     "p.editorial_status = 'approved'",
   ];
   const params: unknown[] = [];
+  const conditions =
+    viewerId === undefined
+      ? publicConditions
+      : [`(p.user_id = $1 OR (${publicConditions.join(' AND ')}))`];
+
+  if (viewerId !== undefined) {
+    params.push(viewerId);
+  }
+
   const add = (condition: string, value: unknown) => {
     params.push(value);
     conditions.push(condition.replace('?', `$${params.length}`));
@@ -1119,7 +1169,9 @@ export async function listPublicBookListings(
   if (filters.sale !== undefined) add('p.sale = ?', filters.sale);
   if (filters.donation !== undefined) add('p.donation = ?', filters.donation);
   if (filters.cornerIds) {
-    if (filters.cornerIds.length === 0) return [];
+    if (filters.cornerIds.length === 0) {
+      return { conditions: ['FALSE'], params: [], distanceExpression: null };
+    }
     add('p.corner_id = ANY(?::text[])', filters.cornerIds);
   }
 
@@ -1137,6 +1189,15 @@ export async function listPublicBookListings(
       );
     }
   }
+
+  return { conditions, params, distanceExpression };
+}
+
+export async function listPublicBookListings(
+  filters: PublicBookListingFilters = {},
+  viewerId?: number
+): Promise<BookListing[]> {
+  const { conditions, params, distanceExpression } = buildCatalogQuery(filters);
   const limit = Math.min(Math.max(filters.limit ?? 50, 1), 100);
   const offset = Math.max(filters.offset ?? 0, 0);
   params.push(limit, offset);
@@ -1148,6 +1209,54 @@ export async function listPublicBookListings(
     `${orderClause} LIMIT $${params.length - 1} OFFSET $${params.length}`
   );
 
+  return addInterestFlags(listings, viewerId);
+}
+
+export async function listAllBookListings(
+  filters: PublicBookListingFilters = {},
+  viewerId?: number
+): Promise<{
+  items: BookListing[];
+  page: {
+    limit: number;
+    offset: number;
+    total: number;
+    hasNext: boolean;
+    hasPrevious: boolean;
+  };
+}> {
+  const { conditions, params, distanceExpression } = buildCatalogQuery(
+    filters,
+    viewerId
+  );
+  const limit = Math.min(Math.max(filters.limit ?? 50, 1), 100);
+  const offset = Math.max(filters.offset ?? 0, 0);
+  params.push(limit, offset);
+  const orderClause = getPublicListingOrder(filters.sort, distanceExpression);
+  const result = await fetchBookListingsWithTotal(
+    `LEFT JOIN community_corners c ON c.id::text = p.corner_id
+     WHERE ${conditions.join(' AND ')}`,
+    params,
+    `${orderClause} LIMIT $${params.length - 1} OFFSET $${params.length}`
+  );
+  const items = await addInterestFlags(result.listings, viewerId);
+
+  return {
+    items,
+    page: {
+      limit,
+      offset,
+      total: result.total,
+      hasNext: offset + items.length < result.total,
+      hasPrevious: offset > 0,
+    },
+  };
+}
+
+async function addInterestFlags(
+  listings: BookListing[],
+  viewerId?: number
+): Promise<BookListing[]> {
   if (!viewerId || listings.length === 0) return listings;
 
   const listingIds = listings.map((listing) => listing.id);

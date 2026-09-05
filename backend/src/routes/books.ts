@@ -4,6 +4,7 @@ import {
   createBookListing,
   createWantBookListing,
   createWantBookListingFromListing,
+  listAllBookListings,
   listHomeBookListings,
   listPublicBookListings,
   listUserBookListings,
@@ -52,6 +53,20 @@ router.get('/', async (_req, res) => {
     });
   }
   const viewerId = await getOptionalViewerId(_req);
+  const scope = queryText(_req.query.scope);
+  if (scope && scope !== 'all') {
+    return res.status(400).json({
+      error: 'InvalidFields',
+      message: 'books.errors.invalid_filters',
+    });
+  }
+  if (scope === 'all') {
+    const result = await listAllBookListings(filters, viewerId);
+    return res.json({
+      items: result.items.map(toPublicBookListing),
+      page: result.page,
+    });
+  }
   const listings = await listPublicBookListings(filters, viewerId);
   res.json(listings.map(toPublicBookListing));
 });

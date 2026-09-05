@@ -1,6 +1,6 @@
 # Estado actual
 
-Fecha de referencia: 2026-09-04.
+Fecha de referencia: 2026-09-05.
 
 ## Resumen de cierre
 
@@ -18,9 +18,11 @@ La matriz de requisitos y la evidencia se mantienen en
   recortada, idioma, intereses y visibilidad territorial.
 - Privacidad: las proyecciones publicas omiten correo, contrasena, calle, altura y
   coordenadas exactas; muestran como maximo el nivel territorial permitido.
-- Libros: catalogo, publicaciones offer/want, condicion, imagenes limitadas,
-  ISBN normalizado, disponibilidad, vencimiento, consentimientos y revision
-  editorial minima.
+- Libros: catálogo `offer/want`, condición, imágenes limitadas, ISBN normalizado,
+  disponibilidad, vencimiento, consentimientos y revisión editorial mínima.
+  `Todos` agrega las publicaciones propias y públicas de las categorías de
+  intercambio, búsqueda y venta en backend, con filtros, orden y paginación
+  estable; los visitantes reciben únicamente publicaciones públicas.
 - Rincones: alta, edicion, normas, horario, consentimiento, visibilidad,
   aprobacion y pausa/reactivacion reversible.
 - Descubrimiento: mapa y listado real comparten filtros, radio, orden y estados
