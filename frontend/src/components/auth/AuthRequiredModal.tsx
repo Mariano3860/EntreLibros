@@ -56,10 +56,9 @@ export const AuthRequiredModal = ({
         </button>
         <img
           className={styles.illustration}
-          src="/prototype/reading-room.svg"
+          src="/prototype/auth-required.svg"
           alt={t('auth.required.illustrationAlt')}
         />
-        <p className={styles.eyebrow}>{t('auth.required.eyebrow')}</p>
         <h2 id={titleId}>{t('auth.required.title')}</h2>
         <p id={descriptionId} className={styles.description}>
           {t('auth.required.description')}
@@ -68,6 +67,9 @@ export const AuthRequiredModal = ({
           <button type="button" className={styles.primary} onClick={onRegister}>
             {t('auth.required.register')}
           </button>
+          <span className={styles.separator} aria-hidden="true">
+            {t('auth.required.or')}
+          </span>
           <button type="button" className={styles.secondary} onClick={onLogin}>
             {t('auth.required.login')}
           </button>

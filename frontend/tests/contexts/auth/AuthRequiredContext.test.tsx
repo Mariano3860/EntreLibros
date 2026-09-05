@@ -45,9 +45,30 @@ describe('authentication-required flow', () => {
     const authTrigger = await screen.findByRole('button', {
       name: 'Open auth prompt',
     })
+    authTrigger.focus()
+    fireEvent.click(authTrigger)
+    const dialog = await screen.findByRole('dialog')
+    const closeButton = screen.getByRole('button', {
+      name: 'auth.required.close',
+    })
+    const loginButton = screen.getByRole('button', {
+      name: 'auth.required.login',
+    })
+    expect(dialog).toBeVisible()
+    expect(closeButton).toHaveFocus()
+
+    fireEvent.keyDown(closeButton, { key: 'Tab', shiftKey: true })
+    expect(loginButton).toHaveFocus()
+    fireEvent.keyDown(loginButton, { key: 'Tab' })
+    expect(closeButton).toHaveFocus()
+    fireEvent.keyDown(dialog, { key: 'Escape' })
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    )
+    expect(authTrigger).toHaveFocus()
+
     fireEvent.click(authTrigger)
     expect(await screen.findByRole('dialog')).toBeVisible()
-
     fireEvent.click(screen.getByRole('button', { name: 'auth.required.login' }))
     await waitFor(() =>
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument()

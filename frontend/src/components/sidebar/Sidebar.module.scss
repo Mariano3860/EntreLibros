@@ -4,6 +4,8 @@
   position: fixed;
   left: 0;
   top: 0;
+  display: flex;
+  flex-direction: column;
   height: 100vh;
   width: $collapsed-width;
   background: var(--prototype-sidebar);
@@ -90,7 +92,8 @@
   gap: 2px;
   width: calc(100% - 28px);
   padding: 12px 0 16px;
-  margin: 0 14px;
+  margin: auto 14px 0;
+  flex-shrink: 0;
   border-top: 1px solid var(--prototype-sidebar-divider);
 }
 
@@ -185,6 +188,7 @@
 .registerCta {
   display: flex;
   align-items: center;
+  box-sizing: border-box;
   width: 100%;
   min-height: 42px;
   padding: 9px 13px;
@@ -202,8 +206,10 @@
 
 .registerCta {
   justify-content: center;
-  min-height: 38px;
-  margin-top: 6px;
+  width: calc(100% - 12px);
+  min-height: 36px;
+  margin: 4px auto 0;
+  padding: 7px 10px;
   border: 1px solid var(--prototype-teal);
   background: var(--prototype-teal);
   color: #06211f;

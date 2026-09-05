@@ -27,7 +27,9 @@ La matriz de requisitos y la evidencia se mantienen en
   de carga/vacio/error; sin centro valido no se inventa una distancia.
 - Experiencia publica: visitantes pueden leer las superficies de descubrimiento,
   Comunidad, perfiles y ayuda; las mutaciones se detienen en una modal comun y
-  las rutas privadas exigen sesion con retorno local validado.
+  las rutas privadas exigen sesion con retorno local validado. La matriz de
+  rutas, consultas y acciones esta en
+  [`public-visitor-matrix.md`](public-visitor-matrix.md).
 - Comunidad: feed persistente, historias, seguimiento, likes unicos, comentarios,
   compartir, Rincones cercanos, fotos de perfil, sugerencias con enlaces reales a
   perfiles y búsqueda global de personas con filtros de privacidad/bloqueo.

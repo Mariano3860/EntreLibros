@@ -34,10 +34,11 @@
       "title": "Sign in to continue",
       "description": "You need an account to contact readers, publish books, and exchange them.",
       "register": "Sign up",
+      "or": "or",
       "login": "Log in",
       "close": "Close",
       "illustrationAlt": "Books in a reading corner",
-      "community": "Explore public content without signing in.",
+      "community": "Join a community that shares stories",
       "loginNotice": "Sign in to access this section.",
       "loginContact": "Log in to contact"
     }

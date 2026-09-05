@@ -34,10 +34,11 @@
       "title": "Ingresá para continuar",
       "description": "Necesitás una cuenta para contactar lectores, publicar libros e intercambiar.",
       "register": "Registrarte",
+      "or": "o",
       "login": "Iniciar sesión",
       "close": "Cerrar",
       "illustrationAlt": "Libros en un rincón de lectura",
-      "community": "Explorá el contenido público sin iniciar sesión.",
+      "community": "Unite a una comunidad que comparte historias",
       "loginNotice": "Iniciá sesión para acceder a esta sección.",
       "loginContact": "Iniciar sesión para contactar"
     }

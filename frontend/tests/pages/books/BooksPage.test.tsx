@@ -1,5 +1,6 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
+import { useLocation } from 'react-router-dom'
 
 vi.mock('@src/api/auth/me.service', () => ({
   fetchMe: vi.fn().mockRejectedValue(new Error('unauthenticated')),
@@ -9,6 +10,16 @@ import { BooksPage } from '@src/pages/books/BooksPage'
 
 import { renderWithProviders } from '../../test-utils'
 
+const LocationProbe = () => {
+  const location = useLocation()
+  return (
+    <output data-testid="location">
+      {location.pathname}
+      {location.search}
+    </output>
+  )
+}
+
 describe('BooksPage', () => {
   test('renders the book sections in one accessible horizontal tablist', () => {
     renderWithProviders(<BooksPage />)
@@ -16,9 +27,34 @@ describe('BooksPage', () => {
     const tablist = screen.getByRole('tablist', { name: 'Tipos de libros' })
 
     expect(tablist).toHaveAttribute('aria-orientation', 'horizontal')
-    expect(tablist.querySelectorAll('[role="tab"]')).toHaveLength(4)
+    expect(tablist.querySelectorAll('[role="tab"]')).toHaveLength(3)
     expect(
       screen.queryByRole('tab', { name: 'Mis libros' })
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('tab', { name: 'Buscando' })
+    ).not.toBeInTheDocument()
+    expect(screen.queryByText('Buscando')).not.toBeInTheDocument()
+  })
+
+  test('normalizes a visitor seeking URL to the public books catalog', async () => {
+    renderWithProviders(
+      <>
+        <BooksPage />
+        <LocationProbe />
+      </>,
+      { initialEntries: ['/books/seeking?type=want&page=2'] }
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId('location')).toHaveTextContent('/books')
+      expect(screen.getByRole('tab', { name: 'Todos' })).toHaveAttribute(
+        'aria-selected',
+        'true'
+      )
+    })
+    expect(
+      screen.queryByRole('tab', { name: 'Buscando' })
     ).not.toBeInTheDocument()
   })
 
