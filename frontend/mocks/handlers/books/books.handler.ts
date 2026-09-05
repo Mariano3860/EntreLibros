@@ -4,6 +4,7 @@ import { RELATIVE_API_ROUTES } from '@src/api/routes'
 
 import { apiRouteMatcher } from '../utils'
 import { generateBooks } from './fakers/books.faker'
+import { generateUserBooks } from './fakers/userBooks.faker'
 
 const interestedIds = new Set<string>()
 
@@ -31,11 +32,39 @@ const listBooks = async ({
   const seed = seedParam ? Number(seedParam) : undefined
   const language = cookies.language || 'es'
   await new Promise((r) => setTimeout(r, 200))
-  let books = generateBooks(seed, language).map((book) => ({
+  const publicBooks = generateBooks(seed, language).map((book) => ({
     ...book,
     type: book.isSeeking ? ('want' as const) : ('offer' as const),
     isInterested: interestedIds.has(String(book.id)),
   }))
+  const ownBooks = generateUserBooks(seed).map((book) => ({
+    ...book,
+    type: book.isSeeking ? ('want' as const) : ('offer' as const),
+    isInterested: interestedIds.has(String(book.id)),
+  }))
+  const categoryBooks = {
+    mine: cookies.sessionToken ? ownBooks : [],
+    trade: publicBooks.filter(
+      (book) => book.type === 'offer' && book.isForTrade
+    ),
+    seeking: publicBooks.filter((book) => book.type === 'want'),
+    sale: publicBooks.filter((book) => book.type === 'offer' && book.isForSale),
+  }
+  const scope = url.searchParams.get('scope')
+  let books =
+    scope === 'all'
+      ? Array.from(
+          new Map(
+            [
+              ...publicBooks,
+              ...categoryBooks.trade,
+              ...categoryBooks.seeking,
+              ...categoryBooks.sale,
+              ...categoryBooks.mine,
+            ].map((book) => [book.id, book])
+          ).values()
+        )
+      : publicBooks
   const query = url.searchParams.get('q')?.trim().toLowerCase()
   const condition = url.searchParams.get('condition')
   const status = url.searchParams.get('status')
@@ -69,6 +98,27 @@ const listBooks = async ({
       return sort === 'price_asc' ? priceA - priceB : priceB - priceA
     })
   }
+  if (scope === 'all') {
+    const limit = Math.min(
+      Math.max(Number(url.searchParams.get('limit') ?? 50), 1),
+      100
+    )
+    const offset = Math.max(Number(url.searchParams.get('offset') ?? 0), 0)
+    return HttpResponse.json(
+      {
+        items: books.slice(offset, offset + limit),
+        page: {
+          limit,
+          offset,
+          total: books.length,
+          hasNext: offset + limit < books.length,
+          hasPrevious: offset > 0,
+        },
+      },
+      { status: 200 }
+    )
+  }
+
   return HttpResponse.json(books, { status: 200 })
 }
 

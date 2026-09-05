@@ -58,6 +58,7 @@ const insertBook = async (): Promise<number> => {
 const insertListing = async (params: {
   userId: number;
   bookId: number;
+  type?: 'offer' | 'want';
   status?:
     | 'available'
     | 'reserved'
@@ -81,6 +82,7 @@ const insertListing = async (params: {
   const {
     userId,
     bookId,
+    type = 'offer',
     status = 'available',
     condition = 'good',
     availability = 'public',
@@ -117,13 +119,14 @@ const insertListing = async (params: {
       delivery_shipping_payer,
       corner_id
     ) VALUES (
-      $1, $2, $3, 'offer', $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,
-       true, true, false, NULL, $14
+      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14,
+       true, true, false, NULL, $15
     ) RETURNING id`,
     [
       userId,
       bookId,
       status,
+      type,
       notes,
       condition,
       sale,
@@ -533,6 +536,185 @@ describe('books API listing projections', () => {
       status: 'completed',
       bookListingStatus: 'completed',
     });
+  });
+});
+
+describe('books API Todos catalog', () => {
+  test('rejects an unsupported catalog scope', async () => {
+    await request(app).get('/api/books').query({ scope: 'mine' }).expect(400);
+  });
+
+  test('unites own, trade, seeking and sale listings before pagination', async () => {
+    const viewerId = await insertUser({ name: 'Clara' });
+    const firstOwnerId = await insertUser({ name: 'First owner' });
+    const secondOwnerId = await insertUser({ name: 'Second owner' });
+    const hiddenOwnerId = await insertUser({ name: 'Hidden owner' });
+    const sharedBookId = await insertBook();
+    const ownBookId = await insertBook();
+    const ownWantBookId = await insertBook();
+    const ownOfferId = await insertListing({
+      userId: viewerId,
+      bookId: ownBookId,
+      availability: 'private',
+    });
+    const ownWantId = await insertListing({
+      userId: viewerId,
+      bookId: ownWantBookId,
+      type: 'want',
+      availability: 'private',
+      sale: false,
+      trade: false,
+    });
+    const firstSharedId = await insertListing({
+      userId: firstOwnerId,
+      bookId: sharedBookId,
+      sale: false,
+      trade: true,
+    });
+    const secondSharedId = await insertListing({
+      userId: secondOwnerId,
+      bookId: sharedBookId,
+      sale: true,
+      trade: false,
+    });
+    const overlapBookId = await insertBook();
+    const overlapId = await insertListing({
+      userId: firstOwnerId,
+      bookId: overlapBookId,
+      sale: true,
+      trade: true,
+    });
+    const hiddenId = await insertListing({
+      userId: hiddenOwnerId,
+      bookId: await insertBook(),
+      availability: 'private',
+    });
+    await client.query(
+      `UPDATE books
+       SET title = CASE id
+         WHEN $1 THEN 'Todos union propio'
+         WHEN $2 THEN 'Todos union buscado'
+         WHEN $3 THEN 'Todos union mismo libro'
+         WHEN $4 THEN 'Todos union overlap'
+         ELSE title
+       END`,
+      [ownBookId, ownWantBookId, sharedBookId, overlapBookId]
+    );
+
+    const firstPage = await request(app)
+      .get('/api/books')
+      .query({ scope: 'all', q: 'Todos union', limit: 2, offset: 0 })
+      .set('Cookie', buildAuthCookie(viewerId))
+      .expect(200);
+    const secondPage = await request(app)
+      .get('/api/books')
+      .query({ scope: 'all', q: 'Todos union', limit: 2, offset: 2 })
+      .set('Cookie', buildAuthCookie(viewerId))
+      .expect(200);
+    const lastPage = await request(app)
+      .get('/api/books')
+      .query({ scope: 'all', q: 'Todos union', limit: 2, offset: 4 })
+      .set('Cookie', buildAuthCookie(viewerId))
+      .expect(200);
+    const emptyPage = await request(app)
+      .get('/api/books')
+      .query({ scope: 'all', q: 'Todos union', limit: 2, offset: 6 })
+      .set('Cookie', buildAuthCookie(viewerId))
+      .expect(200);
+
+    expect(firstPage.body.page).toMatchObject({
+      limit: 2,
+      offset: 0,
+      total: 5,
+      hasNext: true,
+      hasPrevious: false,
+    });
+    expect(secondPage.body.page).toMatchObject({
+      limit: 2,
+      offset: 2,
+      total: 5,
+      hasNext: true,
+      hasPrevious: true,
+    });
+    expect(lastPage.body.page).toMatchObject({
+      limit: 2,
+      offset: 4,
+      total: 5,
+      hasNext: false,
+      hasPrevious: true,
+    });
+    expect(emptyPage.body).toMatchObject({
+      items: [],
+      page: {
+        limit: 2,
+        offset: 6,
+        total: 5,
+        hasNext: false,
+        hasPrevious: true,
+      },
+    });
+
+    const ids = [
+      ...firstPage.body.items,
+      ...secondPage.body.items,
+      ...lastPage.body.items,
+    ].map((listing: { id: string }) => Number(listing.id));
+    expect(new Set(ids)).toEqual(
+      new Set([ownOfferId, ownWantId, firstSharedId, secondSharedId, overlapId])
+    );
+    expect(ids).not.toContain(hiddenId);
+    expect(
+      firstPage.body.items.filter(
+        (listing: { id: string }) => listing.id === String(overlapId)
+      )
+    ).toHaveLength(1);
+  });
+
+  test('keeps Todos public for visitors and applies filters to the union', async () => {
+    const viewerId = await insertUser({ name: 'Private viewer' });
+    const publicOwnerId = await insertUser({ name: 'Public owner' });
+    const ownBookId = await insertBook();
+    const publicBookId = await insertBook();
+    const ownPrivateId = await insertListing({
+      userId: viewerId,
+      bookId: ownBookId,
+      availability: 'private',
+    });
+    const publicWantId = await insertListing({
+      userId: publicOwnerId,
+      bookId: publicBookId,
+      type: 'want',
+      sale: false,
+      trade: false,
+    });
+    await client.query('UPDATE books SET title = $1 WHERE id = $2', [
+      'Todos visitante publico',
+      publicBookId,
+    ]);
+
+    const visitor = await request(app)
+      .get('/api/books')
+      .query({ scope: 'all', q: 'Todos visitante', limit: 100 })
+      .expect(200);
+    const visitorIds = visitor.body.items.map((listing: { id: string }) =>
+      Number(listing.id)
+    );
+    expect(visitorIds).toContain(publicWantId);
+    expect(visitorIds).not.toContain(ownPrivateId);
+    expect(visitor.body.page.total).toBe(1);
+
+    const filtered = await request(app)
+      .get('/api/books')
+      .query({
+        scope: 'all',
+        q: 'Todos visitante',
+        type: 'want',
+        limit: 100,
+      })
+      .set('Cookie', buildAuthCookie(viewerId))
+      .expect(200);
+    expect(filtered.body.page.total).toBe(1);
+    expect(filtered.body.items[0].id).toBe(String(publicWantId));
   });
 });
 

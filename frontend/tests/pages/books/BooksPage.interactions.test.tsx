@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 const fetchMe = vi.hoisted(() => vi.fn())
 const fetchBooks = vi.hoisted(() => vi.fn())
+const fetchAllBooks = vi.hoisted(() => vi.fn())
+const fetchUserBooks = vi.hoisted(() => vi.fn())
 const createWantBook = vi.hoisted(() => vi.fn())
 
 vi.mock('@src/utils/runtimeEnv', () => ({
@@ -15,6 +17,7 @@ vi.mock('@src/api/auth/me.service', () => ({
 
 vi.mock('@api/books/books.service', () => ({
   fetchBooks,
+  fetchAllBooks,
   fetchBookById: vi.fn(),
 }))
 
@@ -23,7 +26,7 @@ vi.mock('@api/books/bookInteractions.service', () => ({
 }))
 
 vi.mock('@api/books/userBooks.service', () => ({
-  fetchUserBooks: vi.fn().mockResolvedValue([]),
+  fetchUserBooks,
 }))
 
 import { BooksPage } from '@src/pages/books/BooksPage'
@@ -50,6 +53,19 @@ describe('BooksPage discovery interactions', () => {
     fetchMe.mockResolvedValue({ id: 1, name: 'Reader' })
     fetchBooks.mockReset()
     fetchBooks.mockResolvedValue([])
+    fetchAllBooks.mockReset()
+    fetchAllBooks.mockResolvedValue({
+      items: [],
+      page: {
+        limit: 5,
+        offset: 0,
+        total: 0,
+        hasNext: false,
+        hasPrevious: false,
+      },
+    })
+    fetchUserBooks.mockReset()
+    fetchUserBooks.mockResolvedValue([])
     createWantBook.mockReset()
   })
 
@@ -149,16 +165,16 @@ describe('BooksPage discovery interactions', () => {
 
   test('does not render want listings in the visitor Todos catalog', async () => {
     fetchMe.mockRejectedValueOnce(new Error('unauthenticated'))
-    fetchBooks.mockResolvedValue([
-      discoveryBook,
-      {
-        ...discoveryBook,
-        id: 'visitor-seeking-book',
-        title: 'Libro que alguien busca',
-        isForTrade: false,
-        isSeeking: true,
+    fetchAllBooks.mockResolvedValue({
+      items: [discoveryBook],
+      page: {
+        limit: 5,
+        offset: 0,
+        total: 1,
+        hasNext: false,
+        hasPrevious: false,
       },
-    ])
+    })
 
     renderWithProviders(<BooksPage />, {
       initialEntries: ['/books'],
@@ -171,9 +187,10 @@ describe('BooksPage discovery interactions', () => {
       screen.queryByRole('button', { name: 'Ver Libro que alguien busca' })
     ).not.toBeInTheDocument()
     expect(screen.queryByText('Buscando')).not.toBeInTheDocument()
-    expect(fetchBooks).toHaveBeenCalledWith(
+    expect(fetchAllBooks).toHaveBeenCalledWith(
       expect.objectContaining({ type: 'offer' })
     )
+    expect(fetchUserBooks).not.toHaveBeenCalled()
   })
 
   test('renders want listings as searching without offer actions', async () => {
