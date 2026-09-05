@@ -1,9 +1,18 @@
-import { fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
-import type { MapCornerPin, MapPin } from '@src/api/map/map.types'
+import type {
+  MapBoundingBox,
+  MapCornerPin,
+  MapPin,
+} from '@src/api/map/map.types'
 
-const mapCanvasRender = vi.hoisted(() => vi.fn())
+const { mapCanvasRender, viewportHandler } = vi.hoisted(() => ({
+  mapCanvasRender: vi.fn(),
+  viewportHandler: {
+    current: null as ((bbox: MapBoundingBox) => void) | null,
+  },
+}))
 
 vi.mock('@components/map/MapCanvas/MapCanvas', () => ({
   MapCanvas: ({
@@ -13,6 +22,8 @@ vi.mock('@components/map/MapCanvas/MapCanvas', () => ({
     focusRequest,
     radiusKm,
     onSelectPin,
+    bbox,
+    onViewportChange,
   }: {
     corners: MapCornerPin[]
     selectedPin: MapPin | null
@@ -20,8 +31,17 @@ vi.mock('@components/map/MapCanvas/MapCanvas', () => ({
     focusRequest: number
     radiusKm?: number | null
     onSelectPin: (pin: MapPin) => void
+    bbox: MapBoundingBox
+    onViewportChange?: (bbox: MapBoundingBox) => void
   }) => {
-    mapCanvasRender({ selectedPin, userLocation, focusRequest, radiusKm })
+    viewportHandler.current = onViewportChange ?? null
+    mapCanvasRender({
+      bbox,
+      selectedPin,
+      userLocation,
+      focusRequest,
+      radiusKm,
+    })
     return (
       <div data-testid="map-canvas">
         {corners.map((corner) => (
@@ -54,6 +74,8 @@ describe('MapPage', () => {
   beforeEach(() => {
     fetchMe.mockReset()
     fetchMe.mockRejectedValue(new Error('unauthenticated'))
+    mapCanvasRender.mockClear()
+    viewportHandler.current = null
   })
 
   test('does not request location automatically for visitors', async () => {
@@ -259,5 +281,32 @@ describe('MapPage', () => {
     } finally {
       if (original) Object.defineProperty(navigator, 'geolocation', original)
     }
+  })
+
+  test('uses the latest bbox after rapid pan and zoom updates in unlimited mode', async () => {
+    renderWithProviders(<MapPage />)
+
+    const pannedBbox: MapBoundingBox = {
+      north: -34.4,
+      south: -34.6,
+      east: -58.1,
+      west: -58.4,
+    }
+    const zoomedBbox: MapBoundingBox = {
+      north: -34.48,
+      south: -34.54,
+      east: -58.2,
+      west: -58.3,
+    }
+
+    await waitFor(() => expect(viewportHandler.current).not.toBeNull())
+    act(() => {
+      viewportHandler.current?.(pannedBbox)
+      viewportHandler.current?.(zoomedBbox)
+    })
+
+    await waitFor(() =>
+      expect(mapCanvasRender.mock.calls.at(-1)?.[0].bbox).toEqual(zoomedBbox)
+    )
   })
 })

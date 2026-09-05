@@ -33,6 +33,12 @@ PUBLIC_API_BASE_URL=http://localhost:4000/api
 `mock` indica MSW y `real` indica API/Socket.IO. Comprueba
 `document.documentElement.dataset.apiMode` y reinicia tras cambiar variables.
 
+## Mapa y viewport
+
+En `Sin limite`, el mapa consulta el bbox real después de cada pan o zoom. Los
+radios numéricos conservan el centro de dispositivo o perfil; si no hay centro
+válido no se inventa una distancia.
+
 ## Acceso publico y rutas privadas
 
 Inicio, libros, detalles, Comunidad, Mapa, Ayuda y perfiles publicos se pueden

@@ -12,6 +12,7 @@ import {
 } from '../../src/repositories/communityCornerRepository.js';
 
 const BENCHMARK_CORNER_COUNT = 100;
+const EXPECTED_CORNER_LIMIT = 50;
 const BENCHMARK_CENTER = { latitude: -34.6037, longitude: -58.3816 };
 
 let client: PoolClient;
@@ -131,7 +132,11 @@ describe('map performance baseline', () => {
         .query(query)
         .expect(200);
       durations.push(performance.now() - startedAt);
-      expect(response.body.corners).toHaveLength(BENCHMARK_CORNER_COUNT);
+      expect(response.body.corners).toHaveLength(EXPECTED_CORNER_LIMIT);
+      expect(response.body.meta).toMatchObject({
+        truncated: true,
+        limits: { corners: 50, publications: 100, activity: 100 },
+      });
     }
 
     const p50 = percentile(durations, 0.5);

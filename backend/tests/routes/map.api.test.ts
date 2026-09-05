@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto';
+
 import request from 'supertest';
 import { beforeEach, afterEach, describe, expect, test, vi } from 'vitest';
 import type { PoolClient } from 'pg';
@@ -229,6 +231,58 @@ describe('map data endpoint', () => {
     });
   });
 
+  test('rejects incomplete, inverted and out-of-range bounding boxes', async () => {
+    const invalidQueries = [
+      {
+        query: {
+          north: -34.5,
+          east: -58.3,
+          west: -58.6,
+        },
+        message: 'map.errors.bbox_required',
+      },
+      {
+        query: {
+          north: -34.7,
+          south: -34.5,
+          east: -58.3,
+          west: -58.6,
+        },
+        message: 'map.errors.bbox_invalid',
+      },
+      {
+        query: {
+          north: 91,
+          south: -34.7,
+          east: -58.3,
+          west: -58.6,
+        },
+        message: 'map.errors.bbox_invalid',
+      },
+      {
+        query: {
+          north: -34.5,
+          south: -34.7,
+          east: -181,
+          west: -58.6,
+        },
+        message: 'map.errors.bbox_invalid',
+      },
+    ];
+
+    for (const { query, message } of invalidQueries) {
+      const response = await request(app)
+        .get('/api/map')
+        .query(query)
+        .expect(400);
+
+      expect(response.body).toEqual({
+        error: 'BadRequest',
+        message,
+      });
+    }
+  });
+
   test('accepts only the supported geographic radius values', async () => {
     const response = await request(app)
       .get('/api/map')
@@ -427,5 +481,48 @@ describe('map data endpoint', () => {
     ).toEqual([nearCorner.id, distantCorner.id]);
     expect(response.body.corners[0].distanceKm).toBe(0);
     expect(response.body.corners[1].distanceKm).toBeGreaterThan(2);
+  });
+
+  test('limits publications and reports more results after the active limit', async () => {
+    const corner = await createCorner({
+      ...CORNER_INPUT,
+      id: randomUUID(),
+      name: 'Publication limit corner',
+      address: {
+        ...CORNER_INPUT.address,
+        street: 'Publication limit street',
+      },
+    });
+
+    for (let index = 0; index < 101; index += 1) {
+      await seedPublicationData(corner.id);
+    }
+
+    const response = await request(app)
+      .get('/api/map')
+      .query({
+        north: -34.5,
+        south: -34.7,
+        east: -58.3,
+        west: -58.6,
+        search: 'Libro en',
+        layers: 'corners,publications',
+      })
+      .expect(200);
+
+    expect(response.body.corners).toEqual([
+      expect.objectContaining({ id: corner.id }),
+    ]);
+    expect(response.body.publications).toHaveLength(100);
+    expect(
+      response.body.publications.every(
+        (publication: { cornerId: string }) =>
+          publication.cornerId === corner.id
+      )
+    ).toBe(true);
+    expect(response.body.meta).toMatchObject({
+      truncated: true,
+      limits: { corners: 50, publications: 100, activity: 100 },
+    });
   });
 });

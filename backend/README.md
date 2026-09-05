@@ -39,6 +39,10 @@ No ejecutes la semilla sobre una base de produccion.
   transaccion que el mensaje.
 - `POST /api/messages/conversations` acepta `silent: true` para preparar un
   contacto sin analitica ni notificacion hasta que la persona lo envie.
+- `GET /api/map` requiere `north`, `south`, `east` y `west`; el bbox representa
+  el viewport de `Sin limite`, mientras `distanceKm` conserva el centro radial.
+  La respuesta limita rincones/publicaciones/actividad a 50/100/100 e informa
+  truncamiento en `meta.truncated` y `meta.limits`.
 - `POST /api/agreements/:id/outcome` registra el resultado privado de una parte.
 - `POST /api/reports` recibe reportes autenticados con categorias controladas.
 - `GET /api/community/metrics` devuelve el contrato de metricas del MVP.
