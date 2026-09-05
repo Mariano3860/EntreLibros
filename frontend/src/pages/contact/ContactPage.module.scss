@@ -57,7 +57,7 @@
   border: 1px solid var(--prototype-border);
   border-radius: 5px;
   color: var(--prototype-muted);
-  font-size: 7px;
+  font-size: 10px;
 }
 
 .hero img {
@@ -118,7 +118,7 @@
 
 .categories small {
   color: var(--prototype-muted);
-  font-size: 7px;
+  font-size: 10px;
   line-height: 1.4;
 }
 
@@ -143,7 +143,7 @@
   background: transparent;
   color: var(--prototype-teal);
   cursor: pointer;
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .faqList {
@@ -186,7 +186,7 @@
   padding: 0 12px 12px;
   margin: 0;
   color: var(--prototype-muted);
-  font-size: 9px;
+  font-size: 10px;
   line-height: 1.55;
 }
 
@@ -226,7 +226,7 @@
 .chatCard > p {
   margin: 0 0 12px;
   color: var(--prototype-muted);
-  font-size: 9px;
+  font-size: 10px;
   line-height: 1.5;
 }
 
@@ -246,7 +246,7 @@
 
 .online strong,
 .online small {
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .online small {
@@ -269,7 +269,7 @@
 
 .contactCard label {
   color: var(--prototype-muted);
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .contactCard textarea {
@@ -289,13 +289,13 @@
   margin-top: 11px;
   border-top: 1px solid var(--prototype-border);
   color: var(--prototype-teal);
-  font-size: 8px;
+  font-size: 10px;
   text-decoration: none;
 }
 
 .sent {
   color: var(--prototype-teal);
-  font-size: 8px;
+  font-size: 10px;
 }
 
 @media (width <= 1100px) {

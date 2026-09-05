@@ -176,7 +176,7 @@ main.layoutMain {
   overflow: hidden;
   margin-top: 3px;
   color: var(--prototype-muted);
-  font-size: 8px;
+  font-size: 10px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -189,7 +189,7 @@ main.layoutMain {
 
 .conversationMeta small {
   color: var(--prototype-muted);
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .conversationMeta b {
@@ -200,7 +200,7 @@ main.layoutMain {
   border-radius: 50%;
   background: var(--prototype-teal);
   color: #06211f;
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .chat {
@@ -231,14 +231,14 @@ main.layoutMain {
   margin: auto;
   padding: 20px 16px;
   color: var(--prototype-muted);
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.45;
   text-align: center;
 }
 
 .messageState strong {
   color: var(--prototype-text);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -258,7 +258,7 @@ main.layoutMain {
   border-radius: 50%;
   background: rgb(255 139 76 / 10%);
   color: var(--prototype-orange);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -285,7 +285,7 @@ main.layoutMain {
   background: rgb(66 215 199 / 9%);
   color: var(--prototype-teal);
   cursor: pointer;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 600;
 }
 
@@ -314,7 +314,7 @@ main.layoutMain {
 .chatHeader small {
   margin-top: 2px;
   color: var(--prototype-teal);
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .chatHeader nav {
@@ -354,7 +354,7 @@ main.layoutMain {
   border-radius: 999px;
   background: var(--prototype-surface);
   color: var(--prototype-muted);
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .bubble {
@@ -364,7 +364,7 @@ main.layoutMain {
   border: 1px solid var(--prototype-border);
   border-radius: 5px 13px 13px;
   background: var(--prototype-surface);
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.45;
 }
 
@@ -372,7 +372,7 @@ main.layoutMain {
   display: block;
   margin-top: 4px;
   color: var(--prototype-muted);
-  font-size: 7px;
+  font-size: 10px;
   text-align: right;
 }
 
@@ -394,7 +394,7 @@ main.layoutMain {
 
 .proposalLabel {
   color: var(--prototype-orange);
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -424,7 +424,7 @@ main.layoutMain {
 .proposal small,
 .proposal p {
   color: var(--prototype-muted);
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .proposalActions {
@@ -466,20 +466,20 @@ main.layoutMain {
 }
 
 .proposalBook strong {
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .proposalBook small {
   margin-top: 3px;
   color: var(--prototype-muted);
-  font-size: 7px;
+  font-size: 10px;
 }
 
 .bubbleTime {
   display: block;
   margin-top: 7px;
   color: var(--prototype-muted);
-  font-size: 7px;
+  font-size: 10px;
   text-align: right;
 }
 
@@ -502,7 +502,7 @@ main.layoutMain {
 .bookAttachment strong,
 .bookAttachment small {
   display: block;
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .bookAttachment small {
@@ -544,7 +544,7 @@ main.layoutMain {
   height: 31px;
   border-radius: 7px;
   color: var(--prototype-text);
-  font-size: 9px;
+  font-size: 10px;
   text-align: left;
 }
 
@@ -588,7 +588,7 @@ main.layoutMain {
   gap: 7px;
   padding: 0 14px 10px;
   color: var(--prototype-orange);
-  font-size: 9px;
+  font-size: 10px;
   line-height: 1.35;
 }
 
@@ -596,14 +596,14 @@ main.layoutMain {
   width: 17px;
   height: 17px;
   flex-basis: 17px;
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .draftSaveStatus {
   min-height: 25px;
   padding: 0 14px 8px;
   color: var(--prototype-muted);
-  font-size: 9px;
+  font-size: 10px;
   line-height: 1.35;
 }
 
@@ -841,7 +841,7 @@ main.layoutMain {
 .contactCopy small {
   margin-top: 3px;
   color: var(--prototype-muted);
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .contactSelection {
@@ -880,7 +880,7 @@ main.layoutMain {
   width: 18px;
   height: 18px;
   flex-basis: 18px;
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .contactState .retryButton {
@@ -993,7 +993,7 @@ main.layoutMain {
 
 .bookPicker header span {
   color: var(--prototype-teal);
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .bookPicker h2 {
@@ -1038,7 +1038,7 @@ main.layoutMain {
   width: 18px;
   height: 18px;
   flex-basis: 18px;
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .bookPickerState {
@@ -1085,7 +1085,7 @@ main.layoutMain {
   border: 1px dashed var(--prototype-border);
   border-radius: 9px;
   color: var(--prototype-muted);
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .bookPickerList > button {
@@ -1124,7 +1124,7 @@ main.layoutMain {
 .bookPicker small {
   margin-top: 3px;
   color: var(--prototype-muted);
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .bookPicker b {

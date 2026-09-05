@@ -28,13 +28,13 @@
 
 .header h1 {
   margin: 3px 0;
-  font-size: 29px;
+  font-size: 31px;
 }
 
 .header p {
   margin: 0;
   color: var(--prototype-muted);
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .mapLayout {
@@ -88,7 +88,7 @@
 
 .distanceValue {
   color: var(--prototype-muted);
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .distanceValue strong {
@@ -105,7 +105,7 @@
   display: flex;
   justify-content: space-between;
   color: var(--prototype-muted);
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .categories {
@@ -128,13 +128,13 @@
 }
 
 .switchRow strong {
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .switchRow small {
   margin-top: 2px;
   color: var(--prototype-muted);
-  font-size: 7px;
+  font-size: 10px;
 }
 
 .switchRow input {
@@ -177,13 +177,13 @@
 }
 
 .activity strong {
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .activity small {
   margin-top: 2px;
   color: var(--prototype-muted);
-  font-size: 7px;
+  font-size: 10px;
 }
 
 .mapCanvas {
@@ -242,7 +242,7 @@
   border-radius: 6px;
   background: var(--map-attribution-background);
   color: var(--prototype-muted);
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .leafletCanvas :global(.leaflet-control-attribution a) {
@@ -285,7 +285,7 @@
 
 .open {
   color: var(--prototype-teal) !important;
-  font-size: 7px !important;
+  font-size: 10px !important;
   letter-spacing: 0 !important;
 }
 
@@ -297,7 +297,7 @@
 .placeCard p {
   margin: 0;
   color: var(--prototype-muted);
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .placeMeta {
@@ -305,7 +305,7 @@
   gap: 12px;
   margin-top: 7px;
   color: var(--prototype-muted);
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .locationNotice {
@@ -318,7 +318,7 @@
   border-radius: 8px;
   background: var(--map-notice-background);
   color: var(--prototype-orange);
-  font-size: 8px;
+  font-size: 10px;
 }
 
 @media (max-width: $breakpoint-tablet) {
