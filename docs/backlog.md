@@ -1,6 +1,6 @@
 # Backlog de producto
 
-Ultima actualizacion: 2026-09-05.
+Ultima actualizacion: 2026-09-06.
 
 El codigo, las migraciones, los contratos y las pruebas son la fuente de verdad.
 La matriz completa y sus referencias estan en
@@ -41,13 +41,19 @@ La matriz completa y sus referencias estan en
 - Mapa sincronizado con el bbox real del viewport, radios centrados en la
   ubicacion disponible y limites server-side de 50 rincones, 100 publicaciones
   y 100 actividades con metadatos de truncamiento.
-- Experiencia publica de lectura para visitantes en Inicio, libros, Comunidad,
+- Experiencia publica de lectura para visitantes en Inicio, detalles publicos de
+  publicaciones, Comunidad,
   Mapa, Ayuda y perfiles, con una modal comun para las acciones autenticadas y
   retorno local seguro a login/registro; la matriz de alcance esta en
   [`public-visitor-matrix.md`](public-visitor-matrix.md).
-- Catálogo `Todos` agregado por publicación: combina fuentes propias y públicas
-  sin duplicar listings, aplica filtros/orden/paginación sobre el conjunto final
-  y devuelve el total estable para la interfaz real y mock.
+- Catálogo agregado `scope=all` para los consumidores que lo mantienen: combina
+  fuentes propias y públicas sin duplicar listings, aplica filtros/orden/paginación
+  sobre el conjunto final y devuelve el total estable; no es la fuente del índice
+  personal de `/books`.
+- Mis libros autenticado como relaciones personales: `Todos`, intercambio,
+  venta y búsqueda consultan `/api/books/relations` con propietario, estados
+  activos, conteos y paginación; los visitantes conservan el descubrimiento
+  social y el detalle público sin acceder al índice personal.
 
 ## Prioridad P0
 

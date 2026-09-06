@@ -11,6 +11,7 @@ export const usePublishBook = () => {
   return useMutation({
     mutationFn: (payload: PublishBookPayload) => publishBook(payload),
     onSuccess: (data: PublishBookResponse) => {
+      queryClient.invalidateQueries({ queryKey: ['bookRelations'] })
       queryClient.setQueryData(['books'], (prev: unknown) => {
         if (!Array.isArray(prev)) return prev
         return [data, ...prev]

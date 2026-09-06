@@ -211,6 +211,29 @@ Devuelve los libros publicados por el usuario autenticado.
 ]
 ```
 
+### `GET /books/relations`
+
+Requiere sesión y devuelve únicamente las relaciones activas de la cuenta
+autenticada. `tab` acepta `all`, `trade`, `sale` o `seeking`; también admite los
+filtros del catálogo y `limit`/`offset`. `Todos` combina ofertas de intercambio
+o venta y demandas `want` sin duplicar publicaciones.
+
+**Respuesta 200**
+
+```json
+{
+  "items": [{ "id": "1", "title": "Matisse en Bélgica", "type": "offer" }],
+  "page": {
+    "limit": 5,
+    "offset": 0,
+    "total": 1,
+    "hasNext": false,
+    "hasPrevious": false
+  },
+  "counts": { "all": 1, "trade": 1, "sale": 0, "seeking": 0 }
+}
+```
+
 ### `GET /user/activity`
 
 Requiere sesión y devuelve la actividad persistida del usuario autenticado.

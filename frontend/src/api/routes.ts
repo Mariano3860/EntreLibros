@@ -19,6 +19,7 @@ export const RELATIVE_API_ROUTES = {
     LIST: `/books`,
     HOME: `/books/home`,
     MINE: `/books/mine`,
+    RELATIONS: `/books/relations`,
     SEARCH: `/books/search`,
     PUBLISH: `/books`,
     INTEREST: (id: string) => `/books/${id}/interest`,

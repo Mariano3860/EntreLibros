@@ -58,11 +58,6 @@ export const Sidebar = () => {
       label: t('pages.home'),
     },
     {
-      path: `/${HOME_URLS.BOOKS}`,
-      icon: Books,
-      label: t('pages.exploreBooks'),
-    },
-    {
       path: `/${HOME_URLS.COMMUNITY}`,
       icon: Community,
       label: t('pages.community'),
@@ -74,6 +69,11 @@ export const Sidebar = () => {
     },
   ]
   const privateNavItems: NavItem[] = [
+    {
+      path: `/${HOME_URLS.BOOKS}`,
+      icon: Books,
+      label: t('pages.books'),
+    },
     {
       path: `/${HOME_URLS.MESSAGES}`,
       icon: Messages,

@@ -41,11 +41,14 @@ incluye metadatos de truncamiento.
 
 ## Descubrimiento publico
 
-Las personas visitantes pueden leer Inicio, Explorar libros, Comunidad, Mapa,
-Ayuda, perfiles publicos y detalles de publicaciones sin cargar consultas
-privadas. Publicar, contactar, guardar, reaccionar, comentar, seguir, crear
-rincones y proponer intercambios usan una unica modal de autenticacion; el
-retorno a login/registro conserva solamente rutas locales seguras.
+Las personas visitantes pueden leer Inicio, Comunidad, Mapa, Ayuda, perfiles
+publicos y detalles de publicaciones sin cargar consultas privadas. El indice
+personal de libros (`/books` y sus pestañas) usa `/api/books/relations` y
+requiere sesion; `/books/mine` se conserva como ruta de compatibilidad y
+normaliza a `/books`. Publicar, contactar, guardar, reaccionar, comentar,
+seguir, crear rincones y proponer intercambios usan una unica modal de
+autenticacion; el retorno a login/registro conserva solamente rutas locales
+seguras.
 
 ## Dataset de demo real
 

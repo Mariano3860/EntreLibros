@@ -1,6 +1,6 @@
 # Estado actual
 
-Fecha de referencia: 2026-09-05.
+Fecha de referencia: 2026-09-06.
 
 ## Resumen de cierre
 
@@ -20,9 +20,10 @@ La matriz de requisitos y la evidencia se mantienen en
   coordenadas exactas; muestran como maximo el nivel territorial permitido.
 - Libros: catálogo `offer/want`, condición, imágenes limitadas, ISBN normalizado,
   disponibilidad, vencimiento, consentimientos y revisión editorial mínima.
-  `Todos` agrega las publicaciones propias y públicas de las categorías de
-  intercambio, búsqueda y venta en backend, con filtros, orden y paginación
-  estable; los visitantes reciben únicamente publicaciones públicas.
+  `Mis libros` consulta relaciones personales activas (`Todos`, intercambio,
+  venta y búsqueda) con filtros, orden, conteos y paginación; el índice personal
+  no reutiliza el catálogo público. Los visitantes conservan el descubrimiento
+  público y el detalle de una publicación, sin acceso a las relaciones privadas.
 - Rincones: alta, edicion, normas, horario, consentimiento, visibilidad,
   aprobacion y pausa/reactivacion reversible.
 - Descubrimiento: mapa y listado real comparten filtros, radio, orden y estados

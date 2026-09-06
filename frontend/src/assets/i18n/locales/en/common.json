@@ -51,7 +51,7 @@
   },
   "pages": {
     "home": "Home",
-    "books": "My Books",
+    "books": "My books",
     "exploreBooks": "Explore books",
     "community": "Community",
     "map": "Map",
@@ -119,7 +119,7 @@
     "es": "Spanish"
   },
   "booksPage": {
-    "description": "Discover books nearby to trade, buy, or add to your list.",
+    "description": "Manage the books you offer, sell, or are looking for.",
     "search_label": "Search books",
     "filters": {
       "button": "Filters",
@@ -143,6 +143,12 @@
       "reset": "Clear filters",
       "locationUnavailable": "Enable your location to filter by distance."
     },
+    "sort": {
+      "recent": "Most recent",
+      "nearby": "Nearest",
+      "price_asc": "Lowest price",
+      "price_desc": "Highest price"
+    },
     "want": {
       "open": "Search for a book",
       "title": "Search for a book",
@@ -153,7 +159,7 @@
       "created": "Request published",
       "duplicate": "You already have an active request for this book.",
       "error": "The request could not be published.",
-      "search": "Search the catalog",
+      "search": "Choose a book to add to Seeking",
       "searchPlaceholder": "ISBN, title, or author...",
       "searching": "Searching...",
       "searchError": "We couldn't search right now.",
@@ -195,7 +201,7 @@
     },
     "loading": "Loading books...",
     "error": "We couldn't load the books. Please try again.",
-    "title": "Explore books",
+    "title": "My books",
     "search_placeholder": "Search by title, author, ISBN",
     "filter": {
       "near": "Near",
@@ -206,8 +212,7 @@
     "tabs": {
       "label": "Book types",
       "all": "All",
-      "mine": "My books",
-      "for_trade": "Available for trade",
+      "for_trade": "For trade",
       "seeking": "Seeking",
       "for_sale": "For sale",
       "see_all": "See all"
@@ -216,10 +221,10 @@
       "filtered": "No books found",
       "filteredHint": "Try another search or remove some filters.",
       "all": "We couldn't find published books yet.",
-      "mine": "You haven't added books yet.",
       "trade": "You haven't listed books for trade yet.",
       "seeking": "No books in your wish list.",
-      "sale": "You don't have books for sale yet."
+      "sale": "You don't have books for sale yet.",
+      "contextualHint": "You can publish a book or add one to Seeking."
     },
     "status": {
       "available": "Available",
@@ -231,6 +236,9 @@
       "for_sale": "For sale · ${{price}}",
       "for_trade": "Trade",
       "seeking": "Seeking"
+    },
+    "intentions": {
+      "sale": "For sale"
     },
     "cover_alt": "Cover of {{title}}",
     "pagination": {

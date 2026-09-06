@@ -14,6 +14,7 @@ export type BookListingAvailability = 'public' | 'private';
 export type BookListingCondition = 'new' | 'very_good' | 'good' | 'acceptable';
 export type BookListingShippingPayer = 'owner' | 'requester' | 'split';
 export type BookListingSort = 'recent' | 'nearby' | 'price_asc' | 'price_desc';
+export type PersonalBookRelationsTab = 'all' | 'trade' | 'sale' | 'seeking';
 export type PublicationEditorialStatus =
   | 'pending'
   | 'needs_correction'
@@ -1107,6 +1108,27 @@ export interface PublicBookListingFilters {
   cornerIds?: string[];
 }
 
+export type PersonalBookRelationsFilters = PublicBookListingFilters & {
+  tab: PersonalBookRelationsTab;
+};
+
+export interface PersonalBookRelationsPage {
+  items: BookListing[];
+  page: {
+    limit: number;
+    offset: number;
+    total: number;
+    hasNext: boolean;
+    hasPrevious: boolean;
+  };
+  counts: {
+    all: number;
+    trade: number;
+    sale: number;
+    seeking: number;
+  };
+}
+
 type CatalogQueryParts = {
   conditions: string[];
   params: unknown[];
@@ -1249,6 +1271,162 @@ export async function listAllBookListings(
       total: result.total,
       hasNext: offset + items.length < result.total,
       hasPrevious: offset > 0,
+    },
+  };
+}
+
+type PersonalRelationsQueryParts = {
+  conditions: string[];
+  params: unknown[];
+  distanceExpression: string | null;
+};
+
+function buildPersonalRelationsQuery(
+  filters: PersonalBookRelationsFilters,
+  userId: number,
+  includeTab = true
+): PersonalRelationsQueryParts {
+  const conditions = [
+    'p.user_id = $1',
+    'p.is_draft = false',
+    "p.status IN ('available', 'reserved')",
+    "p.editorial_status <> 'rejected'",
+    '(p.expires_at IS NULL OR p.expires_at > NOW())',
+  ];
+  const params: unknown[] = [userId];
+
+  const add = (condition: string, value: unknown) => {
+    params.push(value);
+    conditions.push(condition.replace('?', `$${params.length}`));
+  };
+
+  if (includeTab) {
+    const tabConditions: Record<PersonalBookRelationsTab, string> = {
+      all: "((p.type = 'offer' AND (p.trade = true OR p.sale = true)) OR p.type = 'want')",
+      trade: "p.type = 'offer' AND p.trade = true",
+      sale: "p.type = 'offer' AND p.sale = true",
+      seeking: "p.type = 'want'",
+    };
+    conditions.push(tabConditions[filters.tab]);
+  }
+
+  if (filters.text) {
+    params.push(filters.text, filters.text, filters.text, filters.text);
+    conditions.push(
+      `(b.title ILIKE '%' || $${params.length - 3} || '%'
+        OR b.author ILIKE '%' || $${params.length - 2} || '%'
+        OR c.name ILIKE '%' || $${params.length - 1} || '%'
+        OR c.address_street ILIKE '%' || $${params.length} || '%')`
+    );
+  }
+  if (filters.author) add("b.author ILIKE '%' || ? || '%'", filters.author);
+  if (filters.isbn) add('b.isbn = ?', filters.isbn);
+  if (filters.topic) {
+    add(
+      "(b.title || ' ' || COALESCE(p.description, '')) ILIKE '%' || ? || '%'",
+      filters.topic
+    );
+  }
+  if (filters.interest) {
+    add(
+      'EXISTS (SELECT 1 FROM unnest(p.trade_preferences) AS preference WHERE preference ILIKE ?) ',
+      filters.interest
+    );
+  }
+  if (filters.language) add('b.language = ?', filters.language);
+  if (filters.condition) add('p.condition = ?', filters.condition);
+  if (filters.status) add('p.status = ?', filters.status);
+  if (filters.trade !== undefined) add('p.trade = ?', filters.trade);
+  if (filters.sale !== undefined) add('p.sale = ?', filters.sale);
+  if (filters.donation !== undefined) add('p.donation = ?', filters.donation);
+  if (filters.type) add('p.type = ?', filters.type);
+  if (filters.cornerIds) {
+    if (filters.cornerIds.length === 0) {
+      return { conditions: ['FALSE'], params: [], distanceExpression: null };
+    }
+    add('p.corner_id = ANY(?::text[])', filters.cornerIds);
+  }
+
+  let distanceExpression: string | null = null;
+  if (filters.latitude !== undefined && filters.longitude !== undefined) {
+    params.push(filters.longitude, filters.latitude);
+    const longitudeParameter = params.length - 1;
+    const latitudeParameter = params.length;
+    distanceExpression = `ST_Distance(COALESCE(c.location, u.location), ST_SetSRID(ST_MakePoint($${longitudeParameter}, $${latitudeParameter}), 4326)::geography)`;
+    if (filters.radiusKm !== undefined) {
+      params.push(filters.radiusKm * 1000);
+      const radiusParameter = params.length;
+      conditions.push(
+        `COALESCE(c.location, u.location) IS NOT NULL AND ST_DWithin(COALESCE(c.location, u.location), ST_SetSRID(ST_MakePoint($${longitudeParameter}, $${latitudeParameter}), 4326)::geography, $${radiusParameter})`
+      );
+    }
+  }
+
+  return { conditions, params, distanceExpression };
+}
+
+function getPersonalRelationsOrder(
+  sort: BookListingSort | undefined,
+  distanceExpression: string | null
+): string {
+  return getPublicListingOrder(sort, distanceExpression);
+}
+
+export async function listPersonalBookRelations(
+  userId: number,
+  filters: PersonalBookRelationsFilters
+): Promise<PersonalBookRelationsPage> {
+  const baseQuery = buildPersonalRelationsQuery(filters, userId, false);
+  const countResult = await query<{
+    all_count: string;
+    trade_count: string;
+    sale_count: string;
+    seeking_count: string;
+  }>(
+    `SELECT
+       COUNT(*) FILTER (WHERE (p.type = 'offer' AND (p.trade = true OR p.sale = true)) OR p.type = 'want') AS all_count,
+       COUNT(*) FILTER (WHERE p.type = 'offer' AND p.trade = true) AS trade_count,
+       COUNT(*) FILTER (WHERE p.type = 'offer' AND p.sale = true) AS sale_count,
+       COUNT(*) FILTER (WHERE p.type = 'want') AS seeking_count
+     FROM book_listings p
+       JOIN books b ON p.book_id = b.id
+       LEFT JOIN community_corners c ON c.id::text = p.corner_id
+       LEFT JOIN users u ON u.id = p.user_id
+     WHERE ${baseQuery.conditions.join(' AND ')}`,
+    baseQuery.params
+  );
+
+  const { conditions, params, distanceExpression } =
+    buildPersonalRelationsQuery(filters, userId);
+  const limit = Math.min(Math.max(filters.limit ?? 50, 1), 100);
+  const offset = Math.max(filters.offset ?? 0, 0);
+  params.push(limit, offset);
+  const orderClause = getPersonalRelationsOrder(
+    filters.sort,
+    distanceExpression
+  );
+  const result = await fetchBookListingsWithTotal(
+    `LEFT JOIN community_corners c ON c.id::text = p.corner_id
+     WHERE ${conditions.join(' AND ')}`,
+    params,
+    `${orderClause} LIMIT $${params.length - 1} OFFSET $${params.length}`
+  );
+
+  const counts = countResult.rows[0];
+  return {
+    items: result.listings,
+    page: {
+      limit,
+      offset,
+      total: result.total,
+      hasNext: offset + result.listings.length < result.total,
+      hasPrevious: offset > 0,
+    },
+    counts: {
+      all: Number(counts?.all_count ?? 0),
+      trade: Number(counts?.trade_count ?? 0),
+      sale: Number(counts?.sale_count ?? 0),
+      seeking: Number(counts?.seeking_count ?? 0),
     },
   };
 }

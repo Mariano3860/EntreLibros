@@ -6,6 +6,7 @@ export type PrototypeBook = {
   ownerId?: string
   distance: string
   mode: 'Intercambio' | 'Venta' | 'Buscado'
+  intentions?: Array<'trade' | 'sale' | 'seeking'>
   price?: string
   coverUrl?: string
   condition?: string

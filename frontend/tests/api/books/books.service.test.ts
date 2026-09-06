@@ -5,6 +5,7 @@ import { server } from '@mocks/server'
 import { apiRouteMatcher } from '@mocks/handlers/utils'
 import {
   fetchAllBooks,
+  fetchBookRelations,
   fetchBooks,
   fetchHomeBooks,
 } from '@src/api/books/books.service'
@@ -50,6 +51,15 @@ describe('fetchBooks service', () => {
     })
   })
 
+  test('returns only personal relations with category counts', async () => {
+    const page = await fetchBookRelations({ tab: 'all', limit: 100 })
+
+    expect(page.items).toHaveLength(9)
+    expect(page.page.total).toBe(9)
+    expect(page.counts).toEqual({ all: 9, trade: 3, sale: 2, seeking: 4 })
+    expect(page.items.every((book) => book.ownerId === '1')).toBe(true)
+  })
+
   test('throws on invalid response', async () => {
     server.use(
       http.get(apiRouteMatcher(RELATIVE_API_ROUTES.BOOKS.LIST), () =>
@@ -67,5 +77,17 @@ describe('fetchBooks service', () => {
     )
 
     await expect(fetchAllBooks()).rejects.toThrow('Invalid books response')
+  })
+
+  test('throws when personal relations envelope is invalid', async () => {
+    server.use(
+      http.get(apiRouteMatcher(RELATIVE_API_ROUTES.BOOKS.RELATIONS), () =>
+        HttpResponse.json({ items: [], page: {}, counts: {} })
+      )
+    )
+
+    await expect(fetchBookRelations()).rejects.toThrow(
+      'Invalid book relations response'
+    )
   })
 })

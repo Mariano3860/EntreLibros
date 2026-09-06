@@ -1,9 +1,10 @@
 import React from 'react'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
 import { HOME_URLS } from '@src/constants/constants'
 import { AuthRequiredProvider } from '@src/contexts/auth/AuthRequiredContext'
 import { BooksPage } from '@src/pages/books/BooksPage'
+import { PublicBookDetailPage } from '@src/pages/books/PublicBookDetailPage'
 import { CommunityFeedPage } from '@src/pages/community/CommunityFeedPage'
 import { ContactPage } from '@src/pages/contact/ContactPage'
 import { HomePage } from '@src/pages/home/HomePage'
@@ -40,11 +41,46 @@ const AppRoutes = () => {
             path={`/${HOME_URLS.BOOKS}/mine`}
             element={
               <RequireAuth>
+                <Navigate replace to={`/${HOME_URLS.BOOKS}`} />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path={`/${HOME_URLS.BOOKS}`}
+            element={
+              <RequireAuth>
                 <BooksPage />
               </RequireAuth>
             }
           />
-          <Route path={`/${HOME_URLS.BOOKS}/*`} element={<BooksPage />} />
+          <Route
+            path={`/${HOME_URLS.BOOKS}/trade`}
+            element={
+              <RequireAuth>
+                <BooksPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path={`/${HOME_URLS.BOOKS}/sale`}
+            element={
+              <RequireAuth>
+                <BooksPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path={`/${HOME_URLS.BOOKS}/seeking`}
+            element={
+              <RequireAuth>
+                <BooksPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path={`/${HOME_URLS.BOOKS}/:id`}
+            element={<PublicBookDetailPage />}
+          />
           <Route
             path={`/${HOME_URLS.COMMUNITY}`}
             element={<CommunityFeedPage />}
