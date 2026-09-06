@@ -56,9 +56,9 @@ La matriz completa y sus referencias estan en
   social y el detalle público sin acceder al índice personal.
 
 - Baseline E2E real reproducible con PostgreSQL/PostGIS aislado, seed sintetico,
-  Playwright, diagnosticos de fallo y workflow CI; la discrepancia de
-  autorizacion de verificacion de libros queda allowlisted y vinculada a su
-  proximo OpenSpec.
+  Playwright, diagnosticos de fallo, JWT de pruebas automatico y workflow CI;
+  la discrepancia de autorizacion de verificacion de libros queda allowlisted
+  y vinculada a su proximo OpenSpec.
 
 ## Prioridad P0
 

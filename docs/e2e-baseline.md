@@ -30,7 +30,9 @@ E2E_COMPOSE_FILE=docker-compose.e2e.yml
 El nombre de la base debe contener `e2e` y el proyecto Compose debe comenzar
 por `entrelibros-e2e`. Los scripts abortan antes de borrar o recrear una base
 que no cumpla esas reglas. No apuntes `E2E_DATABASE_URL` a la base de desarrollo
-ni reutilices sus datos.
+ni reutilices sus datos. El runtime E2E configura automáticamente un JWT
+exclusivo de pruebas; `E2E_JWT_SECRET` permite sobrescribirlo cuando el entorno
+lo requiera, siempre con un valor que no se use en producción.
 
 ## Comandos
 

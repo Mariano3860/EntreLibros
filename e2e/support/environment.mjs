@@ -2,6 +2,7 @@ import { URL } from "node:url";
 
 const DEFAULT_DATABASE_URL =
   "postgres://postgres:postgres@127.0.0.1:55432/entrelibros_e2e";
+const DEFAULT_E2E_JWT_SECRET = "e2e-test-only-secret";
 
 export const E2E_DATABASE_URL =
   process.env.E2E_DATABASE_URL ?? DEFAULT_DATABASE_URL;
@@ -73,5 +74,7 @@ export function getE2EProcessEnv(extra = {}) {
     FRONTEND_URL: E2E_FRONTEND_URL,
     PORT: process.env.E2E_BACKEND_PORT ?? "4400",
     PUBLIC_API_USE_MOCKS: "false",
+    JWT_SECRET: process.env.E2E_JWT_SECRET ?? DEFAULT_E2E_JWT_SECRET,
+    JWT_ALGORITHM: "HS256",
   };
 }
