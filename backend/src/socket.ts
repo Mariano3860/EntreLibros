@@ -19,6 +19,10 @@ import {
   agreementEvents,
   type AgreementSnapshot,
 } from './repositories/agreementRepository.js';
+import { logPublicError, publicErrorResponse } from './utils/publicErrors.js';
+
+const MAX_SOCKET_BODY_LENGTH = 4_000;
+const MAX_SOCKET_CLIENT_KEY_LENGTH = 160;
 
 function parseCookies(header?: string): Record<string, string> {
   if (!header) return {};
@@ -89,6 +93,110 @@ export type InterServerEvents = Record<string, never>;
 export interface SocketData {
   user: ChatUser;
 }
+
+type ConversationMessagePayload = {
+  conversationId: number;
+  clientKey: string;
+  body: string;
+  attachmentMetadata?: MessageAttachment | null;
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isConversationId(value: unknown): value is number {
+  return Number.isSafeInteger(value) && (value as number) > 0;
+}
+
+function isValidConversationMessage(
+  value: unknown
+): value is ConversationMessagePayload {
+  if (!isRecord(value)) return false;
+  if (
+    !isConversationId(value.conversationId) ||
+    typeof value.clientKey !== 'string' ||
+    value.clientKey.trim().length === 0 ||
+    value.clientKey.length > MAX_SOCKET_CLIENT_KEY_LENGTH ||
+    typeof value.body !== 'string' ||
+    value.body.length > MAX_SOCKET_BODY_LENGTH
+  ) {
+    return false;
+  }
+  const attachment = value.attachmentMetadata;
+  return (
+    attachment === undefined ||
+    attachment === null ||
+    (isRecord(attachment) && Object.keys(attachment).length <= 20)
+  );
+}
+
+function isValidConversationJoin(
+  value: unknown
+): value is { conversationId: number; after?: number } {
+  if (!isRecord(value) || !isConversationId(value.conversationId)) {
+    return false;
+  }
+  return (
+    value.after === undefined ||
+    (Number.isSafeInteger(value.after) && (value.after as number) >= 0)
+  );
+}
+
+function isValidConversationRead(
+  value: unknown
+): value is { conversationId: number; sequence: number } {
+  return (
+    isRecord(value) &&
+    isConversationId(value.conversationId) &&
+    Number.isSafeInteger(value.sequence) &&
+    (value.sequence as number) >= 0
+  );
+}
+
+function socketError(error: unknown) {
+  logPublicError('Socket conversation operation failed', error);
+  const response = publicErrorResponse(
+    error,
+    { status: 500, code: 'MessagingError', key: 'messaging.errors.failed' },
+    {
+      'messaging.errors.body_required': {
+        status: 422,
+        code: 'MessagingError',
+        key: 'messaging.errors.body_required',
+      },
+      'messaging.errors.client_key_required': {
+        status: 422,
+        code: 'MessagingError',
+        key: 'messaging.errors.client_key_required',
+      },
+      'messaging.errors.forbidden': {
+        status: 403,
+        code: 'MessagingError',
+        key: 'messaging.errors.forbidden',
+      },
+      'messaging.errors.invalid_sequence': {
+        status: 422,
+        code: 'MessagingError',
+        key: 'messaging.errors.invalid_sequence',
+      },
+      'messaging.errors.not_found': {
+        status: 404,
+        code: 'MessagingError',
+        key: 'messaging.errors.not_found',
+      },
+    }
+  );
+  return { message: response.body.message };
+}
+
+const emitInvalidSocketPayload = (
+  socket: Parameters<NonNullable<Parameters<Server['on']>[1]>>[0]
+) => {
+  socket.emit('conversation:error', {
+    message: 'messaging.errors.invalid_payload',
+  });
+};
 
 export function setupWebsocket(
   io: Server<
@@ -161,9 +269,14 @@ export function setupWebsocket(
         });
       });
 
-    socket.on(
-      'conversation:join',
-      async ({ conversationId, after }, acknowledge) => {
+    socket.on('conversation:join', async (payload, acknowledge) => {
+      if (!isValidConversationJoin(payload)) {
+        acknowledge?.(false);
+        emitInvalidSocketPayload(socket);
+        return;
+      }
+      const { conversationId, after } = payload;
+      try {
         if (
           !(await isConversationParticipant(
             conversationId,
@@ -176,33 +289,48 @@ export function setupWebsocket(
           });
           return;
         }
+        const missed =
+          after === undefined
+            ? []
+            : await listMessages(conversationId, socket.data.user.id, {
+                after,
+              });
         await socket.join(`conversation:${conversationId}`);
-        if (after !== undefined) {
-          const missed = await listMessages(
-            conversationId,
-            socket.data.user.id,
-            {
-              after,
-            }
-          );
-          missed.forEach((message) => {
-            socket.emit('conversation:message', {
-              conversationId: message.conversationId,
-              sequence: message.sequence,
-              senderId: message.senderId,
-              body: message.body,
-              clientKey: message.clientKey,
-              createdAt: message.createdAt.toISOString(),
-              attachmentMetadata: message.attachmentMetadata,
-            });
+        missed.forEach((message) => {
+          socket.emit('conversation:message', {
+            conversationId: message.conversationId,
+            sequence: message.sequence,
+            senderId: message.senderId,
+            body: message.body,
+            clientKey: message.clientKey,
+            createdAt: message.createdAt.toISOString(),
+            attachmentMetadata: message.attachmentMetadata,
           });
-        }
+        });
         acknowledge?.(true);
+      } catch (error) {
+        acknowledge?.(false);
+        socket.emit('conversation:error', socketError(error));
       }
-    );
+    });
 
     socket.on('conversation:message', async (payload) => {
+      if (!isValidConversationMessage(payload)) {
+        emitInvalidSocketPayload(socket);
+        return;
+      }
       try {
+        if (
+          !(await isConversationParticipant(
+            payload.conversationId,
+            socket.data.user.id
+          ))
+        ) {
+          socket.emit('conversation:error', {
+            message: 'messaging.errors.forbidden',
+          });
+          return;
+        }
         const result = await sendMessageWithStatus({
           conversationId: payload.conversationId,
           senderId: socket.data.user.id,
@@ -264,23 +392,28 @@ export function setupWebsocket(
           );
         }
       } catch (error) {
-        socket.emit('conversation:error', {
-          message:
-            error instanceof Error ? error.message : 'messaging.errors.failed',
-        });
+        socket.emit('conversation:error', socketError(error));
       }
     });
 
-    socket.on('conversation:read', async ({ conversationId, sequence }) => {
-      if (
-        !(await isConversationParticipant(conversationId, socket.data.user.id))
-      ) {
-        socket.emit('conversation:error', {
-          message: 'messaging.errors.forbidden',
-        });
+    socket.on('conversation:read', async (payload) => {
+      if (!isValidConversationRead(payload)) {
+        emitInvalidSocketPayload(socket);
         return;
       }
       try {
+        const { conversationId, sequence } = payload;
+        if (
+          !(await isConversationParticipant(
+            conversationId,
+            socket.data.user.id
+          ))
+        ) {
+          socket.emit('conversation:error', {
+            message: 'messaging.errors.forbidden',
+          });
+          return;
+        }
         await markConversationRead(
           conversationId,
           socket.data.user.id,
@@ -288,10 +421,7 @@ export function setupWebsocket(
         );
         await markMessageNotificationsRead(conversationId, socket.data.user.id);
       } catch (error) {
-        socket.emit('conversation:error', {
-          message:
-            error instanceof Error ? error.message : 'messaging.errors.failed',
-        });
+        socket.emit('conversation:error', socketError(error));
       }
     });
 

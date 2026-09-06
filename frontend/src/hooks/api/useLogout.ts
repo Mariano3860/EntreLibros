@@ -1,13 +1,16 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
 import { logout } from '@src/api/auth/logout.service'
 import { AuthQueryKeys, HOME_URLS } from '@src/constants/constants'
+import { translateApiError } from '@src/utils/apiError'
 
 export const useLogout = () => {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: logout,
@@ -17,7 +20,7 @@ export const useLogout = () => {
     },
     onError: (error: Error) => {
       queryClient.removeQueries({ queryKey: [AuthQueryKeys.AUTH] })
-      toast.error(`Error: ${error.message}`)
+      toast.error(translateApiError(t, error, 'auth.errors.unknown'))
     },
     retry: false,
   })

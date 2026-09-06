@@ -43,6 +43,9 @@
       "loginContact": "Iniciar sesión para contactar"
     }
   },
+  "errors": {
+    "internal": "Ocurrió un error inesperado. Intentá nuevamente."
+  },
   "theme": {
     "mode": {
       "dark": "Modo oscuro",
@@ -60,6 +63,13 @@
     "contact": "Contacto",
     "help": "Ayuda"
   },
+  "books": {
+    "errors": {
+      "query_required": "Ingresá una búsqueda de libros.",
+      "query_too_long": "Usá una búsqueda de libros más corta.",
+      "search_unavailable": "La búsqueda de libros no está disponible temporalmente."
+    }
+  },
   "contact": {
     "title": "Contáctanos",
     "name_label": "Nombre",
@@ -71,6 +81,9 @@
     "submit_button": "Enviar mensaje",
     "success": {
       "submitted": "¡Gracias por tu mensaje! Te responderemos lo antes posible."
+    },
+    "errors": {
+      "submit_failed": "No se pudo enviar tu mensaje. Intentá nuevamente."
     }
   },
   "form": {
@@ -411,7 +424,8 @@
       "consent_required": "Confirmá los consentimientos para publicar.",
       "content_not_allowed": "El contenido no cumple las reglas de publicación.",
       "suspicious_link": "Revisá los enlaces incluidos antes de publicar.",
-      "duplicate": "Ya tenés una publicación igual activa."
+      "duplicate": "Ya tenés una publicación igual activa.",
+      "admin_required": "Necesitás permisos de administrador para verificar libros."
     },
     "previewAlt": "Vista previa de la portada"
   },
@@ -923,6 +937,15 @@
       "following": "Siguiendo",
       "emptySuggestions": "Completá tus intereses o ubicación para encontrar lectores afines."
     },
+    "follow": {
+      "errors": {
+        "failed": "No se pudo actualizar el seguimiento. Intentá nuevamente."
+      }
+    },
+    "social": {
+      "comment_failed": "No se pudo publicar el comentario. Intentá nuevamente.",
+      "comment_invalid": "Ingresá un comentario válido."
+    },
     "story": {
       "title": "Compartir una historia",
       "description": "Compartí algo relacionado con los libros y la comunidad.",
@@ -934,7 +957,17 @@
       "cancel": "Cancelar",
       "publish": "Publicar historia",
       "publishing": "Publicando...",
+      "create_failed": "No se pudo publicar la historia. Intentá nuevamente.",
+      "body_required": "Escribí algo antes de publicar la historia.",
+      "book_invalid": "El libro seleccionado ya no está disponible.",
       "error": "No se pudo publicar la historia. Intentá de nuevo."
+    }
+  },
+  "messaging": {
+    "errors": {
+      "invalid_payload": "La solicitud del mensaje no es válida.",
+      "failed": "No se pudo procesar el mensaje. Intentá nuevamente.",
+      "forbidden": "No tenés permiso para acceder a esta conversación."
     }
   },
   "map": {
@@ -1167,6 +1200,12 @@
       "reminderTitle": "Recordatorio de encuentro",
       "reminderBody": "Tu encuentro con {{name}} es dentro de 24 horas.",
       "reminderWith": "Encuentro con {{name}} dentro de 24 horas"
+    },
+    "errors": {
+      "failed": "No se pudieron actualizar las notificaciones. Intentá nuevamente.",
+      "id_required": "Elegí una notificación válida.",
+      "not_found": "Esa notificación ya no está disponible.",
+      "preference_invalid": "Elegí una preferencia de notificaciones válida."
     }
   },
   "user": {
@@ -1175,7 +1214,8 @@
       "unauthenticated": "Necesitás iniciar sesión.",
       "profile_update_failed": "No se pudieron guardar los cambios del perfil.",
       "invalid_search": "Ingresá una búsqueda válida.",
-      "search_failed": "No se pudo buscar personas. Intentá nuevamente."
+      "search_failed": "No se pudo buscar personas. Intentá nuevamente.",
+      "language_update_failed": "No se pudo actualizar el idioma. Intentá nuevamente."
     }
   },
   "reports": {

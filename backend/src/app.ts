@@ -17,6 +17,7 @@ import { csrfProtection, getFrontendUrl } from './security.js';
 import notificationsRouter from './routes/notifications.js';
 import reportsRouter from './routes/reports.js';
 import { registerNotificationEvents } from './services/notifications.js';
+import { publicErrorHandler } from './utils/publicErrors.js';
 
 const app = express();
 registerNotificationEvents();
@@ -64,5 +65,6 @@ app.use('/api/messages', messagesRouter);
 app.use('/api/agreements', agreementsRouter);
 app.use('/api/notifications', notificationsRouter);
 app.use('/api/reports', reportsRouter);
+app.use(publicErrorHandler);
 
 export default app;

@@ -38,6 +38,11 @@ import {
 } from '../repositories/userFollowRepository.js';
 import { findUserById, hasUserBlock } from '../repositories/userRepository.js';
 import { getMvpMetrics } from '../services/mvpMetrics.js';
+import {
+  asyncHandler,
+  logPublicError,
+  publicErrorResponse,
+} from '../utils/publicErrors.js';
 
 const router = Router();
 
@@ -440,7 +445,10 @@ router.get(
       }
       return res.json(await listCommunityComments(post, req.user?.id));
     } catch (error) {
-      console.error('Failed to list community comments', error);
+      logPublicError('Failed to list community comments', error, {
+        postType: post.type,
+        postId: post.id,
+      });
       return res.status(500).json({
         error: 'CommunityCommentsFailed',
         message: 'community.social.comments_failed',
@@ -481,15 +489,26 @@ router.post(
       });
       return res.status(201).json(comment);
     } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : 'community.social.comment_failed';
-      const status = message === 'community.social.comment_invalid' ? 422 : 500;
-      return res.status(status).json({
-        error: 'CommunityCommentError',
-        message,
+      const response = publicErrorResponse(
+        error,
+        {
+          status: 500,
+          code: 'CommunityCommentError',
+          key: 'community.social.comment_failed',
+        },
+        {
+          'community.social.comment_invalid': {
+            status: 422,
+            code: 'CommunityCommentError',
+            key: 'community.social.comment_invalid',
+          },
+        }
+      );
+      logPublicError('Failed to create community comment', error, {
+        userId: req.user.id,
+        postId: post.id,
       });
+      return res.status(response.status).json(response.body);
     }
   }
 );
@@ -515,16 +534,30 @@ router.post(
       });
       return res.status(201).json(story);
     } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : 'community.story.create_failed';
-      const status =
-        message === 'community.story.body_required' ||
-        message === 'community.story.book_invalid'
-          ? 422
-          : 500;
-      return res.status(status).json({ error: 'CommunityStoryError', message });
+      const response = publicErrorResponse(
+        error,
+        {
+          status: 500,
+          code: 'CommunityStoryError',
+          key: 'community.story.create_failed',
+        },
+        {
+          'community.story.body_required': {
+            status: 422,
+            code: 'CommunityStoryError',
+            key: 'community.story.body_required',
+          },
+          'community.story.book_invalid': {
+            status: 422,
+            code: 'CommunityStoryError',
+            key: 'community.story.book_invalid',
+          },
+        }
+      );
+      logPublicError('Failed to create community story', error, {
+        userId: req.user.id,
+      });
+      return res.status(response.status).json(response.body);
     }
   }
 );
@@ -581,35 +614,61 @@ router.get(
 router.post(
   '/follows/:id',
   authenticate,
-  async (req: AuthenticatedRequest, res) => {
+  asyncHandler(async (req: AuthenticatedRequest, res) => {
     if (!req.user) {
       return res.status(401).json({
         error: 'Unauthorized',
         message: 'auth.errors.unauthorized',
       });
     }
-    const targetId = await validateFollowTarget(req, res);
-    if (!targetId) return;
-    await followUser(req.user.id, targetId);
-    return res.status(201).json({ following: true, userId: String(targetId) });
-  }
+    try {
+      const targetId = await validateFollowTarget(req, res);
+      if (!targetId) return;
+      await followUser(req.user.id, targetId);
+      return res
+        .status(201)
+        .json({ following: true, userId: String(targetId) });
+    } catch (error) {
+      logPublicError('Failed to follow user', error, {
+        userId: req.user.id,
+      });
+      const response = publicErrorResponse(error, {
+        status: 500,
+        code: 'FollowError',
+        key: 'community.follow.errors.failed',
+      });
+      return res.status(response.status).json(response.body);
+    }
+  })
 );
 
 router.delete(
   '/follows/:id',
   authenticate,
-  async (req: AuthenticatedRequest, res) => {
+  asyncHandler(async (req: AuthenticatedRequest, res) => {
     if (!req.user) {
       return res.status(401).json({
         error: 'Unauthorized',
         message: 'auth.errors.unauthorized',
       });
     }
-    const targetId = await validateFollowTarget(req, res);
-    if (!targetId) return;
-    await unfollowUser(req.user.id, targetId);
-    return res.json({ following: false, userId: String(targetId) });
-  }
+    try {
+      const targetId = await validateFollowTarget(req, res);
+      if (!targetId) return;
+      await unfollowUser(req.user.id, targetId);
+      return res.json({ following: false, userId: String(targetId) });
+    } catch (error) {
+      logPublicError('Failed to unfollow user', error, {
+        userId: req.user.id,
+      });
+      const response = publicErrorResponse(error, {
+        status: 500,
+        code: 'FollowError',
+        key: 'community.follow.errors.failed',
+      });
+      return res.status(response.status).json(response.body);
+    }
+  })
 );
 
 export default router;

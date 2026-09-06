@@ -16,6 +16,11 @@ npm run dev:backend
 El servidor escucha normalmente en `http://localhost:4000`. La configuracion se
 carga con `dotenv`; no guardes `.env` ni credenciales en el repositorio.
 
+Las consultas a proveedores externos tienen un timeout configurable de 5 segundos
+por defecto (maximo 60 segundos): `OPEN_LIBRARY_TIMEOUT_MS` para Open Library y
+`GEOCODING_TIMEOUT_MS` para Nominatim. Los fallos inesperados se registran solo
+en el log del backend y las respuestas HTTP/Socket.IO conservan claves publicas.
+
 ## Migraciones
 
 Las migraciones se ejecutan en orden y son append-only. Las versiones 031-034
@@ -46,6 +51,8 @@ No ejecutes la semilla sobre una base de produccion.
 - `POST /api/agreements/:id/outcome` registra el resultado privado de una parte.
 - `POST /api/reports` recibe reportes autenticados con categorias controladas.
 - `GET /api/community/metrics` devuelve el contrato de metricas del MVP.
+- `POST /api/books/:id/verify` requiere una sesion con rol `admin`; los mensajes
+  de error publicos son claves i18n y no incluyen detalles de SQL/proveedores.
 
 ## Comandos
 

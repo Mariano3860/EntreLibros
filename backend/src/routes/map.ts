@@ -7,6 +7,7 @@ import {
   type MapFilters,
   type MapQuery,
 } from '../services/map.js';
+import { logPublicError } from '../utils/publicErrors.js';
 
 const router = Router();
 
@@ -79,9 +80,7 @@ router.get('/geocode', async (req, res) => {
     );
     return res.json(suggestions);
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-
-    console.error('Geocoding request failed', message);
+    logPublicError('Geocoding request failed', error);
     return res.status(502).json({
       error: 'GeocodingUnavailable',
       message: 'map.errors.geocoding_unavailable',
@@ -191,9 +190,7 @@ router.get('/', async (req, res) => {
     const payload = await getMapData(mapQuery);
     return res.json(payload);
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-
-    console.error('Map data generation failed', message);
+    logPublicError('Map data generation failed', error);
     return res.status(500).json({
       error: 'MapGenerationFailed',
       message: 'map.errors.map_unavailable',

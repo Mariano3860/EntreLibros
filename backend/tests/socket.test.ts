@@ -239,4 +239,36 @@ describe('websocket messaging', () => {
     authorized.close();
     outsider.close();
   }, 10000);
+
+  test('rejects invalid payloads and hides unexpected messaging errors', async () => {
+    const invalidPayload = new Promise<void>((resolve) => {
+      clientSocket.once('conversation:error', (payload) => {
+        expect(payload.message).toBe('messaging.errors.invalid_payload');
+        resolve();
+      });
+    });
+    clientSocket.emit('conversation:message', {
+      conversationId: 101,
+      clientKey: 'too-large',
+      body: 'x'.repeat(4001),
+    });
+    await invalidPayload;
+
+    vi.mocked(messagingRepo.sendMessageWithStatus).mockRejectedValueOnce(
+      new Error('SQL connection details')
+    );
+    const unexpectedFailure = new Promise<void>((resolve) => {
+      clientSocket.once('conversation:error', (payload) => {
+        expect(payload.message).toBe('messaging.errors.failed');
+        expect(payload.message).not.toContain('SQL connection details');
+        resolve();
+      });
+    });
+    clientSocket.emit('conversation:message', {
+      conversationId: 101,
+      clientKey: 'unexpected-error',
+      body: 'hello',
+    });
+    await unexpectedFailure;
+  });
 });

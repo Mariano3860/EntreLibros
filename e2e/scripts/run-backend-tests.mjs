@@ -20,17 +20,32 @@ const environment = getE2EProcessEnv({
   NODE_ENV: "test",
 });
 
-const databaseStatus = run(
-  process.execPath,
-  ["e2e/scripts/database.mjs", "reset-empty"],
-  environment,
-);
-if (databaseStatus !== 0) {
-  process.exitCode = databaseStatus;
-  process.exit();
+let status = 1;
+
+try {
+  const databaseStatus = run(
+    process.execPath,
+    ["e2e/scripts/database.mjs", "reset-empty"],
+    environment,
+  );
+
+  if (databaseStatus === 0) {
+    console.log("E2E_BACKEND_TESTS_START database=e2e");
+    status = run(npmCommand, ["run", "test:backend"], environment);
+    console.log(`E2E_BACKEND_TESTS_END status=${status}`);
+  } else {
+    status = databaseStatus;
+  }
+} finally {
+  const cleanupStatus = run(
+    process.execPath,
+    ["e2e/scripts/database.mjs", "cleanup"],
+    environment,
+  );
+
+  if (status === 0 && cleanupStatus !== 0) {
+    status = cleanupStatus;
+  }
 }
 
-console.log("E2E_BACKEND_TESTS_START database=e2e");
-const status = run(npmCommand, ["run", "test:backend"], environment);
-console.log(`E2E_BACKEND_TESTS_END status=${status}`);
 process.exitCode = status;

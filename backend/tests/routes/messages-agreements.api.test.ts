@@ -62,6 +62,24 @@ describe('messaging and agreements API', () => {
       });
 
     await request(app)
+      .post('/api/messages/1/messages')
+      .set('Cookie', first.cookie)
+      .send({ clientKey: 'too-large', body: 'x'.repeat(4001) })
+      .expect(422)
+      .expect(({ body }) => {
+        expect(body.message).toBe('messaging.errors.invalid_message');
+      });
+
+    await request(app)
+      .post('/api/messages/1/messages')
+      .set('Cookie', first.cookie)
+      .send({ clientKey: ' ', body: 'hello' })
+      .expect(422)
+      .expect(({ body }) => {
+        expect(body.message).toBe('messaging.errors.invalid_message');
+      });
+
+    await request(app)
       .post('/api/messages/conversations')
       .set('Cookie', first.cookie)
       .send({ participantId: 'not-a-number' })

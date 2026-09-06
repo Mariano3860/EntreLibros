@@ -116,7 +116,7 @@ export async function getPublicationById(
   id: number,
   viewerId?: number
 ): Promise<Publication | null> {
-  const listing = await getBookListingById(id);
+  const listing = await getBookListingById(id, viewerId);
   if (!listing) {
     return null;
   }

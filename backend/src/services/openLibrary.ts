@@ -1,3 +1,8 @@
+import {
+  configuredExternalRequestTimeout,
+  fetchWithTimeout,
+} from '../utils/fetchWithTimeout.js';
+
 export interface ApiBookSearchResult {
   id: string;
   title: string;
@@ -36,7 +41,12 @@ const DEFAULT_FETCH_INIT: RequestInit = {
 };
 
 async function getJson<T>(url: string, fetchFn: typeof fetch): Promise<T> {
-  const res = await fetchFn(url, DEFAULT_FETCH_INIT);
+  const res = await fetchWithTimeout(
+    fetchFn,
+    url,
+    DEFAULT_FETCH_INIT,
+    configuredExternalRequestTimeout('OPEN_LIBRARY_TIMEOUT_MS')
+  );
   if (!res.ok) {
     throw new Error(
       `OpenLibrary request failed ${res.status} ${res.statusText}`
@@ -97,7 +107,12 @@ export async function checkBookExists(
   if (isbn) {
     try {
       const byIsbnUrl = `https://openlibrary.org/isbn/${encodeURIComponent(isbn)}.json`;
-      const res = await fetchFn(byIsbnUrl, DEFAULT_FETCH_INIT);
+      const res = await fetchWithTimeout(
+        fetchFn,
+        byIsbnUrl,
+        DEFAULT_FETCH_INIT,
+        configuredExternalRequestTimeout('OPEN_LIBRARY_TIMEOUT_MS')
+      );
       if (res.ok) return true;
       if (res.status !== 404) {
         // Non\-404 error, fall through to search

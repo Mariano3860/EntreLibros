@@ -149,4 +149,30 @@ describe('openLibrary service (fully mocked)', () => {
 
     expect(exists).toBe(false);
   });
+
+  test('aborts a provider request after the configured timeout', async () => {
+    const previousTimeout = process.env.OPEN_LIBRARY_TIMEOUT_MS;
+    process.env.OPEN_LIBRARY_TIMEOUT_MS = '5';
+    const mockFetch = vi.fn(
+      (_url: string, init?: RequestInit) =>
+        new Promise<Response>((_resolve, reject) => {
+          init?.signal?.addEventListener('abort', () =>
+            reject(new DOMException('The operation was aborted', 'AbortError'))
+          );
+        })
+    );
+
+    try {
+      await expect(
+        searchBooksApiResults('slow query', mockFetch as typeof fetch)
+      ).rejects.toMatchObject({ name: 'AbortError' });
+      expect(mockFetch.mock.calls[0]?.[1]?.signal).toBeInstanceOf(AbortSignal);
+    } finally {
+      if (previousTimeout === undefined) {
+        delete process.env.OPEN_LIBRARY_TIMEOUT_MS;
+      } else {
+        process.env.OPEN_LIBRARY_TIMEOUT_MS = previousTimeout;
+      }
+    }
+  });
 });

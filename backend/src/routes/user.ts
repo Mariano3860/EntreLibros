@@ -22,6 +22,11 @@ import {
   isProfileNeighborhood,
   type ProfileCity,
 } from '../constants/profileCatalog.js';
+import {
+  asyncHandler,
+  logPublicError,
+  publicErrorResponse,
+} from '../utils/publicErrors.js';
 
 const router = Router();
 
@@ -153,7 +158,7 @@ router.get('/search', authenticate, async (req: AuthenticatedRequest, res) => {
 
 router.get('/profile/:id', async (req, res) => {
   const id = Number(req.params.id);
-  if (!Number.isInteger(id) || id <= 0) {
+  if (!Number.isSafeInteger(id) || id <= 0) {
     return res.status(404).json({
       error: 'NotFound',
       message: 'user.errors.profile_not_found',
@@ -414,9 +419,10 @@ router.patch(
 router.post(
   '/language',
   authenticate,
-  async (req: AuthenticatedRequest, res) => {
-    const { language } = req.body as { language?: string };
-    if (!language) {
+  asyncHandler(async (req: AuthenticatedRequest, res) => {
+    const language =
+      typeof req.body?.language === 'string' ? req.body.language.trim() : '';
+    if (!language || language.length > 10) {
       return res.status(400).json({
         error: 'MissingFields',
         message: 'user.errors.missing_language',
@@ -428,9 +434,21 @@ router.post(
         message: 'user.errors.unauthenticated',
       });
     }
-    await updateUserLanguage(req.user.id, language);
-    res.json({ language });
-  }
+    try {
+      await updateUserLanguage(req.user.id, language);
+      return res.json({ language });
+    } catch (error) {
+      logPublicError('Failed to update user language', error, {
+        userId: req.user.id,
+      });
+      const response = publicErrorResponse(error, {
+        status: 500,
+        code: 'UserLanguageError',
+        key: 'user.errors.language_update_failed',
+      });
+      return res.status(response.status).json(response.body);
+    }
+  })
 );
 
 export default router;
