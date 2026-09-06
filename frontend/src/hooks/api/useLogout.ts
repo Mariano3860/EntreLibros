@@ -1,11 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
 import { logout } from '@src/api/auth/logout.service'
 import { AuthQueryKeys, HOME_URLS } from '@src/constants/constants'
 import { translateApiError } from '@src/utils/apiError'
-import { useTranslation } from 'react-i18next'
 
 export const useLogout = () => {
   const queryClient = useQueryClient()
