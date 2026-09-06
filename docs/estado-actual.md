@@ -69,6 +69,16 @@ La matriz de requisitos y la evidencia se mantienen en
 - La prueba manual de teclado, contraste, responsive y estilo debe repetirse en
   los viewport de entrega. Vitest/Testing Library no sustituyen esa revision.
 
+## Baseline E2E
+
+El recorrido reproducible con navegador real esta en
+[`e2e-baseline.md`](e2e-baseline.md). Usa Docker Compose con PostgreSQL/PostGIS
+aislado, aplica las migraciones, carga un seed sintetico, arranca backend y
+frontend en puertos E2E, y conserva diagnosticos de Playwright solo cuando
+hay fallos. `npm run verify:ci` combina las comprobaciones no mutantes con los
+tests de backend y frontend, los builds y Playwright; los `complete-check` de
+paquete siguen disponibles por separado.
+
 ## Comprobacion manual minima
 
 1. Ejecutar `npm run migrate` sobre una base aislada y arrancar `npm run dev`.

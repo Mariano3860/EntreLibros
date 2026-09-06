@@ -1,0 +1,72 @@
+name: CI E2E baseline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths:
+      - "e2e/**"
+      - "backend/**"
+      - "frontend/**"
+      - "docs/e2e-baseline.md"
+      - "docker-compose.e2e.yml"
+      - "package.json"
+      - "package-lock.json"
+      - "playwright.config.ts"
+      - ".github/workflows/ci-e2e.yml"
+
+concurrency:
+  group: e2e-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CI: "true"
+      E2E_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:55432/entrelibros_e2e
+      E2E_DB_PORT: "55432"
+      E2E_BACKEND_URL: http://127.0.0.1:4400
+      E2E_FRONTEND_URL: http://127.0.0.1:4300
+      E2E_COMPOSE_PROJECT: entrelibros-e2e
+      E2E_COMPOSE_FILE: docker-compose.e2e.yml
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.19.0
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Prepare E2E database
+        run: |
+          npm run e2e:db:up
+          npm run e2e:db:reset
+
+      - name: Run complete non-mutating verification
+        run: npm run verify:ci
+
+      - name: Upload E2E diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-baseline-${{ github.run_attempt }}
+          path: |
+            test-results/e2e/
+            playwright-report/
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Cleanup E2E database
+        if: always()
+        run: npm run e2e:db:cleanup
