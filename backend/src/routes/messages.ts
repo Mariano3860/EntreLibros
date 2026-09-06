@@ -28,8 +28,13 @@ import {
 import { markMessageNotificationsRead } from '../repositories/notificationRepository.js';
 import { notifyMessageRecipients } from '../services/notifications.js';
 import { recordAnalyticsEvent } from '../repositories/analyticsRepository.js';
+import { logPublicError, publicErrorResponse } from '../utils/publicErrors.js';
 
 const router = Router();
+const MAX_MESSAGE_BODY_LENGTH = 4_000;
+const MAX_MESSAGE_CLIENT_KEY_LENGTH = 160;
+const MAX_ATTACHMENT_SIZE = 10_000_000;
+const MAX_ATTACHMENT_TEXT_LENGTH = 240;
 
 function asPositiveInteger(value: unknown): number | null {
   if (typeof value !== 'string' || !/^\d+$/.test(value)) return null;
@@ -55,7 +60,11 @@ function asMessageBookAttachment(value: unknown): MessageBookAttachment | null {
     typeof book.id !== 'string' ||
     typeof book.title !== 'string' ||
     typeof book.author !== 'string' ||
-    typeof book.coverUrl !== 'string'
+    typeof book.coverUrl !== 'string' ||
+    book.id.length > MAX_ATTACHMENT_TEXT_LENGTH ||
+    book.title.length > MAX_ATTACHMENT_TEXT_LENGTH ||
+    book.author.length > MAX_ATTACHMENT_TEXT_LENGTH ||
+    book.coverUrl.length > 2_000
   ) {
     return null;
   }
@@ -77,7 +86,14 @@ function asAgreementDetails(value: unknown): MessageAgreementDetails | null {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
   const details = value as Record<string, unknown>;
   const fields = ['meetingPoint', 'area', 'date', 'time', 'bookTitle'];
-  if (!fields.every((field) => typeof details[field] === 'string')) {
+  if (
+    !fields.every(
+      (field) =>
+        typeof details[field] === 'string' &&
+        (details[field] as string).trim().length > 0 &&
+        (details[field] as string).length <= MAX_ATTACHMENT_TEXT_LENGTH
+    )
+  ) {
     return null;
   }
   return {
@@ -97,7 +113,12 @@ function asAttachmentMetadata(value: unknown): MessageAttachment | null {
     typeof metadata.contentType !== 'string' ||
     typeof metadata.size !== 'number' ||
     !Number.isSafeInteger(metadata.size) ||
-    metadata.size < 1
+    metadata.size < 1 ||
+    metadata.size > MAX_ATTACHMENT_SIZE ||
+    metadata.key.length > MAX_ATTACHMENT_TEXT_LENGTH ||
+    metadata.contentType.length > MAX_ATTACHMENT_TEXT_LENGTH ||
+    (typeof metadata.name === 'string' &&
+      metadata.name.length > MAX_ATTACHMENT_TEXT_LENGTH)
   ) {
     return null;
   }
@@ -205,6 +226,11 @@ function asDraftAttachment(value: unknown): MessageDraftAttachment | null {
     typeof metadata.size !== 'number' ||
     !Number.isSafeInteger(metadata.size) ||
     metadata.size < 1 ||
+    metadata.size > MAX_ATTACHMENT_SIZE ||
+    metadata.key.length > MAX_ATTACHMENT_TEXT_LENGTH ||
+    metadata.contentType.length > MAX_ATTACHMENT_TEXT_LENGTH ||
+    (typeof metadata.name === 'string' &&
+      metadata.name.length > MAX_ATTACHMENT_TEXT_LENGTH) ||
     metadata.kind !== 'agreementProposal'
   ) {
     return null;
@@ -270,25 +296,59 @@ function toConversationBook(listing: BookListing) {
 }
 
 function errorResponse(error: unknown) {
-  const message = error instanceof Error ? error.message : '';
-  const key = /^(?:messaging|agreements)\.errors\.[a-z_]+$/.test(message)
-    ? message
-    : 'messaging.errors.failed';
-  const status =
-    key === 'messaging.errors.forbidden' ||
-    key === 'agreements.errors.forbidden'
-      ? 403
-      : key === 'messaging.errors.draft_not_found'
-        ? 404
-        : key === 'messaging.errors.draft_conflict' ||
-            key === 'agreements.errors.conflict'
-          ? 409
-          : key === 'agreements.errors.not_found'
-            ? 404
-            : key === 'messaging.errors.failed'
-              ? 500
-              : 422;
-  return { status, body: { error: 'MessagingError', message: key } };
+  logPublicError('Messaging operation failed', error);
+  const keys = [
+    'messaging.errors.bot_not_configured',
+    'messaging.errors.body_required',
+    'messaging.errors.client_key_required',
+    'messaging.errors.contacts_failed',
+    'messaging.errors.conversation_required',
+    'messaging.errors.draft_attachment_invalid',
+    'messaging.errors.draft_conflict',
+    'messaging.errors.draft_not_found',
+    'messaging.errors.failed',
+    'messaging.errors.forbidden',
+    'messaging.errors.invalid_attachment',
+    'messaging.errors.invalid_draft',
+    'messaging.errors.invalid_sequence',
+    'messaging.errors.list_failed',
+    'messaging.errors.not_found',
+    'messaging.errors.participant_required',
+    'messaging.errors.participants_required',
+    'messaging.errors.self_conversation',
+    'agreements.errors.conflict',
+    'agreements.errors.forbidden',
+    'agreements.errors.not_found',
+  ];
+  const mappings = Object.fromEntries(
+    keys.map((key) => [
+      key,
+      {
+        status:
+          key === 'messaging.errors.forbidden' ||
+          key === 'agreements.errors.forbidden'
+            ? 403
+            : key === 'messaging.errors.draft_not_found' ||
+                key === 'agreements.errors.not_found'
+              ? 404
+              : key === 'messaging.errors.draft_conflict' ||
+                  key === 'agreements.errors.conflict'
+                ? 409
+                : key === 'messaging.errors.failed' ||
+                    key === 'messaging.errors.contacts_failed' ||
+                    key === 'messaging.errors.list_failed'
+                  ? 500
+                  : 422,
+        code: 'MessagingError',
+        key,
+      },
+    ])
+  );
+  return publicErrorResponse(
+    error,
+    { status: 500, code: 'MessagingError', key: 'messaging.errors.failed' },
+    mappings
+  );
 }
 
 router.use(authenticate);
@@ -302,7 +362,10 @@ router.get('/', async (req: AuthenticatedRequest, res) => {
   }
   try {
     return res.json({ conversations: await listConversations(req.user.id) });
-  } catch {
+  } catch (error) {
+    logPublicError('Failed to list conversations', error, {
+      userId: req.user.id,
+    });
     return res.status(500).json({
       error: 'MessagingError',
       message: 'messaging.errors.list_failed',
@@ -323,7 +386,10 @@ router.get('/contacts', async (req: AuthenticatedRequest, res) => {
       asSearchParam(req.query.search)
     );
     return res.json({ contacts });
-  } catch {
+  } catch (error) {
+    logPublicError('Failed to search messaging contacts', error, {
+      userId: req.user.id,
+    });
     return res.status(500).json({
       error: 'MessagingError',
       message: 'messaging.errors.contacts_failed',
@@ -420,6 +486,7 @@ router.put('/:conversationId/draft', async (req: AuthenticatedRequest, res) => {
   if (
     !conversationId ||
     typeof draftBody !== 'string' ||
+    draftBody.length > MAX_MESSAGE_BODY_LENGTH ||
     (revision !== undefined &&
       (typeof revision !== 'number' ||
         !Number.isSafeInteger(revision) ||
@@ -492,6 +559,8 @@ router.post(
     if (
       !conversationId ||
       typeof body.clientKey !== 'string' ||
+      body.clientKey.trim().length === 0 ||
+      body.clientKey.length > MAX_MESSAGE_CLIENT_KEY_LENGTH ||
       (revision !== undefined &&
         (typeof revision !== 'number' ||
           !Number.isSafeInteger(revision) ||
@@ -598,9 +667,9 @@ router.get(
     const after = req.query.after ? Number(req.query.after) : undefined;
     const limit = req.query.limit ? Number(req.query.limit) : undefined;
     if (
-      (after !== undefined && (!Number.isInteger(after) || after < 0)) ||
+      (after !== undefined && (!Number.isSafeInteger(after) || after < 0)) ||
       (limit !== undefined &&
-        (!Number.isInteger(limit) || limit < 1 || limit > 100))
+        (!Number.isSafeInteger(limit) || limit < 1 || limit > 100))
     ) {
       return res.status(422).json({
         error: 'ValidationError',
@@ -636,7 +705,10 @@ router.post(
     if (
       !conversationId ||
       typeof body.clientKey !== 'string' ||
-      typeof body.body !== 'string'
+      typeof body.body !== 'string' ||
+      body.clientKey.trim().length === 0 ||
+      body.clientKey.length > MAX_MESSAGE_CLIENT_KEY_LENGTH ||
+      body.body.length > MAX_MESSAGE_BODY_LENGTH
     ) {
       return res.status(422).json({
         error: 'ValidationError',

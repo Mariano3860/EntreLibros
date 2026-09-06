@@ -100,7 +100,7 @@ describe('LoginForm', () => {
     expect(showToastMock).toHaveBeenCalled()
   })
 
-  test('handles error with custom message', () => {
+  test('uses the localized fallback for an unexpected message', () => {
     mockMutate.mockImplementation((_data, { onError }) => {
       onError?.(new Error('Custom error message'))
     })
@@ -115,6 +115,6 @@ describe('LoginForm', () => {
     })
     fireEvent.click(screen.getByRole('button', { name: 'login' }))
 
-    expect(showToastMock).toHaveBeenCalledWith('Custom error message', 'error')
+    expect(showToastMock).toHaveBeenCalledWith('auth.errors.unknown', 'error')
   })
 })

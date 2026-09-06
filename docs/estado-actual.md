@@ -24,6 +24,10 @@ La matriz de requisitos y la evidencia se mantienen en
   venta y búsqueda) con filtros, orden, conteos y paginación; el índice personal
   no reutiliza el catálogo público. Los visitantes conservan el descubrimiento
   público y el detalle de una publicación, sin acceso a las relaciones privadas.
+- Seguridad y robustez: `POST /api/books/:id/verify` exige rol administrativo;
+  las respuestas de las superficies cubiertas usan claves i18n estables, los
+  payloads de conversacion tienen limites server-side y Open Library/Nominatim
+  usan timeouts cancelables configurables.
 - Rincones: alta, edicion, normas, horario, consentimiento, visibilidad,
   aprobacion y pausa/reactivacion reversible.
 - Descubrimiento: mapa y listado real comparten filtros, radio, orden y estados

@@ -1,4 +1,8 @@
 import { URL } from 'node:url';
+import {
+  configuredExternalRequestTimeout,
+  fetchWithTimeout,
+} from '../utils/fetchWithTimeout.js';
 
 export interface GeocodingSuggestion {
   id: string;
@@ -102,11 +106,16 @@ export const fetchGeocodingSuggestions = async (
     url.searchParams.set('accept-language', locale.trim());
   }
 
-  const response = await fetch(url, {
-    headers: {
-      'User-Agent': process.env.GEOCODING_USER_AGENT ?? DEFAULT_USER_AGENT,
+  const response = await fetchWithTimeout(
+    fetch,
+    url.toString(),
+    {
+      headers: {
+        'User-Agent': process.env.GEOCODING_USER_AGENT ?? DEFAULT_USER_AGENT,
+      },
     },
-  });
+    configuredExternalRequestTimeout('GEOCODING_TIMEOUT_MS')
+  );
 
   if (!response.ok) {
     throw new Error(`Geocoding request failed with status ${response.status}`);

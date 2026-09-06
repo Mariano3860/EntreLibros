@@ -77,6 +77,33 @@ describe('user language API', () => {
       .send({})
       .expect(400);
   });
+
+  test('rejects an oversized language value before updating the account', async () => {
+    await request(app)
+      .post('/api/auth/register')
+      .send({
+        name: 'Language User',
+        email: 'language-size@example.com',
+        password: 'Str0ng!Pass1',
+      })
+      .expect(201);
+    const loginRes = await request(app)
+      .post('/api/auth/login')
+      .send({
+        email: 'language-size@example.com',
+        password: 'Str0ng!Pass1',
+      })
+      .expect(200);
+
+    await request(app)
+      .post('/api/user/language')
+      .set('Cookie', loginRes.headers['set-cookie'][0])
+      .send({ language: 'x'.repeat(11) })
+      .expect(400)
+      .expect(({ body }) => {
+        expect(body.message).toBe('user.errors.missing_language');
+      });
+  });
 });
 
 describe('user activity API', () => {

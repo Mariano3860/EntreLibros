@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { showToast } from '@src/components/ui/toaster/Toaster'
 import { HOME_URLS } from '@src/constants/constants'
+import { translateApiError } from '@src/utils/apiError'
 
 import styles from './LoginForm.module.scss'
 import { LoginFormProps } from './LoginForm.types'
@@ -15,24 +16,6 @@ export const LoginForm = ({ onSubmit }: LoginFormProps) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const { mutate: login, isPending } = useLogin()
-
-  const getErrorMessage = (error: Error) => {
-    const errorKeyMap: Record<string, string> = {
-      invalid_credentials: 'auth.errors.invalid_credentials',
-      'auth.errors.invalid_credentials': 'auth.errors.invalid_credentials',
-    }
-
-    const translationKey = errorKeyMap[error.message]
-
-    if (translationKey) {
-      const translated = t(translationKey)
-      return translated === translationKey
-        ? t('auth.errors.unknown')
-        : translated
-    }
-
-    return error.message || t('auth.errors.unknown')
-  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -45,7 +28,7 @@ export const LoginForm = ({ onSubmit }: LoginFormProps) => {
           navigate(`/${HOME_URLS.HOME}`)
         },
         onError: (error: Error) => {
-          showToast(getErrorMessage(error), 'error')
+          showToast(translateApiError(t, error, 'auth.errors.unknown'), 'error')
         },
       }
     )

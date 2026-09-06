@@ -60,6 +60,11 @@ La matriz completa y sus referencias estan en
   la discrepancia de autorizacion de verificacion de libros queda allowlisted
   y vinculada a su proximo OpenSpec.
 
+- Pulido tecnico inicial: la verificacion de libros exige rol admin, el catalogo
+  y detalle respetan bloqueos bidireccionales, los errores publicos se normalizan
+  con claves i18n y los limites/timeout de las superficies cubiertas se validan
+  en backend.
+
 ## Prioridad P0
 
 - [x] P0-01 Recorrido real persistente: dataset y checklist real con recarga.

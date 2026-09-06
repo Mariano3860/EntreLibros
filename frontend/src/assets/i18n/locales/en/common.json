@@ -43,6 +43,9 @@
       "loginContact": "Log in to contact"
     }
   },
+  "errors": {
+    "internal": "An unexpected error occurred. Please try again."
+  },
   "theme": {
     "mode": {
       "dark": "Dark mode",
@@ -60,6 +63,13 @@
     "contact": "Contact",
     "help": "Help"
   },
+  "books": {
+    "errors": {
+      "query_required": "Enter a book search.",
+      "query_too_long": "Use a shorter book search.",
+      "search_unavailable": "Book search is temporarily unavailable."
+    }
+  },
   "contact": {
     "title": "Contact Us",
     "name_label": "Name",
@@ -71,6 +81,9 @@
     "submit_button": "Send message",
     "success": {
       "submitted": "Thanks for your message! We'll get back to you soon."
+    },
+    "errors": {
+      "submit_failed": "Your message could not be sent. Please try again."
     }
   },
   "form": {
@@ -928,6 +941,15 @@
       "following": "Following",
       "emptySuggestions": "Complete your interests or location to find readers like you."
     },
+    "follow": {
+      "errors": {
+        "failed": "Following could not be updated. Please try again."
+      }
+    },
+    "social": {
+      "comment_failed": "The comment could not be published. Please try again.",
+      "comment_invalid": "Enter a valid comment."
+    },
     "story": {
       "title": "Share a story",
       "description": "Share something related to books and the community.",
@@ -939,7 +961,17 @@
       "cancel": "Cancel",
       "publish": "Publish story",
       "publishing": "Publishing...",
-      "error": "The story could not be published. Try again."
+      "error": "The story could not be published. Try again.",
+      "create_failed": "The story could not be published. Please try again.",
+      "body_required": "Write something before publishing the story.",
+      "book_invalid": "The selected book is no longer available."
+    }
+  },
+  "messaging": {
+    "errors": {
+      "invalid_payload": "That message request is not valid.",
+      "failed": "The message could not be processed. Please try again.",
+      "forbidden": "You don't have permission to access this conversation."
     }
   },
   "map": {
@@ -1172,6 +1204,12 @@
       "reminderTitle": "Meeting reminder",
       "reminderBody": "Your meeting with {{name}} is within 24 hours.",
       "reminderWith": "Meeting with {{name}} within 24 hours"
+    },
+    "errors": {
+      "failed": "Notifications could not be updated. Please try again.",
+      "id_required": "Choose a valid notification.",
+      "not_found": "That notification is no longer available.",
+      "preference_invalid": "Choose a valid notification preference."
     }
   },
   "user": {
@@ -1180,7 +1218,8 @@
       "unauthenticated": "You need to sign in.",
       "profile_update_failed": "Your profile changes could not be saved.",
       "invalid_search": "Enter a valid search.",
-      "search_failed": "People could not be searched. Please try again."
+      "search_failed": "People could not be searched. Please try again.",
+      "language_update_failed": "The language could not be updated. Please try again."
     }
   },
   "reports": {

@@ -44,125 +44,192 @@ import { isValidImageReference } from '../services/mediaValidation.js';
 import { normalizeIsbn } from '../services/isbn.js';
 import { validateEditorialText } from '../services/editorialValidation.js';
 import { recordAnalyticsEvent } from '../repositories/analyticsRepository.js';
+import {
+  asyncHandler,
+  logPublicError,
+  publicErrorResponse,
+} from '../utils/publicErrors.js';
 
 const router = Router();
 
-router.get('/', async (_req, res) => {
-  const filters = parseCatalogFilters(_req.query);
-  if (!filters) {
-    return res.status(400).json({
-      error: 'InvalidFields',
-      message: 'books.errors.invalid_filters',
-    });
-  }
-  const viewerId = await getOptionalViewerId(_req);
-  const scope = queryText(_req.query.scope);
-  if (scope && scope !== 'all') {
-    return res.status(400).json({
-      error: 'InvalidFields',
-      message: 'books.errors.invalid_filters',
-    });
-  }
-  if (scope === 'all') {
-    const result = await listAllBookListings(filters, viewerId);
-    return res.json({
-      items: result.items.map(toPublicBookListing),
-      page: result.page,
-    });
-  }
-  const listings = await listPublicBookListings(filters, viewerId);
-  res.json(listings.map(toPublicBookListing));
-});
-
-router.get('/home', async (req, res) => {
-  const pagination = parseHomePagination(req.query);
-  if (!pagination) {
-    return res.status(400).json({
-      error: 'InvalidFields',
-      message: 'books.errors.invalid_filters',
-    });
-  }
-  try {
-    const viewerId = await getOptionalViewerId(req);
-    const result = await listHomeBookListings(viewerId, pagination);
-    return res.json({
-      items: result.items.map(toPublicBookListing),
-      page: result.page,
-    });
-  } catch (error) {
-    console.error('Failed to load home book recommendations', error);
-    return res.status(500).json({
-      error: 'HomeBooksQueryFailed',
-      message: 'books.errors.query_failed',
-    });
-  }
-});
-
-router.get('/search', async (req, res) => {
-  try {
-    const raw = (req.query.q ?? req.query.query ?? '') as string | string[];
-    const val = Array.isArray(raw) ? raw[0] : raw;
-    const q = (val ?? '').toString().trim();
-
-    if (!q) {
+router.get(
+  '/',
+  asyncHandler(async (_req, res) => {
+    const filters = parseCatalogFilters(_req.query);
+    if (!filters) {
       return res.status(400).json({
-        error: 'q_required',
-        message: 'Missing q (or query) parameter',
+        error: 'InvalidFields',
+        message: 'books.errors.invalid_filters',
+      });
+    }
+    const viewerId = await getOptionalViewerId(_req);
+    const scope = queryText(_req.query.scope);
+    if (scope && scope !== 'all') {
+      return res.status(400).json({
+        error: 'InvalidFields',
+        message: 'books.errors.invalid_filters',
+      });
+    }
+    if (scope === 'all') {
+      const result = await listAllBookListings(filters, viewerId);
+      return res.json({
+        items: result.items.map(toPublicBookListing),
+        page: result.page,
+      });
+    }
+    const listings = await listPublicBookListings(filters, viewerId);
+    res.json(listings.map(toPublicBookListing));
+  })
+);
+
+router.get(
+  '/home',
+  asyncHandler(async (req, res) => {
+    const pagination = parseHomePagination(req.query);
+    if (!pagination) {
+      return res.status(400).json({
+        error: 'InvalidFields',
+        message: 'books.errors.invalid_filters',
+      });
+    }
+    try {
+      const viewerId = await getOptionalViewerId(req);
+      const result = await listHomeBookListings(viewerId, pagination);
+      return res.json({
+        items: result.items.map(toPublicBookListing),
+        page: result.page,
+      });
+    } catch (error) {
+      logPublicError('Failed to load home book recommendations', error);
+      return res.status(500).json({
+        error: 'HomeBooksQueryFailed',
+        message: 'books.errors.query_failed',
+      });
+    }
+  })
+);
+
+router.get(
+  '/search',
+  asyncHandler(async (req, res) => {
+    try {
+      const raw = req.query.q ?? req.query.query;
+      const value = Array.isArray(raw) ? raw[0] : raw;
+      if (
+        raw !== undefined &&
+        (typeof value !== 'string' || (Array.isArray(raw) && raw.length > 1))
+      ) {
+        return res.status(400).json({
+          error: 'ValidationError',
+          message: 'books.errors.query_required',
+        });
+      }
+      const q = typeof value === 'string' ? value.trim() : '';
+
+      if (!q || q.length > MAX_CATALOG_FILTER_LENGTH) {
+        return res.status(400).json({
+          error: 'ValidationError',
+          message: q
+            ? 'books.errors.query_too_long'
+            : 'books.errors.query_required',
+        });
+      }
+
+      const results = await searchBooksApiResults(q);
+      return res.json(results);
+    } catch (error) {
+      logPublicError('Open Library search failed', error);
+      const response = publicErrorResponse(error, {
+        status: 502,
+        code: 'BookSearchUnavailable',
+        key: 'books.errors.search_unavailable',
+      });
+      return res.status(response.status).json(response.body);
+    }
+  })
+);
+
+router.post(
+  '/',
+  authenticate,
+  asyncHandler(async (req: AuthenticatedRequest, res) => {
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'Unauthorized',
+        message: 'auth.errors.unauthorized',
       });
     }
 
-    const results = await searchBooksApiResults(q);
-    return res.json(results);
-  } catch (e) {
-    return res.status(502).json({ error: `openlibrary_error: ${String(e)}` });
-  }
-});
+    const validation = validatePublishRequest(req.body);
+    if ('error' in validation) {
+      return res.status(validation.status).json(validation.error);
+    }
 
-router.post('/', authenticate, async (req: AuthenticatedRequest, res) => {
-  if (!req.user) {
-    return res.status(401).json({
-      error: 'Unauthorized',
-      message: 'auth.errors.unauthorized',
-    });
-  }
+    const { metadata, images, offer, draft, type, cornerId, consents } =
+      validation.data;
 
-  const validation = validatePublishRequest(req.body);
-  if ('error' in validation) {
-    return res.status(validation.status).json(validation.error);
-  }
+    if (
+      type === 'offer' &&
+      (await hasExactActiveBookListing({
+        userId: req.user.id,
+        type,
+        title: metadata.title,
+        author: metadata.author,
+        isbn: metadata.isbn,
+      }))
+    ) {
+      return res.status(409).json({
+        error: 'DuplicatePublication',
+        message: 'books.errors.duplicate',
+      });
+    }
 
-  const { metadata, images, offer, draft, type, cornerId, consents } =
-    validation.data;
+    let verified: boolean;
+    try {
+      verified = await checkBookExists({
+        isbn: metadata.isbn || undefined,
+        title: metadata.title || undefined,
+        author: metadata.author || undefined,
+      });
+    } catch {
+      verified = false;
+    }
 
-  if (
-    type === 'offer' &&
-    (await hasExactActiveBookListing({
-      userId: req.user.id,
-      type,
-      title: metadata.title,
-      author: metadata.author,
-      isbn: metadata.isbn,
-    }))
-  ) {
-    return res.status(409).json({
-      error: 'DuplicatePublication',
-      message: 'books.errors.duplicate',
-    });
-  }
+    if (type === 'want') {
+      const result = await createWantBookListing({
+        userId: req.user.id,
+        book: {
+          title: metadata.title,
+          author: metadata.author,
+          isbn: metadata.isbn,
+          publisher: metadata.publisher,
+          publishedYear: metadata.year,
+          verified,
+          language: metadata.language,
+          format: metadata.format,
+          coverUrl: metadata.coverUrl,
+        },
+        notes: offer.notes,
+        availability: offer.availability,
+        consents,
+      });
+      if (result.kind === 'duplicate') {
+        return res.status(409).json({
+          error: 'DuplicateWant',
+          message: 'books.errors.want_duplicate',
+        });
+      }
+      await recordAnalyticsEvent({
+        eventType: 'listing_published',
+        actorId: req.user.id,
+        entityType: 'listing',
+        entityId: String(result.listing.id),
+        idempotencyKey: `listing-published:${result.listing.id}`,
+      });
+      return res.status(201).json(toUserBookListing(result.listing));
+    }
 
-  let verified: boolean;
-  try {
-    verified = await checkBookExists({
-      isbn: metadata.isbn || undefined,
-      title: metadata.title || undefined,
-      author: metadata.author || undefined,
-    });
-  } catch {
-    verified = false;
-  }
-
-  if (type === 'want') {
-    const result = await createWantBookListing({
+    const listing = await createBookListing({
       userId: req.user.id,
       book: {
         title: metadata.title,
@@ -175,86 +242,58 @@ router.post('/', authenticate, async (req: AuthenticatedRequest, res) => {
         format: metadata.format,
         coverUrl: metadata.coverUrl,
       },
+      type,
+      condition: offer.condition,
       notes: offer.notes,
+      sale: offer.sale,
+      donation: offer.donation,
+      trade: offer.trade,
+      priceAmount: offer.priceAmount,
+      priceCurrency: offer.priceCurrency,
+      tradePreferences: offer.tradePreferences,
       availability: offer.availability,
+      isDraft: draft,
+      cornerId,
+      delivery: offer.delivery,
+      images: images.map((image, index) => ({
+        url: image.url,
+        source: image.source,
+        isPrimary: image.isPrimary ?? index === 0,
+      })),
       consents,
     });
-    if (result.kind === 'duplicate') {
-      return res.status(409).json({
-        error: 'DuplicateWant',
-        message: 'books.errors.want_duplicate',
-      });
-    }
+
     await recordAnalyticsEvent({
       eventType: 'listing_published',
       actorId: req.user.id,
       entityType: 'listing',
-      entityId: String(result.listing.id),
-      idempotencyKey: `listing-published:${result.listing.id}`,
+      entityId: String(listing.id),
+      idempotencyKey: `listing-published:${listing.id}`,
     });
-    return res.status(201).json(toUserBookListing(result.listing));
-  }
 
-  const listing = await createBookListing({
-    userId: req.user.id,
-    book: {
-      title: metadata.title,
-      author: metadata.author,
-      isbn: metadata.isbn,
-      publisher: metadata.publisher,
-      publishedYear: metadata.year,
-      verified,
-      language: metadata.language,
-      format: metadata.format,
-      coverUrl: metadata.coverUrl,
-    },
-    type,
-    condition: offer.condition,
-    notes: offer.notes,
-    sale: offer.sale,
-    donation: offer.donation,
-    trade: offer.trade,
-    priceAmount: offer.priceAmount,
-    priceCurrency: offer.priceCurrency,
-    tradePreferences: offer.tradePreferences,
-    availability: offer.availability,
-    isDraft: draft,
-    cornerId,
-    delivery: offer.delivery,
-    images: images.map((image, index) => ({
-      url: image.url,
-      source: image.source,
-      isPrimary: image.isPrimary ?? index === 0,
-    })),
-    consents,
-  });
+    res.status(201).json(toUserBookListing(listing));
+  })
+);
 
-  await recordAnalyticsEvent({
-    eventType: 'listing_published',
-    actorId: req.user.id,
-    entityType: 'listing',
-    entityId: String(listing.id),
-    idempotencyKey: `listing-published:${listing.id}`,
-  });
-
-  res.status(201).json(toUserBookListing(listing));
-});
-
-router.get('/mine', authenticate, async (req: AuthenticatedRequest, res) => {
-  if (!req.user) {
-    return res.status(401).json({
-      error: 'Unauthorized',
-      message: 'auth.errors.unauthorized',
-    });
-  }
-  const listings = await listUserBookListings(req.user.id);
-  res.json(listings.map(toUserBookListing));
-});
+router.get(
+  '/mine',
+  authenticate,
+  asyncHandler(async (req: AuthenticatedRequest, res) => {
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'Unauthorized',
+        message: 'auth.errors.unauthorized',
+      });
+    }
+    const listings = await listUserBookListings(req.user.id);
+    res.json(listings.map(toUserBookListing));
+  })
+);
 
 router.get(
   '/relations',
   authenticate,
-  async (req: AuthenticatedRequest, res) => {
+  asyncHandler(async (req: AuthenticatedRequest, res) => {
     if (!req.user) {
       return res.status(401).json({
         error: 'Unauthorized',
@@ -278,19 +317,21 @@ router.get(
         counts: result.counts,
       });
     } catch (error) {
-      console.error('Failed to load personal book relations', error);
+      logPublicError('Failed to load personal book relations', error, {
+        userId: req.user.id,
+      });
       return res.status(500).json({
         error: 'PersonalBooksQueryFailed',
         message: 'books.errors.query_failed',
       });
     }
-  }
+  })
 );
 
 router.post(
   '/:id/interest',
   authenticate,
-  async (req: AuthenticatedRequest, res) => {
+  asyncHandler(async (req: AuthenticatedRequest, res) => {
     if (!req.user) {
       return res.status(401).json({
         error: 'Unauthorized',
@@ -298,7 +339,7 @@ router.post(
       });
     }
     const id = Number(req.params.id);
-    if (!Number.isInteger(id) || id <= 0) {
+    if (!Number.isSafeInteger(id) || id <= 0) {
       return res.status(404).json({
         error: 'NotFound',
         message: 'books.errors.not_found',
@@ -321,13 +362,13 @@ router.post(
       listingId: String(id),
       interested: result.interested,
     });
-  }
+  })
 );
 
 router.post(
   '/:id/want',
   authenticate,
-  async (req: AuthenticatedRequest, res) => {
+  asyncHandler(async (req: AuthenticatedRequest, res) => {
     if (!req.user) {
       return res.status(401).json({
         error: 'Unauthorized',
@@ -335,7 +376,7 @@ router.post(
       });
     }
     const id = Number(req.params.id);
-    if (!Number.isInteger(id) || id <= 0) {
+    if (!Number.isSafeInteger(id) || id <= 0) {
       return res.status(404).json({
         error: 'NotFound',
         message: 'books.errors.not_found',
@@ -361,13 +402,13 @@ router.post(
       });
     }
     return res.status(201).json(toUserBookListing(result.listing));
-  }
+  })
 );
 
 router.post(
   '/:id/renew',
   authenticate,
-  async (req: AuthenticatedRequest, res) => {
+  asyncHandler(async (req: AuthenticatedRequest, res) => {
     if (!req.user) {
       return res.status(401).json({
         error: 'Unauthorized',
@@ -375,7 +416,7 @@ router.post(
       });
     }
     const id = Number(req.params.id);
-    if (!Number.isInteger(id) || id <= 0) {
+    if (!Number.isSafeInteger(id) || id <= 0) {
       return res.status(404).json({
         error: 'NotFound',
         message: 'books.errors.not_found',
@@ -389,13 +430,13 @@ router.post(
       });
     }
     return res.json(toUserBookListing(listing));
-  }
+  })
 );
 
 router.post(
   '/:id/verify',
   authenticate,
-  async (req: AuthenticatedRequest, res) => {
+  asyncHandler(async (req: AuthenticatedRequest, res) => {
     if (!req.user) {
       return res.status(401).json({
         error: 'Unauthorized',
@@ -423,81 +464,88 @@ router.post(
       });
     }
     return res.json(book);
-  }
+  })
 );
 
-router.get('/:id', async (req, res) => {
-  const id = Number(req.params.id);
-  if (!Number.isInteger(id) || id <= 0) {
-    return res.status(404).json({
-      error: 'NotFound',
-      message: 'books.errors.not_found',
-    });
-  }
+router.get(
+  '/:id',
+  asyncHandler(async (req, res) => {
+    const id = Number(req.params.id);
+    if (!Number.isSafeInteger(id) || id <= 0) {
+      return res.status(404).json({
+        error: 'NotFound',
+        message: 'books.errors.not_found',
+      });
+    }
 
-  const viewerId = await getOptionalViewerId(req);
-  const publication = await getPublicationById(id, viewerId);
-  if (!publication) {
-    return res.status(404).json({
-      error: 'NotFound',
-      message: 'books.errors.not_found',
-    });
-  }
+    const viewerId = await getOptionalViewerId(req);
+    const publication = await getPublicationById(id, viewerId);
+    if (!publication) {
+      return res.status(404).json({
+        error: 'NotFound',
+        message: 'books.errors.not_found',
+      });
+    }
 
-  return res.json(publication);
-});
+    return res.json(publication);
+  })
+);
 
-router.put('/:id', authenticate, async (req: AuthenticatedRequest, res) => {
-  if (!req.user) {
-    return res.status(401).json({
-      error: 'Unauthorized',
-      message: 'auth.errors.unauthorized',
-    });
-  }
+router.put(
+  '/:id',
+  authenticate,
+  asyncHandler(async (req: AuthenticatedRequest, res) => {
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'Unauthorized',
+        message: 'auth.errors.unauthorized',
+      });
+    }
 
-  const id = Number(req.params.id);
-  if (!Number.isInteger(id) || id <= 0) {
-    return res.status(404).json({
-      error: 'NotFound',
-      message: 'books.errors.not_found',
-    });
-  }
+    const id = Number(req.params.id);
+    if (!Number.isSafeInteger(id) || id <= 0) {
+      return res.status(404).json({
+        error: 'NotFound',
+        message: 'books.errors.not_found',
+      });
+    }
 
-  const validation = validatePublicationUpdate(req.body);
-  if ('error' in validation) {
-    return res.status(validation.status).json(validation.error);
-  }
+    const validation = validatePublicationUpdate(req.body);
+    if ('error' in validation) {
+      return res.status(validation.status).json(validation.error);
+    }
 
-  const result = await updatePublication(id, req.user.id, validation.data);
+    const result = await updatePublication(id, req.user.id, validation.data);
 
-  if (result.kind === 'not_found') {
-    return res.status(404).json({
-      error: 'NotFound',
-      message: 'books.errors.not_found',
-    });
-  }
+    if (result.kind === 'not_found') {
+      return res.status(404).json({
+        error: 'NotFound',
+        message: 'books.errors.not_found',
+      });
+    }
 
-  if (result.kind === 'forbidden') {
-    return res.status(403).json({
-      error: 'Forbidden',
-      message: 'books.errors.not_owner',
-    });
-  }
+    if (result.kind === 'forbidden') {
+      return res.status(403).json({
+        error: 'Forbidden',
+        message: 'books.errors.not_owner',
+      });
+    }
 
-  if (result.kind === 'invalid_transition') {
-    return res.status(409).json({
-      error: 'Conflict',
-      message: 'books.errors.invalid_status_transition',
-    });
-  }
+    if (result.kind === 'invalid_transition') {
+      return res.status(409).json({
+        error: 'Conflict',
+        message: 'books.errors.invalid_status_transition',
+      });
+    }
 
-  return res.json(result.publication);
-});
+    return res.json(result.publication);
+  })
+);
 
 router.patch(
   '/:id/editorial',
   authenticate,
-  async (req: AuthenticatedRequest, res) => {
+  asyncHandler(async (req: AuthenticatedRequest, res) => {
     if (!req.user) {
       return res.status(401).json({
         error: 'Unauthorized',
@@ -514,7 +562,7 @@ router.patch(
     const id = Number(req.params.id);
     const status = req.body?.status as PublicationEditorialStatus;
     if (
-      !Number.isInteger(id) ||
+      !Number.isSafeInteger(id) ||
       id <= 0 ||
       !EDITORIAL_STATUSES.includes(status)
     ) {
@@ -543,7 +591,7 @@ router.patch(
       });
     }
     return res.json(toUserBookListing(publication));
-  }
+  })
 );
 
 type ValidationError = {
@@ -622,6 +670,7 @@ const ALLOWED_IMAGE_SOURCES: readonly PublicationImageUpdate['source'][] = [
   'upload',
 ];
 const MAX_PUBLICATION_IMAGES = 6;
+const MAX_CATALOG_FILTER_LENGTH = 120;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
@@ -632,6 +681,31 @@ function queryText(value: unknown): string | undefined {
   if (typeof value !== 'string') return undefined;
   const text = value.trim();
   return text || undefined;
+}
+
+function hasOversizedCatalogFilter(query: Request['query']): boolean {
+  const keys = [
+    'q',
+    'text',
+    'author',
+    'isbn',
+    'topic',
+    'interest',
+    'language',
+    'condition',
+    'type',
+    'status',
+    'sort',
+  ];
+  return keys.some((key) => {
+    const value = query[key];
+    const values = Array.isArray(value) ? value : [value];
+    return values.some(
+      (candidate) =>
+        typeof candidate === 'string' &&
+        candidate.trim().length > MAX_CATALOG_FILTER_LENGTH
+    );
+  });
 }
 
 function queryNumber(value: unknown): number | undefined {
@@ -652,6 +726,7 @@ function queryBoolean(value: unknown): boolean | undefined | null {
 function parseCatalogFilters(
   query: Request['query']
 ): PublicBookListingFilters | null {
+  if (hasOversizedCatalogFilter(query)) return null;
   const trade = queryBoolean(query.trade);
   const sale = queryBoolean(query.sale);
   const donation = queryBoolean(query.donation);
@@ -681,12 +756,14 @@ function parseCatalogFilters(
   };
   if (
     filters.limit !== undefined &&
-    (!Number.isInteger(filters.limit) || filters.limit < 1)
+    (!Number.isSafeInteger(filters.limit) ||
+      filters.limit < 1 ||
+      filters.limit > 100)
   )
     return null;
   if (
     filters.offset !== undefined &&
-    (!Number.isInteger(filters.offset) || filters.offset < 0)
+    (!Number.isSafeInteger(filters.offset) || filters.offset < 0)
   )
     return null;
   if (filters.type !== undefined && !ALLOWED_TYPES.includes(filters.type))
@@ -745,10 +822,13 @@ function parseHomePagination(
 ): { limit?: number; offset?: number } | null {
   const limit = queryNumber(query.limit);
   const offset = queryNumber(query.offset);
-  if (limit !== undefined && (!Number.isInteger(limit) || limit < 1)) {
+  if (
+    limit !== undefined &&
+    (!Number.isSafeInteger(limit) || limit < 1 || limit > 100)
+  ) {
     return null;
   }
-  if (offset !== undefined && (!Number.isInteger(offset) || offset < 0)) {
+  if (offset !== undefined && (!Number.isSafeInteger(offset) || offset < 0)) {
     return null;
   }
   return { limit, offset };

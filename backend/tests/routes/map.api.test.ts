@@ -165,6 +165,37 @@ describe('map geocoding endpoint', () => {
       message: 'map.errors.geocoding_unavailable',
     });
   });
+
+  test('maps a geocoding timeout to the public provider error', async () => {
+    const previousTimeout = process.env.GEOCODING_TIMEOUT_MS;
+    process.env.GEOCODING_TIMEOUT_MS = '5';
+    vi.spyOn(global, 'fetch').mockImplementation(
+      async (_input, init) =>
+        new Promise<Response>((_resolve, reject) => {
+          init?.signal?.addEventListener('abort', () =>
+            reject(new DOMException('The operation was aborted', 'AbortError'))
+          );
+        })
+    );
+
+    try {
+      const response = await request(app)
+        .get('/api/map/geocode')
+        .query({ q: 'slow query' })
+        .expect(502);
+
+      expect(response.body).toEqual({
+        error: 'GeocodingUnavailable',
+        message: 'map.errors.geocoding_unavailable',
+      });
+    } finally {
+      if (previousTimeout === undefined) {
+        delete process.env.GEOCODING_TIMEOUT_MS;
+      } else {
+        process.env.GEOCODING_TIMEOUT_MS = previousTimeout;
+      }
+    }
+  });
 });
 
 const seedPublicationData = async (cornerId: string) => {

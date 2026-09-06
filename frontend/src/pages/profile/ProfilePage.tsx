@@ -26,6 +26,7 @@ import {
   SectionHeading,
 } from '@src/features/prototype/PrototypeUI'
 import { toPrototypeProfile } from '@src/features/prototype/realData.adapters'
+import { resolveApiErrorKey } from '@src/utils/apiError'
 import { isApiMockMode } from '@src/utils/runtimeEnv'
 
 import styles from './ProfilePage.module.scss'
@@ -174,7 +175,7 @@ export const ProfilePage = () => {
         )
       } catch (error) {
         const errorKey =
-          error instanceof Error && error.message === 'profile.photo.too_large'
+          resolveApiErrorKey(error, '') === 'profile.photo.too_large'
             ? 'profile.photoInvalid'
             : 'profile.photoReadError'
         setPhotoError(

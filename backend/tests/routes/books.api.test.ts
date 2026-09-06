@@ -178,9 +178,24 @@ describe('books API legacy endpoints', () => {
   test('requires q for search', async () => {
     const res = await request(app).get('/api/books/search').expect(400);
     expect(res.body).toEqual({
-      error: 'q_required',
-      message: 'Missing q (or query) parameter',
+      error: 'ValidationError',
+      message: 'books.errors.query_required',
     });
+  });
+
+  test('rejects an oversized search query before calling Open Library', async () => {
+    const search = vi.spyOn(openLibrary, 'searchBooksApiResults');
+
+    const res = await request(app)
+      .get('/api/books/search')
+      .query({ q: 'x'.repeat(121) })
+      .expect(400);
+
+    expect(res.body).toEqual({
+      error: 'ValidationError',
+      message: 'books.errors.query_too_long',
+    });
+    expect(search).not.toHaveBeenCalled();
   });
 
   test('returns search error when OpenLibrary fails', async () => {
@@ -194,7 +209,8 @@ describe('books API legacy endpoints', () => {
       .expect(502);
 
     expect(res.body).toEqual({
-      error: 'openlibrary_error: Error: fail',
+      error: 'BookSearchUnavailable',
+      message: 'books.errors.search_unavailable',
     });
   });
 

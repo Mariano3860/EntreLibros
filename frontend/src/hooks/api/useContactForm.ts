@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
 
 import { submitContactForm } from '@src/api/contactForm/contactForm.service'
+import { translateApiError } from '@src/utils/apiError'
 
 export const useContactForm = (onSuccessCallback?: () => void) => {
   const { t } = useTranslation()
@@ -16,7 +17,7 @@ export const useContactForm = (onSuccessCallback?: () => void) => {
       }
     },
     onError: (error: Error) => {
-      toast.error(`Error: ${error.message}`)
+      toast.error(translateApiError(t, error, 'contact.errors.submit_failed'))
     },
   })
 }

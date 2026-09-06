@@ -32,6 +32,8 @@ backup/restauracion y accesibilidad indicados arriba.
 - Email, push, MFA, recuperacion avanzada y almacenamiento de objetos.
 - Rate limiting de aplicacion, observabilidad avanzada, retencion/exportacion y
   API publica.
+- La politica de rate limiting/antiabuso (S-04) y la centralizacion amplia de
+  JWT/cookies (S-06) requieren una iniciativa independiente.
 - PWA/offline, importacion/exportacion masiva y analitica comunitaria avanzada.
 
 ## Regla de mantenimiento

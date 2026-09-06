@@ -15,6 +15,7 @@ import {
   type MessageAgreementEvent,
 } from '../repositories/messagingRepository.js';
 import type { AgreementCommand } from '../services/agreementState.js';
+import { logPublicError, publicErrorResponse } from '../utils/publicErrors.js';
 
 const router = Router();
 router.use(authenticate);
@@ -71,15 +72,52 @@ function listingIds(value: unknown): number[] | null {
 }
 
 function failure(error: unknown) {
-  const message =
-    error instanceof Error ? error.message : 'agreements.errors.failed';
-  const status =
-    message === 'agreements.errors.forbidden'
-      ? 403
-      : message === 'agreements.errors.conflict'
-        ? 409
-        : 422;
-  return { status, body: { error: 'AgreementError', message } };
+  logPublicError('Agreement operation failed', error);
+  return publicErrorResponse(
+    error,
+    {
+      status: 500,
+      code: 'AgreementError',
+      key: 'agreements.errors.failed',
+    },
+    {
+      'agreements.errors.forbidden': {
+        status: 403,
+        code: 'AgreementError',
+        key: 'agreements.errors.forbidden',
+      },
+      'agreements.errors.conflict': {
+        status: 409,
+        code: 'AgreementError',
+        key: 'agreements.errors.conflict',
+      },
+      'agreements.errors.not_found': {
+        status: 404,
+        code: 'AgreementError',
+        key: 'agreements.errors.not_found',
+      },
+      'agreements.errors.outcome_unavailable': {
+        status: 422,
+        code: 'AgreementError',
+        key: 'agreements.errors.outcome_unavailable',
+      },
+      'agreements.errors.participants_invalid': {
+        status: 422,
+        code: 'AgreementError',
+        key: 'agreements.errors.participants_invalid',
+      },
+      'agreements.errors.listings_invalid': {
+        status: 422,
+        code: 'AgreementError',
+        key: 'agreements.errors.listings_invalid',
+      },
+      'agreements.errors.listing_unavailable': {
+        status: 422,
+        code: 'AgreementError',
+        key: 'agreements.errors.listing_unavailable',
+      },
+    }
+  );
 }
 
 async function persistAgreementMessage(input: {
