@@ -12,14 +12,18 @@ test("lets the authorized participant confirm the seeded agreement", async ({
   userBPage,
   userAPage,
 }) => {
-  const conversationsResponse = userBPage.waitForResponse(
-    (response) =>
-      response.url().endsWith("/api/messages") && response.status() === 200,
-  );
   await userBPage.goto("/messages");
-  const conversations = (await (
-    await conversationsResponse
-  ).json()) as ConversationsPayload;
+  const conversations = await userBPage.evaluate(
+    async (): Promise<ConversationsPayload> => {
+      const response = await fetch("/api/messages", {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to load conversations: ${response.status}`);
+      }
+      return (await response.json()) as ConversationsPayload;
+    },
+  );
   const seededConversation = conversations.conversations?.find(
     (conversation) => conversation.agreementId !== null,
   );

@@ -6,17 +6,21 @@ type ConversationsPayload = {
 };
 
 async function openSeedConversation(page: Page, counterpart: string) {
-  const conversationsResponse = page.waitForResponse(
-    (response) =>
-      response.url().endsWith("/api/messages") && response.status() === 200,
-  );
   const socket = page.waitForEvent("websocket", {
     predicate: (websocket) => websocket.url().includes("/socket.io/"),
   });
   await page.goto("/messages");
-  const conversations = (await (
-    await conversationsResponse
-  ).json()) as ConversationsPayload;
+  const conversations = await page.evaluate(
+    async (): Promise<ConversationsPayload> => {
+      const response = await fetch("/api/messages", {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to load conversations: ${response.status}`);
+      }
+      return (await response.json()) as ConversationsPayload;
+    },
+  );
   const conversation = conversations.conversations?.find(
     (item) => item.participantName === counterpart,
   );
@@ -59,15 +63,15 @@ test("delivers a real conversation message between contexts without reload", asy
   await Promise.all([draftResponse, sendResponse]);
 
   await expect(
-    userAPage.locator('div[class*="bubble"]').filter({ hasText: message })
+    userAPage.locator('div[class*="bubble"]').filter({ hasText: message }),
   ).toBeVisible();
   await expect(
-    userBPage.locator('div[class*="bubble"]').filter({ hasText: message })
+    userBPage.locator('div[class*="bubble"]').filter({ hasText: message }),
   ).toBeVisible({ timeout: 10000 });
 
   await userBPage.reload();
   await userBPage.getByRole("button", { name: /E2E User A/ }).click();
   await expect(
-    userBPage.locator('div[class*="bubble"]').filter({ hasText: message })
+    userBPage.locator('div[class*="bubble"]').filter({ hasText: message }),
   ).toBeVisible();
 });
