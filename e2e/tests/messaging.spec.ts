@@ -58,12 +58,16 @@ test("delivers a real conversation message between contexts without reload", asy
   await userAPage.getByRole("button", { name: "Enviar mensaje" }).click();
   await Promise.all([draftResponse, sendResponse]);
 
-  await expect(userAPage.getByText(message, { exact: true })).toBeVisible();
-  await expect(userBPage.getByText(message, { exact: true })).toBeVisible({
-    timeout: 10000,
-  });
+  await expect(
+    userAPage.locator('div[class*="bubble"]').filter({ hasText: message })
+  ).toBeVisible();
+  await expect(
+    userBPage.locator('div[class*="bubble"]').filter({ hasText: message })
+  ).toBeVisible({ timeout: 10000 });
 
   await userBPage.reload();
   await userBPage.getByRole("button", { name: /E2E User A/ }).click();
-  await expect(userBPage.getByText(message, { exact: true })).toBeVisible();
+  await expect(
+    userBPage.locator('div[class*="bubble"]').filter({ hasText: message })
+  ).toBeVisible();
 });
