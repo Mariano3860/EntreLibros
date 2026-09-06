@@ -46,6 +46,11 @@ npm run build -w frontend
 npm run complete-check
 ```
 
+Para la capa automatizada con navegador real usa el procedimiento completo de
+[`e2e-baseline.md`](e2e-baseline.md). En particular, `npm run verify:ci` no
+aplica `lint:fix` ni `format:fix`, y los comandos `e2e:db:*` trabajan solamente
+con la base aislada cuyo nombre contiene `e2e`.
+
 ## Datos de prueba
 
 Usa solamente las cuentas y publicaciones sinteticas del script de demo. No

@@ -89,6 +89,11 @@ npm run build -w frontend
 npm run complete-check
 ```
 
+El baseline E2E contra navegador, backend y PostgreSQL/PostGIS reales esta
+documentado en [`docs/e2e-baseline.md`](docs/e2e-baseline.md). Sus comandos
+separados (`e2e:db:*`, `e2e:test:*`, `e2e`, `e2e:headed` y `verify:ci`) usan una
+base exclusiva marcada como `e2e` y nunca la base de desarrollo.
+
 La validacion manual de cookies, proxy, cache, mapa, Socket.IO, responsive y
 privacidad esta en [`docs/tfg-browser-checklist.md`](docs/tfg-browser-checklist.md)
 y [`docs/recovery-baseline.md`](docs/recovery-baseline.md).
@@ -102,6 +107,7 @@ y [`docs/recovery-baseline.md`](docs/recovery-baseline.md).
 - [`docs/base_de_datos.md`](docs/base_de_datos.md): esquema y migraciones.
 - [`docs/security-runbook.md`](docs/security-runbook.md): seguridad.
 - [`docs/recovery-baseline.md`](docs/recovery-baseline.md): recuperacion.
+- [`docs/e2e-baseline.md`](docs/e2e-baseline.md): baseline E2E real y CI.
 
 No guardes credenciales, archivos `.env`, dumps, datos personales ni material
 privado en el repositorio.

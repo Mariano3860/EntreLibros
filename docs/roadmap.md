@@ -20,6 +20,11 @@ servicio y frontend. El contacto puede quedar como borrador privado antes del
 envio y las propuestas enriquecidas se validan al enviarse. Los puntos
 anteriores son evidencia y operacion pendiente, no nuevos contratos de producto.
 
+El baseline E2E real y su workflow CI ya estan implementados como infraestructura
+de evidencia; las discrepancias conocidas siguen separadas de las correcciones
+de producto. El siguiente trabajo de cierre continua siendo la evidencia manual,
+backup/restauracion y accesibilidad indicados arriba.
+
 ## Evolucion posterior
 
 - Recomendacion automatica por proximidad e intereses.
