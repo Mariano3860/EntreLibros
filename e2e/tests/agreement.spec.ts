@@ -26,12 +26,12 @@ test("lets the authorized participant confirm the seeded agreement", async ({
 
   expect(seededConversation?.agreementId).toBeDefined();
   const agreementId = String(seededConversation?.agreementId);
-  await userBPage.getByRole("button", { name: /E2E User A/ }).click();
   const agreementResponse = userBPage.waitForResponse(
     (response) =>
       response.url().endsWith(`/api/agreements/${agreementId}`) &&
       response.status() === 200,
   );
+  await userBPage.getByRole("button", { name: /E2E User A/ }).click();
   await agreementResponse;
   await expect(
     userBPage.getByText("E2E Book A", { exact: true }),
