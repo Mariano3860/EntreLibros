@@ -402,7 +402,19 @@ router.post(
         message: 'auth.errors.unauthorized',
       });
     }
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        error: 'Forbidden',
+        message: 'books.errors.admin_required',
+      });
+    }
     const id = Number(req.params.id);
+    if (!Number.isSafeInteger(id) || id < 1) {
+      return res.status(404).json({
+        error: 'NotFound',
+        message: 'books.errors.not_found',
+      });
+    }
     const book = await verifyBook(id);
     if (!book) {
       return res.status(404).json({

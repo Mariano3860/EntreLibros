@@ -427,11 +427,11 @@ async function fetchBookListingImagesWithClient(
 
 async function fetchBookListingByIdWithClient(
   client: DbClient,
-  id: number
+  id: number,
+  whereClause = 'WHERE p.id = $1',
+  params: unknown[] = [id]
 ): Promise<BookListing | null> {
-  const pubs = await fetchBookListingsWithClient(client, 'WHERE p.id = $1', [
-    id,
-  ]);
+  const pubs = await fetchBookListingsWithClient(client, whereClause, params);
   if (!pubs[0]) {
     return null;
   }
@@ -440,10 +440,35 @@ async function fetchBookListingByIdWithClient(
 }
 
 export async function getBookListingById(
-  id: number
+  id: number,
+  viewerId?: number
 ): Promise<BookListing | null> {
   return withTransaction(async (client) => {
-    return fetchBookListingByIdWithClient(client, id);
+    const visibility =
+      viewerId === undefined
+        ? 'WHERE p.id = $1'
+        : `WHERE p.id = $1
+       AND (
+         p.user_id = $2
+         OR (
+           NOT EXISTS (
+             SELECT 1 FROM user_blocks viewer_block
+             WHERE viewer_block.blocker_id = $2
+               AND viewer_block.blocked_id = p.user_id
+           )
+           AND NOT EXISTS (
+             SELECT 1 FROM user_blocks owner_block
+             WHERE owner_block.blocker_id = p.user_id
+               AND owner_block.blocked_id = $2
+           )
+         )
+       )`;
+    return fetchBookListingByIdWithClient(
+      client,
+      id,
+      visibility,
+      viewerId === undefined ? [id] : [id, viewerId]
+    );
   });
 }
 
@@ -1137,7 +1162,8 @@ type CatalogQueryParts = {
 
 function buildCatalogQuery(
   filters: PublicBookListingFilters,
-  viewerId?: number
+  viewerId?: number,
+  includeOwnerListings = false
 ): CatalogQueryParts {
   const publicConditions = [
     "p.availability = 'public'",
@@ -1147,14 +1173,32 @@ function buildCatalogQuery(
     "p.editorial_status = 'approved'",
   ];
   const params: unknown[] = [];
+  const publicPredicate = `(${publicConditions.join(' AND ')})`;
+  const blockPredicate =
+    viewerId === undefined
+      ? null
+      : `(
+          NOT EXISTS (
+            SELECT 1 FROM user_blocks viewer_block
+            WHERE viewer_block.blocker_id = $1
+              AND viewer_block.blocked_id = p.user_id
+          )
+          AND NOT EXISTS (
+            SELECT 1 FROM user_blocks owner_block
+            WHERE owner_block.blocker_id = p.user_id
+              AND owner_block.blocked_id = $1
+          )
+        )`;
   const conditions =
     viewerId === undefined
-      ? publicConditions
-      : [`(p.user_id = $1 OR (${publicConditions.join(' AND ')}))`];
+      ? [publicPredicate]
+      : [
+          includeOwnerListings
+            ? `(p.user_id = $1 OR (${publicPredicate} AND ${blockPredicate}))`
+            : `(${publicPredicate} AND ${blockPredicate})`,
+        ];
 
-  if (viewerId !== undefined) {
-    params.push(viewerId);
-  }
+  if (viewerId !== undefined) params.push(viewerId);
 
   const add = (condition: string, value: unknown) => {
     params.push(value);
@@ -1219,7 +1263,10 @@ export async function listPublicBookListings(
   filters: PublicBookListingFilters = {},
   viewerId?: number
 ): Promise<BookListing[]> {
-  const { conditions, params, distanceExpression } = buildCatalogQuery(filters);
+  const { conditions, params, distanceExpression } = buildCatalogQuery(
+    filters,
+    viewerId
+  );
   const limit = Math.min(Math.max(filters.limit ?? 50, 1), 100);
   const offset = Math.max(filters.offset ?? 0, 0);
   params.push(limit, offset);
@@ -1249,7 +1296,8 @@ export async function listAllBookListings(
 }> {
   const { conditions, params, distanceExpression } = buildCatalogQuery(
     filters,
-    viewerId
+    viewerId,
+    true
   );
   const limit = Math.min(Math.max(filters.limit ?? 50, 1), 100);
   const offset = Math.max(filters.offset ?? 0, 0);

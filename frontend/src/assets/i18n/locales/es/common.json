@@ -411,7 +411,8 @@
       "consent_required": "Confirmá los consentimientos para publicar.",
       "content_not_allowed": "El contenido no cumple las reglas de publicación.",
       "suspicious_link": "Revisá los enlaces incluidos antes de publicar.",
-      "duplicate": "Ya tenés una publicación igual activa."
+      "duplicate": "Ya tenés una publicación igual activa.",
+      "admin_required": "Necesitás permisos de administrador para verificar libros."
     },
     "previewAlt": "Vista previa de la portada"
   },

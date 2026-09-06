@@ -407,7 +407,8 @@
       "consent_required": "Confirm the consents before publishing.",
       "content_not_allowed": "The content does not meet publication rules.",
       "suspicious_link": "Review the links before publishing.",
-      "duplicate": "You already have an identical active publication."
+      "duplicate": "You already have an identical active publication.",
+      "admin_required": "Administrator permission is required to verify books."
     },
     "previewAlt": "Preview cover"
   },

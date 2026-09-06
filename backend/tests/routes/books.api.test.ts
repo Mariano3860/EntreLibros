@@ -25,15 +25,21 @@ afterEach(async () => {
 });
 
 const insertUser = async (
-  overrides: Partial<{ name: string; alias: string; email: string }>
+  overrides: Partial<{
+    name: string;
+    alias: string;
+    email: string;
+    role: 'user' | 'admin';
+  }>
 ): Promise<number> => {
   const name = overrides.name ?? 'User';
   const alias = overrides.alias ?? name;
   const email =
     overrides.email ?? `${Math.random().toString(36).slice(2)}@example.com`;
+  const role = overrides.role ?? 'user';
   const { rows } = await client.query(
-    "INSERT INTO users (name, alias, email, password, role) VALUES ($1, $2, $3, 'hash', 'user') RETURNING id",
-    [name, alias, email]
+    "INSERT INTO users (name, alias, email, password, role) VALUES ($1, $2, $3, 'hash', $4) RETURNING id",
+    [name, alias, email, role]
   );
   return rows[0].id as number;
 };
@@ -229,7 +235,7 @@ describe('books API legacy endpoints', () => {
   });
 
   test('returns not found when verifying missing book', async () => {
-    const userId = await insertUser({ name: 'Verifier' });
+    const userId = await insertUser({ name: 'Verifier', role: 'admin' });
     const res = await request(app)
       .post('/api/books/123/verify')
       .set('Cookie', buildAuthCookie(userId))
@@ -238,6 +244,47 @@ describe('books API legacy endpoints', () => {
       error: 'NotFound',
       message: 'books.errors.not_found',
     });
+  });
+
+  test('requires an authenticated administrator to verify a book', async () => {
+    const bookId = await insertBook();
+    const userId = await insertUser({ name: 'Common verifier' });
+
+    await request(app).post(`/api/books/${bookId}/verify`).expect(401);
+
+    const forbidden = await request(app)
+      .post(`/api/books/${bookId}/verify`)
+      .set('Cookie', buildAuthCookie(userId))
+      .expect(403);
+    expect(forbidden.body).toEqual({
+      error: 'Forbidden',
+      message: 'books.errors.admin_required',
+    });
+
+    const { rows } = await client.query<{ verified: boolean }>(
+      'SELECT verified FROM books WHERE id = $1',
+      [bookId]
+    );
+    expect(rows[0]?.verified).toBe(false);
+  });
+
+  test('allows an administrator to verify an existing book and validates its id', async () => {
+    const bookId = await insertBook();
+    const adminId = await insertUser({ name: 'Admin verifier', role: 'admin' });
+
+    const success = await request(app)
+      .post(`/api/books/${bookId}/verify`)
+      .set('Cookie', buildAuthCookie(adminId))
+      .expect(200);
+    expect(success.body).toEqual(expect.objectContaining({ id: bookId }));
+
+    await request(app)
+      .post('/api/books/not-an-id/verify')
+      .set('Cookie', buildAuthCookie(adminId))
+      .expect(404, {
+        error: 'NotFound',
+        message: 'books.errors.not_found',
+      });
   });
 });
 
@@ -871,6 +918,70 @@ describe('books API Todos catalog', () => {
       .expect(200);
     expect(filtered.body.page.total).toBe(1);
     expect(filtered.body.items[0].id).toBe(String(publicWantId));
+  });
+
+  test('hides blocked owners from catalog and detail in both directions', async () => {
+    const viewerId = await insertUser({ name: 'Catalog viewer' });
+    const ownerId = await insertUser({ name: 'Blocked owner' });
+    const otherOwnerId = await insertUser({ name: 'Visible owner' });
+    const blockedBookId = await insertBook();
+    const visibleBookId = await insertBook();
+    await client.query('UPDATE books SET title = $1 WHERE id = $2', [
+      'Bloqueado del catálogo',
+      blockedBookId,
+    ]);
+    await client.query('UPDATE books SET title = $1 WHERE id = $2', [
+      'Visible en catálogo',
+      visibleBookId,
+    ]);
+    const blockedListingId = await insertListing({
+      userId: ownerId,
+      bookId: blockedBookId,
+    });
+    const visibleListingId = await insertListing({
+      userId: otherOwnerId,
+      bookId: visibleBookId,
+    });
+
+    await client.query(
+      'INSERT INTO user_blocks (blocker_id, blocked_id) VALUES ($1, $2)',
+      [viewerId, ownerId]
+    );
+
+    const blockedFromViewer = await request(app)
+      .get('/api/books')
+      .query({ scope: 'all', q: 'catálogo', limit: 1 })
+      .set('Cookie', buildAuthCookie(viewerId))
+      .expect(200);
+    expect(blockedFromViewer.body.page).toMatchObject({
+      total: 1,
+      limit: 1,
+      offset: 0,
+      hasNext: false,
+    });
+    expect(blockedFromViewer.body.items[0].id).toBe(String(visibleListingId));
+
+    await request(app)
+      .get(`/api/books/${blockedListingId}`)
+      .set('Cookie', buildAuthCookie(viewerId))
+      .expect(404, {
+        error: 'NotFound',
+        message: 'books.errors.not_found',
+      });
+
+    await request(app)
+      .get(`/api/books/${blockedListingId}`)
+      .set('Cookie', buildAuthCookie(ownerId))
+      .expect(200);
+
+    await client.query(
+      'INSERT INTO user_blocks (blocker_id, blocked_id) VALUES ($1, $2)',
+      [ownerId, viewerId]
+    );
+    await request(app)
+      .get(`/api/books/${blockedListingId}`)
+      .set('Cookie', buildAuthCookie(viewerId))
+      .expect(404);
   });
 });
 

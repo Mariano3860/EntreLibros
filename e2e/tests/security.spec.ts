@@ -1,9 +1,5 @@
 import { test, expect } from "../fixtures/auth";
 import type { Page } from "@playwright/test";
-import {
-  assertKnownDiscrepancyObserved,
-  KNOWN_DISCREPANCIES,
-} from "../support/known-discrepancies";
 
 type ConversationsPayload = {
   conversations?: Array<{ id: number; participantName: string | null }>;
@@ -12,14 +8,6 @@ type ConversationsPayload = {
 type RelationsPayload = {
   items?: Array<{ id?: number | string; userId?: number | string }>;
 };
-
-test("keeps the security discrepancy allowlist explicit and countable", () => {
-  const entries = Object.values(KNOWN_DISCREPANCIES);
-  expect(entries).toHaveLength(1);
-  expect(entries.map((entry) => entry.id)).toEqual([
-    "SEC-BOOK-VERIFY-ADMIN-GUARD",
-  ]);
-});
 
 async function requestStatus(
   page: Page,
@@ -41,14 +29,29 @@ async function requestStatus(
   );
 }
 
-async function requestJson(page: Page, path: string) {
-  return page.evaluate(async (requestPath) => {
-    const response = await fetch(requestPath);
-    return {
-      status: response.status,
-      body: (await response.json().catch(() => null)) as unknown,
-    };
-  }, path);
+async function requestJson(
+  page: Page,
+  path: string,
+  init?: { method?: string; body?: unknown },
+) {
+  return page.evaluate(
+    async ({ path: requestPath, init: requestInit }) => {
+      const response = await fetch(requestPath, {
+        method: requestInit?.method,
+        headers: requestInit?.body
+          ? { "Content-Type": "application/json" }
+          : undefined,
+        body: requestInit?.body
+          ? JSON.stringify(requestInit.body)
+          : undefined,
+      });
+      return {
+        status: response.status,
+        body: (await response.json().catch(() => null)) as unknown,
+      };
+    },
+    { path, init },
+  );
 }
 
 test("enforces visitor and participant authorization at the HTTP boundary", async ({
@@ -87,7 +90,7 @@ test("enforces visitor and participant authorization at the HTTP boundary", asyn
   expect([403, 404]).toContain(outsiderHistoryStatus);
 });
 
-test("records the known book verification authorization discrepancy", async ({
+test("enforces administrator authorization for book verification", async ({
   userAPage,
   adminPage,
 }) => {
@@ -99,16 +102,16 @@ test("records the known book verification authorization discrepancy", async ({
   const listingId = payload.items?.find((item) => item.id !== undefined)?.id;
   expect(listingId).toBeDefined();
 
-  const commonStatus = await requestStatus(
+  const commonResponse = await requestJson(
     userAPage,
     `/api/books/${String(listingId)}/verify`,
     { method: "POST" },
   );
-  assertKnownDiscrepancyObserved(
-    test.info(),
-    "BOOK_VERIFY_MISSING_ADMIN_GUARD",
-    commonStatus,
-  );
+  expect(commonResponse.status).toBe(403);
+  expect(commonResponse.body).toEqual({
+    error: "Forbidden",
+    message: "books.errors.admin_required",
+  });
 
   const adminStatus = await requestStatus(
     adminPage,
