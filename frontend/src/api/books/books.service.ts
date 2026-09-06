@@ -1,7 +1,13 @@
 import { apiClient } from '@src/api/axios'
 import { RELATIVE_API_ROUTES } from '@src/api/routes'
 
-import { ApiBook, ApiBookCatalogPage, ApiHomeBooksPage } from './books.types'
+import {
+  ApiBook,
+  ApiBookCatalogPage,
+  ApiBookRelationsPage,
+  ApiHomeBooksPage,
+  PersonalBookRelationsTab,
+} from './books.types'
 import { PublishBookPayload, PublishBookResponse } from './publishBook.types'
 export {
   createWantBook,
@@ -28,6 +34,22 @@ export type BookCatalogFilters = {
   radiusKm?: number
   limit?: number
   offset?: number
+}
+
+export type PersonalBookRelationsFilters = Omit<
+  BookCatalogFilters,
+  'donation'
+> & {
+  tab?: PersonalBookRelationsTab
+}
+
+const appendFilters = (
+  params: URLSearchParams,
+  filters: Record<string, unknown>
+) => {
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== '') params.set(key, String(value))
+  })
 }
 
 const hasValidCatalogPage = (value: unknown): value is ApiBookCatalogPage => {
@@ -83,6 +105,36 @@ export const fetchAllBooks = async (
 
   if (!hasValidCatalogPage(response.data)) {
     throw new Error('Invalid books response')
+  }
+
+  return response.data
+}
+
+const hasValidBookRelationsPage = (
+  value: unknown
+): value is ApiBookRelationsPage => {
+  if (!hasValidCatalogPage(value)) return false
+  const counts = (value as { counts?: unknown }).counts
+  if (!counts || typeof counts !== 'object') return false
+  return ['all', 'trade', 'sale', 'seeking'].every(
+    (key) =>
+      typeof (counts as Record<string, unknown>)[key] === 'number' &&
+      Number.isInteger((counts as Record<string, unknown>)[key]) &&
+      (counts as Record<string, number>)[key] >= 0
+  )
+}
+
+export const fetchBookRelations = async (
+  filters: PersonalBookRelationsFilters = {}
+): Promise<ApiBookRelationsPage> => {
+  const params = new URLSearchParams({ tab: filters.tab ?? 'all' })
+  appendFilters(params, filters)
+  const response = await apiClient.get<ApiBookRelationsPage>(
+    `${RELATIVE_API_ROUTES.BOOKS.RELATIONS}?${params.toString()}`
+  )
+
+  if (!hasValidBookRelationsPage(response.data)) {
+    throw new Error('Invalid book relations response')
   }
 
   return response.data

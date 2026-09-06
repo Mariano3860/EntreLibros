@@ -1,33 +1,14 @@
-import { fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 const fetchMe = vi.hoisted(() => vi.fn())
-const fetchBooks = vi.hoisted(() => vi.fn())
-const fetchAllBooks = vi.hoisted(() => vi.fn())
-const fetchUserBooks = vi.hoisted(() => vi.fn())
+const fetchBookRelations = vi.hoisted(() => vi.fn())
 const createWantBook = vi.hoisted(() => vi.fn())
 
-vi.mock('@src/utils/runtimeEnv', () => ({
-  isApiMockMode: () => false,
-}))
-
-vi.mock('@src/api/auth/me.service', () => ({
-  fetchMe,
-}))
-
-vi.mock('@api/books/books.service', () => ({
-  fetchBooks,
-  fetchAllBooks,
-  fetchBookById: vi.fn(),
-}))
-
-vi.mock('@api/books/bookInteractions.service', () => ({
-  createWantBook,
-}))
-
-vi.mock('@api/books/userBooks.service', () => ({
-  fetchUserBooks,
-}))
+vi.mock('@src/utils/runtimeEnv', () => ({ isApiMockMode: () => false }))
+vi.mock('@src/api/auth/me.service', () => ({ fetchMe }))
+vi.mock('@api/books/books.service', () => ({ fetchBookRelations }))
+vi.mock('@api/books/bookInteractions.service', () => ({ createWantBook }))
 
 import { BooksPage } from '@src/pages/books/BooksPage'
 
@@ -40,65 +21,53 @@ const discoveryBook = {
   coverUrl: '',
   condition: 'good',
   status: 'available' as const,
+  type: 'offer' as const,
   isForTrade: true,
   isForSale: false,
   isSeeking: false,
   price: null,
-  isInterested: false,
+  ownerId: '1',
+  ownerName: 'Reader',
 }
 
-describe('BooksPage discovery interactions', () => {
+const relationPage = (items = [discoveryBook]) => ({
+  items,
+  page: {
+    limit: 5,
+    offset: 0,
+    total: items.length,
+    hasNext: false,
+    hasPrevious: false,
+  },
+  counts: { all: items.length, trade: items.length, sale: 0, seeking: 0 },
+})
+
+describe('BooksPage relation interactions', () => {
   beforeEach(() => {
     fetchMe.mockReset()
     fetchMe.mockResolvedValue({ id: 1, name: 'Reader' })
-    fetchBooks.mockReset()
-    fetchBooks.mockResolvedValue([])
-    fetchAllBooks.mockReset()
-    fetchAllBooks.mockResolvedValue({
-      items: [],
-      page: {
-        limit: 5,
-        offset: 0,
-        total: 0,
-        hasNext: false,
-        hasPrevious: false,
-      },
-    })
-    fetchUserBooks.mockReset()
-    fetchUserBooks.mockResolvedValue([])
+    fetchBookRelations.mockReset()
+    fetchBookRelations.mockResolvedValue(relationPage())
     createWantBook.mockReset()
   })
 
-  test('opens a blank want form from the header action', async () => {
-    fetchBooks.mockResolvedValue([])
-
-    renderWithProviders(<BooksPage />, {
-      initialEntries: ['/books'],
-    })
+  test('opens a want form from the header action and creates a demand', async () => {
+    renderWithProviders(<BooksPage />, { initialEntries: ['/books'] })
 
     fireEvent.click(
       await screen.findByRole('button', { name: 'booksPage.want.open' })
     )
-
     expect(await screen.findByText('booksPage.want.title')).toBeVisible()
-    expect(screen.getByLabelText('booksPage.want.titleLabel')).toHaveValue('')
 
     createWantBook.mockResolvedValue({ id: 'want-created' })
     const titleInput = screen.getByLabelText('booksPage.want.titleLabel')
     fireEvent.change(titleInput, {
       target: { value: 'Libro buscado desde el encabezado' },
     })
-    fireEvent.input(titleInput, {
-      target: { value: 'Libro buscado desde el encabezado' },
-    })
-    await waitFor(() =>
-      expect(titleInput).toHaveValue('Libro buscado desde el encabezado')
-    )
     const submit = screen.getByRole('button', { name: 'booksPage.want.submit' })
-    await waitFor(() => expect(submit).toBeEnabled())
     fireEvent.click(submit)
 
-    await waitFor(() => {
+    await waitFor(() =>
       expect(createWantBook).toHaveBeenCalledWith(
         expect.objectContaining({
           type: 'want',
@@ -107,27 +76,18 @@ describe('BooksPage discovery interactions', () => {
           }),
         })
       )
-    })
+    )
     expect(screen.queryByText('booksPage.want.title')).not.toBeInTheDocument()
   })
 
-  test('applies catalog filters and resets them from the visible panel', async () => {
-    fetchBooks.mockResolvedValue([discoveryBook])
-
+  test('applies personal filters and resets them from the visible panel', async () => {
     renderWithProviders(<BooksPage />, {
       initialEntries: ['/books/trade?page=2'],
     })
 
-    const offerCardButton = await screen.findByRole('button', {
-      name: 'Ver Libro de descubrimiento',
-    })
-    expect(offerCardButton).toBeInTheDocument()
     expect(
-      within(offerCardButton.closest('article') as HTMLElement).getAllByRole(
-        'button'
-      )
-    ).toHaveLength(1)
-
+      await screen.findByRole('button', { name: 'Ver Libro de descubrimiento' })
+    ).toBeVisible()
     fireEvent.click(
       screen.getByRole('button', { name: /booksPage.filters.button/ })
     )
@@ -136,15 +96,15 @@ describe('BooksPage discovery interactions', () => {
       { target: { value: 'good' } }
     )
 
-    await waitFor(() => {
-      expect(fetchBooks).toHaveBeenLastCalledWith(
+    await waitFor(() =>
+      expect(fetchBookRelations).toHaveBeenLastCalledWith(
         expect.objectContaining({
+          tab: 'trade',
           condition: 'good',
-          type: 'offer',
           trade: true,
         })
       )
-    })
+    )
     expect(screen.getByRole('status')).toHaveTextContent(
       'booksPage.filters.active'
     )
@@ -152,71 +112,25 @@ describe('BooksPage discovery interactions', () => {
     fireEvent.click(
       screen.getAllByRole('button', { name: 'booksPage.filters.reset' })[0]
     )
-
     expect(
       screen.getByRole('combobox', { name: 'booksPage.filters.condition' })
     ).toHaveValue('')
-    await waitFor(() => {
-      expect(fetchBooks).toHaveBeenLastCalledWith(
-        expect.objectContaining({ condition: undefined, trade: true })
+    await waitFor(() =>
+      expect(fetchBookRelations).toHaveBeenLastCalledWith(
+        expect.objectContaining({ tab: 'trade', condition: undefined })
       )
-    })
-  })
-
-  test('does not render want listings in the visitor Todos catalog', async () => {
-    fetchMe.mockRejectedValueOnce(new Error('unauthenticated'))
-    fetchAllBooks.mockResolvedValue({
-      items: [discoveryBook],
-      page: {
-        limit: 5,
-        offset: 0,
-        total: 1,
-        hasNext: false,
-        hasPrevious: false,
-      },
-    })
-
-    renderWithProviders(<BooksPage />, {
-      initialEntries: ['/books'],
-    })
-
-    expect(
-      await screen.findByRole('button', { name: 'Ver Libro de descubrimiento' })
-    ).toBeVisible()
-    expect(
-      screen.queryByRole('button', { name: 'Ver Libro que alguien busca' })
-    ).not.toBeInTheDocument()
-    expect(screen.queryByText('Buscando')).not.toBeInTheDocument()
-    expect(fetchAllBooks).toHaveBeenCalledWith(
-      expect.objectContaining({ type: 'offer' })
     )
-    expect(fetchUserBooks).not.toHaveBeenCalled()
   })
 
-  test('renders want listings as searching without offer actions', async () => {
-    const seekingBook = {
-      ...discoveryBook,
-      id: 'seeking-book',
-      isForTrade: false,
-      isSeeking: true,
-    }
-    fetchBooks.mockResolvedValue([seekingBook])
+  test('does not query personal relations when the session is absent', async () => {
+    fetchMe.mockRejectedValueOnce(new Error('unauthenticated'))
 
-    renderWithProviders(<BooksPage />, {
-      initialEntries: ['/books/seeking'],
-    })
+    renderWithProviders(<BooksPage />)
 
+    await waitFor(() => expect(fetchMe).toHaveBeenCalled())
+    expect(fetchBookRelations).not.toHaveBeenCalled()
     expect(
-      await screen.findByRole('button', { name: 'Ver Libro de descubrimiento' })
-    ).toBeInTheDocument()
-    const card = screen
-      .getByRole('button', { name: 'Ver Libro de descubrimiento' })
-      .closest('article')
-    expect(card).not.toBeNull()
-    expect(
-      within(card as HTMLElement).getByText('Lista de deseos')
-    ).toBeVisible()
-    expect(within(card as HTMLElement).getAllByText('Buscando')).toHaveLength(1)
-    expect(within(card as HTMLElement).getAllByRole('button')).toHaveLength(1)
+      screen.queryByRole('button', { name: 'Ver Libro de descubrimiento' })
+    ).not.toBeInTheDocument()
   })
 })

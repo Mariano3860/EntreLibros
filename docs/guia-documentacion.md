@@ -14,6 +14,13 @@ No conserva instrucciones para rutas, scripts, variables o servicios inexistente
 6. Comprueba enlaces Markdown, nombres de scripts y datos de demo.
 7. Ejecuta verificaciones proporcionales, `git diff --check` y validacion OpenSpec.
 
+Para cambios de libros, comprueba por separado el índice privado (`/books` y sus
+tabs), `/api/books/relations`, el detalle público `/books/:id` y las superficies
+de descubrimiento (`/api/books` y `/api/books/home`). Verifica que Sidebar y
+Home no envíen visitantes al índice privado, que `/books/mine` conserve su
+normalización de compatibilidad y que los mocks no usen el catálogo público
+como fuente de relaciones personales.
+
 ## Lista de revision
 
 - [ ] Las rutas, variables, migraciones y comandos existen.

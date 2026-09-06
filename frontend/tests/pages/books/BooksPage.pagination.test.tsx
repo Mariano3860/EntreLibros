@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
 const books = vi.hoisted(() =>
@@ -9,17 +9,19 @@ const books = vi.hoisted(() =>
     coverUrl: '',
     condition: 'good',
     status: 'available' as const,
+    type: 'offer' as const,
     isForTrade: true,
     isForSale: false,
     isSeeking: false,
     price: null,
   }))
 )
-const fetchAllBooks = vi.hoisted(() =>
+const fetchBookRelations = vi.hoisted(() =>
   vi.fn().mockImplementation(({ offset = 0 }: { offset?: number } = {}) => {
     const limit = 5
+    const items = books.slice(offset, offset + limit)
     return Promise.resolve({
-      items: books.slice(offset, offset + limit),
+      items,
       page: {
         limit,
         offset,
@@ -27,57 +29,31 @@ const fetchAllBooks = vi.hoisted(() =>
         hasNext: offset + limit < books.length,
         hasPrevious: offset > 0,
       },
+      counts: { all: books.length, trade: books.length, sale: 0, seeking: 0 },
     })
   })
 )
-const fetchUserBooks = vi.hoisted(() => vi.fn().mockResolvedValue([]))
 
-vi.mock('@src/utils/runtimeEnv', () => ({
-  isApiMockMode: () => false,
-}))
-
+vi.mock('@src/utils/runtimeEnv', () => ({ isApiMockMode: () => false }))
 vi.mock('@src/api/auth/me.service', () => ({
   fetchMe: vi.fn().mockResolvedValue({ id: 1, name: 'Reader' }),
 }))
-
-vi.mock('@api/books/books.service', () => ({
-  fetchAllBooks,
-  fetchBooks: vi.fn().mockResolvedValue([
-    {
-      id: 'random-public-book',
-      title: 'Random public book',
-      author: 'Another reader',
-      coverUrl: '',
-      condition: 'good',
-      status: 'available' as const,
-      isForTrade: true,
-      isForSale: false,
-      isSeeking: false,
-      price: null,
-    },
-  ]),
-  fetchBookById: vi.fn(),
-}))
-
-vi.mock('@api/books/userBooks.service', () => ({
-  fetchUserBooks,
-}))
+vi.mock('@api/books/books.service', () => ({ fetchBookRelations }))
 
 import { BooksPage } from '@src/pages/books/BooksPage'
 
 import { renderWithProviders } from '../../test-utils'
 
 describe('BooksPage pagination', () => {
-  test('moves between result pages with the footer controls', async () => {
+  test('moves between personal result pages with the footer controls', async () => {
     renderWithProviders(<BooksPage />)
 
     expect(
       await screen.findByRole('button', { name: 'Ver Book 1' })
     ).toBeInTheDocument()
-    expect(fetchAllBooks).toHaveBeenCalledWith(
-      expect.objectContaining({ limit: 5, offset: 0 })
+    expect(fetchBookRelations).toHaveBeenCalledWith(
+      expect.objectContaining({ limit: 5, offset: 0, tab: 'all' })
     )
-    expect(fetchUserBooks).not.toHaveBeenCalled()
     const nextButton = screen.getByRole('button', {
       name: 'booksPage.pagination.next',
     })
@@ -92,21 +68,17 @@ describe('BooksPage pagination', () => {
     expect(
       await screen.findByRole('button', { name: 'Ver Book 6' })
     ).toBeInTheDocument()
-    expect(fetchAllBooks).toHaveBeenLastCalledWith(
-      expect.objectContaining({ limit: 5, offset: 5 })
+    expect(fetchBookRelations).toHaveBeenLastCalledWith(
+      expect.objectContaining({ limit: 5, offset: 5, tab: 'all' })
     )
     expect(
       screen.queryByRole('button', { name: 'Ver Book 1' })
     ).not.toBeInTheDocument()
 
     fireEvent.click(nextButton)
-
     expect(
       await screen.findByRole('button', { name: 'Ver Book 11' })
     ).toBeInTheDocument()
-    expect(
-      screen.queryByRole('button', { name: 'Ver Book 1' })
-    ).not.toBeInTheDocument()
-    expect(nextButton).toBeDisabled()
+    await waitFor(() => expect(nextButton).toBeDisabled())
   })
 })

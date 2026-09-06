@@ -41,11 +41,13 @@ válido no se inventa una distancia.
 
 ## Acceso publico y rutas privadas
 
-Inicio, libros, detalles, Comunidad, Mapa, Ayuda y perfiles publicos se pueden
-leer sin sesion. Las mutaciones muestran la modal comun de autenticacion y
-conservan un `returnTo` local seguro al ir a login o registro. Las rutas
-`/books/new`, `/books/mine`, `/messages`, `/profile` y `/stats` requieren sesion
-y redirigen a login mientras explican el motivo del acceso.
+Inicio, detalles publicos, Comunidad, Mapa, Ayuda y perfiles publicos se pueden
+leer sin sesion. `/books`, sus cuatro pestañas y `/books/new` requieren sesion;
+la lista personal consulta `/api/books/relations` y `/books/mine` se normaliza
+a `/books` por compatibilidad. Las mutaciones muestran la modal comun de
+autenticacion y conservan un `returnTo` local seguro al ir a login o registro.
+Las rutas `/messages`, `/profile` y `/stats` tambien requieren sesion y
+redirigen a login mientras explican el motivo del acceso.
 
 ## Recorridos MVP
 

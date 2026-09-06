@@ -18,6 +18,14 @@ export type ApiBookCatalogPage = {
   }
 }
 
+export type PersonalBookRelationsTab = 'all' | 'trade' | 'sale' | 'seeking'
+
+export type ApiBookRelationsPage = {
+  items: ApiBook[]
+  page: ApiBookCatalogPage['page']
+  counts: Record<PersonalBookRelationsTab, number>
+}
+
 /** Página de recomendaciones públicas retornada por `/api/books/home`. */
 export type ApiHomeBooksPage = {
   items: ApiBook[]

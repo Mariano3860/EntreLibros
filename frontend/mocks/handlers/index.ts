@@ -7,6 +7,7 @@ import {
   booksHandler,
   homeBooksHandler,
 } from './books/books.handler'
+import { bookRelationsHandler } from './books/relations.handler'
 import { publishBookHandler } from './books/publish.handler'
 import { publicationHandlers } from './books/publication.handler'
 import { searchBooksHandler } from './books/search.handler'
@@ -40,6 +41,7 @@ export const handlers = [
   authStateHandler,
   meHandler,
   booksHandler,
+  bookRelationsHandler,
   bookInterestHandler,
   homeBooksHandler,
   searchBooksHandler,

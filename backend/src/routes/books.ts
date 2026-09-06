@@ -18,6 +18,9 @@ import {
   type BookListingSort,
   type BookListingShippingPayer,
   type PublicBookListingFilters,
+  listPersonalBookRelations,
+  type PersonalBookRelationsFilters,
+  type PersonalBookRelationsTab,
   type PublicationConsents,
   hasExactActiveBookListing,
   updateBookListingEditorial,
@@ -247,6 +250,42 @@ router.get('/mine', authenticate, async (req: AuthenticatedRequest, res) => {
   const listings = await listUserBookListings(req.user.id);
   res.json(listings.map(toUserBookListing));
 });
+
+router.get(
+  '/relations',
+  authenticate,
+  async (req: AuthenticatedRequest, res) => {
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'Unauthorized',
+        message: 'auth.errors.unauthorized',
+      });
+    }
+
+    const filters = parsePersonalRelationsFilters(req.query);
+    if (!filters) {
+      return res.status(400).json({
+        error: 'InvalidFields',
+        message: 'books.errors.invalid_filters',
+      });
+    }
+
+    try {
+      const result = await listPersonalBookRelations(req.user.id, filters);
+      return res.json({
+        items: result.items.map(toPersonalBookListing),
+        page: result.page,
+        counts: result.counts,
+      });
+    } catch (error) {
+      console.error('Failed to load personal book relations', error);
+      return res.status(500).json({
+        error: 'PersonalBooksQueryFailed',
+        message: 'books.errors.query_failed',
+      });
+    }
+  }
+);
 
 router.post(
   '/:id/interest',
@@ -660,6 +699,33 @@ function parseCatalogFilters(
     return null;
   if (filters.radiusKm !== undefined && filters.radiusKm <= 0) return null;
   return filters;
+}
+
+function parsePersonalRelationsFilters(
+  query: Request['query']
+): PersonalBookRelationsFilters | null {
+  const tab = queryText(query.tab) as PersonalBookRelationsTab | undefined;
+  const allowedTabs: readonly PersonalBookRelationsTab[] = [
+    'all',
+    'trade',
+    'sale',
+    'seeking',
+  ];
+  if (tab !== undefined && !allowedTabs.includes(tab)) return null;
+
+  const numericKeys = ['limit', 'offset', 'latitude', 'longitude', 'radiusKm'];
+  if (
+    numericKeys.some((key) => {
+      const raw = queryText(query[key]);
+      return raw !== undefined && queryNumber(raw) === undefined;
+    })
+  ) {
+    return null;
+  }
+
+  const filters = parseCatalogFilters(query);
+  if (!filters) return null;
+  return { ...filters, tab: tab ?? 'all' };
 }
 
 function parseHomePagination(
@@ -1113,6 +1179,14 @@ function toUserBookListing(listing: BookListing) {
     editorialStatus: listing.editorialStatus,
     editorialReason: listing.editorialReason ?? undefined,
     type: listing.type,
+  };
+}
+
+function toPersonalBookListing(listing: BookListing) {
+  return {
+    ...toUserBookListing(listing),
+    ownerId: String(listing.userId),
+    ownerName: listing.ownerName,
   };
 }
 

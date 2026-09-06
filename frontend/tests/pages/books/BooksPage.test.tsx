@@ -2,13 +2,49 @@ import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 import { useLocation } from 'react-router-dom'
 
-vi.mock('@src/api/auth/me.service', () => ({
-  fetchMe: vi.fn().mockRejectedValue(new Error('unauthenticated')),
+const fetchMe = vi.hoisted(() => vi.fn())
+const fetchBookRelations = vi.hoisted(() => vi.fn())
+
+vi.mock('@src/utils/runtimeEnv', () => ({
+  isApiMockMode: () => false,
+}))
+
+vi.mock('@src/api/auth/me.service', () => ({ fetchMe }))
+vi.mock('@api/books/books.service', () => ({
+  fetchBookRelations,
 }))
 
 import { BooksPage } from '@src/pages/books/BooksPage'
 
 import { renderWithProviders } from '../../test-utils'
+
+const relationBook = {
+  id: 'own-trade-1',
+  title: 'Dune',
+  author: 'Frank Herbert',
+  coverUrl: '',
+  condition: 'good',
+  status: 'available' as const,
+  type: 'offer' as const,
+  isForTrade: true,
+  isForSale: false,
+  isSeeking: false,
+  price: null,
+  ownerId: '1',
+  ownerName: 'Reader',
+}
+
+const relationPage = (items = [relationBook]) => ({
+  items,
+  page: {
+    limit: 5,
+    offset: 0,
+    total: items.length,
+    hasNext: false,
+    hasPrevious: false,
+  },
+  counts: { all: items.length, trade: items.length, sale: 0, seeking: 0 },
+})
 
 const LocationProbe = () => {
   const location = useLocation()
@@ -21,93 +57,119 @@ const LocationProbe = () => {
 }
 
 describe('BooksPage', () => {
-  test('renders the book sections in one accessible horizontal tablist', () => {
+  beforeEach(() => {
+    fetchMe.mockReset()
+    fetchMe.mockResolvedValue({ id: 1, name: 'Reader' })
+    fetchBookRelations.mockReset()
+    fetchBookRelations.mockResolvedValue(relationPage())
+  })
+
+  test('renders exactly the four personal relation tabs', async () => {
     renderWithProviders(<BooksPage />)
 
-    const tablist = screen.getByRole('tablist', { name: 'Tipos de libros' })
+    const tablist = await screen.findByRole('tablist', {
+      name: 'booksPage.tabs.label',
+    })
 
     expect(tablist).toHaveAttribute('aria-orientation', 'horizontal')
-    expect(tablist.querySelectorAll('[role="tab"]')).toHaveLength(3)
+    expect(tablist.querySelectorAll('[role="tab"]')).toHaveLength(4)
     expect(
       screen.queryByRole('tab', { name: 'Mis libros' })
     ).not.toBeInTheDocument()
     expect(
-      screen.queryByRole('tab', { name: 'Buscando' })
-    ).not.toBeInTheDocument()
-    expect(screen.queryByText('Buscando')).not.toBeInTheDocument()
+      screen.getByRole('tab', { name: 'booksPage.tabs.all' })
+    ).toHaveAttribute('aria-selected', 'true')
+    expect(
+      await screen.findByRole('button', { name: 'Ver Dune' })
+    ).toBeVisible()
   })
 
-  test('normalizes a visitor seeking URL to the public books catalog', async () => {
+  test('normalizes the legacy mine URL to Todos', async () => {
     renderWithProviders(
       <>
         <BooksPage />
         <LocationProbe />
       </>,
-      { initialEntries: ['/books/seeking?type=want&page=2'] }
+      { initialEntries: ['/books/mine'] }
     )
 
-    await waitFor(() => {
+    await waitFor(() =>
       expect(screen.getByTestId('location')).toHaveTextContent('/books')
-      expect(screen.getByRole('tab', { name: 'Todos' })).toHaveAttribute(
-        'aria-selected',
-        'true'
+    )
+    await waitFor(() =>
+      expect(fetchBookRelations).toHaveBeenCalledWith(
+        expect.objectContaining({ tab: 'all' })
       )
-    })
+    )
+  })
+
+  test('does not query or render public books for a visitor', async () => {
+    fetchMe.mockRejectedValueOnce(new Error('unauthenticated'))
+
+    renderWithProviders(<BooksPage />)
+
+    await waitFor(() => expect(fetchMe).toHaveBeenCalled())
+    expect(fetchBookRelations).not.toHaveBeenCalled()
     expect(
-      screen.queryByRole('tab', { name: 'Buscando' })
+      screen.queryByRole('button', { name: 'Ver Dune' })
     ).not.toBeInTheDocument()
   })
 
-  test('renders Todos with the public catalog for visitors', () => {
-    renderWithProviders(<BooksPage />)
-
-    expect(screen.getByRole('tab', { name: 'Todos' })).toHaveAttribute(
-      'aria-selected',
-      'true'
+  test('changes tab and keeps the selected tab in the URL', async () => {
+    renderWithProviders(
+      <>
+        <BooksPage />
+        <LocationProbe />
+      </>,
+      { initialEntries: ['/books'] }
     )
-    expect(
-      screen.getByRole('button', { name: 'Ver Ecos del Viento Norte' })
-    ).toBeVisible()
+
+    fireEvent.click(screen.getByRole('tab', { name: 'booksPage.tabs.seeking' }))
+
+    await waitFor(() =>
+      expect(screen.getByTestId('location')).toHaveTextContent('/books/seeking')
+    )
+    await waitFor(() =>
+      expect(fetchBookRelations).toHaveBeenLastCalledWith(
+        expect.objectContaining({ tab: 'seeking' })
+      )
+    )
   })
 
-  test('keeps public books out of Todos while public tabs can explore them', () => {
+  test('shows a contextual empty state for each personal relation tab', async () => {
+    fetchBookRelations.mockImplementation(async ({ tab }: { tab: string }) => ({
+      items: [],
+      page: {
+        limit: 5,
+        offset: 0,
+        total: 0,
+        hasNext: false,
+        hasPrevious: false,
+      },
+      counts: { all: 0, trade: 0, sale: 0, seeking: 0 },
+      tab,
+    }))
+
     renderWithProviders(<BooksPage />)
 
-    fireEvent.click(
-      screen.getByRole('tab', { name: 'Disponibles para intercambio' })
-    )
-    fireEvent.change(screen.getByRole('textbox', { name: 'Buscar libros' }), {
-      target: { value: 'Ecos' },
-    })
-    expect(screen.getAllByRole('button', { name: /^Ver / })).toHaveLength(1)
-  })
-
-  test('gates the publish action for a visitor', async () => {
-    renderWithProviders(<BooksPage />)
-    fireEvent.click(screen.getByRole('button', { name: /Publicar un libro/ }))
-    expect(await screen.findByRole('dialog')).toBeVisible()
-  })
-
-  test('opens a book detail dialog', async () => {
-    renderWithProviders(<BooksPage />)
-    fireEvent.click(
-      screen.getByRole('tab', { name: 'Disponibles para intercambio' })
-    )
-    fireEvent.click(
-      screen.getByRole('button', { name: 'Ver Ecos del Viento Norte' })
-    )
-    expect(
-      screen.getByRole('button', { name: 'bookDetail.close' })
-    ).toBeVisible()
-    expect(await screen.findByText('bookDetail.offer.title')).toBeVisible()
-    const contact = screen.getByRole('button', { name: 'bookDetail.contact' })
-    expect(contact).toBeVisible()
-    fireEvent.click(contact)
-    expect(await screen.findByText('auth.required.title')).toBeVisible()
-
-    fireEvent.click(screen.getByRole('button', { name: 'bookDetail.close' }))
-    expect(
-      screen.queryByRole('button', { name: 'bookDetail.close' })
-    ).not.toBeInTheDocument()
+    expect(await screen.findByText('booksPage.empty.all')).toBeVisible()
+    for (const tab of [
+      'booksPage.tabs.for_trade',
+      'booksPage.tabs.for_sale',
+      'booksPage.tabs.seeking',
+    ]) {
+      fireEvent.click(screen.getByRole('tab', { name: tab }))
+      await waitFor(() => {
+        expect(
+          screen.getByText(
+            tab === 'booksPage.tabs.for_trade'
+              ? 'booksPage.empty.trade'
+              : tab === 'booksPage.tabs.for_sale'
+                ? 'booksPage.empty.sale'
+                : 'booksPage.empty.seeking'
+          )
+        ).toBeVisible()
+      })
+    }
   })
 })

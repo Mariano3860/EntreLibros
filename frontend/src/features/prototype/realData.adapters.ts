@@ -69,6 +69,11 @@ export const toPrototypeBook = (
     : book.isForSale
       ? 'Venta'
       : 'Intercambio'
+  const intentions: NonNullable<PrototypeBook['intentions']> = [
+    ...(book.isForTrade ? (['trade'] as const) : []),
+    ...(book.isForSale ? (['sale'] as const) : []),
+    ...(book.isSeeking ? (['seeking'] as const) : []),
+  ]
 
   return {
     id: String(book.id),
@@ -78,6 +83,7 @@ export const toPrototypeBook = (
     ...(book.ownerId ? { ownerId: String(book.ownerId) } : {}),
     distance: options.distance ?? 'Ubicación disponible',
     mode,
+    ...(intentions.length > 0 ? { intentions } : {}),
     ...(book.price !== undefined && book.price !== null
       ? { price: `$${book.price.toLocaleString('es-AR')}` }
       : {}),

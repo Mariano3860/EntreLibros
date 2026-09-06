@@ -193,9 +193,15 @@ export const HomePage = () => {
             )}
             <PrototypeButton
               tone="primary"
-              onClick={() => navigate(`/${HOME_URLS.BOOKS}`)}
+              onClick={() =>
+                navigate(
+                  isAuthenticated
+                    ? `/${HOME_URLS.BOOKS}`
+                    : `/${HOME_URLS.COMMUNITY}`
+                )
+              }
             >
-              {t('home.explore_books', { defaultValue: 'Explorar libros' })}{' '}
+              {t(isAuthenticated ? 'home.my_books' : 'home.explore_community')}{' '}
               <span aria-hidden="true">→</span>
             </PrototypeButton>
             {!isAuthenticated ? (
@@ -229,10 +235,13 @@ export const HomePage = () => {
                 tone="ghost"
                 size="small"
                 onClick={() =>
-                  navigate(isAuthenticated ? '/books/mine' : '/books')
+                  navigate(isAuthenticated ? '/books' : '/community')
                 }
               >
-                {isAuthenticated ? 'Ver mis libros →' : 'Ver catálogo →'}
+                {isAuthenticated
+                  ? t('home.my_books')
+                  : t('home.explore_community')}{' '}
+                →
               </PrototypeButton>
             }
           />

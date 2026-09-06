@@ -5,6 +5,7 @@ import {
   type ButtonHTMLAttributes,
   type ReactNode,
 } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import type { PrototypeBook } from './catalog'
 import styles from './PrototypeUI.module.scss'
@@ -41,6 +42,7 @@ export const PageHeader = ({
 export const Panel = ({
   children,
   className = '',
+  id,
   as: Element = 'section',
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledBy,
@@ -49,6 +51,7 @@ export const Panel = ({
 }: {
   children: ReactNode
   className?: string
+  id?: string
   as?: 'section' | 'article' | 'div' | 'aside'
   'aria-label'?: string
   'aria-labelledby'?: string
@@ -57,6 +60,7 @@ export const Panel = ({
 }) => (
   <Element
     className={`${styles.panel} ${className}`}
+    id={id}
     aria-label={ariaLabel}
     aria-labelledby={ariaLabelledBy}
     aria-modal={ariaModal}
@@ -182,38 +186,55 @@ export const PrototypeBookCard = ({
   book: PrototypeBook
   decorative?: boolean
   onClick?: () => void
-}) => (
-  <article className={styles.bookCard}>
-    <button
-      onClick={onClick}
-      className={styles.bookCardButton}
-      aria-label={`Ver ${book.title}`}
-      disabled={decorative}
-      tabIndex={decorative ? -1 : undefined}
-    >
-      <BookCover book={book} />
-      <div className={styles.bookCardBody}>
-        <span className={styles.bookMode}>
-          {book.mode === 'Buscado' ? 'Lista de deseos' : book.mode}
-        </span>
-        <h3>{book.title}</h3>
-        <p>{book.author}</p>
-        <div className={styles.bookMeta}>
-          <span>{book.owner}</span>
-          <span>{book.distance}</span>
+}) => {
+  const { t } = useTranslation()
+  const hasTrade = book.intentions?.includes('trade') ?? false
+  const hasSale = book.intentions?.includes('sale') ?? false
+  const isSeeking = book.intentions?.includes('seeking') ?? false
+  const modeLabel = isSeeking
+    ? t('booksPage.badge.seeking')
+    : hasTrade && hasSale
+      ? `${t('booksPage.badge.for_trade')} · ${t('booksPage.intentions.sale')}`
+      : hasSale
+        ? t('booksPage.intentions.sale')
+        : hasTrade
+          ? t('booksPage.badge.for_trade')
+          : book.mode
+  const footerLabel = isSeeking
+    ? t('booksPage.badge.seeking')
+    : hasSale
+      ? book.price
+        ? book.price
+        : t('booksPage.intentions.sale')
+      : (book.price ?? t('booksPage.status.available'))
+
+  return (
+    <article className={styles.bookCard}>
+      <button
+        onClick={onClick}
+        className={styles.bookCardButton}
+        aria-label={`Ver ${book.title}`}
+        disabled={decorative}
+        tabIndex={decorative ? -1 : undefined}
+      >
+        <BookCover book={book} />
+        <div className={styles.bookCardBody}>
+          <span className={styles.bookMode}>{modeLabel}</span>
+          <h3>{book.title}</h3>
+          <p>{book.author}</p>
+          <div className={styles.bookMeta}>
+            <span>{book.owner}</span>
+            <span>{book.distance}</span>
+          </div>
+          <div className={styles.bookFooter}>
+            <strong>{footerLabel}</strong>
+            <span aria-hidden="true">→</span>
+          </div>
         </div>
-        <div className={styles.bookFooter}>
-          <strong>
-            {book.mode === 'Buscado'
-              ? 'Buscando'
-              : (book.price ?? 'Disponible')}
-          </strong>
-          <span aria-hidden="true">→</span>
-        </div>
-      </div>
-    </button>
-  </article>
-)
+      </button>
+    </article>
+  )
+}
 
 export const KpiCard = ({
   icon,

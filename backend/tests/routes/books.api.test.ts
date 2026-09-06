@@ -241,6 +241,162 @@ describe('books API legacy endpoints', () => {
   });
 });
 
+describe('personal book relations API', () => {
+  test('requires authentication and validates relation filters', async () => {
+    await request(app).get('/api/books/relations').expect(401);
+
+    const userId = await insertUser({ name: 'Relations user' });
+    const cookie = buildAuthCookie(userId);
+
+    await request(app)
+      .get('/api/books/relations')
+      .set('Cookie', cookie)
+      .query({ tab: 'unknown' })
+      .expect(400);
+    await request(app)
+      .get('/api/books/relations')
+      .set('Cookie', cookie)
+      .query({ limit: 'invalid' })
+      .expect(400);
+  });
+
+  test('returns only active own relations with category counts and pagination', async () => {
+    const userId = await insertUser({ name: 'Relations owner' });
+    const otherUserId = await insertUser({ name: 'Other owner' });
+    const activeIds: number[] = [];
+
+    for (let index = 0; index < 3; index += 1) {
+      activeIds.push(
+        await insertListing({
+          userId,
+          bookId: await insertBook(),
+          sale: false,
+          trade: true,
+        })
+      );
+    }
+    for (let index = 0; index < 2; index += 1) {
+      activeIds.push(
+        await insertListing({
+          userId,
+          bookId: await insertBook(),
+          sale: true,
+          trade: false,
+        })
+      );
+    }
+    for (let index = 0; index < 4; index += 1) {
+      activeIds.push(
+        await insertListing({
+          userId,
+          bookId: await insertBook(),
+          type: 'want',
+          sale: false,
+          trade: false,
+        })
+      );
+    }
+
+    const privateListing = await insertListing({
+      userId,
+      bookId: await insertBook(),
+      sale: true,
+      trade: false,
+      availability: 'private',
+      status: 'reserved',
+    });
+    activeIds.push(privateListing);
+
+    await insertListing({
+      userId: otherUserId,
+      bookId: await insertBook(),
+      sale: true,
+      trade: true,
+    });
+    const draftId = await insertListing({
+      userId,
+      bookId: await insertBook(),
+      sale: true,
+      trade: false,
+      isDraft: true,
+      status: 'draft',
+    });
+    const expiredId = await insertListing({
+      userId,
+      bookId: await insertBook(),
+      sale: true,
+      trade: false,
+    });
+    await client.query(
+      "UPDATE book_listings SET expires_at = NOW() - INTERVAL '1 day' WHERE id = $1",
+      [expiredId]
+    );
+    const rejectedId = await insertListing({
+      userId,
+      bookId: await insertBook(),
+      sale: true,
+      trade: false,
+    });
+    await client.query(
+      "UPDATE book_listings SET editorial_status = 'rejected' WHERE id = $1",
+      [rejectedId]
+    );
+
+    const cookie = buildAuthCookie(userId);
+    const all = await request(app)
+      .get('/api/books/relations')
+      .set('Cookie', cookie)
+      .query({ limit: 100 })
+      .expect(200);
+
+    expect(all.body.page).toMatchObject({
+      limit: 100,
+      offset: 0,
+      total: 10,
+      hasNext: false,
+      hasPrevious: false,
+    });
+    expect(all.body.counts).toEqual({ all: 10, trade: 3, sale: 3, seeking: 4 });
+    expect(
+      all.body.items.map((item: { id: string }) => Number(item.id))
+    ).toEqual(expect.arrayContaining(activeIds));
+    expect(
+      all.body.items.map((item: { id: string }) => Number(item.id))
+    ).not.toContain(draftId);
+    expect(
+      all.body.items.map((item: { id: string }) => Number(item.id))
+    ).not.toContain(expiredId);
+    expect(
+      all.body.items.map((item: { id: string }) => Number(item.id))
+    ).not.toContain(rejectedId);
+
+    const trade = await request(app)
+      .get('/api/books/relations')
+      .set('Cookie', cookie)
+      .query({ tab: 'trade', limit: 2 })
+      .expect(200);
+    expect(trade.body.page).toMatchObject({ total: 3, limit: 2 });
+    expect(trade.body.items).toHaveLength(2);
+    expect(trade.body.counts).toEqual({
+      all: 10,
+      trade: 3,
+      sale: 3,
+      seeking: 4,
+    });
+
+    const seeking = await request(app)
+      .get('/api/books/relations')
+      .set('Cookie', cookie)
+      .query({ tab: 'seeking' })
+      .expect(200);
+    expect(seeking.body.page.total).toBe(4);
+    expect(seeking.body.items).toHaveLength(4);
+    expect(
+      seeking.body.items.every((item: { isSeeking: boolean }) => item.isSeeking)
+    ).toBe(true);
+  });
+});
+
 describe('books API listing projections', () => {
   test('returns UI status in public listings', async () => {
     const userId = await insertUser({
