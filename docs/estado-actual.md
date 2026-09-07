@@ -34,7 +34,10 @@ La matriz de requisitos y la evidencia se mantienen en
   de carga/vacio/error; `Sin limite` usa el bbox real del viewport y los radios
   numericos usan el centro del dispositivo/perfil; sin centro valido no se
   inventa una distancia. El mapa limita 50 rincones, 100 publicaciones y 100
-  actividades e informa truncamiento.
+  actividades e informa truncamiento. `/map` presenta ahora una composicion
+  dominante de mapa oscuro, panel de exploracion flotante, pines semanticos y
+  una unica tarjeta de seleccion; la actividad visible sigue siendo la senal
+  agregada disponible, no un feed inventado.
 - Experiencia publica: visitantes pueden leer las superficies de descubrimiento,
   Comunidad, perfiles y ayuda; las mutaciones se detienen en una modal comun y
   las rutas privadas exigen sesion con retorno local validado. La matriz de

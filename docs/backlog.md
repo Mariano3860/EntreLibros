@@ -41,6 +41,9 @@ La matriz completa y sus referencias estan en
 - Mapa sincronizado con el bbox real del viewport, radios centrados en la
   ubicacion disponible y limites server-side de 50 rincones, 100 publicaciones
   y 100 actividades con metadatos de truncamiento.
+- Rediseño de `/map` como experiencia de exploracion: mapa dominante oscuro,
+  panel flotante de capas y filtros reales, pines semanticos, tarjeta unica de
+  seleccion, actividad cercana honesta y adaptacion responsive.
 - Experiencia publica de lectura para visitantes en Inicio, detalles publicos de
   publicaciones, Comunidad,
   Mapa, Ayuda y perfiles, con una modal comun para las acciones autenticadas y

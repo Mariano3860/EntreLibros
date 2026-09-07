@@ -20,6 +20,8 @@ permisos de ubicacion ni Socket.IO.
 
 ## Checklist de navegador
 
+Para `/map`, comprobá que la capa base oscura y su atribución OSM/CARTO sean visibles, que el panel se pueda ocultar y mostrar en un viewport intermedio, que la búsqueda, el radio y las categorías no inventen datos, y que el estado vacío distinga la ausencia de actividad.
+
 La checklist detallada esta en [`tfg-browser-checklist.md`](tfg-browser-checklist.md).
 Comprueba que `/api` y `/socket.io` llegan al backend, que el modo resuelto es
 `real`, que una recarga conserva los datos, que el mapa respeta ubicacion
