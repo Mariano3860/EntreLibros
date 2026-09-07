@@ -975,6 +975,36 @@
     }
   },
   "map": {
+    "exploration": {
+      "eyebrow": "Nearby exploration",
+      "title": "Corners map",
+      "mapLabel": "Map of corners and nearby activity",
+      "nearbyLocation": "Showing places near your location",
+      "profileLocation": "Sorting places by your profile area",
+      "fallbackLocation": "Buenos Aires · approximate location",
+      "locate": "My location",
+      "layersTitle": "Map layers",
+      "activityLayer": "Activity on map",
+      "availabilityTitle": "Availability",
+      "openNowHint": "Corners available now",
+      "activityVisible": "Show activity",
+      "closePanel": "Close panel",
+      "activityVisibleHint": "Aggregated community signals",
+      "nearbyActivity": "Nearby activity",
+      "activitySignal": "Recorded signal",
+      "noNearbyActivity": "There are no activity signals in this area yet."
+    },
+    "selection": {
+      "open": "Open now",
+      "closed": "Closed now",
+      "publicationStatus": "Available publication",
+      "unknownAuthor": "Author not provided",
+      "distanceUnavailable": "Distance unavailable",
+      "recentActivity": "Recent activity",
+      "noActivity": "No recent activity",
+      "close": "Close selection",
+      "hideDetails": "Hide details"
+    },
     "location": {
       "youAreHere": "Your approximate location"
     },
@@ -1008,6 +1038,8 @@
       "updating": "Updating...",
       "loading": "Loading map...",
       "error": "We couldn't load the map. Try again.",
+      "retry": "Try again",
+      "truncated": "Showing a selection. Zoom in to explore more.",
       "locationDenied": "Location permission denied"
     },
     "badge": {

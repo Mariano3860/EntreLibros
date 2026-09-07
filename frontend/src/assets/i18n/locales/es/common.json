@@ -971,6 +971,36 @@
     }
   },
   "map": {
+    "exploration": {
+      "eyebrow": "Exploración cercana",
+      "title": "Mapa de rincones",
+      "mapLabel": "Mapa de rincones y actividad cercana",
+      "nearbyLocation": "Mostrando lugares cerca de tu ubicación",
+      "profileLocation": "Ordenando lugares según tu zona de perfil",
+      "fallbackLocation": "Buenos Aires · ubicación aproximada",
+      "locate": "Mi ubicación",
+      "layersTitle": "Capas del mapa",
+      "activityLayer": "Actividad en el mapa",
+      "availabilityTitle": "Disponibilidad",
+      "openNowHint": "Rincones disponibles ahora",
+      "activityVisible": "Mostrar actividad",
+      "closePanel": "Cerrar panel",
+      "activityVisibleHint": "Señales agregadas de la comunidad",
+      "nearbyActivity": "Actividad cercana",
+      "activitySignal": "Señal registrada",
+      "noNearbyActivity": "Todavía no hay señales de actividad en esta zona."
+    },
+    "selection": {
+      "open": "Abierto ahora",
+      "closed": "Cerrado ahora",
+      "publicationStatus": "Publicación disponible",
+      "unknownAuthor": "Autoría no informada",
+      "distanceUnavailable": "Distancia no disponible",
+      "recentActivity": "Actividad reciente",
+      "noActivity": "Sin actividad reciente",
+      "close": "Cerrar selección",
+      "hideDetails": "Ocultar detalle"
+    },
     "location": {
       "youAreHere": "Tu ubicación aproximada"
     },
@@ -1004,6 +1034,8 @@
       "updating": "Actualizando...",
       "loading": "Cargando mapa...",
       "error": "No pudimos cargar el mapa. Intenta nuevamente.",
+      "retry": "Reintentar",
+      "truncated": "Mostramos una selección. Acercá el mapa para explorar más.",
       "locationDenied": "Permiso de ubicación denegado"
     },
     "badge": {

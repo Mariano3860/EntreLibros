@@ -36,11 +36,23 @@ const userLocationIcon = divIcon({
   </span>`,
 })
 
-const cornerMarkerColors = [
-  'var(--prototype-orange)',
-  'var(--prototype-purple)',
-  'var(--prototype-teal)',
-] as const
+const getCornerMarkerColor = (corner: MapCornerPin) => {
+  if (corner.status === 'paused') return 'var(--prototype-orange)'
+
+  const isSemiprivate = corner.themes.some((theme) =>
+    theme.toLocaleLowerCase().includes('semiprivado')
+  )
+
+  return isSemiprivate ? 'var(--prototype-blue)' : 'var(--prototype-teal)'
+}
+
+const mapTileUrls = {
+  dark: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+  light: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+} as const
+
+const mapTileAttribution =
+  '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions" target="_blank" rel="noreferrer">CARTO</a>'
 
 type MapCanvasProps = {
   bbox: MapBoundingBox
@@ -273,12 +285,10 @@ export const MapCanvas = ({
 
   const cornerPins = useMemo(() => {
     if (!layers.corners) return []
-    return corners.map((corner, index) => {
+    return corners.map((corner) => {
       const isSelected =
         selectedPin?.type === 'corner' && selectedPin.data.id === corner.id
-      const markerColor =
-        cornerMarkerColors[index % cornerMarkerColors.length] ??
-        'var(--primary-color)'
+      const markerColor = getCornerMarkerColor(corner)
 
       return (
         <CircleMarker
@@ -294,7 +304,7 @@ export const MapCanvas = ({
           eventHandlers={{
             click: () => onSelectPin(cornerToPin(corner)),
           }}
-          className={styles.cornerMarker}
+          className={`${styles.cornerMarker} ${isSelected ? styles.selectedMarker : ''}`}
         >
           <Tooltip
             direction="top"
@@ -335,7 +345,7 @@ export const MapCanvas = ({
           eventHandlers={{
             click: () => onSelectPin(publicationToPin(publication)),
           }}
-          className={styles.publicationMarker}
+          className={`${styles.publicationMarker} ${isSelected ? styles.selectedMarker : ''}`}
         >
           <Tooltip
             direction="top"
@@ -378,8 +388,8 @@ export const MapCanvas = ({
         pathOptions={{
           color: 'var(--color-warning)',
           fillColor: 'var(--color-warning)',
-          fillOpacity: 0.25,
-          weight: 0,
+          fillOpacity: 0.2,
+          weight: 2,
         }}
         className={styles.activityMarker}
       />
@@ -407,7 +417,11 @@ export const MapCanvas = ({
           focusRequest={focusRequest}
         />
         <MapControls bbox={bbox} userLocation={userLocation} />
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        <TileLayer
+          url={mapTileUrls[theme]}
+          attribution={mapTileAttribution}
+          crossOrigin="anonymous"
+        />
         {userLocation ? (
           <>
             {radiusKm !== null ? (

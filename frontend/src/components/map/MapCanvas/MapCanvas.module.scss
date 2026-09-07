@@ -12,7 +12,7 @@
   --map-container-background: #102c3a;
   --map-control-background: rgb(8 23 34 / 86%);
   --map-control-shadow: 0 8px 20px rgb(2 10 16 / 22%);
-  --map-tile-filter: brightness(0.62) saturate(0.78) contrast(1.08);
+  --map-tile-filter: none;
   --map-attribution-background: rgb(8 23 34 / 78%);
   --map-attribution-border: rgb(41 69 83 / 68%);
 
@@ -25,7 +25,7 @@
   --map-container-background: #dce9e8;
   --map-control-background: rgb(255 255 255 / 92%);
   --map-control-shadow: 0 8px 20px rgb(27 62 70 / 16%);
-  --map-tile-filter: brightness(1.05) saturate(0.78) contrast(0.94);
+  --map-tile-filter: none;
   --map-attribution-background: rgb(255 255 255 / 86%);
   --map-attribution-border: var(--prototype-border);
 }
@@ -91,7 +91,22 @@
 .cornerMarker,
 .publicationMarker,
 .userLocationMarker {
-  transition: transform $transition-duration-fast;
+  transition:
+    transform $transition-duration-fast,
+    filter $transition-duration-fast;
+}
+
+.cornerMarker {
+  filter: drop-shadow(0 0 5px rgb(66 215 199 / 42%));
+}
+
+.publicationMarker {
+  filter: drop-shadow(0 0 4px rgb(93 169 255 / 36%));
+}
+
+.selectedMarker {
+  filter: drop-shadow(0 0 8px rgb(255 139 76 / 74%));
+  transform: scale(1.18);
 }
 
 .userLocationIcon {
@@ -130,11 +145,11 @@
 .userLocationMarker:hover,
 .cornerMarker:focus,
 .publicationMarker:focus {
-  filter: brightness(1.08);
+  filter: brightness(1.12) drop-shadow(0 0 8px rgb(255 255 255 / 34%));
 }
 
 .activityMarker {
-  mix-blend-mode: multiply;
+  filter: drop-shadow(0 0 8px rgb(246 200 95 / 42%));
 }
 
 .tooltip {
