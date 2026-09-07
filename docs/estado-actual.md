@@ -83,9 +83,10 @@ El recorrido reproducible con navegador real esta en
 [`e2e-baseline.md`](e2e-baseline.md). Usa Docker Compose con PostgreSQL/PostGIS
 aislado, aplica las migraciones, carga un seed sintetico, arranca backend y
 frontend en puertos E2E, y conserva diagnosticos de Playwright solo cuando
-hay fallos. `npm run verify:ci` combina las comprobaciones no mutantes con los
-tests de backend y frontend, los builds y Playwright; los `complete-check` de
-paquete siguen disponibles por separado.
+hay fallos. La pipeline E2E usa `npm run verify:e2e` para ejecutar los tests
+backend aislados y Playwright; la pipeline de frontend es la responsable de
+sus tests unitarios. `verify:ci` conserva la comprobacion global no mutante y
+los `complete-check` de paquete siguen disponibles por separado.
 
 ## Comprobacion manual minima
 
