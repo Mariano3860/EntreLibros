@@ -38,30 +38,27 @@ describe('useChatSocket', () => {
     })
   })
 
-  test('handles incoming and outgoing messages', () => {
+  test('keeps the authenticated socket identity', () => {
+    const { result } = renderHook(() => useChatSocket(), { wrapper })
+    act(() => listeners['user']({ id: 1, name: 'Me' }))
+    expect(result.current.currentUser).toEqual({ id: 1, name: 'Me' })
+  })
+
+  test('sends conversation messages and joins their room', () => {
     const { result } = renderHook(() => useChatSocket(), { wrapper })
     act(() => {
-      listeners['user']({ id: 1, name: 'Me' })
-      listeners['message']({
-        text: 'hi',
-        user: { id: 1, name: 'Me' },
-        timestamp: '2023-01-01T00:00:00.000Z',
-        channel: 'general',
-      })
+      result.current.joinConversation(9, 4)
+      result.current.sendConversationMessage(9, 'client-key', 'hello', null)
     })
-    expect(result.current.currentUser).toEqual({ id: 1, name: 'Me' })
-    expect(result.current.messages).toEqual([
-      {
-        text: 'hi',
-        user: { id: 1, name: 'Me' },
-        timestamp: '2023-01-01T00:00:00.000Z',
-        channel: 'general',
-      },
-    ])
-    act(() => result.current.sendMessage('hello', 'general'))
-    expect(emit).toHaveBeenCalledWith('message', {
-      text: 'hello',
-      channel: 'general',
+    expect(emit).toHaveBeenCalledWith('conversation:join', {
+      conversationId: 9,
+      after: 4,
+    })
+    expect(emit).toHaveBeenCalledWith('conversation:message', {
+      conversationId: 9,
+      clientKey: 'client-key',
+      body: 'hello',
+      attachmentMetadata: null,
     })
   })
 

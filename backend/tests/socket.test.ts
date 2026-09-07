@@ -5,7 +5,6 @@ import type {
   ServerToClientEvents,
   InterServerEvents,
   SocketData,
-  ChatMessage,
 } from '../src/socket.js';
 import Client from 'socket.io-client';
 import type { AddressInfo } from 'net';
@@ -67,20 +66,6 @@ describe('websocket messaging', () => {
     clientSocket.close();
     io.close();
     httpServer.close();
-  });
-
-  test('broadcasts messages without exposing sensitive data', () => {
-    return new Promise<void>((resolve) => {
-      clientSocket.on('message', (msg: ChatMessage) => {
-        expect(msg.text).toBe('hello');
-        expect(msg.user).toEqual({ id: 1, name: 'Test' });
-        expect(msg.timestamp).toBeTruthy();
-        expect(msg.channel).toBe('general');
-        expect('email' in msg.user).toBe(false);
-        resolve();
-      });
-      clientSocket.emit('message', { text: 'hello', channel: 'general' });
-    });
   });
 
   test('delivers persisted messages only to authorized conversation rooms', async () => {
@@ -174,6 +159,15 @@ describe('websocket messaging', () => {
       authorized.once('conversation:message', (message) => {
         expect(message.body).toBe('private');
         expect(message.conversationId).toBe(101);
+        expect(Object.keys(message).sort()).toEqual([
+          'attachmentMetadata',
+          'body',
+          'clientKey',
+          'conversationId',
+          'createdAt',
+          'senderId',
+          'sequence',
+        ]);
         expect(message.attachmentMetadata).toEqual(
           expect.objectContaining({ kind: 'book', bookId: '1' })
         );

@@ -7,7 +7,7 @@
 3. `conversation:message` valida autorización, persiste el mensaje y luego lo emite.
 4. El cliente reconcilia reintentos mediante `clientKey` y vuelve a cargar el historial después de reconectar.
 
-La mensajería real necesita sesión, migraciones aplicadas y backend activo. El bot persistente se crea con `015_seed_messaging_bot.sql`; el canal global antiguo se mantiene únicamente por compatibilidad.
+La mensajería real necesita sesión, migraciones aplicadas y backend activo. El bot persistente se crea con `015_seed_messaging_bot.sql` y responde dentro de la conversación autorizada.
 
 ## Adjuntos y acuerdos
 
