@@ -7,15 +7,15 @@
   right: $spacing-4;
   bottom: $spacing-4;
   display: grid;
-  width: min(430px, calc(100% - 32px));
-  grid-template-columns: 92px minmax(0, 1fr);
+  width: min(400px, calc(100% - 32px));
+  grid-template-columns: 76px minmax(0, 1fr);
   gap: $spacing-3;
-  padding: $spacing-3;
+  padding: $spacing-4;
   border-color: rgb(66 215 199 / 34%);
-  background: color-mix(
-    in srgb,
-    var(--prototype-surface-raised) 94%,
-    transparent 6%
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--prototype-surface-raised) 96%, transparent 4%),
+    color-mix(in srgb, var(--prototype-surface) 96%, transparent 4%)
   );
   box-shadow: 0 22px 60px rgb(2 10 16 / 46%);
   backdrop-filter: blur(18px);
@@ -48,7 +48,7 @@
 
 .imageFrame {
   display: grid;
-  min-height: 92px;
+  min-height: 76px;
   overflow: hidden;
   border-radius: var(--prototype-radius-md);
   background:
@@ -62,7 +62,7 @@
 .image {
   width: 100%;
   height: 100%;
-  min-height: 92px;
+  min-height: 76px;
   object-fit: cover;
 }
 
@@ -72,6 +72,9 @@
 }
 
 .status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   color: var(--prototype-teal);
   font-size: 10px;
   font-weight: $font-weight-bold;
@@ -79,10 +82,19 @@
   text-transform: uppercase;
 }
 
+.status::before {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--prototype-teal);
+  box-shadow: 0 0 0 4px rgb(66 215 199 / 12%);
+  content: '';
+}
+
 .content h2 {
   margin: 4px 0;
   color: var(--prototype-text);
-  font-size: 17px;
+  font-size: 21px;
   line-height: 1.15;
 }
 
@@ -90,7 +102,7 @@
   margin: 0;
   overflow: hidden;
   color: var(--prototype-muted);
-  font-size: 11px;
+  font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -101,7 +113,7 @@
   gap: $spacing-2;
   margin-top: $spacing-2;
   color: var(--prototype-muted);
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .meta span + span::before {
@@ -111,8 +123,15 @@
 
 .actions {
   display: flex;
-  justify-content: flex-start;
+  justify-content: stretch;
   margin-top: $spacing-3;
+}
+
+.actions :global(.button) {
+  width: 100%;
+  min-height: 42px;
+  border-radius: 12px;
+  font-size: 14px;
 }
 
 .detail {
@@ -138,7 +157,7 @@
     bottom: 8px;
     left: 8px;
     gap: 8px;
-    padding: 8px;
+    padding: 12px;
   }
 
   .imageFrame,

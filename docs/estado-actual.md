@@ -1,6 +1,6 @@
 # Estado actual
 
-Fecha de referencia: 2026-09-06.
+Fecha de referencia: 2026-09-07.
 
 ## Resumen de cierre
 
@@ -36,7 +36,8 @@ La matriz de requisitos y la evidencia se mantienen en
   inventa una distancia. El mapa limita 50 rincones, 100 publicaciones y 100
   actividades e informa truncamiento. `/map` presenta ahora una composicion
   dominante de mapa oscuro, panel de exploracion flotante, pines semanticos y
-  una unica tarjeta de seleccion; la actividad visible sigue siendo la senal
+  una unica tarjeta de seleccion; usa las capas Esri Canvas con atribucion
+  visible de OpenStreetMap/Esri. La actividad visible sigue siendo la senal
   agregada disponible, no un feed inventado.
 - Experiencia publica: visitantes pueden leer las superficies de descubrimiento,
   Comunidad, perfiles y ayuda; las mutaciones se detienen en una modal comun y
@@ -82,9 +83,10 @@ El recorrido reproducible con navegador real esta en
 [`e2e-baseline.md`](e2e-baseline.md). Usa Docker Compose con PostgreSQL/PostGIS
 aislado, aplica las migraciones, carga un seed sintetico, arranca backend y
 frontend en puertos E2E, y conserva diagnosticos de Playwright solo cuando
-hay fallos. `npm run verify:ci` combina las comprobaciones no mutantes con los
-tests de backend y frontend, los builds y Playwright; los `complete-check` de
-paquete siguen disponibles por separado.
+hay fallos. La pipeline E2E usa `npm run verify:e2e` para ejecutar los tests
+backend aislados y Playwright; la pipeline de frontend es la responsable de
+sus tests unitarios. `verify:ci` conserva la comprobacion global no mutante y
+los `complete-check` de paquete siguen disponibles por separado.
 
 ## Comprobacion manual minima
 

@@ -33,7 +33,9 @@ describe('enableMocking', () => {
       useMocksEnv: 'true',
     })
 
-    expect(worker.start).toHaveBeenCalledWith({ onUnhandledRequest: 'error' })
+    expect(worker.start).toHaveBeenCalledWith({
+      onUnhandledRequest: expect.any(Function),
+    })
     expect(document.documentElement.dataset.apiMode).toBe('mock')
   })
 
@@ -65,7 +67,9 @@ describe('enableMocking', () => {
     await enableMocking({ useMocksEnv: 'yes' })
 
     expect(typeof globalThis.ProgressEvent).toBe('function')
-    expect(worker.start).toHaveBeenCalledWith({ onUnhandledRequest: 'error' })
+    expect(worker.start).toHaveBeenCalledWith({
+      onUnhandledRequest: expect.any(Function),
+    })
 
     if (originalProgressEvent) {
       globalThis.ProgressEvent = originalProgressEvent

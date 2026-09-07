@@ -978,6 +978,7 @@
     "exploration": {
       "eyebrow": "Nearby exploration",
       "title": "Corners map",
+      "subtitle": "Discover book corners near you.",
       "mapLabel": "Map of corners and nearby activity",
       "nearbyLocation": "Showing places near your location",
       "profileLocation": "Sorting places by your profile area",
@@ -992,7 +993,11 @@
       "activityVisibleHint": "Aggregated community signals",
       "nearbyActivity": "Nearby activity",
       "activitySignal": "Recorded signal",
-      "noNearbyActivity": "There are no activity signals in this area yet."
+      "nearbyCorner": "Nearby corner",
+      "noNearbyActivity": "There are no activity signals in this area yet.",
+      "noNearbyCorners": "There are no corners matching these filters.",
+      "viewAll": "View all",
+      "viewLess": "View less"
     },
     "selection": {
       "open": "Open now",

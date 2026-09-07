@@ -4,6 +4,11 @@ export interface EnableMockingOptions {
   useMocksEnv?: string | null
 }
 
+const shouldBypassMapTiles = (request: Request) => {
+  const hostname = new URL(request.url).hostname
+  return hostname === 'server.arcgisonline.com'
+}
+
 export async function enableMocking(options: EnableMockingOptions = {}) {
   // PUBLIC_* values are injected by Rsbuild at startup, so changing .env
   // requires restarting dev or rebuilding before this decision can change.
@@ -29,7 +34,12 @@ export async function enableMocking(options: EnableMockingOptions = {}) {
 
   const { worker } = await import('@mocks/browser')
   delete document.documentElement.dataset.apiMode
-  const startResult = await worker.start({ onUnhandledRequest: 'error' })
+  const startResult = await worker.start({
+    onUnhandledRequest(request, print) {
+      if (shouldBypassMapTiles(request)) return
+      print.error()
+    },
+  })
   document.documentElement.dataset.apiMode = 'mock'
   return startResult
 }

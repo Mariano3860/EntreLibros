@@ -91,7 +91,8 @@ npm run complete-check
 
 El baseline E2E contra navegador, backend y PostgreSQL/PostGIS reales esta
 documentado en [`docs/e2e-baseline.md`](docs/e2e-baseline.md). Sus comandos
-separados (`e2e:db:*`, `e2e:test:*`, `e2e`, `e2e:headed` y `verify:ci`) usan una
+separados (`e2e:db:*`, `e2e:test:*`, `e2e`, `e2e:headed`, `verify:e2e` y
+`verify:ci`) usan una
 base exclusiva marcada como `e2e` y nunca la base de desarrollo.
 
 La validacion manual de cookies, proxy, cache, mapa, Socket.IO, responsive y

@@ -26,10 +26,14 @@ En desarrollo, Rsbuild proxifica `/api` y `/socket.io` al backend. Los Dockerfil
 
 ## Comunidad y descubrimiento
 
-`/map` usa la capa raster oscura de CARTO con datos de OpenStreetMap y muestra la
-atribucion correspondiente en el mapa. La capa cartografica es presentacion; los
+`/map` usa las capas raster `World_Dark_Gray_Base` y `World_Light_Gray_Base` de
+Esri con datos de OpenStreetMap y muestra la atribucion correspondiente en el
+mapa. La capa cartografica es presentacion; los
 pines, filtros, actividad y tarjeta de seleccion consumen los mismos contratos
 reales de mapa y no agregan una fuente paralela de datos.
+El panel de `/map` presenta Rincones con búsqueda, radio y disponibilidad; no
+reutiliza los temas técnicos del API como etiquetas visuales ni muestra una capa
+de publicaciones separada.
 
 `GET /api/community/feed` proyecta historias y publicaciones visibles respetando perfiles, bloqueos y sesión. Likes, comentarios, seguimiento e historias relevantes tienen persistencia. El mapa consulta Rincones, publicaciones y actividad con filtros de radio y ubicación aproximada; el centro puede venir de la geolocalización del dispositivo o de `GET /api/user/profile` para la zona privada de la persona autenticada. Las respuestas mantienen coordenadas públicas aproximadas y omiten la distancia cuando no existe un centro válido.
 

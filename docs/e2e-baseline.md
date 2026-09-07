@@ -49,6 +49,7 @@ npm run e2e:test:frontend
 npm run e2e:test:integration
 npm run e2e
 npm run e2e:headed
+npm run verify:e2e
 npm run verify:ci
 npm run e2e:db:cleanup
 ```
@@ -62,7 +63,10 @@ dos paquetes, arranca ambos servidores, espera sus health checks y ejecuta
 Playwright en un worker serial. El teardown destruye el proyecto Compose y su
 volumen aunque la suite falle.
 
-`verify:ci` es la comprobacion global no mutante: ejecuta formato en modo
+`verify:e2e` es la comprobacion usada por la pipeline E2E: ejecuta los tests
+backend contra la base E2E aislada y Playwright. Los tests unitarios del
+frontend se ejecutan exclusivamente en la pipeline de frontend, para no
+duplicarlos. `verify:ci` es la comprobacion global no mutante: ejecuta formato en modo
 check, lint sin `fix`, stylelint, typecheck, los tests backend existentes
 contra la base E2E aislada, los tests frontend, builds y Playwright. Asi CI no
 depende de un `.env.test` ni de una base manual preexistente. Los `complete-check` de cada paquete se

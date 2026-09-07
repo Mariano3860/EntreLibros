@@ -20,11 +20,9 @@ test("permite explorar el mapa real y conservar sus acciones principales", async
   await search.fill("Palermo");
   await expect(search).toHaveValue("Palermo");
 
-  await userAPage.getByRole("button", { name: "Comunidad" }).click();
-  await userAPage.getByLabel("Abiertos ahora").check();
-  await userAPage.getByLabel("Mostrar actividad").uncheck();
+  await userAPage.getByRole("button", { name: "Abiertos ahora" }).click();
   await expect(
-    userAPage.getByRole("button", { name: "Comunidad" }),
+    userAPage.getByRole("button", { name: "Abiertos ahora" }),
   ).toHaveAttribute("aria-pressed", "true");
 
   const locationButton = userAPage.getByRole("button", {
@@ -56,7 +54,7 @@ test("permite explorar el mapa real y conservar sus acciones principales", async
   await expect(filters).toHaveAttribute("aria-hidden", "false");
 });
 
-test("expone un estado honesto cuando el area no tiene actividad", async ({
+test("expone un estado honesto cuando el area no tiene rincones", async ({
   userAPage,
 }) => {
   await userAPage.goto("/map");
@@ -65,6 +63,6 @@ test("expone un estado honesto cuando el area no tiene actividad", async ({
     userAPage.getByText(/Ajust.*filtros o explor.*barrios cercanos/i),
   ).toBeVisible();
   await expect(
-    userAPage.getByText(/Todav.*no hay se.*ales de actividad/i),
+    userAPage.getByText(/No hay rincones que coincidan con estos filtros/i),
   ).toBeVisible();
 });

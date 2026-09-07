@@ -36,23 +36,39 @@ const userLocationIcon = divIcon({
   </span>`,
 })
 
-const getCornerMarkerColor = (corner: MapCornerPin) => {
-  if (corner.status === 'paused') return 'var(--prototype-orange)'
+type MapPinKind = 'corner' | 'publication' | 'activity'
 
-  const isSemiprivate = corner.themes.some((theme) =>
-    theme.toLocaleLowerCase().includes('semiprivado')
-  )
+const pinClassNames: Record<MapPinKind, string> = {
+  corner: styles.cornerPin,
+  publication: styles.publicationPin,
+  activity: styles.activityPin,
+}
 
-  return isSemiprivate ? 'var(--prototype-blue)' : 'var(--prototype-teal)'
+const createMapPinIcon = (kind: MapPinKind, selected = false) => {
+  const iconSize = selected ? 42 : 32
+  const selectedClass = selected ? ` ${styles.selectedPin}` : ''
+  return divIcon({
+    className: styles.mapPinContainer,
+    iconSize: [iconSize, iconSize],
+    iconAnchor: [iconSize / 2, iconSize],
+    popupAnchor: [0, -iconSize],
+    html: `<span class="${styles.mapPin} ${pinClassNames[kind]}${selectedClass}" aria-hidden="true">
+      <svg viewBox="0 0 24 24" focusable="false">
+        <path class="${styles.pinShape}" d="M12 21s7-6.1 7-12A7 7 0 1 0 5 9c0 5.9 7 12 7 12Z"/>
+        <circle class="${styles.pinCenter}" cx="12" cy="9" r="2.5"/>
+      </svg>
+    </span>`,
+  })
 }
 
 const mapTileUrls = {
-  dark: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-  light: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+  dark: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+  light:
+    'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
 } as const
 
 const mapTileAttribution =
-  '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions" target="_blank" rel="noreferrer">CARTO</a>'
+  '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> contributors &copy; <a href="https://www.esri.com/en-us/legal/terms/use-of-esri-data" target="_blank" rel="noreferrer">Esri</a>'
 
 type MapCanvasProps = {
   bbox: MapBoundingBox
@@ -288,23 +304,18 @@ export const MapCanvas = ({
     return corners.map((corner) => {
       const isSelected =
         selectedPin?.type === 'corner' && selectedPin.data.id === corner.id
-      const markerColor = getCornerMarkerColor(corner)
-
       return (
-        <CircleMarker
+        <Marker
           key={corner.id}
-          center={[corner.lat, corner.lon]}
-          radius={isSelected ? 12 : 8}
-          pathOptions={{
-            color: markerColor,
-            fillColor: markerColor,
-            fillOpacity: isSelected ? 0.9 : 0.7,
-            weight: isSelected ? 4 : 2,
-          }}
+          position={[corner.lat, corner.lon]}
+          icon={createMapPinIcon(
+            corner.status === 'paused' ? 'publication' : 'corner',
+            isSelected
+          )}
+          title={corner.name}
           eventHandlers={{
             click: () => onSelectPin(cornerToPin(corner)),
           }}
-          className={`${styles.cornerMarker} ${isSelected ? styles.selectedMarker : ''}`}
         >
           <Tooltip
             direction="top"
@@ -318,7 +329,7 @@ export const MapCanvas = ({
               <span>{corner.barrio}</span>
             </div>
           </Tooltip>
-        </CircleMarker>
+        </Marker>
       )
     })
   }, [corners, layers.corners, onSelectPin, selectedPin])
@@ -332,20 +343,14 @@ export const MapCanvas = ({
         selectedPin.data.id === publication.id
 
       return (
-        <CircleMarker
+        <Marker
           key={publication.id}
-          center={[lat, lon]}
-          radius={isSelected ? 10 : 7}
-          pathOptions={{
-            color: 'var(--color-info)',
-            fillColor: 'var(--color-info)',
-            fillOpacity: isSelected ? 0.85 : 0.65,
-            weight: isSelected ? 4 : 2,
-          }}
+          position={[lat, lon]}
+          icon={createMapPinIcon('publication', isSelected)}
+          title={publication.title}
           eventHandlers={{
             click: () => onSelectPin(publicationToPin(publication)),
           }}
-          className={`${styles.publicationMarker} ${isSelected ? styles.selectedMarker : ''}`}
         >
           <Tooltip
             direction="top"
@@ -366,7 +371,7 @@ export const MapCanvas = ({
               </span>
             </div>
           </Tooltip>
-        </CircleMarker>
+        </Marker>
       )
     })
   }, [
@@ -381,17 +386,10 @@ export const MapCanvas = ({
   const activityMarkers = useMemo(() => {
     if (!layers.activity) return []
     return activity.map((point) => (
-      <CircleMarker
+      <Marker
         key={point.id}
-        center={[point.lat, point.lon]}
-        radius={Math.max(6, point.intensity * 3)}
-        pathOptions={{
-          color: 'var(--color-warning)',
-          fillColor: 'var(--color-warning)',
-          fillOpacity: 0.2,
-          weight: 2,
-        }}
-        className={styles.activityMarker}
+        position={[point.lat, point.lon]}
+        icon={createMapPinIcon('activity', point.intensity >= 3)}
       />
     ))
   }, [activity, layers.activity])
@@ -417,11 +415,7 @@ export const MapCanvas = ({
           focusRequest={focusRequest}
         />
         <MapControls bbox={bbox} userLocation={userLocation} />
-        <TileLayer
-          url={mapTileUrls[theme]}
-          attribution={mapTileAttribution}
-          crossOrigin="anonymous"
-        />
+        <TileLayer url={mapTileUrls[theme]} attribution={mapTileAttribution} />
         {userLocation ? (
           <>
             {radiusKm !== null ? (

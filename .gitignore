@@ -12,3 +12,6 @@ test-results/
 
 # Material de referencia visual local; no forma parte del producto publicado.
 /Screens/Prototipo ideal/
+
+# Los artefactos de planificación OpenSpec son locales y no se versionan.
+/openspec/

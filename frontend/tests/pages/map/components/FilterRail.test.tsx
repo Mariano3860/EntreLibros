@@ -9,10 +9,7 @@ describe('FilterRail', () => {
   test('invokes callbacks when interacting with exploration controls', () => {
     const handleSearchChange = vi.fn()
     const handleDistanceChange = vi.fn()
-    const handleToggleLayer = vi.fn()
-    const handleCategoryChange = vi.fn()
     const handleToggleOpenNow = vi.fn()
-    const handleToggleRecentActivity = vi.fn()
 
     renderWithProviders(
       <FilterRail
@@ -20,15 +17,8 @@ describe('FilterRail', () => {
         onSearchChange={handleSearchChange}
         distanceKm={5}
         onDistanceChange={handleDistanceChange}
-        categories={['Todo', 'Comunidad']}
-        selectedCategory="Todo"
-        onCategoryChange={handleCategoryChange}
-        layers={{ corners: true, publications: true, activity: true }}
-        onToggleLayer={handleToggleLayer}
         openNow={false}
         onToggleOpenNow={handleToggleOpenNow}
-        recentActivity
-        onToggleRecentActivity={handleToggleRecentActivity}
         activityItems={[]}
       />
     )
@@ -46,24 +36,7 @@ describe('FilterRail', () => {
     fireEvent.change(radius, { target: { value: '4' } })
     expect(handleDistanceChange).toHaveBeenCalledWith(null)
 
-    fireEvent.click(
-      screen.getByRole('button', { name: /map\.filters\.types\.corners/ })
-    )
-    fireEvent.click(
-      screen.getByRole('button', {
-        name: /map\.filters\.types\.publications/,
-      })
-    )
-    expect(handleToggleLayer).toHaveBeenCalledWith('corners')
-    expect(handleToggleLayer).toHaveBeenCalledWith('publications')
-
-    fireEvent.click(screen.getByRole('button', { name: 'Comunidad' }))
-    expect(handleCategoryChange).toHaveBeenCalledWith('Comunidad')
-
-    fireEvent.click(screen.getByLabelText('map.filters.openNow'))
+    fireEvent.click(screen.getByRole('button', { name: 'map.filters.openNow' }))
     expect(handleToggleOpenNow).toHaveBeenCalled()
-
-    fireEvent.click(screen.getByLabelText('map.exploration.activityVisible'))
-    expect(handleToggleRecentActivity).toHaveBeenCalled()
   })
 })

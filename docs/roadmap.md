@@ -1,6 +1,6 @@
 # Hoja de ruta
 
-Fecha de referencia: 2026-09-06. El estado verificable se mantiene en
+Fecha de referencia: 2026-09-07. El estado verificable se mantiene en
 [`tfg-mvp-trazabilidad.md`](tfg-mvp-trazabilidad.md).
 
 ## Cierre inmediato
@@ -26,9 +26,10 @@ de producto. El siguiente trabajo de cierre continua siendo la evidencia manual,
 backup/restauracion y accesibilidad indicados arriba.
 
 La experiencia de exploracion de `/map` ya fue pulida sobre la arquitectura
-existente. La evolucion pendiente es validar manualmente contraste, teclado,
-responsive y datos reales; no incluye todavia una reescritura del estado de
-mensajeria ni una actividad geolocalizada nueva.
+existente, con panel flotante, mapa oscuro Esri Canvas y atribucion visible
+OpenStreetMap/Esri. La evolucion pendiente es validar manualmente contraste,
+teclado, responsive y datos reales; no incluye todavia una reescritura del
+estado de mensajeria ni una actividad geolocalizada nueva.
 
 ## Evolucion posterior
 

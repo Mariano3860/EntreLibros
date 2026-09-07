@@ -83,8 +83,26 @@ vi.mock('react-leaflet', () => {
     Circle: ({ radius }: { radius: number }) => (
       <div data-testid="radius-circle" data-radius={radius} />
     ),
-    Marker: ({ children }: { children?: React.ReactNode }) => (
-      <div data-testid="user-location-marker">{children}</div>
+    Marker: ({
+      children,
+      eventHandlers,
+      icon,
+      title,
+    }: {
+      children?: React.ReactNode
+      eventHandlers?: { click?: () => void }
+      icon?: { options?: { html?: string } }
+      title?: string
+    }) => (
+      <button
+        type="button"
+        data-testid="marker"
+        data-marker-icon={icon?.options?.html}
+        aria-label={title}
+        onClick={() => eventHandlers?.click?.()}
+      >
+        {children}
+      </button>
     ),
     CircleMarker: ({
       children,
@@ -176,10 +194,10 @@ describe('MapCanvas', () => {
     )
 
     expect(tileLayerProps.current?.url).toContain(
-      'basemaps.cartocdn.com/dark_all'
+      'server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base'
     )
     expect(tileLayerProps.current?.attribution).toContain('OpenStreetMap')
-    expect(tileLayerProps.current?.attribution).toContain('CARTO')
+    expect(tileLayerProps.current?.attribution).toContain('Esri')
   })
 
   test('renders markers and handles selection', () => {
@@ -200,13 +218,7 @@ describe('MapCanvas', () => {
       />
     )
 
-    const cornerMarker = screen
-      .getAllByTestId(/marker-/)
-      .find((element) =>
-        element.getAttribute('data-testid')?.includes('corner')
-      )
-    expect(cornerMarker).toBeDefined()
-    fireEvent.click(cornerMarker as HTMLElement)
+    fireEvent.click(screen.getByRole('button', { name: 'Corner Norte' }))
 
     expect(handleSelectPin).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -217,7 +229,7 @@ describe('MapCanvas', () => {
     expect(fitBoundsMock).toHaveBeenCalled()
   })
 
-  test('uses semantic colors for corner state and scope', () => {
+  test('uses simple semantic spot pins for corners and paused corners', () => {
     renderWithProviders(
       <MapCanvas
         bbox={bbox}
@@ -240,18 +252,26 @@ describe('MapCanvas', () => {
       />
     )
 
-    const cornerMarkers = screen.getAllByTestId(/marker-.*cornerMarker/)
+    const cornerMarkers = screen.getAllByTestId('marker')
     expect(cornerMarkers[0]).toHaveAttribute(
-      'data-marker-color',
-      'var(--prototype-teal)'
+      'data-marker-icon',
+      expect.stringContaining('cornerPin')
     )
-    expect(cornerMarkers[1]).toHaveAttribute(
-      'data-marker-color',
-      'var(--prototype-blue)'
+    expect(cornerMarkers[0]).toHaveAttribute(
+      'data-marker-icon',
+      expect.not.stringContaining('pinGlyph')
+    )
+    expect(cornerMarkers[0]).toHaveAttribute(
+      'data-marker-icon',
+      expect.stringContaining('pinCenter')
+    )
+    expect(cornerMarkers[0]).toHaveAttribute(
+      'data-marker-icon',
+      expect.not.stringContaining('pinHalo')
     )
     expect(cornerMarkers[2]).toHaveAttribute(
-      'data-marker-color',
-      'var(--prototype-orange)'
+      'data-marker-icon',
+      expect.stringContaining('publicationPin')
     )
   })
 
@@ -272,7 +292,11 @@ describe('MapCanvas', () => {
     )
 
     expect(screen.getByText('map.status.loading')).toBeInTheDocument()
-    expect(screen.getAllByTestId(/marker-/)).toHaveLength(activity.length)
+    expect(screen.getAllByTestId('marker')).toHaveLength(activity.length)
+    expect(screen.getByTestId('marker')).toHaveAttribute(
+      'data-marker-icon',
+      expect.stringContaining('activityPin')
+    )
 
     rerender(
       <MapCanvas
@@ -371,7 +395,9 @@ describe('MapCanvas', () => {
       />
     )
 
-    expect(screen.getByTestId('user-location-marker')).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Tu ubicación aproximada' })
+    ).toBeInTheDocument()
   })
 
   test('renders the geographic radius around the approximate location', () => {

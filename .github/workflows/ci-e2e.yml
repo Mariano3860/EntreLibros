@@ -53,8 +53,8 @@ jobs:
           npm run e2e:db:up
           npm run e2e:db:reset
 
-      - name: Run complete non-mutating verification
-        run: npm run verify:ci
+      - name: Run E2E verification
+        run: npm run verify:e2e
 
       - name: Upload E2E diagnostics
         if: always()

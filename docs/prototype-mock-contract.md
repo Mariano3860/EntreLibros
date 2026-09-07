@@ -1,6 +1,6 @@
 # Contrato del modo demo
 
-Fecha de referencia: 2026-09-02.
+Fecha de referencia: 2026-09-07.
 
 Este documento describe el dataset determinista que permite revisar la interfaz sin PostgreSQL. El modo demo es aislado, reinicia su estado al recargar y no representa datos de usuarios ni persistencia del backend.
 
@@ -22,9 +22,14 @@ El modo demo también debe cubrir estados de carga, vacío y error. El estado va
 
 ## Recursos visuales
 
-La pantalla `/map` usa en modo demo la misma capa raster de CARTO/OpenStreetMap
+La pantalla `/map` usa en modo demo la misma capa raster de Esri/OpenStreetMap
 que en modo real; los datos de pines, filtros y actividad siguen siendo respuestas
-deterministas de MSW y no implican persistencia del backend.
+deterministas de MSW y no implican persistencia del backend. Las solicitudes de
+teselas de `server.arcgisonline.com` quedan fuera de MSW para que la cartografía
+real siga visible durante la revisión del modo demo.
+
+Los Rincones sin una señal registrada siguen apareciendo en la lista como
+Rincones cercanos; la señal solo se etiqueta cuando `lastSignalAt` existe.
 
 
 ## Límite

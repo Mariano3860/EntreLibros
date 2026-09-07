@@ -36,8 +36,10 @@ de una base local aislada.
 2. Ejecutar `psql "$DATABASE_URL" -f backend/scripts/seed-demo-dataset.sql`.
 3. Arrancar backend y frontend con `PUBLIC_API_USE_MOCKS=false`.
 4. Abrir `/community`, seguir el enlace a un perfil y abrir `/map`. Verificar que
-   el mapa ocupa la superficie principal, cambiar radio/categoria/capas,
-   seleccionar un Rincon desde un pin y abrir/cerrar su tarjeta de detalle.
+   el mapa ocupa la superficie principal, cambiar radio/disponibilidad/capas,
+   seleccionar un Rincon desde un pin y abrir/cerrar su tarjeta de detalle. La
+   capa base oscura debe cargar desde Esri Canvas y mostrar atribucion visible
+   de OpenStreetMap/Esri.
 5. Probar `Mi ubicacion`, `Crear Rincon`, busqueda, estado sin resultados y
    ocultar/mostrar el panel en un viewport intermedio.
 6. Abrir `/stats`, cambiar entre 7, 30 y 90 dias y comprobar la fecha de

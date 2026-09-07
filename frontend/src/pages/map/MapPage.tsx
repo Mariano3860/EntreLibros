@@ -74,13 +74,6 @@ const MAP_RESULT_LIMITS = { corners: 50, publications: 100, activity: 100 }
 const EMPTY_CORNERS: MapCornerPin[] = []
 const EMPTY_PUBLICATIONS: MapResponse['publications'] = []
 const EMPTY_ACTIVITY: MapResponse['activity'] = []
-const MAP_CATEGORIES = [
-  'Todo',
-  'Comunidad',
-  'Espacio abierto',
-  'Espacio semiprivado',
-]
-
 const parseRequestedRadius = (value: string | null): MapRadiusKm | null => {
   if (value === null) return null
   const parsed = Number(value)
@@ -115,15 +108,14 @@ export const MapPage = () => {
   const [distance, setDistance] = useState(() =>
     parseRequestedRadius(searchParams.get('radius'))
   )
-  const [category, setCategory] = useState('Todo')
   const [search, setSearch] = useState('')
   const [viewportBbox, setViewportBbox] = useState<MapBoundingBox>(MAP_BOUNDS)
   const [location, setLocation] = useState<UserLocation | null>(null)
   const [locationDenied, setLocationDenied] = useState(false)
   const [openNow, setOpenNow] = useState(false)
-  const [mapLayers, setMapLayers] = useState<MapLayerToggles>({
+  const [mapLayers] = useState<MapLayerToggles>({
     corners: true,
-    publications: true,
+    publications: false,
     activity: true,
   })
   const [selectedPin, setSelectedPin] = useState<MapPin | null>(null)
@@ -244,16 +236,12 @@ export const MapPage = () => {
     const matchesSearch = (value: string) =>
       normalizedSearch.length === 0 ||
       value.toLowerCase().includes(normalizedSearch)
-    const matchesCategory = (themes: string[]) =>
-      category === 'Todo' || themes.includes(category)
-
     const visibleCorners = mockMapData.corners
       .filter(
         (corner) =>
           (matchesSearch(corner.name) ||
             matchesSearch(corner.barrio) ||
             matchesSearch(corner.city)) &&
-          matchesCategory(corner.themes) &&
           (!openNow || corner.isOpenNow !== false) &&
           matchesDistance(corner.lat, corner.lon) &&
           matchesViewport(corner.lat, corner.lon)
@@ -294,7 +282,6 @@ export const MapPage = () => {
       },
     }
   }, [
-    category,
     discoveryLocation,
     effectiveDistance,
     mapBbox,
@@ -315,7 +302,7 @@ export const MapPage = () => {
       searchTerm: search.trim() || undefined,
       filters: {
         distanceKm: effectiveDistance,
-        themes: category === 'Todo' ? [] : [category],
+        themes: [],
         openNow,
         recentActivity: mapLayers.activity,
       },
@@ -327,8 +314,18 @@ export const MapPage = () => {
   const mapData = mockMode ? mockFilteredMapData : mapQuery.data
   const mapResultsTruncated = mapData?.meta.truncated === true
   const mapCorners = mapData?.corners ?? EMPTY_CORNERS
-  const mapPublications = mapData?.publications ?? EMPTY_PUBLICATIONS
-  const mapActivity = mapData?.activity ?? EMPTY_ACTIVITY
+  const visibleCornerIds = useMemo(
+    () => new Set(mapCorners.map((corner) => corner.id)),
+    [mapCorners]
+  )
+  const mapPublications = EMPTY_PUBLICATIONS
+  const mapActivity = useMemo(
+    () =>
+      (mapData?.activity ?? EMPTY_ACTIVITY).filter((point) =>
+        visibleCornerIds.has(point.id.replace(/-activity$/, ''))
+      ),
+    [mapData?.activity, visibleCornerIds]
+  )
   const isMapEmpty =
     mapCorners.length + mapPublications.length + mapActivity.length === 0
 
@@ -452,10 +449,6 @@ export const MapPage = () => {
     [setSearchParams]
   )
 
-  const handleToggleLayer = useCallback((layer: keyof MapLayerToggles) => {
-    setMapLayers((current) => ({ ...current, [layer]: !current[layer] }))
-  }, [])
-
   const selectedMapCorner =
     selectedPin?.type === 'corner' ? selectedPin.data : null
   const selectedPublication =
@@ -551,19 +544,22 @@ export const MapPage = () => {
 
   const activityItems = useMemo<MapExplorationActivityItem[]>(
     () =>
-      mapCorners
-        .filter((corner) => corner.lastSignalAt)
-        .slice(0, 5)
-        .map((corner) => ({
-          id: corner.id,
-          title: corner.name,
-          meta: `${t('map.exploration.activitySignal')} · ${
-            corner.distanceKm === null
-              ? t('map.selection.distanceUnavailable')
-              : `${corner.distanceKm.toLocaleString('es-AR')} km`
-          }`,
-          onSelect: () => selectCorner(toDisplayCorner(corner)),
-        })),
+      mapCorners.slice(0, 5).map((corner) => ({
+        id: corner.id,
+        title: corner.name,
+        meta: `${
+          corner.lastSignalAt
+            ? t('map.exploration.activitySignal')
+            : t('map.exploration.nearbyCorner')
+        } · ${
+          corner.distanceKm === null
+            ? t('map.selection.distanceUnavailable')
+            : `${corner.distanceKm.toLocaleString('es-AR')} km`
+        }`,
+        photo: corner.photos[0],
+        icon: 'book',
+        onSelect: () => selectCorner(toDisplayCorner(corner)),
+      })),
     [mapCorners, selectCorner, t]
   )
 
@@ -639,17 +635,9 @@ export const MapPage = () => {
               onSearchChange={setSearch}
               distanceKm={distance}
               onDistanceChange={handleDistanceChange}
-              categories={MAP_CATEGORIES}
-              selectedCategory={category}
-              onCategoryChange={setCategory}
-              layers={mapLayers}
-              onToggleLayer={handleToggleLayer}
               openNow={openNow}
               onToggleOpenNow={() => setOpenNow((current) => !current)}
-              recentActivity={mapLayers.activity}
-              onToggleRecentActivity={() => handleToggleLayer('activity')}
               activityItems={activityItems}
-              isFetching={!mockMode && mapQuery.isFetching}
               isOpen={panelOpen}
               onClose={() => setPanelOpen(false)}
             />
