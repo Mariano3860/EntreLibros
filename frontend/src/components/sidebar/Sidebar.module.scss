@@ -71,18 +71,21 @@
   }
 
   &.active {
-    color: var(--prototype-teal);
+    color: var(--prototype-text);
     font-weight: 600;
-    background: rgb(66 215 199 / 13%);
+    background: linear-gradient(
+      135deg,
+      var(--prototype-teal-strong),
+      color-mix(
+        in srgb,
+        var(--prototype-teal) 72%,
+        var(--prototype-teal-strong)
+      )
+    );
+    box-shadow: 0 10px 24px rgb(22 185 169 / 18%);
 
     &::before {
-      position: absolute;
-      left: 0;
-      width: 3px;
-      height: 22px;
-      border-radius: 0 3px 3px 0;
-      background: var(--prototype-teal);
-      content: '';
+      display: none;
     }
   }
 }

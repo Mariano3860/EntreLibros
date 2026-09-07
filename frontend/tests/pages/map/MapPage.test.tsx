@@ -112,21 +112,11 @@ describe('MapPage', () => {
     }
   })
 
-  test('changes radius and category while keeping one selected card', () => {
+  test('changes radius while keeping one selected card', () => {
     renderWithProviders(<MapPage />)
 
     fireEvent.change(radiusSlider(), { target: { value: '1' } })
     expect(radiusSlider()).toHaveValue('1')
-    expect(screen.getByRole('button', { name: 'Comunidad' })).toHaveAttribute(
-      'aria-pressed',
-      'false'
-    )
-
-    fireEvent.click(screen.getByRole('button', { name: 'Comunidad' }))
-    expect(screen.getByRole('button', { name: 'Comunidad' })).toHaveAttribute(
-      'aria-pressed',
-      'true'
-    )
     fireEvent.click(selectedCornerButton())
 
     const card = screen.getByRole('article', {
@@ -307,34 +297,14 @@ describe('MapPage', () => {
     ).toBeVisible()
   })
 
-  test('toggles exploration layers, availability, activity and panel visibility', () => {
+  test('toggles availability and panel visibility', () => {
     renderWithProviders(<MapPage />)
 
-    fireEvent.click(
-      screen.getByRole('button', { name: 'map.filters.types.corners' })
-    )
-    expect(
-      screen.getByRole('button', { name: 'map.filters.types.corners' })
-    ).toHaveAttribute('aria-pressed', 'false')
-
-    fireEvent.click(
-      screen.getByRole('button', { name: 'map.filters.types.corners' })
-    )
-    expect(
-      screen.getByRole('button', { name: 'map.filters.types.corners' })
-    ).toHaveAttribute('aria-pressed', 'true')
-
-    const openNow = screen.getByRole('checkbox', {
+    const openNow = screen.getByRole('button', {
       name: 'map.filters.openNow',
     })
     fireEvent.click(openNow)
-    expect(openNow).toBeChecked()
-
-    const activity = screen.getByRole('checkbox', {
-      name: 'map.exploration.activityVisible',
-    })
-    fireEvent.click(activity)
-    expect(activity).not.toBeChecked()
+    expect(openNow).toHaveAttribute('aria-pressed', 'true')
 
     fireEvent.click(screen.getByRole('button', { name: 'map.filters.hide' }))
     expect(

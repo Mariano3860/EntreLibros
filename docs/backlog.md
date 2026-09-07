@@ -1,6 +1,6 @@
 # Backlog de producto
 
-Ultima actualizacion: 2026-09-06.
+Ultima actualizacion: 2026-09-07.
 
 El codigo, las migraciones, los contratos y las pruebas son la fuente de verdad.
 La matriz completa y sus referencias estan en
@@ -43,7 +43,9 @@ La matriz completa y sus referencias estan en
   y 100 actividades con metadatos de truncamiento.
 - Rediseño de `/map` como experiencia de exploracion: mapa dominante oscuro,
   panel flotante de capas y filtros reales, pines semanticos, tarjeta unica de
-  seleccion, actividad cercana honesta y adaptacion responsive.
+  seleccion, actividad cercana honesta y adaptacion responsive. La capa base
+  usa Esri/OpenStreetMap con atribucion visible y sin una clave publica en el
+  repositorio.
 - Experiencia publica de lectura para visitantes en Inicio, detalles publicos de
   publicaciones, Comunidad,
   Mapa, Ayuda y perfiles, con una modal comun para las acciones autenticadas y

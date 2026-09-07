@@ -974,6 +974,7 @@
     "exploration": {
       "eyebrow": "Exploración cercana",
       "title": "Mapa de rincones",
+      "subtitle": "Descubrí rincones de libros cerca tuyo.",
       "mapLabel": "Mapa de rincones y actividad cercana",
       "nearbyLocation": "Mostrando lugares cerca de tu ubicación",
       "profileLocation": "Ordenando lugares según tu zona de perfil",
@@ -988,7 +989,11 @@
       "activityVisibleHint": "Señales agregadas de la comunidad",
       "nearbyActivity": "Actividad cercana",
       "activitySignal": "Señal registrada",
-      "noNearbyActivity": "Todavía no hay señales de actividad en esta zona."
+      "nearbyCorner": "Rincón cercano",
+      "noNearbyActivity": "Todavía no hay señales de actividad en esta zona.",
+      "noNearbyCorners": "No hay rincones que coincidan con estos filtros.",
+      "viewAll": "Ver todo",
+      "viewLess": "Ver menos"
     },
     "selection": {
       "open": "Abierto ahora",

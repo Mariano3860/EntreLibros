@@ -237,7 +237,7 @@ $base-unit: 4px;
 $spacing-scale: 0.25;
 
 @function space($multiplier) {
-  @return $base-unit * math.div($multiplier, $spacing-scale); // Usar math.div
+  @return $base-unit * $multiplier;
 }
 
 @function rem($px) {
