@@ -1,8 +1,12 @@
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
-import { CornerDetailsPanel } from '@components/map/CornerDetailsPanel/CornerDetailsPanel'
 import { CornerEditModal } from '@components/map/CornerEditModal/CornerEditModal'
-import { RadiusSelector } from '@components/map/FilterRail/FilterRail'
+import { CreateCornerFab } from '@components/map/CreateCornerFab/CreateCornerFab'
+import {
+  FilterRail,
+  type MapExplorationActivityItem,
+} from '@components/map/FilterRail/FilterRail'
 import { MapCanvas } from '@components/map/MapCanvas/MapCanvas'
+import { MapSelectionCard } from '@components/map/MapSelectionCard/MapSelectionCard'
 import { PublishCornerModal } from '@components/publish/PublishCornerModal'
 import { ReportModal } from '@components/reports/ReportModal'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -19,13 +23,13 @@ import type {
   CommunityCornerDetail,
   UpdateCornerPayload,
 } from '@src/api/community/corners.types'
-import {
-  MAP_RADIUS_OPTIONS,
-  type MapBoundingBox,
-  type MapCornerPin,
-  type MapPin,
-  type MapResponse,
-  type MapRadiusKm,
+import type {
+  MapBoundingBox,
+  MapCornerPin,
+  MapLayerToggles,
+  MapPin,
+  MapResponse,
+  MapRadiusKm,
 } from '@src/api/map/map.types'
 import { mapKeys } from '@src/api/map/mapApi'
 import { fetchProfile } from '@src/api/user/profile.service'
@@ -34,11 +38,8 @@ import { useAuthRequired } from '@src/contexts/auth/AuthRequiredContext'
 import { useTheme } from '@src/contexts/theme/ThemeContext'
 import { usePrototype } from '@src/features/prototype/PrototypeContext'
 import {
-  Chip,
-  Panel,
   PrototypeButton,
   PrototypePage,
-  UnavailableState,
 } from '@src/features/prototype/PrototypeUI'
 import { useMapData } from '@src/hooks/api/useMapData'
 import {
@@ -70,27 +71,26 @@ const MAP_BOUNDS: MapBoundingBox = {
 const MIN_MAP_RADIUS_KM = 5.55
 const MOCK_MAP_REFERENCE_DATE = '2025-01-15T12:00:00.000Z'
 const MAP_RESULT_LIMITS = { corners: 50, publications: 100, activity: 100 }
+const EMPTY_CORNERS: MapCornerPin[] = []
+const EMPTY_PUBLICATIONS: MapResponse['publications'] = []
+const EMPTY_ACTIVITY: MapResponse['activity'] = []
+const MAP_CATEGORIES = [
+  'Todo',
+  'Comunidad',
+  'Espacio abierto',
+  'Espacio semiprivado',
+]
 
 const parseRequestedRadius = (value: string | null): MapRadiusKm | null => {
   if (value === null) return null
   const parsed = Number(value)
-  return MAP_RADIUS_OPTIONS.includes(parsed as MapRadiusKm)
-    ? (parsed as MapRadiusKm)
-    : null
+  return [1, 5, 30, 50].includes(parsed) ? (parsed as MapRadiusKm) : null
 }
-
-const realCategories = [
-  'Todo',
-  'Infancias',
-  'Ciencia ficción',
-  'Poesía',
-  'Historia',
-]
 
 const toDisplayCorner = (corner: MapCornerPin): MapCorner => ({
   id: corner.id,
   name: corner.name,
-  category: corner.themes[0] ?? corner.barrio,
+  category: corner.themes[1] ?? corner.themes[0] ?? corner.barrio,
   distance:
     corner.distanceKm === null
       ? 'Sin distancia'
@@ -121,15 +121,21 @@ export const MapPage = () => {
   const [location, setLocation] = useState<UserLocation | null>(null)
   const [locationDenied, setLocationDenied] = useState(false)
   const [openNow, setOpenNow] = useState(false)
-  const [recentActivity, setRecentActivity] = useState(true)
-  const [selectedCorner, setSelectedCorner] = useState<MapCorner | null>(null)
+  const [mapLayers, setMapLayers] = useState<MapLayerToggles>({
+    corners: true,
+    publications: true,
+    activity: true,
+  })
   const [selectedPin, setSelectedPin] = useState<MapPin | null>(null)
   const [cornerDetailsOpen, setCornerDetailsOpen] = useState(false)
   const [cornerReportOpen, setCornerReportOpen] = useState(false)
   const [focusRequest, setFocusRequest] = useState(0)
   const [createOpen, setCreateOpen] = useState(false)
+  const [panelOpen, setPanelOpen] = useState(true)
+  const [selectionDismissed, setSelectionDismissed] = useState(false)
   const [editingCorner, setEditingCorner] =
     useState<CommunityCornerDetail | null>(null)
+
   const profileQuery = useQuery({
     queryKey: ['prototype', 'profile'],
     queryFn: fetchProfile,
@@ -138,6 +144,7 @@ export const MapPage = () => {
   })
   const profileLocation = profileQuery.data?.location ?? null
   const discoveryLocation = location ?? profileLocation
+
   const mockMapData = useMemo<MapResponse>(
     () => ({
       corners: catalog.corners.map((corner, index) => {
@@ -147,6 +154,8 @@ export const MapPage = () => {
         const longitude =
           MAP_BOUNDS.west +
           (corner.x / 100) * (MAP_BOUNDS.east - MAP_BOUNDS.west)
+        const scope =
+          index % 2 === 0 ? 'Espacio abierto' : 'Espacio semiprivado'
         return {
           id: corner.id,
           name: corner.name,
@@ -159,7 +168,7 @@ export const MapPage = () => {
             Date.parse(MOCK_MAP_REFERENCE_DATE) - (index + 1) * 12 * 60_000
           ).toISOString(),
           photos: ['/prototype/reading-room.svg'],
-          themes: [corner.category],
+          themes: ['Comunidad', scope],
           isOpenNow: true,
           status: 'active',
         }
@@ -188,6 +197,7 @@ export const MapPage = () => {
     }),
     [catalog.corners]
   )
+
   const effectiveDistance = discoveryLocation ? distance : null
   const radialBbox = useMemo(
     () =>
@@ -202,6 +212,7 @@ export const MapPage = () => {
     [discoveryLocation, effectiveDistance]
   )
   const mapBbox = radialBbox ?? viewportBbox
+
   const mockFilteredMapData = useMemo<MapResponse>(() => {
     const normalizedSearch = search.trim().toLowerCase()
     const getDistanceKm = (corner: MapCornerPin) =>
@@ -234,11 +245,7 @@ export const MapPage = () => {
       normalizedSearch.length === 0 ||
       value.toLowerCase().includes(normalizedSearch)
     const matchesCategory = (themes: string[]) =>
-      category === 'Todo' ||
-      category === 'Más' ||
-      themes.some(
-        (theme) => theme === category || theme === category.replace(/s$/, '')
-      )
+      category === 'Todo' || themes.includes(category)
 
     const visibleCorners = mockMapData.corners
       .filter(
@@ -264,62 +271,40 @@ export const MapPage = () => {
     }
     const limitedCorners = visibleCorners.slice(0, MAP_RESULT_LIMITS.corners)
     const visibleCornerIds = new Set(limitedCorners.map((corner) => corner.id))
-    const visiblePublications = mockMapData.publications.filter(
-      (publication) => {
-        const corner = mockMapData.corners.find(
-          (item) => item.id === publication.cornerId
-        )
-        const latitude = publication.lat ?? corner?.lat
-        const longitude = publication.lon ?? corner?.lon
-        return (
-          visibleCornerIds.has(publication.cornerId) &&
-          (matchesSearch(publication.title) ||
-            publication.authors.some(matchesSearch)) &&
-          latitude !== undefined &&
-          longitude !== undefined &&
-          matchesDistance(latitude, longitude) &&
-          matchesViewport(latitude, longitude)
-        )
-      }
-    )
-    const visibleActivity = recentActivity
-      ? mockMapData.activity.filter(
-          (point) =>
-            visibleCornerIds.has(point.id.replace(/-activity$/, '')) &&
-            matchesDistance(point.lat, point.lon)
+    const visibleActivity = mapLayers.activity
+      ? mockMapData.activity.filter((point) =>
+          visibleCornerIds.has(point.id.replace(/-activity$/, ''))
         )
       : []
-    const limitedPublications = visiblePublications.slice(
-      0,
-      MAP_RESULT_LIMITS.publications
-    )
     const limitedActivity = visibleActivity.slice(0, MAP_RESULT_LIMITS.activity)
 
     return {
       ...mockMapData,
-      corners: limitedCorners,
-      publications: limitedPublications,
+      corners: mapLayers.corners ? limitedCorners : [],
+      publications: mapLayers.publications
+        ? mockMapData.publications.filter((publication) =>
+            visibleCornerIds.has(publication.cornerId)
+          )
+        : [],
       activity: limitedActivity,
       meta: {
         ...mockMapData.meta,
         bbox: mapBbox,
-        truncated:
-          visibleCorners.length > MAP_RESULT_LIMITS.corners ||
-          visiblePublications.length > MAP_RESULT_LIMITS.publications ||
-          visibleActivity.length > MAP_RESULT_LIMITS.activity,
+        truncated: visibleCorners.length > MAP_RESULT_LIMITS.corners,
       },
     }
   }, [
     category,
-    effectiveDistance,
     discoveryLocation,
+    effectiveDistance,
     mapBbox,
+    mapLayers,
     mockMapData,
     openNow,
-    recentActivity,
     search,
     viewportBbox,
   ])
+
   const mapQuery = useMapData(
     {
       bbox: mapBbox,
@@ -332,53 +317,24 @@ export const MapPage = () => {
         distanceKm: effectiveDistance,
         themes: category === 'Todo' ? [] : [category],
         openNow,
-        recentActivity,
+        recentActivity: mapLayers.activity,
       },
-      layers: { corners: true, publications: true, activity: true },
+      layers: mapLayers,
       locale: 'es',
     },
     { enabled: !mockMode }
   )
   const mapData = mockMode ? mockFilteredMapData : mapQuery.data
   const mapResultsTruncated = mapData?.meta.truncated === true
-  const mapCorners = useMemo(() => mapData?.corners ?? [], [mapData])
-  const mapPublications = useMemo(() => mapData?.publications ?? [], [mapData])
-  const mapActivity = useMemo(() => mapData?.activity ?? [], [mapData])
-  const corners: ReadonlyArray<MapCorner> = mapCorners.map((corner) => {
-    if (!mockMode) return toDisplayCorner(corner)
-    const mockCorner = catalog.corners.find((item) => item.id === corner.id)
-    return mockCorner
-      ? {
-          ...mockCorner,
-          distance: toDisplayCorner(corner).distance,
-        }
-      : toDisplayCorner(corner)
-  })
-  const categories = mockMode ? catalog.mapCategories : realCategories
-  const mapLayers = {
-    corners: true,
-    publications: true,
-    activity: recentActivity,
-  }
-  const visibleActivity = mapLayers.activity ? mapActivity.length : 0
+  const mapCorners = mapData?.corners ?? EMPTY_CORNERS
+  const mapPublications = mapData?.publications ?? EMPTY_PUBLICATIONS
+  const mapActivity = mapData?.activity ?? EMPTY_ACTIVITY
   const isMapEmpty =
-    mapCorners.length + mapPublications.length + visibleActivity === 0
-
-  const displayCornerForPin = useCallback(
-    (pin: MapCornerPin) => {
-      if (mockMode) {
-        return (
-          corners.find((corner) => corner.id === pin.id) ?? toDisplayCorner(pin)
-        )
-      }
-      return toDisplayCorner(pin)
-    },
-    [corners, mockMode]
-  )
+    mapCorners.length + mapPublications.length + mapActivity.length === 0
 
   const selectCorner = useCallback(
     (corner: MapCorner, openDetails = false) => {
-      setSelectedCorner(corner)
+      setSelectionDismissed(false)
       setCornerDetailsOpen(openDetails)
       const mapCorner = mapCorners.find((item) => item.id === corner.id)
       if (!mapCorner) return
@@ -388,22 +344,19 @@ export const MapPage = () => {
     [mapCorners]
   )
 
-  const handleSelectPin = useCallback(
-    (pin: MapPin) => {
-      setSelectedPin(pin)
-      setCornerDetailsOpen(pin.type === 'corner')
-      if (pin.type === 'corner') {
-        setSelectedCorner(displayCornerForPin(pin.data))
-        setFocusRequest((current) => current + 1)
-      }
-    },
-    [displayCornerForPin]
-  )
+  const handleSelectPin = useCallback((pin: MapPin) => {
+    setSelectionDismissed(false)
+    setSelectedPin(pin)
+    setCornerDetailsOpen(false)
+    if (pin.type === 'corner') {
+      setFocusRequest((current) => current + 1)
+    }
+  }, [])
 
   useEffect(() => {
     if (!mapCorners.length) {
       setSelectedPin(null)
-      setSelectedCorner(null)
+      setCornerDetailsOpen(false)
       return
     }
 
@@ -411,25 +364,25 @@ export const MapPage = () => {
       const requestedCorner = mapCorners.find(
         (corner) => corner.id === requestedCornerId
       )
-
       if (!requestedCorner) {
         setSelectedPin(null)
-        setSelectedCorner(null)
+        setCornerDetailsOpen(false)
         return
       }
 
-      const isRequestedCornerSelected =
-        selectedPin?.type === 'corner' &&
-        selectedPin.data.id === requestedCorner.id
-
-      if (!isRequestedCornerSelected) {
+      if (
+        selectedPin?.type !== 'corner' ||
+        selectedPin.data.id !== requestedCorner.id
+      ) {
+        setSelectionDismissed(false)
         setCornerDetailsOpen(false)
-        setSelectedCorner(displayCornerForPin(requestedCorner))
         setSelectedPin({ type: 'corner', data: requestedCorner })
         setFocusRequest((current) => current + 1)
       }
       return
     }
+
+    if (selectionDismissed && !selectedPin) return
 
     const isSelectedPinVisible =
       selectedPin &&
@@ -442,16 +395,16 @@ export const MapPage = () => {
 
     if (!isSelectedPinVisible) {
       const firstCorner = mapCorners[0]
+      setSelectionDismissed(false)
       setCornerDetailsOpen(false)
-      setSelectedCorner(displayCornerForPin(firstCorner))
       setSelectedPin({ type: 'corner', data: firstCorner })
     }
   }, [
-    displayCornerForPin,
     mapCorners,
     mapPublications,
     requestedCornerId,
     selectedPin,
+    selectionDismissed,
   ])
 
   const locate = useCallback(() => {
@@ -461,11 +414,10 @@ export const MapPage = () => {
     }
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        const nextLocation = {
+        setLocation({
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
-        }
-        setLocation(nextLocation)
+        })
         setLocationDenied(false)
       },
       () => setLocationDenied(true),
@@ -500,36 +452,14 @@ export const MapPage = () => {
     [setSearchParams]
   )
 
+  const handleToggleLayer = useCallback((layer: keyof MapLayerToggles) => {
+    setMapLayers((current) => ({ ...current, [layer]: !current[layer] }))
+  }, [])
+
   const selectedMapCorner =
     selectedPin?.type === 'corner' ? selectedPin.data : null
   const selectedPublication =
     selectedPin?.type === 'publication' ? selectedPin.data : null
-  const selectedTitle =
-    selectedPublication?.title ??
-    selectedMapCorner?.name ??
-    selectedCorner?.name ??
-    (mapQuery.isLoading ? 'Cargando rincones…' : 'No encontramos rincones')
-  const selectedSubtitle = selectedPublication
-    ? selectedPublication.authors.join(', ')
-    : selectedMapCorner
-      ? `${selectedMapCorner.themes[0] ?? selectedMapCorner.barrio} · ${toDisplayCorner(selectedMapCorner).distance}`
-      : selectedCorner
-        ? `${selectedCorner.category} · ${selectedCorner.distance}`
-        : 'Esperando datos del mapa.'
-  const selectedActivity = selectedPublication
-    ? selectedPublication.distanceKm === null
-      ? 'Distancia no disponible'
-      : `${selectedPublication.distanceKm.toLocaleString('es-AR')} km del rincón`
-    : selectedMapCorner?.lastSignalAt
-      ? 'Actividad reciente'
-      : (selectedCorner?.activity ?? 'Sin actividad reciente')
-  const cornerForSelectedCard =
-    selectedMapCorner ??
-    (selectedPublication
-      ? (mapCorners.find(
-          (corner) => corner.id === selectedPublication.cornerId
-        ) ?? null)
-      : null)
   const mockCornerDetail = useMemo<CommunityCornerDetail | null>(() => {
     if (!selectedMapCorner) return null
     return {
@@ -541,7 +471,7 @@ export const MapPage = () => {
       schedule: null,
       status: selectedMapCorner.status,
       visibilityPreference: 'approximate',
-      imageUrl: selectedMapCorner.photos?.[0] ?? null,
+      imageUrl: selectedMapCorner.photos[0] ?? null,
       isOwner: false,
       location: {
         city: selectedMapCorner.city,
@@ -559,6 +489,7 @@ export const MapPage = () => {
       },
     }
   }, [selectedMapCorner])
+
   const cornerDetailQuery = useQuery({
     queryKey: cornerKeys.detail(selectedMapCorner?.id ?? ''),
     queryFn: () => fetchCornerDetail(selectedMapCorner?.id ?? ''),
@@ -568,10 +499,7 @@ export const MapPage = () => {
   const selectedCornerDetail = mockMode
     ? mockCornerDetail
     : (cornerDetailQuery.data ?? null)
-  const selectedPlaceImage =
-    selectedPublication?.photo ||
-    selectedMapCorner?.photos?.[0] ||
-    selectedCornerDetail?.imageUrl
+
   const cornerUpdateMutation = useMutation({
     mutationFn: (input: { id: string; payload: UpdateCornerPayload }) =>
       updateCorner(input.id, input.payload),
@@ -580,16 +508,25 @@ export const MapPage = () => {
       void queryClient.invalidateQueries({ queryKey: mapKeys.all })
     },
   })
-  const handleViewCorner = useCallback(() => {
-    if (!cornerForSelectedCard) return
-    selectCorner(displayCornerForPin(cornerForSelectedCard), true)
-  }, [cornerForSelectedCard, displayCornerForPin, selectCorner])
+
+  const handleToggleCornerDetails = useCallback(() => {
+    if (!selectedMapCorner) return
+    setCornerDetailsOpen((current) => !current)
+  }, [selectedMapCorner])
+
   const handleViewPublication = useCallback(() => {
     if (!selectedPublication) return
     const listingId = selectedPublication.id.replace(/^listing-/, '')
     if (!/^\d+$/.test(listingId)) return
     navigate(`/books/${listingId}`)
   }, [navigate, selectedPublication])
+
+  const handleCloseSelection = useCallback(() => {
+    setSelectedPin(null)
+    setCornerDetailsOpen(false)
+    setSelectionDismissed(true)
+  }, [])
+
   const handleSaveCorner = useCallback(
     async (payload: UpdateCornerPayload) => {
       if (!selectedCornerDetail) return
@@ -601,6 +538,7 @@ export const MapPage = () => {
     },
     [cornerUpdateMutation, selectedCornerDetail]
   )
+
   const handleToggleCornerStatus = useCallback(() => {
     if (!selectedCornerDetail?.isOwner) return
     void cornerUpdateMutation.mutateAsync({
@@ -611,227 +549,157 @@ export const MapPage = () => {
     })
   }, [cornerUpdateMutation, selectedCornerDetail])
 
-  if (!mockMode && mapQuery.isError)
-    return (
-      <BaseLayout id="map-page" mainClassName={styles.layoutMain}>
-        <PrototypePage className={styles.page}>
-          <UnavailableState
-            title="No pudimos cargar el mapa"
-            description="Probá nuevamente en unos instantes."
-          />
-        </PrototypePage>
-      </BaseLayout>
-    )
+  const activityItems = useMemo<MapExplorationActivityItem[]>(
+    () =>
+      mapCorners
+        .filter((corner) => corner.lastSignalAt)
+        .slice(0, 5)
+        .map((corner) => ({
+          id: corner.id,
+          title: corner.name,
+          meta: `${t('map.exploration.activitySignal')} · ${
+            corner.distanceKm === null
+              ? t('map.selection.distanceUnavailable')
+              : `${corner.distanceKm.toLocaleString('es-AR')} km`
+          }`,
+          onSelect: () => selectCorner(toDisplayCorner(corner)),
+        })),
+    [mapCorners, selectCorner, t]
+  )
 
   return (
     <BaseLayout id="map-page" mainClassName={styles.layoutMain}>
       <PrototypePage className={styles.page}>
-        <header className={styles.header}>
-          <div>
-            <h1>Mapa de rincones</h1>
-            <p>
-              {location
-                ? 'Mostrando lugares cerca de tu ubicación'
-                : profileLocation
-                  ? 'Ordenando lugares según tu zona de perfil'
-                  : 'Buenos Aires · ubicación aproximada'}
-            </p>
-          </div>
-          <div>
-            <PrototypeButton onClick={locate}>⌖ Mi ubicación</PrototypeButton>
-            <PrototypeButton
-              tone="primary"
-              onClick={() => runIfAuthenticated(() => setCreateOpen(true))}
-            >
-              ＋ Crear rincón
-            </PrototypeButton>
-          </div>
-        </header>
-
-        <div className={styles.mapLayout}>
-          <Panel className={styles.rail} as="aside">
-            <label className={styles.search}>
-              <span>⌕</span>
-              <input
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Buscar zona o rincón"
-              />
-            </label>
-            <section>
-              <h2>Distancia</h2>
-              <div className={styles.distanceValue}>
-                Radio activo
-                <strong>
-                  {distance === null ? 'Sin límite' : `Hasta ${distance} km`}
-                </strong>
-              </div>
-              <RadiusSelector
-                distanceKm={distance}
-                onDistanceChange={handleDistanceChange}
-              />
-            </section>
-            <section>
-              <h2>Categorías</h2>
-              <div className={styles.categories}>
-                {categories.map((item) => (
-                  <Chip
-                    key={item}
-                    active={category === item}
-                    onClick={() => setCategory(item)}
-                  >
-                    {item}
-                  </Chip>
-                ))}
-              </div>
-            </section>
-            <section>
-              <h2>Disponibilidad</h2>
-              <label className={styles.switchRow}>
-                <span>
-                  <strong>Abierto ahora</strong>
-                  <small>Rincones disponibles hoy</small>
-                </span>
-                <input
-                  type="checkbox"
-                  checked={openNow}
-                  onChange={(event) => setOpenNow(event.target.checked)}
-                />
-              </label>
-              <label className={styles.switchRow}>
-                <span>
-                  <strong>Con actividad</strong>
-                  <small>Lectores en las últimas 2 h</small>
-                </span>
-                <input
-                  type="checkbox"
-                  checked={recentActivity}
-                  onChange={(event) => setRecentActivity(event.target.checked)}
-                />
-              </label>
-            </section>
-            <section className={styles.activity}>
-              <h2>Actividad cercana</h2>
-              {corners.map((corner) => (
-                <button
-                  key={corner.id}
-                  aria-label={corner.name}
-                  onClick={() => selectCorner(corner, true)}
-                >
-                  <span>⌖</span>
-                  <span>
-                    <strong>{corner.name}</strong>
-                    <small>
-                      {corner.activity} · {corner.distance}
-                    </small>
-                  </span>
-                </button>
-              ))}
-            </section>
-          </Panel>
-
-          <div
+        <div
+          className={styles.mapShell}
+          data-map-theme={theme}
+          data-panel-open={panelOpen}
+          role="region"
+          aria-label={t('map.exploration.mapLabel')}
+        >
+          <MapCanvas
+            bbox={mapBbox}
+            corners={mapCorners}
+            publications={mapPublications}
+            activity={mapActivity}
+            layers={mapLayers}
+            selectedPin={selectedPin}
+            focusRequest={focusRequest}
+            onSelectPin={handleSelectPin}
+            isLoading={!mockMode && mapQuery.isLoading}
+            isFetching={!mockMode && mapQuery.isFetching}
+            isEmpty={!mapQuery.isError && isMapEmpty}
+            userLocation={discoveryLocation}
+            radiusKm={effectiveDistance}
+            onViewportChange={handleViewportChange}
             className={styles.mapCanvas}
-            data-map-theme={theme}
-            role="img"
-            aria-label={`Mapa ${theme === 'dark' ? 'oscuro' : 'claro'} con rincones en un radio ${distance === null ? 'sin límite' : `de hasta ${distance} kilómetros`}`}
-          >
-            <MapCanvas
-              bbox={mapBbox}
-              corners={mapCorners}
-              publications={mapPublications}
-              activity={mapActivity}
-              layers={mapLayers}
-              selectedPin={selectedPin}
-              focusRequest={focusRequest}
-              onSelectPin={handleSelectPin}
-              isLoading={!mockMode && mapQuery.isLoading}
-              isFetching={!mockMode && mapQuery.isFetching}
-              isEmpty={isMapEmpty}
-              userLocation={discoveryLocation}
-              radiusKm={effectiveDistance}
-              onViewportChange={handleViewportChange}
-              className={styles.leafletCanvas}
-            />
-            {mapResultsTruncated ? (
-              <div className={styles.locationNotice} role="status">
-                Mostrando una selección de resultados. Acercá el mapa para ver
-                más rincones.
-              </div>
-            ) : null}
-            <Panel className={styles.placeCard} as="article">
-              <div className={styles.placeImage}>
-                <span>☕</span>
-                {selectedPlaceImage ? (
-                  <img
-                    src={selectedPlaceImage}
-                    alt=""
-                    className={styles.placeImageCover}
-                    onError={(event) => {
-                      event.currentTarget.hidden = true
-                    }}
-                  />
-                ) : null}
-              </div>
-              <div>
-                <span className={styles.open}>
-                  {selectedPublication
-                    ? '● Publicación disponible'
-                    : selectedMapCorner?.isOpenNow === false
-                      ? '● Cerrado ahora'
-                      : '● Abierto ahora'}
-                </span>
-                <h2>{selectedTitle}</h2>
-                <p>{selectedSubtitle}</p>
-                <div className={styles.placeMeta}>
-                  <span>★ 4,8</span>
-                  <span>{selectedActivity}</span>
-                </div>
-              </div>
-              <PrototypeButton
-                tone="primary"
-                size="small"
-                disabled={!selectedPublication && !cornerForSelectedCard}
-                onClick={
-                  selectedPublication ? handleViewPublication : handleViewCorner
-                }
+          />
+
+          <header className={styles.topBar}>
+            <div className={styles.titleBlock}>
+              <span>{t('map.exploration.eyebrow')}</span>
+              <h1>{t('map.exploration.title')}</h1>
+              <p>
+                {location
+                  ? t('map.exploration.nearbyLocation')
+                  : profileLocation
+                    ? t('map.exploration.profileLocation')
+                    : t('map.exploration.fallbackLocation')}
+              </p>
+            </div>
+            <div className={styles.topActions}>
+              <button
+                type="button"
+                className={styles.filterToggle}
+                onClick={() => setPanelOpen((current) => !current)}
+                aria-expanded={panelOpen}
+                aria-controls="map-exploration-panel"
               >
-                {selectedPublication
-                  ? t('map.cta.openPublication')
-                  : 'Ver rincón'}
+                <span aria-hidden="true">☷</span>
+                {panelOpen ? t('map.filters.hide') : t('map.filters.show')}
+              </button>
+              <PrototypeButton
+                className={styles.locationButton}
+                onClick={locate}
+                aria-label={t('map.filters.locateMe')}
+              >
+                <span aria-hidden="true">◎</span>
+                {t('map.exploration.locate')}
               </PrototypeButton>
-            </Panel>
-            {locationDenied ? (
-              <div className={styles.locationNotice} role="status">
-                {discoveryLocation
-                  ? 'No pudimos acceder a tu ubicación. Usamos tu zona de perfil para ordenar y aplicar el radio.'
-                  : 'No pudimos acceder a tu ubicación. Mostramos Buenos Aires sin ordenar por distancia; podés configurar una zona o volver a intentar.'}
-              </div>
-            ) : null}
-          </div>
-          {cornerDetailsOpen && selectedMapCorner ? (
-            <CornerDetailsPanel
-              detail={selectedCornerDetail}
-              isLoading={!mockMode && cornerDetailQuery.isLoading}
-              isError={!mockMode && cornerDetailQuery.isError}
-              isUpdating={cornerUpdateMutation.isPending}
-              error={
-                cornerUpdateMutation.isError
-                  ? t('map.cornerDetail.updateError')
-                  : undefined
-              }
-              onRetry={() => void cornerDetailQuery.refetch()}
-              onEdit={
-                selectedCornerDetail?.isOwner
-                  ? () => setEditingCorner(selectedCornerDetail)
-                  : undefined
-              }
-              onToggleStatus={handleToggleCornerStatus}
-              onReport={() =>
-                runIfAuthenticated(() => setCornerReportOpen(true))
-              }
+              <CreateCornerFab
+                placement="inline"
+                onClick={() => runIfAuthenticated(() => setCreateOpen(true))}
+              />
+            </div>
+          </header>
+
+          <div id="map-exploration-panel" className={styles.panelLayer}>
+            <FilterRail
+              searchValue={search}
+              onSearchChange={setSearch}
+              distanceKm={distance}
+              onDistanceChange={handleDistanceChange}
+              categories={MAP_CATEGORIES}
+              selectedCategory={category}
+              onCategoryChange={setCategory}
+              layers={mapLayers}
+              onToggleLayer={handleToggleLayer}
+              openNow={openNow}
+              onToggleOpenNow={() => setOpenNow((current) => !current)}
+              recentActivity={mapLayers.activity}
+              onToggleRecentActivity={() => handleToggleLayer('activity')}
+              activityItems={activityItems}
+              isFetching={!mockMode && mapQuery.isFetching}
+              isOpen={panelOpen}
+              onClose={() => setPanelOpen(false)}
             />
+          </div>
+
+          {mapQuery.isError && !mockMode ? (
+            <div className={styles.mapNotice} role="alert">
+              <span>{t('map.status.error')}</span>
+              <button type="button" onClick={() => void mapQuery.refetch()}>
+                {t('map.status.retry')}
+              </button>
+            </div>
           ) : null}
+          {mapResultsTruncated ? (
+            <div className={styles.mapNotice} role="status">
+              {t('map.status.truncated')}
+            </div>
+          ) : null}
+          {locationDenied ? (
+            <div className={styles.locationNotice} role="status">
+              {discoveryLocation
+                ? t('map.location.deniedWithProfile')
+                : t('map.location.deniedWithoutProfile')}
+            </div>
+          ) : null}
+
+          <MapSelectionCard
+            pin={selectedPin}
+            cornerDetail={selectedCornerDetail}
+            cornerDetailsOpen={cornerDetailsOpen}
+            isLoading={!mockMode && cornerDetailQuery.isLoading}
+            isError={!mockMode && cornerDetailQuery.isError}
+            isUpdating={cornerUpdateMutation.isPending}
+            error={
+              cornerUpdateMutation.isError
+                ? t('map.cornerDetail.updateError')
+                : undefined
+            }
+            onClose={handleCloseSelection}
+            onOpenDetails={handleToggleCornerDetails}
+            onOpenPublication={handleViewPublication}
+            onRetry={() => void cornerDetailQuery.refetch()}
+            onEdit={
+              selectedCornerDetail?.isOwner
+                ? () => setEditingCorner(selectedCornerDetail)
+                : undefined
+            }
+            onToggleStatus={handleToggleCornerStatus}
+            onReport={() => runIfAuthenticated(() => setCornerReportOpen(true))}
+          />
         </div>
       </PrototypePage>
 

@@ -25,6 +25,11 @@ de evidencia; las discrepancias conocidas siguen separadas de las correcciones
 de producto. El siguiente trabajo de cierre continua siendo la evidencia manual,
 backup/restauracion y accesibilidad indicados arriba.
 
+La experiencia de exploracion de `/map` ya fue pulida sobre la arquitectura
+existente. La evolucion pendiente es validar manualmente contraste, teclado,
+responsive y datos reales; no incluye todavia una reescritura del estado de
+mensajeria ni una actividad geolocalizada nueva.
+
 ## Evolucion posterior
 
 - Recomendacion automatica por proximidad e intereses.

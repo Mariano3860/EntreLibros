@@ -53,6 +53,9 @@ const mapMock = {
   zoomIn: zoomInMock,
   zoomOut: zoomOutMock,
 }
+const tileLayerProps = vi.hoisted(() => ({
+  current: null as { url?: string; attribution?: string } | null,
+}))
 
 beforeEach(() => {
   currentMapBounds = { ...bbox }
@@ -65,6 +68,7 @@ beforeEach(() => {
   zoomOutMock.mockClear()
   setViewMock.mockClear()
   flyToMock.mockClear()
+  tileLayerProps.current = null
 })
 
 vi.mock('react-leaflet', () => {
@@ -72,7 +76,10 @@ vi.mock('react-leaflet', () => {
     MapContainer: ({ children }: { children: React.ReactNode }) => (
       <div data-testid="leaflet-map">{children}</div>
     ),
-    TileLayer: () => <div data-testid="tile-layer" />,
+    TileLayer: (props: { url?: string; attribution?: string }) => {
+      tileLayerProps.current = props
+      return <div data-testid="tile-layer" />
+    },
     Circle: ({ radius }: { radius: number }) => (
       <div data-testid="radius-circle" data-radius={radius} />
     ),
@@ -83,14 +90,17 @@ vi.mock('react-leaflet', () => {
       children,
       eventHandlers,
       className,
+      pathOptions,
     }: {
       children?: React.ReactNode
       eventHandlers?: { click?: () => void }
       className?: string
+      pathOptions?: { color?: string }
     }) => (
       <button
         type="button"
         data-testid={`marker-${className ?? 'default'}`}
+        data-marker-color={pathOptions?.color}
         onClick={() => eventHandlers?.click?.()}
       >
         {children}
@@ -149,6 +159,29 @@ const activity: MapActivityPoint[] = [
 ]
 
 describe('MapCanvas', () => {
+  test('uses dark cartography with visible attribution', () => {
+    renderWithProviders(
+      <MapCanvas
+        bbox={bbox}
+        corners={[]}
+        publications={[]}
+        activity={[]}
+        layers={{ corners: true, publications: true, activity: true }}
+        selectedPin={null}
+        onSelectPin={vi.fn()}
+        isLoading={false}
+        isFetching={false}
+        isEmpty={false}
+      />
+    )
+
+    expect(tileLayerProps.current?.url).toContain(
+      'basemaps.cartocdn.com/dark_all'
+    )
+    expect(tileLayerProps.current?.attribution).toContain('OpenStreetMap')
+    expect(tileLayerProps.current?.attribution).toContain('CARTO')
+  })
+
   test('renders markers and handles selection', () => {
     const handleSelectPin = vi.fn()
 
@@ -182,6 +215,44 @@ describe('MapCanvas', () => {
       })
     )
     expect(fitBoundsMock).toHaveBeenCalled()
+  })
+
+  test('uses semantic colors for corner state and scope', () => {
+    renderWithProviders(
+      <MapCanvas
+        bbox={bbox}
+        corners={[
+          corners[0],
+          {
+            ...corners[1],
+            themes: ['Comunidad', 'Espacio semiprivado'],
+          },
+          { ...corners[0], id: 'corner-paused', status: 'paused' },
+        ]}
+        publications={[]}
+        activity={[]}
+        layers={{ corners: true, publications: false, activity: false }}
+        selectedPin={null}
+        onSelectPin={vi.fn()}
+        isLoading={false}
+        isFetching={false}
+        isEmpty={false}
+      />
+    )
+
+    const cornerMarkers = screen.getAllByTestId(/marker-.*cornerMarker/)
+    expect(cornerMarkers[0]).toHaveAttribute(
+      'data-marker-color',
+      'var(--prototype-teal)'
+    )
+    expect(cornerMarkers[1]).toHaveAttribute(
+      'data-marker-color',
+      'var(--prototype-blue)'
+    )
+    expect(cornerMarkers[2]).toHaveAttribute(
+      'data-marker-color',
+      'var(--prototype-orange)'
+    )
   })
 
   test('shows activity markers, loading overlay and empty state', () => {

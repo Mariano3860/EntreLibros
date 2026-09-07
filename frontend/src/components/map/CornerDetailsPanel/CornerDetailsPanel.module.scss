@@ -6,6 +6,14 @@
   overflow-y: auto;
 }
 
+.embedded {
+  padding: 14px 0 0;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
 .imageFrame {
   display: grid;
   min-height: 150px;

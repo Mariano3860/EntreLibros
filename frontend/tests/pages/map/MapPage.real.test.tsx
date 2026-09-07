@@ -117,6 +117,8 @@ const profile = {
   street: null,
 }
 
+const radiusSlider = () => screen.getByRole('slider', { name: /Radio geogr/ })
+
 describe('MapPage in real API mode', () => {
   beforeEach(() => {
     fetchMe.mockReset()
@@ -138,7 +140,7 @@ describe('MapPage in real API mode', () => {
       renderWithProviders(<MapPage />)
 
       expect(
-        await screen.findByText(/Ordenando lugares según tu zona de perfil/)
+        await screen.findByText('map.exploration.profileLocation')
       ).toBeVisible()
       expect(screen.getByTestId('profile-location')).toHaveTextContent(
         '-34.6037,-58.3816'
@@ -170,12 +172,7 @@ describe('MapPage in real API mode', () => {
     try {
       renderWithProviders(<MapPage />)
       await screen.findByTestId('profile-location')
-      fireEvent.change(
-        screen.getByRole('slider', { name: 'Radio geográfico' }),
-        {
-          target: { value: '1' },
-        }
-      )
+      fireEvent.change(radiusSlider(), { target: { value: '1' } })
 
       await waitFor(() =>
         expect(useMapDataMock.mock.calls.at(-1)?.[0]).toEqual(
@@ -244,9 +241,7 @@ describe('MapPage in real API mode', () => {
     })
 
     try {
-      renderWithProviders(<MapPage />, {
-        initialEntries: ['/map?radius=5'],
-      })
+      renderWithProviders(<MapPage />, { initialEntries: ['/map?radius=5'] })
       await screen.findByTestId('profile-location')
       await waitFor(() =>
         expect(useMapDataMock.mock.calls.at(-1)?.[0]).toEqual(

@@ -22,7 +22,10 @@ El modo demo también debe cubrir estados de carga, vacío y error. El estado va
 
 ## Recursos visuales
 
-Los recursos estables están en `frontend/public/prototype/`. Son SVG locales para evitar variaciones de red y mantener una composición reproducible. El mapa y los gráficos son composiciones de la interfaz; no implican que exista un proveedor cartográfico o analítico externo.
+La pantalla `/map` usa en modo demo la misma capa raster de CARTO/OpenStreetMap
+que en modo real; los datos de pines, filtros y actividad siguen siendo respuestas
+deterministas de MSW y no implican persistencia del backend.
+
 
 ## Límite
 

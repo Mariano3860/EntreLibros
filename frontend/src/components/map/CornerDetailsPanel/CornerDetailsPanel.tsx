@@ -7,6 +7,9 @@ import styles from './CornerDetailsPanel.module.scss'
 
 type CornerDetailsPanelProps = {
   detail: CommunityCornerDetail | null
+  as?: 'aside' | 'div'
+  embedded?: boolean
+  className?: string
   isLoading?: boolean
   isError?: boolean
   isUpdating?: boolean
@@ -19,6 +22,9 @@ type CornerDetailsPanelProps = {
 
 export const CornerDetailsPanel = ({
   detail,
+  as = 'aside',
+  embedded = false,
+  className = '',
   isLoading = false,
   isError = false,
   isUpdating = false,
@@ -33,8 +39,8 @@ export const CornerDetailsPanel = ({
   if (isLoading) {
     return (
       <Panel
-        className={styles.panel}
-        as="aside"
+        className={`${styles.panel} ${embedded ? styles.embedded : ''} ${className}`}
+        as={as}
         aria-label={t('map.cornerDetail.title')}
       >
         <p className={styles.feedback}>{t('map.cornerDetail.loading')}</p>
@@ -45,8 +51,8 @@ export const CornerDetailsPanel = ({
   if (isError || !detail) {
     return (
       <Panel
-        className={styles.panel}
-        as="aside"
+        className={`${styles.panel} ${embedded ? styles.embedded : ''} ${className}`}
+        as={as}
         aria-label={t('map.cornerDetail.title')}
       >
         <p className={styles.feedback}>{t('map.cornerDetail.error')}</p>
@@ -63,27 +69,31 @@ export const CornerDetailsPanel = ({
 
   return (
     <Panel
-      className={styles.panel}
-      as="aside"
+      className={`${styles.panel} ${embedded ? styles.embedded : ''} ${className}`}
+      as={as}
       aria-label={t('map.cornerDetail.title')}
     >
-      <div className={styles.imageFrame}>
-        {detail.imageUrl ? (
-          <img src={detail.imageUrl} alt="" className={styles.image} />
-        ) : (
-          <span aria-hidden="true">⌂</span>
-        )}
-      </div>
+      {!embedded ? (
+        <>
+          <div className={styles.imageFrame}>
+            {detail.imageUrl ? (
+              <img src={detail.imageUrl} alt="" className={styles.image} />
+            ) : (
+              <span aria-hidden="true">⌂</span>
+            )}
+          </div>
 
-      <div className={styles.heading}>
-        <span className={isActive ? styles.active : styles.paused}>
-          {isActive
-            ? t('map.cornerDetail.status.active')
-            : t('map.cornerDetail.status.paused')}
-        </span>
-        <h2>{detail.name}</h2>
-        <p>{detail.hostAlias}</p>
-      </div>
+          <div className={styles.heading}>
+            <span className={isActive ? styles.active : styles.paused}>
+              {isActive
+                ? t('map.cornerDetail.status.active')
+                : t('map.cornerDetail.status.paused')}
+            </span>
+            <h2>{detail.name}</h2>
+            <p>{detail.hostAlias}</p>
+          </div>
+        </>
+      ) : null}
 
       <dl className={styles.dataList}>
         <div>

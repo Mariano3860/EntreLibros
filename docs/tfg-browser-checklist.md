@@ -22,7 +22,7 @@ de una base local aislada.
 | Comunidad real | OK | Feed con Alma/Bruno y sugerencias enlazadas a `/profile/:id`. |
 | Perfil publico | OK | Alias, ciudad e intereses visibles; no aparecen correo ni coordenadas. |
 | Reporte | OK parcial | El formulario abre con categoria conducta y motivo; el envio queda pendiente de una sesion autenticada propietaria. |
-| Mapa/listado | OK | Rincon sintetico en listado y mapa; detalle con zona, horario, normas y actividad sin calle ni altura. |
+| Mapa/listado | OK | Mapa dominante oscuro con panel flotante, filtros, pines y una tarjeta unica de seleccion; detalle con zona, horario, normas y actividad sin calle ni altura. |
 | Metricas | OK | Panel con periodo, publicaciones, contactos, acuerdos, confirmaciones y ultima actualizacion. |
 | Recarga | OK | Las rutas cargan desde API real despues de navegar y recargar. |
 | Mensajeria/acuerdo | Automatizado | Persistencia, autorizacion, concurrencia, outcome y deduplicacion cubiertos por Vitest de backend; falta completar la sesion manual de dos usuarios. |
@@ -35,14 +35,17 @@ de una base local aislada.
 1. Ejecutar migraciones sobre una base aislada.
 2. Ejecutar `psql "$DATABASE_URL" -f backend/scripts/seed-demo-dataset.sql`.
 3. Arrancar backend y frontend con `PUBLIC_API_USE_MOCKS=false`.
-4. Abrir `/community`, seguir el enlace a un perfil, abrir `/map` y seleccionar
-   el Rincon desde listado y pin.
-5. Abrir `/stats`, cambiar entre 7, 30 y 90 dias y comprobar la fecha de
+4. Abrir `/community`, seguir el enlace a un perfil y abrir `/map`. Verificar que
+   el mapa ocupa la superficie principal, cambiar radio/categoria/capas,
+   seleccionar un Rincon desde un pin y abrir/cerrar su tarjeta de detalle.
+5. Probar `Mi ubicacion`, `Crear Rincon`, busqueda, estado sin resultados y
+   ocultar/mostrar el panel en un viewport intermedio.
+6. Abrir `/stats`, cambiar entre 7, 30 y 90 dias y comprobar la fecha de
    actualizacion.
-6. Con dos sesiones autenticadas, iniciar contacto desde publicacion y perfil,
+7. Con dos sesiones autenticadas, iniciar contacto desde publicacion y perfil,
    enviar la plantilla, recargar, proponer/confirmar un acuerdo y registrar ambos
    resultados. No copiar correo, direccion, tokens ni coordenadas en capturas.
-7. Repetir en viewport desktop y responsive, con teclado y en ambos idiomas.
+8. Repetir en viewport desktop y responsive, con teclado y en ambos idiomas.
 
 ## Politica de evidencia
 

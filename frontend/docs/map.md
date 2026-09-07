@@ -4,14 +4,14 @@ El mini mapa de `/community` consume el contrato de rincones reales y navega al 
 
 `/map` ofrece radios geográficos discretos de 1, 5, 30 y 50 km, además de “Sin límite”. El valor se refleja en `radius`; si se elige “Sin límite”, el parámetro se elimina. Con permiso de ubicación, el frontend envía el centro aproximado autorizado y la API aplica el mismo radio a rincones, publicaciones, actividad y lista lateral usando distancia geográfica. Sin permiso, el mapa mantiene el radio elegido en la interfaz, no dibuja un perímetro ni inventa un centro preciso y muestra el fallback de Buenos Aires.
 
-La ruta `/map` funciona como hub territorial para descubrir Rincones de Libros, publicaciones cercanas y señales de actividad. El mock se apoya en `msw` y genera datos deterministas a partir de la semilla `2048`. El panel lateral permanece como bloque placeholder hasta definir el detalle definitivo.
+La ruta `/map` funciona como hub territorial para descubrir Rincones de Libros, publicaciones cercanas y señales de actividad. El mock se apoya en `msw` y genera datos deterministas a partir de la semilla `2048`. La experiencia usa un shell de mapa dominante, un panel flotante de exploración y una tarjeta única para el pin seleccionado. La capa base oscura usa teselas Carto basadas en OpenStreetMap y mantiene la atribución visible.
 
 ### Cómo probar el mapa en desarrollo
 
 1. Levanta el frontend con `npm run dev` (desde `frontend/`).
 2. Asegúrate de tener los mocks activos (`npm run dev` ya inicia `msw`).
 3. Navega a `http://localhost:3000/map`.
-4. Usa los chips superiores para activar/desactivar capas y el rail para afinar filtros (radio, temas, actividad). El perímetro azul-celeste aparece al compartir la ubicación y se ajusta al radio elegido.
+4. Usa el panel flotante para afinar filtros (búsqueda, radio, temas, capas, disponibilidad y actividad). El perímetro azul-celeste aparece al compartir la ubicación y se ajusta al radio elegido; `Mi ubicación` y `Crear rincón` permanecen disponibles sobre el mapa.
 5. Para simular estados vacíos o errores en tests puedes sobrescribir el handler `mapHandler` desde `msw`.
 
 ### Eventos de analítica
