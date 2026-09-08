@@ -3,7 +3,7 @@ import { afterEach, describe, expect, test } from 'vitest';
 import { pool } from '../../src/db.js';
 import {
   listMessages,
-  sendMessage,
+  sendMessageWithStatus,
   createConversation,
 } from '../../src/repositories/messagingRepository.js';
 
@@ -43,20 +43,20 @@ describe('messaging cursor recovery', () => {
     const conversation = await createConversation([firstUser, secondUser]);
     conversationId = conversation.id;
 
-    await sendMessage({
+    await sendMessageWithStatus({
       conversationId: conversation.id,
       senderId: firstUser,
       clientKey: 'cursor-1',
       body: 'one',
     });
-    await sendMessage({
+    await sendMessageWithStatus({
       conversationId: conversation.id,
       senderId: firstUser,
       clientKey: 'cursor-2',
       body: 'two',
     });
     const cursor = 1;
-    await sendMessage({
+    await sendMessageWithStatus({
       conversationId: conversation.id,
       senderId: firstUser,
       clientKey: 'cursor-3',

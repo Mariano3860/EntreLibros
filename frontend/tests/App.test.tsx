@@ -3,9 +3,6 @@ import { describe, expect, test, vi } from 'vitest'
 
 import { fetchMe } from '@src/api/auth/me.service'
 import App from '@src/App'
-vi.mock('@src/hooks/api/useBooks', () => ({
-  useBooks: () => ({ data: [] }),
-}))
 vi.mock('@src/api/auth/me.service', () => ({ fetchMe: vi.fn() }))
 
 describe('App Component', () => {

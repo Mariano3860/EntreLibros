@@ -1,10 +1,6 @@
 import { describe, expect, test, vi, beforeEach } from 'vitest'
 
-import {
-  fetchBookById,
-  fetchBooks,
-  publishBook,
-} from '@api/books/books.service'
+import { fetchBooks, publishBook } from '@api/books/books.service'
 import { searchBooks } from '@api/books/searchBooks.service'
 import { PublishBookPayload } from '@api/books/publishBook.types'
 
@@ -65,25 +61,6 @@ describe('books service', () => {
     expect(getMock).toHaveBeenCalledWith(
       '/books?q=astronom%C3%ADa&author=Autora&isbn=9780000000002&topic=espacio&interest=ciencia-ficcion&condition=good&trade=true&latitude=-34.6&longitude=-58.4&radiusKm=5&limit=10&offset=20'
     )
-  })
-
-  test('fetchBookById returns a persisted publication', async () => {
-    const sample = {
-      id: '7',
-      title: 'Dune',
-      author: 'Frank Herbert',
-      coverUrl: '',
-    }
-    getMock.mockResolvedValueOnce({ data: sample })
-
-    await expect(fetchBookById(7)).resolves.toEqual(sample)
-    expect(getMock).toHaveBeenCalledWith('/books/7')
-  })
-
-  test('fetchBookById rejects an invalid publication response', async () => {
-    getMock.mockResolvedValueOnce({ data: null })
-
-    await expect(fetchBookById(7)).rejects.toThrow('Invalid book response')
   })
 
   test('publishBook returns created book when response contains id', async () => {

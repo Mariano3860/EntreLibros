@@ -92,24 +92,6 @@ export const fetchBooks = async (
   return response.data
 }
 
-export const fetchAllBooks = async (
-  filters: BookCatalogFilters = {}
-): Promise<ApiBookCatalogPage> => {
-  const params = new URLSearchParams({ scope: 'all' })
-  Object.entries(filters).forEach(([key, value]) => {
-    if (value !== undefined && value !== '') params.set(key, String(value))
-  })
-  const response = await apiClient.get<ApiBookCatalogPage>(
-    `${RELATIVE_API_ROUTES.BOOKS.LIST}?${params.toString()}`
-  )
-
-  if (!hasValidCatalogPage(response.data)) {
-    throw new Error('Invalid books response')
-  }
-
-  return response.data
-}
-
 const hasValidBookRelationsPage = (
   value: unknown
 ): value is ApiBookRelationsPage => {
@@ -158,16 +140,6 @@ export const fetchHomeBooks = async (offset = 0): Promise<ApiHomeBooksPage> => {
   return response.data
 }
 
-export const fetchBookById = async (id: number): Promise<ApiBook> => {
-  const response = await apiClient.get<ApiBook>(
-    `${RELATIVE_API_ROUTES.BOOKS.LIST}/${id}`
-  )
-  if (!response.data || typeof response.data !== 'object') {
-    throw new Error('Invalid book response')
-  }
-  return response.data
-}
-
 export const publishBook = async (
   payload: PublishBookPayload
 ): Promise<PublishBookResponse> => {
@@ -180,17 +152,5 @@ export const publishBook = async (
     throw new Error('Invalid publish response')
   }
 
-  return response.data
-}
-
-export const createWantFromBook = async (
-  id: string
-): Promise<PublishBookResponse> => {
-  const response = await apiClient.post<PublishBookResponse>(
-    RELATIVE_API_ROUTES.BOOKS.WANT(id)
-  )
-  if (!response.data || !response.data.id) {
-    throw new Error('Invalid want response')
-  }
   return response.data
 }

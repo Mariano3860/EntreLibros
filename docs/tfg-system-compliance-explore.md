@@ -628,6 +628,19 @@ La prueba de mapa con p95 local cercano a 25,51 ms es una señal útil, no una g
 
 ## 21. Candidatos de código muerto, duplicado o innecesario
 
+### Actualización de Fase 3 (2026-09-08)
+
+El inventario completo sobre `main` posterior a la Fase 2 confirmó y retiró las
+cadenas test-only de `fetchAllBooks`, `fetchBookById`, `createWantFromBook`,
+`useBooks`, `useUserBooks`, `createBook`, `listBooks`, `sendMessage`,
+`areUsersBlocked` y `withMessagingClient`, junto con sus mocks e imports
+exclusivos. La cobertura de verificación de publicaciones se conserva en la
+ruta canónica y la de mensajes usa `sendMessageWithStatus`. Se conservaron
+`fetchUserBooks`, `getBookById`, discovery/suggestions, FeedActions,
+FeedItem.types, CornersMiniMap y Socket.IO productivo. El inventario histórico
+que sigue documenta la hipótesis previa a esta confirmación, no una superficie
+vigente.
+
 Esta sección no autoriza borrados. Son candidatos que requieren un OpenSpec de implementación o una verificación final de consumidores.
 
 ### Alta confianza, pero sujetos a traslado de cobertura
