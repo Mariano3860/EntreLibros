@@ -14,8 +14,10 @@
     "errors": {
       "invalid_credentials": "Invalid email or password.",
       "email_exists": "Email is already registered.",
+      "weak_password": "Password must be at least 8 characters and include uppercase, lowercase, a number, and a symbol.",
       "unknown": "An unexpected error occurred."
     },
+    "password_requirements": "At least 8 characters, with uppercase, lowercase, a number, and a symbol.",
     "success": {
       "login": "Login successful!",
       "register": "Registration successful!"

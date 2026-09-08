@@ -544,7 +544,7 @@ export const MapPage = () => {
 
   const activityItems = useMemo<MapExplorationActivityItem[]>(
     () =>
-      mapCorners.slice(0, 5).map((corner) => ({
+      mapCorners.map((corner) => ({
         id: corner.id,
         title: corner.name,
         meta: `${
@@ -558,9 +558,11 @@ export const MapPage = () => {
         }`,
         photo: corner.photos[0],
         icon: 'book',
+        isSelected:
+          selectedPin?.type === 'corner' && selectedPin.data.id === corner.id,
         onSelect: () => selectCorner(toDisplayCorner(corner)),
       })),
-    [mapCorners, selectCorner, t]
+    [mapCorners, selectCorner, selectedPin, t]
   )
 
   return (

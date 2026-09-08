@@ -16,6 +16,8 @@ type FormValues = {
   confirmPassword: string
 }
 
+const PASSWORD_POLICY = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/
+
 export const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
   const { t } = useTranslation()
   const { mutate: doRegister, isPending } = useRegister()
@@ -87,13 +89,20 @@ export const RegisterForm = ({ onSubmit }: RegisterFormProps) => {
           type="password"
           placeholder={t('password')}
           className={styles.input}
-          {...register('password', { required: true, minLength: 6 })}
+          {...register('password', {
+            required: true,
+            validate: (value) =>
+              PASSWORD_POLICY.test(value) || t('auth.errors.weak_password'),
+          })}
         />
+        <span className={styles.passwordHint}>
+          {t('auth.password_requirements')}
+        </span>
         {errors.password && (
           <span className={styles.errorMessage}>
             {errors.password.type === 'required'
               ? t('form.errors.required')
-              : t('form.errors.min_length', { count: 6 })}
+              : (errors.password.message as string)}
           </span>
         )}
         <input

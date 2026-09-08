@@ -14,8 +14,10 @@
     "errors": {
       "invalid_credentials": "Correo electrónico o contraseña incorrectos.",
       "email_exists": "El correo ya está registrado.",
+      "weak_password": "La contraseña debe tener al menos 8 caracteres e incluir mayúscula, minúscula, número y símbolo.",
       "unknown": "Ocurrió un error inesperado."
     },
+    "password_requirements": "Al menos 8 caracteres, con mayúscula, minúscula, número y símbolo.",
     "success": {
       "login": "¡Inicio de sesión exitoso!",
       "register": "¡Registro exitoso!"

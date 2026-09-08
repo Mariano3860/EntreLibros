@@ -287,14 +287,15 @@ describe('MapPage', () => {
     )
     expect(screen.queryByRole('article')).not.toBeInTheDocument()
 
-    fireEvent.click(
-      within(screen.getByRole('complementary')).getByRole('button', {
-        name: /Biblioteca de Palermo/,
-      })
+    const cornerInRail = within(screen.getByRole('complementary')).getByRole(
+      'button',
+      { name: /Biblioteca de Palermo/ }
     )
+    fireEvent.click(cornerInRail)
     expect(
       screen.getByRole('article', { name: 'Biblioteca de Palermo' })
     ).toBeVisible()
+    expect(cornerInRail).toHaveAttribute('aria-pressed', 'true')
   })
 
   test('toggles availability and panel visibility', () => {

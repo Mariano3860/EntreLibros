@@ -54,3 +54,37 @@ test("covers visitor, private navigation, logout, and reload with real cookies",
   await expect(page).toHaveURL(/\/login\?returnTo=%2Fmessages$/);
   await context.close();
 });
+
+test("enforces the registration password policy before creating a real session", async ({
+  browser,
+}) => {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  const email = `password-policy-${Date.now()}@entrelibros.local`;
+
+  await page.goto("/register");
+  await page.getByPlaceholder("Nombre").fill("Password Policy");
+  await page.getByPlaceholder("Correo electrónico").fill(email);
+  await page.getByPlaceholder("Contraseña").first().fill("weakpass1");
+  await page.getByPlaceholder("Confirmar contraseña").fill("weakpass1");
+  await page.getByRole("button", { name: "Registrarse" }).click();
+
+  await expect(
+    page.getByText(
+      "La contraseña debe tener al menos 8 caracteres e incluir mayúscula, minúscula, número y símbolo.",
+    ),
+  ).toBeVisible();
+  await expect(page).toHaveURL(/\/register$/);
+
+  await page.getByPlaceholder("Contraseña").first().fill("Str0ng!Pass1");
+  await page.getByPlaceholder("Confirmar contraseña").fill("Str0ng!Pass1");
+  await page.getByRole("button", { name: "Registrarse" }).click();
+  await expect(page).toHaveURL(/\/login$/);
+
+  await page.getByPlaceholder("Correo electrónico").fill(email);
+  await page.getByPlaceholder("Contraseña").fill("Str0ng!Pass1");
+  await page.getByRole("button", { name: /iniciar sesión/i }).click();
+  await expect(page).toHaveURL(/\/home$/);
+
+  await context.close();
+});
