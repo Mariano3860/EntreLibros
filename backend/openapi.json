@@ -2554,6 +2554,34 @@
         }
       }
     },
+    "/api/auth/me": {
+      "get": {
+        "summary": "Get the current authenticated user",
+        "tags": ["Auth"],
+        "security": [{ "cookieAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Current authenticated user without password data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["id", "name", "email", "role", "language"],
+                  "properties": {
+                    "id": { "type": "integer" },
+                    "name": { "type": "string" },
+                    "email": { "type": "string", "format": "email" },
+                    "role": { "type": "string" },
+                    "language": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
     "/api/books/{id}": {
       "get": {
         "summary": "Get publication details",

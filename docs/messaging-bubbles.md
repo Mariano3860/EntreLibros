@@ -4,8 +4,13 @@
 
 1. El cliente carga conversaciones con `GET /api/messages`.
 2. Al abrir una conversación se une a su sala de Socket.IO.
-3. `conversation:message` valida autorización, persiste el mensaje y luego lo emite.
-4. El cliente reconcilia reintentos mediante `clientKey` y vuelve a cargar el historial después de reconectar.
+3. La interfaz productiva envía el borrador con `POST /api/messages/:conversationId/draft/send`; esa operación valida, persiste y publica el resultado.
+4. Socket.IO entrega `conversation:message` y permite `conversation:join` con cursor para el replay; el cliente invalida y recarga el historial tras reconectar.
+
+El backend conserva un listener Socket de escritura por compatibilidad con el
+contrato actual, pero no es el camino de envío utilizado por `MessagesPage`.
+Su consolidación o retiro se evaluará con consumidores y pruebas de
+caracterización en la fase dedicada al protocolo, sin cambiar este flujo.
 
 La mensajería real necesita sesión, migraciones aplicadas y backend activo. El bot persistente se crea con `015_seed_messaging_bot.sql` y responde dentro de la conversación autorizada.
 

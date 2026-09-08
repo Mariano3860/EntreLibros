@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { renderHook } from '@testing-library/react'
+import { act, renderHook } from '@testing-library/react'
 import { toast } from 'react-toastify'
 import { describe, expect, test, vi } from 'vitest'
 
@@ -20,10 +20,12 @@ describe('useContactForm', () => {
     )
     const onSuccess = vi.fn()
     const { result } = renderHook(() => useContactForm(onSuccess), { wrapper })
-    await result.current.mutateAsync({
-      name: 'John',
-      email: 'john@example.com',
-      message: 'Hi',
+    await act(async () => {
+      await result.current.mutateAsync({
+        name: 'John',
+        email: 'john@example.com',
+        message: 'Hi',
+      })
     })
     expect(toast.success).toHaveBeenCalledWith('contact.success.submitted')
     expect(onSuccess).toHaveBeenCalled()
@@ -35,13 +37,15 @@ describe('useContactForm', () => {
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
     const { result } = renderHook(() => useContactForm(), { wrapper })
-    await expect(
-      result.current.mutateAsync({
-        name: 'John 400',
-        email: 'john@example.com',
-        message: 'Hi',
-      })
-    ).rejects.toThrow()
+    await act(async () => {
+      await expect(
+        result.current.mutateAsync({
+          name: 'John 400',
+          email: 'john@example.com',
+          message: 'Hi',
+        })
+      ).rejects.toThrow()
+    })
     expect(toast.error).toHaveBeenCalled()
   })
 })

@@ -47,7 +47,15 @@ resumida y estado de seguimiento.
 
 `GET /api/messages` lista conversaciones autenticadas y calcula `unreadCount` desde el cursor de lectura. `GET /api/messages/contacts?search=` busca personas públicas por nombre o alias y respeta seguimiento, visibilidad y bloqueos.
 
-Los eventos `conversation:join`, `conversation:leave` y `conversation:message` operan sobre conversaciones autorizadas. El backend persiste cada mensaje antes de emitirlo, y el cliente invalida el listado para mantener sincronizados historial, no leídos y notificaciones. El bot persistente se crea de forma idempotente con la migración `015_seed_messaging_bot.sql`.
+El cliente usa `conversation:join` para autorizar la sala y recuperar mensajes
+posteriores a su cursor; `conversation:read` actualiza el cursor de lectura. El
+backend entrega `conversation:message` y `agreement:updated` a participantes
+autorizados. La interfaz productiva envía borradores por HTTP y reconcilia por
+Socket.IO historial, no leídos, notificaciones y acuerdos. Existe además un
+listener Socket de escritura que se conserva como comportamiento actual hasta
+la revisión acotada de su protocolo; `conversation:leave` no es un evento
+implementado. El bot persistente se crea de forma idempotente con la migración
+`015_seed_messaging_bot.sql`.
 
 ## Perfil y privacidad
 
