@@ -15,6 +15,7 @@ import jwt, { type Algorithm } from 'jsonwebtoken';
 import * as userRepo from '../src/repositories/userRepository.js';
 import * as messagingRepo from '../src/repositories/messagingRepository.js';
 import * as notificationService from '../src/services/notifications.js';
+import { sendDirectMessageCommand } from '../src/services/messageCommand.js';
 
 let io: Server<
   ClientToServerEvents,
@@ -118,8 +119,9 @@ describe('chat bot replies', () => {
       clientSocket.on('conversation:message', onMessage);
     });
 
-    clientSocket.emit('conversation:message', {
+    await sendDirectMessageCommand({
       conversationId: 42,
+      senderId: 1,
       clientKey: 'user-message-1',
       body: 'hola',
     });

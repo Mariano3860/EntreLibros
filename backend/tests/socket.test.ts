@@ -79,28 +79,6 @@ describe('websocket messaging', () => {
       async (conversationId, userId) =>
         memberships.get(`${conversationId}:${userId}`) ?? false
     );
-    vi.spyOn(messagingRepo, 'sendMessageWithStatus').mockResolvedValue({
-      message: {
-        id: 1,
-        conversationId: 101,
-        senderId: 1,
-        sequence: 1,
-        clientKey: 'room-key',
-        body: 'private',
-        attachmentMetadata: {
-          key: 'book:1',
-          contentType: 'application/x-entrelibros-book',
-          size: 1,
-          kind: 'book',
-          bookId: '1',
-          title: 'Libro privado',
-          author: 'Autora',
-          coverUrl: '/cover.jpg',
-        },
-        createdAt: new Date(),
-      },
-      created: true,
-    });
     vi.spyOn(messagingRepo, 'listMessages').mockResolvedValue([
       {
         id: 2,
@@ -222,10 +200,24 @@ describe('websocket messaging', () => {
     await agreementReceived;
     await new Promise((resolve) => setTimeout(resolve, 30));
     expect(outsiderAgreementReceived).toBe(false);
-    clientSocket.emit('conversation:message', {
+    messagingRepo.publishMessage({
+      id: 1,
       conversationId: 101,
+      senderId: 1,
+      sequence: 1,
       clientKey: 'room-key',
       body: 'private',
+      attachmentMetadata: {
+        key: 'book:1',
+        contentType: 'application/x-entrelibros-book',
+        size: 1,
+        kind: 'book',
+        bookId: '1',
+        title: 'Libro privado',
+        author: 'Autora',
+        coverUrl: '/cover.jpg',
+      },
+      createdAt: new Date(),
     });
     await received;
     await new Promise((resolve) => setTimeout(resolve, 30));
@@ -234,21 +226,23 @@ describe('websocket messaging', () => {
     outsider.close();
   }, 10000);
 
-  test('rejects invalid payloads and hides unexpected messaging errors', async () => {
+  test('rejects invalid read payloads and hides unexpected messaging errors', async () => {
     const invalidPayload = new Promise<void>((resolve) => {
       clientSocket.once('conversation:error', (payload) => {
         expect(payload.message).toBe('messaging.errors.invalid_payload');
         resolve();
       });
     });
-    clientSocket.emit('conversation:message', {
+    clientSocket.emit('conversation:read', {
       conversationId: 101,
-      clientKey: 'too-large',
-      body: 'x'.repeat(4001),
+      sequence: -1,
     });
     await invalidPayload;
 
-    vi.mocked(messagingRepo.sendMessageWithStatus).mockRejectedValueOnce(
+    vi.spyOn(messagingRepo, 'isConversationParticipant').mockResolvedValue(
+      true
+    );
+    vi.spyOn(messagingRepo, 'markConversationRead').mockRejectedValueOnce(
       new Error('SQL connection details')
     );
     const unexpectedFailure = new Promise<void>((resolve) => {
@@ -258,10 +252,9 @@ describe('websocket messaging', () => {
         resolve();
       });
     });
-    clientSocket.emit('conversation:message', {
+    clientSocket.emit('conversation:read', {
       conversationId: 101,
-      clientKey: 'unexpected-error',
-      body: 'hello',
+      sequence: 1,
     });
     await unexpectedFailure;
   });

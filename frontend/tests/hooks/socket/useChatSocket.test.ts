@@ -44,21 +44,14 @@ describe('useChatSocket', () => {
     expect(result.current.currentUser).toEqual({ id: 1, name: 'Me' })
   })
 
-  test('sends conversation messages and joins their room', () => {
+  test('joins conversation rooms for replay', () => {
     const { result } = renderHook(() => useChatSocket(), { wrapper })
     act(() => {
       result.current.joinConversation(9, 4)
-      result.current.sendConversationMessage(9, 'client-key', 'hello', null)
     })
     expect(emit).toHaveBeenCalledWith('conversation:join', {
       conversationId: 9,
       after: 4,
-    })
-    expect(emit).toHaveBeenCalledWith('conversation:message', {
-      conversationId: 9,
-      clientKey: 'client-key',
-      body: 'hello',
-      attachmentMetadata: null,
     })
   })
 
