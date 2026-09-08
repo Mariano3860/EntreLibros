@@ -267,21 +267,6 @@ export async function listConversationParticipantIds(
   return rows.map((row) => Number(row.user_id));
 }
 
-export async function areUsersBlocked(
-  firstUserId: number,
-  secondUserId: number
-): Promise<boolean> {
-  const { rows } = await query<{ blocked: boolean }>(
-    `SELECT EXISTS (
-       SELECT 1 FROM user_blocks
-       WHERE (blocker_id = $1 AND blocked_id = $2)
-          OR (blocker_id = $2 AND blocked_id = $1)
-     ) AS blocked`,
-    [firstUserId, secondUserId]
-  );
-  return rows[0]?.blocked ?? false;
-}
-
 export async function createConversation(
   participantIds: number[],
   requesterId = participantIds[0]
@@ -724,13 +709,6 @@ export async function sendMessageWithStatus(
   return withTransaction((client) => sendMessageWithClient(client, input));
 }
 
-export async function sendMessage(
-  input: SendMessageInput
-): Promise<PersistedMessage> {
-  const result = await sendMessageWithStatus(input);
-  return result.message;
-}
-
 export async function markConversationRead(
   conversationId: number,
   userId: number,
@@ -745,10 +723,4 @@ export async function markConversationRead(
      WHERE conversation_id = $1 AND user_id = $2`,
     [conversationId, userId, sequence]
   );
-}
-
-export async function withMessagingClient<T>(
-  work: (client: DbClient) => Promise<T>
-): Promise<T> {
-  return withTransaction(work);
 }

@@ -8,7 +8,6 @@ import {
   listConversations,
   listMessages,
   markConversationRead,
-  sendMessage,
   sendMessageWithStatus,
 } from '../../src/repositories/messagingRepository.js';
 
@@ -45,7 +44,7 @@ describe('messagingRepository', () => {
     expect(second.id).toBe(first.id);
     expect(first.isBot).toBe(true);
 
-    const message = await sendMessage({
+    const { message } = await sendMessageWithStatus({
       conversationId: first.id,
       senderId: userId,
       clientKey: 'bot-check-1',
@@ -80,7 +79,7 @@ describe('messagingRepository', () => {
     });
     const first = firstResult.message;
     const retry = retryResult.message;
-    const second = await sendMessage({
+    const secondResult = await sendMessageWithStatus({
       conversationId: conversation.id,
       senderId: secondUser,
       clientKey: 'client-2',
@@ -90,7 +89,7 @@ describe('messagingRepository', () => {
     expect(retry.id).toBe(first.id);
     expect(firstResult.created).toBe(true);
     expect(retryResult.created).toBe(false);
-    expect(second.sequence).toBe(first.sequence + 1);
+    expect(secondResult.message.sequence).toBe(first.sequence + 1);
     await expect(
       listMessages(conversation.id, firstUser)
     ).resolves.toMatchObject([
@@ -159,7 +158,7 @@ describe('messagingRepository', () => {
     const secondUser = await createUser('unread-second');
     const conversation = await createConversation([firstUser, secondUser]);
 
-    await sendMessage({
+    await sendMessageWithStatus({
       conversationId: conversation.id,
       senderId: firstUser,
       clientKey: 'unread-check-1',

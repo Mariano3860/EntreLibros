@@ -47,43 +47,6 @@ export interface NewBook {
   coverUrl?: string | null;
 }
 
-export async function createBook(book: NewBook): Promise<Book> {
-  const {
-    title,
-    author,
-    isbn,
-    publisher,
-    publishedYear,
-    verified = false,
-    language,
-    format,
-    coverUrl,
-  } = book;
-  const { rows } = await query<BookRow>(
-    `INSERT INTO books
-      (title, author, isbn, publisher, published_year, verified, language, format, cover_url)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-    RETURNING *`,
-    [
-      title,
-      author ?? null,
-      isbn ?? null,
-      publisher ?? null,
-      publishedYear ?? null,
-      verified,
-      language ?? null,
-      format ?? null,
-      coverUrl ?? null,
-    ]
-  );
-  return rowToBook(rows[0]);
-}
-
-export async function listBooks(): Promise<Book[]> {
-  const { rows } = await query<BookRow>('SELECT * FROM books ORDER BY id');
-  return rows.map(rowToBook);
-}
-
 export async function verifyBook(id: number): Promise<Book | null> {
   const { rows } = await query<BookRow>(
     'UPDATE books SET verified = true WHERE id = $1 RETURNING *',

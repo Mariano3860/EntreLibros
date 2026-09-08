@@ -13,10 +13,6 @@ const setupMocks = async () => {
   vi.doMock('@src/api/auth/me.service', () => ({
     fetchMe: fetchMeMock,
   }))
-  vi.doMock('@src/hooks/api/useBooks', () => ({
-    useBooks: () => ({ data: [] }),
-  }))
-
   const { fetchMe } = await import('@src/api/auth/me.service')
 
   return { fetchMe }
