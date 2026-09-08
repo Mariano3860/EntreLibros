@@ -112,19 +112,7 @@
     "activity_empty": "There is no activity to show yet.",
     "community_title": "Join the community",
     "community_subtitle": "Create your book house and start sharing books today",
-    "explore_community": "Explore community",
-    "hero_logged_in_title": "Welcome back",
-    "hero_logged_in_subtitle": "Discover new books from the community.",
-    "hero_logged_in_cta": "Browse books",
-    "community_logged_in_title": "Your community",
-    "community_logged_in_subtitle": "See what's happening with other readers.",
-    "community_logged_in_cta": "Go to community"
-  },
-  "activity": {
-    "added": "You added",
-    "offered": "You offered",
-    "exchanged": "You exchanged",
-    "cover_alt": "Cover of {{title}}"
+    "explore_community": "Explore community"
   },
   "language": {
     "label": "Language",
@@ -533,31 +521,7 @@
     }
   },
   "community": {
-    "title": "Community",
-    "tabs": {
-      "activity": "Activity",
-      "forums": "Forums",
-      "messages": "Messages",
-      "events": "Events",
-      "stats": "Stats"
-    },
-    "activity": {
-      "title": "Activity",
-      "feed": {
-        "new_book": "New book posted",
-        "exchange": "Exchange completed",
-        "new_house": "New house",
-        "comment": "Highlighted comment",
-        "event": "Event created"
-      }
-    },
-    "forums": {
-      "title": "Forums",
-      "placeholder": "Forum list"
-    },
     "messages": {
-      "title": "Messages",
-      "placeholder": "Messages list",
       "states": {
         "loadingConversations": "Loading conversations...",
         "conversationsError": "We couldn't load your conversations.",
@@ -800,71 +764,7 @@
         "sharedBook": "Shared a book"
       }
     },
-    "events": {
-      "title": "Events",
-      "placeholder": "Upcoming events"
-    },
-    "stats": {
-      "title": "Stats",
-      "subtitle": "Community overview",
-      "filters": {
-        "aria": "Select time range",
-        "7d": "7d",
-        "30d": "30d",
-        "90d": "90d",
-        "lastDays": "Last {{count}} days"
-      },
-      "kpis": {
-        "exchanges": "Exchanges",
-        "activeHouses": "Active houses",
-        "activeUsers": "Active users",
-        "booksPublished": "Books posted"
-      },
-      "trends": {
-        "exchanges": "Exchanges per day (7d)",
-        "newBooks": "New books per day (7d)"
-      },
-      "topContributors": {
-        "title": "Top contributors",
-        "metric": {
-          "exchanges": "{{count}} exchanges",
-          "books": "{{count}} books posted"
-        },
-        "viewCommunity": "View community"
-      },
-      "map": {
-        "title": "Active houses map",
-        "description": "Reference view. Interactive map coming soon."
-      },
-      "hotSearches": {
-        "title": "Trending searches"
-      }
-    },
     "feed": {
-      "tabs": {
-        "all": "All",
-        "book": "Books",
-        "swap": "Swaps",
-        "sale": "For sale",
-        "seeking": "Seeking",
-        "review": "Reviews",
-        "event": "Events",
-        "house": "Casitas",
-        "person": "People"
-      },
-      "search": "Search feed",
-      "cta": {
-        "publish": "Publish",
-        "viewMap": "View map",
-        "propose_swap": "Propose swap",
-        "accept": "Accept",
-        "buy": "Buy",
-        "offer_copy": "Offer my copy",
-        "helpful": "Helpful",
-        "go": "I'll go",
-        "open_map": "Open in map",
-        "message": "Message"
-      },
       "actions": {
         "like": "Like",
         "comment": "Comment",
@@ -880,37 +780,6 @@
         "shareTitle": "EntreLibros post",
         "shareSuccess": "Link shared.",
         "shareFallback": "Copy this link to share it:"
-      },
-      "swap": {
-        "wants": "{{requester}} wants to swap “{{offeredTitle}}” for {{requestedOwner}}'s “{{requestedTitle}}”",
-        "proposalAria": "Swap proposal by {{user}}",
-        "requester": "Requester",
-        "offered": "Offers",
-        "requested": "Requests",
-        "requestedOwner": "Owner"
-      },
-      "sale": {
-        "price": "Price: ${{price}}"
-      },
-      "seeking": {
-        "description": "{{user}} is looking for {{title}}"
-      },
-      "house": {
-        "distance": "{{distance}} km away"
-      },
-      "person": {
-        "match": "{{match}}% match"
-      },
-      "suggestions": "Suggestions",
-      "cornerChip": {
-        "ariaLabel": "View Book Corner {{name}}"
-      },
-      "corners": {
-        "title": "Book corners near you",
-        "viewMap": "View map",
-        "distance": "{{distance}} km away",
-        "empty": "No nearby book corners yet.",
-        "error": "We couldn't load nearby corners. Try again later."
       },
       "cornersMap": {
         "empty": "There are no visible corners in this area.",
@@ -1047,10 +916,6 @@
       "truncated": "Showing a selection. Zoom in to explore more.",
       "locationDenied": "Location permission denied"
     },
-    "badge": {
-      "live": "Live",
-      "privacy": "Privacy protected"
-    },
     "drawer": {
       "placeholderTitle": "Select a pin to see the details",
       "close": "Close detail",
@@ -1072,7 +937,6 @@
     },
     "cta": {
       "createCorner": "Create corner",
-      "proposeMeeting": "Propose meetup",
       "sendMessage": "Send message",
       "openReference": "Open reference",
       "openPublication": "View publication",
@@ -1113,11 +977,6 @@
         "createCorner": "Create corner"
       }
     },
-    "activity": {
-      "legend": "Activity in the last 30 days",
-      "empty": "No signals in the selected period.",
-      "summary": "{{count}} recent interactions"
-    },
     "publications": {
       "empty": "No nearby publications yet.",
       "distance": "{{count}} km away",
@@ -1132,13 +991,6 @@
     "cluster": {
       "more": "Show {{count}} pins",
       "collapse": "Collapse cluster"
-    },
-    "modal": {
-      "cornerLabel": "Choose a nearby corner",
-      "dateLabel": "Date",
-      "timeLabel": "Time",
-      "cancel": "Cancel",
-      "confirm": "Confirm"
     }
   },
   "bookDetail": {

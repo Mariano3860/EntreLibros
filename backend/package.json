@@ -46,8 +46,6 @@
     "@types/morgan": "^1.9.9",
     "@types/node": "^20.11.30",
     "@types/pg": "^8.10.3",
-    "@types/socket.io": "^3.0.1",
-    "@types/socket.io-client": "^1.4.36",
     "@types/supertest": "^2.0.12",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.8",

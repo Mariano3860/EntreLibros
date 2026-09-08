@@ -112,19 +112,7 @@
     "activity_empty": "Todavía no hay actividad para mostrar.",
     "community_title": "Únete a la comunidad",
     "community_subtitle": "Crea tu casita y empieza a intercambiar libros hoy mismo",
-    "explore_community": "Explorar comunidad",
-    "hero_logged_in_title": "Bienvenido de nuevo",
-    "hero_logged_in_subtitle": "Descubre nuevos libros de la comunidad.",
-    "hero_logged_in_cta": "Explorar libros",
-    "community_logged_in_title": "Tu comunidad",
-    "community_logged_in_subtitle": "Mira qué sucede con otros lectores.",
-    "community_logged_in_cta": "Ir a la comunidad"
-  },
-  "activity": {
-    "added": "Ofreciste",
-    "offered": "Ofreciste",
-    "exchanged": "Intercambiaste",
-    "cover_alt": "Portada de {{title}}"
+    "explore_community": "Explorar comunidad"
   },
   "language": {
     "label": "Idioma",
@@ -537,31 +525,7 @@
     }
   },
   "community": {
-    "title": "Comunidad",
-    "tabs": {
-      "activity": "Actividad",
-      "forums": "Foros",
-      "messages": "Mensajes",
-      "events": "Eventos",
-      "stats": "Estadísticas"
-    },
-    "activity": {
-      "title": "Actividad",
-      "feed": {
-        "new_book": "Nuevo libro publicado",
-        "exchange": "Intercambio realizado",
-        "new_house": "Nueva casita",
-        "comment": "Comentario destacado",
-        "event": "Evento creado"
-      }
-    },
-    "forums": {
-      "title": "Foros",
-      "placeholder": "Listado de foros"
-    },
     "messages": {
-      "title": "Mensajes",
-      "placeholder": "Lista de mensajes",
       "states": {
         "loadingConversations": "Cargando conversaciones...",
         "conversationsError": "No pudimos cargar tus conversaciones.",
@@ -804,71 +768,7 @@
         "sharedBook": "Compartió un libro"
       }
     },
-    "events": {
-      "title": "Eventos",
-      "placeholder": "Próximos eventos"
-    },
-    "stats": {
-      "title": "Estadísticas",
-      "subtitle": "Visión general de la comunidad",
-      "filters": {
-        "aria": "Seleccionar rango temporal",
-        "7d": "7d",
-        "30d": "30d",
-        "90d": "90d",
-        "lastDays": "Últimos {{count}} días"
-      },
-      "kpis": {
-        "exchanges": "Intercambios",
-        "activeHouses": "Casitas activas",
-        "activeUsers": "Usuarios activos",
-        "booksPublished": "Libros publicados"
-      },
-      "trends": {
-        "exchanges": "Intercambios por día (7d)",
-        "newBooks": "Nuevos libros por día (7d)"
-      },
-      "topContributors": {
-        "title": "Top contribuidores",
-        "metric": {
-          "exchanges": "{{count}} intercambios",
-          "books": "{{count}} libros publicados"
-        },
-        "viewCommunity": "Ver comunidad"
-      },
-      "map": {
-        "title": "Mapa de casitas activas",
-        "description": "Vista referencial. En breve se habilitará el mapa interactivo."
-      },
-      "hotSearches": {
-        "title": "Lo más buscado"
-      }
-    },
     "feed": {
-      "tabs": {
-        "all": "Todos",
-        "book": "Libros",
-        "swap": "Intercambios",
-        "sale": "En venta",
-        "seeking": "Buscando",
-        "review": "Reseñas",
-        "event": "Eventos",
-        "house": "Casitas",
-        "person": "Personas"
-      },
-      "search": "Buscar en el feed",
-      "cta": {
-        "publish": "Publicar",
-        "viewMap": "Ver mapa",
-        "propose_swap": "Proponer intercambio",
-        "accept": "Aceptar",
-        "buy": "Comprar",
-        "offer_copy": "Ofrecer mi copia",
-        "helpful": "Útil",
-        "go": "Voy",
-        "open_map": "Abrir en el mapa",
-        "message": "Mensaje"
-      },
       "actions": {
         "like": "Me gusta",
         "comment": "Comentar",
@@ -884,29 +784,6 @@
         "shareTitle": "Publicación de EntreLibros",
         "shareSuccess": "Enlace compartido.",
         "shareFallback": "Copiá este enlace para compartirlo:"
-      },
-      "swap": {
-        "wants": "{{requester}} quiere intercambiar «{{offeredTitle}}» por «{{requestedTitle}}» de {{requestedOwner}}",
-        "proposalAria": "Propuesta de intercambio de {{user}}",
-        "requester": "Solicitante",
-        "offered": "Ofrece",
-        "requested": "Solicita",
-        "requestedOwner": "Propietario/a"
-      },
-      "sale": { "price": "Precio: ${{price}}" },
-      "seeking": { "description": "{{user}} busca {{title}}" },
-      "house": { "distance": "A {{distance}} km" },
-      "person": { "match": "Coincidencia {{match}}%" },
-      "suggestions": "Sugerencias",
-      "cornerChip": {
-        "ariaLabel": "Ver Rincón {{name}}"
-      },
-      "corners": {
-        "title": "Rincones de libros cerca de ti",
-        "viewMap": "Ver mapa",
-        "distance": "a {{distance}} km",
-        "empty": "Aún no hay rincones cercanos.",
-        "error": "No pudimos cargar los rincones cercanos. Intenta más tarde."
       },
       "cornersMap": {
         "empty": "No hay rincones visibles en esta zona.",
@@ -1043,10 +920,6 @@
       "truncated": "Mostramos una selección. Acercá el mapa para explorar más.",
       "locationDenied": "Permiso de ubicación denegado"
     },
-    "badge": {
-      "live": "Vivo",
-      "privacy": "Privacidad protegida"
-    },
     "drawer": {
       "placeholderTitle": "Selecciona un pin para ver el detalle",
       "close": "Cerrar detalle",
@@ -1068,7 +941,6 @@
     },
     "cta": {
       "createCorner": "Crear rincón",
-      "proposeMeeting": "Proponer encuentro",
       "sendMessage": "Enviar mensaje",
       "openReference": "Abrir referencia",
       "openPublication": "Ver publicación",
@@ -1109,11 +981,6 @@
         "createCorner": "Crear rincón"
       }
     },
-    "activity": {
-      "legend": "Movimiento de los últimos 30 días",
-      "empty": "Sin señales en el período seleccionado.",
-      "summary": "{{count}} interacciones recientes"
-    },
     "publications": {
       "empty": "Aún no hay publicaciones cerca.",
       "distance": "a {{count}} km",
@@ -1128,13 +995,6 @@
     "cluster": {
       "more": "Ver {{count}} pins",
       "collapse": "Cerrar grupo"
-    },
-    "modal": {
-      "cornerLabel": "Elegí un rincón cercano",
-      "dateLabel": "Fecha",
-      "timeLabel": "Hora",
-      "cancel": "Cancelar",
-      "confirm": "Confirmar"
     }
   },
   "bookDetail": {
