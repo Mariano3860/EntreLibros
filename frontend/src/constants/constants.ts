@@ -23,5 +23,3 @@ export const SUPPORTED_IMAGE_TYPES = [
 ] as const
 
 export const DEFAULT_AUTOSAVE_DELAY = 2500
-
-export const COMMUNITY_STATS_RANGES = [7, 30, 90] as const

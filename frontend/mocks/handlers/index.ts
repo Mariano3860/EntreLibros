@@ -21,7 +21,6 @@ import {
 import { activityHandler } from './community/activity.handler'
 import { communityStatsHandler } from './community/communityStats.handler'
 import { communityFeedHandler } from './community/feed.handler'
-import { messagesAvailabilityHandler } from './community/messages.handler'
 import {
   cornersMapHandler,
   createCornerSuccessHandler,
@@ -56,7 +55,6 @@ export const handlers = [
   userLanguageHandler,
   communityStatsHandler,
   communityFeedHandler,
-  messagesAvailabilityHandler,
   nearbyCornersHandler,
   cornersMapHandler,
   createCornerSuccessHandler,

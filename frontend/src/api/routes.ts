@@ -2,7 +2,6 @@ export const RELATIVE_API_ROUTES = {
   AUTH: {
     LOGIN: `/auth/login`,
     LOGOUT: `/auth/logout`,
-    PROFILE: `/auth/profile`,
     ME: `/auth/me`,
     REGISTER: `/auth/register`,
   },
@@ -38,9 +37,6 @@ export const RELATIVE_API_ROUTES = {
       `/community/posts/${postType}/${id}/like`,
     POST_COMMENTS: (postType: string, id: string) =>
       `/community/posts/${postType}/${id}/comments`,
-    MESSAGES: {
-      AVAILABILITY: `/community/messages/availability`,
-    },
     CORNERS: {
       NEARBY: `/community/corners/nearby`,
       MAP: `/community/corners/map`,
