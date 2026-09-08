@@ -1,12 +1,33 @@
 # Matriz de trazabilidad del MVP del TFG
 
-Fecha de referencia: 2026-09-04.
+## Estado actual verificado
 
-## Cierre de implementacion 2026-09-04
+Fecha de referencia: 2026-09-08. Commit de entrada: `1a96b28` (`main`, tras el
+merge de PR #191). La evidencia de esta fase se ejecuta desde
+`chore/tfg-baseline-and-traceability`; los cambios posteriores a ese commit se
+identifican en la PR de fase y no se presentan como si ya estuvieran en `main`.
 
-Esta seccion prevalece sobre las tablas de auditoria historica que conservan el
-corte anterior. El codigo y las pruebas ya cierran el comportamiento funcional
-de las tareas 3.2, 3.5, 4.1, 4.2, 4.4-4.8, 5.1-5.5, 6.1-6.4 y 7.1-7.4.
+| Nivel | Estado actual | Evidencia reproducible |
+| --- | --- | --- |
+| E0 | documentado | Esta matriz, README y documentación operativa separan hechos actuales de antecedentes. |
+| E1 | verificado | Rutas, migraciones 001-035, configuración y contratos actuales revisados contra `1a96b28`. |
+| E2 | verificado | `npm run test:frontend`: 123 archivos y 449 tests pasan sin errores asíncronos no controlados ni warnings `act(...)`. |
+| E3 | verificado | `npm run test:backend`: reset controlado de `entrelibros_test`, migraciones actuales y 35 archivos/193 tests pasan. |
+| E4 | baseline disponible | El stack Playwright/PostgreSQL/PostGIS aislado está definido en `docs/e2e-baseline.md`; la ejecución de cierre se registra con la PR de esta fase. |
+
+Estado funcional: el MVP persistente mantiene las capacidades listadas abajo.
+La evidencia E2 no prueba persistencia ni autorización reales; E3 y E4 son las
+fuentes para esas afirmaciones. Los límites de operación, accesibilidad manual,
+backups y servicios cloud siguen declarados como límites, no como capacidades
+implementadas.
+
+## Registro histórico
+
+### Cierre de implementación 2026-09-04
+
+Esta tabla es un corte histórico. El código y las pruebas de aquel momento
+indicaban cierre funcional de las tareas 3.2, 3.5, 4.1, 4.2, 4.4-4.8, 5.1-5.5,
+6.1-6.4 y 7.1-7.4.
 
 | Tarea   | Estado actual      | Referencia principal                                                                                                                                                                |
 | ------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -26,11 +47,10 @@ de las tareas 3.2, 3.5, 4.1, 4.2, 4.4-4.8, 5.1-5.5, 6.1-6.4 y 7.1-7.4.
 
 ## Riesgos residuales declarados
 
-- La base local de pruebas historica `entrelibros_test` tiene una linea de
-  migraciones distinta. No se alteraron sus hashes; la suite backend canónica
-  queda bloqueada antes de iniciar por ese desvío y las pruebas específicas de
-  borradores se ejecutaron sobre una base PostgreSQL/PostGIS aislada con la
-  migración 035 aplicada.
+- El hash drift histórico de `entrelibros_test` se resolvió recreando solo la
+  base de pruebas protegida por nombre y aplicando las migraciones actuales. Las
+  migraciones ya aplicadas no se modificaron; la estrategia y sus límites están
+  documentados en `backend/README.md`.
 - `activeCorners` es global con filtro de zona porque el esquema no asocia el
   Rincon a una ciudad propietaria.
 - No hay rate limiting de aplicacion, email/push, MFA, almacenamiento de objetos,

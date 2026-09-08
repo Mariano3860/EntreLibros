@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { renderHook } from '@testing-library/react'
+import { act, renderHook } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
 import { MemoryRouter } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
@@ -37,7 +37,9 @@ describe('useLogout', () => {
     vi.mocked(useNavigate).mockReturnValue(navigate)
 
     const { result } = renderHook(() => useLogout(), { wrapper })
-    await result.current.mutateAsync()
+    await act(async () => {
+      await result.current.mutateAsync()
+    })
     expect(queryClient.getQueryData([AuthQueryKeys.AUTH])).toBeUndefined()
     expect(navigate).toHaveBeenCalledWith('/login', { replace: true })
   })
@@ -57,7 +59,9 @@ describe('useLogout', () => {
       )
     )
     const { result } = renderHook(() => useLogout(), { wrapper })
-    await expect(result.current.mutateAsync()).rejects.toThrow()
+    await act(async () => {
+      await expect(result.current.mutateAsync()).rejects.toThrow()
+    })
     expect(toast.error).toHaveBeenCalled()
   })
 })

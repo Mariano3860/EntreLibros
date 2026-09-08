@@ -65,6 +65,15 @@ npm run build -w backend
 npm run openapi -w backend
 ```
 
+### Base de datos de tests
+
+`npm run test:backend` reinicia antes de cada ejecuciÃ³n la base indicada por
+`backend/.env.test` (por defecto `entrelibros_test`) y vuelve a aplicar las
+migraciones. El script rechaza cualquier nombre que no contenga `test` como
+token separado, por lo que no acepta una base de desarrollo o producciÃ³n. No
+uses esa configuraciÃ³n para datos que quieras conservar. El runner E2E conserva
+su lifecycle aislado `entrelibros_e2e` y no aplica este reset adicional.
+
 Las imagenes son referencias HTTPS o datos inline limitados a JPG, PNG o WebP de
 hasta 5 MB; no hay almacenamiento de objetos productivo.
 
