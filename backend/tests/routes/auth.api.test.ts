@@ -64,16 +64,19 @@ describe('auth API', () => {
     expect(res.body.error).toBe('InvalidEmail');
   });
 
-  test('rejects weak passwords', async () => {
+  test.each([
+    'S1!abcd',
+    'lowercase1!',
+    'UPPERCASE1!',
+    'NoDigits!',
+    'NoSymbol1',
+  ])('rejects a password that violates the policy: %s', async (password) => {
     const res = await request(app)
       .post('/api/auth/register')
-      .send({
-        name: 'Mallory',
-        email: 'mallory@example.com',
-        password: 'Weakpass1',
-      })
+      .send({ name: 'Mallory', email: 'mallory@example.com', password })
       .expect(400);
     expect(res.body.error).toBe('WeakPassword');
+    expect(res.body.message).toBe('auth.errors.weak_password');
   });
 
   test('fails when JWT secret is missing', async () => {

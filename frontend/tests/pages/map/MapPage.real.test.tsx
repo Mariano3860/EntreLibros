@@ -1,5 +1,5 @@
 import { act, fireEvent, screen, waitFor } from '@testing-library/react'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
 import type {
   MapBoundingBox,
@@ -127,6 +127,10 @@ describe('MapPage in real API mode', () => {
     viewportHandler.current = null
     fetchMe.mockResolvedValue({ id: profile.id, email: profile.email })
     fetchProfile.mockResolvedValue(profile)
+  })
+
+  afterEach(() => {
+    delete mapResponse.meta.truncated
   })
 
   test('uses the profile zone when device location is denied', async () => {
@@ -268,5 +272,15 @@ describe('MapPage in real API mode', () => {
       if (original) Object.defineProperty(navigator, 'geolocation', original)
       else Reflect.deleteProperty(navigator, 'geolocation')
     }
+  })
+
+  test('communicates when the active corner result set is truncated', async () => {
+    mapResponse.meta.truncated = true
+
+    renderWithProviders(<MapPage />)
+
+    expect(await screen.findByRole('status')).toHaveTextContent(
+      'map.status.truncated'
+    )
   })
 })

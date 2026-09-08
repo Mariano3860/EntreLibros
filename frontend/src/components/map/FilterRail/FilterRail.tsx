@@ -12,6 +12,7 @@ export type MapExplorationActivityItem = {
   meta: string
   photo?: string
   icon: MapIconName
+  isSelected?: boolean
   onSelect: () => void
 }
 
@@ -186,6 +187,7 @@ export const FilterRail = ({
                 type="button"
                 className={styles.activityItem}
                 onClick={item.onSelect}
+                aria-pressed={item.isSelected === true}
               >
                 <span className={styles.activityIcon}>
                   {item.photo ? (

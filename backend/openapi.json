@@ -2329,7 +2329,10 @@
                     "type": "string"
                   },
                   "password": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 8,
+                    "pattern": "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\\W_]).{8,}$",
+                    "description": "At least eight characters with lowercase, uppercase, digit, and symbol."
                   }
                 }
               }

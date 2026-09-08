@@ -39,7 +39,7 @@ describe('RegisterForm', () => {
       target: { value: 'john@example.com' },
     })
     fireEvent.change(screen.getByPlaceholderText('password'), {
-      target: { value: '123456' },
+      target: { value: 'Str0ng!Pass1' },
     })
     fireEvent.change(screen.getByPlaceholderText('confirm_password'), {
       target: { value: '123' },
@@ -48,6 +48,26 @@ describe('RegisterForm', () => {
     expect(
       await screen.findByText('form.errors.password_mismatch')
     ).toBeVisible()
+  })
+
+  test('rejects a password that does not match the backend policy', async () => {
+    renderWithProviders(<RegisterForm />)
+    fireEvent.change(screen.getByPlaceholderText('name'), {
+      target: { value: 'John' },
+    })
+    fireEvent.change(screen.getByPlaceholderText('email'), {
+      target: { value: 'john@example.com' },
+    })
+    fireEvent.change(screen.getByPlaceholderText('password'), {
+      target: { value: 'weakpass1' },
+    })
+    fireEvent.change(screen.getByPlaceholderText('confirm_password'), {
+      target: { value: 'weakpass1' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'register' }))
+
+    expect(await screen.findByText('auth.errors.weak_password')).toBeVisible()
+    expect(mockMutate).not.toHaveBeenCalled()
   })
 
   test('submits form and calls onSubmit on success', async () => {
@@ -65,10 +85,10 @@ describe('RegisterForm', () => {
       target: { value: 'john@example.com' },
     })
     fireEvent.change(screen.getByPlaceholderText('password'), {
-      target: { value: '123456' },
+      target: { value: 'Str0ng!Pass1' },
     })
     fireEvent.change(screen.getByPlaceholderText('confirm_password'), {
-      target: { value: '123456' },
+      target: { value: 'Str0ng!Pass1' },
     })
     fireEvent.click(screen.getByRole('button', { name: 'register' }))
 
@@ -95,10 +115,10 @@ describe('RegisterForm', () => {
       target: { value: 'john@example.com' },
     })
     fireEvent.change(screen.getByPlaceholderText('password'), {
-      target: { value: '123456' },
+      target: { value: 'Str0ng!Pass1' },
     })
     fireEvent.change(screen.getByPlaceholderText('confirm_password'), {
-      target: { value: '123456' },
+      target: { value: 'Str0ng!Pass1' },
     })
     fireEvent.click(screen.getByRole('button', { name: 'register' }))
 
@@ -120,10 +140,10 @@ describe('RegisterForm', () => {
       target: { value: 'john@example.com' },
     })
     fireEvent.change(screen.getByPlaceholderText('password'), {
-      target: { value: '123456' },
+      target: { value: 'Str0ng!Pass1' },
     })
     fireEvent.change(screen.getByPlaceholderText('confirm_password'), {
-      target: { value: '123456' },
+      target: { value: 'Str0ng!Pass1' },
     })
     fireEvent.click(screen.getByRole('button', { name: 'register' }))
 
