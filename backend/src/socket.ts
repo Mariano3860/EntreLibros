@@ -42,15 +42,7 @@ interface ChatUser {
   name: string;
 }
 
-export interface ChatMessage {
-  text: string;
-  user: ChatUser;
-  timestamp: string;
-  channel: string;
-}
-
 export interface ClientToServerEvents {
-  message: (payload: { text: string; channel?: string }) => void;
   'conversation:join': (
     payload: { conversationId: number; after?: number },
     acknowledge?: (joined: boolean) => void
@@ -68,7 +60,6 @@ export interface ClientToServerEvents {
 }
 
 export interface ServerToClientEvents {
-  message: (msg: ChatMessage) => void;
   user: (user: ChatUser) => void;
   'conversation:message': (msg: {
     conversationId: number;
@@ -422,26 +413,6 @@ export function setupWebsocket(
         await markMessageNotificationsRead(conversationId, socket.data.user.id);
       } catch (error) {
         socket.emit('conversation:error', socketError(error));
-      }
-    });
-
-    socket.on('message', async ({ text, channel = 'general' }) => {
-      const msg: ChatMessage = {
-        text,
-        user: socket.data.user,
-        timestamp: new Date().toISOString(),
-        channel,
-      };
-      io.emit('message', msg);
-      if (channel === 'Bot' || /^@bot\b/i.test(text)) {
-        const reply = await generateReply(text.replace(/^@bot\s*/i, ''));
-        const botMsg: ChatMessage = {
-          text: reply,
-          user: { id: 0, name: 'Bot' },
-          timestamp: new Date().toISOString(),
-          channel,
-        };
-        io.emit('message', botMsg);
       }
     });
   });

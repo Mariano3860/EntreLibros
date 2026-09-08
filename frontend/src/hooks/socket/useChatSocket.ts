@@ -9,13 +9,6 @@ import { isApiMockMode } from '@utils/runtimeEnv'
 import { useCallback, useEffect, useState } from 'react'
 import { io, type Socket } from 'socket.io-client'
 
-export interface ChatMessage {
-  text: string
-  user: { id: number; name: string }
-  timestamp: string
-  channel: string
-}
-
 export interface ConversationMessage {
   conversationId: number
   sequence: number
@@ -36,7 +29,6 @@ export interface AgreementUpdate {
 export const useChatSocket = () => {
   const queryClient = useQueryClient()
   const mockMode = isApiMockMode()
-  const [messages, setMessages] = useState<ChatMessage[]>([])
   const [socket, setSocket] = useState<Socket | null>(null)
   const [currentUser, setCurrentUser] = useState<{
     id: number
@@ -64,9 +56,6 @@ export const useChatSocket = () => {
     const s = io(origin, { withCredentials: true })
     setSocket(s)
     s.on('user', (u: { id: number; name: string }) => setCurrentUser(u))
-    s.on('message', (msg: ChatMessage) => {
-      setMessages((prev) => [...prev, msg])
-    })
     s.on('conversation:message', (msg: ConversationMessage) => {
       void queryClient.invalidateQueries({ queryKey: notificationKeys.all })
       void queryClient.invalidateQueries({
@@ -115,32 +104,6 @@ export const useChatSocket = () => {
     }
   }, [mockMode, queryClient])
 
-  const sendMessage = useCallback(
-    (text: string, channel?: string) => {
-      if (mockMode) {
-        if (channel !== 'Bot' && !/^@bot\b/i.test(text)) return
-        const cleanText = text.replace(/^@bot\s*/i, '').trim()
-        const reply = /^(hola|hello)/i.test(cleanText)
-          ? '¡Hola! Soy el bot de EntreLibros.'
-          : `Recibí tu mensaje: ${cleanText}`
-        setMessages((prev) => [
-          ...prev,
-          {
-            text: reply,
-            user: { id: 0, name: 'Bot' },
-            timestamp: new Date().toISOString(),
-            channel: channel ?? 'Bot',
-          },
-        ])
-        return
-      }
-      if (socket) {
-        socket.emit('message', { text, channel })
-      }
-    },
-    [mockMode, socket]
-  )
-
   const sendConversationMessage = useCallback(
     (
       conversationId: number,
@@ -166,10 +129,8 @@ export const useChatSocket = () => {
   )
 
   return {
-    messages,
     conversationMessages,
     agreementUpdates,
-    sendMessage,
     sendConversationMessage,
     joinConversation,
     currentUser,
