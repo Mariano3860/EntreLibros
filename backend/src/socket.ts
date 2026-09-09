@@ -147,6 +147,8 @@ const emitInvalidSocketPayload = (
   });
 };
 
+// Socket.IO authorizes delivery, read cursors and replay; HTTP owns message
+// persistence so reconnecting clients never introduce a second write path.
 export function setupWebsocket(
   io: Server<
     ClientToServerEvents,

@@ -630,6 +630,8 @@ export async function findMessageWithClient(
   return rows[0] ? mapMessage(rows[0]) : null;
 }
 
+// The conversation row is locked before assigning a sequence. Rechecking the
+// client key inside that lock makes concurrent retries converge on one message.
 export async function sendMessageWithClient(
   client: DbClient,
   input: SendMessageInput
