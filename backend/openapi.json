@@ -2561,7 +2561,11 @@
       "get": {
         "summary": "Get the current authenticated user",
         "tags": ["Auth"],
-        "security": [{ "cookieAuth": [] }],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "Current authenticated user without password data",
@@ -2571,17 +2575,30 @@
                   "type": "object",
                   "required": ["id", "name", "email", "role", "language"],
                   "properties": {
-                    "id": { "type": "integer" },
-                    "name": { "type": "string" },
-                    "email": { "type": "string", "format": "email" },
-                    "role": { "type": "string" },
-                    "language": { "type": "string" }
+                    "id": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string",
+                      "format": "email"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "language": {
+                      "type": "string"
+                    }
                   }
                 }
               }
             }
           },
-          "401": { "$ref": "#/components/responses/Unauthorized" }
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
         }
       }
     },
