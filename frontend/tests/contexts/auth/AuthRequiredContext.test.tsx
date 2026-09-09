@@ -55,7 +55,7 @@ describe('authentication-required flow', () => {
       name: 'auth.required.login',
     })
     expect(dialog).toBeVisible()
-    expect(closeButton).toHaveFocus()
+    await waitFor(() => expect(closeButton).toHaveFocus())
 
     fireEvent.keyDown(closeButton, { key: 'Tab', shiftKey: true })
     expect(loginButton).toHaveFocus()
