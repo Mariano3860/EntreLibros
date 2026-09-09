@@ -8,8 +8,6 @@ import {
   listMessages,
   markConversationRead,
   searchMessagingContacts,
-  sendMessageWithStatus,
-  publishMessage,
   type MessageAgreementDetails,
   type MessageBookAttachment,
   type MessageAttachment,
@@ -17,7 +15,6 @@ import {
 import {
   deleteMessageDraft,
   getMessageDraft,
-  sendMessageDraft,
   upsertMessageDraft,
   type MessageDraftAttachment,
 } from '../repositories/messageDraftRepository.js';
@@ -26,7 +23,10 @@ import {
   type BookListing,
 } from '../repositories/bookListingRepository.js';
 import { markMessageNotificationsRead } from '../repositories/notificationRepository.js';
-import { notifyMessageRecipients } from '../services/notifications.js';
+import {
+  sendDirectMessageCommand,
+  sendDraftMessageCommand,
+} from '../services/messageCommand.js';
 import { recordAnalyticsEvent } from '../repositories/analyticsRepository.js';
 import { logPublicError, publicErrorResponse } from '../utils/publicErrors.js';
 
@@ -572,40 +572,12 @@ router.post(
       });
     }
     try {
-      const result = await sendMessageDraft({
+      const result = await sendDraftMessageCommand({
         conversationId,
         authorId: req.user.id,
         clientKey: body.clientKey,
         ...(revision !== undefined ? { revision } : {}),
       });
-      if (result.created) {
-        const attachment = result.message.attachmentMetadata;
-        if (attachment?.kind === 'book') {
-          await recordAnalyticsEvent({
-            eventType: 'contact_started',
-            actorId: req.user.id,
-            entityType: 'listing',
-            entityId: attachment.bookId,
-            metadata: { conversationId },
-            idempotencyKey: `contact-listing:${conversationId}:${attachment.bookId}:${req.user.id}`,
-          });
-        }
-        if (result.agreementId) {
-          await recordAnalyticsEvent({
-            eventType: 'agreement_created',
-            actorId: req.user.id,
-            entityType: 'agreement',
-            entityId: String(result.agreementId),
-            idempotencyKey: `agreement-created:${result.agreementId}`,
-          });
-        }
-        await notifyMessageRecipients({
-          messageId: result.message.id,
-          conversationId,
-          senderId: req.user.id,
-        });
-        publishMessage(result.message);
-      }
       return res.status(201).json({ message: result.message });
     } catch (error) {
       const response = errorResponse(error);
@@ -723,33 +695,14 @@ router.post(
       });
     }
     try {
-      const result = await sendMessageWithStatus({
+      const result = await sendDirectMessageCommand({
         conversationId,
         senderId: req.user.id,
         clientKey: body.clientKey,
         body: body.body,
         attachmentMetadata,
       });
-      const message = result.message;
-      if (result.created) {
-        if (attachmentMetadata?.kind === 'book') {
-          await recordAnalyticsEvent({
-            eventType: 'contact_started',
-            actorId: req.user.id,
-            entityType: 'listing',
-            entityId: attachmentMetadata.bookId,
-            metadata: { conversationId },
-            idempotencyKey: `contact-listing:${conversationId}:${attachmentMetadata.bookId}:${req.user.id}`,
-          });
-        }
-        await notifyMessageRecipients({
-          messageId: message.id,
-          conversationId,
-          senderId: req.user.id,
-        });
-        publishMessage(message);
-      }
-      return res.status(201).json({ message });
+      return res.status(201).json({ message: result.message });
     } catch (error) {
       const response = errorResponse(error);
       return res.status(response.status).json(response.body);

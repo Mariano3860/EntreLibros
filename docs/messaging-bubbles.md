@@ -4,15 +4,13 @@
 
 1. El cliente carga conversaciones con `GET /api/messages`.
 2. Al abrir una conversación se une a su sala de Socket.IO.
-3. La interfaz productiva envía el borrador con `POST /api/messages/:conversationId/draft/send`; esa operación valida, persiste y publica el resultado.
+3. La interfaz productiva envía el borrador con `POST /api/messages/:conversationId/draft/send`; el comando canónico valida, persiste, crea los efectos y publica el resultado una sola vez.
 4. Socket.IO entrega `conversation:message` y permite `conversation:join` con cursor para el replay; el cliente invalida y recarga el historial tras reconectar.
 
-El backend conserva un listener Socket de escritura por compatibilidad con el
-contrato actual, pero no es el camino de envío utilizado por `MessagesPage`.
-Su consolidación o retiro se evaluará con consumidores y pruebas de
-caracterización en la fase dedicada al protocolo, sin cambiar este flujo.
+Socket.IO no acepta comandos de escritura: autentica la sesión, autoriza las
+salas y entrega los eventos de mensajes y acuerdos ya persistidos.
 
-La mensajería real necesita sesión, migraciones aplicadas y backend activo. El bot persistente se crea con `015_seed_messaging_bot.sql` y responde dentro de la conversación autorizada.
+La mensajería real necesita sesión, migraciones aplicadas y backend activo. El bot persistente se crea con `015_seed_messaging_bot.sql`; cuando una conversación autorizada lo incluye, el mismo comando canónico persiste, notifica y entrega su respuesta.
 
 ## Adjuntos y acuerdos
 
@@ -29,6 +27,12 @@ El backend comprueba participantes, propietarios, disponibilidad y pertenencia d
 `GET`, `PUT` y `DELETE /api/messages/:conversationId/draft` gestionan un único borrador privado por autor y conversación. El borrador puede contener texto, un libro, un intercambio o una propuesta de acuerdo; se guarda con revisión para detectar ediciones obsoletas y se conserva al recargar la sesión.
 
 `POST /api/messages/:conversationId/draft/send` valida nuevamente el contenido, crea el acuerdo cuando corresponde, persiste un único mensaje normal y elimina el borrador en la misma transacción. Hasta ese momento no aparece en el historial, no incrementa no leídos ni envía notificaciones. Contactar desde una publicación crea una conversación silenciosa y guarda el texto inicial junto con el libro como borrador.
+
+## Protocolo de envío y realtime
+
+El envío soportado es HTTP: `POST /api/messages/:conversationId/messages` para el contrato API y `POST /api/messages/:conversationId/draft/send` para la interfaz productiva. Ambos terminan en el mismo comando de mensajería: la persistencia conserva `clientKey` para idempotencia y, solo si el resultado es nuevo, crea analítica aplicable, notificaciones y el evento interno de entrega.
+
+`conversation:join` con cursor repite los mensajes persistidos posteriores al cursor. Tras recibir `conversation:message` o `agreement:updated`, el cliente invalida historial, conversaciones y notificaciones; el estado leído continúa usando su ruta HTTP. Los acuerdos y borradores conservan sus transacciones y revisiones actuales; los borradores no se entregan ni notifican hasta enviarse.
 
 ## Contactos y no leídos
 

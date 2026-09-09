@@ -51,10 +51,9 @@ El cliente usa `conversation:join` para autorizar la sala y recuperar mensajes
 posteriores a su cursor; `conversation:read` actualiza el cursor de lectura. El
 backend entrega `conversation:message` y `agreement:updated` a participantes
 autorizados. La interfaz productiva envía borradores por HTTP y reconcilia por
-Socket.IO historial, no leídos, notificaciones y acuerdos. Existe además un
-listener Socket de escritura que se conserva como comportamiento actual hasta
-la revisión acotada de su protocolo; `conversation:leave` no es un evento
-implementado. El bot persistente se crea de forma idempotente con la migración
+Socket.IO historial, no leídos, notificaciones y acuerdos. Socket.IO no acepta
+comandos de escritura; `conversation:leave` no es un evento implementado. El
+bot persistente se crea de forma idempotente con la migración
 `015_seed_messaging_bot.sql`.
 
 ## Perfil y privacidad

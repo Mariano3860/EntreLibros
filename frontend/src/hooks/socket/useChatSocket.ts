@@ -104,23 +104,6 @@ export const useChatSocket = () => {
     }
   }, [mockMode, queryClient])
 
-  const sendConversationMessage = useCallback(
-    (
-      conversationId: number,
-      clientKey: string,
-      body: string,
-      attachmentMetadata?: ApiMessageAttachment | null
-    ) => {
-      socket?.emit('conversation:message', {
-        conversationId,
-        clientKey,
-        body,
-        attachmentMetadata,
-      })
-    },
-    [socket]
-  )
-
   const joinConversation = useCallback(
     (conversationId: number, after = 0) => {
       socket?.emit('conversation:join', { conversationId, after })
@@ -131,7 +114,6 @@ export const useChatSocket = () => {
   return {
     conversationMessages,
     agreementUpdates,
-    sendConversationMessage,
     joinConversation,
     currentUser,
     isConnected,

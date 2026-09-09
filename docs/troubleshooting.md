@@ -17,7 +17,7 @@
 
 ## El mensaje no aparece después de recargar
 
-Comprueba que se emitió `conversation:message`, que el backend no registró un error SQL y que el usuario pertenece a la conversación. El mensaje debe persistirse antes de emitirse por Socket.IO.
+Comprueba la respuesta del envío HTTP, que el backend no registró un error SQL y que el usuario pertenece a la conversación. El mensaje debe persistirse por el comando canónico antes de entregarse como `conversation:message` por Socket.IO.
 
 ## El punto rojo no se actualiza
 

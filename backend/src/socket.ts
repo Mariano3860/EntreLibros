@@ -6,23 +6,16 @@ import {
   listConversations,
   markConversationRead,
   listMessages,
-  sendMessageWithStatus,
-  findBotIdForConversation,
   messageEvents,
   type MessageAttachment,
 } from './repositories/messagingRepository.js';
 import { logger } from './utils/logger.js';
-import { generateReply } from './services/chatBot.js';
-import { notifyMessageRecipients } from './services/notifications.js';
 import { markMessageNotificationsRead } from './repositories/notificationRepository.js';
 import {
   agreementEvents,
   type AgreementSnapshot,
 } from './repositories/agreementRepository.js';
 import { logPublicError, publicErrorResponse } from './utils/publicErrors.js';
-
-const MAX_SOCKET_BODY_LENGTH = 4_000;
-const MAX_SOCKET_CLIENT_KEY_LENGTH = 160;
 
 function parseCookies(header?: string): Record<string, string> {
   if (!header) return {};
@@ -47,12 +40,6 @@ export interface ClientToServerEvents {
     payload: { conversationId: number; after?: number },
     acknowledge?: (joined: boolean) => void
   ) => void;
-  'conversation:message': (payload: {
-    conversationId: number;
-    clientKey: string;
-    body: string;
-    attachmentMetadata?: MessageAttachment | null;
-  }) => void;
   'conversation:read': (payload: {
     conversationId: number;
     sequence: number;
@@ -85,41 +72,12 @@ export interface SocketData {
   user: ChatUser;
 }
 
-type ConversationMessagePayload = {
-  conversationId: number;
-  clientKey: string;
-  body: string;
-  attachmentMetadata?: MessageAttachment | null;
-};
-
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 function isConversationId(value: unknown): value is number {
   return Number.isSafeInteger(value) && (value as number) > 0;
-}
-
-function isValidConversationMessage(
-  value: unknown
-): value is ConversationMessagePayload {
-  if (!isRecord(value)) return false;
-  if (
-    !isConversationId(value.conversationId) ||
-    typeof value.clientKey !== 'string' ||
-    value.clientKey.trim().length === 0 ||
-    value.clientKey.length > MAX_SOCKET_CLIENT_KEY_LENGTH ||
-    typeof value.body !== 'string' ||
-    value.body.length > MAX_SOCKET_BODY_LENGTH
-  ) {
-    return false;
-  }
-  const attachment = value.attachmentMetadata;
-  return (
-    attachment === undefined ||
-    attachment === null ||
-    (isRecord(attachment) && Object.keys(attachment).length <= 20)
-  );
 }
 
 function isValidConversationJoin(
@@ -301,88 +259,6 @@ export function setupWebsocket(
         acknowledge?.(true);
       } catch (error) {
         acknowledge?.(false);
-        socket.emit('conversation:error', socketError(error));
-      }
-    });
-
-    socket.on('conversation:message', async (payload) => {
-      if (!isValidConversationMessage(payload)) {
-        emitInvalidSocketPayload(socket);
-        return;
-      }
-      try {
-        if (
-          !(await isConversationParticipant(
-            payload.conversationId,
-            socket.data.user.id
-          ))
-        ) {
-          socket.emit('conversation:error', {
-            message: 'messaging.errors.forbidden',
-          });
-          return;
-        }
-        const result = await sendMessageWithStatus({
-          conversationId: payload.conversationId,
-          senderId: socket.data.user.id,
-          clientKey: payload.clientKey,
-          body: payload.body,
-          attachmentMetadata: payload.attachmentMetadata,
-        });
-        const message = result.message;
-        if (!result.created) return;
-        await notifyMessageRecipients({
-          messageId: message.id,
-          conversationId: message.conversationId,
-          senderId: message.senderId,
-        });
-        io.to(`conversation:${payload.conversationId}`).emit(
-          'conversation:message',
-          {
-            conversationId: message.conversationId,
-            sequence: message.sequence,
-            senderId: message.senderId,
-            body: message.body,
-            clientKey: message.clientKey,
-            createdAt: message.createdAt.toISOString(),
-            attachmentMetadata: message.attachmentMetadata,
-          }
-        );
-        const botId = await findBotIdForConversation(
-          payload.conversationId,
-          socket.data.user.id
-        );
-        if (botId) {
-          // Keep the bot reply on the same persisted path as user messages;
-          // emit only after the message is newly persisted.
-          const reply = await generateReply(payload.body);
-          const botResult = await sendMessageWithStatus({
-            conversationId: payload.conversationId,
-            senderId: botId,
-            clientKey: `bot-reply-${message.id}`,
-            body: reply,
-          });
-          const botMessage = botResult.message;
-          if (!botResult.created) return;
-          await notifyMessageRecipients({
-            messageId: botMessage.id,
-            conversationId: botMessage.conversationId,
-            senderId: botMessage.senderId,
-          });
-          io.to(`conversation:${payload.conversationId}`).emit(
-            'conversation:message',
-            {
-              conversationId: botMessage.conversationId,
-              sequence: botMessage.sequence,
-              senderId: botMessage.senderId,
-              body: botMessage.body,
-              clientKey: botMessage.clientKey,
-              createdAt: botMessage.createdAt.toISOString(),
-              attachmentMetadata: botMessage.attachmentMetadata,
-            }
-          );
-        }
-      } catch (error) {
         socket.emit('conversation:error', socketError(error));
       }
     });
