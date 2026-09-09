@@ -12,10 +12,10 @@
   padding: 18px 14px;
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: var(--prototype-border) transparent;
-  border: 1px solid var(--prototype-border);
+  scrollbar-color: var(--app-border) transparent;
+  border: 1px solid var(--app-border);
   border-radius: 16px;
-  background: color-mix(in srgb, var(--prototype-surface) 95%, transparent);
+  background: color-mix(in srgb, var(--app-surface) 95%, transparent);
   box-shadow: 0 20px 55px rgb(0 0 0 / 30%);
   backdrop-filter: blur(18px);
   transition:
@@ -49,7 +49,7 @@
 
 .railHeader h1 {
   margin: 0 0 5px;
-  color: var(--prototype-text);
+  color: var(--app-text);
   font-size: 23px;
   font-weight: 600;
   letter-spacing: -0.025em;
@@ -58,7 +58,7 @@
 
 .railHeader p {
   margin: 0;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 13px;
   line-height: 1.5;
 }
@@ -68,10 +68,10 @@
   flex: 0 0 26px;
   width: 26px;
   height: 26px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 50%;
   background: transparent;
-  color: var(--prototype-text);
+  color: var(--app-text);
   font-size: 18px;
   cursor: pointer;
 }
@@ -82,10 +82,10 @@
   align-items: center;
   gap: 9px;
   padding: 0 11px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 12px;
   background: rgb(128 169 184 / 5%);
-  color: var(--prototype-muted);
+  color: var(--app-muted);
 }
 
 .search svg {
@@ -101,17 +101,17 @@
   border: 0;
   outline: 0;
   background: transparent;
-  color: var(--prototype-text);
+  color: var(--app-text);
   font: inherit;
   font-size: 13px;
 }
 
 .search input::placeholder {
-  color: var(--prototype-muted);
+  color: var(--app-muted);
 }
 
 .search:focus-within {
-  border-color: var(--prototype-teal);
+  border-color: var(--app-teal);
   box-shadow: 0 0 0 3px rgb(66 215 199 / 14%);
 }
 
@@ -128,9 +128,9 @@
   min-height: 34px;
   align-items: center;
   padding: 0 12px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 13px;
-  color: var(--prototype-text);
+  color: var(--app-text);
   font: inherit;
   font-size: 13px;
 }
@@ -150,7 +150,7 @@
 }
 
 .filterChip[aria-pressed='true'] {
-  border-color: var(--prototype-teal);
+  border-color: var(--app-teal);
   background: rgb(22 185 169 / 22%);
 }
 
@@ -162,14 +162,14 @@
 
 .sectionHeading h2 {
   margin: 0;
-  color: var(--prototype-text);
+  color: var(--app-text);
   font-size: 15px;
   font-weight: 600;
   line-height: 1.3;
 }
 
 .sectionHeading > span {
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 13px;
 }
 
@@ -187,8 +187,7 @@
   border: 0;
   border-radius: 8px;
   background:
-    linear-gradient(var(--prototype-teal-strong), var(--prototype-teal))
-      no-repeat,
+    linear-gradient(var(--app-teal-strong), var(--app-teal)) no-repeat,
     rgb(86 123 142 / 28%);
   cursor: pointer;
 }
@@ -197,9 +196,9 @@
   width: 22px;
   height: 22px;
   appearance: none;
-  border: 5px solid var(--prototype-surface);
+  border: 5px solid var(--app-surface);
   border-radius: 50%;
-  background: var(--prototype-teal);
+  background: var(--app-teal);
   box-shadow:
     0 0 0 1px rgb(66 215 199 / 55%),
     0 0 18px rgb(22 185 169 / 50%);
@@ -208,9 +207,9 @@
 .slider input::-moz-range-thumb {
   width: 14px;
   height: 14px;
-  border: 5px solid var(--prototype-surface);
+  border: 5px solid var(--app-surface);
   border-radius: 50%;
-  background: var(--prototype-teal);
+  background: var(--app-teal);
   box-shadow:
     0 0 0 1px rgb(66 215 199 / 55%),
     0 0 18px rgb(22 185 169 / 50%);
@@ -219,7 +218,7 @@
 .rangeLabels {
   display: flex;
   justify-content: space-between;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 11px;
 }
 
@@ -232,14 +231,14 @@
   display: grid;
   gap: 8px;
   padding-top: 14px;
-  border-top: 1px solid var(--prototype-border);
+  border-top: 1px solid var(--app-border);
 }
 
 .viewAll {
   padding: 0;
   border: 0;
   background: transparent;
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   font: inherit;
   font-size: 12px;
   cursor: pointer;
@@ -279,10 +278,10 @@
   flex: 0 0 40px;
   overflow: hidden;
   place-items: center;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 50%;
   background: rgb(22 185 169 / 15%);
-  color: var(--prototype-teal);
+  color: var(--app-teal);
 }
 
 .activityIcon img {
@@ -299,7 +298,7 @@
 
 .activityText strong {
   overflow: hidden;
-  color: var(--prototype-text);
+  color: var(--app-text);
   font-size: 12px;
   font-weight: 500;
   text-overflow: ellipsis;
@@ -309,14 +308,14 @@
 .activityText small,
 .activityEmpty {
   margin: 0;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 11px;
   line-height: 1.4;
 }
 
 .rail button:focus-visible,
 .slider input:focus-visible {
-  outline: 2px solid var(--prototype-teal);
+  outline: 2px solid var(--app-teal);
   outline-offset: 4px;
 }
 

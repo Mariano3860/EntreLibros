@@ -31,7 +31,7 @@ import { contactFormHandler } from './contactForm/contactForm.handler'
 import { userLanguageHandler } from './language/language.handler'
 import { geocodingHandler } from './map/geocoding.handler'
 import { mapHandler } from './map/map.handler'
-import { prototypeHandlers } from './prototype/prototype.handler'
+import { mockHandlers } from './mock/mock.handler'
 
 export const handlers = [
   loginHandler,
@@ -62,5 +62,5 @@ export const handlers = [
   suggestionsHandler,
   geocodingHandler,
   mapHandler,
-  ...prototypeHandlers,
+  ...mockHandlers,
 ]

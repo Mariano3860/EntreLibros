@@ -8,11 +8,11 @@ import { renderWithProviders } from '../../test-utils'
 
 const corner: CommunityCornerDetail = {
   id: 'corner-1',
-  name: 'RincÃ³n Centro',
+  name: 'Rincón Centro',
   scope: 'public',
-  hostAlias: 'AnfitriÃ³n',
+  hostAlias: 'Anfitrión',
   rules: 'Cuidar los libros',
-  schedule: 'SÃ¡bados',
+  schedule: 'Sábados',
   status: 'active',
   visibilityPreference: 'approximate',
   imageUrl: 'https://example.com/corner.jpg',

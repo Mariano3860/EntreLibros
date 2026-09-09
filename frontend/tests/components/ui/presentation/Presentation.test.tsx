@@ -5,7 +5,7 @@ import {
   Avatar,
   BookCover,
   FixtureState,
-} from '@src/features/prototype/PrototypeUI'
+} from '@src/components/ui/presentation/Presentation'
 
 describe('FixtureState', () => {
   beforeEach(() => window.history.replaceState({}, '', '/'))
@@ -86,7 +86,7 @@ describe('BookCover', () => {
     expect(screen.getByText('Ficcion')).toBeInTheDocument()
   })
 
-  test('uses the prototype cover when there is no connected cover', () => {
+  test('uses the illustration cover when there is no connected cover', () => {
     const { container } = render(<BookCover book={book} />)
 
     expect(container.querySelector('img')).not.toBeInTheDocument()

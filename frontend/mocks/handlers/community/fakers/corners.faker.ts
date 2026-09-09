@@ -2,15 +2,15 @@ import type {
   CommunityCornerMap,
   CommunityCornerSummary,
 } from '@src/api/community/corners.types'
-import { prototypeCatalog } from '@src/features/prototype/catalog'
+import { mockExperienceFixtures } from '@src/mocks/fixtures/experience'
 
 let additionalCorners: CommunityCornerSummary[] = []
 
 const baseCorners = (): CommunityCornerSummary[] =>
-  prototypeCatalog.corners.map((corner) => ({
+  mockExperienceFixtures.corners.map((corner) => ({
     id: corner.id,
     name: corner.name,
-    imageUrl: '/prototype/community-reading.svg',
+    imageUrl: '/illustrations/community-reading.svg',
     distanceKm: Number(
       corner.distance.replace(',', '.').replace(/[^\d.]/g, '')
     ),
@@ -32,7 +32,7 @@ export const generateCornersMap = (): CommunityCornerMap => ({
       y: 22 + index * 7,
       status: 'active' as const,
     })),
-    ...prototypeCatalog.corners.map((corner) => ({
+    ...mockExperienceFixtures.corners.map((corner) => ({
       id: corner.id,
       name: corner.name,
       x: corner.x,

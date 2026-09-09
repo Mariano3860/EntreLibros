@@ -4,18 +4,18 @@ import { useState } from 'react'
 
 import { fetchCommunityStats } from '@src/api/community/communityStats.service'
 import { fetchMvpMetrics } from '@src/api/community/mvpMetrics.service'
-import { usePrototype } from '@src/features/prototype/PrototypeContext'
 import {
   Avatar,
   KpiCard,
   MiniMap,
   PageHeader,
   Panel,
-  PrototypeButton,
-  PrototypePage,
+  ActionButton,
+  PageFrame,
   SectionHeading,
   UnavailableState,
-} from '@src/features/prototype/PrototypeUI'
+} from '@src/components/ui/presentation/Presentation'
+import { useMockExperience } from '@src/contexts/mock/MockExperienceContext'
 import { isApiMockMode } from '@src/utils/runtimeEnv'
 
 import styles from './StatsPage.module.scss'
@@ -31,14 +31,15 @@ const points = (values: readonly number[]) =>
         .join(' ')
 
 export const StatsPage = () => {
-  const { catalog, period, setPeriod } = usePrototype()
+  const { fixtures } = useMockExperience()
   const mockMode = isApiMockMode()
+  const [period, setPeriod] = useState('�ltimos 7 d�as')
 
   if (!mockMode) return <RealStatsPage />
 
   return (
     <BaseLayout id="stats-page">
-      <PrototypePage>
+      <PageFrame>
         <PageHeader
           title="Estadísticas"
           description="Mirá cómo crecen las lecturas, intercambios y encuentros de EntreLibros."
@@ -55,13 +56,13 @@ export const StatsPage = () => {
                   <option>Este año</option>
                 </select>
               </label>
-              <PrototypeButton>⇩ Exportar</PrototypeButton>
+              <ActionButton>⇩ Exportar</ActionButton>
             </>
           }
         />
 
         <section className={styles.kpis}>
-          {catalog.stats.kpis.map((kpi) => (
+          {fixtures.stats.kpis.map((kpi) => (
             <KpiCard key={kpi.label} {...kpi} />
           ))}
         </section>
@@ -100,18 +101,18 @@ export const StatsPage = () => {
                 />
               ))}
               <polygon
-                points={`0,180 ${points(catalog.stats.weekly)} 600,180`}
+                points={`0,180 ${points(fixtures.stats.weekly)} 600,180`}
                 fill="url(#chart-fill)"
               />
               <polyline
-                points={points(catalog.stats.weekly)}
+                points={points(fixtures.stats.weekly)}
                 fill="none"
                 stroke="#42d7c7"
                 strokeWidth="4"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
-              {catalog.stats.weekly.map((value, index) => (
+              {fixtures.stats.weekly.map((value, index) => (
                 <circle
                   key={index}
                   cx={index * 100}
@@ -124,7 +125,7 @@ export const StatsPage = () => {
               ))}
             </svg>
             <div className={styles.axis}>
-              {catalog.stats.dayLabels.map((day) => (
+              {fixtures.stats.dayLabels.map((day) => (
                 <span key={day}>{day}</span>
               ))}
             </div>
@@ -136,10 +137,10 @@ export const StatsPage = () => {
               action={<button className={styles.menu}>•••</button>}
             />
             <div className={styles.barChart}>
-              {catalog.stats.posts.map((value, index) => (
+              {fixtures.stats.posts.map((value, index) => (
                 <div key={index}>
                   <span style={{ height: `${value}%` }} />
-                  <small>{catalog.stats.shortDayLabels[index]}</small>
+                  <small>{fixtures.stats.shortDayLabels[index]}</small>
                 </div>
               ))}
             </div>
@@ -148,7 +149,7 @@ export const StatsPage = () => {
           <Panel className={styles.card}>
             <SectionHeading title="Rincones más activos" />
             <ol className={styles.ranking}>
-              {catalog.corners.map((corner, index) => (
+              {fixtures.corners.map((corner, index) => (
                 <li key={corner.id}>
                   <b>{index + 1}</b>
                   <span>
@@ -157,7 +158,7 @@ export const StatsPage = () => {
                       {corner.category} · {corner.distance}
                     </small>
                   </span>
-                  <em>{catalog.stats.rankingVisits[index]}</em>
+                  <em>{fixtures.stats.rankingVisits[index]}</em>
                 </li>
               ))}
             </ol>
@@ -175,13 +176,13 @@ export const StatsPage = () => {
             <SectionHeading
               title="Contribuyentes destacados"
               action={
-                <PrototypeButton size="small" tone="ghost">
+                <ActionButton size="small" tone="ghost">
                   Ver ranking →
-                </PrototypeButton>
+                </ActionButton>
               }
             />
             <div className={styles.contributors}>
-              {catalog.stats.contributors.map((person, index) => (
+              {fixtures.stats.contributors.map((person, index) => (
                 <article key={person.name}>
                   <span className={styles.position}>{index + 1}</span>
                   <Avatar initials={person.initials} accent={person.accent} />
@@ -195,7 +196,7 @@ export const StatsPage = () => {
             </div>
           </Panel>
         </div>
-      </PrototypePage>
+      </PageFrame>
     </BaseLayout>
   )
 }
@@ -214,7 +215,7 @@ const RealStatsPage = () => {
   const stats = query.data
   return (
     <BaseLayout id="stats-page">
-      <PrototypePage>
+      <PageFrame>
         <PageHeader
           title="Estadísticas"
           description="Mirá cómo crecen las lecturas, intercambios y encuentros de EntreLibros."
@@ -386,7 +387,7 @@ const RealStatsPage = () => {
             </div>
           </>
         ) : null}
-      </PrototypePage>
+      </PageFrame>
     </BaseLayout>
   )
 }

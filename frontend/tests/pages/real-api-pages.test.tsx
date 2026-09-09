@@ -79,7 +79,7 @@ import { StatsPage } from '@src/pages/stats/StatsPage'
 
 import { renderWithProviders } from '../test-utils'
 
-describe('prototype pages in real API mode', () => {
+describe('application pages in real API mode', () => {
   test('renders persisted community and statistics data', async () => {
     const { unmount } = renderWithProviders(<CommunityFeedPage />)
     expect(await screen.findByText('Dune')).toBeVisible()
@@ -178,7 +178,7 @@ describe('prototype pages in real API mode', () => {
       recommendedBooks: [
         {
           id: 'listing-1',
-          title: 'La casa de los espÃ­ritus',
+          title: 'La casa de los espíritus',
           author: 'Isabel Allende',
           cover: '/cover.jpg',
           owner: { id: '42', user: 'Clara' },
@@ -190,7 +190,7 @@ describe('prototype pages in real API mode', () => {
 
     renderWithProviders(<CommunityFeedPage />)
 
-    expect(await screen.findByText('La casa de los espÃ­ritus')).toBeVisible()
+    expect(await screen.findByText('La casa de los espíritus')).toBeVisible()
     expect(
       screen.queryByRole('button', { name: /^Mariano$/ })
     ).not.toBeInTheDocument()

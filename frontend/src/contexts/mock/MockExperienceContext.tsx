@@ -6,9 +6,12 @@ import {
   useState,
 } from 'react'
 
+import {
+  mockExperienceFixtures,
+  type MockExperienceFixtures,
+} from '@src/mocks/fixtures/experience'
+import type { ChatMessageView } from '@src/shared/view-models/types'
 import { isApiMockMode } from '@src/utils/runtimeEnv'
-
-import { prototypeCatalog, type PrototypeChatMessage } from './catalog'
 
 type SocialPost = {
   id: string
@@ -17,40 +20,33 @@ type SocialPost = {
   createdAt: string
 }
 
-type PrototypeContextValue = {
-  catalog: typeof prototypeCatalog
-  period: string
-  setPeriod: (period: string) => void
+type MockExperienceContextValue = {
+  fixtures: MockExperienceFixtures
   socialPosts: SocialPost[]
   publishStory: (text: string) => void
-  chatMessages: PrototypeChatMessage[]
-  sendMessage: (text: string, kind?: PrototypeChatMessage['kind']) => void
+  chatMessages: ChatMessageView[]
+  sendMessage: (text: string, kind?: ChatMessageView['kind']) => void
   readConversationIds: ReadonlySet<string>
   markConversationRead: (conversationId: string) => void
-  openFaq: string | null
-  setOpenFaq: (id: string | null) => void
-  supportSent: boolean
-  sendSupport: () => void
 }
 
-const PrototypeContext = createContext<PrototypeContextValue | null>(null)
+const MockExperienceContext = createContext<MockExperienceContextValue | null>(
+  null
+)
 
-export const PrototypeProvider = ({
+export const MockExperienceProvider = ({
   children,
 }: {
   children: React.ReactNode
 }) => {
   const mockMode = isApiMockMode()
-  const [period, setPeriod] = useState('Últimos 7 días')
   const [socialPosts, setSocialPosts] = useState<SocialPost[]>([])
-  const [chatMessages, setChatMessages] = useState<PrototypeChatMessage[]>(
-    () => (mockMode ? [...prototypeCatalog.chatMessages] : [])
+  const [chatMessages, setChatMessages] = useState<ChatMessageView[]>(() =>
+    mockMode ? [...mockExperienceFixtures.chatMessages] : []
   )
   const [readConversationIds, setReadConversationIds] = useState<Set<string>>(
     () => new Set()
   )
-  const [openFaq, setOpenFaq] = useState<string | null>('publish')
-  const [supportSent, setSupportSent] = useState(false)
   const markConversationRead = useCallback(
     (conversationId: string) => {
       if (!mockMode) return
@@ -63,11 +59,9 @@ export const PrototypeProvider = ({
     },
     [mockMode]
   )
-  const value = useMemo<PrototypeContextValue>(
+  const value = useMemo<MockExperienceContextValue>(
     () => ({
-      catalog: prototypeCatalog,
-      period,
-      setPeriod,
+      fixtures: mockExperienceFixtures,
       socialPosts,
       publishStory: (text) => {
         if (!mockMode) return
@@ -97,35 +91,28 @@ export const PrototypeProvider = ({
       },
       readConversationIds,
       markConversationRead,
-      openFaq,
-      setOpenFaq,
-      supportSent,
-      sendSupport: () => {
-        if (mockMode) setSupportSent(true)
-      },
     }),
     [
       chatMessages,
       markConversationRead,
       mockMode,
-      openFaq,
-      period,
       readConversationIds,
       socialPosts,
-      supportSent,
     ]
   )
 
   return (
-    <PrototypeContext.Provider value={value}>
+    <MockExperienceContext.Provider value={value}>
       {children}
-    </PrototypeContext.Provider>
+    </MockExperienceContext.Provider>
   )
 }
 
-export const usePrototype = () => {
-  const value = useContext(PrototypeContext)
+export const useMockExperience = () => {
+  const value = useContext(MockExperienceContext)
   if (!value)
-    throw new Error('usePrototype must be used inside PrototypeProvider')
+    throw new Error(
+      'useMockExperience must be used inside MockExperienceProvider'
+    )
   return value
 }

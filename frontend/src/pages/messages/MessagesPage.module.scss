@@ -33,7 +33,7 @@ main.layoutMain {
   border: 0;
   border-radius: 8px;
   background: transparent;
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   cursor: pointer;
   font-size: 19px;
 }
@@ -54,7 +54,7 @@ main.layoutMain {
   display: flex;
   min-height: 0;
   flex-direction: column;
-  border-right: 1px solid var(--prototype-border);
+  border-right: 1px solid var(--app-border);
 }
 
 .search {
@@ -64,10 +64,10 @@ main.layoutMain {
   gap: 8px;
   padding: 0 12px;
   margin: 13px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 9px;
-  background: var(--prototype-surface-soft);
-  color: var(--prototype-muted);
+  background: var(--app-surface-soft);
+  color: var(--app-muted);
 }
 
 .search input {
@@ -76,7 +76,7 @@ main.layoutMain {
   border: 0;
   outline: 0;
   background: transparent;
-  color: var(--prototype-input-text);
+  color: var(--app-input-text);
   font-size: 11px;
 }
 
@@ -84,20 +84,20 @@ main.layoutMain {
   display: flex;
   gap: 15px;
   padding: 0 14px 10px;
-  border-bottom: 1px solid var(--prototype-border);
+  border-bottom: 1px solid var(--app-border);
 }
 
 .railTabs button {
   padding: 0;
   border: 0;
   background: transparent;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   cursor: pointer;
   font-size: 10px;
 }
 
 .railTabs .active {
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   font-weight: 700;
 }
 
@@ -112,7 +112,7 @@ main.layoutMain {
   justify-items: center;
   gap: 7px;
   padding: 24px 14px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
   line-height: 1.4;
   text-align: center;
@@ -120,7 +120,7 @@ main.layoutMain {
 
 .conversationState strong {
   max-width: 170px;
-  color: var(--prototype-text);
+  color: var(--app-text);
   font-size: 10px;
   font-weight: 600;
 }
@@ -128,7 +128,7 @@ main.layoutMain {
 .conversationState .stateMark {
   border-color: rgb(66 215 199 / 28%);
   background: rgb(66 215 199 / 8%);
-  color: var(--prototype-teal);
+  color: var(--app-teal);
 }
 
 .conversationList > button {
@@ -146,11 +146,11 @@ main.layoutMain {
 }
 
 .conversationList > button:hover {
-  background: var(--prototype-subtle-hover);
+  background: var(--app-subtle-hover);
 }
 
 .conversationList > .selected {
-  border-left-color: var(--prototype-teal);
+  border-left-color: var(--app-teal);
   background: rgb(66 215 199 / 9%);
 }
 
@@ -175,7 +175,7 @@ main.layoutMain {
 .conversationCopy small {
   overflow: hidden;
   margin-top: 3px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -188,7 +188,7 @@ main.layoutMain {
 }
 
 .conversationMeta small {
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
 }
 
@@ -198,7 +198,7 @@ main.layoutMain {
   height: 17px;
   place-items: center;
   border-radius: 50%;
-  background: var(--prototype-teal);
+  background: var(--app-teal);
   color: #06211f;
   font-size: 10px;
 }
@@ -208,7 +208,7 @@ main.layoutMain {
   min-width: 0;
   min-height: 0;
   flex-direction: column;
-  background: var(--prototype-chat-background);
+  background: var(--app-chat-background);
 }
 
 .empty {
@@ -216,8 +216,8 @@ main.layoutMain {
   min-height: 100%;
   place-items: center;
   padding: 24px;
-  background: var(--prototype-chat-background);
-  color: var(--prototype-muted);
+  background: var(--app-chat-background);
+  color: var(--app-muted);
   text-align: center;
 }
 
@@ -230,14 +230,14 @@ main.layoutMain {
   gap: 8px;
   margin: auto;
   padding: 20px 16px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 11px;
   line-height: 1.45;
   text-align: center;
 }
 
 .messageState strong {
-  color: var(--prototype-text);
+  color: var(--app-text);
   font-size: 12px;
   font-weight: 600;
 }
@@ -257,7 +257,7 @@ main.layoutMain {
   border: 1px solid rgb(255 139 76 / 35%);
   border-radius: 50%;
   background: rgb(255 139 76 / 10%);
-  color: var(--prototype-orange);
+  color: var(--app-orange);
   font-size: 12px;
   font-weight: 700;
 }
@@ -265,8 +265,8 @@ main.layoutMain {
 .stateSpinner {
   width: 18px;
   height: 18px;
-  border: 2px solid var(--prototype-border);
-  border-top-color: var(--prototype-teal);
+  border: 2px solid var(--app-border);
+  border-top-color: var(--app-teal);
   border-radius: 50%;
   animation: messages-spin 0.8s linear infinite;
 }
@@ -283,7 +283,7 @@ main.layoutMain {
   border: 1px solid rgb(66 215 199 / 32%);
   border-radius: 999px;
   background: rgb(66 215 199 / 9%);
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   cursor: pointer;
   font-size: 11px;
   font-weight: 600;
@@ -299,7 +299,7 @@ main.layoutMain {
   gap: 10px;
   min-height: 66px;
   padding: 0 16px;
-  border-bottom: 1px solid var(--prototype-border);
+  border-bottom: 1px solid var(--app-border);
 }
 
 .chatHeader strong,
@@ -313,7 +313,7 @@ main.layoutMain {
 
 .chatHeader small {
   margin-top: 2px;
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   font-size: 10px;
 }
 
@@ -329,13 +329,13 @@ main.layoutMain {
   border: 1px solid transparent;
   border-radius: 8px;
   background: transparent;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   cursor: pointer;
 }
 
 .chatHeader nav button:hover {
-  border-color: var(--prototype-border);
-  background: var(--prototype-surface);
+  border-color: var(--app-border);
+  background: var(--app-surface);
 }
 
 .messages {
@@ -352,8 +352,8 @@ main.layoutMain {
   align-self: center;
   padding: 4px 9px;
   border-radius: 999px;
-  background: var(--prototype-surface);
-  color: var(--prototype-muted);
+  background: var(--app-surface);
+  color: var(--app-muted);
   font-size: 10px;
 }
 
@@ -361,9 +361,9 @@ main.layoutMain {
   max-width: 64%;
   align-self: flex-start;
   padding: 9px 11px 6px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 5px 13px 13px;
-  background: var(--prototype-surface);
+  background: var(--app-surface);
   font-size: 11px;
   line-height: 1.45;
 }
@@ -371,7 +371,7 @@ main.layoutMain {
 .bubble small {
   display: block;
   margin-top: 4px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
   text-align: right;
 }
@@ -380,7 +380,7 @@ main.layoutMain {
   align-self: flex-end;
   border-color: rgb(66 215 199 / 24%);
   border-radius: 13px 5px 13px 13px;
-  background: var(--prototype-message-mine-background);
+  background: var(--app-message-mine-background);
 }
 
 .proposal {
@@ -389,11 +389,11 @@ main.layoutMain {
   padding: 12px;
   border: 1px solid rgb(255 139 76 / 30%);
   border-radius: 13px;
-  background: var(--prototype-proposal-background);
+  background: var(--app-proposal-background);
 }
 
 .proposalLabel {
-  color: var(--prototype-orange);
+  color: var(--app-orange);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -423,7 +423,7 @@ main.layoutMain {
 
 .proposal small,
 .proposal p {
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
 }
 
@@ -447,9 +447,9 @@ main.layoutMain {
   gap: 7px;
   min-width: 0;
   padding: 6px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 8px;
-  background: var(--prototype-surface-soft);
+  background: var(--app-surface-soft);
 }
 
 .proposalBook > div {
@@ -471,14 +471,14 @@ main.layoutMain {
 
 .proposalBook small {
   margin-top: 3px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
 }
 
 .bubbleTime {
   display: block;
   margin-top: 7px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
   text-align: right;
 }
@@ -507,7 +507,7 @@ main.layoutMain {
 
 .bookAttachment small {
   margin-top: 3px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
 }
 
 .composer {
@@ -516,7 +516,7 @@ main.layoutMain {
   align-items: center;
   gap: 6px;
   padding: 10px 13px;
-  border-top: 1px solid var(--prototype-border);
+  border-top: 1px solid var(--app-border);
 }
 
 .composerActions {
@@ -533,9 +533,9 @@ main.layoutMain {
   width: 176px;
   gap: 3px;
   padding: 6px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 11px;
-  background: var(--prototype-surface);
+  background: var(--app-surface);
   box-shadow: 0 14px 32px rgb(0 0 0 / 24%);
 }
 
@@ -543,14 +543,14 @@ main.layoutMain {
   width: auto;
   height: 31px;
   border-radius: 7px;
-  color: var(--prototype-text);
+  color: var(--app-text);
   font-size: 10px;
   text-align: left;
 }
 
 .composerMenu button:hover {
-  background: var(--prototype-subtle-hover);
-  color: var(--prototype-teal);
+  background: var(--app-subtle-hover);
+  color: var(--app-teal);
 }
 
 .composer input {
@@ -558,11 +558,11 @@ main.layoutMain {
   min-height: 38px;
   flex: 1;
   padding: 0 13px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 999px;
   outline: 0;
-  background: var(--prototype-surface-soft);
-  color: var(--prototype-input-text);
+  background: var(--app-surface-soft);
+  color: var(--app-input-text);
   font-size: 11px;
 }
 
@@ -573,12 +573,12 @@ main.layoutMain {
   border: 0;
   border-radius: 50%;
   background: transparent;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   cursor: pointer;
 }
 
 .composer .send {
-  background: var(--prototype-teal);
+  background: var(--app-teal);
   color: #05231f;
 }
 
@@ -587,7 +587,7 @@ main.layoutMain {
   align-items: center;
   gap: 7px;
   padding: 0 14px 10px;
-  color: var(--prototype-orange);
+  color: var(--app-orange);
   font-size: 10px;
   line-height: 1.35;
 }
@@ -602,13 +602,13 @@ main.layoutMain {
 .draftSaveStatus {
   min-height: 25px;
   padding: 0 14px 8px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
   line-height: 1.35;
 }
 
 .draftSaveStatus[role='alert'] {
-  color: var(--prototype-orange);
+  color: var(--app-orange);
 }
 
 .modalBackdrop {
@@ -618,7 +618,7 @@ main.layoutMain {
   display: grid;
   place-items: center;
   padding: 20px;
-  background: var(--prototype-modal-backdrop);
+  background: var(--app-modal-backdrop);
   backdrop-filter: blur(8px);
 }
 
@@ -637,7 +637,7 @@ main.layoutMain {
   align-items: flex-start;
   gap: 18px;
   padding: 22px 22px 19px;
-  border-bottom: 1px solid var(--prototype-border);
+  border-bottom: 1px solid var(--app-border);
 }
 
 .newConversationTitle {
@@ -661,7 +661,7 @@ main.layoutMain {
 .newConversationTitle p {
   max-width: 315px;
   margin: 8px 0 0;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 11px;
   line-height: 1.45;
 }
@@ -672,10 +672,10 @@ main.layoutMain {
   height: 30px;
   flex: 0 0 30px;
   place-items: center;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 50%;
-  background: var(--prototype-surface-soft);
-  color: var(--prototype-muted);
+  background: var(--app-surface-soft);
+  color: var(--app-muted);
   font-size: 19px;
   line-height: 1;
 }
@@ -683,7 +683,7 @@ main.layoutMain {
 .newConversationHeader .modalCloseButton:hover {
   border-color: rgb(66 215 199 / 45%);
   background: rgb(66 215 199 / 10%);
-  color: var(--prototype-teal);
+  color: var(--app-teal);
 }
 
 .newConversationForm {
@@ -700,7 +700,7 @@ main.layoutMain {
 }
 
 .newConversationField > span {
-  color: var(--prototype-text);
+  color: var(--app-text);
   font-size: 11px;
   font-weight: 650;
 }
@@ -710,11 +710,11 @@ main.layoutMain {
   width: 100%;
   min-height: 45px;
   padding: 0 13px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 10px;
   outline: 0;
-  background: var(--prototype-surface-soft);
-  color: var(--prototype-input-text);
+  background: var(--app-surface-soft);
+  color: var(--app-input-text);
   font-size: 13px;
   transition:
     border-color 160ms ease,
@@ -722,11 +722,11 @@ main.layoutMain {
 }
 
 .newConversationField input::placeholder {
-  color: var(--prototype-muted);
+  color: var(--app-muted);
 }
 
 .newConversationField input:focus {
-  border-color: var(--prototype-teal);
+  border-color: var(--app-teal);
   box-shadow: 0 0 0 3px rgb(66 215 199 / 12%);
 }
 
@@ -735,7 +735,7 @@ main.layoutMain {
   align-items: flex-start;
   gap: 8px;
   margin: -3px 0 0;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
   line-height: 1.45;
 }
@@ -749,7 +749,7 @@ main.layoutMain {
   border: 1px solid rgb(66 215 199 / 35%);
   border-radius: 50%;
   background: rgb(66 215 199 / 9%);
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   font-size: 10px;
   font-weight: 700;
 }
@@ -766,7 +766,7 @@ main.layoutMain {
 
 .contactSection h3 {
   margin: 0;
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   font-size: 10px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -785,10 +785,10 @@ main.layoutMain {
   gap: 10px;
   min-height: 52px;
   padding: 7px 9px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 11px;
-  background: var(--prototype-surface-soft);
-  color: var(--prototype-text);
+  background: var(--app-surface-soft);
+  color: var(--app-text);
   cursor: pointer;
   text-align: left;
   transition:
@@ -805,7 +805,7 @@ main.layoutMain {
 }
 
 .contactOptionSelected {
-  border-color: var(--prototype-teal);
+  border-color: var(--app-teal);
   background: rgb(66 215 199 / 12%);
   box-shadow: 0 0 0 2px rgb(66 215 199 / 8%);
 }
@@ -817,7 +817,7 @@ main.layoutMain {
   place-items: center;
   border-radius: 50%;
   background: rgb(66 215 199 / 15%);
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   font-size: 10px;
   font-weight: 700;
 }
@@ -840,7 +840,7 @@ main.layoutMain {
 
 .contactCopy small {
   margin-top: 3px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
 }
 
@@ -851,7 +851,7 @@ main.layoutMain {
   place-items: center;
   border: 1px solid rgb(66 215 199 / 32%);
   border-radius: 50%;
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   font-size: 14px;
   line-height: 1;
 }
@@ -865,7 +865,7 @@ main.layoutMain {
   margin: 0;
   padding: 11px;
   border-radius: 9px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
   line-height: 1.4;
 }
@@ -873,7 +873,7 @@ main.layoutMain {
 .contactState {
   justify-content: center;
   min-height: 50px;
-  border: 1px dashed var(--prototype-border);
+  border: 1px dashed var(--app-border);
 }
 
 .contactState .stateMark {
@@ -888,14 +888,14 @@ main.layoutMain {
 }
 
 .contactEmpty {
-  border: 1px dashed var(--prototype-border);
+  border: 1px dashed var(--app-border);
   text-align: center;
 }
 
 .contactError {
   border: 1px solid rgb(255 139 76 / 28%);
   background: rgb(255 139 76 / 7%);
-  color: var(--prototype-text);
+  color: var(--app-text);
 }
 
 .newConversationActions {
@@ -905,8 +905,8 @@ main.layoutMain {
   gap: 10px;
   margin: 2px -22px -22px;
   padding: 14px 22px;
-  border-top: 1px solid var(--prototype-border);
-  background: var(--prototype-inset-background);
+  border-top: 1px solid var(--app-border);
+  background: var(--app-inset-background);
 }
 
 .newConversationCancel {
@@ -915,15 +915,15 @@ main.layoutMain {
   border: 1px solid transparent;
   border-radius: 10px;
   background: transparent;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   cursor: pointer;
   font-size: 12px;
   font-weight: 600;
 }
 
 .newConversationCancel:hover {
-  background: var(--prototype-subtle-hover);
-  color: var(--prototype-text);
+  background: var(--app-subtle-hover);
+  color: var(--app-text);
 }
 
 .newConversationSubmit {
@@ -966,9 +966,9 @@ main.layoutMain {
   display: grid;
   min-height: 48px;
   place-items: center;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 10px;
-  background: var(--prototype-surface-soft);
+  background: var(--app-surface-soft);
   color: inherit;
   cursor: pointer;
   font-size: 24px;
@@ -992,7 +992,7 @@ main.layoutMain {
 }
 
 .bookPicker header span {
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   font-size: 10px;
 }
 
@@ -1004,13 +1004,13 @@ main.layoutMain {
 .bookPicker header button {
   border: 0;
   background: transparent;
-  color: var(--prototype-text);
+  color: var(--app-text);
   cursor: pointer;
   font-size: 23px;
 }
 
 .bookPicker > p {
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
 }
 
@@ -1031,7 +1031,7 @@ main.layoutMain {
 .bookPickerError {
   border: 1px solid rgb(255 139 76 / 28%);
   background: rgb(255 139 76 / 7%);
-  color: var(--prototype-text);
+  color: var(--app-text);
 }
 
 .bookPickerError .stateMark {
@@ -1046,14 +1046,14 @@ main.layoutMain {
   flex-direction: column;
   margin: 0;
   padding: 20px 12px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   text-align: center;
 }
 
 .bookPickerState.errorState {
   border: 1px solid rgb(255 139 76 / 28%);
   background: rgb(255 139 76 / 7%);
-  color: var(--prototype-text);
+  color: var(--app-text);
 }
 
 .bookPickerList {
@@ -1073,7 +1073,7 @@ main.layoutMain {
 
 .bookPickerGroup h3 {
   margin: 0;
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   font-size: 10px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -1082,9 +1082,9 @@ main.layoutMain {
 .bookPickerEmpty {
   margin: 0;
   padding: 10px;
-  border: 1px dashed var(--prototype-border);
+  border: 1px dashed var(--app-border);
   border-radius: 9px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
 }
 
@@ -1094,9 +1094,9 @@ main.layoutMain {
   align-items: center;
   gap: 10px;
   padding: 8px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 10px;
-  background: var(--prototype-surface-soft);
+  background: var(--app-surface-soft);
   color: inherit;
   cursor: pointer;
   text-align: left;
@@ -1123,12 +1123,12 @@ main.layoutMain {
 
 .bookPicker small {
   margin-top: 3px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
 }
 
 .bookPicker b {
-  color: var(--prototype-teal);
+  color: var(--app-teal);
 }
 
 .swapForm {
@@ -1145,7 +1145,7 @@ main.layoutMain {
 
 .swapForm label > span,
 .agreementFields label > span {
-  color: var(--prototype-text);
+  color: var(--app-text);
   font-size: 10px;
   font-weight: 650;
 }
@@ -1158,11 +1158,11 @@ main.layoutMain {
   box-sizing: border-box;
   width: 100%;
   padding: 9px 10px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 8px;
   outline: 0;
-  background: var(--prototype-surface-soft);
-  color: var(--prototype-input-text);
+  background: var(--app-surface-soft);
+  color: var(--app-input-text);
   font: inherit;
   font-size: 10px;
 }
@@ -1183,7 +1183,7 @@ main.layoutMain {
 .bookPicker select:focus,
 .bookPicker input[type='date']:focus,
 .bookPicker input[type='time']:focus {
-  border-color: var(--prototype-teal);
+  border-color: var(--app-teal);
   box-shadow: 0 0 0 3px rgb(66 215 199 / 12%);
 }
 
@@ -1211,7 +1211,7 @@ main.layoutMain {
   .conversationRail {
     max-height: 270px;
     border-right: 0;
-    border-bottom: 1px solid var(--prototype-border);
+    border-bottom: 1px solid var(--app-border);
   }
 
   .chat {

@@ -3,7 +3,10 @@ import { useMutation } from '@tanstack/react-query'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { Panel, PrototypeButton } from '@src/features/prototype/PrototypeUI'
+import {
+  Panel,
+  ActionButton,
+} from '@src/components/ui/presentation/Presentation'
 
 import styles from './ReportModal.module.scss'
 
@@ -54,9 +57,9 @@ export const ReportModal = ({
         {mutation.isSuccess ? (
           <div className={styles.success} role="status">
             <p>{t('reports.submitted')}</p>
-            <PrototypeButton tone="primary" onClick={onClose}>
+            <ActionButton tone="primary" onClick={onClose}>
               {t('bookDetail.close', { defaultValue: 'Cerrar' })}
-            </PrototypeButton>
+            </ActionButton>
           </div>
         ) : (
           <form
@@ -82,10 +85,10 @@ export const ReportModal = ({
               </p>
             ) : null}
             <div className={styles.actions}>
-              <PrototypeButton type="button" onClick={onClose}>
+              <ActionButton type="button" onClick={onClose}>
                 {t('bookDetail.cancel', { defaultValue: 'Cancelar' })}
-              </PrototypeButton>
-              <PrototypeButton
+              </ActionButton>
+              <ActionButton
                 type="submit"
                 tone="primary"
                 disabled={mutation.isPending || reason.trim().length < 3}
@@ -93,7 +96,7 @@ export const ReportModal = ({
                 {mutation.isPending
                   ? t('reports.sending')
                   : t('reports.submit')}
-              </PrototypeButton>
+              </ActionButton>
             </div>
           </form>
         )}

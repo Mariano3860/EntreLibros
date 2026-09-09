@@ -7,10 +7,11 @@ import {
 } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import type { PrototypeBook } from './catalog'
-import styles from './PrototypeUI.module.scss'
+import type { BookCardView } from '@src/shared/view-models/types'
 
-export const PrototypePage = ({
+import styles from './Presentation.module.scss'
+
+export const PageFrame = ({
   children,
   className = '',
 }: {
@@ -88,7 +89,7 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   size?: 'small' | 'medium'
 }
 
-export const PrototypeButton = ({
+export const ActionButton = ({
   tone = 'secondary',
   size = 'medium',
   className = '',
@@ -144,7 +145,7 @@ export const BookCover = ({
   book,
   compact = false,
 }: {
-  book: PrototypeBook
+  book: BookCardView
   compact?: boolean
 }) => {
   const [coverFailed, setCoverFailed] = useState(false)
@@ -178,12 +179,12 @@ export const BookCover = ({
   )
 }
 
-export const PrototypeBookCard = ({
+export const CatalogBookCard = ({
   book,
   decorative = false,
   onClick,
 }: {
-  book: PrototypeBook
+  book: BookCardView
   decorative?: boolean
   onClick?: () => void
 }) => {
@@ -318,7 +319,7 @@ export const FixtureState = ({
       <div className={`${styles.panel} ${styles.state}`} role="alert">
         <strong>No pudimos cargar esta sección</strong>
         <span>El resto de la pantalla sigue disponible.</span>
-        <PrototypeButton
+        <ActionButton
           onClick={() => {
             const url = new URL(window.location.href)
             url.searchParams.delete('fixture')
@@ -327,7 +328,7 @@ export const FixtureState = ({
           }}
         >
           Reintentar
-        </PrototypeButton>
+        </ActionButton>
       </div>
     )
   return children

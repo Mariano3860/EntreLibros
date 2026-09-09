@@ -105,7 +105,7 @@ const book = {
   id: 'book-1',
   title: 'Ecos del Viento Norte',
   author: 'Clara Montiel',
-  coverUrl: '/prototype/book-cover.svg',
+  coverUrl: '/illustrations/book-cover.svg',
 }
 
 describe('MessagesPage in real API mode', () => {

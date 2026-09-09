@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw'
 
-import { prototypeCatalog } from '@src/features/prototype/catalog'
+import { mockExperienceFixtures } from '@src/mocks/fixtures/experience'
 
 import { apiRouteMatcher } from '../utils'
 
@@ -12,25 +12,25 @@ type DemoAction = {
 const demoState = {
   stories: [] as Record<string, unknown>[],
   messages: [] as Record<string, unknown>[],
-  profile: { ...prototypeCatalog.user } as Record<string, unknown>,
+  profile: { ...mockExperienceFixtures.user } as Record<string, unknown>,
   support: [] as Record<string, unknown>[],
 }
 
-export const prototypeHandlers = [
-  http.get(apiRouteMatcher('/demo/prototype'), ({ request }) => {
+export const mockHandlers = [
+  http.get(apiRouteMatcher('/demo/mock'), ({ request }) => {
     const fixture = new URL(request.url).searchParams.get('fixture')
     if (fixture === 'error') {
-      return HttpResponse.json(
-        { error: 'prototype_fixture_error' },
-        { status: 503 }
-      )
+      return HttpResponse.json({ error: 'mock_fixture_error' }, { status: 503 })
     }
     if (fixture === 'empty') {
       return HttpResponse.json({ catalog: {}, state: demoState })
     }
-    return HttpResponse.json({ catalog: prototypeCatalog, state: demoState })
+    return HttpResponse.json({
+      catalog: mockExperienceFixtures,
+      state: demoState,
+    })
   }),
-  http.post(apiRouteMatcher('/demo/prototype/actions'), async ({ request }) => {
+  http.post(apiRouteMatcher('/demo/mock/actions'), async ({ request }) => {
     const action = (await request.json()) as DemoAction
     const payload = action.payload ?? {}
     if (action.type === 'publish-story') demoState.stories.unshift(payload)

@@ -9,7 +9,7 @@ const people = [
     id: 21,
     name: 'Ana Lectura',
     alias: 'ana.lectura',
-    profilePhoto: '/prototype/avatar-ana.svg',
+    profilePhoto: '/illustrations/avatar-ana.svg',
     booksCount: 8,
     exchangeCount: 3,
     isFollowing: true,

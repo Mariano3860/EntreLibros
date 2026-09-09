@@ -6,13 +6,13 @@
   align-items: center;
   gap: 7px;
   padding: 0 10px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 10px;
-  background: var(--prototype-surface);
+  background: var(--app-surface);
 }
 
 .period span {
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
 }
 
@@ -20,12 +20,12 @@
   border: 0;
   outline: 0;
   background: transparent;
-  color: var(--prototype-text);
+  color: var(--app-text);
   font-size: 10px;
 }
 
 .period option {
-  background: var(--prototype-surface);
+  background: var(--app-surface);
 }
 
 .kpis {
@@ -62,14 +62,14 @@
 
 .metricGrid span,
 .funnel span {
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
 }
 
 .metricGrid strong {
   display: block;
   margin-bottom: 4px;
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   font-size: 18px;
 }
 
@@ -83,7 +83,7 @@
 }
 
 .growth {
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   font-size: 10px;
 }
 
@@ -91,12 +91,12 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: 4px;
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   font-size: 10px;
 }
 
 .legend small {
-  color: var(--prototype-muted);
+  color: var(--app-muted);
 }
 
 .lineChart {
@@ -107,18 +107,18 @@
 }
 
 .lineChart line {
-  stroke: var(--prototype-border);
+  stroke: var(--app-border);
 }
 
 .lineChart circle {
-  fill: var(--prototype-surface);
-  stroke: var(--prototype-teal);
+  fill: var(--app-surface);
+  stroke: var(--app-teal);
 }
 
 .axis {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
   text-align: center;
 }
@@ -126,7 +126,7 @@
 .menu {
   border: 0;
   background: transparent;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
 }
 
 .barChart {
@@ -136,11 +136,8 @@
   justify-content: space-around;
   gap: 12px;
   padding: 15px 8px 0;
-  border-bottom: 1px solid var(--prototype-border);
-  background-image: linear-gradient(
-    var(--prototype-border) 1px,
-    transparent 1px
-  );
+  border-bottom: 1px solid var(--app-border);
+  background-image: linear-gradient(var(--app-border) 1px, transparent 1px);
   background-size: 100% 25%;
 }
 
@@ -163,7 +160,7 @@
 }
 
 .barChart small {
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
 }
 
@@ -181,7 +178,7 @@
   gap: 9px;
   padding: 9px;
   border-radius: 9px;
-  background: var(--prototype-inset-background);
+  background: var(--app-inset-background);
 }
 
 .ranking b {
@@ -191,7 +188,7 @@
   place-items: center;
   border-radius: 8px;
   background: rgb(66 215 199 / 12%);
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   font-size: 10px;
 }
 
@@ -206,13 +203,13 @@
 
 .ranking small {
   margin-top: 2px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
 }
 
 .ranking em {
   margin-left: auto;
-  color: var(--prototype-orange);
+  color: var(--app-orange);
   font-size: 10px;
   font-style: normal;
 }
@@ -230,7 +227,7 @@
   gap: 8px;
   min-width: 0;
   padding: 10px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 10px;
 }
 
@@ -245,12 +242,12 @@
 
 .contributors small {
   margin-top: 2px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
 }
 
 .position {
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
 }
 
@@ -258,7 +255,7 @@
   position: absolute;
   top: 4px;
   right: 5px;
-  color: var(--prototype-orange);
+  color: var(--app-orange);
   font-size: 10px;
 }
 

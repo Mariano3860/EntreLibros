@@ -1,70 +1,17 @@
-export type PrototypeBook = {
-  id: string
-  title: string
-  author: string
-  owner: string
-  ownerId?: string
-  distance: string
-  mode: 'Intercambio' | 'Venta' | 'Buscado'
-  intentions?: Array<'trade' | 'sale' | 'seeking'>
-  price?: string
-  coverUrl?: string
-  condition?: string
-  accent: string
-  genre: string
-}
+import type {
+  BookCardView,
+  ChatMessageView,
+  ConversationView,
+} from '@src/shared/view-models/types'
 
-export type PrototypeConversation = {
-  id: string
-  name: string
-  initials: string
-  preview: string
-  time: string
-  unread?: number
-  online?: boolean
-  accent: string
-}
+export type {
+  BookCardView,
+  ChatBookView,
+  ChatMessageView,
+  ConversationView,
+} from '@src/shared/view-models/types'
 
-export type PrototypeChatBook = {
-  id: string
-  title: string
-  author: string
-  coverUrl: string
-}
-
-export type PrototypeChatMessage = {
-  id: string
-  role: 'me' | 'them'
-  text: string
-  time: string
-  kind?: 'book' | 'proposal' | 'swap' | 'agreement'
-  book?: PrototypeChatBook
-  swap?: {
-    offered: PrototypeChatBook
-    requested: PrototypeChatBook
-    note?: string
-  }
-  agreement?: {
-    agreementId: number
-    version: number
-    event:
-      | 'proposal'
-      | 'counterproposal'
-      | 'confirm'
-      | 'cancel'
-      | 'reject'
-      | 'complete'
-    meetingPoint: string
-    area: string
-    date: string
-    time: string
-    bookTitle: string
-    actorName: string
-    reason?: string
-  }
-}
-
-export const prototypeCatalog = {
+export const mockExperienceFixtures = {
   user: {
     id: 'mariano',
     name: 'Mariano',
@@ -128,7 +75,7 @@ export const prototypeCatalog = {
       accent: '#416c91',
       genre: 'Contemporánea',
     },
-  ] satisfies PrototypeBook[],
+  ] satisfies BookCardView[],
   userBooks: [
     {
       id: 'mariano-libro',
@@ -140,7 +87,7 @@ export const prototypeCatalog = {
       accent: '#42d7c7',
       genre: 'Ficción',
     },
-  ] satisfies PrototypeBook[],
+  ] satisfies BookCardView[],
   homeKpis: [
     {
       icon: '↗',
@@ -190,7 +137,7 @@ export const prototypeCatalog = {
       online: true,
       meta: 'Hace 24 min · Palermo',
       text: 'Encontré el rincón perfecto para terminar un libro un domingo. ¿Alguien se suma la próxima? 📚',
-      image: '/prototype/community-reading.svg',
+      image: '/illustrations/community-reading.svg',
       imageAlt: 'Una lectora disfrutando un libro en un rincón cálido',
       likes: '♥ 42 personas',
       comments: '8 comentarios',
@@ -248,7 +195,7 @@ export const prototypeCatalog = {
       time: 'Lun',
       accent: '#d7a657',
     },
-  ] satisfies PrototypeConversation[],
+  ] satisfies ConversationView[],
   chatMessages: [
     {
       id: 'm1',
@@ -275,7 +222,7 @@ export const prototypeCatalog = {
       time: '11:47',
       kind: 'proposal',
     },
-  ] satisfies PrototypeChatMessage[],
+  ] satisfies ChatMessageView[],
   mapCategories: [
     'Todo',
     'Cafés',
@@ -398,40 +345,6 @@ export const prototypeCatalog = {
     goal: { read: 23, target: 30, year: 2026 },
     streak: { current: 12, best: 28, completedDays: 6 },
   },
-  helpCategories: [
-    { icon: '♙', title: 'Cuenta', text: 'Perfil, privacidad y acceso' },
-    { icon: '▤', title: 'Publicaciones', text: 'Publicá y administrá libros' },
-    { icon: '↔', title: 'Intercambios', text: 'Propuestas y acuerdos' },
-    { icon: '✉', title: 'Mensajes', text: 'Chats y notificaciones' },
-    { icon: '⌂', title: 'Casitas', text: 'Rincones y comunidad' },
-    { icon: '◇', title: 'Seguridad', text: 'Reportes y buenas prácticas' },
-  ],
-  faqs: [
-    {
-      id: 'publish',
-      question: '¿Cómo publico un libro?',
-      answer:
-        'Desde Explorar elegí “Publicar un libro”, completá los datos y seleccioná si querés venderlo o intercambiarlo.',
-    },
-    {
-      id: 'trade',
-      question: '¿Cómo funciona un intercambio?',
-      answer:
-        'Enviá una propuesta desde un libro o un chat. Ambas personas deben aceptar lugar, fecha y libros antes de confirmarlo.',
-    },
-    {
-      id: 'corner',
-      question: '¿Qué es una casita o rincón?',
-      answer:
-        'Es un punto de encuentro de la comunidad: cafés, bibliotecas, parques y librerías donde podés leer o intercambiar.',
-    },
-    {
-      id: 'safety',
-      question: '¿Cómo reporto un problema?',
-      answer:
-        'Usá la opción Reportar en la publicación o escribinos desde el panel de soporte de esta página.',
-    },
-  ],
 } as const
 
-export type PrototypeCatalog = typeof prototypeCatalog
+export type MockExperienceFixtures = typeof mockExperienceFixtures

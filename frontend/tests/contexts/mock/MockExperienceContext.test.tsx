@@ -6,52 +6,41 @@ vi.mock('@src/utils/runtimeEnv', () => ({
 }))
 
 import {
-  PrototypeProvider,
-  usePrototype,
-} from '@src/features/prototype/PrototypeContext'
+  MockExperienceProvider,
+  useMockExperience,
+} from '@src/contexts/mock/MockExperienceContext'
 
 const RealModeConsumer = () => {
-  const {
-    chatMessages,
-    publishStory,
-    sendMessage,
-    socialPosts,
-    supportSent,
-    sendSupport,
-  } = usePrototype()
+  const { chatMessages, publishStory, sendMessage, socialPosts } =
+    useMockExperience()
 
   return (
     <>
       <output data-testid="messages">{chatMessages.length}</output>
       <output data-testid="stories">{socialPosts.length}</output>
-      <output data-testid="support">{String(supportSent)}</output>
       <button onClick={() => publishStory('Historia de prueba')}>
         Publicar
       </button>
       <button onClick={() => sendMessage('Mensaje de prueba')}>Enviar</button>
-      <button onClick={sendSupport}>Soporte</button>
     </>
   )
 }
 
-describe('PrototypeProvider in real API mode', () => {
-  test('does not initialize or mutate prototype-only state', () => {
+describe('MockExperienceProvider in real API mode', () => {
+  test('does not initialize or mutate mock-only state', () => {
     render(
-      <PrototypeProvider>
+      <MockExperienceProvider>
         <RealModeConsumer />
-      </PrototypeProvider>
+      </MockExperienceProvider>
     )
 
     expect(screen.getByTestId('messages')).toHaveTextContent('0')
     expect(screen.getByTestId('stories')).toHaveTextContent('0')
-    expect(screen.getByTestId('support')).toHaveTextContent('false')
 
     fireEvent.click(screen.getByRole('button', { name: 'Publicar' }))
     fireEvent.click(screen.getByRole('button', { name: 'Enviar' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Soporte' }))
 
     expect(screen.getByTestId('messages')).toHaveTextContent('0')
     expect(screen.getByTestId('stories')).toHaveTextContent('0')
-    expect(screen.getByTestId('support')).toHaveTextContent('false')
   })
 })

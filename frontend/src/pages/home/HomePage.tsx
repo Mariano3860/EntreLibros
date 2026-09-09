@@ -12,19 +12,19 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
-import { HOME_URLS } from '@src/constants/constants'
-import type { PrototypeBook } from '@src/features/prototype/catalog'
-import { usePrototype } from '@src/features/prototype/PrototypeContext'
 import {
   FixtureState,
   KpiCard,
   Panel,
-  PrototypeBookCard,
-  PrototypeButton,
-  PrototypePage,
+  CatalogBookCard,
+  ActionButton,
+  PageFrame,
   SectionHeading,
-} from '@src/features/prototype/PrototypeUI'
-import { toPrototypeBook } from '@src/features/prototype/realData.adapters'
+} from '@src/components/ui/presentation/Presentation'
+import { HOME_URLS } from '@src/constants/constants'
+import { useMockExperience } from '@src/contexts/mock/MockExperienceContext'
+import type { BookCardView } from '@src/mocks/fixtures/experience'
+import { toBookCardView } from '@src/shared/view-models/adapters'
 import { isApiMockMode } from '@src/utils/runtimeEnv'
 
 import styles from './HomePage.module.scss'
@@ -33,10 +33,10 @@ export const HomePage = () => {
   const { isAuthenticated, isLoading, user } = useAuth()
   const { runIfAuthenticated } = useAuthRequired()
   const { t } = useTranslation()
-  const { catalog } = usePrototype()
+  const { fixtures } = useMockExperience()
   const mockMode = isApiMockMode()
   const navigate = useNavigate()
-  const [selectedBook, setSelectedBook] = useState<PrototypeBook | null>(null)
+  const [selectedBook, setSelectedBook] = useState<BookCardView | null>(null)
   const [recommendationOffset, setRecommendationOffset] = useState(0)
   const [railDirection, setRailDirection] = useState<'next' | 'previous'>(
     'next'
@@ -50,37 +50,37 @@ export const HomePage = () => {
   )
   const contactMutation = useBookContact({ onSuccess: handleContactSuccess })
   const booksQuery = useQuery({
-    queryKey: ['prototype', 'home', 'books', recommendationOffset],
+    queryKey: ['home', 'books', recommendationOffset],
     queryFn: () => fetchHomeBooks(recommendationOffset),
     enabled: !mockMode,
     placeholderData: (previousData) => previousData,
   })
   const privateActivityQuery = useQuery({
-    queryKey: ['prototype', 'home', 'activity', 'private'],
+    queryKey: ['home', 'activity', 'private'],
     queryFn: fetchUserActivity,
     enabled: !mockMode && isAuthenticated,
   })
   const publicActivityQuery = useQuery({
-    queryKey: ['prototype', 'home', 'activity', 'public'],
+    queryKey: ['home', 'activity', 'public'],
     queryFn: fetchActivityItems,
     enabled: !mockMode && !isAuthenticated,
   })
   const statsQuery = useQuery({
-    queryKey: ['prototype', 'home', 'stats'],
+    queryKey: ['home', 'stats'],
     queryFn: fetchCommunityStats,
     enabled: !mockMode,
   })
 
   if (isLoading) return null
   const books = mockMode
-    ? catalog.books.slice(0, 5)
-    : (booksQuery.data?.items ?? []).map((book) => toPrototypeBook(book))
+    ? fixtures.books.slice(0, 5)
+    : (booksQuery.data?.items ?? []).map((book) => toBookCardView(book))
   const recommendationPage = mockMode
     ? { hasNext: false, hasPrevious: false }
     : (booksQuery.data?.page ?? { hasNext: false, hasPrevious: false })
   const kpis = mockMode
     ? isAuthenticated
-      ? catalog.homeKpis
+      ? fixtures.homeKpis
       : [
           {
             icon: '↔',
@@ -137,8 +137,8 @@ export const HomePage = () => {
       : []
   const activities = mockMode
     ? isAuthenticated
-      ? catalog.activity
-      : catalog.communityPosts.map((post) => ({
+      ? fixtures.activity
+      : fixtures.communityPosts.map((post) => ({
           icon: '↔',
           title: `${post.author} compartió una historia`,
           meta: post.meta,
@@ -169,7 +169,7 @@ export const HomePage = () => {
 
   return (
     <BaseLayout id="home-page">
-      <PrototypePage>
+      <PageFrame>
         <section className={styles.hero}>
           <div className={styles.heroContent}>
             {isAuthenticated ? (
@@ -191,7 +191,7 @@ export const HomePage = () => {
                 </p>
               </>
             )}
-            <PrototypeButton
+            <ActionButton
               tone="primary"
               onClick={() =>
                 navigate(
@@ -203,14 +203,14 @@ export const HomePage = () => {
             >
               {t(isAuthenticated ? 'home.my_books' : 'home.explore_community')}{' '}
               <span aria-hidden="true">→</span>
-            </PrototypeButton>
+            </ActionButton>
             {!isAuthenticated ? (
-              <PrototypeButton
+              <ActionButton
                 tone="ghost"
                 onClick={() => navigate(`/${HOME_URLS.REGISTER}`)}
               >
                 {t('auth.required.register')}
-              </PrototypeButton>
+              </ActionButton>
             ) : null}
           </div>
         </section>
@@ -231,7 +231,7 @@ export const HomePage = () => {
           <SectionHeading
             title="Libros que podrían gustarte"
             action={
-              <PrototypeButton
+              <ActionButton
                 tone="ghost"
                 size="small"
                 onClick={() =>
@@ -242,7 +242,7 @@ export const HomePage = () => {
                   ? t('home.my_books')
                   : t('home.explore_community')}{' '}
                 →
-              </PrototypeButton>
+              </ActionButton>
             }
           />
           {mockMode ? (
@@ -312,7 +312,7 @@ export const HomePage = () => {
                   author: selectedBook.author,
                   coverUrl:
                     selectedBook.coverUrl ??
-                    `/prototype/book-cover.svg?book=${selectedBook.id}`,
+                    `/illustrations/book-cover.svg?book=${selectedBook.id}`,
                   isSeeking: selectedBook.mode === 'Buscado',
                   ownerName: selectedBook.owner,
                 }
@@ -332,7 +332,7 @@ export const HomePage = () => {
             contactMutation.isError ? t('bookDetail.contactError') : undefined
           }
         />
-      </PrototypePage>
+      </PageFrame>
     </BaseLayout>
   )
 }
@@ -363,17 +363,17 @@ const BookRail = ({
   onOpen,
   onPrevious,
 }: {
-  books: ReturnType<typeof toPrototypeBook>[]
+  books: ReturnType<typeof toBookCardView>[]
   direction: 'next' | 'previous'
   hasNext: boolean
   hasPrevious: boolean
   isRefreshing: boolean
   onNext: () => void
-  onOpen: (book: PrototypeBook) => void
+  onOpen: (book: BookCardView) => void
   onPrevious: () => void
 }) => {
   const previousBooks = useRef(books)
-  const [outgoingBooks, setOutgoingBooks] = useState<PrototypeBook[]>([])
+  const [outgoingBooks, setOutgoingBooks] = useState<BookCardView[]>([])
   const [animationKey, setAnimationKey] = useState(0)
 
   useEffect(() => {
@@ -409,7 +409,7 @@ const BookRail = ({
             inert
           >
             {outgoingBooks.slice(0, 5).map((book) => (
-              <PrototypeBookCard decorative key={book.id} book={book} />
+              <CatalogBookCard decorative key={book.id} book={book} />
             ))}
           </div>
         ) : null}
@@ -419,7 +419,7 @@ const BookRail = ({
         >
           {visibleBooks.length ? (
             visibleBooks.map((book) => (
-              <PrototypeBookCard
+              <CatalogBookCard
                 key={book.id}
                 book={book}
                 onClick={() => onOpen(book)}

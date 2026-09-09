@@ -8,7 +8,7 @@ const relation = (
   id,
   title,
   author: 'Mariano Demo',
-  coverUrl: `/prototype/book-cover.svg?book=${id}`,
+  coverUrl: `/illustrations/book-cover.svg?book=${id}`,
   condition: 'very_good',
   status: 'available',
   ...options,

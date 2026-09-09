@@ -33,7 +33,7 @@
     radial-gradient(circle at 70% 32%, rgb(22 185 169 / 8%), transparent 24%),
     linear-gradient(145deg, rgb(255 255 255 / 18%), rgb(220 233 232 / 12%));
   --map-attribution-background: rgb(255 255 255 / 86%);
-  --map-attribution-border: var(--prototype-border);
+  --map-attribution-border: var(--app-border);
 }
 
 .canvas::after {
@@ -64,12 +64,12 @@
   border-radius: rem(6px) 0 0;
   border: 1px solid var(--map-attribution-border);
   background: var(--map-attribution-background);
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
 }
 
 .canvas :global(.leaflet-control-attribution a) {
-  color: var(--prototype-teal);
+  color: var(--app-teal);
 }
 
 .controls {
@@ -86,11 +86,11 @@
   width: rem(36px);
   height: rem(36px);
   padding: 0;
-  border: 1px solid var(--prototype-border);
-  border-radius: var(--prototype-radius-sm);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-sm);
   background: var(--map-control-background);
   box-shadow: var(--map-control-shadow);
-  color: var(--prototype-text);
+  color: var(--app-text);
   cursor: pointer;
   font-size: 18px;
   place-items: center;
@@ -98,8 +98,8 @@
 
 .controls button:hover,
 .controls button:focus-visible {
-  border-color: var(--prototype-teal);
-  color: var(--prototype-teal);
+  border-color: var(--app-teal);
+  color: var(--app-teal);
   outline: none;
 }
 
@@ -110,7 +110,7 @@
 }
 
 .mapPin {
-  --pin-color: var(--prototype-teal);
+  --pin-color: var(--app-teal);
 
   position: relative;
   display: block;
@@ -140,12 +140,12 @@
 }
 
 .cornerPin {
-  --pin-color: var(--prototype-teal);
+  --pin-color: var(--app-teal);
 }
 
 .publicationPin,
 .activityPin {
-  --pin-color: var(--prototype-orange);
+  --pin-color: var(--app-orange);
 }
 
 .selectedPin {

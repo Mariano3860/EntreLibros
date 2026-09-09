@@ -6,55 +6,51 @@
 
 // Base Colors
 :root {
-  // Ideal prototype palette. Semantic variables below remain compatible with
-  // existing components while the prototype variables describe the new shell.
-  --prototype-canvas: #0b1d2a;
-  --prototype-sidebar: #081722;
-  --prototype-surface: #122a38;
-  --prototype-surface-raised: #173443;
-  --prototype-surface-soft: #102532;
-  --prototype-border: #294553;
-  --prototype-text: #f4f7f8;
-  --prototype-muted: #91a6b1;
-  --prototype-teal: #42d7c7;
-  --prototype-teal-strong: #16b9a9;
-  --prototype-orange: #ff8b4c;
-  --prototype-yellow: #f6c85f;
-  --prototype-blue: #5da9ff;
-  --prototype-purple: #a98bff;
-  --prototype-danger: #ff6f7d;
-  --prototype-danger-text: #ff9da7;
-  --prototype-danger-background: rgb(255 111 125 / 12%);
-  --prototype-danger-border: rgb(255 111 125 / 40%);
-  --prototype-sidebar-border: rgb(255 255 255 / 6%);
-  --prototype-sidebar-hover: rgb(255 255 255 / 4%);
-  --prototype-sidebar-divider: rgb(255 255 255 / 8%);
-  --prototype-panel-background: linear-gradient(
+  // Application palette. Semantic variables below remain compatible with
+  // existing components while the app variables describe the application shell.
+  --app-canvas: #0b1d2a;
+  --app-sidebar: #081722;
+  --app-surface: #122a38;
+  --app-surface-raised: #173443;
+  --app-surface-soft: #102532;
+  --app-border: #294553;
+  --app-text: #f4f7f8;
+  --app-muted: #91a6b1;
+  --app-teal: #42d7c7;
+  --app-teal-strong: #16b9a9;
+  --app-orange: #ff8b4c;
+  --app-yellow: #f6c85f;
+  --app-blue: #5da9ff;
+  --app-purple: #a98bff;
+  --app-danger: #ff6f7d;
+  --app-danger-text: #ff9da7;
+  --app-danger-background: rgb(255 111 125 / 12%);
+  --app-danger-border: rgb(255 111 125 / 40%);
+  --app-sidebar-border: rgb(255 255 255 / 6%);
+  --app-sidebar-hover: rgb(255 255 255 / 4%);
+  --app-sidebar-divider: rgb(255 255 255 / 8%);
+  --app-panel-background: linear-gradient(
     145deg,
     rgb(24 54 69 / 92%),
     rgb(15 37 50 / 96%)
   );
-  --prototype-panel-shadow: 0 12px 30px rgb(2 11 17 / 12%);
-  --prototype-inset-background: rgb(3 17 25 / 24%);
-  --prototype-inset-border: rgb(255 255 255 / 5%);
-  --prototype-subtle-hover: rgb(255 255 255 / 3%);
-  --prototype-modal-backdrop: rgb(1 9 14 / 78%);
-  --prototype-input-text: #fff;
-  --prototype-hero-text: #fff;
-  --prototype-hero-muted: #c2d0d5;
-  --prototype-chat-background: rgb(7 24 34 / 30%);
-  --prototype-message-mine-background: rgb(32 99 96 / 58%);
-  --prototype-proposal-background: linear-gradient(145deg, #173341, #102a37);
-  --prototype-map-background: radial-gradient(
-    circle at 60% 40%,
-    #173846,
-    #0b202c
-  );
-  --prototype-map-road: #355360;
-  --prototype-radius-sm: 10px;
-  --prototype-radius-md: 15px;
-  --prototype-radius-lg: 22px;
-  --prototype-shadow: 0 18px 44px rgb(2 10 16 / 24%);
+  --app-panel-shadow: 0 12px 30px rgb(2 11 17 / 12%);
+  --app-inset-background: rgb(3 17 25 / 24%);
+  --app-inset-border: rgb(255 255 255 / 5%);
+  --app-subtle-hover: rgb(255 255 255 / 3%);
+  --app-modal-backdrop: rgb(1 9 14 / 78%);
+  --app-input-text: #fff;
+  --app-hero-text: #fff;
+  --app-hero-muted: #c2d0d5;
+  --app-chat-background: rgb(7 24 34 / 30%);
+  --app-message-mine-background: rgb(32 99 96 / 58%);
+  --app-proposal-background: linear-gradient(145deg, #173341, #102a37);
+  --app-map-background: radial-gradient(circle at 60% 40%, #173846, #0b202c);
+  --app-map-road: #355360;
+  --app-radius-sm: 10px;
+  --app-radius-md: 15px;
+  --app-radius-lg: 22px;
+  --app-shadow: 0 18px 44px rgb(2 10 16 / 24%);
   // Primary Colors
   --color-primary-100: #e0f2f1;
   --color-primary-100-rgb: 224 242 241;
@@ -143,23 +139,23 @@
 
 // Dark Theme Overrides
 [data-theme='dark'] {
-  --background-primary: var(--prototype-canvas);
+  --background-primary: var(--app-canvas);
   --background-primary-rgb: 11 29 42;
-  --background-card: var(--prototype-surface);
+  --background-card: var(--app-surface);
   --background-card-rgb: 18 42 56;
   --text-primary: #f8f9fa;
   --text-primary-rgb: 248 249 250;
-  --text-secondary: var(--prototype-muted);
+  --text-secondary: var(--app-muted);
   --text-secondary-rgb: 145 166 177;
-  --border-color: var(--prototype-border);
+  --border-color: var(--app-border);
   --border-color-rgb: 41 69 83;
   --border-color-secondary: #6c757d;
   --border-color-secondary-rgb: 108 117 125;
   --primary-light: #00fff0;
   --primary-light-rgb: 0 255 240;
-  --primary-color: var(--prototype-teal);
+  --primary-color: var(--app-teal);
   --primary-color-rgb: 66 215 199;
-  --primary-dark: var(--prototype-teal-strong);
+  --primary-dark: var(--app-teal-strong);
   --primary-dark-rgb: 22 185 169;
   --primary-super-dark: #013631;
   --primary-super-dark-rgb: 1 54 49;
@@ -194,39 +190,35 @@
   --toggle-hover-rgb: 203 218 215;
   --scroll-bar-color: #6b9994;
   --scroll-bar-color-rgb: 107 153 148;
-  --prototype-canvas: #e7efee;
-  --prototype-sidebar: #f0f5f3;
-  --prototype-surface: #f8faf9;
-  --prototype-surface-raised: #eef4f2;
-  --prototype-surface-soft: #e5efec;
-  --prototype-border: #becfcd;
-  --prototype-text: #15303a;
-  --prototype-muted: #607781;
-  --prototype-danger-text: #b4233b;
-  --prototype-danger-background: rgb(180 35 59 / 10%);
-  --prototype-danger-border: rgb(180 35 59 / 30%);
-  --prototype-sidebar-border: var(--prototype-border);
-  --prototype-sidebar-hover: var(--prototype-subtle-hover);
-  --prototype-sidebar-divider: rgb(203 217 220 / 82%);
-  --prototype-shadow: 0 18px 44px rgb(27 62 70 / 12%);
-  --prototype-panel-background: linear-gradient(145deg, #f7faf9, #eaf2f0);
-  --prototype-panel-shadow: 0 12px 30px rgb(27 62 70 / 10%);
-  --prototype-inset-background: rgb(222 235 232 / 80%);
-  --prototype-inset-border: rgb(190 207 204 / 88%);
-  --prototype-subtle-hover: rgb(21 48 58 / 6%);
-  --prototype-modal-backdrop: rgb(21 48 58 / 48%);
-  --prototype-input-text: var(--prototype-text);
-  --prototype-hero-text: #fff;
-  --prototype-hero-muted: #e5f1f0;
-  --prototype-chat-background: #e8f1ef;
-  --prototype-message-mine-background: rgb(66 178 168 / 16%);
-  --prototype-proposal-background: linear-gradient(145deg, #fff3e8, #f8faf9);
-  --prototype-map-background: radial-gradient(
-    circle at 60% 40%,
-    #eff7f5,
-    #d3e4e1
-  );
-  --prototype-map-road: #97b7b4;
+  --app-canvas: #e7efee;
+  --app-sidebar: #f0f5f3;
+  --app-surface: #f8faf9;
+  --app-surface-raised: #eef4f2;
+  --app-surface-soft: #e5efec;
+  --app-border: #becfcd;
+  --app-text: #15303a;
+  --app-muted: #607781;
+  --app-danger-text: #b4233b;
+  --app-danger-background: rgb(180 35 59 / 10%);
+  --app-danger-border: rgb(180 35 59 / 30%);
+  --app-sidebar-border: var(--app-border);
+  --app-sidebar-hover: var(--app-subtle-hover);
+  --app-sidebar-divider: rgb(203 217 220 / 82%);
+  --app-shadow: 0 18px 44px rgb(27 62 70 / 12%);
+  --app-panel-background: linear-gradient(145deg, #f7faf9, #eaf2f0);
+  --app-panel-shadow: 0 12px 30px rgb(27 62 70 / 10%);
+  --app-inset-background: rgb(222 235 232 / 80%);
+  --app-inset-border: rgb(190 207 204 / 88%);
+  --app-subtle-hover: rgb(21 48 58 / 6%);
+  --app-modal-backdrop: rgb(21 48 58 / 48%);
+  --app-input-text: var(--app-text);
+  --app-hero-text: #fff;
+  --app-hero-muted: #e5f1f0;
+  --app-chat-background: #e8f1ef;
+  --app-message-mine-background: rgb(66 178 168 / 16%);
+  --app-proposal-background: linear-gradient(145deg, #fff3e8, #f8faf9);
+  --app-map-background: radial-gradient(circle at 60% 40%, #eff7f5, #d3e4e1);
+  --app-map-road: #97b7b4;
 }
 
 // ======================

@@ -3,7 +3,10 @@ import type { MapPin } from '@api/map/map.types'
 import { CornerDetailsPanel } from '@components/map/CornerDetailsPanel/CornerDetailsPanel'
 import { useTranslation } from 'react-i18next'
 
-import { Panel, PrototypeButton } from '@src/features/prototype/PrototypeUI'
+import {
+  Panel,
+  ActionButton,
+} from '@src/components/ui/presentation/Presentation'
 
 import styles from './MapSelectionCard.module.scss'
 
@@ -100,7 +103,7 @@ export const MapSelectionCard = ({
           {corner ? <span>{activity}</span> : null}
         </div>
         <div className={styles.actions}>
-          <PrototypeButton
+          <ActionButton
             tone="primary"
             size="small"
             onClick={publication ? onOpenPublication : onOpenDetails}
@@ -110,7 +113,7 @@ export const MapSelectionCard = ({
               : cornerDetailsOpen
                 ? t('map.selection.hideDetails')
                 : t('map.cta.openCorner')}
-          </PrototypeButton>
+          </ActionButton>
         </div>
       </div>
       {corner && cornerDetailsOpen ? (

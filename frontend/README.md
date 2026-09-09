@@ -30,8 +30,10 @@ PUBLIC_API_USE_MOCKS=false
 PUBLIC_API_BASE_URL=http://localhost:4000/api
 ```
 
-`mock` indica MSW y `real` indica API/Socket.IO. Comprueba
-`document.documentElement.dataset.apiMode` y reinicia tras cambiar variables.
+`mock` activa MSW y las fixtures de demo de `src/mocks/fixtures/`; `real` usa
+API/Socket.IO. La única interpretación de la variable está en
+`src/utils/runtimeEnv.ts`. Comprueba `document.documentElement.dataset.apiMode`
+y reinicia tras cambiar variables.
 
 ## Mapa y viewport
 

@@ -18,7 +18,7 @@
 
   p {
     margin-bottom: $spacing-2x5;
-    color: var(--prototype-muted);
+    color: var(--app-muted);
   }
 }
 
@@ -26,7 +26,7 @@
   padding: 7px 12px;
   border: 1px solid transparent;
   border-radius: 9px;
-  background: var(--prototype-teal);
+  background: var(--app-teal);
   color: #06211f;
   cursor: pointer;
   font-size: 0.72rem;
@@ -34,7 +34,7 @@
   transition: background $transition-duration-fast $transition-timing-function;
 
   &:hover {
-    background: var(--prototype-teal-strong);
+    background: var(--app-teal-strong);
   }
 }
 
@@ -48,7 +48,7 @@
   padding: 16px 18px;
   background:
     radial-gradient(circle at 0% 0%, rgb(66 215 199 / 8%), transparent 32%),
-    var(--prototype-surface);
+    var(--app-surface);
 
   @media (width <= $breakpoint-tablet) {
     grid-template-columns: 1fr;
@@ -73,7 +73,7 @@
   align-items: baseline;
   justify-content: space-between;
   gap: 8px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 0.65rem;
   font-weight: 750;
   letter-spacing: 0.08em;
@@ -89,10 +89,10 @@
 
 .galleryFrame {
   overflow: hidden;
-  border: 1px solid var(--prototype-border);
-  border-radius: var(--prototype-radius-md);
-  background: var(--prototype-inset-background);
-  box-shadow: var(--prototype-panel-shadow);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-md);
+  background: var(--app-inset-background);
+  box-shadow: var(--app-panel-shadow);
 }
 
 .coverImage {
@@ -109,9 +109,9 @@
   aspect-ratio: 2 / 3;
   align-items: center;
   justify-content: center;
-  border: 1px dashed var(--prototype-border);
-  background: var(--prototype-surface-raised);
-  color: var(--prototype-muted);
+  border: 1px dashed var(--app-border);
+  background: var(--app-surface-raised);
+  color: var(--app-muted);
   font-size: 0.7rem;
 }
 
@@ -121,25 +121,25 @@
   justify-content: space-between;
   gap: 8px;
   padding: 7px 9px;
-  border-top: 1px solid var(--prototype-border);
-  color: var(--prototype-muted);
+  border-top: 1px solid var(--app-border);
+  color: var(--app-muted);
   font-size: 0.68rem;
 }
 
 .galleryControls button {
   width: 26px;
   height: 26px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 8px;
-  background: var(--prototype-surface-raised);
-  color: var(--prototype-text);
+  background: var(--app-surface-raised);
+  color: var(--app-text);
   cursor: pointer;
   font-size: 1.1rem;
   line-height: 1;
 
   &:hover {
-    border-color: var(--prototype-teal);
-    color: var(--prototype-teal);
+    border-color: var(--app-teal);
+    color: var(--app-teal);
   }
 }
 
@@ -157,14 +157,14 @@
 .thumbnailButton {
   display: block;
   padding: 2px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 7px;
-  background: var(--prototype-surface-raised);
+  background: var(--app-surface-raised);
   cursor: pointer;
 
   &:hover,
   &.thumbnailActive {
-    border-color: var(--prototype-teal);
+    border-color: var(--app-teal);
   }
 }
 
@@ -190,17 +190,17 @@
   height: 18px;
   place-items: center;
   padding: 0;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 50%;
-  background: var(--prototype-surface);
-  color: var(--prototype-muted);
+  background: var(--app-surface);
+  color: var(--app-muted);
   cursor: pointer;
   font-size: 0.8rem;
   line-height: 1;
 
   &:hover {
-    border-color: var(--prototype-danger, #e07b67);
-    color: var(--prototype-danger, #e07b67);
+    border-color: var(--app-danger, #e07b67);
+    color: var(--app-danger, #e07b67);
   }
 }
 
@@ -222,15 +222,15 @@
   min-height: 28px;
   align-items: center;
   padding: 0 9px;
-  border: 1px dashed var(--prototype-border);
+  border: 1px dashed var(--app-border);
   border-radius: 8px;
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   cursor: pointer;
   font-size: 0.68rem;
   font-weight: 700;
 
   &:hover {
-    border-color: var(--prototype-teal);
+    border-color: var(--app-teal);
     background: rgb(66 215 199 / 8%);
   }
 }
@@ -288,7 +288,7 @@
 
   &.seeking {
     background: rgb(66 215 199 / 12%);
-    color: var(--prototype-teal);
+    color: var(--app-teal);
   }
 }
 
@@ -298,7 +298,7 @@
   border: 1px solid rgb(66 215 199 / 30%);
   border-radius: 999px;
   background: rgb(66 215 199 / 12%);
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   font-size: 0.68rem;
   font-weight: $font-weight-medium;
 }
@@ -313,7 +313,7 @@
   border: 1px solid rgb(66 215 199 / 20%);
   border-radius: 10px;
   background: rgb(66 215 199 / 6%);
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 0.68rem;
 
   span {
@@ -322,7 +322,7 @@
 
   strong {
     min-width: 0;
-    color: var(--prototype-teal);
+    color: var(--app-teal);
     font-weight: 750;
     overflow-wrap: anywhere;
   }
@@ -342,12 +342,12 @@
   flex-direction: column;
   gap: 5px;
   padding: 9px 10px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 10px;
-  background: var(--prototype-surface-raised);
+  background: var(--app-surface-raised);
 
   label {
-    color: var(--prototype-muted);
+    color: var(--app-muted);
     font-size: 0.6rem;
     font-weight: 700;
     letter-spacing: 0.06em;
@@ -356,7 +356,7 @@
 
   .value {
     margin: 0;
-    color: var(--prototype-text);
+    color: var(--app-text);
     font-size: 0.78rem;
     line-height: 1.35;
     overflow-wrap: anywhere;
@@ -364,7 +364,7 @@
 
   .empty {
     margin: 0;
-    color: var(--prototype-muted);
+    color: var(--app-muted);
     font-style: italic;
   }
 }
@@ -380,7 +380,7 @@
   gap: 5px;
 
   > label {
-    color: var(--prototype-muted);
+    color: var(--app-muted);
     font-size: 0.6rem;
     font-weight: 700;
     letter-spacing: 0.06em;
@@ -397,16 +397,16 @@
   min-width: 0;
   min-height: 32px;
   padding: 6px 8px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 7px;
-  background: var(--prototype-surface-soft);
-  color: var(--prototype-text);
+  background: var(--app-surface-soft);
+  color: var(--app-text);
   font-size: 0.76rem;
   transition: border-color $transition-duration-fast $transition-timing-function;
 
   &:focus {
     outline: none;
-    border-color: var(--prototype-teal);
+    border-color: var(--app-teal);
   }
 }
 
@@ -422,13 +422,13 @@
   box-sizing: border-box;
   min-width: 0;
   padding: 12px;
-  border: 1px solid var(--prototype-border);
-  border-radius: var(--prototype-radius-md);
-  background: var(--prototype-inset-background);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-md);
+  background: var(--app-inset-background);
 
   h3 {
     margin: 0 0 9px;
-    color: var(--prototype-text);
+    color: var(--app-text);
     font-size: 0.82rem;
     font-weight: $font-weight-bold;
   }
@@ -445,7 +445,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: var(--prototype-text);
+  color: var(--app-text);
   font-size: 0.72rem;
 }
 
@@ -458,18 +458,18 @@
 
 .tag {
   padding: 5px 8px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 999px;
-  background: var(--prototype-surface-raised);
-  color: var(--prototype-muted);
+  background: var(--app-surface-raised);
+  color: var(--app-muted);
   cursor: pointer;
   font-size: 0.68rem;
 
   &:hover,
   &.tagActive {
-    border-color: var(--prototype-teal);
+    border-color: var(--app-teal);
     background: rgb(66 215 199 / 12%);
-    color: var(--prototype-teal);
+    color: var(--app-teal);
   }
 }
 
@@ -485,19 +485,19 @@
   justify-content: space-between;
   gap: 8px;
   padding: 7px 8px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 8px;
-  background: var(--prototype-surface-raised);
+  background: var(--app-surface-raised);
 }
 
 .offerLabel {
-  color: var(--prototype-text);
+  color: var(--app-text);
   font-size: 0.72rem;
   font-weight: $font-weight-medium;
 }
 
 .offerValue {
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 0.7rem;
   overflow-wrap: anywhere;
   text-align: right;
@@ -508,7 +508,7 @@
 
   h4 {
     margin: 0 0 8px;
-    color: var(--prototype-text);
+    color: var(--app-text);
     font-size: 0.76rem;
     font-weight: $font-weight-medium;
   }
@@ -526,16 +526,16 @@
 
 .deliveryBadge {
   padding: 4px 7px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 8px;
-  background: var(--prototype-surface-raised);
-  color: var(--prototype-text);
+  background: var(--app-surface-raised);
+  color: var(--app-text);
   font-size: 0.68rem;
 }
 
 .deliveryPayer {
   margin: 8px 0 0;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 0.68rem;
 }
 
@@ -547,7 +547,7 @@
 
 .contactError {
   margin: 7px 0 0;
-  color: var(--prototype-danger-text);
+  color: var(--app-danger-text);
   font-size: 0.68rem;
 }
 
@@ -571,23 +571,23 @@
 }
 
 .cancelButton {
-  border: 1px solid var(--prototype-border);
-  background: var(--prototype-surface-raised);
-  color: var(--prototype-text);
+  border: 1px solid var(--app-border);
+  background: var(--app-surface-raised);
+  color: var(--app-text);
 
   &:hover:not(:disabled) {
-    background: var(--prototype-subtle-hover);
+    background: var(--app-subtle-hover);
   }
 }
 
 .saveButton,
 .editButton {
   border: 1px solid transparent;
-  background: var(--prototype-teal);
+  background: var(--app-teal);
   color: #06211f;
 
   &:hover:not(:disabled) {
-    background: var(--prototype-teal-strong);
+    background: var(--app-teal-strong);
   }
 }
 

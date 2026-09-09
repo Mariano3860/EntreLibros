@@ -17,6 +17,8 @@ Lee EntreLibros siguiendo este orden:
 5. Para seguridad, sigue cookie de sesión -> `middleware/auth.ts` -> ruta ->
    comprobación de propietario/participante/bloqueo -> DTO público -> tests.
 
-El modo `PUBLIC_API_USE_MOCKS=true` sirve una demo MSW y se reinicia al recargar;
-no prueba persistencia, cookies ni Socket.IO real. Para la demo de defensa usa
-el modo real y los recorridos de [Request Flows](request-flows.md).
+El modo `PUBLIC_API_USE_MOCKS=true` sirve una demo MSW, usando
+`frontend/src/mocks/fixtures/experience.ts` y el estado acotado de
+`frontend/src/contexts/mock/MockExperienceContext.tsx`; se reinicia al
+recargar. No prueba persistencia, cookies ni Socket.IO real. Para la demo de
+defensa usa el modo real y los recorridos de [Request Flows](request-flows.md).

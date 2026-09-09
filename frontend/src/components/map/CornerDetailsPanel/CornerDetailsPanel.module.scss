@@ -33,7 +33,7 @@
 
 .heading {
   padding: 16px 2px 12px;
-  border-bottom: 1px solid var(--prototype-border);
+  border-bottom: 1px solid var(--app-border);
 }
 
 .heading h2 {
@@ -43,7 +43,7 @@
 
 .heading p {
   margin: 0;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
 }
 
@@ -56,11 +56,11 @@
 }
 
 .active {
-  color: var(--prototype-teal);
+  color: var(--app-teal);
 }
 
 .paused {
-  color: var(--prototype-orange);
+  color: var(--app-orange);
 }
 
 .dataList {
@@ -76,7 +76,7 @@
 }
 
 .dataList dt {
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
@@ -84,13 +84,13 @@
 
 .dataList dd {
   margin: 0;
-  color: var(--prototype-text);
+  color: var(--app-text);
   font-size: 11px;
   line-height: 1.45;
 }
 
 .dataList small {
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
 }
 
@@ -98,11 +98,11 @@
   display: grid;
   gap: 10px;
   padding: 14px 2px 2px;
-  border-top: 1px solid var(--prototype-border);
+  border-top: 1px solid var(--app-border);
 }
 
 .ownerLabel {
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
@@ -113,22 +113,22 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  color: var(--prototype-text);
+  color: var(--app-text);
   font-size: 10px;
 }
 
 .statusToggle input {
-  accent-color: var(--prototype-teal);
+  accent-color: var(--app-teal);
 }
 
 .feedback,
 .error {
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
   line-height: 1.5;
 }
 
 .error {
   margin: 12px 0 0;
-  color: var(--prototype-orange);
+  color: var(--app-orange);
 }

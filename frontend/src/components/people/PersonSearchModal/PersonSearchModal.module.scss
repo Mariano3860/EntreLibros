@@ -12,7 +12,7 @@
 .searchField {
   display: grid;
   gap: 8px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 11px;
   font-weight: 750;
   letter-spacing: 0.08em;
@@ -25,14 +25,14 @@
   align-items: center;
   gap: 9px;
   padding: 0 13px;
-  border: 1px solid var(--prototype-teal);
+  border: 1px solid var(--app-teal);
   border-radius: 10px;
-  background: var(--prototype-surface-raised);
+  background: var(--app-surface-raised);
   box-shadow: 0 0 0 3px rgb(66 215 199 / 10%);
 }
 
 .searchIcon {
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   font-size: 20px;
   line-height: 1;
 }
@@ -43,7 +43,7 @@
   border: 0;
   outline: 0;
   background: transparent;
-  color: var(--prototype-text);
+  color: var(--app-text);
   font: inherit;
   font-size: 14px;
   letter-spacing: normal;
@@ -53,7 +53,7 @@
 .hint,
 .state {
   margin: 0;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 12px;
   line-height: 1.5;
 }
@@ -73,7 +73,7 @@
 
 .sectionHeading h3 {
   margin: 0;
-  color: var(--prototype-text);
+  color: var(--app-text);
   font-size: 12px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -85,7 +85,7 @@
 .state button {
   border: 0;
   background: transparent;
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   cursor: pointer;
   font: inherit;
   font-size: 11px;
@@ -101,10 +101,10 @@
 .recentChip {
   display: inline-flex;
   align-items: center;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 999px;
-  background: var(--prototype-surface-soft);
-  color: var(--prototype-text);
+  background: var(--app-surface-soft);
+  color: var(--app-text);
 }
 
 .recentChip > button:first-child {
@@ -118,7 +118,7 @@
 
 .removeRecent {
   padding: 5px 9px 5px 2px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
 }
 
 .peopleList {
@@ -138,9 +138,9 @@
   justify-content: space-between;
   gap: 14px;
   padding: 12px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 12px;
-  background: var(--prototype-surface-soft);
+  background: var(--app-surface-soft);
 }
 
 .personMain {
@@ -166,18 +166,18 @@
 }
 
 .personCopy strong {
-  color: var(--prototype-text);
+  color: var(--app-text);
   font-size: 14px;
 }
 
 .personCopy span,
 .personCopy small {
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 11px;
 }
 
 .personCopy em {
-  color: var(--prototype-danger-text);
+  color: var(--app-danger-text);
   font-size: 10px;
   font-style: normal;
 }
@@ -204,7 +204,7 @@
   align-content: center;
   gap: 8px;
   padding: 12px;
-  border: 1px dashed var(--prototype-border);
+  border: 1px dashed var(--app-border);
   border-radius: 12px;
   text-align: center;
 }
@@ -217,7 +217,7 @@
   width: 22px;
   height: 22px;
   border: 2px solid rgb(66 215 199 / 25%);
-  border-top-color: var(--prototype-teal);
+  border-top-color: var(--app-teal);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }

@@ -8,7 +8,7 @@
 
 .form label {
   margin-top: $spacing-1;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 0.7rem;
   font-weight: 650;
 }
@@ -18,9 +18,9 @@
 .form input {
   width: 100%;
   box-sizing: border-box;
-  color: var(--prototype-input-text);
-  background: var(--prototype-surface-soft);
-  border: 1px solid var(--prototype-border);
+  color: var(--app-input-text);
+  background: var(--app-surface-soft);
+  border: 1px solid var(--app-border);
   border-radius: rem(9px);
   padding: $spacing-1x5;
 }
@@ -31,7 +31,7 @@
 }
 
 .form textarea::placeholder {
-  color: var(--prototype-muted);
+  color: var(--app-muted);
 }
 
 .preview {
@@ -64,7 +64,7 @@
 }
 
 .secondary {
-  color: var(--prototype-text);
-  background: var(--prototype-surface-raised);
-  border: 1px solid var(--prototype-border);
+  color: var(--app-text);
+  background: var(--app-surface-raised);
+  border: 1px solid var(--app-border);
 }

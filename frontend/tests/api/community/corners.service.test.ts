@@ -41,7 +41,7 @@ describe('community corners service', () => {
     const payload: CommunityCornerSummary[] = [
       {
         id: '1',
-        name: 'Rincón Centro',
+        name: 'Rinc�n Centro',
         imageUrl: '/corner.jpg',
         distanceKm: 1.2,
       },
@@ -69,7 +69,7 @@ describe('community corners service', () => {
       pins: [
         {
           id: 'pin-1',
-          name: 'Rincón Norte',
+          name: 'Rinc�n Norte',
           x: -58.38,
           y: -34.6,
           status: 'active',
@@ -96,7 +96,7 @@ describe('community corners service', () => {
 
   test('createCorner posts payload and returns response data', async () => {
     const payload = {
-      name: 'Rincón Nueva Dirección',
+      name: 'Rinc�n Nueva Direcci�n',
       scope: 'public',
       hostAlias: 'Anfitriona',
       internalContact: 'contacto@entrelibros.org',
@@ -140,11 +140,11 @@ describe('community corners service', () => {
   test('fetchCornerDetail gets the selected corner detail', async () => {
     const payload: CommunityCornerDetail = {
       id: 'corner-1',
-      name: 'RincÃ³n Centro',
+      name: 'Rincón Centro',
       scope: 'public',
-      hostAlias: 'AnfitriÃ³n',
+      hostAlias: 'Anfitrión',
       rules: 'Cuidar los libros',
-      schedule: 'SÃ¡bados',
+      schedule: 'Sábados',
       status: 'active',
       visibilityPreference: 'approximate',
       imageUrl: '/corner.jpg',
@@ -175,7 +175,7 @@ describe('community corners service', () => {
 
   test('updateCorner patches the owner payload and returns refreshed detail', async () => {
     const payload: UpdateCornerPayload = {
-      name: 'RincÃ³n Actualizado',
+      name: 'Rincón Actualizado',
       status: 'paused',
     }
     const response = {

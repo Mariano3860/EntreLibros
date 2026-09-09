@@ -6,7 +6,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { AuthProvider } from '@src/contexts/auth/AuthContext'
 import { AuthRequiredProvider } from '@src/contexts/auth/AuthRequiredContext'
 import { ThemeProvider } from '@src/contexts/theme/ThemeContext'
-import { PrototypeProvider } from '@src/features/prototype/PrototypeContext'
+import { MockExperienceProvider } from '@src/contexts/mock/MockExperienceContext'
 
 type WrapperOptions = {
   initialEntries?: string[]
@@ -26,7 +26,7 @@ export const createWrapper = (options?: WrapperOptions) => {
         <AuthProvider>
           <AuthRequiredProvider>
             <ThemeProvider>
-              <PrototypeProvider>{children}</PrototypeProvider>
+              <MockExperienceProvider>{children}</MockExperienceProvider>
             </ThemeProvider>
           </AuthRequiredProvider>
         </AuthProvider>

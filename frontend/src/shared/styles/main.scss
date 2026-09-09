@@ -27,7 +27,7 @@ textarea,
 select,
 [tabindex] {
   &:focus-visible {
-    outline: 2px solid var(--prototype-teal);
+    outline: 2px solid var(--app-teal);
     outline-offset: 3px;
   }
 }
@@ -38,7 +38,7 @@ button {
 
 ::selection {
   color: #061418;
-  background: var(--prototype-teal);
+  background: var(--app-teal);
 }
 
 @media (prefers-reduced-motion: reduce) {

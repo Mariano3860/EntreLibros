@@ -17,22 +17,22 @@
   border: 1px solid var(--border-color);
   padding: 12px 14px;
   font-size: 0.95rem;
-  color: var(--prototype-input-text);
-  caret-color: var(--prototype-teal);
+  color: var(--app-input-text);
+  caret-color: var(--app-teal);
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease;
-  background: var(--prototype-surface-soft);
+  background: var(--app-surface-soft);
 }
 
 .input::placeholder,
 .textarea::placeholder {
-  color: var(--prototype-muted);
+  color: var(--app-muted);
 }
 
 .select option {
-  color: var(--prototype-input-text);
-  background: var(--prototype-surface);
+  color: var(--app-input-text);
+  background: var(--app-surface);
 }
 
 .input:focus,
