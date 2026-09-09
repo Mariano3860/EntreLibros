@@ -7,8 +7,11 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
+import {
+  Avatar,
+  ActionButton,
+} from '@src/components/ui/presentation/Presentation'
 import { useAuthRequired } from '@src/contexts/auth/AuthRequiredContext'
-import { Avatar, PrototypeButton } from '@src/features/prototype/PrototypeUI'
 
 import styles from './PersonSearchModal.module.scss'
 
@@ -327,7 +330,7 @@ export const PersonSearchModal = ({
                     >
                       {t('booksPage.personSearch.viewProfile')}
                     </button>
-                    <PrototypeButton
+                    <ActionButton
                       type="button"
                       size="small"
                       tone={person.isFollowing ? 'ghost' : 'primary'}
@@ -343,7 +346,7 @@ export const PersonSearchModal = ({
                         : person.isFollowing
                           ? t('booksPage.personSearch.following')
                           : t('booksPage.personSearch.follow')}
-                    </PrototypeButton>
+                    </ActionButton>
                   </div>
                 </li>
               )

@@ -4,8 +4,8 @@ import type {
 } from '@api/messages/messages'
 import { useTranslation } from 'react-i18next'
 
-import type { PrototypeBook } from '@src/features/prototype/catalog'
-import { BookCover } from '@src/features/prototype/PrototypeUI'
+import { BookCover } from '@src/components/ui/presentation/Presentation'
+import type { BookCardView } from '@src/mocks/fixtures/experience'
 
 import styles from './MessageDraftCard.module.scss'
 
@@ -27,7 +27,7 @@ const toBook = (
     coverUrl: string
   },
   accent = '#42d7c7'
-): PrototypeBook => ({
+): BookCardView => ({
   id: book.id ?? book.bookId ?? 'draft-book',
   title: book.title,
   author: book.author,

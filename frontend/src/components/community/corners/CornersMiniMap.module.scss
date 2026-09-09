@@ -42,18 +42,18 @@
     linear-gradient(
       32deg,
       transparent 44%,
-      var(--prototype-map-road) 45% 47%,
+      var(--app-map-road) 45% 47%,
       transparent 48%
     ),
     linear-gradient(
       112deg,
       transparent 42%,
-      color-mix(in srgb, var(--prototype-map-road) 74%, transparent) 43% 46%,
+      color-mix(in srgb, var(--app-map-road) 74%, transparent) 43% 46%,
       transparent 47%
     ),
-    var(--prototype-map-background);
+    var(--app-map-background);
   overflow: hidden;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   height: rem(220px);
 }
 

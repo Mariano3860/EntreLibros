@@ -21,7 +21,7 @@ import { ReactComponent as Messages } from '@src/assets/icons/messages.svg'
 import { ReactComponent as Profile } from '@src/assets/icons/profile.svg'
 import { ReactComponent as Stats } from '@src/assets/icons/stats.svg'
 import { HOME_URLS } from '@src/constants/constants'
-import { usePrototype } from '@src/features/prototype/PrototypeContext'
+import { useMockExperience } from '@src/contexts/mock/MockExperienceContext'
 
 import styles from './Sidebar.module.scss'
 
@@ -29,7 +29,7 @@ export const Sidebar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { t } = useTranslation()
   const { isAuthenticated, isLoading } = useAuth()
-  const { catalog, readConversationIds } = usePrototype()
+  const { fixtures, readConversationIds } = useMockExperience()
   const mockMode = isApiMockMode()
   const conversationsQuery = useQuery({
     queryKey: messageQueryKeys.conversations(),
@@ -42,7 +42,7 @@ export const Sidebar = () => {
     !isLoading &&
     isAuthenticated &&
     (mockMode
-      ? catalog.conversations.some(
+      ? fixtures.conversations.some(
           (conversation) =>
             Boolean(conversation.unread) &&
             !readConversationIds.has(conversation.id)

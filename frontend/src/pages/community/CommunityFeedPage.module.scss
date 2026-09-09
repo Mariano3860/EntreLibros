@@ -15,7 +15,7 @@
 
 .header p {
   margin: 0;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 13px;
 }
 
@@ -56,23 +56,23 @@
   padding: 0;
   border: 0;
   background: transparent;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   cursor: pointer;
   font-size: 10px;
 }
 
 .stories button:first-child {
-  color: var(--prototype-teal);
+  color: var(--app-teal);
 }
 
 .createStory {
-  color: var(--prototype-teal) !important;
+  color: var(--app-teal) !important;
 }
 
 .emptyStories {
   align-self: center;
   margin: 0;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
   white-space: nowrap;
 }
@@ -81,7 +81,7 @@
   padding: 8px 12px;
   border-radius: 9px;
   background: rgb(66 215 199 / 10%);
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   font-size: 11px;
 }
 
@@ -106,10 +106,10 @@
   flex: 1;
   min-height: 38px;
   padding: 0 14px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 999px;
-  background: var(--prototype-surface-soft);
-  color: var(--prototype-muted);
+  background: var(--app-surface-soft);
+  color: var(--app-muted);
   text-align: left;
   cursor: pointer;
   font-size: 11px;
@@ -121,7 +121,7 @@
   gap: 4px;
   margin-top: 11px;
   padding-top: 10px;
-  border-top: 1px solid var(--prototype-border);
+  border-top: 1px solid var(--app-border);
 }
 
 .composerActions > button:not(:last-child) {
@@ -129,7 +129,7 @@
   padding: 0 8px;
   border: 0;
   background: transparent;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   cursor: pointer;
   font-size: 10px;
 }
@@ -157,9 +157,9 @@
   min-width: 0;
   gap: 9px;
   padding: 9px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 10px;
-  background: var(--prototype-surface-soft);
+  background: var(--app-surface-soft);
 }
 
 .recommendation img,
@@ -172,11 +172,7 @@
 }
 
 .recommendationCover {
-  background: linear-gradient(
-    145deg,
-    var(--prototype-orange),
-    var(--prototype-teal)
-  );
+  background: linear-gradient(145deg, var(--app-orange), var(--app-teal));
 }
 
 .recommendation > div:last-child {
@@ -192,19 +188,19 @@
 }
 
 .recommendation strong {
-  color: var(--prototype-text);
+  color: var(--app-text);
   font-size: 10px;
 }
 
 .recommendation small {
   margin-top: 3px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
 }
 
 .emptyDiscovery {
   margin: 10px 0 0;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
   line-height: 1.4;
 }
@@ -226,7 +222,7 @@
 
 .postHeader small {
   margin-top: 2px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
 }
 
@@ -234,13 +230,13 @@
   margin-left: auto;
   border: 0;
   background: transparent;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   cursor: pointer;
 }
 
 .post > p {
   margin: 13px 0;
-  color: var(--prototype-text);
+  color: var(--app-text);
   font-size: 12px;
   line-height: 1.55;
 }
@@ -263,7 +259,7 @@
 .sidePanel > div:first-child button {
   border: 0;
   background: transparent;
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   cursor: pointer;
   font-size: 10px;
 }
@@ -298,7 +294,7 @@
   place-items: center;
   border-radius: 9px;
   background: rgb(255 139 76 / 13%);
-  color: var(--prototype-orange);
+  color: var(--app-orange);
 }
 
 .cornerList strong,
@@ -316,7 +312,7 @@
 .suggestion strong a,
 .suggestion strong a:hover,
 .suggestion strong a:focus-visible {
-  color: var(--prototype-text);
+  color: var(--app-text);
   text-decoration: none;
   cursor: pointer;
 }
@@ -324,13 +320,13 @@
 .cornerList small,
 .suggestion small {
   margin-top: 2px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
 }
 
 .suggestion {
   padding: 9px 0;
-  border-bottom: 1px solid var(--prototype-border);
+  border-bottom: 1px solid var(--app-border);
 }
 
 .suggestion:last-child {
@@ -343,7 +339,7 @@
   border: 1px solid rgb(66 215 199 / 40%);
   border-radius: 7px;
   background: transparent;
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   cursor: pointer;
   font-size: 10px;
 }
@@ -360,7 +356,7 @@
   display: grid;
   place-items: center;
   padding: 20px;
-  background: var(--prototype-modal-backdrop);
+  background: var(--app-modal-backdrop);
   backdrop-filter: blur(8px);
 }
 
@@ -382,7 +378,7 @@
 .modalHeader button {
   border: 0;
   background: transparent;
-  color: var(--prototype-text);
+  color: var(--app-text);
   cursor: pointer;
   font-size: 24px;
 }
@@ -398,18 +394,18 @@
 }
 
 .modal label {
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 11px;
 }
 
 .modal textarea {
   min-height: 130px;
   padding: 13px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 11px;
   outline: 0;
-  background: var(--prototype-surface-soft);
-  color: var(--prototype-input-text);
+  background: var(--app-surface-soft);
+  color: var(--app-input-text);
   resize: vertical;
 }
 
@@ -421,10 +417,10 @@
 
 .attachments button {
   padding: 7px 9px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 8px;
   background: transparent;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   cursor: pointer;
   font-size: 10px;
 }

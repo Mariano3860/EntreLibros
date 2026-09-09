@@ -16,7 +16,7 @@ const LocationProbe = () => {
 }
 
 describe('HomePage', () => {
-  test('renders the complete prototype home', async () => {
+  test('renders the complete home', async () => {
     renderWithProviders(
       <>
         <HomePage />

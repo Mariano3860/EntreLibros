@@ -1,6 +1,6 @@
 import type { FeedItem } from '@components/feed/FeedItem.types'
 
-import { prototypeCatalog } from '@src/features/prototype/catalog'
+import { mockExperienceFixtures } from '@src/mocks/fixtures/experience'
 
 const requester = {
   id: 'user-lucia',
@@ -26,7 +26,7 @@ const ITEMS: FeedItem[] = [
     likes: 42,
     title: 'Una tarde para leer',
     body: 'Encontré el rincón perfecto para terminar un libro un domingo.',
-    image: '/prototype/community-reading.svg',
+    image: '/illustrations/community-reading.svg',
     corner: { id: 'cafe-literario', name: 'Café Literario' },
   },
   {
@@ -36,9 +36,9 @@ const ITEMS: FeedItem[] = [
     avatar: '',
     time: 'hace 1 hora',
     likes: 28,
-    title: prototypeCatalog.books[0].title,
-    author: prototypeCatalog.books[0].author,
-    cover: '/prototype/book-cover.svg',
+    title: mockExperienceFixtures.books[0].title,
+    author: mockExperienceFixtures.books[0].author,
+    cover: '/illustrations/book-cover.svg',
   },
   {
     id: 'swap-ecos',
@@ -49,18 +49,18 @@ const ITEMS: FeedItem[] = [
     likes: 16,
     requester,
     offered: {
-      id: prototypeCatalog.books[0].id,
-      title: prototypeCatalog.books[0].title,
-      author: prototypeCatalog.books[0].author,
-      cover: '/prototype/book-cover.svg',
+      id: mockExperienceFixtures.books[0].id,
+      title: mockExperienceFixtures.books[0].title,
+      author: mockExperienceFixtures.books[0].author,
+      cover: '/illustrations/book-cover.svg',
       category: 'book',
       owner: requester,
     },
     requested: {
-      id: prototypeCatalog.books[1].id,
-      title: prototypeCatalog.books[1].title,
-      author: prototypeCatalog.books[1].author,
-      cover: '/prototype/book-cover.svg',
+      id: mockExperienceFixtures.books[1].id,
+      title: mockExperienceFixtures.books[1].title,
+      author: mockExperienceFixtures.books[1].author,
+      cover: '/illustrations/book-cover.svg',
       category: 'book',
       owner: mariano,
     },

@@ -1,14 +1,14 @@
 import type { ApiBook } from '@src/api/books/books.types'
-import { prototypeCatalog } from '@src/features/prototype/catalog'
+import { mockExperienceFixtures } from '@src/mocks/fixtures/experience'
 
 export const generateBooks = (seed?: number, language = 'es'): ApiBook[] => {
   void seed
   void language
-  return prototypeCatalog.books.map((book) => ({
+  return mockExperienceFixtures.books.map((book) => ({
     id: book.id,
     title: book.title,
     author: book.author,
-    coverUrl: `/prototype/book-cover.svg?book=${book.id}`,
+    coverUrl: `/illustrations/book-cover.svg?book=${book.id}`,
     condition: 'muy bueno',
     status: 'available',
     isForTrade: book.mode === 'Intercambio',

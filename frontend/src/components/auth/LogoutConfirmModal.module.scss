@@ -7,17 +7,17 @@
   display: grid;
   place-items: center;
   padding: $spacing-2;
-  background: var(--prototype-modal-backdrop);
+  background: var(--app-modal-backdrop);
 }
 
 .dialog {
   width: min(100%, rem(420px));
   padding: rem(24px);
-  border: 1px solid var(--prototype-border);
-  border-radius: var(--prototype-radius-lg);
-  background: var(--prototype-panel-background);
-  color: var(--prototype-text);
-  box-shadow: var(--prototype-shadow);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-lg);
+  background: var(--app-panel-background);
+  color: var(--app-text);
+  box-shadow: var(--app-shadow);
 }
 
 .dialog h2 {
@@ -28,7 +28,7 @@
 
 .dialog p {
   margin: 0;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 0.8rem;
   line-height: 1.5;
 }
@@ -43,7 +43,7 @@
 .cancel,
 .confirm {
   min-height: 34px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 9px;
   padding: 0 12px;
   font-size: 0.72rem;
@@ -52,13 +52,13 @@
 }
 
 .cancel {
-  background: var(--prototype-surface-raised);
-  color: var(--prototype-text);
+  background: var(--app-surface-raised);
+  color: var(--app-text);
 }
 
 .confirm {
-  border-color: var(--prototype-teal);
-  background: var(--prototype-teal);
+  border-color: var(--app-teal);
+  background: var(--app-teal);
   color: #06211f;
 }
 

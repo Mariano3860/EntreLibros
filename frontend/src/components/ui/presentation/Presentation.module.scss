@@ -3,7 +3,7 @@
 .page {
   width: min(100%, 1224px);
   margin: 0 auto;
-  color: var(--prototype-text);
+  color: var(--app-text);
 }
 
 .pageHeader {
@@ -23,7 +23,7 @@
   p {
     max-width: 660px;
     margin: 7px 0 0;
-    color: var(--prototype-muted);
+    color: var(--app-muted);
     font-size: 14px;
   }
 }
@@ -31,7 +31,7 @@
 .eyebrow {
   display: block;
   margin-bottom: 5px;
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -46,10 +46,10 @@
 }
 
 .panel {
-  border: 1px solid var(--prototype-border);
-  border-radius: var(--prototype-radius-md);
-  background: var(--prototype-panel-background);
-  box-shadow: var(--prototype-panel-shadow);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-md);
+  background: var(--app-panel-background);
+  box-shadow: var(--app-panel-shadow);
 }
 
 .sectionHeading {
@@ -91,25 +91,25 @@
 }
 
 .primary {
-  background: var(--prototype-teal);
+  background: var(--app-teal);
   color: #06211f;
 }
 
 .secondary {
-  border-color: var(--prototype-border);
-  background: var(--prototype-surface-raised);
-  color: var(--prototype-text);
+  border-color: var(--app-border);
+  background: var(--app-surface-raised);
+  color: var(--app-text);
 }
 
 .ghost {
   background: transparent;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
 }
 
 .danger {
-  border-color: var(--prototype-danger-border);
-  background: var(--prototype-danger-background);
-  color: var(--prototype-danger-text);
+  border-color: var(--app-danger-border);
+  background: var(--app-danger-background);
+  color: var(--app-danger-text);
 }
 
 .small {
@@ -173,9 +173,9 @@
   bottom: 1px;
   width: 9px;
   height: 9px;
-  border: 2px solid var(--prototype-surface);
+  border: 2px solid var(--app-surface);
   border-radius: 50%;
-  background: var(--prototype-teal);
+  background: var(--app-teal);
   content: '';
 }
 
@@ -272,9 +272,9 @@
   height: 100%;
   min-width: 0;
   overflow: hidden;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 14px;
-  background: var(--prototype-surface);
+  background: var(--app-surface);
   transition:
     transform 180ms ease,
     box-shadow 180ms ease,
@@ -282,7 +282,7 @@
 
   &:hover {
     border-color: rgb(66 215 199 / 38%);
-    box-shadow: var(--prototype-shadow);
+    box-shadow: var(--app-shadow);
     transform: translateY(-4px);
   }
 }
@@ -320,7 +320,7 @@
   p {
     margin: 0;
     overflow: hidden;
-    color: var(--prototype-muted);
+    color: var(--app-muted);
     font-size: 11px;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -332,7 +332,7 @@
   padding: 3px 7px;
   border-radius: 999px;
   background: rgb(66 215 199 / 13%);
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   font-size: 10px;
   font-weight: 700;
 }
@@ -347,7 +347,7 @@
 
 .bookMeta {
   margin-top: 10px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
 
   span {
@@ -361,8 +361,8 @@
 .bookFooter {
   margin-top: 9px;
   padding-top: 9px;
-  border-top: 1px solid var(--prototype-border);
-  color: var(--prototype-teal);
+  border-top: 1px solid var(--app-border);
+  color: var(--app-teal);
   font-size: 11px;
 }
 
@@ -383,7 +383,7 @@
 
   p {
     margin: 5px 0 0;
-    color: var(--prototype-muted);
+    color: var(--app-muted);
     font-size: 11px;
   }
 }
@@ -401,39 +401,39 @@
 
 .toneteal {
   background: rgb(66 215 199 / 14%);
-  color: var(--prototype-teal);
+  color: var(--app-teal);
 }
 
 .toneorange {
   background: rgb(255 139 76 / 14%);
-  color: var(--prototype-orange);
+  color: var(--app-orange);
 }
 
 .tonepurple {
   background: rgb(169 139 255 / 14%);
-  color: var(--prototype-purple);
+  color: var(--app-purple);
 }
 
 .toneblue {
   background: rgb(93 169 255 / 14%);
-  color: var(--prototype-blue);
+  color: var(--app-blue);
 }
 
 .kpiChange {
   position: absolute;
   top: 12px;
   right: 12px;
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   font-size: 10px;
 }
 
 .chip {
   min-height: 32px;
   padding: 0 12px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 999px;
-  background: var(--prototype-surface-soft);
-  color: var(--prototype-muted);
+  background: var(--app-surface-soft);
+  color: var(--app-muted);
   cursor: pointer;
   font-size: 11px;
 }
@@ -441,7 +441,7 @@
 .chipActive {
   border-color: rgb(66 215 199 / 45%);
   background: rgb(66 215 199 / 14%);
-  color: var(--prototype-teal);
+  color: var(--app-teal);
 }
 
 .state {
@@ -451,15 +451,15 @@
   align-content: center;
   gap: 8px;
   padding: 24px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   text-align: center;
 }
 
 .spinner {
   width: 26px;
   height: 26px;
-  border: 3px solid var(--prototype-border);
-  border-top-color: var(--prototype-teal);
+  border: 3px solid var(--app-border);
+  border-top-color: var(--app-teal);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -474,22 +474,22 @@
   position: relative;
   min-height: 148px;
   overflow: hidden;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 12px;
   background:
     linear-gradient(
       32deg,
       transparent 44%,
-      var(--prototype-map-road) 45% 47%,
+      var(--app-map-road) 45% 47%,
       transparent 48%
     ),
     linear-gradient(
       112deg,
       transparent 42%,
-      color-mix(in srgb, var(--prototype-map-road) 74%, transparent) 43% 46%,
+      color-mix(in srgb, var(--app-map-road) 74%, transparent) 43% 46%,
       transparent 47%
     ),
-    var(--prototype-map-background);
+    var(--app-map-background);
 }
 
 .miniMapLarge {
@@ -500,7 +500,7 @@
 .roadA,
 .roadB {
   position: absolute;
-  background: var(--prototype-map-road);
+  background: var(--app-map-road);
   opacity: 0.5;
 }
 
@@ -527,7 +527,7 @@
   height: 24px;
   place-items: center;
   border-radius: 50% 50% 50% 4px;
-  background: var(--prototype-orange);
+  background: var(--app-orange);
   color: white;
   font-size: 11px;
   transform: rotate(-45deg);
@@ -545,13 +545,13 @@
 .pinB {
   top: 57%;
   left: 68%;
-  background: var(--prototype-purple);
+  background: var(--app-purple);
 }
 
 .pinC {
   top: 17%;
   left: 75%;
-  background: var(--prototype-teal);
+  background: var(--app-teal);
 }
 
 .userPin {
@@ -564,7 +564,7 @@
   place-items: center;
   border: 8px solid rgb(93 169 255 / 18%);
   border-radius: 50%;
-  color: var(--prototype-blue);
+  color: var(--app-blue);
   box-sizing: content-box;
 
   span {
@@ -574,7 +574,7 @@
     place-items: center;
     border: 2px solid white;
     border-radius: 50%;
-    background: var(--prototype-blue);
+    background: var(--app-blue);
     font-size: 10px;
   }
 }

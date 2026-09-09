@@ -10,7 +10,7 @@ import { StatsPage } from '@src/pages/stats/StatsPage'
 import { renderWithProviders } from '../../test-utils'
 
 describe('StatsPage', () => {
-  test('renders the prototype metrics and analytic regions', () => {
+  test('renders the metrics and analytic regions', () => {
     renderWithProviders(<StatsPage />)
 
     for (const metric of ['2.843', '1.327', '5.891', '7.642']) {

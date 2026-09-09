@@ -13,19 +13,19 @@ import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
+  Avatar,
+  Panel,
+  ActionButton,
+  PageFrame,
+  SectionHeading,
+} from '@src/components/ui/presentation/Presentation'
+import {
   PROFILE_COUNTRIES,
   PROFILE_INTERESTS,
   PROFILE_LOCATIONS,
 } from '@src/constants/profileCatalog'
-import { usePrototype } from '@src/features/prototype/PrototypeContext'
-import {
-  Avatar,
-  Panel,
-  PrototypeButton,
-  PrototypePage,
-  SectionHeading,
-} from '@src/features/prototype/PrototypeUI'
-import { toPrototypeProfile } from '@src/features/prototype/realData.adapters'
+import { useMockExperience } from '@src/contexts/mock/MockExperienceContext'
+import { toProfileView } from '@src/shared/view-models/adapters'
 import { resolveApiErrorKey } from '@src/utils/apiError'
 import { isApiMockMode } from '@src/utils/runtimeEnv'
 
@@ -42,7 +42,7 @@ import { ProfilePhotoCropper } from './ProfilePhotoCropper'
 type ProfileStateProps = { text: string; error?: boolean }
 type ProfileCity = keyof typeof PROFILE_LOCATIONS
 
-const PROFILE_QUERY_KEY = ['prototype', 'profile'] as const
+const PROFILE_QUERY_KEY = ['profile'] as const
 const LOCATION_VISIBILITY_OPTIONS: readonly LocationVisibility[] = [
   'none',
   'country',
@@ -60,16 +60,16 @@ const isProfileCity = (value: string): value is ProfileCity =>
 
 const ProfileState = ({ text, error = false }: ProfileStateProps) => (
   <BaseLayout id="profile-page">
-    <PrototypePage>
+    <PageFrame>
       <Panel className={styles.loading} {...(error ? { role: 'alert' } : {})}>
         {text}
       </Panel>
-    </PrototypePage>
+    </PageFrame>
   </BaseLayout>
 )
 
 export const ProfilePage = () => {
-  const { catalog } = usePrototype()
+  const { fixtures } = useMockExperience()
   const queryClient = useQueryClient()
   const { t } = useTranslation()
   const mockMode = isApiMockMode()
@@ -82,8 +82,8 @@ export const ProfilePage = () => {
     enabled: !mockMode,
   })
   const [editing, setEditing] = useState(false)
-  const [name, setName] = useState<string>(catalog.user.name)
-  const [bio, setBio] = useState<string>(catalog.user.bio)
+  const [name, setName] = useState<string>(fixtures.user.name)
+  const [bio, setBio] = useState<string>(fixtures.user.bio)
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null)
   const [profileVisibility, setProfileVisibility] =
     useState<ProfileVisibility>('public')
@@ -106,14 +106,14 @@ export const ProfilePage = () => {
   const photoInputRef = useRef<HTMLInputElement>(null)
   const photoSelectionId = useRef(0)
   const profile = profileQuery.data
-  const realProfile = profile ? toPrototypeProfile(profile) : null
+  const realProfile = profile ? toProfileView(profile) : null
   const availableNeighborhoods = isProfileCity(city)
     ? PROFILE_LOCATIONS[city]
     : []
 
   useEffect(() => {
     if (!profile) return
-    const next = toPrototypeProfile(profile)
+    const next = toProfileView(profile)
     setName(next.name)
     setBio(next.bio)
     setProfilePhoto(profile.profilePhoto)
@@ -132,7 +132,7 @@ export const ProfilePage = () => {
     photoSelectionId.current += 1
     setReadingPhoto(false)
     if (profile) {
-      const next = toPrototypeProfile(profile)
+      const next = toProfileView(profile)
       setName(next.name)
       setBio(next.bio)
       setProfileVisibility(profile.profileVisibility)
@@ -144,8 +144,8 @@ export const ProfilePage = () => {
       setStreet(profile.street ?? '')
       setProfilePhoto(profile.profilePhoto)
     } else {
-      setName(catalog.user.name)
-      setBio(catalog.user.bio)
+      setName(fixtures.user.name)
+      setBio(fixtures.user.bio)
       setProfileVisibility('public')
       setLocationVisibility('city')
       setInterests(mockInterests)
@@ -294,11 +294,11 @@ export const ProfilePage = () => {
     )
 
   const visible = realProfile ?? {
-    name: catalog.user.name,
-    username: catalog.user.username,
-    initials: catalog.user.initials,
-    city: catalog.user.city,
-    bio: catalog.user.bio,
+    name: fixtures.user.name,
+    username: fixtures.user.username,
+    initials: fixtures.user.initials,
+    city: fixtures.user.city,
+    bio: fixtures.user.bio,
     profilePhoto: null,
     interests: interests.map((interest) =>
       t(`profile.interestOptions.${interest}`, { defaultValue: interest })
@@ -307,7 +307,7 @@ export const ProfilePage = () => {
 
   return (
     <BaseLayout id="profile-page">
-      <PrototypePage>
+      <PageFrame>
         <section className={styles.profileHero}>
           <div className={styles.cover} />
           <div className={styles.identity}>
@@ -325,9 +325,9 @@ export const ProfilePage = () => {
               </p>
               <small>◷ Miembro de EntreLibros</small>
             </div>
-            <PrototypeButton onClick={openEditor}>
+            <ActionButton onClick={openEditor}>
               {t('profile.edit', { defaultValue: 'Editar perfil' })}
-            </PrototypeButton>
+            </ActionButton>
           </div>
           <p className={styles.bio}>{bio}</p>
           <div className={styles.profileFooter}>
@@ -343,7 +343,7 @@ export const ProfilePage = () => {
             </div>
             <section className={styles.metrics} aria-label="Métricas de perfil">
               {mockMode ? (
-                catalog.profileMetrics.map((metric) => (
+                fixtures.profileMetrics.map((metric) => (
                   <div key={metric.label}>
                     <strong>{metric.value}</strong>
                     <span>{metric.label}</span>
@@ -373,7 +373,7 @@ export const ProfilePage = () => {
               />
               <div className={styles.preferenceGrid}>
                 {mockMode ? (
-                  catalog.profile.preferences.map((preference) => (
+                  fixtures.profile.preferences.map((preference) => (
                     <article key={preference.title}>
                       <span>{preference.icon}</span>
                       <div>
@@ -405,7 +405,7 @@ export const ProfilePage = () => {
               />
               <div>
                 {mockMode ? (
-                  catalog.profile.achievements.map((achievement) => (
+                  fixtures.profile.achievements.map((achievement) => (
                     <article key={achievement.title}>
                       <span>{achievement.icon}</span>
                       <strong>{achievement.title}</strong>
@@ -429,14 +429,14 @@ export const ProfilePage = () => {
               <SectionHeading
                 title="Objetivo de lectura"
                 action={
-                  <span>{mockMode ? catalog.profile.goal.year : '—'}</span>
+                  <span>{mockMode ? fixtures.profile.goal.year : '—'}</span>
                 }
               />
               <div className={styles.goalRing}>
-                <strong>{mockMode ? catalog.profile.goal.read : '—'}</strong>
+                <strong>{mockMode ? fixtures.profile.goal.read : '—'}</strong>
                 <small>
                   {mockMode
-                    ? `de ${catalog.profile.goal.target} libros`
+                    ? `de ${fixtures.profile.goal.target} libros`
                     : 'Objetivo próximamente'}
                 </small>
               </div>
@@ -445,7 +445,7 @@ export const ProfilePage = () => {
               </div>
               <p>
                 {mockMode
-                  ? `¡Te faltan ${catalog.profile.goal.target - catalog.profile.goal.read} libros para cumplir tu objetivo!`
+                  ? `¡Te faltan ${fixtures.profile.goal.target - fixtures.profile.goal.read} libros para cumplir tu objetivo!`
                   : 'Se conectará al existir una fuente persistida.'}
               </p>
             </Panel>
@@ -454,28 +454,31 @@ export const ProfilePage = () => {
               <div>
                 <strong>
                   {mockMode
-                    ? `${catalog.profile.streak.current} días de racha`
+                    ? `${fixtures.profile.streak.current} días de racha`
                     : 'Racha próximamente'}
                 </strong>
                 <p>
                   {mockMode
-                    ? `Tu mejor racha: ${catalog.profile.streak.best} días`
+                    ? `Tu mejor racha: ${fixtures.profile.streak.best} días`
                     : 'No hay datos de racha persistidos.'}
                 </p>
               </div>
               <div className={styles.week}>
-                {(mockMode ? catalog.profile.week : ['—']).map((day, index) => (
-                  <span
-                    className={
-                      mockMode && index < catalog.profile.streak.completedDays
-                        ? styles.done
-                        : ''
-                    }
-                    key={day}
-                  >
-                    {day}
-                  </span>
-                ))}
+                {(mockMode ? fixtures.profile.week : ['—']).map(
+                  (day, index) => (
+                    <span
+                      className={
+                        mockMode &&
+                        index < fixtures.profile.streak.completedDays
+                          ? styles.done
+                          : ''
+                      }
+                      key={day}
+                    >
+                      {day}
+                    </span>
+                  )
+                )}
               </div>
             </Panel>
           </aside>
@@ -798,10 +801,10 @@ export const ProfilePage = () => {
                   </div>
                 </section>
                 <div className={styles.modalActions}>
-                  <PrototypeButton type="button" onClick={closeEditor}>
+                  <ActionButton type="button" onClick={closeEditor}>
                     {t('profile.cancel', { defaultValue: 'Cancelar' })}
-                  </PrototypeButton>
-                  <PrototypeButton
+                  </ActionButton>
+                  <ActionButton
                     tone="primary"
                     type="submit"
                     disabled={
@@ -813,7 +816,7 @@ export const ProfilePage = () => {
                     {saving
                       ? t('profile.saving', { defaultValue: 'Guardando...' })
                       : t('profile.save', { defaultValue: 'Guardar cambios' })}
-                  </PrototypeButton>
+                  </ActionButton>
                 </div>
               </form>
               {saveError ? (
@@ -824,7 +827,7 @@ export const ProfilePage = () => {
             </Panel>
           </div>
         ) : null}
-      </PrototypePage>
+      </PageFrame>
     </BaseLayout>
   )
 }

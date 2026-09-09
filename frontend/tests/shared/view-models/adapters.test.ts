@@ -1,17 +1,17 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  formatPrototypeTime,
-  toPrototypeBook,
-  toPrototypeChatMessage,
-  toPrototypeConversation,
-  toPrototypeProfile,
-} from './realData.adapters'
+  formatRelativeTime,
+  toBookCardView,
+  toChatMessageView,
+  toConversationView,
+  toProfileView,
+} from '@src/shared/view-models/adapters'
 
-describe('prototype real-data adapters', () => {
+describe('real-data adapters', () => {
   it('maps optional book fields to a content-safe card model', () => {
     expect(
-      toPrototypeBook({
+      toBookCardView({
         id: 'book-1',
         title: 'Una novela',
         author: '',
@@ -31,7 +31,7 @@ describe('prototype real-data adapters', () => {
 
   it('keeps the public publisher separate from the bibliographic author', () => {
     expect(
-      toPrototypeBook({
+      toBookCardView({
         id: 'book-2',
         title: 'Otra novela',
         author: 'Autora del libro',
@@ -48,7 +48,7 @@ describe('prototype real-data adapters', () => {
 
   it('maps profile privacy-safe display fields without requiring extended mock metrics', () => {
     expect(
-      toPrototypeProfile({
+      toProfileView({
         id: 7,
         name: 'Mariano',
         alias: 'mariano_lector',
@@ -80,7 +80,7 @@ describe('prototype real-data adapters', () => {
   it('maps persisted conversation messages and attachment metadata', () => {
     const now = new Date('2026-08-30T12:00:00.000Z')
     expect(
-      toPrototypeConversation(
+      toConversationView(
         {
           id: 12,
           isBot: false,
@@ -100,7 +100,7 @@ describe('prototype real-data adapters', () => {
       time: 'hace 1 min',
     })
     expect(
-      toPrototypeChatMessage(
+      toChatMessageView(
         {
           id: 5,
           conversationId: 12,
@@ -140,7 +140,7 @@ describe('prototype real-data adapters', () => {
       coverUrl: '/cover.jpg',
     }
     expect(
-      toPrototypeChatMessage(
+      toChatMessageView(
         {
           ...common,
           id: 6,
@@ -163,7 +163,7 @@ describe('prototype real-data adapters', () => {
       swap: { offered: { id: 'listing-1' }, requested: { id: 'listing-2' } },
     })
     expect(
-      toPrototypeChatMessage(
+      toChatMessageView(
         {
           ...common,
           id: 7,
@@ -201,6 +201,6 @@ describe('prototype real-data adapters', () => {
   })
 
   it('does not fabricate a timestamp for malformed persisted dates', () => {
-    expect(formatPrototypeTime('not-a-date')).toBe('')
+    expect(formatRelativeTime('not-a-date')).toBe('')
   })
 })

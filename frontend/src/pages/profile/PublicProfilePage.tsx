@@ -10,14 +10,14 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router-dom'
 
-import { usePrototype } from '@src/features/prototype/PrototypeContext'
 import {
   Avatar,
   Panel,
-  PrototypeButton,
-  PrototypePage,
+  ActionButton,
+  PageFrame,
   SectionHeading,
-} from '@src/features/prototype/PrototypeUI'
+} from '@src/components/ui/presentation/Presentation'
+import { useMockExperience } from '@src/contexts/mock/MockExperienceContext'
 import { isApiMockMode } from '@src/utils/runtimeEnv'
 
 import styles from './PublicProfilePage.module.scss'
@@ -35,14 +35,14 @@ export const PublicProfilePage = () => {
   const { id: rawId } = useParams<{ id: string }>()
   const profileId = toProfileId(rawId)
   const mockMode = isApiMockMode()
-  const { catalog } = usePrototype()
+  const { fixtures } = useMockExperience()
   const navigate = useNavigate()
   const { t } = useTranslation()
   const { isAuthenticated, user } = useAuth()
   const { runIfAuthenticated } = useAuthRequired()
   const [reportOpen, setReportOpen] = useState(false)
   const profileQuery = useQuery({
-    queryKey: ['prototype', 'public-profile', profileId],
+    queryKey: ['public-profile', profileId],
     queryFn: () => fetchPublicProfile(profileId ?? 0),
     enabled: !mockMode && profileId !== null,
   })
@@ -63,14 +63,14 @@ export const PublicProfilePage = () => {
     interests: ['fiction', 'poetry'],
     country: 'Argentina',
     city: 'Buenos Aires',
-    publicationCount: catalog.communityPosts.length,
+    publicationCount: fixtures.communityPosts.length,
     exchangeCount: 12,
     publications: [],
   }
 
   const renderState = (text: string, error = false) => (
     <BaseLayout id="public-profile-page">
-      <PrototypePage>
+      <PageFrame>
         <Panel
           as="article"
           className={styles.state}
@@ -78,7 +78,7 @@ export const PublicProfilePage = () => {
         >
           {text}
         </Panel>
-      </PrototypePage>
+      </PageFrame>
     </BaseLayout>
   )
 
@@ -96,7 +96,7 @@ export const PublicProfilePage = () => {
 
   return (
     <BaseLayout id="public-profile-page">
-      <PrototypePage>
+      <PageFrame>
         <header className={styles.header}>
           <div>
             <span className={styles.eyebrow}>{t('publicProfile.member')}</span>
@@ -104,7 +104,7 @@ export const PublicProfilePage = () => {
             {location ? <p>{location}</p> : null}
           </div>
           <div className={styles.actions}>
-            <PrototypeButton
+            <ActionButton
               tone="primary"
               onClick={() => runIfAuthenticated(() => contactMutation.mutate())}
               disabled={user?.id === profile.id || contactMutation.isPending}
@@ -114,12 +114,12 @@ export const PublicProfilePage = () => {
                 : isAuthenticated
                   ? t('publicProfile.contact')
                   : t('auth.required.loginContact')}
-            </PrototypeButton>
-            <PrototypeButton
+            </ActionButton>
+            <ActionButton
               onClick={() => runIfAuthenticated(() => setReportOpen(true))}
             >
               {t('reports.report', { defaultValue: 'Reportar' })}
-            </PrototypeButton>
+            </ActionButton>
           </div>
         </header>
 
@@ -198,7 +198,7 @@ export const PublicProfilePage = () => {
             </div>
           </section>
         ) : null}
-      </PrototypePage>
+      </PageFrame>
       <ReportModal
         isOpen={reportOpen}
         targetType="conduct"

@@ -34,7 +34,7 @@
 
 .communityActions .buttons {
   gap: 0;
-  border-top: 1px solid var(--prototype-border);
+  border-top: 1px solid var(--app-border);
 }
 
 .communityActions .buttons button {
@@ -42,13 +42,13 @@
   flex: 1;
   justify-content: center;
   gap: 5px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
 }
 
 .communityActions .buttons button:hover:not(:disabled) {
-  background: var(--prototype-subtle-hover);
-  color: var(--prototype-text);
+  background: var(--app-subtle-hover);
+  color: var(--app-text);
 }
 
 .communityActions .buttons button svg {
@@ -57,7 +57,7 @@
 }
 
 .communityActions .buttons button.liked {
-  color: var(--prototype-danger);
+  color: var(--app-danger);
 }
 
 .communityActions .buttons button.liked svg {
@@ -75,7 +75,7 @@
   justify-content: space-between;
   gap: 12px;
   padding: 9px 2px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
 }
 
@@ -157,7 +157,7 @@
   padding: 0 $spacing-1;
   border: 1px solid var(--border-color);
   border-radius: rem(6px);
-  background: var(--prototype-surface);
+  background: var(--app-surface);
   color: var(--text-primary);
 }
 
@@ -166,7 +166,7 @@
   border: 1px solid var(--primary-color);
   border-radius: rem(6px);
   background: var(--primary-color);
-  color: var(--prototype-surface);
+  color: var(--app-surface);
   font-size: 0.8rem;
 }
 

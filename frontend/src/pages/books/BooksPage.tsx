@@ -20,18 +20,18 @@ import {
 } from 'react-router-dom'
 
 import type { PersonalBookRelationsTab } from '@src/api/books/books.types'
-import { useAuth } from '@src/contexts/auth/AuthContext'
-import { useAuthRequired } from '@src/contexts/auth/AuthRequiredContext'
-import type { PrototypeBook } from '@src/features/prototype/catalog'
 import {
   PageHeader,
   Panel,
-  PrototypeBookCard,
-  PrototypeButton,
-  PrototypePage,
-} from '@src/features/prototype/PrototypeUI'
-import { toPrototypeBook } from '@src/features/prototype/realData.adapters'
+  CatalogBookCard,
+  ActionButton,
+  PageFrame,
+} from '@src/components/ui/presentation/Presentation'
+import { useAuth } from '@src/contexts/auth/AuthContext'
+import { useAuthRequired } from '@src/contexts/auth/AuthRequiredContext'
 import { useBookContact } from '@src/hooks/useBookContact'
+import type { BookCardView } from '@src/mocks/fixtures/experience'
+import { toBookCardView } from '@src/shared/view-models/adapters'
 
 import styles from './BooksPage.module.scss'
 
@@ -105,10 +105,10 @@ const BookResults = ({
   onPublish,
   onWant,
 }: {
-  books: PrototypeBook[]
+  books: BookCardView[]
   tab: PersonalBookRelationsTab
   hasActiveFilters: boolean
-  onSelect: (book: PrototypeBook) => void
+  onSelect: (book: BookCardView) => void
   onClearFilters?: () => void
   onPublish: () => void
   onWant: () => void
@@ -141,7 +141,7 @@ const BookResults = ({
         ) : null}
         {!hasActiveFilters ? (
           <div className={styles.emptyActions}>
-            <PrototypeButton
+            <ActionButton
               size="small"
               tone={tab === 'seeking' ? 'primary' : 'ghost'}
               onClick={tab === 'seeking' ? onWant : onPublish}
@@ -151,11 +151,11 @@ const BookResults = ({
                   ? 'booksPage.want.open'
                   : 'booksPage.publish_button'
               )}
-            </PrototypeButton>
+            </ActionButton>
             {tab !== 'seeking' ? (
-              <PrototypeButton size="small" onClick={onWant}>
+              <ActionButton size="small" onClick={onWant}>
                 {t('booksPage.want.open')}
-              </PrototypeButton>
+              </ActionButton>
             ) : null}
           </div>
         ) : null}
@@ -167,7 +167,7 @@ const BookResults = ({
     <div className={styles.grid}>
       {books.map((book) => (
         <article key={book.id} className={styles.resultCard}>
-          <PrototypeBookCard book={book} onClick={() => onSelect(book)} />
+          <CatalogBookCard book={book} onClick={() => onSelect(book)} />
         </article>
       ))}
     </div>
@@ -184,7 +184,7 @@ export const BooksPage = () => {
   const queryClient = useQueryClient()
   const publishMatch = useMatch('/books/new')
   const [filtersOpen, setFiltersOpen] = useState(false)
-  const [selectedBook, setSelectedBook] = useState<PrototypeBook | null>(null)
+  const [selectedBook, setSelectedBook] = useState<BookCardView | null>(null)
   const [wantBook, setWantBook] = useState<WantBookSource | undefined>()
   const [isWantModalOpen, setIsWantModalOpen] = useState(false)
   const [coordinates, setCoordinates] = useState<
@@ -307,7 +307,7 @@ export const BooksPage = () => {
 
   const books = useMemo(
     () =>
-      (relationsQuery.data?.items ?? []).map((book) => toPrototypeBook(book)),
+      (relationsQuery.data?.items ?? []).map((book) => toBookCardView(book)),
     [relationsQuery.data?.items]
   )
   const total = relationsQuery.data?.page.total ?? 0
@@ -368,23 +368,21 @@ export const BooksPage = () => {
 
   return (
     <BaseLayout id="books-page">
-      <PrototypePage>
+      <PageFrame>
         <PageHeader
           title={t('booksPage.title')}
           description={t('booksPage.description')}
           actions={
             <div className={styles.headerActions}>
-              <PrototypeButton
-                onClick={() => runIfAuthenticated(openWantModal)}
-              >
+              <ActionButton onClick={() => runIfAuthenticated(openWantModal)}>
                 {t('booksPage.want.open')}
-              </PrototypeButton>
-              <PrototypeButton
+              </ActionButton>
+              <ActionButton
                 tone="primary"
                 onClick={() => runIfAuthenticated(() => navigate('/books/new'))}
               >
                 + {t('booksPage.publish_button')}
-              </PrototypeButton>
+              </ActionButton>
             </div>
           }
         />
@@ -398,13 +396,13 @@ export const BooksPage = () => {
               aria-label={t('booksPage.search_label')}
             />
           </label>
-          <PrototypeButton
+          <ActionButton
             onClick={() => setFiltersOpen((value) => !value)}
             aria-expanded={filtersOpen}
             aria-controls="books-filters"
           >
             ⚙ {t('booksPage.filters.button')}
-          </PrototypeButton>
+          </ActionButton>
         </div>
         {filtersOpen ? (
           <Panel className={styles.filters} id="books-filters">
@@ -628,7 +626,7 @@ export const BooksPage = () => {
                   author: selectedBook.author,
                   coverUrl:
                     selectedBook.coverUrl ??
-                    `/prototype/book-cover.svg?book=${selectedBook.id}`,
+                    `/illustrations/book-cover.svg?book=${selectedBook.id}`,
                   isSeeking: selectedBook.mode === 'Buscado',
                   ownerName: selectedBook.owner,
                 }
@@ -648,7 +646,7 @@ export const BooksPage = () => {
             contactMutation.isError ? t('bookDetail.contactError') : undefined
           }
         />
-      </PrototypePage>
+      </PageFrame>
       {publishMatch ? (
         <PublishBookModal
           isOpen

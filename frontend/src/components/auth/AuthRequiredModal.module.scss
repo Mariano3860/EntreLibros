@@ -8,7 +8,7 @@
   place-items: center;
   overflow-y: auto;
   padding: $spacing-4;
-  background: var(--prototype-modal-backdrop);
+  background: var(--app-modal-backdrop);
 }
 
 .dialog {
@@ -21,8 +21,8 @@
   border-radius: 26px;
   background:
     radial-gradient(circle at 50% 0%, rgb(66 215 199 / 13%), transparent 42%),
-    var(--prototype-panel-background);
-  color: var(--prototype-text);
+    var(--app-panel-background);
+  color: var(--app-text);
   box-shadow: 0 24px 70px rgb(2 10 16 / 42%);
   text-align: center;
 }
@@ -37,7 +37,7 @@
   place-items: center;
   border: 0;
   background: transparent;
-  color: var(--prototype-text);
+  color: var(--app-text);
   font-size: 1.5rem;
   line-height: 1;
   cursor: pointer;
@@ -61,7 +61,7 @@
 .description {
   max-width: 39ch;
   margin: 18px auto 0;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 0.94rem;
   line-height: 1.55;
 }
@@ -83,22 +83,22 @@
 }
 
 .primary {
-  border: 1px solid var(--prototype-teal);
-  background: var(--prototype-teal);
+  border: 1px solid var(--app-teal);
+  background: var(--app-teal);
   color: #06211f;
 }
 
 .secondary {
-  border: 1px solid var(--prototype-teal);
+  border: 1px solid var(--app-teal);
   background: transparent;
-  color: var(--prototype-teal);
+  color: var(--app-teal);
 }
 
 .separator {
   display: flex;
   align-items: center;
   gap: 12px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 0.72rem;
   line-height: 1;
 }
@@ -107,14 +107,14 @@
 .separator::after {
   height: 1px;
   flex: 1;
-  background: var(--prototype-border);
+  background: var(--app-border);
   content: '';
 }
 
 .community {
   max-width: 32ch;
   margin: 20px auto 0;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 0.78rem;
   line-height: 1.45;
 }

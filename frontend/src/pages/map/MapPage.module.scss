@@ -23,9 +23,9 @@
   height: 100%;
   min-height: 0;
   overflow: hidden;
-  border: 1px solid var(--prototype-border);
-  border-radius: var(--prototype-radius-lg);
-  background: var(--prototype-map-background);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-lg);
+  background: var(--app-map-background);
   box-shadow: 0 24px 70px rgb(2 10 16 / 22%);
 }
 
@@ -59,9 +59,9 @@
 .titleBlock {
   margin-right: auto;
   padding: $spacing-2 $spacing-3;
-  border: 1px solid var(--prototype-border);
-  border-radius: var(--prototype-radius-md);
-  background: color-mix(in srgb, var(--prototype-surface) 82%, transparent 18%);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-md);
+  background: color-mix(in srgb, var(--app-surface) 82%, transparent 18%);
   box-shadow: 0 12px 30px rgb(2 10 16 / 18%);
   backdrop-filter: blur(14px);
 }
@@ -71,7 +71,7 @@
 }
 
 .titleBlock > span {
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   font-size: 10px;
   font-weight: $font-weight-bold;
   letter-spacing: 0.13em;
@@ -80,14 +80,14 @@
 
 .titleBlock h1 {
   margin: 2px 0;
-  color: var(--prototype-text);
+  color: var(--app-text);
   font-size: clamp(18px, 2vw, 24px);
   letter-spacing: -0.04em;
 }
 
 .titleBlock p {
   margin: 0;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 11px;
 }
 
@@ -104,11 +104,11 @@
   align-items: center;
   gap: $spacing-2;
   padding: 0 $spacing-3;
-  border: 1px solid var(--prototype-border);
-  border-radius: var(--prototype-radius-md);
-  background: var(--prototype-panel-background);
-  box-shadow: var(--prototype-panel-shadow);
-  color: var(--prototype-text);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-md);
+  background: var(--app-panel-background);
+  box-shadow: var(--app-panel-shadow);
+  color: var(--app-text);
   cursor: pointer;
   font: inherit;
   font-size: 12px;
@@ -118,8 +118,8 @@
 
 .filterToggle:hover,
 .filterToggle:focus-visible {
-  border-color: var(--prototype-teal);
-  color: var(--prototype-teal);
+  border-color: var(--app-teal);
+  color: var(--app-teal);
   outline: none;
 }
 
@@ -130,7 +130,7 @@
 }
 
 .locationButton span {
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   font-size: 17px;
 }
 
@@ -156,15 +156,11 @@
   gap: $spacing-2;
   max-width: min(430px, calc(100% - 32px));
   padding: $spacing-2 $spacing-3;
-  border: 1px solid var(--prototype-border);
-  border-radius: var(--prototype-radius-md);
-  background: color-mix(
-    in srgb,
-    var(--prototype-surface-raised) 94%,
-    transparent 6%
-  );
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-md);
+  background: color-mix(in srgb, var(--app-surface-raised) 94%, transparent 6%);
   box-shadow: 0 12px 30px rgb(2 10 16 / 24%);
-  color: var(--prototype-text);
+  color: var(--app-text);
   font-size: 11px;
   backdrop-filter: blur(14px);
 }
@@ -172,7 +168,7 @@
 .mapNotice button {
   border: 0;
   background: transparent;
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   cursor: pointer;
   font: inherit;
   font-weight: $font-weight-bold;
@@ -188,7 +184,7 @@
 .locationNotice {
   inset: auto auto $spacing-4 $spacing-4;
   max-width: 420px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
 }
 
 .modalLayer {
@@ -233,7 +229,7 @@
 
   .mapShell {
     min-height: min(640px, calc(100vh - 88px));
-    border-radius: var(--prototype-radius-md);
+    border-radius: var(--app-radius-md);
   }
 
   .topBar {

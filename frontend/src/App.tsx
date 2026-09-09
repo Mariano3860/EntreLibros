@@ -5,7 +5,7 @@ import { useUserLanguage } from '@hooks/language/useUserLanguage'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import React from 'react'
 
-import { PrototypeProvider } from '@src/features/prototype/PrototypeContext'
+import { MockExperienceProvider } from '@src/contexts/mock/MockExperienceContext'
 
 import AppRoutes from './routes'
 
@@ -24,13 +24,13 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <ThemeProvider>
-          <PrototypeProvider>
+          <MockExperienceProvider>
             <LanguageInitializer />
             <div>
               <AppRoutes />
               <Toaster />
             </div>
-          </PrototypeProvider>
+          </MockExperienceProvider>
         </ThemeProvider>
       </AuthProvider>
     </QueryClientProvider>

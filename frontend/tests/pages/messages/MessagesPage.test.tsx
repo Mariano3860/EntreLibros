@@ -75,6 +75,9 @@ describe('MessagesPage', () => {
     )
     const firstRender = renderWithProviders(<MessagesPage />)
     expect(await screen.findByText('Borrador persistente')).toBeVisible()
+    expect(
+      localStorage.getItem('entrelibros:mock:message-drafts:mariano')
+    ).toContain('Borrador persistente')
     firstRender.unmount()
     renderWithProviders(<MessagesPage />)
     expect(await screen.findByText('Borrador persistente')).toBeVisible()

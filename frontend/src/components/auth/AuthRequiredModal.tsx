@@ -56,7 +56,7 @@ export const AuthRequiredModal = ({
         </button>
         <img
           className={styles.illustration}
-          src="/prototype/auth-required.svg"
+          src="/illustrations/auth-required.svg"
           alt={t('auth.required.illustrationAlt')}
         />
         <h2 id={titleId}>{t('auth.required.title')}</h2>

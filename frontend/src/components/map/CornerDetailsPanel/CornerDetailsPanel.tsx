@@ -1,7 +1,10 @@
 import { useTranslation } from 'react-i18next'
 
 import type { CommunityCornerDetail } from '@src/api/community/corners.types'
-import { Panel, PrototypeButton } from '@src/features/prototype/PrototypeUI'
+import {
+  Panel,
+  ActionButton,
+} from '@src/components/ui/presentation/Presentation'
 
 import styles from './CornerDetailsPanel.module.scss'
 
@@ -57,9 +60,9 @@ export const CornerDetailsPanel = ({
       >
         <p className={styles.feedback}>{t('map.cornerDetail.error')}</p>
         {onRetry ? (
-          <PrototypeButton size="small" onClick={onRetry}>
+          <ActionButton size="small" onClick={onRetry}>
             {t('map.cornerDetail.retry')}
-          </PrototypeButton>
+          </ActionButton>
         ) : null}
       </Panel>
     )
@@ -127,14 +130,14 @@ export const CornerDetailsPanel = ({
           <span className={styles.ownerLabel}>
             {t('map.cornerDetail.owner')}
           </span>
-          <PrototypeButton
+          <ActionButton
             size="small"
             onClick={onEdit}
             disabled={isUpdating}
             data-testid="corner-edit-button"
           >
             {t('map.cornerDetail.edit')}
-          </PrototypeButton>
+          </ActionButton>
           <label className={styles.statusToggle}>
             <span>
               {isActive
@@ -162,9 +165,9 @@ export const CornerDetailsPanel = ({
         </p>
       ) : null}
       {onReport ? (
-        <PrototypeButton size="small" onClick={onReport}>
+        <ActionButton size="small" onClick={onReport}>
           {t('reports.report', { defaultValue: 'Reportar' })}
-        </PrototypeButton>
+        </ActionButton>
       ) : null}
     </Panel>
   )

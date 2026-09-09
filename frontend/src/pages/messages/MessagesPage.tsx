@@ -29,30 +29,30 @@ import { FormEvent, useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 
-import type {
-  PrototypeBook,
-  PrototypeChatBook,
-  PrototypeChatMessage,
-} from '@src/features/prototype/catalog'
-import { usePrototype } from '@src/features/prototype/PrototypeContext'
 import {
   Avatar,
   BookCover,
   Panel,
-  PrototypeButton,
-  PrototypePage,
-} from '@src/features/prototype/PrototypeUI'
-import {
-  toPrototypeChatMessage,
-  toPrototypeConversation,
-} from '@src/features/prototype/realData.adapters'
+  ActionButton,
+  PageFrame,
+} from '@src/components/ui/presentation/Presentation'
+import { useMockExperience } from '@src/contexts/mock/MockExperienceContext'
 import { useChatSocket } from '@src/hooks/socket/useChatSocket'
 import { useMessageDraft } from '@src/hooks/useMessageDraft'
+import type {
+  BookCardView,
+  ChatBookView,
+  ChatMessageView,
+} from '@src/mocks/fixtures/experience'
+import {
+  toChatMessageView,
+  toConversationView,
+} from '@src/shared/view-models/adapters'
 import { isApiMockMode } from '@src/utils/runtimeEnv'
 
 import styles from './MessagesPage.module.scss'
 
-const toPrototypeBook = (book: PrototypeChatBook): PrototypeBook => ({
+const toBookCardView = (book: ChatBookView): BookCardView => ({
   id: book.id,
   title: book.title,
   author: book.author,
@@ -67,6 +67,12 @@ const toPrototypeBook = (book: PrototypeChatBook): PrototypeBook => ({
 const createClientKey = () =>
   globalThis.crypto?.randomUUID?.() ??
   `message-${Date.now()}-${Math.random().toString(36).slice(2)}`
+
+const mockDraftStorageKey = (userId: string) =>
+  `entrelibros:mock:message-drafts:${userId}`
+
+const legacyMockDraftStorageKey = (userId: string) =>
+  `entrelibros:prototype:message-drafts:${userId}`
 
 const COMPOSER_EMOJIS = ['😀', '😁', '😂', '😍', '🤔', '👍', '🎉', '📚']
 
@@ -207,7 +213,7 @@ const EmojiPickerModal = ({
 }
 
 type ChatMessageBubbleProps = {
-  item: PrototypeChatMessage
+  item: ChatMessageView
   agreement?: AgreementSnapshot
   agreementPending: boolean
   onConfirmAgreement: () => void
@@ -273,7 +279,7 @@ const AgreementOutcomePanel = ({
         })}
         rows={2}
       />
-      <PrototypeButton
+      <ActionButton
         size="small"
         tone="primary"
         onClick={() => onSave(outcome, reason)}
@@ -282,7 +288,7 @@ const AgreementOutcomePanel = ({
         {t('community.messages.outcome.saved', {
           defaultValue: 'Guardar resultado',
         })}
-      </PrototypeButton>
+      </ActionButton>
     </Panel>
   )
 }
@@ -301,7 +307,7 @@ const ChatMessageBubble = ({
   if (item.kind === 'book' && item.book) {
     return (
       <article className={`${styles.bookAttachment} ${alignment}`}>
-        <BookCover compact book={toPrototypeBook(item.book)} />
+        <BookCover compact book={toBookCardView(item.book)} />
         <div>
           <strong>{item.book.title}</strong>
           <small>{item.book.author}</small>
@@ -328,7 +334,7 @@ const ChatMessageBubble = ({
         </span>
         <div className={styles.proposalBooks}>
           <div className={styles.proposalBook}>
-            <BookCover compact book={toPrototypeBook(item.swap.offered)} />
+            <BookCover compact book={toBookCardView(item.swap.offered)} />
             <span>
               <strong>{item.swap.offered.title}</strong>
               <small>
@@ -339,7 +345,7 @@ const ChatMessageBubble = ({
             </span>
           </div>
           <div className={styles.proposalBook}>
-            <BookCover compact book={toPrototypeBook(item.swap.requested)} />
+            <BookCover compact book={toBookCardView(item.swap.requested)} />
             <span>
               <strong>{item.swap.requested.title}</strong>
               <small>
@@ -402,7 +408,7 @@ const ChatMessageBubble = ({
         {agreementMessage.reason ? <p>{agreementMessage.reason}</p> : null}
         {canRespond ? (
           <div className={styles.proposalActions}>
-            <PrototypeButton
+            <ActionButton
               size="small"
               tone="primary"
               onClick={onConfirmAgreement}
@@ -411,8 +417,8 @@ const ChatMessageBubble = ({
               {t('community.messages.bubbles.accept', {
                 defaultValue: 'Aceptar',
               })}
-            </PrototypeButton>
-            <PrototypeButton
+            </ActionButton>
+            <ActionButton
               size="small"
               onClick={onRejectAgreement}
               disabled={agreementPending}
@@ -420,11 +426,11 @@ const ChatMessageBubble = ({
               {t('community.messages.bubbles.reject', {
                 defaultValue: 'Rechazar',
               })}
-            </PrototypeButton>
+            </ActionButton>
           </div>
         ) : canCancel ? (
           <div className={styles.proposalActions}>
-            <PrototypeButton
+            <ActionButton
               size="small"
               onClick={onCancelAgreement}
               disabled={agreementPending}
@@ -432,7 +438,7 @@ const ChatMessageBubble = ({
               {t('community.messages.agreement.cancellation.confirmAction', {
                 defaultValue: 'Cancelar acuerdo',
               })}
-            </PrototypeButton>
+            </ActionButton>
           </div>
         ) : null}
         <small className={styles.bubbleTime}>{item.time}</small>
@@ -456,12 +462,12 @@ export const MessagesPage = () =>
 
 const MockMessagesPage = () => {
   const {
-    catalog,
+    fixtures,
     chatMessages,
     markConversationRead,
     readConversationIds,
     sendMessage,
-  } = usePrototype()
+  } = useMockExperience()
   const { t } = useTranslation()
   const [selected, setSelected] = useState('lucia')
   const [search, setSearch] = useState('')
@@ -470,9 +476,9 @@ const MockMessagesPage = () => {
   const [mockDrafts, setMockDrafts] = useState<Record<string, ApiMessageDraft>>(
     () => {
       try {
-        const stored = localStorage.getItem(
-          `entrelibros:prototype:message-drafts:${catalog.user.id}`
-        )
+        const stored =
+          localStorage.getItem(mockDraftStorageKey(fixtures.user.id)) ??
+          localStorage.getItem(legacyMockDraftStorageKey(fixtures.user.id))
         return stored
           ? (JSON.parse(stored) as Record<string, ApiMessageDraft>)
           : {}
@@ -490,23 +496,23 @@ const MockMessagesPage = () => {
     area: 'Palermo',
     date: '2026-09-10',
     time: '18:30',
-    bookTitle: catalog.books[0]?.title ?? '',
+    bookTitle: fixtures.books[0]?.title ?? '',
   })
   const [composerMenuOpen, setComposerMenuOpen] = useState(false)
   const [emojiPickerOpen, setEmojiPickerOpen] = useState(false)
   const messageInputRef = useRef<HTMLInputElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const activeConversation =
-    catalog.conversations.find(
+    fixtures.conversations.find(
       (conversation) => conversation.id === selected
-    ) ?? catalog.conversations[1]
+    ) ?? fixtures.conversations[1]
   const mockConversationId = Math.max(
-    catalog.conversations.findIndex(
+    fixtures.conversations.findIndex(
       (conversation) => conversation.id === selected
     ) + 1,
     1
   )
-  const conversations = catalog.conversations
+  const conversations = fixtures.conversations
     .map((conversation) =>
       readConversationIds.has(conversation.id)
         ? { ...conversation, unread: undefined }
@@ -521,13 +527,13 @@ const MockMessagesPage = () => {
   useEffect(() => {
     try {
       localStorage.setItem(
-        `entrelibros:prototype:message-drafts:${catalog.user.id}`,
+        mockDraftStorageKey(fixtures.user.id),
         JSON.stringify(mockDrafts)
       )
     } catch {
       // La vista mock sigue funcionando aunque el navegador bloquee el almacenamiento.
     }
-  }, [catalog.user.id, mockDrafts])
+  }, [fixtures.user.id, mockDrafts])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView?.({ block: 'end' })
@@ -619,7 +625,7 @@ const MockMessagesPage = () => {
 
   return (
     <BaseLayout id="messages-page" mainClassName={styles.layoutMain}>
-      <PrototypePage className={styles.page}>
+      <PageFrame className={styles.page}>
         <section className={styles.messenger}>
           <aside className={styles.conversationRail}>
             <header className={styles.conversationHeader}>
@@ -724,24 +730,22 @@ const MockMessagesPage = () => {
                       Propuesta de intercambio
                     </span>
                     <div>
-                      <BookCover compact book={catalog.books[0]} />
+                      <BookCover compact book={fixtures.books[0]} />
                       <div>
-                        <strong>{catalog.books[0].title}</strong>
-                        <small>{catalog.books[0].author}</small>
+                        <strong>{fixtures.books[0].title}</strong>
+                        <small>{fixtures.books[0].author}</small>
                         <p>Café Literario · mañana, 18:30</p>
                       </div>
                     </div>
                     <div className={styles.proposalActions}>
                       {item.role === 'me' ? (
-                        <PrototypeButton size="small">Cancelar</PrototypeButton>
+                        <ActionButton size="small">Cancelar</ActionButton>
                       ) : (
                         <>
-                          <PrototypeButton size="small" tone="primary">
+                          <ActionButton size="small" tone="primary">
                             Aceptar
-                          </PrototypeButton>
-                          <PrototypeButton size="small">
-                            Rechazar
-                          </PrototypeButton>
+                          </ActionButton>
+                          <ActionButton size="small">Rechazar</ActionButton>
                         </>
                       )}
                     </div>
@@ -751,7 +755,7 @@ const MockMessagesPage = () => {
                     key={item.id}
                     className={`${styles.bookAttachment} ${styles.mine}`}
                   >
-                    <BookCover compact book={catalog.books[0]} />
+                    <BookCover compact book={fixtures.books[0]} />
                     <div>
                       <strong>{item.text}</strong>
                       <small>Libro adjunto</small>
@@ -862,7 +866,7 @@ const MockMessagesPage = () => {
               </header>
               <p>Todos tus libros disponibles aparecen en esta lista.</p>
               <div>
-                {catalog.books.map((book) => (
+                {fixtures.books.map((book) => (
                   <button
                     key={book.id}
                     onClick={() => {
@@ -882,8 +886,8 @@ const MockMessagesPage = () => {
                               : '',
                         })
                       } else {
-                        const offered = catalog.userBooks[0] ?? book
-                        const requested = catalog.books[0] ?? book
+                        const offered = fixtures.userBooks[0] ?? book
+                        const requested = fixtures.books[0] ?? book
                         saveMockDraft(message, {
                           key: `swap:${offered.id}:${requested.id}`,
                           contentType: 'application/x-entrelibros-swap',
@@ -989,7 +993,7 @@ const MockMessagesPage = () => {
                       }))
                     }
                   >
-                    {catalog.books.map((book) => (
+                    {fixtures.books.map((book) => (
                       <option key={book.id} value={book.title}>
                         {book.title}
                       </option>
@@ -1081,9 +1085,9 @@ const MockMessagesPage = () => {
                       defaultValue: 'Cancelar',
                     })}
                   </button>
-                  <PrototypeButton type="submit" tone="primary">
+                  <ActionButton type="submit" tone="primary">
                     Guardar borrador
-                  </PrototypeButton>
+                  </ActionButton>
                 </div>
               </form>
             </Panel>
@@ -1094,7 +1098,7 @@ const MockMessagesPage = () => {
           onClose={() => setEmojiPickerOpen(false)}
           onSelect={insertEmoji}
         />
-      </PrototypePage>
+      </PageFrame>
     </BaseLayout>
   )
 }
@@ -1176,7 +1180,7 @@ const RealMessagesPage = () => {
     enabled: selected !== null && (bookPickerMode !== null || agreementOpen),
   })
   const agreementQuery = useQuery({
-    queryKey: ['prototype', 'agreement', activeConversation?.agreementId],
+    queryKey: ['agreements', activeConversation?.agreementId],
     queryFn: () => fetchAgreement(activeConversation?.agreementId ?? 0),
     enabled:
       activeConversation?.agreementId !== null && activeConversation !== null,
@@ -1223,10 +1227,7 @@ const RealMessagesPage = () => {
         ...(reason ? { reason } : {}),
       }),
     onSuccess: (agreement) => {
-      queryClient.setQueryData(
-        ['prototype', 'agreement', agreement.id],
-        agreement
-      )
+      queryClient.setQueryData(['agreements', agreement.id], agreement)
       void queryClient.invalidateQueries({
         queryKey: messageQueryKeys.all,
       })
@@ -1251,10 +1252,7 @@ const RealMessagesPage = () => {
         ...(reason.trim() ? { reason: reason.trim() } : {}),
       }),
     onSuccess: async (agreement) => {
-      queryClient.setQueryData(
-        ['prototype', 'agreement', agreement.id],
-        agreement
-      )
+      queryClient.setQueryData(['agreements', agreement.id], agreement)
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: messageQueryKeys.history(agreement.conversationId),
@@ -1655,7 +1653,7 @@ const RealMessagesPage = () => {
     (contact) => !contact.isFollowing
   )
   const persistedMessages = (historyQuery.data?.messages ?? []).map((item) =>
-    toPrototypeChatMessage(item, user?.id ?? -1)
+    toChatMessageView(item, user?.id ?? -1)
   )
   const messages = [
     ...persistedMessages,
@@ -1668,7 +1666,7 @@ const RealMessagesPage = () => {
           )
       )
       .map((item) =>
-        toPrototypeChatMessage(
+        toChatMessageView(
           {
             id: -item.sequence,
             conversationId: item.conversationId,
@@ -1794,7 +1792,7 @@ const RealMessagesPage = () => {
 
   return (
     <BaseLayout id="messages-page" mainClassName={styles.layoutMain}>
-      <PrototypePage className={styles.page}>
+      <PageFrame className={styles.page}>
         <section className={styles.messenger}>
           <aside className={styles.conversationRail}>
             <header className={styles.conversationHeader}>
@@ -1902,7 +1900,7 @@ const RealMessagesPage = () => {
                 </div>
               ) : (
                 visibleConversations.map((conversation) => {
-                  const view = toPrototypeConversation(conversation, {
+                  const view = toConversationView(conversation, {
                     unread: conversation.unreadCount,
                   })
                   return (
@@ -1969,14 +1967,12 @@ const RealMessagesPage = () => {
               <>
                 <header className={styles.chatHeader}>
                   <Avatar
-                    initials={
-                      toPrototypeConversation(activeConversation).initials
-                    }
-                    accent={toPrototypeConversation(activeConversation).accent}
+                    initials={toConversationView(activeConversation).initials}
+                    accent={toConversationView(activeConversation).accent}
                   />
                   <div>
                     <strong>
-                      {toPrototypeConversation(activeConversation).name}
+                      {toConversationView(activeConversation).name}
                     </strong>
                     <small>Conversación persistida</small>
                   </div>
@@ -2077,7 +2073,7 @@ const RealMessagesPage = () => {
                       <div className={styles.proposalActions}>
                         {agreementQuery.data.participantId === user.id ? (
                           <>
-                            <PrototypeButton
+                            <ActionButton
                               size="small"
                               tone="primary"
                               onClick={() =>
@@ -2088,8 +2084,8 @@ const RealMessagesPage = () => {
                               disabled={agreementMutation.isPending}
                             >
                               Aceptar
-                            </PrototypeButton>
-                            <PrototypeButton
+                            </ActionButton>
+                            <ActionButton
                               size="small"
                               onClick={() =>
                                 agreementMutation.mutate({
@@ -2099,10 +2095,10 @@ const RealMessagesPage = () => {
                               disabled={agreementMutation.isPending}
                             >
                               Rechazar
-                            </PrototypeButton>
+                            </ActionButton>
                           </>
                         ) : agreementQuery.data.proposerId === user.id ? (
-                          <PrototypeButton
+                          <ActionButton
                             size="small"
                             onClick={cancelAgreement}
                             disabled={agreementMutation.isPending}
@@ -2111,7 +2107,7 @@ const RealMessagesPage = () => {
                               'community.messages.agreement.cancellation.confirmAction',
                               { defaultValue: 'Cancelar acuerdo' }
                             )}
-                          </PrototypeButton>
+                          </ActionButton>
                         ) : null}
                       </div>
                     ) : null}
@@ -2346,7 +2342,7 @@ const RealMessagesPage = () => {
                       >
                         Cancelar
                       </button>
-                      <PrototypeButton
+                      <ActionButton
                         type="submit"
                         tone="primary"
                         disabled={
@@ -2357,7 +2353,7 @@ const RealMessagesPage = () => {
                         }
                       >
                         Enviar propuesta
-                      </PrototypeButton>
+                      </ActionButton>
                     </div>
                   </form>
                 ) : (
@@ -2637,7 +2633,7 @@ const RealMessagesPage = () => {
                         defaultValue: 'Cancelar',
                       })}
                     </button>
-                    <PrototypeButton
+                    <ActionButton
                       type="submit"
                       tone="primary"
                       disabled={
@@ -2656,7 +2652,7 @@ const RealMessagesPage = () => {
                         : t('community.messages.drafts.saveAgreement', {
                             defaultValue: 'Guardar borrador',
                           })}
-                    </PrototypeButton>
+                    </ActionButton>
                   </div>
                 </form>
               </Panel>
@@ -2841,7 +2837,7 @@ const RealMessagesPage = () => {
                         defaultValue: 'Cancelar',
                       })}
                     </button>
-                    <PrototypeButton
+                    <ActionButton
                       className={styles.newConversationSubmit}
                       type="submit"
                       tone="primary"
@@ -2857,7 +2853,7 @@ const RealMessagesPage = () => {
                       {t('community.messages.newConversation.submit', {
                         defaultValue: 'Iniciar conversación',
                       })}
-                    </PrototypeButton>
+                    </ActionButton>
                   </div>
                 </form>
               </Panel>
@@ -2869,7 +2865,7 @@ const RealMessagesPage = () => {
           onClose={() => setEmojiPickerOpen(false)}
           onSelect={insertEmoji}
         />
-      </PrototypePage>
+      </PageFrame>
     </BaseLayout>
   )
 }

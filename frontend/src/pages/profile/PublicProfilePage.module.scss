@@ -3,7 +3,7 @@
 .state,
 .error {
   padding: 22px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
 }
 
 .stats {
@@ -12,18 +12,18 @@
   gap: 18px;
   margin-top: 22px;
   padding-top: 16px;
-  border-top: 1px solid var(--prototype-border);
+  border-top: 1px solid var(--app-border);
 }
 
 .stats span {
   display: grid;
   gap: 3px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 12px;
 }
 
 .stats strong {
-  color: var(--prototype-text);
+  color: var(--app-text);
   font-size: 20px;
 }
 
@@ -43,9 +43,9 @@
   gap: 10px;
   min-width: 0;
   padding: 10px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 12px;
-  background: var(--prototype-panel-background);
+  background: var(--app-panel-background);
   color: inherit;
   text-align: left;
 }
@@ -72,7 +72,7 @@
 }
 
 .publicationList small {
-  color: var(--prototype-muted);
+  color: var(--app-muted);
 }
 
 .header {
@@ -89,7 +89,7 @@
 
   p {
     margin: 6px 0 0;
-    color: var(--prototype-muted);
+    color: var(--app-muted);
   }
 }
 
@@ -102,7 +102,7 @@
 .eyebrow,
 .label {
   display: block;
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -131,7 +131,7 @@
 .identity p,
 .description {
   margin: 6px 0 0;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   line-height: 1.5;
 }
 
@@ -151,21 +151,21 @@
   border: 1px solid rgb(66 215 199 / 22%);
   border-radius: 999px;
   background: rgb(66 215 199 / 8%);
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   font-size: 12px;
 }
 
 .label {
   margin-top: 18px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   letter-spacing: 0.04em;
 }
 
 .error {
   margin-bottom: 16px;
-  border-color: var(--prototype-danger-border);
-  background: var(--prototype-danger-background);
-  color: var(--prototype-danger-text);
+  border-color: var(--app-danger-border);
+  background: var(--app-danger-background);
+  color: var(--app-danger-text);
 }
 
 @media (width <= $breakpoint-tablet) {

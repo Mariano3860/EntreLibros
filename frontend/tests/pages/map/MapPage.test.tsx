@@ -156,7 +156,7 @@ describe('MapPage', () => {
     })
     expect(card.querySelector('img')).toHaveAttribute(
       'src',
-      '/prototype/reading-room.svg'
+      '/illustrations/reading-room.svg'
     )
     expect(
       within(card).getByRole('button', { name: 'map.cta.openCorner' })

@@ -28,14 +28,14 @@
 }
 
 .secondary {
-  border-color: var(--prototype-border);
-  background: var(--prototype-surface-raised);
-  color: var(--prototype-text);
+  border-color: var(--app-border);
+  background: var(--app-surface-raised);
+  color: var(--app-text);
 }
 
 .ghost {
   background: transparent;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
 }
 
 .primary {

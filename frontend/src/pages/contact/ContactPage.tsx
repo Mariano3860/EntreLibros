@@ -1,40 +1,37 @@
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { FormEvent, useMemo, useState } from 'react'
 
-import { usePrototype } from '@src/features/prototype/PrototypeContext'
 import {
   Panel,
-  PrototypeButton,
-  PrototypePage,
+  ActionButton,
+  PageFrame,
   SectionHeading,
-} from '@src/features/prototype/PrototypeUI'
+} from '@src/components/ui/presentation/Presentation'
 import { useContactForm } from '@src/hooks/api/useContactForm'
+import { faqs, helpCategories } from '@src/shared/content/help'
 import { isApiMockMode } from '@src/utils/runtimeEnv'
-
-import type { PrototypeCatalog } from '../../features/prototype/catalog'
 
 import styles from './ContactPage.module.scss'
 
 export const ContactPage = () => {
-  const { catalog, openFaq, setOpenFaq, supportSent, sendSupport } =
-    usePrototype()
   const mockMode = isApiMockMode()
   const [search, setSearch] = useState('')
   const [message, setMessage] = useState('')
+  const [openFaq, setOpenFaq] = useState<string | null>('publish')
+  const [supportSent, setSupportSent] = useState(false)
   const filteredFaqs = useMemo(
     () =>
-      catalog.faqs.filter((faq) =>
+      faqs.filter((faq) =>
         `${faq.question} ${faq.answer}`
           .toLowerCase()
           .includes(search.toLowerCase())
       ),
-    [catalog.faqs, search]
+    [search]
   )
 
   if (!mockMode)
     return (
       <RealContactPage
-        catalog={catalog}
         openFaq={openFaq}
         setOpenFaq={setOpenFaq}
         search={search}
@@ -46,13 +43,13 @@ export const ContactPage = () => {
   const submit = (event: FormEvent) => {
     event.preventDefault()
     if (!message.trim()) return
-    sendSupport()
+    setSupportSent(true)
     setMessage('')
   }
 
   return (
     <BaseLayout id="contact-page">
-      <PrototypePage>
+      <PageFrame>
         <section className={styles.hero}>
           <div>
             <h1>¿Cómo podemos ayudarte?</h1>
@@ -70,11 +67,11 @@ export const ContactPage = () => {
               <kbd>⌘ K</kbd>
             </label>
           </div>
-          <img src="/prototype/help.svg" alt="" />
+          <img src="/illustrations/help.svg" alt="" />
         </section>
 
         <section className={styles.categories} aria-label="Categorías de ayuda">
-          {catalog.helpCategories.map((category) => (
+          {helpCategories.map((category) => (
             <button
               key={category.title}
               onClick={() => setSearch(category.title)}
@@ -128,14 +125,14 @@ export const ContactPage = () => {
                 <strong>Estamos en línea</strong>
                 <small>Respuesta en ~5 min</small>
               </div>
-              <PrototypeButton
+              <ActionButton
                 tone="primary"
                 onClick={() =>
                   document.getElementById('support-message')?.focus()
                 }
               >
                 Iniciar chat
-              </PrototypeButton>
+              </ActionButton>
             </Panel>
             <Panel className={styles.contactCard}>
               <SectionHeading title="Escribinos" />
@@ -149,9 +146,9 @@ export const ContactPage = () => {
                     placeholder="Contanos qué pasó…"
                   />
                 </label>
-                <PrototypeButton type="submit" disabled={!message.trim()}>
+                <ActionButton type="submit" disabled={!message.trim()}>
                   Enviar consulta
-                </PrototypeButton>
+                </ActionButton>
               </form>
               {supportSent ? (
                 <p className={styles.sent} role="status">
@@ -164,25 +161,23 @@ export const ContactPage = () => {
             </Panel>
           </aside>
         </div>
-      </PrototypePage>
+      </PageFrame>
     </BaseLayout>
   )
 }
 
 const RealContactPage = ({
-  catalog,
   openFaq,
   setOpenFaq,
   search,
   setSearch,
   filteredFaqs,
 }: {
-  catalog: PrototypeCatalog
   openFaq: string | null
   setOpenFaq: (id: string | null) => void
   search: string
   setSearch: (value: string) => void
-  filteredFaqs: ReadonlyArray<PrototypeCatalog['faqs'][number]>
+  filteredFaqs: ReadonlyArray<(typeof faqs)[number]>
 }) => {
   const [message, setMessage] = useState('')
   const mutation = useContactForm(() => setMessage(''))
@@ -197,7 +192,7 @@ const RealContactPage = ({
   }
   return (
     <BaseLayout id="contact-page">
-      <PrototypePage>
+      <PageFrame>
         <section className={styles.hero}>
           <div>
             <h1>¿Cómo podemos ayudarte?</h1>
@@ -215,11 +210,11 @@ const RealContactPage = ({
               <kbd>⌘ K</kbd>
             </label>
           </div>
-          <img src="/prototype/help.svg" alt="" />
+          <img src="/illustrations/help.svg" alt="" />
         </section>
 
         <section className={styles.categories} aria-label="Categorías de ayuda">
-          {catalog.helpCategories.map((category) => (
+          {helpCategories.map((category) => (
             <button
               key={category.title}
               onClick={() => setSearch(category.title)}
@@ -273,14 +268,14 @@ const RealContactPage = ({
                 <strong>Estamos en línea</strong>
                 <small>Respuesta en ~5 min</small>
               </div>
-              <PrototypeButton
+              <ActionButton
                 tone="primary"
                 onClick={() =>
                   document.getElementById('support-message')?.focus()
                 }
               >
                 Iniciar chat
-              </PrototypeButton>
+              </ActionButton>
             </Panel>
             <Panel className={styles.contactCard}>
               <SectionHeading title="Escribinos" />
@@ -294,12 +289,12 @@ const RealContactPage = ({
                     placeholder="Contanos qué pasó…"
                   />
                 </label>
-                <PrototypeButton
+                <ActionButton
                   type="submit"
                   disabled={!message.trim() || mutation.isPending}
                 >
                   {mutation.isPending ? 'Enviando…' : 'Enviar consulta'}
-                </PrototypeButton>
+                </ActionButton>
               </form>
               {mutation.isSuccess ? (
                 <p className={styles.sent} role="status">
@@ -312,7 +307,7 @@ const RealContactPage = ({
             </Panel>
           </aside>
         </div>
-      </PrototypePage>
+      </PageFrame>
     </BaseLayout>
   )
 }

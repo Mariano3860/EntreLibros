@@ -33,14 +33,14 @@ import type {
 } from '@src/api/map/map.types'
 import { mapKeys } from '@src/api/map/mapApi'
 import { fetchProfile } from '@src/api/user/profile.service'
+import {
+  ActionButton,
+  PageFrame,
+} from '@src/components/ui/presentation/Presentation'
 import { useAuth } from '@src/contexts/auth/AuthContext'
 import { useAuthRequired } from '@src/contexts/auth/AuthRequiredContext'
+import { useMockExperience } from '@src/contexts/mock/MockExperienceContext'
 import { useTheme } from '@src/contexts/theme/ThemeContext'
-import { usePrototype } from '@src/features/prototype/PrototypeContext'
-import {
-  PrototypeButton,
-  PrototypePage,
-} from '@src/features/prototype/PrototypeUI'
 import { useMapData } from '@src/hooks/api/useMapData'
 import {
   boundingBoxFromCenter,
@@ -95,7 +95,7 @@ const toDisplayCorner = (corner: MapCornerPin): MapCorner => ({
 })
 
 export const MapPage = () => {
-  const { catalog } = usePrototype()
+  const { fixtures } = useMockExperience()
   const { theme } = useTheme()
   const { t } = useTranslation()
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
@@ -129,7 +129,7 @@ export const MapPage = () => {
     useState<CommunityCornerDetail | null>(null)
 
   const profileQuery = useQuery({
-    queryKey: ['prototype', 'profile'],
+    queryKey: ['profile'],
     queryFn: fetchProfile,
     enabled: !mockMode && isAuthenticated,
     retry: false,
@@ -139,7 +139,7 @@ export const MapPage = () => {
 
   const mockMapData = useMemo<MapResponse>(
     () => ({
-      corners: catalog.corners.map((corner, index) => {
+      corners: fixtures.corners.map((corner, index) => {
         const latitude =
           MAP_BOUNDS.south +
           ((100 - corner.y) / 100) * (MAP_BOUNDS.north - MAP_BOUNDS.south)
@@ -159,14 +159,14 @@ export const MapPage = () => {
           lastSignalAt: new Date(
             Date.parse(MOCK_MAP_REFERENCE_DATE) - (index + 1) * 12 * 60_000
           ).toISOString(),
-          photos: ['/prototype/reading-room.svg'],
+          photos: ['/illustrations/reading-room.svg'],
           themes: ['Comunidad', scope],
           isOpenNow: true,
           status: 'active',
         }
       }),
       publications: [],
-      activity: catalog.corners.map((corner, index) => {
+      activity: fixtures.corners.map((corner, index) => {
         const latitude =
           MAP_BOUNDS.south +
           ((100 - corner.y) / 100) * (MAP_BOUNDS.north - MAP_BOUNDS.south)
@@ -187,7 +187,7 @@ export const MapPage = () => {
         limits: MAP_RESULT_LIMITS,
       },
     }),
-    [catalog.corners]
+    [fixtures.corners]
   )
 
   const effectiveDistance = discoveryLocation ? distance : null
@@ -567,7 +567,7 @@ export const MapPage = () => {
 
   return (
     <BaseLayout id="map-page" mainClassName={styles.layoutMain}>
-      <PrototypePage className={styles.page}>
+      <PageFrame className={styles.page}>
         <div
           className={styles.mapShell}
           data-map-theme={theme}
@@ -616,14 +616,14 @@ export const MapPage = () => {
                 <span aria-hidden="true">☷</span>
                 {panelOpen ? t('map.filters.hide') : t('map.filters.show')}
               </button>
-              <PrototypeButton
+              <ActionButton
                 className={styles.locationButton}
                 onClick={locate}
                 aria-label={t('map.filters.locateMe')}
               >
                 <span aria-hidden="true">◎</span>
                 {t('map.exploration.locate')}
-              </PrototypeButton>
+              </ActionButton>
               <CreateCornerFab
                 placement="inline"
                 onClick={() => runIfAuthenticated(() => setCreateOpen(true))}
@@ -691,7 +691,7 @@ export const MapPage = () => {
             onReport={() => runIfAuthenticated(() => setCornerReportOpen(true))}
           />
         </div>
-      </PrototypePage>
+      </PageFrame>
 
       {editingCorner ? (
         <CornerEditModal

@@ -28,7 +28,7 @@
 }
 
 .header span {
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
@@ -42,7 +42,7 @@
 .header button {
   border: 0;
   background: transparent;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   cursor: pointer;
   font-size: 20px;
 }
@@ -50,17 +50,17 @@
 .field {
   display: grid;
   gap: 7px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 12px;
 }
 
 .field textarea {
   resize: vertical;
   padding: 9px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 8px;
-  background: var(--prototype-surface-raised);
-  color: var(--prototype-text);
+  background: var(--app-surface-raised);
+  color: var(--app-text);
   font: inherit;
 }
 
@@ -71,7 +71,7 @@
 }
 
 .error {
-  color: var(--prototype-danger-text);
+  color: var(--app-danger-text);
 }
 
 .success {

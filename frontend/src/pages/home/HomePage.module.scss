@@ -7,8 +7,8 @@
   align-items: center;
   padding: 36px 42px;
   overflow: hidden;
-  border: 1px solid var(--prototype-border);
-  border-radius: var(--prototype-radius-lg);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-lg);
   background:
     linear-gradient(
       90deg,
@@ -16,9 +16,9 @@
       rgb(5 20 29 / 79%) 45%,
       rgb(5 20 29 / 14%) 75%
     ),
-    url('../../../public/prototype/reading-room.svg') center / cover;
-  box-shadow: var(--prototype-shadow);
-  color: var(--prototype-hero-text);
+    url('../../../public/illustrations/reading-room.svg') center / cover;
+  box-shadow: var(--app-shadow);
+  color: var(--app-hero-text);
 }
 
 .heroContent {
@@ -33,13 +33,13 @@
   }
 
   em {
-    color: var(--prototype-teal);
+    color: var(--app-teal);
     font-style: normal;
   }
 
   p {
     margin: 0 0 20px;
-    color: var(--prototype-hero-muted);
+    color: var(--app-hero-muted);
     font-size: 14px;
   }
 }
@@ -82,7 +82,7 @@
   border-radius: 999px;
   background: rgb(24 39 49 / 96%);
   box-shadow: 0 8px 20px rgb(0 0 0 / 22%);
-  color: var(--prototype-hero-text);
+  color: var(--app-hero-text);
   cursor: pointer;
   transition:
     border-color 160ms ease,
@@ -118,9 +118,9 @@
 }
 
 .railArrow:not(:disabled):hover {
-  border-color: var(--prototype-teal);
+  border-color: var(--app-teal);
   background: rgb(31 57 68 / 98%);
-  color: var(--prototype-teal);
+  color: var(--app-teal);
 }
 
 .railArrowNext:not(:disabled):hover {
@@ -132,7 +132,7 @@
 }
 
 .railArrow:focus-visible {
-  outline: 2px solid var(--prototype-teal);
+  outline: 2px solid var(--app-teal);
   outline-offset: 2px;
 }
 
@@ -245,12 +245,12 @@
   display: grid;
   min-height: 78px;
   place-items: center;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   text-align: center;
 }
 
 .live {
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   font-size: 10px;
 }
 
@@ -266,9 +266,9 @@
   gap: 10px;
   min-width: 0;
   padding: 11px;
-  border: 1px solid var(--prototype-inset-border);
+  border: 1px solid var(--app-inset-border);
   border-radius: 11px;
-  background: var(--prototype-inset-background);
+  background: var(--app-inset-background);
 }
 
 .activityList article > div {
@@ -290,7 +290,7 @@
 
 .activityList small {
   margin-top: 3px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
 }
 
@@ -298,7 +298,7 @@
   margin-left: auto;
   border: 0;
   background: transparent;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   cursor: pointer;
 }
 
@@ -313,17 +313,17 @@
 
 .teal {
   background: rgb(66 215 199 / 14%);
-  color: var(--prototype-teal);
+  color: var(--app-teal);
 }
 
 .orange {
   background: rgb(255 139 76 / 14%);
-  color: var(--prototype-orange);
+  color: var(--app-orange);
 }
 
 .purple {
   background: rgb(169 139 255 / 14%);
-  color: var(--prototype-purple);
+  color: var(--app-purple);
 }
 
 @media (width <= 1100px) {

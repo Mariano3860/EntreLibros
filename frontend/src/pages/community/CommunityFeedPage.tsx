@@ -24,23 +24,23 @@ import {
 import { FeedActions } from '@src/components/feed/FeedActions'
 import type { FeedItem } from '@src/components/feed/FeedItem.types'
 import { PersonSearchModal } from '@src/components/people/PersonSearchModal/PersonSearchModal'
-import { useAuth } from '@src/contexts/auth/AuthContext'
-import { useAuthRequired } from '@src/contexts/auth/AuthRequiredContext'
-import { usePrototype } from '@src/features/prototype/PrototypeContext'
 import {
   Avatar,
   FixtureState,
   Panel,
-  PrototypeButton,
-  PrototypePage,
+  ActionButton,
+  PageFrame,
   SectionHeading,
-} from '@src/features/prototype/PrototypeUI'
+} from '@src/components/ui/presentation/Presentation'
+import { useAuth } from '@src/contexts/auth/AuthContext'
+import { useAuthRequired } from '@src/contexts/auth/AuthRequiredContext'
+import { useMockExperience } from '@src/contexts/mock/MockExperienceContext'
 import { isApiMockMode } from '@src/utils/runtimeEnv'
 
 import styles from './CommunityFeedPage.module.scss'
 
 export const CommunityFeedPage = () => {
-  const { catalog, socialPosts, publishStory } = usePrototype()
+  const { fixtures, socialPosts, publishStory } = useMockExperience()
   const { t } = useTranslation()
   const { runIfAuthenticated } = useAuthRequired()
   const mockMode = isApiMockMode()
@@ -60,26 +60,26 @@ export const CommunityFeedPage = () => {
     setComposerOpen(false)
   }
 
-  const storyChips = catalog.stories.filter((story) => story.id !== 'mine')
+  const storyChips = fixtures.stories.filter((story) => story.id !== 'mine')
 
   return (
     <BaseLayout id="community-page">
-      <PrototypePage>
+      <PageFrame>
         <header className={styles.header}>
           <div>
             <h1>Comunidad</h1>
             <p>Historias, recomendaciones y encuentros cerca tuyo.</p>
           </div>
           <div className={styles.headerActions}>
-            <PrototypeButton onClick={() => setIsPersonSearchOpen(true)}>
+            <ActionButton onClick={() => setIsPersonSearchOpen(true)}>
               {t('booksPage.personSearch.open')}
-            </PrototypeButton>
-            <PrototypeButton
+            </ActionButton>
+            <ActionButton
               tone="primary"
               onClick={() => runIfAuthenticated(() => setComposerOpen(true))}
             >
               ＋ Publicar
-            </PrototypeButton>
+            </ActionButton>
           </div>
         </header>
 
@@ -157,7 +157,7 @@ export const CommunityFeedPage = () => {
                 >
                   ☷ Encuesta
                 </button>
-                <PrototypeButton
+                <ActionButton
                   tone="primary"
                   size="small"
                   onClick={() =>
@@ -165,7 +165,7 @@ export const CommunityFeedPage = () => {
                   }
                 >
                   Publicar
-                </PrototypeButton>
+                </ActionButton>
               </div>
             </Panel>
 
@@ -189,7 +189,7 @@ export const CommunityFeedPage = () => {
                     />
                   </Panel>
                 ))}
-                {catalog.communityPosts.map((post) => (
+                {fixtures.communityPosts.map((post) => (
                   <Panel as="article" className={styles.post} key={post.id}>
                     <div className={styles.postHeader}>
                       <Avatar
@@ -220,7 +220,7 @@ export const CommunityFeedPage = () => {
             <Panel className={styles.sidePanel}>
               <CommunityCornersPanel
                 navigate={navigate}
-                corners={catalog.corners.slice(0, 2).map((corner) => ({
+                corners={fixtures.corners.slice(0, 2).map((corner) => ({
                   id: corner.id,
                   name: corner.name,
                   meta: `${corner.distance} · ${corner.activity}`,
@@ -229,7 +229,7 @@ export const CommunityFeedPage = () => {
             </Panel>
             <Panel className={styles.sidePanel}>
               <SectionHeading title="Sugerencias para vos" />
-              {catalog.stats.contributors.slice(0, 3).map((person) => (
+              {fixtures.stats.contributors.slice(0, 3).map((person) => (
                 <article className={styles.suggestion} key={person.name}>
                   <Avatar
                     initials={person.initials}
@@ -274,13 +274,13 @@ export const CommunityFeedPage = () => {
                   <button type="button">▤ Linkear libro</button>
                   <button type="button">↔ Intercambio</button>
                 </div>
-                <PrototypeButton
+                <ActionButton
                   tone="primary"
                   type="submit"
                   disabled={!storyText.trim()}
                 >
                   Publicar historia
-                </PrototypeButton>
+                </ActionButton>
               </form>
             </Panel>
           </div>
@@ -289,7 +289,7 @@ export const CommunityFeedPage = () => {
           isOpen={isPersonSearchOpen}
           onClose={() => setIsPersonSearchOpen(false)}
         />
-      </PrototypePage>
+      </PageFrame>
     </BaseLayout>
   )
 }
@@ -450,22 +450,22 @@ const RealCommunityPage = ({
 
   return (
     <BaseLayout id="community-page">
-      <PrototypePage>
+      <PageFrame>
         <header className={styles.header}>
           <div>
             <h1>Comunidad</h1>
             <p>Historias, recomendaciones y encuentros cerca tuyo.</p>
           </div>
           <div className={styles.headerActions}>
-            <PrototypeButton onClick={() => setIsPersonSearchOpen(true)}>
+            <ActionButton onClick={() => setIsPersonSearchOpen(true)}>
               {t('booksPage.personSearch.open')}
-            </PrototypeButton>
-            <PrototypeButton
+            </ActionButton>
+            <ActionButton
               tone="primary"
               onClick={() => runIfAuthenticated(() => setComposerOpen(true))}
             >
               ＋ Publicar
-            </PrototypeButton>
+            </ActionButton>
           </div>
         </header>
         <div className={styles.layout}>
@@ -553,7 +553,7 @@ const RealCommunityPage = ({
                 >
                   ☷ Encuesta
                 </button>
-                <PrototypeButton
+                <ActionButton
                   tone="primary"
                   size="small"
                   onClick={() =>
@@ -561,7 +561,7 @@ const RealCommunityPage = ({
                   }
                 >
                   Publicar
-                </PrototypeButton>
+                </ActionButton>
               </div>
             </Panel>
             {discovery.data?.recommendedBooks.length ? (
@@ -619,12 +619,12 @@ const RealCommunityPage = ({
               ) : feed.isError ? (
                 <Panel className={styles.post} as="article">
                   <p>No pudimos cargar la actividad de la comunidad.</p>
-                  <PrototypeButton
+                  <ActionButton
                     size="small"
                     onClick={() => void feed.refetch()}
                   >
                     Reintentar
-                  </PrototypeButton>
+                  </ActionButton>
                 </Panel>
               ) : feed.data?.length ? (
                 feed.data?.map((item) => (
@@ -740,7 +740,7 @@ const RealCommunityPage = ({
           isOpen={isPersonSearchOpen}
           onClose={() => setIsPersonSearchOpen(false)}
         />
-      </PrototypePage>
+      </PageFrame>
     </BaseLayout>
   )
 }

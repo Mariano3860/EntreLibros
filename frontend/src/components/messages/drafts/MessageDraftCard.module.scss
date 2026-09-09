@@ -37,7 +37,7 @@
 .titleGroup > strong {
   min-width: 0;
   overflow: hidden;
-  color: var(--prototype-text);
+  color: var(--app-text);
   font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -49,7 +49,7 @@
   min-height: 26px;
   padding: 0 14px;
   border-radius: 999px;
-  background: var(--prototype-teal);
+  background: var(--app-teal);
   color: #06211f;
   font-size: 10px;
   font-weight: 800;
@@ -58,14 +58,14 @@
 .privacy {
   flex: 0 1 auto;
   gap: 6px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
   line-height: 1.35;
   text-align: right;
 }
 
 .privacy > span {
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   font-size: 12px;
 }
 
@@ -77,7 +77,7 @@
 .textContent,
 .note {
   margin: 0;
-  color: var(--prototype-text);
+  color: var(--app-text);
   font-size: 11px;
   line-height: 1.45;
   overflow-wrap: anywhere;
@@ -96,7 +96,7 @@
   align-items: center;
   gap: 10px;
   padding: 7px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 9px;
   background: rgb(6 26 38 / 68%);
 }
@@ -108,7 +108,7 @@
 
 .bookLabel {
   grid-column: 1 / -1;
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -132,12 +132,12 @@
 }
 
 .bookCopy strong {
-  color: var(--prototype-text);
+  color: var(--app-text);
   font-size: 11px;
 }
 
 .bookCopy span {
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
 }
 
@@ -145,7 +145,7 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
 }
 
@@ -177,7 +177,7 @@
   place-items: center;
   border-radius: 50%;
   background: rgb(66 215 199 / 26%);
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   font-size: 21px;
 }
 
@@ -187,7 +187,7 @@
   align-items: center;
   gap: 10px;
   padding: 13px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 9px;
   background: rgb(6 26 38 / 68%);
 }
@@ -206,12 +206,12 @@
 }
 
 .agreementContent strong {
-  color: var(--prototype-text);
+  color: var(--app-text);
   font-size: 12px;
 }
 
 .agreementContent span {
-  color: var(--prototype-muted);
+  color: var(--app-muted);
   font-size: 10px;
 }
 
@@ -223,7 +223,7 @@
   border: 1px solid rgb(66 215 199 / 35%);
   border-radius: 12px;
   background: rgb(66 215 199 / 10%);
-  color: var(--prototype-teal);
+  color: var(--app-teal);
   font-size: 22px;
 }
 
@@ -236,7 +236,7 @@
   gap: 12px;
   margin-top: 10px;
   padding-top: 10px;
-  border-top: 1px solid var(--prototype-border);
+  border-top: 1px solid var(--app-border);
 }
 
 .secondaryActions {
@@ -248,10 +248,10 @@
 .sendButton {
   min-height: 32px;
   padding: 0 12px;
-  border: 1px solid var(--prototype-border);
+  border: 1px solid var(--app-border);
   border-radius: 8px;
   background: transparent;
-  color: var(--prototype-text);
+  color: var(--app-text);
   cursor: pointer;
   font-size: 10px;
   font-weight: 650;
@@ -260,13 +260,13 @@
 .secondaryActions button:hover,
 .secondaryActions button:focus-visible {
   border-color: rgb(66 215 199 / 45%);
-  color: var(--prototype-teal);
+  color: var(--app-teal);
 }
 
 .sendButton {
   min-width: 130px;
   border-color: transparent;
-  background: var(--prototype-teal);
+  background: var(--app-teal);
   color: #06211f;
   font-weight: 800;
 }

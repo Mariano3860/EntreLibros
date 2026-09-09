@@ -3,11 +3,11 @@ import type { ApiConversation, ApiMessage } from '@api/messages/messages'
 import type { UserProfile } from '@api/user/profile.types'
 
 import type {
-  PrototypeBook,
-  PrototypeChatBook,
-  PrototypeChatMessage,
-  PrototypeConversation,
-} from './catalog'
+  BookCardView,
+  ChatBookView,
+  ChatMessageView,
+  ConversationView,
+} from './types'
 
 const accents = ['#42d7c7', '#dd7b62', '#6e85b5', '#9a78aa', '#5c9b83']
 
@@ -34,7 +34,7 @@ const accentFor = (value: string) => {
   return accents[hash % accents.length]
 }
 
-export type PrototypeProfileView = {
+export type ProfileView = {
   id: number
   name: string
   username: string
@@ -45,9 +45,7 @@ export type PrototypeProfileView = {
   interests: string[]
 }
 
-export const toPrototypeProfile = (
-  profile: UserProfile
-): PrototypeProfileView => ({
+export const toProfileView = (profile: UserProfile): ProfileView => ({
   id: profile.id,
   name: profile.alias || profile.name,
   username: `@${profile.alias || profile.name}`,
@@ -60,16 +58,16 @@ export const toPrototypeProfile = (
   interests: profile.interests.map(titleCase),
 })
 
-export const toPrototypeBook = (
+export const toBookCardView = (
   book: ApiBook,
   options: { owner?: string; distance?: string } = {}
-): PrototypeBook => {
-  const mode: PrototypeBook['mode'] = book.isSeeking
+): BookCardView => {
+  const mode: BookCardView['mode'] = book.isSeeking
     ? 'Buscado'
     : book.isForSale
       ? 'Venta'
       : 'Intercambio'
-  const intentions: NonNullable<PrototypeBook['intentions']> = [
+  const intentions: NonNullable<BookCardView['intentions']> = [
     ...(book.isForTrade ? (['trade'] as const) : []),
     ...(book.isForSale ? (['sale'] as const) : []),
     ...(book.isSeeking ? (['seeking'] as const) : []),
@@ -105,7 +103,7 @@ export const mergeApiBooks = (
     ).values()
   )
 
-export const formatPrototypeTime = (value: string, now = new Date()) => {
+export const formatRelativeTime = (value: string, now = new Date()) => {
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return ''
   const elapsedMinutes = Math.max(
@@ -124,10 +122,10 @@ export const formatPrototypeTime = (value: string, now = new Date()) => {
   return date.toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })
 }
 
-export const toPrototypeConversation = (
+export const toConversationView = (
   conversation: ApiConversation,
   options: { preview?: string; unread?: number; now?: Date } = {}
-): PrototypeConversation => {
+): ConversationView => {
   const name =
     conversation.participantName ??
     (conversation.isBot ? 'Bot' : 'Conversación')
@@ -136,23 +134,23 @@ export const toPrototypeConversation = (
     name,
     initials: initials(name),
     preview: options.preview ?? 'Todavía no hay mensajes',
-    time: formatPrototypeTime(conversation.updatedAt, options.now),
+    time: formatRelativeTime(conversation.updatedAt, options.now),
     ...(options.unread !== undefined ? { unread: options.unread } : {}),
     accent: accentFor(String(conversation.id)),
   }
 }
 
-export const toPrototypeChatMessage = (
+export const toChatMessageView = (
   message: ApiMessage,
   currentUserId: number,
   now?: Date
-): PrototypeChatMessage => {
+): ChatMessageView => {
   const base = {
     id: String(message.id),
     role:
       message.senderId === currentUserId ? ('me' as const) : ('them' as const),
     text: message.body,
-    time: formatPrototypeTime(message.createdAt, now),
+    time: formatRelativeTime(message.createdAt, now),
   }
   const attachment = message.attachmentMetadata
   if (!attachment) return base
@@ -163,7 +161,7 @@ export const toPrototypeChatMessage = (
     title: string
     author: string
     coverUrl: string
-  }): PrototypeChatBook => ({
+  }): ChatBookView => ({
     id: book.id ?? book.bookId ?? book.title,
     title: book.title,
     author: book.author,

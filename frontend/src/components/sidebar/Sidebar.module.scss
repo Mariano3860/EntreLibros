@@ -8,8 +8,8 @@
   flex-direction: column;
   height: 100vh;
   width: $collapsed-width;
-  background: var(--prototype-sidebar);
-  border-right: 1px solid var(--prototype-sidebar-border);
+  background: var(--app-sidebar);
+  border-right: 1px solid var(--app-sidebar-border);
   overflow: auto;
   z-index: 1000;
 
@@ -66,21 +66,17 @@
 
   &:hover {
     color: var(--text-primary);
-    background: var(--prototype-sidebar-hover);
+    background: var(--app-sidebar-hover);
     transform: translateX(2px);
   }
 
   &.active {
-    color: var(--prototype-text);
+    color: var(--app-text);
     font-weight: 600;
     background: linear-gradient(
       135deg,
-      var(--prototype-teal-strong),
-      color-mix(
-        in srgb,
-        var(--prototype-teal) 72%,
-        var(--prototype-teal-strong)
-      )
+      var(--app-teal-strong),
+      color-mix(in srgb, var(--app-teal) 72%, var(--app-teal-strong))
     );
     box-shadow: 0 10px 24px rgb(22 185 169 / 18%);
 
@@ -97,7 +93,7 @@
   padding: 12px 0 16px;
   margin: auto 14px 0;
   flex-shrink: 0;
-  border-top: 1px solid var(--prototype-sidebar-divider);
+  border-top: 1px solid var(--app-sidebar-divider);
 }
 
 /* === Mobile Toggle Button === */
@@ -213,8 +209,8 @@
   min-height: 36px;
   margin: 4px auto 0;
   padding: 7px 10px;
-  border: 1px solid var(--prototype-teal);
-  background: var(--prototype-teal);
+  border: 1px solid var(--app-teal);
+  background: var(--app-teal);
   color: #06211f;
   font-size: 0.78rem;
   font-weight: 700;
@@ -252,8 +248,8 @@
   gap: 10px;
   padding: 14px 8px 0;
   margin-top: 6px;
-  border-top: 1px solid var(--prototype-sidebar-divider);
-  color: var(--prototype-text);
+  border-top: 1px solid var(--app-sidebar-divider);
+  color: var(--app-text);
   text-decoration: none;
 
   strong,
@@ -267,7 +263,7 @@
   }
 
   small {
-    color: var(--prototype-muted);
+    color: var(--app-muted);
     font-size: 11px;
   }
 }
