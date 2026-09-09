@@ -66,5 +66,5 @@ npm run format:frontend
 npm run complete-check:frontend
 ```
 
-Para el navegador real revisa [`../docs/tfg-browser-checklist.md`](../docs/tfg-browser-checklist.md)
-y [`../docs/recovery-baseline.md`](../docs/recovery-baseline.md).
+Para el navegador real revisa [`../docs/testing.md`](../docs/testing.md)
+y [`../docs/deployment-and-operation.md`](../docs/deployment-and-operation.md).

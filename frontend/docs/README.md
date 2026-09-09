@@ -2,8 +2,8 @@
 
 La documentación técnica transversal vive en [`../../docs/`](../../docs/). Estos enlaces son la entrada recomendada:
 
-- [`arquitectura.md`](../../docs/arquitectura.md): límites entre navegador, frontend, API y Socket.IO.
-- [`messaging-bubbles.md`](../../docs/messaging-bubbles.md): estados visuales y contrato de burbujas.
-- [`troubleshooting.md`](../../docs/troubleshooting.md): diagnóstico de mocks, `/messages`, cookies y WebSocket.
-- [`estado-actual.md`](../../docs/estado-actual.md): capacidades comprobadas y límites conocidos.
-- [`guia-documentacion.md`](../../docs/guia-documentacion.md): cómo actualizar estos documentos.
+- [`architecture.md`](../../docs/architecture.md): límites entre navegador, frontend, API y Socket.IO.
+- [`messaging.md`](../../docs/messaging.md): command path, eventos y replay.
+- [`deployment-and-operation.md`](../../docs/deployment-and-operation.md): diagnóstico de mocks, cookies y WebSocket.
+- [`tfg-traceability.md`](../../docs/tfg-traceability.md): capacidades comprobadas y límites conocidos.
+- [`README.md`](../../docs/README.md): índice y reglas de actualización.

@@ -177,6 +177,9 @@ const deriveOffsetFromId = (id: string) => {
 
 const APPROXIMATION_OFFSET_METERS = 150;
 
+// Public map coordinates deliberately differ from stored coordinates so a map
+// response cannot become an alternate channel for a Corner's exact location.
+
 export const getDisplayCoordinates = (
   corner: CommunityCornerEntity
 ): { lat: number; lon: number; approximate: boolean } => {

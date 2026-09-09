@@ -9,7 +9,7 @@ Estas instrucciones aplican a todo el repositorio. Si existe otro `AGENTS.md` en
 - Los README locales explican el trabajo dentro de cada paquete.
 - `docs/` contiene arquitectura, operación, estado actual, decisiones y procedimientos.
 - `openspec/changes/` contiene el plan de cambios en curso; no reemplaza la documentación operativa.
-- Cuando una implementación cambia rutas, variables, migraciones o flujos, actualiza también el README o documento correspondiente y `docs/backlog.md`.
+- Cuando una implementación cambia rutas, variables, migraciones o flujos, actualiza también el README y el documento final correspondiente en `docs/`.
 
 ## Flujo de trabajo
 
@@ -46,13 +46,13 @@ npm run complete-check
 - Backend: Vitest ejecuta pruebas unitarias, de integración y de servicio según el paquete.
 - Frontend: Vitest/Testing Library prueba componentes y flujos con MSW; no es una prueba de navegador real.
 - E2E de servicio: comprueba HTTP, Socket.IO y persistencia con servicios levantados.
-- E2E de navegador: valida manualmente la aplicación en un navegador, cookies, proxy, caché y variables públicas. Sigue `docs/recovery-baseline.md`.
+- E2E de navegador: valida manualmente la aplicación en un navegador, cookies, proxy, caché y variables públicas. Sigue `docs/testing.md` y `docs/deployment-and-operation.md`.
 
 Si modificas solo backend o frontend, ejecuta su suite; antes de entregar cambios ejecuta las verificaciones generales indicadas arriba y corrige cualquier fallo.
 
 ## Documentación
 
-Al terminar una funcionalidad, verifica rutas, variables `PUBLIC_*`, comandos, migraciones, eventos Socket.IO, capturas o instrucciones manuales y enlaces relativos. Actualiza el backlog sin duplicar entradas. Si el cambio tiene alcance o decisiones relevantes, registra el estado en `docs/estado-actual.md`, el destino en `docs/roadmap.md` y el procedimiento en `docs/guia-documentacion.md`.
+Al terminar una funcionalidad, verifica rutas, variables `PUBLIC_*`, comandos, migraciones, eventos Socket.IO, capturas o instrucciones manuales y enlaces relativos. Actualiza el documento final dueño del tema y conserva límites o follow-ups en trazabilidad, sin duplicar documentación histórica.
 
 ## Estilo
 

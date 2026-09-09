@@ -365,6 +365,8 @@ export async function createAgreement(
   return agreement;
 }
 
+// Agreement commands are version-specific: a stale acceptance must not confirm
+// a newer proposal that the participant has not reviewed.
 export async function commandAgreement(input: {
   id: number;
   actorId: number;
