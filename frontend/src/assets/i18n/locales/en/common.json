@@ -122,7 +122,7 @@
     "es": "Spanish"
   },
   "booksPage": {
-    "description": "Manage the books you offer, sell, or are looking for.",
+    "description": "Manage the books you offer, sell, or are interested in.",
     "search_label": "Search books",
     "filters": {
       "button": "Filters",
@@ -132,7 +132,11 @@
         "available": "Available",
         "reserved": "Reserved"
       },
-      "type": { "label": "Publication", "offer": "Offered", "want": "Wanted" },
+      "type": {
+        "label": "Publication",
+        "offer": "Offered",
+        "want": "Interested"
+      },
       "topic": "Topic",
       "topicPlaceholder": "Science, fiction, history...",
       "interest": "Interest",
@@ -153,16 +157,16 @@
       "price_desc": "Highest price"
     },
     "want": {
-      "open": "Search for a book",
-      "title": "Search for a book",
-      "subtitle": "Tell the community which book you want to find.",
+      "open": "I'm interested",
+      "title": "Share an interest",
+      "subtitle": "Let the community know which book interests you.",
       "cancel": "Cancel",
-      "submit": "Publish request",
-      "saving": "Publishing...",
-      "created": "Request published",
-      "duplicate": "You already have an active request for this book.",
-      "error": "The request could not be published.",
-      "search": "Choose a book to add to Seeking",
+      "submit": "Share interest",
+      "saving": "Saving interest...",
+      "created": "Interest shared",
+      "duplicate": "You already shared your interest in this book.",
+      "error": "Your interest could not be shared.",
+      "search": "Choose a book to add to your interests",
       "searchPlaceholder": "ISBN, title, or author...",
       "searching": "Searching...",
       "searchError": "We couldn't search right now.",
@@ -221,7 +225,7 @@
       "label": "Book types",
       "all": "All",
       "for_trade": "For trade",
-      "seeking": "Seeking",
+      "seeking": "I'm interested",
       "for_sale": "For sale",
       "see_all": "See all"
     },
@@ -230,9 +234,9 @@
       "filteredHint": "Try another search or remove some filters.",
       "all": "We couldn't find published books yet.",
       "trade": "You haven't listed books for trade yet.",
-      "seeking": "No books in your wish list.",
+      "seeking": "You haven't added any books you're interested in yet.",
       "sale": "You don't have books for sale yet.",
-      "contextualHint": "You can publish a book or add one to Seeking."
+      "contextualHint": "You can publish a book or share an interest."
     },
     "status": {
       "available": "Available",
@@ -243,7 +247,7 @@
     "badge": {
       "for_sale": "For sale · ${{price}}",
       "for_trade": "Trade",
-      "seeking": "Seeking"
+      "seeking": "Interested"
     },
     "intentions": {
       "sale": "For sale"
@@ -528,6 +532,9 @@
     }
   },
   "community": {
+    "feed": {
+      "seekingBook": "Interested in this book"
+    },
     "messages": {
       "states": {
         "loadingConversations": "Loading conversations...",
@@ -995,7 +1002,7 @@
       "distanceUnavailable": "Distance unavailable",
       "types": {
         "offer": "Offer",
-        "want": "Wants",
+        "want": "Interested in",
         "donation": "Donation",
         "sale": "For sale"
       }
@@ -1033,7 +1040,7 @@
       "completed": "Completed",
       "draft": "Draft",
       "sold": "Sold",
-      "seeking": "Seeking",
+      "seeking": "Interested",
       "exchanged": "Exchanged"
     },
     "changeStatus": "Change status",

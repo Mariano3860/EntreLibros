@@ -61,6 +61,7 @@ export const mockExperienceFixtures = {
       owner: 'Ana',
       distance: '1,8 km',
       mode: 'Buscado',
+      intentions: ['seeking'],
       accent: '#8b75b9',
       genre: 'Fantasía',
     },

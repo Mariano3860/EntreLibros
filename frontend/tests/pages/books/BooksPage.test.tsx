@@ -136,6 +136,19 @@ describe('BooksPage', () => {
     )
   })
 
+  test('keeps the legacy seeking URL bound to the same interest relation', async () => {
+    renderWithProviders(<BooksPage />, { initialEntries: ['/books/seeking'] })
+
+    await waitFor(() =>
+      expect(fetchBookRelations).toHaveBeenCalledWith(
+        expect.objectContaining({ tab: 'seeking' })
+      )
+    )
+    expect(
+      screen.getByRole('tab', { name: 'booksPage.tabs.seeking' })
+    ).toHaveAttribute('aria-selected', 'true')
+  })
+
   test('shows a contextual empty state for each personal relation tab', async () => {
     fetchBookRelations.mockImplementation(async ({ tab }: { tab: string }) => ({
       items: [],

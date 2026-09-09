@@ -687,7 +687,8 @@ export const BooksPage = () => {
                   coverUrl:
                     selectedBook.coverUrl ??
                     `/illustrations/book-cover.svg?book=${selectedBook.id}`,
-                  isSeeking: selectedBook.mode === 'Buscado',
+                  isSeeking:
+                    selectedBook.intentions?.includes('seeking') ?? false,
                   ownerName: selectedBook.owner,
                 }
               : undefined

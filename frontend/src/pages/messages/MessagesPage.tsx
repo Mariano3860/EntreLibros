@@ -952,7 +952,10 @@ const MockMessagesPage = () => {
                     <span>
                       <strong>{book.title}</strong>
                       <small>
-                        {book.author} · {book.mode}
+                        {book.author} ·{' '}
+                        {book.intentions?.includes('seeking')
+                          ? t('booksPage.badge.seeking')
+                          : book.mode}
                       </small>
                     </span>
                     <b>＋</b>
