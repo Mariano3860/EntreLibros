@@ -62,28 +62,25 @@ test("lists seeded books and keeps a detail coherent after navigation and reload
   ).toBeVisible();
 });
 
-test("uses the real catalog API when filtering by title", async ({
+test("discovers public publications when filtering by title", async ({
   userAPage,
 }) => {
   await userAPage.goto("/books");
   const search = userAPage.getByRole("textbox", { name: "Buscar libros" });
   const filteredResponse = waitForApiResponse(
     userAPage,
-    "/api/books/relations",
+    "/api/books?scope=all",
   );
 
-  // `/books` is the authenticated user's personal relations catalog, so A
-  // is the matching seed publication for this context and B is intentionally
-  // outside the returned relation set.
-  await search.fill("E2E Book A");
+  await search.fill("E2E Book B");
   await filteredResponse;
 
   await expect(
-    userAPage.getByRole("button", { name: "Ver E2E Book A" }),
+    userAPage.getByRole("button", { name: "Ver E2E Book B" }),
   ).toBeVisible();
   await expect(
-    userAPage.getByRole("button", { name: "Ver E2E Book B" }),
-  ).toHaveCount(0);
+    userAPage.getByText("Publicación de otra persona"),
+  ).toBeVisible();
 });
 
 test("hides a blocked owner's public publication in discovery and detail", async ({

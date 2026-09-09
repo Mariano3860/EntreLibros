@@ -3,11 +3,15 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 const fetchMe = vi.hoisted(() => vi.fn())
 const fetchBookRelations = vi.hoisted(() => vi.fn())
+const fetchPublicBookCatalog = vi.hoisted(() => vi.fn())
 const createWantBook = vi.hoisted(() => vi.fn())
 
 vi.mock('@src/utils/runtimeEnv', () => ({ isApiMockMode: () => false }))
 vi.mock('@src/api/auth/me.service', () => ({ fetchMe }))
-vi.mock('@api/books/books.service', () => ({ fetchBookRelations }))
+vi.mock('@api/books/books.service', () => ({
+  fetchBookRelations,
+  fetchPublicBookCatalog,
+}))
 vi.mock('@api/books/bookInteractions.service', () => ({ createWantBook }))
 
 import { BooksPage } from '@src/pages/books/BooksPage'
@@ -42,13 +46,60 @@ const relationPage = (items = [discoveryBook]) => ({
   counts: { all: items.length, trade: items.length, sale: 0, seeking: 0 },
 })
 
+const publicCatalogPage = (
+  items = [
+    discoveryBook,
+    {
+      ...discoveryBook,
+      id: 'public-book',
+      title: 'Publicación comunitaria',
+      ownerId: '2',
+      ownerName: 'Lucía',
+    },
+  ]
+) => ({
+  items,
+  page: {
+    limit: 5,
+    offset: 0,
+    total: items.length,
+    hasNext: false,
+    hasPrevious: false,
+  },
+})
+
 describe('BooksPage relation interactions', () => {
   beforeEach(() => {
     fetchMe.mockReset()
     fetchMe.mockResolvedValue({ id: 1, name: 'Reader' })
     fetchBookRelations.mockReset()
     fetchBookRelations.mockResolvedValue(relationPage())
+    fetchPublicBookCatalog.mockReset()
+    fetchPublicBookCatalog.mockResolvedValue(publicCatalogPage())
     createWantBook.mockReset()
+  })
+
+  test('uses the public catalog in Todos when searching and identifies external publications', async () => {
+    renderWithProviders(<BooksPage />, {
+      initialEntries: ['/books?q=Dune'],
+    })
+
+    expect(await screen.findByText('booksPage.discovery.title')).toBeVisible()
+    expect(
+      await screen.findByRole('button', {
+        name: 'Ver Libro de descubrimiento',
+      })
+    ).toBeVisible()
+    expect(
+      await screen.findByRole('button', {
+        name: 'Ver Publicación comunitaria',
+      })
+    ).toBeVisible()
+    expect(screen.getAllByText('booksPage.publicPublication')).toHaveLength(1)
+    expect(fetchPublicBookCatalog).toHaveBeenCalledWith(
+      expect.objectContaining({ q: 'Dune', limit: 5, offset: 0 })
+    )
+    expect(fetchBookRelations).not.toHaveBeenCalled()
   })
 
   test('opens a want form from the header action and creates a demand', async () => {

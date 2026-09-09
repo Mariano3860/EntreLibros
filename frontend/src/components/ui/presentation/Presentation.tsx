@@ -220,6 +220,11 @@ export const CatalogBookCard = ({
       >
         <BookCover book={book} />
         <div className={styles.bookCardBody}>
+          {book.isExternal ? (
+            <span className={styles.bookContext}>
+              {t('booksPage.publicPublication')}
+            </span>
+          ) : null}
           <span className={styles.bookMode}>{modeLabel}</span>
           <h3>{book.title}</h3>
           <p>{book.author}</p>

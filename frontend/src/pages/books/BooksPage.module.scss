@@ -173,6 +173,22 @@
   content: '';
 }
 
+.discoveryNotice {
+  display: grid;
+  gap: 3px;
+  padding: 11px 13px;
+  margin-bottom: 14px;
+  border-color: rgb(110 133 181 / 28%);
+  background: rgb(110 133 181 / 8%);
+  color: var(--app-muted);
+  font-size: 11px;
+}
+
+.discoveryNotice strong {
+  color: var(--app-text);
+  font-size: 12px;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));

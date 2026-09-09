@@ -337,6 +337,18 @@
   font-weight: 700;
 }
 
+.bookContext {
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: rgb(110 133 181 / 13%);
+  color: var(--app-muted);
+  font-size: 10px;
+  font-weight: 700;
+}
+
 .bookMeta,
 .bookFooter {
   display: flex;
