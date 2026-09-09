@@ -81,6 +81,11 @@ type ContributorRow = {
   value: number | string;
 };
 
+type SearchSignalRow = {
+  term: string;
+  count: number | string;
+};
+
 const AVATAR_FALLBACK = '/logo.svg';
 
 function relativeTime(date: Date): string {
@@ -302,6 +307,7 @@ export async function getPersistedCommunityStats(): Promise<PersistedCommunitySt
     trendBooksResult,
     trendExchangesResult,
     contributorResult,
+    searchSignalResult,
     map,
   ] = await Promise.all([
     query<{
@@ -354,6 +360,25 @@ export async function getPersistedCommunityStats(): Promise<PersistedCommunitySt
           ) contributors
         `
     ),
+    query<SearchSignalRow>(
+      `
+        SELECT token AS term, COUNT(*)::int AS count
+        FROM (
+          SELECT regexp_split_to_table(
+            lower(concat_ws(' ', b.title, b.author)),
+            '[^[:alnum:]]+'
+          ) AS token
+          FROM book_listings p
+          JOIN books b ON b.id = p.book_id
+          WHERE ${publicListingWhere('p')}
+        ) signals
+        WHERE length(token) >= 4
+          AND token NOT IN ('para', 'como', 'libro', 'libros', 'esta', 'este')
+        GROUP BY token
+        ORDER BY count DESC, term
+        LIMIT 6
+      `
+    ),
     getCornersMap(),
   ]);
 
@@ -376,7 +401,10 @@ export async function getPersistedCommunityStats(): Promise<PersistedCommunitySt
       metric: row.metric,
       value: Number(row.value),
     })),
-    hotSearches: [],
+    hotSearches: searchSignalResult.rows.map((row) => ({
+      term: row.term,
+      count: Number(row.count),
+    })),
     activeHousesMap: map.pins.map((pin) => ({
       top: `${pin.y}%`,
       left: `${pin.x}%`,

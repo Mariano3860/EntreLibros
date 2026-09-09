@@ -3,6 +3,6 @@ export const isPublicFlagEnabled = (value: string | undefined): boolean => {
   return normalized === 'true' || normalized === '1' || normalized === 'yes'
 }
 
-export const isApiMockMode = (): boolean =>
-  isPublicFlagEnabled(import.meta.env.PUBLIC_API_USE_MOCKS) ||
-  import.meta.env.MODE === 'test'
+// Fixtures are a test harness concern. A public environment variable must not
+// silently replace persisted API data in a running application.
+export const isApiMockMode = (): boolean => import.meta.env.MODE === 'test'

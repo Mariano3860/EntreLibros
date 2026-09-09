@@ -5,18 +5,13 @@ import { useState } from 'react'
 import { fetchCommunityStats } from '@src/api/community/communityStats.service'
 import { fetchMvpMetrics } from '@src/api/community/mvpMetrics.service'
 import {
-  Avatar,
   KpiCard,
   MiniMap,
   PageHeader,
   Panel,
-  ActionButton,
   PageFrame,
   SectionHeading,
-  UnavailableState,
 } from '@src/components/ui/presentation/Presentation'
-import { useMockExperience } from '@src/contexts/mock/MockExperienceContext'
-import { isApiMockMode } from '@src/utils/runtimeEnv'
 
 import styles from './StatsPage.module.scss'
 
@@ -31,179 +26,8 @@ const points = (values: readonly number[]) =>
         .join(' ')
 
 export const StatsPage = () => {
-  const { fixtures } = useMockExperience()
-  const mockMode = isApiMockMode()
-  const [period, setPeriod] = useState('�ltimos 7 d�as')
-
-  if (!mockMode) return <RealStatsPage />
-
-  return (
-    <BaseLayout id="stats-page">
-      <PageFrame>
-        <PageHeader
-          title="Estadísticas"
-          description="Mirá cómo crecen las lecturas, intercambios y encuentros de EntreLibros."
-          actions={
-            <>
-              <label className={styles.period}>
-                <span>Período</span>
-                <select
-                  value={period}
-                  onChange={(event) => setPeriod(event.target.value)}
-                >
-                  <option>Últimos 7 días</option>
-                  <option>Últimos 30 días</option>
-                  <option>Este año</option>
-                </select>
-              </label>
-              <ActionButton>⇩ Exportar</ActionButton>
-            </>
-          }
-        />
-
-        <section className={styles.kpis}>
-          {fixtures.stats.kpis.map((kpi) => (
-            <KpiCard key={kpi.label} {...kpi} />
-          ))}
-        </section>
-
-        <div className={styles.dashboard}>
-          <Panel className={`${styles.card} ${styles.wide}`}>
-            <SectionHeading
-              title="Intercambios esta semana"
-              action={<span className={styles.growth}>↗ 12,4%</span>}
-            />
-            <div className={styles.legend}>
-              <span>● Intercambios</span>
-              <small>{period}</small>
-            </div>
-            <svg
-              className={styles.lineChart}
-              viewBox="0 0 600 190"
-              role="img"
-              aria-label="Intercambios por día"
-            >
-              <defs>
-                <linearGradient id="chart-fill" x1="0" y1="0" x2="0" y2="1">
-                  <stop stopColor="#42d7c7" stopOpacity=".35" />
-                  <stop offset="1" stopColor="#42d7c7" stopOpacity="0" />
-                </linearGradient>
-              </defs>
-              {[35, 70, 105, 140].map((y) => (
-                <line
-                  key={y}
-                  x1="0"
-                  y1={y}
-                  x2="600"
-                  y2={y}
-                  stroke="#294553"
-                  strokeDasharray="4 5"
-                />
-              ))}
-              <polygon
-                points={`0,180 ${points(fixtures.stats.weekly)} 600,180`}
-                fill="url(#chart-fill)"
-              />
-              <polyline
-                points={points(fixtures.stats.weekly)}
-                fill="none"
-                stroke="#42d7c7"
-                strokeWidth="4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              {fixtures.stats.weekly.map((value, index) => (
-                <circle
-                  key={index}
-                  cx={index * 100}
-                  cy={170 - value * 1.45}
-                  r="5"
-                  fill="#0b1d2a"
-                  stroke="#42d7c7"
-                  strokeWidth="3"
-                />
-              ))}
-            </svg>
-            <div className={styles.axis}>
-              {fixtures.stats.dayLabels.map((day) => (
-                <span key={day}>{day}</span>
-              ))}
-            </div>
-          </Panel>
-
-          <Panel className={styles.card}>
-            <SectionHeading
-              title="Publicaciones"
-              action={<button className={styles.menu}>•••</button>}
-            />
-            <div className={styles.barChart}>
-              {fixtures.stats.posts.map((value, index) => (
-                <div key={index}>
-                  <span style={{ height: `${value}%` }} />
-                  <small>{fixtures.stats.shortDayLabels[index]}</small>
-                </div>
-              ))}
-            </div>
-          </Panel>
-
-          <Panel className={styles.card}>
-            <SectionHeading title="Rincones más activos" />
-            <ol className={styles.ranking}>
-              {fixtures.corners.map((corner, index) => (
-                <li key={corner.id}>
-                  <b>{index + 1}</b>
-                  <span>
-                    <strong>{corner.name}</strong>
-                    <small>
-                      {corner.category} · {corner.distance}
-                    </small>
-                  </span>
-                  <em>{fixtures.stats.rankingVisits[index]}</em>
-                </li>
-              ))}
-            </ol>
-          </Panel>
-
-          <Panel className={styles.card}>
-            <SectionHeading
-              title="Mapa de actividad"
-              action={<span className={styles.growth}>En vivo</span>}
-            />
-            <MiniMap />
-          </Panel>
-
-          <Panel className={`${styles.card} ${styles.wide}`}>
-            <SectionHeading
-              title="Contribuyentes destacados"
-              action={
-                <ActionButton size="small" tone="ghost">
-                  Ver ranking →
-                </ActionButton>
-              }
-            />
-            <div className={styles.contributors}>
-              {fixtures.stats.contributors.map((person, index) => (
-                <article key={person.name}>
-                  <span className={styles.position}>{index + 1}</span>
-                  <Avatar initials={person.initials} accent={person.accent} />
-                  <div>
-                    <strong>{person.name}</strong>
-                    <small>{person.value}</small>
-                  </div>
-                  <span className={styles.badge}>★ Nivel {8 - index}</span>
-                </article>
-              ))}
-            </div>
-          </Panel>
-        </div>
-      </PageFrame>
-    </BaseLayout>
-  )
-}
-
-const RealStatsPage = () => {
   const [days, setDays] = useState<7 | 30 | 90>(30)
-  const query = useQuery({
+  const statsQuery = useQuery({
     queryKey: ['community', 'stats'],
     queryFn: fetchCommunityStats,
   })
@@ -212,7 +36,9 @@ const RealStatsPage = () => {
     queryFn: () => fetchMvpMetrics({ days }),
     retry: false,
   })
-  const stats = query.data
+
+  const stats = statsQuery.data
+
   return (
     <BaseLayout id="stats-page">
       <PageFrame>
@@ -235,126 +61,101 @@ const RealStatsPage = () => {
             </label>
           }
         />
-        {metricsQuery.isLoading ? (
-          <Panel className={styles.card}>Cargando métricas…</Panel>
-        ) : metricsQuery.isError ? (
-          <Panel className={styles.card}>
-            No pudimos cargar las métricas mínimas.
-          </Panel>
-        ) : metricsQuery.data?.status === 'no_data' ? (
-          <Panel className={styles.card}>
-            Sin datos para el período seleccionado.
-          </Panel>
-        ) : metricsQuery.data ? (
-          <Panel className={`${styles.card} ${styles.metricSummary}`}>
-            <SectionHeading
-              title="Métricas del MVP"
-              action={
-                <span className={styles.growth}>
-                  {metricsQuery.data.lastUpdatedAt
-                    ? `Actualizado ${new Date(metricsQuery.data.lastUpdatedAt).toLocaleString()}`
-                    : 'Sin actualización'}
-                </span>
-              }
-            />
-            <div className={styles.metricGrid}>
-              <span>
-                <strong>{metricsQuery.data.activeCorners}</strong>
-                Rincones activos
-              </span>
-              <span>
-                <strong>{metricsQuery.data.activeListings}</strong>
-                Publicaciones activas
-              </span>
-              <span>
-                <strong>{metricsQuery.data.confirmedAgreements}</strong>
-                Acuerdos confirmados
-              </span>
-              <span>
-                <strong>
-                  {metricsQuery.data.discoveryTimeMinutes === null
-                    ? '—'
-                    : `${Math.round(metricsQuery.data.discoveryTimeMinutes)} min`}
-                </strong>
-                Tiempo de descubrimiento
-              </span>
-            </div>
-            <div className={styles.funnel}>
-              <span>
-                Publicaciones → {metricsQuery.data.funnel.publications}
-              </span>
-              <span>Contactos → {metricsQuery.data.funnel.contacts}</span>
-              <span>Acuerdos → {metricsQuery.data.funnel.agreements}</span>
-              <span>
-                Confirmaciones → {metricsQuery.data.funnel.confirmations}
-              </span>
-            </div>
-          </Panel>
-        ) : null}
-        {query.isLoading ? (
+
+        {statsQuery.isLoading ? (
           <Panel className={styles.card}>Cargando estadísticas…</Panel>
-        ) : null}
-        {query.isError ? (
-          <UnavailableState
-            title="No pudimos cargar las estadísticas"
-            description="Intentá nuevamente en unos instantes."
-          />
-        ) : null}
-        {stats ? (
+        ) : statsQuery.isError || !stats ? (
+          <Panel className={styles.card} role="alert">
+            No pudimos cargar las estadísticas de la comunidad.
+          </Panel>
+        ) : (
           <>
             <section className={styles.kpis}>
               <KpiCard
                 icon="↔"
-                value={String(stats.kpis.exchanges)}
                 label="Intercambios"
+                value={String(stats.kpis.exchanges)}
                 tone="teal"
               />
               <KpiCard
                 icon="⌂"
-                value={String(stats.kpis.activeHouses)}
                 label="Rincones activos"
+                value={String(stats.kpis.activeHouses)}
                 tone="blue"
               />
               <KpiCard
-                icon="◉"
+                icon="●"
+                label="Personas activas"
                 value={String(stats.kpis.activeUsers)}
-                label="Usuarios activos"
-                tone="violet"
+                tone="purple"
               />
               <KpiCard
                 icon="▣"
-                value={String(stats.kpis.booksPublished)}
                 label="Libros publicados"
+                value={String(stats.kpis.booksPublished)}
                 tone="orange"
               />
             </section>
+
             <div className={styles.dashboard}>
               <Panel className={`${styles.card} ${styles.wide}`}>
-                <SectionHeading
-                  title="Intercambios esta semana"
-                  action={<span className={styles.growth}>En vivo</span>}
-                />
-                <svg
-                  className={styles.lineChart}
-                  viewBox="0 0 600 190"
-                  role="img"
-                  aria-label="Intercambios por día"
-                >
-                  <polyline
-                    points={points(stats.trendExchanges)}
-                    fill="none"
-                    stroke="#42d7c7"
-                    strokeWidth="4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                <SectionHeading title="Intercambios recientes" />
+                {stats.trendExchanges.length > 1 ? (
+                  <svg
+                    className={styles.lineChart}
+                    viewBox="0 0 600 190"
+                    role="img"
+                    aria-label="Intercambios por período"
+                  >
+                    <polyline
+                      points={points(stats.trendExchanges)}
+                      fill="none"
+                      stroke="#42d7c7"
+                      strokeWidth="4"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                ) : (
+                  <p>Sin datos suficientes para mostrar una tendencia.</p>
+                )}
               </Panel>
+
+              <Panel className={styles.card}>
+                <SectionHeading title="Métricas persistidas" />
+                {metricsQuery.isLoading ? (
+                  <p>Cargando métricas…</p>
+                ) : metricsQuery.isError ? (
+                  <p>No pudimos cargar las métricas del período.</p>
+                ) : metricsQuery.data?.status === 'no_data' ? (
+                  <p>Sin datos para el período seleccionado.</p>
+                ) : metricsQuery.data ? (
+                  <div className={styles.metricGrid}>
+                    <div>
+                      <strong>{metricsQuery.data.activeListings}</strong>
+                      <span>Publicaciones activas</span>
+                    </div>
+                    <div>
+                      <strong>{metricsQuery.data.activeCorners}</strong>
+                      <span>Rincones activos</span>
+                    </div>
+                    <div>
+                      <strong>{metricsQuery.data.confirmedAgreements}</strong>
+                      <span>Acuerdos confirmados</span>
+                    </div>
+                    <div>
+                      <strong>{metricsQuery.data.funnel.contacts}</strong>
+                      <span>Contactos iniciados</span>
+                    </div>
+                  </div>
+                ) : null}
+              </Panel>
+
               <Panel className={styles.card}>
                 <SectionHeading title="Contribuyentes destacados" />
                 <ol className={styles.ranking}>
                   {stats.topContributors.map((person, index) => (
-                    <li key={person.username}>
+                    <li key={`${person.username}-${person.metric}`}>
                       <b>{index + 1}</b>
                       <span>
                         <strong>{person.username}</strong>
@@ -369,24 +170,34 @@ const RealStatsPage = () => {
                   ))}
                 </ol>
               </Panel>
+
               <Panel className={styles.card}>
+                <SectionHeading title="Mapa de actividad" />
+                <MiniMap />
+              </Panel>
+
+              <Panel className={`${styles.card} ${styles.wide}`}>
                 <SectionHeading title="Búsquedas populares" />
                 <ol className={styles.ranking}>
-                  {stats.hotSearches.map((item, index) => (
-                    <li key={item.term}>
-                      <b>{index + 1}</b>
-                      <span>
-                        <strong>{item.term}</strong>
-                        <small>Consultas</small>
-                      </span>
-                      <em>{item.count}</em>
-                    </li>
-                  ))}
+                  {stats.hotSearches.length === 0 ? (
+                    <li>Sin búsquedas registradas.</li>
+                  ) : (
+                    stats.hotSearches.map((item, index) => (
+                      <li key={item.term}>
+                        <b>{index + 1}</b>
+                        <span>
+                          <strong>{item.term}</strong>
+                          <small>Consultas</small>
+                        </span>
+                        <em>{item.count}</em>
+                      </li>
+                    ))
+                  )}
                 </ol>
               </Panel>
             </div>
           </>
-        ) : null}
+        )}
       </PageFrame>
     </BaseLayout>
   )

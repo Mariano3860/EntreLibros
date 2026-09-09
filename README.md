@@ -14,14 +14,16 @@ mensajería privada.
 ## Stack
 
 React/Rsbuild, TypeScript, Express, Socket.IO, PostgreSQL/PostGIS, Docker y
-Playwright. `PUBLIC_API_USE_MOCKS=true` activa demo MSW; el modo real usa API y
-Socket.IO.
+Playwright. La aplicación en ejecución usa siempre la API y Socket.IO reales;
+MSW queda aislado al arnés de tests.
 
 ## Ejecutar y verificar
 
 ```bash
 npm install
 npm run migrate
+npm run seed:local
+npm run seed:local:verify
 npm run dev
 npm run test:backend
 npm run test:frontend
@@ -32,6 +34,8 @@ npm run build:frontend
 npm run verify:e2e
 ```
 
-Consulta [Testing](docs/testing.md) y
+Para poblar el recorrido local de defensa, usa `npm run seed:local`; para
+retirarlo sin tocar otros datos, usa `npm run seed:local:cleanup`. Consulta
+[Testing](docs/testing.md), [Local dataset](docs/local-dataset.md) y
 [Deployment and Operation](docs/deployment-and-operation.md) para límites y
 prerrequisitos de cada verificación.

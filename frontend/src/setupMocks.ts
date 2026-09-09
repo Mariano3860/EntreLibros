@@ -14,7 +14,11 @@ export async function enableMocking(options: EnableMockingOptions = {}) {
   // requires restarting dev or rebuilding before this decision can change.
   const useMocksEnv =
     options.useMocksEnv ?? import.meta.env.PUBLIC_API_USE_MOCKS ?? undefined
-  const explicitlyEnabled = isPublicFlagEnabled(useMocksEnv?.toString())
+  // MSW is intentionally restricted to the test bundle. Local runtime data
+  // must come from the API and database even if an old PUBLIC_* flag lingers.
+  const explicitlyEnabled =
+    import.meta.env.MODE === 'test' &&
+    isPublicFlagEnabled(useMocksEnv?.toString())
 
   if (!explicitlyEnabled) {
     return

@@ -57,7 +57,13 @@ describe('community persistence endpoints', () => {
       activeUsers: expect.any(Number),
       booksPublished: expect.any(Number),
     });
-    expect(response.body.hotSearches).toEqual([]);
+    expect(response.body.hotSearches).toEqual(expect.any(Array));
+    for (const signal of response.body.hotSearches) {
+      expect(signal).toEqual({
+        term: expect.any(String),
+        count: expect.any(Number),
+      });
+    }
     expect(response.body.activeHousesMap).toEqual(expect.any(Array));
   });
 
