@@ -209,6 +209,11 @@
     "loading": "Cargando libros...",
     "error": "No pudimos cargar los libros. Intenta nuevamente.",
     "title": "Mis libros",
+    "discovery": {
+      "title": "Publicaciones de otros lectores",
+      "description": "Estos resultados muestran libros publicados por la comunidad."
+    },
+    "publicPublication": "Publicación de otra persona",
     "search_placeholder": "Buscar por título, autor, ISBN",
     "filter": {
       "near": "Cerca",

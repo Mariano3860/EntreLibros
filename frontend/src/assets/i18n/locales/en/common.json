@@ -205,6 +205,11 @@
     "loading": "Loading books...",
     "error": "We couldn't load the books. Please try again.",
     "title": "My books",
+    "discovery": {
+      "title": "Publications from other readers",
+      "description": "These results show books published by the community."
+    },
+    "publicPublication": "Another reader's publication",
     "search_placeholder": "Search by title, author, ISBN",
     "filter": {
       "near": "Near",

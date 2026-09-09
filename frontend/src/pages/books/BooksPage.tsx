@@ -1,4 +1,5 @@
 import {
+  fetchPublicBookCatalog,
   fetchBookRelations,
   type BookCatalogFilters,
 } from '@api/books/books.service'
@@ -100,6 +101,7 @@ const BookResults = ({
   books,
   tab,
   hasActiveFilters,
+  showPublicContext,
   onSelect,
   onClearFilters,
   onPublish,
@@ -108,74 +110,89 @@ const BookResults = ({
   books: BookCardView[]
   tab: PersonalBookRelationsTab
   hasActiveFilters: boolean
+  showPublicContext: boolean
   onSelect: (book: BookCardView) => void
   onClearFilters?: () => void
   onPublish: () => void
   onWant: () => void
 }) => {
   const { t } = useTranslation()
+  const publicNotice = showPublicContext ? (
+    <Panel className={styles.discoveryNotice} role="status">
+      <strong>{t('booksPage.discovery.title')}</strong>
+      <span>{t('booksPage.discovery.description')}</span>
+    </Panel>
+  ) : null
 
   if (!books.length) {
     return (
-      <Panel className={styles.empty}>
-        <strong>
-          {t(
-            hasActiveFilters ? 'booksPage.empty.filtered' : emptyKeyForTab(tab)
-          )}
-        </strong>
-        <span>
-          {t(
-            hasActiveFilters
-              ? 'booksPage.empty.filteredHint'
-              : 'booksPage.empty.contextualHint'
-          )}
-        </span>
-        {hasActiveFilters && onClearFilters ? (
-          <button
-            type="button"
-            className={styles.clearEmpty}
-            onClick={onClearFilters}
-          >
-            {t('booksPage.filters.reset')}
-          </button>
-        ) : null}
-        {!hasActiveFilters ? (
-          <div className={styles.emptyActions}>
-            <ActionButton
-              size="small"
-              tone={tab === 'seeking' ? 'primary' : 'ghost'}
-              onClick={tab === 'seeking' ? onWant : onPublish}
+      <>
+        {publicNotice}
+        <Panel className={styles.empty}>
+          <strong>
+            {t(
+              hasActiveFilters
+                ? 'booksPage.empty.filtered'
+                : emptyKeyForTab(tab)
+            )}
+          </strong>
+          <span>
+            {t(
+              hasActiveFilters
+                ? 'booksPage.empty.filteredHint'
+                : 'booksPage.empty.contextualHint'
+            )}
+          </span>
+          {hasActiveFilters && onClearFilters ? (
+            <button
+              type="button"
+              className={styles.clearEmpty}
+              onClick={onClearFilters}
             >
-              {t(
-                tab === 'seeking'
-                  ? 'booksPage.want.open'
-                  : 'booksPage.publish_button'
-              )}
-            </ActionButton>
-            {tab !== 'seeking' ? (
-              <ActionButton size="small" onClick={onWant}>
-                {t('booksPage.want.open')}
+              {t('booksPage.filters.reset')}
+            </button>
+          ) : null}
+          {!hasActiveFilters ? (
+            <div className={styles.emptyActions}>
+              <ActionButton
+                size="small"
+                tone={tab === 'seeking' ? 'primary' : 'ghost'}
+                onClick={tab === 'seeking' ? onWant : onPublish}
+              >
+                {t(
+                  tab === 'seeking'
+                    ? 'booksPage.want.open'
+                    : 'booksPage.publish_button'
+                )}
               </ActionButton>
-            ) : null}
-          </div>
-        ) : null}
-      </Panel>
+              {tab !== 'seeking' ? (
+                <ActionButton size="small" onClick={onWant}>
+                  {t('booksPage.want.open')}
+                </ActionButton>
+              ) : null}
+            </div>
+          ) : null}
+        </Panel>
+      </>
     )
   }
 
   return (
-    <div className={styles.grid}>
-      {books.map((book) => (
-        <article key={book.id} className={styles.resultCard}>
-          <CatalogBookCard book={book} onClick={() => onSelect(book)} />
-        </article>
-      ))}
-    </div>
+    <>
+      {publicNotice}
+      <div className={styles.grid}>
+        {books.map((book) => (
+          <article key={book.id} className={styles.resultCard}>
+            <CatalogBookCard book={book} onClick={() => onSelect(book)} />
+          </article>
+        ))}
+      </div>
+    </>
   )
 }
 
 export const BooksPage = () => {
-  const { isAuthenticated, isLoading } = useAuth()
+  const { user, isAuthenticated, isLoading } = useAuth()
   const { runIfAuthenticated } = useAuthRequired()
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -208,6 +225,7 @@ export const BooksPage = () => {
   const selectedSale = searchParams.get('sale') === 'true'
   const currentPage = Math.max(0, (toNumber(searchParams.get('page')) ?? 1) - 1)
   const hasActiveFilters = hasFilterValue(searchParams)
+  const showPublicDiscovery = activeTab === 'all' && search.trim().length > 0
 
   const updateParams = useCallback(
     (updates: Record<string, string | undefined>) => {
@@ -238,9 +256,8 @@ export const BooksPage = () => {
     navigate('/books', { replace: true })
   }, [navigate, segment])
 
-  const relationFilters = useMemo(
+  const catalogFilters = useMemo<BookCatalogFilters>(
     () => ({
-      tab: activeTab,
       q: search.trim() || undefined,
       topic: selectedTopic.trim() || undefined,
       interest: selectedInterest.trim() || undefined,
@@ -277,6 +294,11 @@ export const BooksPage = () => {
     ]
   )
 
+  const relationFilters = useMemo(
+    () => ({ ...catalogFilters, tab: activeTab }),
+    [activeTab, catalogFilters]
+  )
+
   useEffect(() => {
     if (!selectedRadius) {
       setLocationError(false)
@@ -302,15 +324,49 @@ export const BooksPage = () => {
   const relationsQuery = useQuery({
     queryKey: ['bookRelations', relationFilters],
     queryFn: () => fetchBookRelations(relationFilters),
-    enabled: !isLoading && isAuthenticated && segment !== 'mine',
+    enabled:
+      !isLoading &&
+      isAuthenticated &&
+      segment !== 'mine' &&
+      !showPublicDiscovery,
   })
 
+  const publicCatalogQuery = useQuery({
+    queryKey: ['publicBookCatalog', catalogFilters],
+    queryFn: () => fetchPublicBookCatalog(catalogFilters),
+    enabled:
+      !isLoading &&
+      isAuthenticated &&
+      segment !== 'mine' &&
+      showPublicDiscovery,
+  })
+
+  const activeItems = useMemo(
+    () =>
+      showPublicDiscovery
+        ? (publicCatalogQuery.data?.items ?? [])
+        : (relationsQuery.data?.items ?? []),
+    [
+      publicCatalogQuery.data?.items,
+      relationsQuery.data?.items,
+      showPublicDiscovery,
+    ]
+  )
   const books = useMemo(
     () =>
-      (relationsQuery.data?.items ?? []).map((book) => toBookCardView(book)),
-    [relationsQuery.data?.items]
+      activeItems.map((book) =>
+        toBookCardView(book, {
+          isExternal:
+            user?.id !== undefined &&
+            book.ownerId !== undefined &&
+            String(book.ownerId) !== String(user.id),
+        })
+      ),
+    [activeItems, user?.id]
   )
-  const total = relationsQuery.data?.page.total ?? 0
+  const total = showPublicDiscovery
+    ? (publicCatalogQuery.data?.page.total ?? 0)
+    : (relationsQuery.data?.page.total ?? 0)
   const totalPages = Math.max(1, Math.ceil(total / BOOKS_PER_PAGE))
   const activePage = Math.min(currentPage, totalPages - 1)
   const filterSummary = [
@@ -364,7 +420,10 @@ export const BooksPage = () => {
 
   const invalidateRelations = () => {
     void queryClient.invalidateQueries({ queryKey: ['bookRelations'] })
+    void queryClient.invalidateQueries({ queryKey: ['publicBookCatalog'] })
   }
+
+  const activeQuery = showPublicDiscovery ? publicCatalogQuery : relationsQuery
 
   return (
     <BaseLayout id="books-page">
@@ -566,15 +625,16 @@ export const BooksPage = () => {
             </button>
           ))}
         </div>
-        {relationsQuery.isLoading ? (
+        {activeQuery.isLoading ? (
           <Panel className={styles.empty}>{t('booksPage.loading')}</Panel>
-        ) : relationsQuery.isError ? (
+        ) : activeQuery.isError ? (
           <Panel className={styles.empty}>{t('booksPage.error')}</Panel>
         ) : (
           <BookResults
             books={books}
             tab={activeTab}
             hasActiveFilters={hasActiveFilters}
+            showPublicContext={showPublicDiscovery}
             onSelect={setSelectedBook}
             onClearFilters={hasActiveFilters ? resetFilters : undefined}
             onPublish={() => runIfAuthenticated(() => navigate('/books/new'))}

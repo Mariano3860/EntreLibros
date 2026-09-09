@@ -4,6 +4,7 @@ export type BookCardView = {
   author: string
   owner: string
   ownerId?: string
+  isExternal?: boolean
   distance: string
   mode: 'Intercambio' | 'Venta' | 'Buscado'
   intentions?: Array<'trade' | 'sale' | 'seeking'>

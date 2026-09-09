@@ -92,6 +92,22 @@ export const fetchBooks = async (
   return response.data
 }
 
+export const fetchPublicBookCatalog = async (
+  filters: BookCatalogFilters = {}
+): Promise<ApiBookCatalogPage> => {
+  const params = new URLSearchParams({ scope: 'all' })
+  appendFilters(params, filters)
+  const response = await apiClient.get<ApiBookCatalogPage>(
+    `${RELATIVE_API_ROUTES.BOOKS.LIST}?${params.toString()}`
+  )
+
+  if (!hasValidCatalogPage(response.data)) {
+    throw new Error('Invalid public book catalog response')
+  }
+
+  return response.data
+}
+
 const hasValidBookRelationsPage = (
   value: unknown
 ): value is ApiBookRelationsPage => {

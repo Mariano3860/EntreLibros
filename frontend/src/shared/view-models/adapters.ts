@@ -60,7 +60,7 @@ export const toProfileView = (profile: UserProfile): ProfileView => ({
 
 export const toBookCardView = (
   book: ApiBook,
-  options: { owner?: string; distance?: string } = {}
+  options: { owner?: string; distance?: string; isExternal?: boolean } = {}
 ): BookCardView => {
   const mode: BookCardView['mode'] = book.isSeeking
     ? 'Buscado'
@@ -79,6 +79,7 @@ export const toBookCardView = (
     author: book.author || 'Autor desconocido',
     owner: options.owner ?? book.ownerName ?? 'Miembro de EntreLibros',
     ...(book.ownerId ? { ownerId: String(book.ownerId) } : {}),
+    ...(options.isExternal ? { isExternal: true } : {}),
     distance: options.distance ?? 'Ubicación disponible',
     mode,
     ...(intentions.length > 0 ? { intentions } : {}),
