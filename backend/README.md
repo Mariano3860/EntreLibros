@@ -26,13 +26,29 @@ en el log del backend y las respuestas HTTP/Socket.IO conservan claves publicas.
 Las migraciones se ejecutan en orden y son append-only. Las versiones 031-034
 agregan outcomes privados de acuerdos, reportes, eventos de analitica y
 compatibilidad de esquema de reportes; la 035 agrega borradores privados de
-mensajeria con revision y adjuntos tipados. Para el dataset local usa:
+mensajería con revisión y adjuntos tipados.
+
+## Dataset local persistido
+
+Después de migrar la base de desarrollo, ejecuta desde la raíz:
 
 ```bash
-psql "$DATABASE_URL" -f backend/scripts/seed-demo-dataset.sql
+npm run seed:local
+npm run seed:local:verify
+npm run seed:local:cleanup
 ```
 
-No ejecutes la semilla sobre una base de produccion.
+`seed:local` crea un recorrido reproducible con 12 perfiles humanos, 30 libros,
+40 publicaciones, 8 Rincones, historias, relaciones sociales, conversaciones,
+mensajes, borradores, acuerdos, notificaciones y eventos de analítica. Es
+idempotente: una segunda ejecución actualiza la misma namespace y no duplica
+filas. `seed:local:cleanup` elimina únicamente esa namespace; no ejecuta
+`TRUNCATE` y conserva los libros bibliográficos compartidos.
+
+Ambos comandos rechazan `entrelibros_test`, `entrelibros_e2e`, nombres de
+producción y cualquier base que no esté en `ENTRELIBROS_LOCAL_DATABASE_NAMES`.
+La contraseña común de las cuentas sembradas es solo para desarrollo local y no
+debe reutilizarse fuera de esa base.
 
 ## Rutas relevantes
 

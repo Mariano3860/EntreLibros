@@ -22,6 +22,7 @@
 ## Operation
 
 - [Deployment and Operation](deployment-and-operation.md)
+- [Local dataset and defense walkthrough](local-dataset.md)
 
 Al cambiar comportamiento, verifica código, contratos, migraciones y tests;
 actualiza el documento dueño del tema y no presentes un modo mock o capacidad
