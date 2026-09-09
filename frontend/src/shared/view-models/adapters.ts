@@ -152,6 +152,7 @@ export const toChatMessageView = (
       message.senderId === currentUserId ? ('me' as const) : ('them' as const),
     text: message.body,
     time: formatRelativeTime(message.createdAt, now),
+    ...(message.deliveryState ? { deliveryState: message.deliveryState } : {}),
   }
   const attachment = message.attachmentMetadata
   if (!attachment) return base

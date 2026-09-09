@@ -5,6 +5,7 @@ import {
   isConversationParticipant,
   listConversations,
   markConversationRead,
+  markConversationDelivered,
   listMessages,
   messageEvents,
   type MessageAttachment,
@@ -44,6 +45,10 @@ export interface ClientToServerEvents {
     conversationId: number;
     sequence: number;
   }) => void;
+  'conversation:delivered': (
+    payload: { conversationId: number; sequence: number },
+    acknowledge?: (accepted: boolean) => void
+  ) => void;
 }
 
 export interface ServerToClientEvents {
@@ -64,6 +69,16 @@ export interface ServerToClientEvents {
     currentVersion: number;
   }) => void;
   'conversation:error': (payload: { message: string }) => void;
+  'conversation:delivered': (payload: {
+    conversationId: number;
+    sequence: number;
+    userId: number;
+  }) => void;
+  'conversation:read': (payload: {
+    conversationId: number;
+    sequence: number;
+    userId: number;
+  }) => void;
 }
 
 export type InterServerEvents = Record<string, never>;
@@ -102,6 +117,8 @@ function isValidConversationRead(
     (value.sequence as number) >= 0
   );
 }
+
+const isValidConversationDelivered = isValidConversationRead;
 
 function socketError(error: unknown) {
   logPublicError('Socket conversation operation failed', error);
@@ -289,7 +306,38 @@ export function setupWebsocket(
           sequence
         );
         await markMessageNotificationsRead(conversationId, socket.data.user.id);
+        io.to(`conversation:${conversationId}`).emit('conversation:read', {
+          conversationId,
+          sequence,
+          userId: socket.data.user.id,
+        });
       } catch (error) {
+        socket.emit('conversation:error', socketError(error));
+      }
+    });
+
+    socket.on('conversation:delivered', async (payload, acknowledge) => {
+      if (!isValidConversationDelivered(payload)) {
+        acknowledge?.(false);
+        emitInvalidSocketPayload(socket);
+        return;
+      }
+      try {
+        const { conversationId, sequence } = payload;
+        const advanced = await markConversationDelivered(
+          conversationId,
+          socket.data.user.id,
+          sequence
+        );
+        acknowledge?.(true);
+        if (advanced) {
+          io.to(`conversation:${conversationId}`).emit(
+            'conversation:delivered',
+            { conversationId, sequence, userId: socket.data.user.id }
+          );
+        }
+      } catch (error) {
+        acknowledge?.(false);
         socket.emit('conversation:error', socketError(error));
       }
     });

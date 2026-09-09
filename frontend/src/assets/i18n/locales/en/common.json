@@ -572,6 +572,11 @@
         "lastSeen": "Last seen {{lastSeen}}",
         "lastSeenFallback": "just now"
       },
+      "delivery": {
+        "sent": "Sent",
+        "delivered": "Delivered",
+        "read": "Read"
+      },
       "searchPlaceholder": "Search",
       "searchAriaLabel": "Search conversations",
       "filterLabel": "Conversation filter",

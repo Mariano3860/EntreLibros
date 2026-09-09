@@ -258,4 +258,43 @@ describe('websocket messaging', () => {
     });
     await unexpectedFailure;
   });
+
+  test('authorizes delivered acknowledgements and broadcasts them to the room', async () => {
+    const delivered = vi
+      .spyOn(messagingRepo, 'markConversationDelivered')
+      .mockResolvedValueOnce(true);
+    const status = new Promise<void>((resolve) => {
+      clientSocket.once('conversation:delivered', (payload) => {
+        expect(payload).toEqual({
+          conversationId: 101,
+          sequence: 2,
+          userId: 1,
+        });
+        resolve();
+      });
+    });
+    const acknowledged = new Promise<boolean>((resolve) => {
+      clientSocket.emit(
+        'conversation:delivered',
+        { conversationId: 101, sequence: 2 },
+        resolve
+      );
+    });
+
+    await expect(acknowledged).resolves.toBe(true);
+    await status;
+    expect(delivered).toHaveBeenCalledWith(101, 1, 2);
+
+    const invalidPayload = new Promise<void>((resolve) => {
+      clientSocket.once('conversation:error', (payload) => {
+        expect(payload.message).toBe('messaging.errors.invalid_payload');
+        resolve();
+      });
+    });
+    clientSocket.emit('conversation:delivered', {
+      conversationId: 101,
+      sequence: -1,
+    });
+    await invalidPayload;
+  });
 });

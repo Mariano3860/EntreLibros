@@ -33,11 +33,14 @@ export type ChatBookView = {
   coverUrl: string
 }
 
+export type MessageDeliveryState = 'sent' | 'delivered' | 'read'
+
 export type ChatMessageView = {
   id: string
   role: 'me' | 'them'
   text: string
   time: string
+  deliveryState?: MessageDeliveryState
   kind?: 'book' | 'proposal' | 'swap' | 'agreement'
   book?: ChatBookView
   swap?: {

@@ -576,6 +576,11 @@
         "lastSeen": "Última vez {{lastSeen}}",
         "lastSeenFallback": "hace un momento"
       },
+      "delivery": {
+        "sent": "Enviado",
+        "delivered": "Entregado",
+        "read": "Leído"
+      },
       "searchPlaceholder": "Buscar",
       "searchAriaLabel": "Buscar conversaciones",
       "filterLabel": "Filtro de conversaciones",

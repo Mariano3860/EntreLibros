@@ -376,6 +376,18 @@ main.layoutMain {
   text-align: right;
 }
 
+.deliveryStatus {
+  display: inline-block;
+  margin-left: 3px;
+  color: var(--app-muted);
+  font-weight: 700;
+  letter-spacing: -0.08em;
+}
+
+.deliveryStatusRead {
+  color: var(--app-teal);
+}
+
 .mine {
   align-self: flex-end;
   border-color: rgb(66 215 199 / 24%);

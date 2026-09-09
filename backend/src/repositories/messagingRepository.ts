@@ -82,6 +82,8 @@ export type MessageAttachment = MessageAttachmentBase &
 
 export type MessageAttachmentKind = MessageAttachment['kind'];
 
+export type MessageDeliveryState = 'sent' | 'delivered' | 'read';
+
 export const messageEvents = new EventEmitter();
 
 export function publishMessage(message: PersistedMessage): void {
@@ -97,6 +99,7 @@ export interface PersistedMessage {
   body: string;
   attachmentMetadata: MessageAttachment | null;
   createdAt: Date;
+  deliveryState?: MessageDeliveryState;
 }
 
 interface ConversationRow {
@@ -118,6 +121,7 @@ interface MessageRow {
   body: string;
   attachment_metadata: MessageAttachment | null;
   created_at: Date;
+  delivery_state?: MessageDeliveryState | null;
 }
 
 function mapConversation(row: ConversationRow): ConversationSummary {
@@ -133,7 +137,10 @@ function mapConversation(row: ConversationRow): ConversationSummary {
   };
 }
 
-function mapMessage(row: MessageRow): PersistedMessage {
+function mapMessage(
+  row: MessageRow,
+  fallbackDeliveryState?: MessageDeliveryState
+): PersistedMessage {
   return {
     id: Number(row.id),
     conversationId: Number(row.conversation_id),
@@ -143,6 +150,9 @@ function mapMessage(row: MessageRow): PersistedMessage {
     body: row.body,
     attachmentMetadata: row.attachment_metadata,
     createdAt: row.created_at,
+    ...(row.delivery_state || fallbackDeliveryState
+      ? { deliveryState: row.delivery_state ?? fallbackDeliveryState }
+      : {}),
   };
 }
 
@@ -474,15 +484,45 @@ export async function listMessages(
   const limit = Math.min(Math.max(options.limit ?? 50, 1), 100);
   const after = options.after ?? 0;
   const { rows } = await query<MessageRow>(
-    `SELECT id, conversation_id, sender_id, sequence, client_key, body,
-            attachment_metadata, created_at
-     FROM messages
-     WHERE conversation_id = $1 AND sequence > $2
-     ORDER BY sequence ASC
-     LIMIT $3`,
-    [conversationId, after, limit]
+    `SELECT m.id, m.conversation_id, m.sender_id, m.sequence, m.client_key,
+            m.body, m.attachment_metadata, m.created_at,
+            CASE
+              WHEN m.sender_id <> $2 THEN NULL
+              WHEN EXISTS (
+                SELECT 1
+                FROM conversation_participants recipient
+                WHERE recipient.conversation_id = m.conversation_id
+                  AND recipient.user_id <> m.sender_id
+              )
+              AND NOT EXISTS (
+                SELECT 1
+                FROM conversation_participants recipient
+                WHERE recipient.conversation_id = m.conversation_id
+                  AND recipient.user_id <> m.sender_id
+                  AND recipient.last_read_sequence < m.sequence
+              ) THEN 'read'
+              WHEN EXISTS (
+                SELECT 1
+                FROM conversation_participants recipient
+                WHERE recipient.conversation_id = m.conversation_id
+                  AND recipient.user_id <> m.sender_id
+              )
+              AND NOT EXISTS (
+                SELECT 1
+                FROM conversation_participants recipient
+                WHERE recipient.conversation_id = m.conversation_id
+                  AND recipient.user_id <> m.sender_id
+                  AND recipient.last_delivered_sequence < m.sequence
+              ) THEN 'delivered'
+              ELSE 'sent'
+            END AS delivery_state
+     FROM messages m
+     WHERE m.conversation_id = $1 AND m.sequence > $3
+     ORDER BY m.sequence ASC
+     LIMIT $4`,
+    [conversationId, userId, after, limit]
   );
-  return rows.map(mapMessage);
+  return rows.map((row) => mapMessage(row));
 }
 
 function asListingId(value: string): number | null {
@@ -627,7 +667,7 @@ export async function findMessageWithClient(
      WHERE conversation_id = $1 AND sender_id = $2 AND client_key = $3`,
     [input.conversationId, input.senderId, input.clientKey]
   );
-  return rows[0] ? mapMessage(rows[0]) : null;
+  return rows[0] ? mapMessage(rows[0], 'sent') : null;
 }
 
 // The conversation row is locked before assigning a sequence. Rechecking the
@@ -702,7 +742,7 @@ export async function sendMessageWithClient(
       input.attachmentMetadata ?? null,
     ]
   );
-  return { message: mapMessage(rows[0]), created: true };
+  return { message: mapMessage(rows[0], 'sent'), created: true };
 }
 
 export async function sendMessageWithStatus(
@@ -721,8 +761,47 @@ export async function markConversationRead(
   }
   await query(
     `UPDATE conversation_participants
-     SET last_read_sequence = GREATEST(last_read_sequence, $3)
+     SET last_read_sequence = GREATEST(last_read_sequence, $3),
+         last_delivered_sequence = GREATEST(last_delivered_sequence, $3)
      WHERE conversation_id = $1 AND user_id = $2`,
     [conversationId, userId, sequence]
   );
+}
+
+/**
+ * Records that a participant received a committed message. The cursor is
+ * monotonic and only a participant who received a message from someone else
+ * can advance it; a sender cannot acknowledge their own message as delivered.
+ */
+export async function markConversationDelivered(
+  conversationId: number,
+  userId: number,
+  sequence: number
+): Promise<boolean> {
+  if (!Number.isInteger(sequence) || sequence < 0) {
+    throw new Error('messaging.errors.invalid_sequence');
+  }
+  if (!(await isConversationParticipant(conversationId, userId))) {
+    throw new Error('messaging.errors.forbidden');
+  }
+  const message = await query<{ sender_id: number }>(
+    `SELECT sender_id
+     FROM messages
+     WHERE conversation_id = $1 AND sequence = $2`,
+    [conversationId, sequence]
+  );
+  if (!message.rows[0]) {
+    throw new Error('messaging.errors.not_found');
+  }
+  if (Number(message.rows[0].sender_id) === userId) return false;
+  const result = await query<{ updated: boolean }>(
+    `UPDATE conversation_participants
+     SET last_delivered_sequence = GREATEST(last_delivered_sequence, $3)
+     WHERE conversation_id = $1
+       AND user_id = $2
+       AND last_delivered_sequence < $3
+     RETURNING TRUE AS updated`,
+    [conversationId, userId, sequence]
+  );
+  return result.rows.length > 0;
 }

@@ -6,8 +6,14 @@ HTTP es el command path canónico: el usuario guarda un borrador con
 el mensaje antes de notificar o emitir eventos.
 
 Socket.IO no crea mensajes. `conversation:join` valida al participante, abre la
-room y permite replay posterior al cursor; `conversation:read` avanza el cursor.
-`conversation:message` y `agreement:updated` distribuyen hechos ya persistidos.
+room y permite replay posterior al cursor; `conversation:read` avanza el cursor
+de lectura. Al recibir o reproducir un mensaje, el cliente emite
+`conversation:delivered`; el servidor valida al participante y actualiza el
+cursor monotónico `conversation_participants.last_delivered_sequence`.
+`conversation:message`, `conversation:delivered`, `conversation:read` y
+`agreement:updated` distribuyen hechos ya persistidos. El historial calcula
+`deliveryState` para los mensajes propios como `sent`, `delivered` o `read`, sin
+exponer ticks en mensajes entrantes, drafts ni texto todavía no enviado.
 
 Un draft tiene revisión y es privado: no pertenece al historial, no incrementa
 unread ni crea notificaciones hasta enviarse. `clientKey` evita duplicados.

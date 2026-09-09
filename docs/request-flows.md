@@ -24,7 +24,9 @@ Revisa pruebas API/map y `e2e/tests/map.spec.ts`.
 
 `MessagesPage` guarda un draft y lo envía por HTTP. `sendDraftMessageCommand`
 valida, persiste y luego publica el evento comprometido. Socket.IO entrega o
-repite mensajes para participantes autorizados. Las rutas de acuerdos crean,
+repite mensajes para participantes autorizados; el cliente confirma la entrega
+con `conversation:delivered` y la lectura con `conversation:read`. El historial
+devuelve el estado persistido de los mensajes propios. Las rutas de acuerdos crean,
 versionan y confirman propuestas; notificaciones reaccionan a eventos
 persistidos. Revisa `messagingAgreement.e2e.test.ts`, socket y acuerdos.
 

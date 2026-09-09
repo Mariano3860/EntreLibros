@@ -7,6 +7,7 @@ import {
   ensureBotConversation,
   listConversations,
   listMessages,
+  markConversationDelivered,
   markConversationRead,
   sendMessageWithStatus,
 } from '../../src/repositories/messagingRepository.js';
@@ -181,5 +182,77 @@ describe('messagingRepository', () => {
         expect.objectContaining({ id: conversation.id, unreadCount: 0 }),
       ])
     );
+  });
+
+  test('derives monotonic sent, delivered and read states from participant cursors', async () => {
+    const firstUser = await createUser('delivery-first');
+    const secondUser = await createUser('delivery-second');
+    const outsider = await createUser('delivery-outsider');
+    const conversation = await createConversation([firstUser, secondUser]);
+
+    const saved = await sendMessageWithStatus({
+      conversationId: conversation.id,
+      senderId: firstUser,
+      clientKey: 'delivery-check-1',
+      body: 'Estado verificable',
+    });
+    const second = await sendMessageWithStatus({
+      conversationId: conversation.id,
+      senderId: firstUser,
+      clientKey: 'delivery-check-2',
+      body: 'Segundo estado',
+    });
+
+    await expect(
+      listMessages(conversation.id, firstUser)
+    ).resolves.toMatchObject([
+      { sequence: saved.message.sequence, deliveryState: 'sent' },
+      { sequence: second.message.sequence, deliveryState: 'sent' },
+    ]);
+    const incomingMessages = await listMessages(conversation.id, secondUser);
+    expect(incomingMessages).toHaveLength(2);
+    expect(incomingMessages[0]).not.toHaveProperty('deliveryState');
+    expect(incomingMessages[1]).not.toHaveProperty('deliveryState');
+
+    await expect(
+      markConversationDelivered(
+        conversation.id,
+        secondUser,
+        second.message.sequence
+      )
+    ).resolves.toBe(true);
+    await expect(
+      listMessages(conversation.id, firstUser)
+    ).resolves.toMatchObject([
+      { sequence: saved.message.sequence, deliveryState: 'delivered' },
+      { sequence: second.message.sequence, deliveryState: 'delivered' },
+    ]);
+
+    await expect(
+      markConversationDelivered(
+        conversation.id,
+        secondUser,
+        saved.message.sequence
+      )
+    ).resolves.toBe(false);
+    await markConversationRead(
+      conversation.id,
+      secondUser,
+      second.message.sequence
+    );
+    await expect(
+      listMessages(conversation.id, firstUser)
+    ).resolves.toMatchObject([
+      { sequence: saved.message.sequence, deliveryState: 'read' },
+      { sequence: second.message.sequence, deliveryState: 'read' },
+    ]);
+
+    await expect(
+      markConversationDelivered(
+        conversation.id,
+        outsider,
+        saved.message.sequence
+      )
+    ).rejects.toThrow('messaging.errors.forbidden');
   });
 });

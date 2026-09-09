@@ -14,6 +14,7 @@ import {
   fetchMessageHistory,
   markMessagesRead,
   messageQueryKeys,
+  type ApiMessage,
   type ConversationBook,
   type MessagingContact,
   type ApiMessageDraft,
@@ -303,6 +304,29 @@ const ChatMessageBubble = ({
 }: ChatMessageBubbleProps) => {
   const { t } = useTranslation()
   const alignment = item.role === 'me' ? styles.mine : ''
+  const deliveryLabel =
+    item.role === 'me' && item.deliveryState
+      ? t(`community.messages.delivery.${item.deliveryState}`, {
+          defaultValue:
+            item.deliveryState === 'sent'
+              ? 'Enviado'
+              : item.deliveryState === 'delivered'
+                ? 'Entregado'
+                : 'Le\u00eddo',
+        })
+      : null
+  const deliveryIndicator = deliveryLabel ? (
+    <span
+      className={`${styles.deliveryStatus} ${
+        item.deliveryState === 'read' ? styles.deliveryStatusRead : ''
+      }`}
+      role="img"
+      aria-label={deliveryLabel}
+      title={deliveryLabel}
+    >
+      {item.deliveryState === 'sent' ? '✓' : '✓✓'}
+    </span>
+  ) : null
 
   if (item.kind === 'book' && item.book) {
     return (
@@ -319,6 +343,9 @@ const ChatMessageBubble = ({
           {item.text && item.text !== item.book.title ? (
             <p>{item.text}</p>
           ) : null}
+          <small className={styles.bubbleTime}>
+            {item.time} {deliveryIndicator}
+          </small>
         </div>
       </article>
     )
@@ -357,7 +384,9 @@ const ChatMessageBubble = ({
           </div>
         </div>
         {item.swap.note ? <p>{item.swap.note}</p> : null}
-        <small className={styles.bubbleTime}>{item.time}</small>
+        <small className={styles.bubbleTime}>
+          {item.time} {deliveryIndicator}
+        </small>
       </article>
     )
   }
@@ -441,7 +470,9 @@ const ChatMessageBubble = ({
             </ActionButton>
           </div>
         ) : null}
-        <small className={styles.bubbleTime}>{item.time}</small>
+        <small className={styles.bubbleTime}>
+          {item.time} {deliveryIndicator}
+        </small>
       </article>
     )
   }
@@ -451,7 +482,7 @@ const ChatMessageBubble = ({
       <span>{item.text}</span>
       <small>
         {item.time}
-        {item.role === 'me' ? ' ✓✓' : ''}
+        {deliveryIndicator}
       </small>
     </div>
   )
@@ -767,9 +798,7 @@ const MockMessagesPage = () => {
                     className={`${styles.bubble} ${item.role === 'me' ? styles.mine : ''}`}
                   >
                     <span>{item.text}</span>
-                    <small>
-                      {item.time} {item.role === 'me' ? '✓✓' : ''}
-                    </small>
+                    <small>{item.time}</small>
                   </div>
                 )
               )}
@@ -1110,7 +1139,9 @@ const RealMessagesPage = () => {
   const queryClient = useQueryClient()
   const {
     conversationMessages: liveMessages,
+    messageStatuses = {},
     joinConversation,
+    notifyConversationRead = () => undefined,
     isConnected,
   } = useChatSocket()
   const [selected, setSelected] = useState<number | null>(null)
@@ -1444,6 +1475,7 @@ const RealMessagesPage = () => {
     lastReadSequenceRef.current.set(selected, lastSequence)
     void markMessagesRead(selected, lastSequence)
       .then(async () => {
+        notifyConversationRead(selected, lastSequence)
         await Promise.all([
           queryClient.invalidateQueries({
             queryKey: messageQueryKeys.conversations(),
@@ -1456,7 +1488,13 @@ const RealMessagesPage = () => {
           lastReadSequenceRef.current.delete(selected)
         }
       })
-  }, [historyQuery.data, liveMessages, queryClient, selected])
+  }, [
+    historyQuery.data,
+    liveMessages,
+    notifyConversationRead,
+    queryClient,
+    selected,
+  ])
 
   const handleSendDraft = async (draftOverride?: ApiMessageDraft | null) => {
     const draft = draftOverride ?? draftState.query.data
@@ -1652,8 +1690,36 @@ const RealMessagesPage = () => {
   const suggestedContacts = availableContacts.filter(
     (contact) => !contact.isFollowing
   )
+  const currentUserId = user?.id ?? -1
+  const deliveryRank = {
+    sent: 1,
+    delivered: 2,
+    read: 3,
+  } as const
+  const withDeliveryStatus = (item: ApiMessage): ApiMessage => {
+    if (item.senderId !== currentUserId) return item
+    let socketState = messageStatuses[`${item.conversationId}:${item.sequence}`]
+    for (const [key, state] of Object.entries(messageStatuses)) {
+      const [conversationId, sequence] = key.split(':').map(Number)
+      if (
+        conversationId === item.conversationId &&
+        sequence >= item.sequence &&
+        (!socketState || deliveryRank[state] > deliveryRank[socketState])
+      ) {
+        socketState = state
+      }
+    }
+    if (
+      !socketState ||
+      (item.deliveryState &&
+        deliveryRank[item.deliveryState] >= deliveryRank[socketState])
+    ) {
+      return item
+    }
+    return { ...item, deliveryState: socketState }
+  }
   const persistedMessages = (historyQuery.data?.messages ?? []).map((item) =>
-    toChatMessageView(item, user?.id ?? -1)
+    toChatMessageView(withDeliveryStatus(item), currentUserId)
   )
   const messages = [
     ...persistedMessages,
@@ -1667,7 +1733,7 @@ const RealMessagesPage = () => {
       )
       .map((item) =>
         toChatMessageView(
-          {
+          withDeliveryStatus({
             id: -item.sequence,
             conversationId: item.conversationId,
             senderId: item.senderId,
@@ -1676,8 +1742,8 @@ const RealMessagesPage = () => {
             body: item.body,
             attachmentMetadata: item.attachmentMetadata,
             createdAt: item.createdAt,
-          },
-          user?.id ?? -1
+          }),
+          currentUserId
         )
       ),
   ]
