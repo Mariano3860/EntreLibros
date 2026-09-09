@@ -81,6 +81,41 @@ describe('useChatSocket', () => {
     expect(result.current.agreementUpdates).toEqual([update])
   })
 
+  test('acknowledges received messages and applies monotonic delivery states', () => {
+    const { result } = renderHook(() => useChatSocket(), { wrapper })
+    act(() => {
+      listeners['conversation:message']({
+        conversationId: 9,
+        sequence: 2,
+        senderId: 4,
+        body: 'recibido',
+        clientKey: 'delivery-2',
+        createdAt: '2026-08-28T00:00:00.000Z',
+        attachmentMetadata: null,
+      })
+      listeners['conversation:delivered']({
+        conversationId: 9,
+        sequence: 2,
+        userId: 4,
+      })
+      listeners['conversation:read']({
+        conversationId: 9,
+        sequence: 2,
+        userId: 4,
+      })
+      listeners['conversation:delivered']({
+        conversationId: 9,
+        sequence: 2,
+        userId: 4,
+      })
+    })
+    expect(emit).toHaveBeenCalledWith('conversation:delivered', {
+      conversationId: 9,
+      sequence: 2,
+    })
+    expect(result.current.messageStatuses).toEqual({ '9:2': 'read' })
+  })
+
   test('refreshes conversation queries for incoming messages', () => {
     const queryClient = new QueryClient()
     const invalidateQueries = vi.spyOn(queryClient, 'invalidateQueries')

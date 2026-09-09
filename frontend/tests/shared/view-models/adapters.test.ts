@@ -123,7 +123,28 @@ describe('real-data adapters', () => {
         1,
         now
       )
-    ).toMatchObject({ role: 'them', kind: 'book', time: 'hace 1 min' })
+    ).toMatchObject({
+      role: 'them',
+      kind: 'book',
+      time: 'hace 1 min',
+    })
+    expect(
+      toChatMessageView(
+        {
+          id: 8,
+          conversationId: 12,
+          senderId: 1,
+          sequence: 8,
+          clientKey: 'own-key',
+          body: 'Mensaje enviado',
+          attachmentMetadata: null,
+          deliveryState: 'delivered',
+          createdAt: '2026-08-30T11:59:00.000Z',
+        },
+        1,
+        now
+      )
+    ).toMatchObject({ role: 'me', deliveryState: 'delivered' })
   })
 
   it('maps swap and agreement attachments to their rich bubble models', () => {

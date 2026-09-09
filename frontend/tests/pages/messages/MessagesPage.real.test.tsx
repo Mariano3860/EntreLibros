@@ -229,6 +229,42 @@ describe('MessagesPage in real API mode', () => {
     expect(screen.getByText(book.title)).toBeVisible()
   })
 
+  test('shows localized delivery state only on messages sent by the reader', async () => {
+    mocks.fetchConversations.mockResolvedValue([conversation])
+    mocks.fetchMessageHistory.mockResolvedValue({
+      messages: [
+        {
+          id: 20,
+          conversationId: conversation.id,
+          senderId: 7,
+          sequence: 1,
+          clientKey: 'own-status',
+          body: 'Mensaje propio',
+          attachmentMetadata: null,
+          deliveryState: 'read',
+          createdAt: '2026-08-31T10:00:00.000Z',
+        },
+        {
+          id: 21,
+          conversationId: conversation.id,
+          senderId: 8,
+          sequence: 2,
+          clientKey: 'incoming-status',
+          body: 'Mensaje recibido',
+          attachmentMetadata: null,
+          deliveryState: 'delivered',
+          createdAt: '2026-08-31T10:01:00.000Z',
+        },
+      ],
+      nextAfter: 2,
+    })
+
+    renderWithProviders(<MessagesPage />)
+
+    expect(await screen.findByLabelText('Leído')).toBeVisible()
+    expect(screen.queryByLabelText('Entregado')).not.toBeInTheDocument()
+  })
+
   test('sends a persisted draft with its revision and refreshes the history', async () => {
     mocks.fetchConversations.mockResolvedValue([conversation])
     mocks.fetchMessageHistory.mockResolvedValue({ messages: [], nextAfter: 0 })

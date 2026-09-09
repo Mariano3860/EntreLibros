@@ -1,3 +1,5 @@
+import type { MessageDeliveryState } from '@src/shared/view-models/types'
+
 import { apiClient } from '../axios'
 import { RELATIVE_API_ROUTES } from '../routes'
 
@@ -105,6 +107,7 @@ export type ApiMessage = {
   body: string
   attachmentMetadata: ApiMessageAttachment | null
   createdAt: string
+  deliveryState?: MessageDeliveryState
 }
 
 export type ApiMessageDraft = {

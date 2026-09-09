@@ -1151,7 +1151,32 @@
         ],
         "responses": {
           "200": {
-            "description": "Ordered message page"
+            "description": "Ordered message page with sender-only delivery metadata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["messages", "nextAfter"],
+                  "properties": {
+                    "messages": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "deliveryState": {
+                            "$ref": "#/components/schemas/MessageDeliveryState"
+                          }
+                        }
+                      }
+                    },
+                    "nextAfter": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  }
+                }
+              }
+            }
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
@@ -4116,6 +4141,11 @@
       }
     },
     "schemas": {
+      "MessageDeliveryState": {
+        "type": "string",
+        "enum": ["sent", "delivered", "read"],
+        "description": "Delivery state for messages sent by the authenticated reader"
+      },
       "MessageBookReference": {
         "type": "object",
         "properties": {
