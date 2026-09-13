@@ -184,6 +184,14 @@ export async function createConversation(
   return response.data.conversation
 }
 
+export async function deleteConversation(
+  conversationId: number
+): Promise<void> {
+  await apiClient.delete(
+    RELATIVE_API_ROUTES.MESSAGES.DELETE_CONVERSATION(conversationId)
+  )
+}
+
 export async function fetchMessageDraft(
   conversationId: number
 ): Promise<ApiMessageDraft | null> {

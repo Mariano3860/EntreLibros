@@ -339,7 +339,15 @@ export async function createConversation(
        LIMIT 1`,
       uniqueIds
     );
-    if (existing.rows[0]) return mapConversation(existing.rows[0]);
+    if (existing.rows[0]) {
+      await client.query(
+        `UPDATE conversation_participants
+         SET hidden_at = NULL
+         WHERE conversation_id = $1 AND user_id = $2`,
+        [existing.rows[0].id, requesterId]
+      );
+      return mapConversation(existing.rows[0]);
+    }
 
     const conversationResult = await client.query<{ id: number }>(
       'INSERT INTO conversations DEFAULT VALUES RETURNING id'
@@ -368,7 +376,9 @@ export async function listConversations(
     `${CONVERSATION_SELECT}
      WHERE EXISTS (
        SELECT 1 FROM conversation_participants mine
-       WHERE mine.conversation_id = c.id AND mine.user_id = $1
+       WHERE mine.conversation_id = c.id
+         AND mine.user_id = $1
+         AND mine.hidden_at IS NULL
      )
      GROUP BY c.id
      ORDER BY is_bot DESC, c.updated_at DESC`,
@@ -417,6 +427,20 @@ export async function listConversations(
     participantName: nameByConversation.get(conversation.id) ?? null,
     unreadCount: unreadByConversation.get(conversation.id) ?? 0,
   }));
+}
+
+export async function hideConversation(
+  conversationId: number,
+  userId: number
+): Promise<void> {
+  const result = await query<{ conversation_id: number }>(
+    `UPDATE conversation_participants
+     SET hidden_at = COALESCE(hidden_at, NOW())
+     WHERE conversation_id = $1 AND user_id = $2
+     RETURNING conversation_id`,
+    [conversationId, userId]
+  );
+  if (result.rows.length === 0) throw new Error('messaging.errors.forbidden');
 }
 
 export async function searchMessagingContacts(
@@ -741,6 +765,14 @@ export async function sendMessageWithClient(
       body,
       input.attachmentMetadata ?? null,
     ]
+  );
+  await client.query(
+    `UPDATE conversation_participants
+     SET hidden_at = NULL
+     WHERE conversation_id = $1
+       AND user_id <> $2
+       AND hidden_at IS NOT NULL`,
+    [input.conversationId, input.senderId]
   );
   return { message: mapMessage(rows[0], 'sent'), created: true };
 }

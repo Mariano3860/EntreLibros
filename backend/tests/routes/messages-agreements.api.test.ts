@@ -38,6 +38,110 @@ async function registerAndLogin(name: string) {
 }
 
 describe('messaging and agreements API', () => {
+  test('hides a conversation only for its actor and keeps the counterpart intact', async () => {
+    const first = await registerAndLogin('hide-first');
+    const second = await registerAndLogin('hide-second');
+    const outsider = await registerAndLogin('hide-outsider');
+    const created = await request(app)
+      .post('/api/messages/conversations')
+      .set('Cookie', first.cookie)
+      .send({ participantId: second.id })
+      .expect(201);
+    const conversationId = created.body.conversation.id as number;
+
+    await request(app)
+      .post(`/api/messages/${conversationId}/messages`)
+      .set('Cookie', first.cookie)
+      .send({
+        clientKey: 'keep-message-after-hide',
+        body: 'Mensaje visible para ambos.',
+      })
+      .expect(201);
+    const proposal = await request(app)
+      .post('/api/agreements')
+      .set('Cookie', first.cookie)
+      .send({
+        conversationId,
+        participantId: second.id,
+        details: {
+          meetingPoint: 'Biblioteca',
+          area: 'Centro',
+          date: '2026-09-01',
+          time: '18:00',
+          bookTitle: 'Dune',
+        },
+      })
+      .expect(201);
+    const agreementId = proposal.body.agreement.id as number;
+
+    await request(app)
+      .delete(`/api/messages/${conversationId}`)
+      .set('Cookie', first.cookie)
+      .expect(204);
+    await request(app)
+      .delete(`/api/messages/${conversationId}`)
+      .set('Cookie', first.cookie)
+      .expect(204);
+    await request(app)
+      .get('/api/messages')
+      .set('Cookie', first.cookie)
+      .expect(200)
+      .expect(({ body }) =>
+        expect(
+          body.conversations.map((item: { id: number }) => item.id)
+        ).not.toContain(conversationId)
+      );
+    await request(app)
+      .get('/api/messages')
+      .set('Cookie', second.cookie)
+      .expect(200)
+      .expect(({ body }) =>
+        expect(
+          body.conversations.map((item: { id: number }) => item.id)
+        ).toContain(conversationId)
+      );
+    await request(app)
+      .get(`/api/messages/${conversationId}/messages`)
+      .set('Cookie', second.cookie)
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body.messages).toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({ body: 'Mensaje visible para ambos.' }),
+            expect.objectContaining({
+              attachmentMetadata: expect.objectContaining({
+                kind: 'agreement',
+                agreementId,
+              }),
+            }),
+          ])
+        );
+      });
+    await request(app)
+      .get(`/api/agreements/${agreementId}`)
+      .set('Cookie', second.cookie)
+      .expect(200)
+      .expect(({ body }) => expect(body.agreement.id).toBe(agreementId));
+    await request(app)
+      .post(`/api/messages/${conversationId}/messages`)
+      .set('Cookie', second.cookie)
+      .send({ clientKey: 'reopen-after-hide', body: '¿Seguimos conversando?' })
+      .expect(201);
+    await request(app)
+      .get('/api/messages')
+      .set('Cookie', first.cookie)
+      .expect(200)
+      .expect(({ body }) =>
+        expect(
+          body.conversations.map((item: { id: number }) => item.id)
+        ).toContain(conversationId)
+      );
+    await request(app)
+      .delete(`/api/messages/${conversationId}`)
+      .set('Cookie', outsider.cookie)
+      .expect(403);
+  });
+
   test('returns localized validation and authorization errors', async () => {
     await request(app)
       .get('/api/messages')

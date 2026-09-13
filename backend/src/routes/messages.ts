@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { authenticate, type AuthenticatedRequest } from '../middleware/auth.js';
 import {
   createConversation,
+  hideConversation,
   isConversationParticipant,
   listConversationParticipantIds,
   listConversations,
@@ -438,6 +439,28 @@ router.post('/conversations', async (req: AuthenticatedRequest, res) => {
       });
     }
     return res.status(201).json({ conversation });
+  } catch (error) {
+    const response = errorResponse(error);
+    return res.status(response.status).json(response.body);
+  }
+});
+
+router.delete('/:conversationId', async (req: AuthenticatedRequest, res) => {
+  if (!req.user) {
+    return res
+      .status(401)
+      .json({ error: 'Unauthorized', message: 'auth.errors.unauthorized' });
+  }
+  const conversationId = asPositiveInteger(req.params.conversationId);
+  if (!conversationId) {
+    return res.status(422).json({
+      error: 'ValidationError',
+      message: 'messaging.errors.conversation_required',
+    });
+  }
+  try {
+    await hideConversation(conversationId, req.user.id);
+    return res.status(204).send();
   } catch (error) {
     const response = errorResponse(error);
     return res.status(response.status).json(response.body);
