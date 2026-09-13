@@ -32,7 +32,7 @@ import type {
   MapRadiusKm,
 } from '@src/api/map/map.types'
 import { mapKeys } from '@src/api/map/mapApi'
-import { fetchProfile } from '@src/api/user/profile.service'
+import { fetchProfile, profileQueryKeys } from '@src/api/user/profile.service'
 import {
   ActionButton,
   PageFrame,
@@ -98,7 +98,7 @@ export const MapPage = () => {
   const { fixtures } = useMockExperience()
   const { theme } = useTheme()
   const { t } = useTranslation()
-  const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
+  const { user, isAuthenticated, isLoading: isAuthLoading } = useAuth()
   const { runIfAuthenticated } = useAuthRequired()
   const mockMode = isApiMockMode()
   const navigate = useNavigate()
@@ -129,7 +129,7 @@ export const MapPage = () => {
     useState<CommunityCornerDetail | null>(null)
 
   const profileQuery = useQuery({
-    queryKey: ['profile'],
+    queryKey: profileQueryKeys.current(user?.id),
     queryFn: fetchProfile,
     enabled: !mockMode && isAuthenticated,
     retry: false,

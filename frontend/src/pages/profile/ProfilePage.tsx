@@ -1,4 +1,8 @@
-import { fetchProfile, updateProfile } from '@api/user/profile.service'
+import {
+  fetchProfile,
+  profileQueryKeys,
+  updateProfile,
+} from '@api/user/profile.service'
 import type {
   LocationVisibility,
   ProfileCountry,
@@ -24,6 +28,7 @@ import {
   PROFILE_INTERESTS,
   PROFILE_LOCATIONS,
 } from '@src/constants/profileCatalog'
+import { useAuth } from '@src/contexts/auth/AuthContext'
 import { useMockExperience } from '@src/contexts/mock/MockExperienceContext'
 import { toProfileView } from '@src/shared/view-models/adapters'
 import { resolveApiErrorKey } from '@src/utils/apiError'
@@ -42,7 +47,6 @@ import { ProfilePhotoCropper } from './ProfilePhotoCropper'
 type ProfileStateProps = { text: string; error?: boolean }
 type ProfileCity = keyof typeof PROFILE_LOCATIONS
 
-const PROFILE_QUERY_KEY = ['profile'] as const
 const LOCATION_VISIBILITY_OPTIONS: readonly LocationVisibility[] = [
   'none',
   'country',
@@ -70,6 +74,7 @@ const ProfileState = ({ text, error = false }: ProfileStateProps) => (
 
 export const ProfilePage = () => {
   const { fixtures } = useMockExperience()
+  const { user } = useAuth()
   const queryClient = useQueryClient()
   const { t } = useTranslation()
   const mockMode = isApiMockMode()
@@ -77,7 +82,7 @@ export const ProfilePage = () => {
     enabled: !mockMode,
   })
   const profileQuery = useQuery({
-    queryKey: PROFILE_QUERY_KEY,
+    queryKey: profileQueryKeys.current(user?.id),
     queryFn: fetchProfile,
     enabled: !mockMode,
   })
@@ -203,7 +208,10 @@ export const ProfilePage = () => {
           neighborhood,
           street: street.trim() || null,
         })
-        queryClient.setQueryData<UserProfile>(PROFILE_QUERY_KEY, updated)
+        queryClient.setQueryData<UserProfile>(
+          profileQueryKeys.current(user?.id),
+          updated
+        )
       } catch {
         setSaveError(
           t('profile.saveError', {

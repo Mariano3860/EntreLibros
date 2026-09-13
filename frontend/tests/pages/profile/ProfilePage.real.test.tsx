@@ -69,6 +69,9 @@ const installFileReader = (result: string) => {
 
 vi.mock('@src/api/user/profile.service', () => ({
   fetchProfile,
+  profileQueryKeys: {
+    current: (userId: number | undefined) => ['profile', userId],
+  },
   updateProfile,
 }))
 

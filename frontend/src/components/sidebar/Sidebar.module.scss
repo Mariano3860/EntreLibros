@@ -279,6 +279,13 @@
   background: linear-gradient(145deg, #ff9f6b, #7047a8);
   color: white;
   font-weight: 700;
+
+  img {
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    object-fit: cover;
+  }
 }
 
 .dropdown {
