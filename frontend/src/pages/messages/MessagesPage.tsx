@@ -556,6 +556,10 @@ const MockMessagesPage = () => {
   const activeDraft = mockDrafts[selected] ?? null
 
   useEffect(() => {
+    setMessage(activeDraft?.body ?? '')
+  }, [activeDraft, selected])
+
+  useEffect(() => {
     try {
       localStorage.setItem(
         mockDraftStorageKey(fixtures.user.id),
@@ -802,7 +806,7 @@ const MockMessagesPage = () => {
                   </div>
                 )
               )}
-              {activeDraft ? (
+              {activeDraft?.attachmentMetadata ? (
                 <MessageDraftCard
                   draft={activeDraft}
                   onEdit={() => {
@@ -1324,7 +1328,7 @@ const RealMessagesPage = () => {
     }
     setAttachError(null)
     try {
-      await saveDraft({
+      const draft = await saveDraft({
         body: '',
         attachmentMetadata: {
           key: `agreement-proposal:${selected}:${listingId}`,
@@ -1341,6 +1345,7 @@ const RealMessagesPage = () => {
             : {}),
         },
       })
+      setMessage(draft?.body ?? '')
       setAgreementOpen(false)
       setAgreementForm({
         meetingPoint: '',
@@ -1576,7 +1581,7 @@ const RealMessagesPage = () => {
     setSendError(null)
     setAttachError(null)
     try {
-      await saveDraft({
+      const draft = await saveDraft({
         body: message.trim() || book.title,
         attachmentMetadata: {
           key: `book:${book.id}`,
@@ -1591,6 +1596,7 @@ const RealMessagesPage = () => {
           ...(book.condition ? { condition: book.condition } : {}),
         },
       })
+      setMessage(draft?.body ?? '')
       setBookPickerMode(null)
       setComposerMenuOpen(false)
       setAttachError(null)
@@ -1621,7 +1627,7 @@ const RealMessagesPage = () => {
     }
     setAttachError(null)
     try {
-      await saveDraft({
+      const draft = await saveDraft({
         body: swapNote.trim(),
         attachmentMetadata: {
           key: `swap:${offered.id}:${requested.id}`,
@@ -1641,6 +1647,7 @@ const RealMessagesPage = () => {
           ...(swapNote.trim() ? { note: swapNote.trim() } : {}),
         },
       })
+      setMessage(draft?.body ?? '')
       setBookPickerMode(null)
       setComposerMenuOpen(false)
       setOfferedId('')
@@ -2114,7 +2121,7 @@ const RealMessagesPage = () => {
                       </span>
                     </div>
                   )}
-                  {draftState.query.data ? (
+                  {draftState.query.data?.attachmentMetadata ? (
                     <MessageDraftCard
                       draft={draftState.query.data}
                       onEdit={handleEditDraft}
