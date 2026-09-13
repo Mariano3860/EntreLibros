@@ -265,7 +265,7 @@ describe('MessagesPage in real API mode', () => {
     expect(screen.queryByLabelText('Entregado')).not.toBeInTheDocument()
   })
 
-  test('sends a persisted draft with its revision and refreshes the history', async () => {
+  test('restores a text-only draft in the composer and sends it with its revision', async () => {
     mocks.fetchConversations.mockResolvedValue([conversation])
     mocks.fetchMessageHistory.mockResolvedValue({ messages: [], nextAfter: 0 })
     mocks.fetchMessageDraft.mockResolvedValue({
@@ -277,6 +277,16 @@ describe('MessagesPage in real API mode', () => {
       revision: 3,
       createdAt: '2026-08-31T10:00:00.000Z',
       updatedAt: '2026-08-31T10:01:00.000Z',
+    })
+    mocks.saveMessageDraft.mockResolvedValue({
+      id: 8,
+      conversationId: conversation.id,
+      authorId: 7,
+      body: 'Borrador listo',
+      attachmentMetadata: null,
+      revision: 4,
+      createdAt: '2026-08-31T10:00:00.000Z',
+      updatedAt: '2026-08-31T10:02:00.000Z',
     })
     mocks.sendMessageDraft.mockResolvedValue({
       id: 30,
@@ -291,20 +301,18 @@ describe('MessagesPage in real API mode', () => {
 
     renderWithProviders(<MessagesPage />)
 
-    const draftCard = await screen.findByRole('article', {
-      name: 'Borrador: Mensaje',
-    })
-    fireEvent.click(within(draftCard).getByRole('button', { name: 'Editar' }))
-    expect(screen.getByPlaceholderText('Escribí un mensaje...')).toHaveValue(
-      'Borrador listo'
-    )
-    fireEvent.click(within(draftCard).getByRole('button', { name: 'Enviar' }))
+    const input = await screen.findByPlaceholderText('Escribí un mensaje...')
+    await waitFor(() => expect(input).toHaveValue('Borrador listo'))
+    expect(
+      screen.queryByRole('article', { name: 'Borrador: Mensaje' })
+    ).not.toBeInTheDocument()
+    fireEvent.submit(input.closest('form')!)
 
     await waitFor(() =>
       expect(mocks.sendMessageDraft).toHaveBeenCalledWith({
         conversationId: conversation.id,
         clientKey: expect.any(String),
-        revision: 3,
+        revision: 4,
       })
     )
     expect(mocks.fetchMessageHistory).toHaveBeenCalledWith(conversation.id)
@@ -364,7 +372,43 @@ describe('MessagesPage in real API mode', () => {
     ).not.toBeInTheDocument()
   })
 
-  test('discards a persisted draft using its current revision', async () => {
+  test('restores a structured draft card and its note only in the composer', async () => {
+    mocks.fetchConversations.mockResolvedValue([conversation])
+    mocks.fetchMessageHistory.mockResolvedValue({ messages: [], nextAfter: 0 })
+    mocks.fetchMessageDraft.mockResolvedValue({
+      id: 12,
+      conversationId: conversation.id,
+      authorId: 7,
+      body: 'Te lo puedo acercar el viernes.',
+      attachmentMetadata: {
+        key: 'book:book-1',
+        contentType: 'application/x-entrelibros-book',
+        size: 1,
+        kind: 'book',
+        bookId: book.id,
+        title: book.title,
+        author: book.author,
+        coverUrl: book.coverUrl,
+      },
+      revision: 6,
+      createdAt: '2026-08-31T10:00:00.000Z',
+      updatedAt: '2026-08-31T10:01:00.000Z',
+    })
+
+    renderWithProviders(<MessagesPage />)
+
+    expect(
+      await screen.findByRole('article', { name: 'Borrador: Libro adjunto' })
+    ).toBeVisible()
+    expect(screen.getByPlaceholderText('Escribí un mensaje...')).toHaveValue(
+      'Te lo puedo acercar el viernes.'
+    )
+    expect(
+      screen.queryByText('Te lo puedo acercar el viernes.')
+    ).not.toBeInTheDocument()
+  })
+
+  test('discards a structured draft using its current revision', async () => {
     mocks.fetchConversations.mockResolvedValue([conversation])
     mocks.fetchMessageHistory.mockResolvedValue({ messages: [], nextAfter: 0 })
     mocks.fetchMessageDraft.mockResolvedValue({
@@ -372,7 +416,16 @@ describe('MessagesPage in real API mode', () => {
       conversationId: conversation.id,
       authorId: 7,
       body: 'Borrador descartable',
-      attachmentMetadata: null,
+      attachmentMetadata: {
+        key: 'book:book-1',
+        contentType: 'application/x-entrelibros-book',
+        size: 1,
+        kind: 'book',
+        bookId: book.id,
+        title: book.title,
+        author: book.author,
+        coverUrl: book.coverUrl,
+      },
       revision: 5,
       createdAt: '2026-08-31T10:00:00.000Z',
       updatedAt: '2026-08-31T10:01:00.000Z',
@@ -381,7 +434,7 @@ describe('MessagesPage in real API mode', () => {
     renderWithProviders(<MessagesPage />)
 
     const draftCard = await screen.findByRole('article', {
-      name: 'Borrador: Mensaje',
+      name: 'Borrador: Libro adjunto',
     })
     fireEvent.click(
       within(draftCard).getByRole('button', { name: 'Descartar' })
@@ -391,7 +444,7 @@ describe('MessagesPage in real API mode', () => {
       expect(mocks.deleteMessageDraft).toHaveBeenCalledWith(conversation.id, 5)
     )
     expect(
-      screen.queryByRole('article', { name: 'Borrador: Mensaje' })
+      screen.queryByRole('article', { name: 'Borrador: Libro adjunto' })
     ).not.toBeInTheDocument()
   })
 

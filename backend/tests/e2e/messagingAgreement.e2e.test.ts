@@ -56,6 +56,47 @@ const agreementDetails = {
 };
 
 describe('messaging and agreement real-service E2E', () => {
+  test('keeps a text draft private until its idempotent send', async () => {
+    const first = await registerAndLogin('e2e-draft-first');
+    const second = await registerAndLogin('e2e-draft-second');
+    const conversation = await request(app)
+      .post('/api/messages/conversations')
+      .set('Cookie', first.cookie)
+      .send({ participantId: second.id, silent: true })
+      .expect(201);
+    const conversationId = conversation.body.conversation.id as number;
+
+    await request(app)
+      .put(`/api/messages/${conversationId}/draft`)
+      .set('Cookie', first.cookie)
+      .send({ body: 'Borrador privado', attachmentMetadata: null })
+      .expect(200)
+      .expect(({ body }) => expect(body.draft.revision).toBe(1));
+
+    await request(app)
+      .get(`/api/messages/${conversationId}/messages`)
+      .set('Cookie', second.cookie)
+      .expect(200)
+      .expect(({ body }) => expect(body.messages).toHaveLength(0));
+    await request(app)
+      .get('/api/notifications')
+      .set('Cookie', second.cookie)
+      .expect(200)
+      .expect(({ body }) => expect(body.notifications).toHaveLength(0));
+
+    const firstSend = await request(app)
+      .post(`/api/messages/${conversationId}/draft/send`)
+      .set('Cookie', first.cookie)
+      .send({ clientKey: 'e2e-draft-send-1', revision: 1 })
+      .expect(201);
+    const replayedSend = await request(app)
+      .post(`/api/messages/${conversationId}/draft/send`)
+      .set('Cookie', first.cookie)
+      .send({ clientKey: 'e2e-draft-send-1' })
+      .expect(201);
+    expect(replayedSend.body.message.id).toBe(firstSend.body.message.id);
+  });
+
   test('runs messaging persistence, negotiation, conflict and cursor flow', async () => {
     const first = await registerAndLogin('e2e-first');
     const second = await registerAndLogin('e2e-second');

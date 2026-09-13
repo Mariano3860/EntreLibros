@@ -113,4 +113,48 @@ describe('useMessageDraft', () => {
 
     expect(fetchMessageDraft).not.toHaveBeenCalled()
   })
+
+  test('preserves structured metadata and the current revision while saving a note', async () => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    })
+    const attachment = {
+      key: 'book:1',
+      contentType: 'application/x-entrelibros-book',
+      size: 1,
+      kind: 'book' as const,
+      bookId: '1',
+      title: 'Ecos del Viento Norte',
+      author: 'Clara Montiel',
+      coverUrl: '/illustrations/book-cover.svg',
+    }
+    const structuredDraft = { ...draft, attachmentMetadata: attachment }
+    vi.mocked(fetchMessageDraft).mockResolvedValueOnce(structuredDraft)
+    vi.mocked(saveMessageDraft).mockResolvedValueOnce({
+      ...structuredDraft,
+      body: 'Nota actualizada',
+      revision: 4,
+    })
+    const { result } = renderHook(() => useMessageDraft(4), {
+      wrapper: createWrapper(queryClient),
+    })
+
+    await waitFor(() =>
+      expect(result.current.query.data).toEqual(structuredDraft)
+    )
+    await result.current.save.mutateAsync({
+      body: 'Nota actualizada',
+      attachmentMetadata: attachment,
+    })
+
+    expect(saveMessageDraft).toHaveBeenCalledWith({
+      conversationId: 4,
+      body: 'Nota actualizada',
+      attachmentMetadata: attachment,
+      revision: 3,
+    })
+  })
 })

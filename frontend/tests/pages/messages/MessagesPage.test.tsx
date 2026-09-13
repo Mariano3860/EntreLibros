@@ -56,7 +56,7 @@ describe('MessagesPage', () => {
     ).toBeGreaterThan(0)
   })
 
-  test('recovers a draft after remount and keeps it isolated by conversation', async () => {
+  test('restores a text-only draft only in the composer and keeps it isolated by conversation', async () => {
     localStorage.clear()
     localStorage.setItem(
       'entrelibros:prototype:message-drafts:mariano',
@@ -74,18 +74,27 @@ describe('MessagesPage', () => {
       })
     )
     const firstRender = renderWithProviders(<MessagesPage />)
-    expect(await screen.findByText('Borrador persistente')).toBeVisible()
+    expect(
+      await screen.findByDisplayValue('Borrador persistente')
+    ).toBeVisible()
+    expect(
+      screen.queryByRole('article', { name: 'Borrador: Mensaje' })
+    ).not.toBeInTheDocument()
     expect(
       localStorage.getItem('entrelibros:mock:message-drafts:mariano')
     ).toContain('Borrador persistente')
     firstRender.unmount()
     renderWithProviders(<MessagesPage />)
-    expect(await screen.findByText('Borrador persistente')).toBeVisible()
+    expect(
+      await screen.findByDisplayValue('Borrador persistente')
+    ).toBeVisible()
 
     fireEvent.click(screen.getByRole('button', { name: /Sofia/i }))
-    expect(screen.queryByText('Borrador persistente')).not.toBeInTheDocument()
+    expect(
+      screen.queryByDisplayValue('Borrador persistente')
+    ).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: /Lucia/ }))
-    expect(screen.getByText('Borrador persistente')).toBeVisible()
+    expect(screen.getByDisplayValue('Borrador persistente')).toBeVisible()
   })
 
   test('sends the current draft from the composer submit button', async () => {

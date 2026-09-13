@@ -371,6 +371,17 @@ describe('messaging and agreements API', () => {
     );
 
     await request(app)
+      .get(`/api/messages/${conversationId}/messages`)
+      .set('Cookie', second.cookie)
+      .expect(200)
+      .expect(({ body }) => expect(body.messages).toHaveLength(0));
+    await request(app)
+      .get('/api/notifications')
+      .set('Cookie', second.cookie)
+      .expect(200)
+      .expect(({ body }) => expect(body.notifications).toHaveLength(0));
+
+    await request(app)
       .get(`/api/messages/${conversationId}/draft`)
       .set('Cookie', second.cookie)
       .expect(200)

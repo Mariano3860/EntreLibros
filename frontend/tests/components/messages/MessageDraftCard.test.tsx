@@ -33,7 +33,6 @@ const callbacks = () => ({
 
 describe('MessageDraftCard', () => {
   test.each([
-    ['text', baseDraft],
     [
       'book',
       {
@@ -107,6 +106,43 @@ describe('MessageDraftCard', () => {
     expect(handlers.onEdit).toHaveBeenCalledOnce()
     expect(handlers.onDiscard).toHaveBeenCalledOnce()
     expect(handlers.onSend).toHaveBeenCalledOnce()
+  })
+
+  test('does not render a card for a text-only draft', () => {
+    const handlers = callbacks()
+    const { container } = renderWithProviders(
+      <MessageDraftCard draft={baseDraft} {...handlers} />
+    )
+
+    expect(container).toBeEmptyDOMElement()
+    expect(handlers.onSend).not.toHaveBeenCalled()
+  })
+
+  test('keeps an attachment note out of the structured card', () => {
+    const handlers = callbacks()
+    renderWithProviders(
+      <MessageDraftCard
+        draft={{
+          ...baseDraft,
+          body: 'Esta nota se edita en el composer.',
+          attachmentMetadata: {
+            key: 'book:1',
+            contentType: 'application/x-entrelibros-book',
+            size: 1,
+            kind: 'book',
+            bookId: '1',
+            title: 'Ecos del Viento Norte',
+            author: 'Clara Montiel',
+            coverUrl: '/illustrations/book-cover.svg',
+          },
+        }}
+        {...handlers}
+      />
+    )
+
+    expect(
+      screen.queryByText('Esta nota se edita en el composer.')
+    ).not.toBeInTheDocument()
   })
 
   test('keeps agreement details visible in the variable center', () => {

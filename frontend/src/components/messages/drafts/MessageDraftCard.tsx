@@ -73,15 +73,10 @@ const DraftBook = ({
 
 const DraftContent = ({
   attachment,
-  body,
 }: {
-  attachment: ApiMessageDraftAttachment | null
-  body: string
+  attachment: ApiMessageDraftAttachment
 }) => {
   const { t } = useTranslation()
-  if (!attachment) {
-    return <p className={styles.textContent}>{body}</p>
-  }
   if (attachment.kind === 'book') {
     return (
       <div className={styles.singleContent}>
@@ -89,7 +84,6 @@ const DraftContent = ({
           book={attachment}
           label={t('community.messages.drafts.book')}
         />
-        {body ? <p className={styles.note}>{body}</p> : null}
       </div>
     )
   }
@@ -111,9 +105,6 @@ const DraftContent = ({
             defaultValue: 'Querés recibir',
           })}
         />
-        {attachment.note || body ? (
-          <p className={styles.note}>{attachment.note ?? body}</p>
-        ) : null}
       </div>
     )
   }
@@ -131,7 +122,6 @@ const DraftContent = ({
           {attachment.details.date} · {attachment.details.time}
         </span>
       </div>
-      {body ? <p className={styles.note}>{body}</p> : null}
     </div>
   )
 }
@@ -146,8 +136,9 @@ export const MessageDraftCard = ({
 }: MessageDraftCardProps) => {
   const { t } = useTranslation()
   const attachment = draft.attachmentMetadata
-  const title = attachment
-    ? attachment.kind === 'book'
+  if (!attachment) return null
+  const title =
+    attachment.kind === 'book'
       ? t('community.messages.drafts.bookTitle', {
           defaultValue: 'Libro adjunto',
         })
@@ -158,9 +149,6 @@ export const MessageDraftCard = ({
         : t('community.messages.drafts.agreementTitle', {
             defaultValue: 'Propuesta de acuerdo',
           })
-    : t('community.messages.drafts.textTitle', {
-        defaultValue: 'Mensaje',
-      })
   const sendLabel =
     attachment?.kind === 'swap' || attachment?.kind === 'agreementProposal'
       ? t('community.messages.drafts.sendProposal', {
@@ -191,7 +179,7 @@ export const MessageDraftCard = ({
         </span>
       </header>
       <div className={styles.content}>
-        <DraftContent attachment={attachment} body={draft.body} />
+        <DraftContent attachment={attachment} />
       </div>
       <footer className={styles.footer}>
         <div className={styles.secondaryActions}>
