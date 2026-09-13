@@ -122,7 +122,7 @@
     "es": "Español"
   },
   "booksPage": {
-    "description": "Gestioná los libros que ofrecés, vendés o estás buscando.",
+    "description": "Gestioná los libros que ofrecés, vendés o te interesan.",
     "search_label": "Buscar libros",
     "filters": {
       "button": "Filtros",
@@ -135,7 +135,7 @@
       "type": {
         "label": "Publicacion",
         "offer": "Ofrecidos",
-        "want": "Buscados"
+        "want": "Me interesan"
       },
       "topic": "Tema",
       "topicPlaceholder": "Ciencia, novela, historia...",
@@ -157,16 +157,16 @@
       "price_desc": "Precio mayor"
     },
     "want": {
-      "open": "Buscar un libro",
-      "title": "Buscar un libro",
-      "subtitle": "Contale a la comunidad que libro queres encontrar.",
+      "open": "Me interesa",
+      "title": "Sumar a Me interesa",
+      "subtitle": "Contale a la comunidad qué libro te interesa.",
       "cancel": "Cancelar",
-      "submit": "Publicar busqueda",
-      "saving": "Publicando...",
-      "created": "Busqueda publicada",
-      "duplicate": "Ya tenes una busqueda activa para este libro.",
-      "error": "No se pudo publicar la busqueda.",
-      "search": "Elegí un libro para agregar a Buscando",
+      "submit": "Compartir interés",
+      "saving": "Guardando interés...",
+      "created": "Interés compartido",
+      "duplicate": "Ya compartiste tu interés por este libro.",
+      "error": "No se pudo compartir tu interés.",
+      "search": "Elegí un libro para agregar a Me interesa",
       "searchPlaceholder": "ISBN, titulo o autor...",
       "searching": "Buscando...",
       "searchError": "No pudimos buscar ahora.",
@@ -225,7 +225,7 @@
       "label": "Tipos de libros",
       "all": "Todos",
       "for_trade": "Para intercambiar",
-      "seeking": "Buscando",
+      "seeking": "Me interesa",
       "for_sale": "A la venta",
       "see_all": "Ver todos"
     },
@@ -234,9 +234,9 @@
       "filteredHint": "Proba con otra busqueda o elimina algunos filtros.",
       "all": "No encontramos libros publicados todavía.",
       "trade": "Aún no publicaste libros para intercambio. Cargá el primero.",
-      "seeking": "No hay libros en tu lista de deseos.",
+      "seeking": "Todavía no agregaste libros que te interesen.",
       "sale": "Aún no tenés libros a la venta.",
-      "contextualHint": "Podés publicar un libro o agregar uno a Buscando."
+      "contextualHint": "Podés publicar un libro o agregar uno a Me interesa."
     },
     "status": {
       "available": "Disponible",
@@ -247,7 +247,7 @@
     "badge": {
       "for_sale": "A la venta · ${{price}}",
       "for_trade": "Intercambio",
-      "seeking": "Buscando"
+      "seeking": "Me interesa"
     },
     "intentions": {
       "sale": "A la venta"
@@ -532,6 +532,9 @@
     }
   },
   "community": {
+    "feed": {
+      "seekingBook": "Le interesa este libro"
+    },
     "messages": {
       "states": {
         "loadingConversations": "Cargando conversaciones...",
@@ -999,7 +1002,7 @@
       "distanceUnavailable": "Distancia no disponible",
       "types": {
         "offer": "Oferta",
-        "want": "Busca",
+        "want": "Le interesa",
         "donation": "Donación",
         "sale": "En venta"
       }
@@ -1037,7 +1040,7 @@
       "completed": "Completado",
       "draft": "Borrador",
       "sold": "Vendido",
-      "seeking": "Buscando",
+      "seeking": "Me interesa",
       "exchanged": "Intercambiado"
     },
     "changeStatus": "Cambiar estado",

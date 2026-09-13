@@ -757,6 +757,7 @@ const feedItemLabel = (
 }
 
 const RealFeedCard = ({ item }: { item: FeedItem }) => {
+  const { t } = useTranslation()
   const image =
     'cover' in item
       ? item.cover
@@ -788,7 +789,9 @@ const RealFeedCard = ({ item }: { item: FeedItem }) => {
           ${item.price} · {item.condition}
         </small>
       ) : null}
-      {item.type === 'seeking' ? <small>Buscando este libro</small> : null}
+      {item.type === 'seeking' ? (
+        <small>{t('community.feed.seekingBook')}</small>
+      ) : null}
       {item.type === 'house' ? (
         <small>{item.distance} km de distancia</small>
       ) : null}
