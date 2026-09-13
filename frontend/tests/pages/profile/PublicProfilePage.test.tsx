@@ -19,7 +19,10 @@ vi.mock('@api/messages/messages', async (importOriginal) => ({
   createConversation,
 }))
 vi.mock('@api/reports/reports', () => ({ createReport }))
-vi.mock('@api/user/profile.service', () => ({ fetchPublicProfile }))
+vi.mock('@api/user/profile.service', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@api/user/profile.service')>()),
+  fetchPublicProfile,
+}))
 
 import { PublicProfilePage } from '@src/pages/profile/PublicProfilePage'
 import { setLoggedInState } from '@mocks/handlers/auth/me.handler'

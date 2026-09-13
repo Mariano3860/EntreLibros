@@ -24,7 +24,12 @@ const { fetchMe, fetchProfile, useMapDataMock, viewportHandler } = vi.hoisted(
 )
 
 vi.mock('@src/api/auth/me.service', () => ({ fetchMe }))
-vi.mock('@src/api/user/profile.service', () => ({ fetchProfile }))
+vi.mock('@src/api/user/profile.service', () => ({
+  fetchProfile,
+  profileQueryKeys: {
+    current: (userId: number | undefined) => ['profile', userId],
+  },
+}))
 vi.mock('@src/hooks/api/useMapData', () => ({
   useMapData: (input: MapQueryInput) => {
     useMapDataMock(input)

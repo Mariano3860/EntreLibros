@@ -7,6 +7,10 @@ import type {
   UserProfile,
 } from './profile.types'
 
+export const profileQueryKeys = {
+  current: (userId: number | undefined) => ['profile', userId] as const,
+}
+
 export const fetchProfile = async (): Promise<UserProfile> => {
   const response = await apiClient.get<UserProfile>(
     RELATIVE_API_ROUTES.USER.PROFILE,

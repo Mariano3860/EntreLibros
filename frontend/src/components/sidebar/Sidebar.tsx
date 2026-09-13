@@ -1,4 +1,5 @@
 import { fetchConversations, messageQueryKeys } from '@api/messages/messages'
+import { fetchProfile, profileQueryKeys } from '@api/user/profile.service'
 import { LogoEntreLibros } from '@components/logo/LogoEntreLibros'
 import { NotificationBell } from '@components/notifications/NotificationBell'
 import { SidebarLanguageSwitcher } from '@components/sidebar/buttons/SidebarLanguageSwitcher'
@@ -8,7 +9,7 @@ import { NavItem } from '@components/sidebar/Sidebar.types'
 import { useAuth } from '@contexts/auth/AuthContext'
 import { useQuery } from '@tanstack/react-query'
 import { isApiMockMode } from '@utils/runtimeEnv'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 
@@ -27,8 +28,11 @@ import styles from './Sidebar.module.scss'
 
 export const Sidebar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [failedProfilePhoto, setFailedProfilePhoto] = useState<string | null>(
+    null
+  )
   const { t } = useTranslation()
-  const { isAuthenticated, isLoading } = useAuth()
+  const { user, isAuthenticated, isLoading } = useAuth()
   const { fixtures, readConversationIds } = useMockExperience()
   const mockMode = isApiMockMode()
   const conversationsQuery = useQuery({
@@ -38,6 +42,40 @@ export const Sidebar = () => {
     refetchInterval: 15_000,
     enabled: !isLoading && isAuthenticated && !mockMode,
   })
+  const profileQuery = useQuery({
+    queryKey: profileQueryKeys.current(user?.id),
+    queryFn: fetchProfile,
+    enabled: !isLoading && isAuthenticated && !mockMode,
+    retry: false,
+  })
+  const sidebarProfile = mockMode
+    ? {
+        name: fixtures.user.name,
+        alias: fixtures.user.username.replace(/^@/, ''),
+        profilePhoto: null,
+      }
+    : profileQuery.data
+
+  useEffect(() => {
+    setFailedProfilePhoto(null)
+  }, [sidebarProfile?.profilePhoto])
+
+  const profileName = sidebarProfile
+    ? (sidebarProfile.name.trim() || sidebarProfile.alias.trim()).trim()
+    : ''
+  const profileAlias = sidebarProfile?.alias.trim() ?? ''
+  const profileInitials = profileName
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join('')
+    .toUpperCase()
+  const profilePhoto =
+    sidebarProfile?.profilePhoto &&
+    sidebarProfile.profilePhoto !== failedProfilePhoto
+      ? sidebarProfile.profilePhoto
+      : null
   const hasUnreadMessages =
     !isLoading &&
     isAuthenticated &&
@@ -168,10 +206,31 @@ export const Sidebar = () => {
               onClick={closeMenu}
               className={styles.userSummary}
             >
-              <span className={styles.userAvatar}>M</span>
+              <span className={styles.userAvatar}>
+                {profilePhoto ? (
+                  <img
+                    src={profilePhoto}
+                    alt={profileName}
+                    onError={() => setFailedProfilePhoto(profilePhoto)}
+                  />
+                ) : (
+                  profileInitials || '…'
+                )}
+              </span>
               <span>
-                <strong>Mariano</strong>
-                <small>@mariano</small>
+                <strong>
+                  {profileName ||
+                    t('profile.loading', { defaultValue: 'Cargando perfil…' })}
+                </strong>
+                <small>
+                  {profileAlias
+                    ? `@${profileAlias}`
+                    : profileName
+                      ? t('profile.aliasUnavailable', {
+                          defaultValue: 'Sin alias',
+                        })
+                      : ''}
+                </small>
               </span>
             </NavLink>
           ) : null}
