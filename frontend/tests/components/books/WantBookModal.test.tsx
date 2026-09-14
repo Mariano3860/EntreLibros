@@ -45,6 +45,7 @@ describe('WantBookModal', () => {
     fireEvent.change(screen.getByLabelText('booksPage.want.notesLabel'), {
       target: { value: 'Edicion en español' },
     })
+    fireEvent.click(screen.getByLabelText('booksPage.want.consent'))
     fireEvent.click(
       screen.getByRole('button', { name: 'booksPage.want.submit' })
     )
@@ -90,6 +91,7 @@ describe('WantBookModal', () => {
       )
 
     renderModal()
+    fireEvent.click(screen.getByLabelText('booksPage.want.consent'))
     fireEvent.click(
       screen.getByRole('button', { name: 'booksPage.want.submit' })
     )
@@ -98,6 +100,7 @@ describe('WantBookModal', () => {
     cleanup()
     vi.clearAllMocks()
     renderModal()
+    fireEvent.click(screen.getByLabelText('booksPage.want.consent'))
     fireEvent.click(
       screen.getByRole('button', { name: 'booksPage.want.submit' })
     )
