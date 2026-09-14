@@ -5,6 +5,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 
+import { ensureSystemAccounts } from './seed-system-data.js';
+
 const { Client } = pg;
 const scriptDirectory = path.dirname(fileURLToPath(import.meta.url));
 const seedSqlPath = path.join(scriptDirectory, 'seed-local-dataset.sql');
@@ -24,7 +26,7 @@ function assertSafeLocalDatabase(databaseUrl) {
     .toLowerCase();
   const configuredNames = (
     process.env.ENTRELIBROS_LOCAL_DATABASE_NAMES ??
-    'entrelibros,entrelibros_dev,entrelibros_local'
+    'entrelibros,entrelibros_baseline,entrelibros_dev,entrelibros_local'
   )
     .split(',')
     .map((name) => name.trim().toLowerCase())
@@ -45,6 +47,7 @@ function assertSafeLocalDatabase(databaseUrl) {
 async function main() {
   const databaseUrl = process.env.DATABASE_URL;
   const database = assertSafeLocalDatabase(databaseUrl);
+  await ensureSystemAccounts(databaseUrl);
   const client = new Client({ connectionString: databaseUrl });
 
   await client.connect();

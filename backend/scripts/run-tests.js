@@ -32,6 +32,12 @@ execSync('node -r dotenv/config scripts/migrate.js', {
   env,
 });
 
+execSync('node -r dotenv/config scripts/seed-system-data.js', {
+  cwd: projectRoot,
+  stdio: 'inherit',
+  env,
+});
+
 // Execute tests
 execSync('node -r dotenv/config ../node_modules/vitest/vitest.mjs --run', {
   cwd: projectRoot,

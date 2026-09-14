@@ -576,7 +576,9 @@ describe('books API listing projections', () => {
     const viewerId = await insertUser({ name: 'Home viewer' });
     const bookId = await insertBook();
     await Promise.all(
-      Array.from({ length: 6 }, async (_, index) => {
+      // Keep both pages self-contained: the schema baseline intentionally has
+      // no historical demo listings that this pagination check could rely on.
+      Array.from({ length: 10 }, async (_, index) => {
         const readerId = await insertUser({ name: `Reader ${index}` });
         return insertListing({ userId: readerId, bookId });
       })

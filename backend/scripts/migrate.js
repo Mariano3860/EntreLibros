@@ -7,14 +7,11 @@ import os from 'os';
 import crypto from 'crypto';
 import pg from 'pg';
 import { verifyPostgresPreflight } from './preflight.js';
+import {
+  assertApprovedMigrationTarget,
+  assertNoRetiredMigrationLedger,
+} from './migration-target.js';
 
-const connectionString = process.env.DATABASE_URL;
-if (!connectionString) {
-  console.error('DATABASE_URL is not set');
-  process.exit(1);
-}
-
-const url = new URL(connectionString);
 const migrationsDir = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
   '..',
@@ -30,8 +27,31 @@ const hashMigration = (fileName, source) =>
 const migrationName = (fileName) =>
   fileName.replace(/^\d+_/, '').replace(/\.sql$/, '');
 
-async function run() {
-  await verifyPostgresPreflight(connectionString);
+export const normalizeMigrationSource = (source) =>
+  source.replaceAll(String.fromCharCode(13, 10), String.fromCharCode(10));
+
+export async function getOrderedMigrationFiles() {
+  return (await fs.readdir(migrationsDir))
+    .filter((file) => file.endsWith('.sql'))
+    .sort();
+}
+
+export async function assertMigrationTargetIsSafe(connectionString, client) {
+  assertApprovedMigrationTarget(connectionString);
+  await assertNoRetiredMigrationLedger(client);
+}
+
+export async function runMigrations(
+  connectionString = process.env.DATABASE_URL
+) {
+  if (!connectionString) {
+    throw new Error('DATABASE_URL is not set');
+  }
+
+  const url = new URL(connectionString);
+  assertApprovedMigrationTarget(connectionString);
+  // Checking the retired ledger happens before PostGIS setup or migration DDL.
+  // The old database remains a rollback reference and must never be upgraded.
   // postgres-migrations hashes raw file contents. Normalizing CRLF here keeps
   // the recorded hashes stable when a Windows checkout reads LF migrations.
   const normalizedDir = await fs.mkdtemp(
@@ -48,24 +68,32 @@ async function run() {
     const appliedHashes = new Map();
     try {
       await client.connect();
+      await assertNoRetiredMigrationLedger(client);
       const result = await client.query('SELECT name, hash FROM migrations');
       for (const row of result.rows) appliedHashes.set(row.name, row.hash);
-    } catch {
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message.includes('retired migration ledger')
+      ) {
+        throw error;
+      }
+      if (error?.code !== '42P01') throw error;
       // A fresh database has no migrations table yet; the migrator creates it.
     } finally {
       await client.end().catch(() => undefined);
     }
-    const files = await fs.readdir(migrationsDir);
+    // The grouped baseline has ordered stages. Keep that order independent of
+    // the filesystem enumeration so every fresh database receives the same
+    // sequence of migration ledger entries.
+    const files = await getOrderedMigrationFiles();
     await Promise.all(
       files.map(async (file) => {
         const source = await fs.readFile(
           path.join(migrationsDir, file),
           'utf8'
         );
-        const lineFeedSource = source.replaceAll(
-          String.fromCharCode(13, 10),
-          String.fromCharCode(10)
-        );
+        const lineFeedSource = normalizeMigrationSource(source);
         const appliedHash = appliedHashes.get(migrationName(file));
         const sourceForMigration =
           appliedHash === hashMigration(file, source) ? source : lineFeedSource;
@@ -76,6 +104,9 @@ async function run() {
         );
       })
     );
+    await verifyPostgresPreflight(connectionString, {
+      ensurePostgisExtension: false,
+    });
     await migrate(
       {
         database: url.pathname.slice(1),
@@ -93,7 +124,9 @@ async function run() {
   }
 }
 
-run().catch((err) => {
-  console.error(err.message || err);
-  process.exit(1);
-});
+if (process.argv[1] && process.argv[1].endsWith('migrate.js')) {
+  runMigrations().catch((err) => {
+    console.error(err.message || err);
+    process.exit(1);
+  });
+}

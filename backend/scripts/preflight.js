@@ -1,6 +1,9 @@
 import pg from 'pg';
 
-export async function verifyPostgresPreflight(connectionString) {
+export async function verifyPostgresPreflight(
+  connectionString,
+  { ensurePostgisExtension = true } = {}
+) {
   if (!connectionString) {
     throw new Error(
       'DATABASE_URL environment variable is required for database operations.'
@@ -67,7 +70,7 @@ export async function verifyPostgresPreflight(connectionString) {
 
     // Only enable PostGIS in the target database. For a fresh database this
     // connection is to `postgres`; the migration owns extension creation.
-    if (targetDatabaseConnected) {
+    if (targetDatabaseConnected && ensurePostgisExtension) {
       await client.query('CREATE EXTENSION IF NOT EXISTS postgis;');
     }
   } catch (err) {

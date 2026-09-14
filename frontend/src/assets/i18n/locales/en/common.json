@@ -179,7 +179,8 @@
       "isbnLabel": "ISBN",
       "coverLabel": "Cover URL",
       "notesLabel": "Notes",
-      "notesPlaceholder": "Edition, language, or details you care about..."
+      "notesPlaceholder": "Edition, language, or details you care about...",
+      "consent": "I confirm the information is accurate and I accept EntreLibros' terms."
     },
     "personSearch": {
       "open": "Find people",

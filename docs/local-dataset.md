@@ -19,6 +19,11 @@ their owned listings, social records, conversations, drafts, agreements,
 notifications, analytics events and fixed seed corners. Shared bibliographic
 rows are retained when their provenance cannot be distinguished safely.
 
+The wrapper also ensures the operational bot account before it loads the
+removable walkthrough. That account is system seed data, not a schema migration
+or an extra demo profile: it is intentionally retained by cleanup so existing
+bot conversations cannot be deleted accidentally.
+
 The scripts refuse test, E2E and production-like database names before opening
 a write connection. The twelve seeded accounts share the local-only password
 `Demo123!`; change or delete them before sharing a development database.
