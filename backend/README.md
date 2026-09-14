@@ -23,10 +23,12 @@ en el log del backend y las respuestas HTTP/Socket.IO conservan claves publicas.
 
 ## Migraciones
 
-`backend/migrations/001_initial_schema.sql` es el baseline final, solo de
-esquema: extensiones, tipos, tablas, constraints e índices. No contiene
-usuarios, bot ni datos de demostración. Tras ese corte, las migraciones vuelven
-a ser append-only con un nuevo número; no se edita el baseline ya aplicado.
+`backend/migrations/001_schema_objects.sql` a
+`004_foreign_keys.sql` forman el baseline final, solo de esquema. Se recorren
+en este orden: objetos, defaults y constraints locales, índices y claves
+foráneas. No contienen usuarios, bot ni datos de demostración. Tras ese corte,
+las migraciones vuelven a ser append-only con un nuevo número; no se edita el
+baseline ya aplicado.
 
 El runner acepta por defecto solo `entrelibros_baseline`, `entrelibros_dev`,
 `entrelibros_local`, `entrelibros_test` y `entrelibros_e2e`. Para otro nombre

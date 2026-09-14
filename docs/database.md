@@ -5,11 +5,15 @@ proyecciones geográficas.
 
 ## Baseline y ciclo de migraciones
 
-`backend/migrations/001_initial_schema.sql` instala el modelo final completo
-en una base PostgreSQL/PostGIS nueva y vacía. Es DDL exclusivamente: no inserta
-usuarios, libros, conversaciones ni contenido de demostración. El migrador
-normaliza LF para mantener hashes estables y puede ejecutarse de nuevo sin
-duplicar objetos.
+Los cuatro archivos iniciales de `backend/migrations/` instalan el modelo final
+completo en una base PostgreSQL/PostGIS nueva y vacía. Están separados para
+poder recorrerse en orden: `001_schema_objects.sql` crea extensiones, tipos,
+tablas y secuencias; `002_defaults_and_constraints.sql` completa defaults y
+constraints locales; `003_indexes.sql` añade los índices; y
+`004_foreign_keys.sql` establece las relaciones entre tablas. Son DDL
+exclusivamente: no insertan usuarios, libros, conversaciones ni contenido de
+demostración. El migrador normaliza LF para mantener hashes estables y puede
+ejecutarse de nuevo sin duplicar objetos.
 
 El baseline no actualiza una base que tenga el ledger histórico `001`–`037`.
 El runner la rechaza antes de aplicar DDL; conserva esa base y su `DATABASE_URL`

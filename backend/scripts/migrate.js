@@ -30,6 +30,12 @@ const migrationName = (fileName) =>
 export const normalizeMigrationSource = (source) =>
   source.replaceAll(String.fromCharCode(13, 10), String.fromCharCode(10));
 
+export async function getOrderedMigrationFiles() {
+  return (await fs.readdir(migrationsDir))
+    .filter((file) => file.endsWith('.sql'))
+    .sort();
+}
+
 export async function assertMigrationTargetIsSafe(connectionString, client) {
   assertApprovedMigrationTarget(connectionString);
   await assertNoRetiredMigrationLedger(client);
@@ -77,7 +83,10 @@ export async function runMigrations(
     } finally {
       await client.end().catch(() => undefined);
     }
-    const files = await fs.readdir(migrationsDir);
+    // The grouped baseline has ordered stages. Keep that order independent of
+    // the filesystem enumeration so every fresh database receives the same
+    // sequence of migration ledger entries.
+    const files = await getOrderedMigrationFiles();
     await Promise.all(
       files.map(async (file) => {
         const source = await fs.readFile(

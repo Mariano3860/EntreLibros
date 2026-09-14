@@ -2,10 +2,11 @@
 
 ## Decision
 
-The live migration chain was consolidated at the final schema into
-`backend/migrations/001_initial_schema.sql`. The file is schema-only and is
-immutable after it has been applied. Future changes use new append-only
-migrations.
+The live migration chain was consolidated at the final schema into four ordered
+files: `001_schema_objects.sql`, `002_defaults_and_constraints.sql`,
+`003_indexes.sql` and `004_foreign_keys.sql`. Together they are schema-only and
+immutable after they have been applied. Future changes use new append-only
+migrations starting after `004`.
 
 ## Cutoff and compatibility
 
