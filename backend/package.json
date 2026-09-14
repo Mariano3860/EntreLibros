@@ -11,6 +11,8 @@
     "build": "node scripts/build.js",
     "start": "node dist/index.js",
     "migrate": "node -r dotenv/config scripts/migrate.js",
+    "schema:compare": "node scripts/compare-schema-inventory.js",
+    "seed:system": "node scripts/seed-system-data.js",
     "seed:local": "node scripts/seed-local-dataset.js",
     "seed:local:cleanup": "node scripts/cleanup-local-dataset.js",
     "seed:local:verify": "node scripts/verify-local-dataset.js",

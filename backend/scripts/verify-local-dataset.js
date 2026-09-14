@@ -16,7 +16,7 @@ function assertSafeLocalDatabase() {
     .toLowerCase();
   const allowed = (
     process.env.ENTRELIBROS_LOCAL_DATABASE_NAMES ??
-    'entrelibros,entrelibros_dev,entrelibros_local'
+    'entrelibros_baseline,entrelibros_dev,entrelibros_local'
   )
     .split(',')
     .map((name) => name.trim().toLowerCase())

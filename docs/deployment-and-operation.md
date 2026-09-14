@@ -2,19 +2,32 @@
 
 ## Desarrollo local
 
-1. Configura `backend/.env` con una base PostgreSQL/PostGIS aislada.
-2. Ejecuta `npm run migrate`.
-3. Ejecuta `npm run seed:local` para cargar el recorrido persistido de defensa.
-4. Ejecuta `npm run seed:local:verify` para comprobar conteos, relaciones e
+1. Conserva la base anterior con el ledger `001`–`037`; no la borres ni ejecutes
+   el nuevo `npm run migrate` sobre ella.
+2. Crea una base PostgreSQL/PostGIS distinta, por ejemplo
+   `entrelibros_baseline`, y configura `backend/.env` con ese nombre. Si usas
+   otro nombre, declara también
+   `ENTRELIBROS_MIGRATION_DATABASE_NAMES=<nombre>` y
+   `ENTRELIBROS_LOCAL_DATABASE_NAMES=<nombre>`.
+3. Ejecuta `npm run migrate`. El runner rechaza un ledger retirado antes de DDL.
+4. Ejecuta `npm run seed:local` para cargar el recorrido persistido de defensa.
+5. Ejecuta `npm run seed:local:verify` para comprobar conteos, relaciones e
    imágenes primarias.
-5. Ejecuta `npm run dev`.
+6. Ejecuta `npm run dev`.
 
 La aplicación usa la API y Socket.IO reales. MSW solo se inicia en el bundle de
 tests; `PUBLIC_API_USE_MOCKS` no debe usarse para reemplazar datos en ejecución.
 Para retirar el recorrido de demostración sin borrar otros datos, ejecuta
 `npm run seed:local:cleanup`. Ambos comandos aceptan por defecto únicamente
-`entrelibros`, `entrelibros_dev` y `entrelibros_local`; se puede ampliar esa
-lista con `ENTRELIBROS_LOCAL_DATABASE_NAMES`.
+`entrelibros_baseline`, `entrelibros_dev` y `entrelibros_local`; se puede
+ampliar esa lista con `ENTRELIBROS_LOCAL_DATABASE_NAMES`.
+
+## Rollback del corte de baseline
+
+El corte no tiene upgrade in-place. Si la nueva instalación no es aceptable,
+detén el proceso, vuelve el `DATABASE_URL` de la aplicación a la base anterior
+y usa la versión de backend compatible con su ledger. No ejecutes el migrador
+del baseline contra esa base ni intentes editar hashes históricos.
 
 ## Verificación
 

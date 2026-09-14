@@ -124,6 +124,9 @@ async function resetDatabase() {
   run(process.execPath, ["backend/scripts/migrate.js"], {
     env: getE2EProcessEnv({ NODE_ENV: "test" }),
   });
+  run(process.execPath, ["backend/scripts/seed-system-data.js"], {
+    env: getE2EProcessEnv({ NODE_ENV: "test" }),
+  });
 }
 
 async function seedDatabase() {

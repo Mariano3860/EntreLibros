@@ -19,6 +19,12 @@ MSW queda aislado al arnés de tests.
 
 ## Ejecutar y verificar
 
+Antes de migrar por primera vez, crea una base PostgreSQL/PostGIS nueva para el
+baseline (por ejemplo, `entrelibros_baseline`) y apunta `backend/.env` a ella.
+No ejecutes el nuevo migrador sobre una base que conserve el historial `001` a
+`037`; consulta [Deployment and Operation](docs/deployment-and-operation.md)
+para el corte y rollback local.
+
 ```bash
 npm install
 npm run migrate

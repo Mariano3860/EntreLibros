@@ -23,10 +23,16 @@ en el log del backend y las respuestas HTTP/Socket.IO conservan claves publicas.
 
 ## Migraciones
 
-Las migraciones se ejecutan en orden y son append-only. Las versiones 031-034
-agregan outcomes privados de acuerdos, reportes, eventos de analitica y
-compatibilidad de esquema de reportes; la 035 agrega borradores privados de
-mensajería con revisión y adjuntos tipados.
+`backend/migrations/001_initial_schema.sql` es el baseline final, solo de
+esquema: extensiones, tipos, tablas, constraints e índices. No contiene
+usuarios, bot ni datos de demostración. Tras ese corte, las migraciones vuelven
+a ser append-only con un nuevo número; no se edita el baseline ya aplicado.
+
+El runner acepta por defecto solo `entrelibros_baseline`, `entrelibros_dev`,
+`entrelibros_local`, `entrelibros_test` y `entrelibros_e2e`. Para otro nombre
+explícito, configura `ENTRELIBROS_MIGRATION_DATABASE_NAMES`. Una base con el
+ledger retirado `001`–`037` se rechaza antes de DDL: no se actualiza en sitio.
+Conserva esa base como rollback y crea una nueva para el baseline.
 
 ## Dataset local persistido
 
@@ -45,8 +51,13 @@ idempotente: una segunda ejecución actualiza la misma namespace y no duplica
 filas. `seed:local:cleanup` elimina únicamente esa namespace; no ejecuta
 `TRUNCATE` y conserva los libros bibliográficos compartidos.
 
+Antes del dataset local, su wrapper prepara de forma idempotente la cuenta
+operativa del bot. Los tests y el ciclo E2E hacen el mismo bootstrap justo
+después de migrar; no es una migración ni forma parte del dataset removible.
+
 Ambos comandos rechazan `entrelibros_test`, `entrelibros_e2e`, nombres de
-producción y cualquier base que no esté en `ENTRELIBROS_LOCAL_DATABASE_NAMES`.
+producción y cualquier base que no esté en `ENTRELIBROS_LOCAL_DATABASE_NAMES`
+(por defecto `entrelibros_baseline`, `entrelibros_dev` y `entrelibros_local`).
 La contraseña común de las cuentas sembradas es solo para desarrollo local y no
 debe reutilizarse fuera de esa base.
 
@@ -94,7 +105,4 @@ Las imagenes son referencias HTTPS o datos inline limitados a JPG, PNG o WebP de
 hasta 5 MB; no hay almacenamiento de objetos productivo.
 
 Los borradores se conservan en `message_drafts` y solo se exponen a su autor;
-el destinatario no puede descubrir su existencia. La migracion 035 es aditiva y
-no tiene down-migration: para revertir la aplicacion, vuelve a una version de
-backend anterior y conserva la tabla hasta planificar su eliminacion con una
-backup verificada.
+el destinatario no puede descubrir su existencia.
