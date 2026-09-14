@@ -4,9 +4,9 @@
 
 1. Conserva la base anterior con el ledger `001`–`037`; no la borres ni ejecutes
    el nuevo `npm run migrate` sobre ella.
-2. Crea una base PostgreSQL/PostGIS distinta, por ejemplo
-   `entrelibros_baseline`, y configura `backend/.env` con ese nombre. Si usas
-   otro nombre, declara también
+2. Crea una base PostgreSQL/PostGIS distinta, por ejemplo `entrelibros` tras
+   retirar la base histórica, o `entrelibros_baseline` si quieres conservarla,
+   y configura `backend/.env` con ese nombre. Si usas otro nombre, declara también
    `ENTRELIBROS_MIGRATION_DATABASE_NAMES=<nombre>` y
    `ENTRELIBROS_LOCAL_DATABASE_NAMES=<nombre>`.
 3. Ejecuta `npm run migrate`. El runner rechaza un ledger retirado antes de DDL.
@@ -19,8 +19,9 @@ La aplicación usa la API y Socket.IO reales. MSW solo se inicia en el bundle de
 tests; `PUBLIC_API_USE_MOCKS` no debe usarse para reemplazar datos en ejecución.
 Para retirar el recorrido de demostración sin borrar otros datos, ejecuta
 `npm run seed:local:cleanup`. Ambos comandos aceptan por defecto únicamente
-`entrelibros_baseline`, `entrelibros_dev` y `entrelibros_local`; se puede
-ampliar esa lista con `ENTRELIBROS_LOCAL_DATABASE_NAMES`.
+`entrelibros`, `entrelibros_baseline`, `entrelibros_dev` y
+`entrelibros_local`; se puede ampliar esa lista con
+`ENTRELIBROS_LOCAL_DATABASE_NAMES`.
 
 ## Rollback del corte de baseline
 

@@ -39,6 +39,7 @@ const RETIRED_MIGRATION_NAMES = new Set([
 ]);
 
 const DEFAULT_APPROVED_DATABASE_NAMES = [
+  'entrelibros',
   'entrelibros_baseline',
   'entrelibros_dev',
   'entrelibros_local',

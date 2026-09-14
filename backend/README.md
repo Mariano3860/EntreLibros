@@ -30,11 +30,12 @@ foráneas. No contienen usuarios, bot ni datos de demostración. Tras ese corte,
 las migraciones vuelven a ser append-only con un nuevo número; no se edita el
 baseline ya aplicado.
 
-El runner acepta por defecto solo `entrelibros_baseline`, `entrelibros_dev`,
-`entrelibros_local`, `entrelibros_test` y `entrelibros_e2e`. Para otro nombre
-explícito, configura `ENTRELIBROS_MIGRATION_DATABASE_NAMES`. Una base con el
-ledger retirado `001`–`037` se rechaza antes de DDL: no se actualiza en sitio.
-Conserva esa base como rollback y crea una nueva para el baseline.
+El runner acepta por defecto `entrelibros`, `entrelibros_baseline`,
+`entrelibros_dev`, `entrelibros_local`, `entrelibros_test` y
+`entrelibros_e2e`. Para otro nombre explícito, configura
+`ENTRELIBROS_MIGRATION_DATABASE_NAMES`. Una base con el ledger retirado
+`001`–`037` se rechaza antes de DDL: no se actualiza en sitio. Conserva esa
+base como rollback y crea una nueva para el baseline.
 
 ## Dataset local persistido
 
@@ -59,7 +60,8 @@ después de migrar; no es una migración ni forma parte del dataset removible.
 
 Ambos comandos rechazan `entrelibros_test`, `entrelibros_e2e`, nombres de
 producción y cualquier base que no esté en `ENTRELIBROS_LOCAL_DATABASE_NAMES`
-(por defecto `entrelibros_baseline`, `entrelibros_dev` y `entrelibros_local`).
+(por defecto `entrelibros`, `entrelibros_baseline`, `entrelibros_dev` y
+`entrelibros_local`).
 La contraseña común de las cuentas sembradas es solo para desarrollo local y no
 debe reutilizarse fuera de esa base.
 

@@ -14,18 +14,24 @@ import {
 } from '../../scripts/migrate.js';
 
 describe('migration baseline target guard', () => {
-  test('accepts only explicitly approved baseline lifecycle databases', () => {
+  test('accepts the rebuilt local database and other baseline lifecycle targets', () => {
     expect(
       assertApprovedMigrationTarget(
         'postgres://postgres:postgres@localhost:5432/entrelibros_baseline'
       )
     ).toBe('entrelibros_baseline');
 
-    expect(() =>
+    expect(
       assertApprovedMigrationTarget(
         'postgres://postgres:postgres@localhost:5432/entrelibros'
       )
-    ).toThrow('Refusing to migrate database "entrelibros"');
+    ).toBe('entrelibros');
+
+    expect(() =>
+      assertApprovedMigrationTarget(
+        'postgres://postgres:postgres@localhost:5432/entrelibros_legacy'
+      )
+    ).toThrow('Refusing to migrate database "entrelibros_legacy"');
   });
 
   test('allows an operator to explicitly approve a separate local target', () => {
