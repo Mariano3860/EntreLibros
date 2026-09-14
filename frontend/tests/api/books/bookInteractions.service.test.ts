@@ -23,6 +23,7 @@ describe('book interaction service', () => {
       type: 'want',
       metadata: { title: '1984', author: 'George Orwell' },
       notes: 'Cualquier edicion',
+      consents: { content: true, image: true, rules: true },
     })
 
     expect(result).toMatchObject({

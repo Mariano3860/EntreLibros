@@ -179,7 +179,8 @@
       "isbnLabel": "ISBN",
       "coverLabel": "URL de portada",
       "notesLabel": "Notas",
-      "notesPlaceholder": "Edicion, idioma o detalles que te interesen..."
+      "notesPlaceholder": "Edicion, idioma o detalles que te interesen...",
+      "consent": "Confirmo que la información es correcta y acepto los términos de EntreLibros."
     },
     "personSearch": {
       "open": "Buscar personas",

@@ -61,6 +61,7 @@ export type CreateWantBookPayload = {
     | 'coverUrl'
   >
   notes?: string
+  consents: PublishBookConsents
 }
 
 export type PublishBookResponse = ApiUserBook & {

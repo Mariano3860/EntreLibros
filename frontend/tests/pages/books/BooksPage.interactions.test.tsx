@@ -116,6 +116,9 @@ describe('BooksPage relation interactions', () => {
       target: { value: 'Libro buscado desde el encabezado' },
     })
     const submit = screen.getByRole('button', { name: 'booksPage.want.submit' })
+    expect(submit).toBeDisabled()
+    fireEvent.click(screen.getByLabelText('booksPage.want.consent'))
+    expect(submit).toBeEnabled()
     fireEvent.click(submit)
 
     await waitFor(() =>
@@ -125,6 +128,7 @@ describe('BooksPage relation interactions', () => {
           metadata: expect.objectContaining({
             title: 'Libro buscado desde el encabezado',
           }),
+          consents: { content: true, image: true, rules: true },
         })
       )
     )

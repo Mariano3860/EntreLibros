@@ -43,6 +43,7 @@ type WantBookForm = {
   isbn: string
   coverUrl: string
   notes: string
+  acceptedTerms: boolean
 }
 
 const formFromBook = (book?: WantBookSource): WantBookForm => ({
@@ -55,6 +56,7 @@ const formFromBook = (book?: WantBookSource): WantBookForm => ({
   isbn: book?.isbn ?? '',
   coverUrl: book?.coverUrl ?? '',
   notes: '',
+  acceptedTerms: false,
 })
 
 export const WantBookModal: React.FC<WantBookModalProps> = ({
@@ -118,6 +120,11 @@ export const WantBookModal: React.FC<WantBookModalProps> = ({
         coverUrl: form.coverUrl.trim() || undefined,
       },
       notes: form.notes.trim() || undefined,
+      consents: {
+        content: form.acceptedTerms,
+        image: form.acceptedTerms,
+        rules: form.acceptedTerms,
+      },
     }
 
     try {
@@ -161,7 +168,9 @@ export const WantBookModal: React.FC<WantBookModalProps> = ({
             type="submit"
             form="want-book-form"
             className={styles.primaryAction}
-            disabled={!form.title.trim() || mutation.isPending}
+            disabled={
+              !form.title.trim() || !form.acceptedTerms || mutation.isPending
+            }
           >
             {mutation.isPending
               ? t('booksPage.want.saving')
@@ -282,6 +291,20 @@ export const WantBookModal: React.FC<WantBookModalProps> = ({
             placeholder={t('booksPage.want.notesPlaceholder')}
             onChange={(event) => updateField('notes', event.target.value)}
           />
+        </label>
+
+        <label className={styles.consent}>
+          <input
+            type="checkbox"
+            checked={form.acceptedTerms}
+            onChange={(event) =>
+              setForm((current) => ({
+                ...current,
+                acceptedTerms: event.target.checked,
+              }))
+            }
+          />
+          <span>{t('booksPage.want.consent')}</span>
         </label>
       </form>
     </PublishModal>
