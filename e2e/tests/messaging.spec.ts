@@ -112,4 +112,21 @@ test("hides a conversation from one participant after a clear confirmation", asy
   await expect(
     userBPage.getByRole("button", { name: /E2E User A/ }),
   ).toBeVisible();
+
+  await openSeedConversation(userBPage, "E2E User A");
+  const reply = `E2E restore ${Date.now()}`;
+  const replyResponse = userBPage.waitForResponse(
+    (response) =>
+      /\/api\/messages\/\d+\/draft\/send$/.test(response.url()) &&
+      response.request().method() === "POST" &&
+      response.status() === 201,
+  );
+  await userBPage.getByPlaceholder("Escribí un mensaje...").fill(reply);
+  await userBPage.getByRole("button", { name: "Enviar mensaje" }).click();
+  await replyResponse;
+
+  await userAPage.reload();
+  await expect(
+    userAPage.getByRole("button", { name: /E2E User B/ }),
+  ).toBeVisible();
 });

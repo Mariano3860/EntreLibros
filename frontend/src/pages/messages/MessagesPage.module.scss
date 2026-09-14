@@ -298,7 +298,9 @@ main.layoutMain {
   align-items: center;
   gap: 10px;
   min-height: 66px;
-  padding: 0 16px;
+  // The notification bell is fixed in the top-right corner by the global
+  // sidebar. Keep conversation actions out of its hit area on every viewport.
+  padding: 0 64px 0 16px;
   border-bottom: 1px solid var(--app-border);
 }
 
