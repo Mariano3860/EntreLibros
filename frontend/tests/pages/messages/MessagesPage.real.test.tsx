@@ -6,6 +6,7 @@ const { mocks, messageQueryKeys } = vi.hoisted(() => ({
     fetchConversations: vi.fn(),
     fetchMessagingContacts: vi.fn(),
     createConversation: vi.fn(),
+    deleteConversation: vi.fn(),
     fetchMessageHistory: vi.fn(),
     fetchConversationBooks: vi.fn(),
     sendPersistedMessage: vi.fn(),
@@ -41,6 +42,7 @@ vi.mock('@src/api/messages/messages', () => ({
   fetchConversations: mocks.fetchConversations,
   fetchMessagingContacts: mocks.fetchMessagingContacts,
   createConversation: mocks.createConversation,
+  deleteConversation: mocks.deleteConversation,
   fetchMessageHistory: mocks.fetchMessageHistory,
   fetchConversationBooks: mocks.fetchConversationBooks,
   sendPersistedMessage: mocks.sendPersistedMessage,
@@ -55,6 +57,7 @@ vi.mock('@api/messages/messages', () => ({
   fetchConversations: mocks.fetchConversations,
   fetchMessagingContacts: mocks.fetchMessagingContacts,
   createConversation: mocks.createConversation,
+  deleteConversation: mocks.deleteConversation,
   fetchMessageHistory: mocks.fetchMessageHistory,
   fetchConversationBooks: mocks.fetchConversationBooks,
   sendPersistedMessage: mocks.sendPersistedMessage,
@@ -113,6 +116,7 @@ describe('MessagesPage in real API mode', () => {
     mocks.fetchConversations.mockReset()
     mocks.fetchMessagingContacts.mockReset()
     mocks.createConversation.mockReset()
+    mocks.deleteConversation.mockReset()
     mocks.fetchMessageHistory.mockReset()
     mocks.fetchConversationBooks.mockReset()
     mocks.sendPersistedMessage.mockReset()
@@ -139,6 +143,7 @@ describe('MessagesPage in real API mode', () => {
       updatedAt: '2026-08-31T10:00:00.000Z',
     })
     mocks.deleteMessageDraft.mockResolvedValue(undefined)
+    mocks.deleteConversation.mockResolvedValue(undefined)
     mocks.sendMessageDraft.mockResolvedValue({})
     mocks.markMessagesRead.mockResolvedValue(undefined)
   })
@@ -1005,5 +1010,44 @@ describe('MessagesPage in real API mode', () => {
     expect(
       await screen.findByText('No hay conversaciones no leídas.')
     ).toBeVisible()
+  })
+
+  test('confirms deletion before hiding only the selected conversation', async () => {
+    mocks.fetchConversations.mockResolvedValue([conversation])
+    mocks.fetchMessageHistory.mockResolvedValue({ messages: [], nextAfter: 0 })
+
+    renderWithProviders(<MessagesPage />)
+
+    fireEvent.click(
+      await screen.findByRole('button', {
+        name: 'Eliminar conversación solo para vos',
+      })
+    )
+    expect(
+      screen.getByRole('heading', { name: '¿Eliminar conversación?' })
+    ).toBeVisible()
+    expect(mocks.deleteConversation).not.toHaveBeenCalled()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Eliminar para mí' }))
+    await waitFor(() =>
+      expect(mocks.deleteConversation).toHaveBeenCalledWith(conversation.id)
+    )
+  })
+
+  test('closes the delete confirmation without hiding the conversation', async () => {
+    mocks.fetchConversations.mockResolvedValue([conversation])
+    mocks.fetchMessageHistory.mockResolvedValue({ messages: [], nextAfter: 0 })
+
+    renderWithProviders(<MessagesPage />)
+
+    fireEvent.click(
+      await screen.findByRole('button', {
+        name: 'Eliminar conversación solo para vos',
+      })
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }))
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(mocks.deleteConversation).not.toHaveBeenCalled()
   })
 })

@@ -8,6 +8,7 @@ import {
 } from '@api/agreements/agreements'
 import {
   createConversation,
+  deleteConversation,
   fetchConversationBooks,
   fetchConversations,
   fetchMessagingContacts,
@@ -1172,6 +1173,7 @@ const RealMessagesPage = () => {
     bookTitle: '',
   })
   const [newConversationOpen, setNewConversationOpen] = useState(false)
+  const [deleteConversationOpen, setDeleteConversationOpen] = useState(false)
   const [contactSearch, setContactSearch] = useState('')
   const [selectedContactId, setSelectedContactId] = useState<number | null>(
     null
@@ -1386,6 +1388,16 @@ const RealMessagesPage = () => {
         queryKey: messageQueryKeys.conversations(),
       })
       setSelected(conversation.id)
+    },
+  })
+  const deleteConversationMutation = useMutation({
+    mutationFn: () => deleteConversation(selected ?? 0),
+    onSuccess: async () => {
+      setDeleteConversationOpen(false)
+      setSelected(null)
+      await queryClient.invalidateQueries({
+        queryKey: messageQueryKeys.conversations(),
+      })
     },
   })
 
@@ -1858,11 +1870,16 @@ const RealMessagesPage = () => {
 
   useFocusTrap({
     containerRef: modalRef,
-    active: bookPickerMode !== null || agreementOpen || newConversationOpen,
+    active:
+      bookPickerMode !== null ||
+      agreementOpen ||
+      newConversationOpen ||
+      deleteConversationOpen,
     onEscape: () => {
       setBookPickerMode(null)
       setAgreementOpen(false)
       setNewConversationOpen(false)
+      setDeleteConversationOpen(false)
     },
   })
 
@@ -2052,6 +2069,22 @@ const RealMessagesPage = () => {
                     </strong>
                     <small>Conversación persistida</small>
                   </div>
+                  <nav aria-label="Acciones de conversación">
+                    <button
+                      type="button"
+                      className={styles.deleteConversationButton}
+                      aria-label="Eliminar conversación solo para vos"
+                      title="Eliminar conversación"
+                      onClick={() => {
+                        deleteConversationMutation.reset()
+                        setDeleteConversationOpen(true)
+                      }}
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M4 7h16M10 11v6m4-6v6M9 7l1-2h4l1 2m-9 0 1 13h10l1-13" />
+                      </svg>
+                    </button>
+                  </nav>
                 </header>
                 <div className={styles.messages} aria-live="polite">
                   <div className={styles.day}>Mensajes</div>
@@ -2941,6 +2974,74 @@ const RealMessagesPage = () => {
           onClose={() => setEmojiPickerOpen(false)}
           onSelect={insertEmoji}
         />
+        {deleteConversationOpen && activeConversation ? (
+          <div className={styles.modalBackdrop} role="presentation">
+            <div
+              ref={modalRef}
+              className={styles.deleteConversationDialog}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="delete-conversation-title"
+              aria-describedby="delete-conversation-description"
+            >
+              <Panel className={styles.deleteConversationModal} as="div">
+                <header className={styles.deleteConversationHeader}>
+                  <span
+                    className={styles.deleteConversationIcon}
+                    aria-hidden="true"
+                  >
+                    <svg viewBox="0 0 24 24">
+                      <path d="M4 7h16M10 11v6m4-6v6M9 7l1-2h4l1 2m-9 0 1 13h10l1-13" />
+                    </svg>
+                  </span>
+                  <div className={styles.deleteConversationCopy}>
+                    <h2 id="delete-conversation-title">
+                      ¿Eliminar conversación?
+                    </h2>
+                    <p id="delete-conversation-description">
+                      La ocultaremos de tus mensajes. La otra persona conserva
+                      su conversación, sus mensajes y sus acuerdos.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    className={styles.deleteConversationCloseButton}
+                    aria-label="Cerrar"
+                    onClick={() => setDeleteConversationOpen(false)}
+                    disabled={deleteConversationMutation.isPending}
+                  >
+                    ×
+                  </button>
+                </header>
+                {deleteConversationMutation.isError ? (
+                  <p className={styles.deleteConversationError} role="alert">
+                    No pudimos eliminar la conversación. Intentá nuevamente.
+                  </p>
+                ) : null}
+                <div className={styles.deleteConversationActions}>
+                  <button
+                    type="button"
+                    className={styles.deleteConversationCancel}
+                    onClick={() => setDeleteConversationOpen(false)}
+                    disabled={deleteConversationMutation.isPending}
+                  >
+                    Cancelar
+                  </button>
+                  <ActionButton
+                    type="button"
+                    tone="danger"
+                    onClick={() => deleteConversationMutation.mutate()}
+                    disabled={deleteConversationMutation.isPending}
+                  >
+                    {deleteConversationMutation.isPending
+                      ? 'Eliminando…'
+                      : 'Eliminar para mí'}
+                  </ActionButton>
+                </div>
+              </Panel>
+            </div>
+          </div>
+        ) : null}
       </PageFrame>
     </BaseLayout>
   )

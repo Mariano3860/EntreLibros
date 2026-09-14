@@ -298,7 +298,9 @@ main.layoutMain {
   align-items: center;
   gap: 10px;
   min-height: 66px;
-  padding: 0 16px;
+  // The notification bell is fixed in the top-right corner by the global
+  // sidebar. Keep conversation actions out of its hit area on every viewport.
+  padding: 0 64px 0 16px;
   border-bottom: 1px solid var(--app-border);
 }
 
@@ -638,11 +640,147 @@ main.layoutMain {
   width: min(440px, 100%);
 }
 
+.deleteConversationDialog {
+  width: min(400px, 100%);
+}
+
 .newConversationModal {
   width: 100%;
   max-height: none;
   padding: 0;
   overflow: hidden;
+}
+
+.deleteConversationModal {
+  width: 100%;
+  padding: 0;
+  overflow: hidden;
+}
+
+.deleteConversationHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  padding: 20px 20px 16px;
+}
+
+.deleteConversationIcon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  place-items: center;
+  border: 1px solid rgb(255 139 76 / 30%);
+  border-radius: 11px;
+  background: rgb(255 139 76 / 9%);
+  color: var(--app-orange);
+}
+
+.deleteConversationIcon svg,
+.deleteConversationButton svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentcolor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.deleteConversationCopy {
+  min-width: 0;
+  flex: 1;
+}
+
+.deleteConversationCopy h2 {
+  margin: 1px 0 0;
+  color: var(--app-text);
+  font-size: 17px;
+  letter-spacing: -0.018em;
+  line-height: 1.25;
+}
+
+.deleteConversationCopy p {
+  margin: 7px 0 0;
+  color: var(--app-muted);
+  font-size: 12px;
+  line-height: 1.48;
+}
+
+.deleteConversationCloseButton {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--app-muted);
+  cursor: pointer;
+  font-size: 19px;
+  line-height: 1;
+}
+
+.deleteConversationCloseButton:hover:not(:disabled) {
+  border-color: var(--app-border);
+  background: var(--app-subtle-hover);
+  color: var(--app-text);
+}
+
+.deleteConversationCloseButton:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.deleteConversationError {
+  margin: 0 20px 16px;
+  padding: 10px 12px;
+  border: 1px solid rgb(255 139 76 / 28%);
+  border-radius: 9px;
+  background: rgb(255 139 76 / 7%);
+  color: var(--app-text);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.deleteConversationActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--app-border);
+  background: var(--app-inset-background);
+}
+
+.deleteConversationCancel {
+  min-height: 40px;
+  padding: 0 13px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--app-muted);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.deleteConversationCancel:hover:not(:disabled) {
+  background: var(--app-subtle-hover);
+  color: var(--app-text);
+}
+
+.deleteConversationCancel:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.chatHeader .deleteConversationButton:hover {
+  border-color: rgb(255 139 76 / 30%);
+  background: rgb(255 139 76 / 8%);
+  color: var(--app-orange);
 }
 
 .newConversationHeader {

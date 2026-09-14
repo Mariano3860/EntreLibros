@@ -75,3 +75,58 @@ test("delivers a real conversation message between contexts without reload", asy
     userBPage.locator('div[class*="bubble"]').filter({ hasText: message }),
   ).toBeVisible();
 });
+
+test("hides a conversation from one participant after a clear confirmation", async ({
+  userAPage,
+  userBPage,
+}) => {
+  await openSeedConversation(userAPage, "E2E User B");
+
+  await userAPage
+    .getByRole("button", { name: "Eliminar conversación solo para vos" })
+    .click();
+  const dialog = userAPage.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toContainText("La ocultaremos de tus mensajes");
+  await expect(dialog).toContainText("La otra persona conserva");
+
+  await dialog.getByRole("button", { name: "Cancelar", exact: true }).click();
+  await expect(dialog).toBeHidden();
+
+  await userAPage
+    .getByRole("button", { name: "Eliminar conversación solo para vos" })
+    .click();
+  const deleteResponse = userAPage.waitForResponse(
+    (response) =>
+      /\/api\/messages\/\d+$/.test(response.url()) &&
+      response.request().method() === "DELETE" &&
+      response.status() === 204,
+  );
+  await userAPage.getByRole("button", { name: "Eliminar para mí" }).click();
+  await deleteResponse;
+  await expect(
+    userAPage.getByRole("button", { name: /E2E User B/ }),
+  ).toHaveCount(0);
+
+  await userBPage.goto("/messages");
+  await expect(
+    userBPage.getByRole("button", { name: /E2E User A/ }),
+  ).toBeVisible();
+
+  await openSeedConversation(userBPage, "E2E User A");
+  const reply = `E2E restore ${Date.now()}`;
+  const replyResponse = userBPage.waitForResponse(
+    (response) =>
+      /\/api\/messages\/\d+\/draft\/send$/.test(response.url()) &&
+      response.request().method() === "POST" &&
+      response.status() === 201,
+  );
+  await userBPage.getByPlaceholder("Escribí un mensaje...").fill(reply);
+  await userBPage.getByRole("button", { name: "Enviar mensaje" }).click();
+  await replyResponse;
+
+  await userAPage.reload();
+  await expect(
+    userAPage.getByRole("button", { name: /E2E User B/ }),
+  ).toBeVisible();
+});
