@@ -1,4 +1,4 @@
-import { resolveApiErrorKey } from './apiError'
+import { resolveApiErrorKey } from '@utils/apiError'
 
 describe('resolveApiErrorKey', () => {
   it('uses a public key returned by the API', () => {
