@@ -26,6 +26,7 @@ const toBook = (
     author: string
     coverUrl: string
   },
+  genre: string,
   accent = '#42d7c7'
 ): BookCardView => ({
   id: book.id ?? book.bookId ?? 'draft-book',
@@ -35,7 +36,7 @@ const toBook = (
   distance: '',
   mode: 'Intercambio',
   accent,
-  genre: 'Libro',
+  genre,
   coverUrl: book.coverUrl,
 })
 
@@ -56,7 +57,10 @@ const DraftBook = ({
   return (
     <div className={styles.bookCard} aria-label={`${label}: ${book.title}`}>
       <span className={styles.bookLabel}>{label}</span>
-      <BookCover compact book={toBook(book)} />
+      <BookCover
+        compact
+        book={toBook(book, t('community.messages.drafts.book'))}
+      />
       <div className={styles.bookCopy}>
         <strong>{book.title}</strong>
         <span>{book.author}</span>

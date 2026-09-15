@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import i18n from '@src/assets/i18n/i18n'
 import {
   formatRelativeTime,
   toBookCardView,
@@ -46,6 +47,48 @@ describe('real-data adapters', () => {
     })
   })
 
+  it('localizes product-owned fallbacks without changing bibliographic data', async () => {
+    await i18n.changeLanguage('en')
+
+    try {
+      const book = toBookCardView({
+        id: 'book-3',
+        title: 'Una novela',
+        author: '',
+        coverUrl: '',
+        isForTrade: true,
+      })
+      const conversation = toConversationView(
+        {
+          id: 3,
+          isBot: false,
+          participantIds: [1, 2],
+          agreementId: null,
+          lastMessageSequence: 0,
+          updatedAt: '2026-08-30T11:59:00.000Z',
+          participantName: null,
+          unreadCount: 0,
+        },
+        { now: new Date('2026-08-30T12:00:00.000Z') }
+      )
+
+      expect(book).toMatchObject({
+        title: 'Una novela',
+        author: 'Unknown author',
+        owner: 'EntreLibros member',
+        distance: 'Location available',
+        genre: 'Book',
+      })
+      expect(conversation).toMatchObject({
+        name: 'Conversation',
+        preview: 'There are no messages yet.',
+        time: '1 min ago',
+      })
+    } finally {
+      await i18n.changeLanguage('es')
+    }
+  })
+
   it('maps profile privacy-safe display fields without requiring extended mock metrics', () => {
     expect(
       toProfileView({
@@ -73,7 +116,7 @@ describe('real-data adapters', () => {
       profilePhoto: null,
       city: 'Palermo · Buenos Aires · Argentina',
       bio: '',
-      interests: ['Science Fiction'],
+      interests: ['science-fiction'],
     })
   })
 

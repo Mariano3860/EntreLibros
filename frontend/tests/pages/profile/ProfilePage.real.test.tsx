@@ -1,4 +1,5 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { useTranslation } from 'react-i18next'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
 import type { UpdateProfileRequest } from '@src/api/user/profile.types'
@@ -138,7 +139,7 @@ describe('ProfilePage in real API mode', () => {
         },
       })
       await screen.findByText('Ajustá el encuadre')
-      fireEvent.click(screen.getByLabelText('profile.interestOptions.fantasy'))
+      fireEvent.click(screen.getByLabelText('Fantasía'))
       fireEvent.change(screen.getByLabelText('profile.neighborhood'), {
         target: { value: 'Chacarita' },
       })
@@ -172,6 +173,45 @@ describe('ProfilePage in real API mode', () => {
     } finally {
       restoreFileReader()
     }
+  })
+
+  test('localizes persisted interest keys when the application language changes', async () => {
+    fetchProfile.mockResolvedValue({
+      ...profile,
+      interests: ['fiction', 'history'],
+    })
+
+    const { rerender } = renderWithProviders(<ProfilePage />)
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Mariano' })).toBeVisible()
+    )
+
+    expect(screen.getAllByText('Ficción').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Historia').length).toBeGreaterThan(0)
+
+    await useTranslation().i18n.changeLanguage('en')
+    rerender(<ProfilePage />)
+
+    expect(screen.getAllByText('Fiction').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('History').length).toBeGreaterThan(0)
+  })
+
+  test('localizes the profile editor without translating persisted user data', async () => {
+    await useTranslation().i18n.changeLanguage('en')
+    renderWithProviders(<ProfilePage />)
+
+    expect(
+      await screen.findByRole('heading', { name: 'Mariano' })
+    ).toBeVisible()
+    expect(screen.getAllByText('Fiction').length).toBeGreaterThan(0)
+
+    fireEvent.click(screen.getAllByRole('button', { name: 'Edit profile' })[0])
+    expect(screen.getByRole('heading', { name: 'Edit profile' })).toBeVisible()
+    expect(screen.getByLabelText('Name')).toHaveValue('Mariano')
+    expect(screen.getByLabelText('Description')).toHaveValue('Lector de prueba')
+    expect(screen.getByLabelText('Profile photo')).toBeInTheDocument()
+    expect(screen.getAllByText('Reading interests').length).toBeGreaterThan(0)
+    expect(screen.getByRole('button', { name: 'Save changes' })).toBeVisible()
   })
 
   test('replaces an existing photo and can select the same filename again', async () => {

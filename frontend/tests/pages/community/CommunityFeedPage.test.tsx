@@ -1,4 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react'
+import { useTranslation } from 'react-i18next'
 import { describe, expect, test, vi } from 'vitest'
 import { useLocation } from 'react-router-dom'
 
@@ -39,6 +40,18 @@ describe('CommunityFeedPage', () => {
     expect(
       screen.getByRole('heading', { name: 'booksPage.personSearch.title' })
     ).toBeVisible()
+  })
+
+  test('localizes the community feed in English', async () => {
+    await useTranslation().i18n.changeLanguage('en')
+    renderWithProviders(<CommunityFeedPage />)
+
+    expect(
+      await screen.findByRole('heading', { name: 'Community' })
+    ).toBeVisible()
+    expect(screen.getByText('Your story')).toBeVisible()
+    expect(screen.getByRole('button', { name: /Photo\/video/ })).toBeVisible()
+    expect(screen.getByText('Suggestions for you')).toBeVisible()
   })
 
   test('connects the community mini map with the selected corner in Map', async () => {

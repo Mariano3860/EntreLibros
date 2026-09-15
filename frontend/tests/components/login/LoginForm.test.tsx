@@ -1,4 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react'
+import { useTranslation } from 'react-i18next'
 import { describe, expect, test, vi, beforeEach } from 'vitest'
 
 const mockMutate = vi.fn()
@@ -98,6 +99,19 @@ describe('LoginForm', () => {
     fireEvent.click(screen.getByRole('button', { name: 'login' }))
 
     expect(showToastMock).toHaveBeenCalled()
+  })
+
+  test('renders the login form in English', async () => {
+    await useTranslation().i18n.changeLanguage('en')
+    renderWithProviders(<LoginForm onSubmit={vi.fn()} />)
+
+    expect(
+      screen.getByRole('heading', { name: 'Welcome to EntreLibros' })
+    ).toBeVisible()
+    expect(screen.getByText("Readers' Community")).toBeVisible()
+    expect(screen.getByPlaceholderText('Email')).toBeVisible()
+    expect(screen.getByPlaceholderText('Password')).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Login' })).toBeVisible()
   })
 
   test('uses the localized fallback for an unexpected message', () => {

@@ -35,9 +35,23 @@ import {
 import { useAuth } from '@src/contexts/auth/AuthContext'
 import { useAuthRequired } from '@src/contexts/auth/AuthRequiredContext'
 import { useMockExperience } from '@src/contexts/mock/MockExperienceContext'
+import { localizeLegacyRelativeTime } from '@src/shared/view-models/adapters'
 import { isApiMockMode } from '@src/utils/runtimeEnv'
 
 import styles from './CommunityFeedPage.module.scss'
+
+const localizeCornerActivity = (
+  value: string | null | undefined,
+  t: ReturnType<typeof useTranslation>['t']
+) => {
+  const weeklyExchanges = /^(\d+) intercambios esta semana$/.exec(value ?? '')
+  if (weeklyExchanges) {
+    return t('community.ui.weeklyExchanges', {
+      count: Number(weeklyExchanges[1]),
+    })
+  }
+  return value ?? t('community.ui.noActivity')
+}
 
 export const CommunityFeedPage = () => {
   const { fixtures, socialPosts, publishStory } = useMockExperience()
@@ -67,8 +81,8 @@ export const CommunityFeedPage = () => {
       <PageFrame>
         <header className={styles.header}>
           <div>
-            <h1>Comunidad</h1>
-            <p>Historias, recomendaciones y encuentros cerca tuyo.</p>
+            <h1>{t('community.ui.title')}</h1>
+            <p>{t('community.ui.subtitle')}</p>
           </div>
           <div className={styles.headerActions}>
             <ActionButton onClick={() => setIsPersonSearchOpen(true)}>
@@ -78,7 +92,7 @@ export const CommunityFeedPage = () => {
               tone="primary"
               onClick={() => runIfAuthenticated(() => setComposerOpen(true))}
             >
-              ＋ Publicar
+              ＋ {t('community.ui.publish')}
             </ActionButton>
           </div>
         </header>
@@ -92,7 +106,7 @@ export const CommunityFeedPage = () => {
                 onClick={() => runIfAuthenticated(() => setComposerOpen(true))}
               >
                 <Avatar initials="+" accent="#42d7c7" size="large" />
-                <span>Tu historia</span>
+                <span>{t('community.ui.myStory')}</span>
               </button>
               {storyChips.map((story) => (
                 <button
@@ -112,8 +126,10 @@ export const CommunityFeedPage = () => {
 
             {selectedStory ? (
               <div className={styles.storyNotice} role="status">
-                Historia de {selectedStory} abierta ·{' '}
-                <button onClick={() => setSelectedStory(null)}>Cerrar</button>
+                {t('community.ui.storyOpen', { name: selectedStory })} ·{' '}
+                <button onClick={() => setSelectedStory(null)}>
+                  {t('community.ui.close')}
+                </button>
               </div>
             ) : null}
 
@@ -125,7 +141,7 @@ export const CommunityFeedPage = () => {
                     runIfAuthenticated(() => setComposerOpen(true))
                   }
                 >
-                  ¿Qué estás leyendo, Mariano?
+                  {t('community.ui.readingPrompt', { name: 'Mariano' })}
                 </button>
               </div>
               <div className={styles.composerActions}>
@@ -134,28 +150,28 @@ export const CommunityFeedPage = () => {
                     runIfAuthenticated(() => setComposerOpen(true))
                   }
                 >
-                  ▧ Foto/Video
+                  ▧ {t('community.ui.photoVideo')}
                 </button>
                 <button
                   onClick={() =>
                     runIfAuthenticated(() => setComposerOpen(true))
                   }
                 >
-                  ▤ Ofrecer libro
+                  ▤ {t('community.ui.offerBook')}
                 </button>
                 <button
                   onClick={() =>
                     runIfAuthenticated(() => setComposerOpen(true))
                   }
                 >
-                  ↔ Proponer intercambio
+                  ↔ {t('community.ui.proposeTrade')}
                 </button>
                 <button
                   onClick={() =>
                     runIfAuthenticated(() => setComposerOpen(true))
                   }
                 >
-                  ☷ Encuesta
+                  ☷ {t('community.ui.poll')}
                 </button>
                 <ActionButton
                   tone="primary"
@@ -164,7 +180,7 @@ export const CommunityFeedPage = () => {
                     runIfAuthenticated(() => setComposerOpen(true))
                   }
                 >
-                  Publicar
+                  {t('community.ui.publish')}
                 </ActionButton>
               </div>
             </Panel>
@@ -179,7 +195,9 @@ export const CommunityFeedPage = () => {
                         <strong>{post.author}</strong>
                         <small>{post.createdAt} · Buenos Aires</small>
                       </div>
-                      <button aria-label="Más opciones">•••</button>
+                      <button aria-label={t('community.ui.moreOptions')}>
+                        •••
+                      </button>
                     </div>
                     <p>{post.text}</p>
                     <FeedActions
@@ -201,7 +219,9 @@ export const CommunityFeedPage = () => {
                         <strong>{post.author}</strong>
                         <small>{post.meta}</small>
                       </div>
-                      <button aria-label="Más opciones">•••</button>
+                      <button aria-label={t('community.ui.moreOptions')}>
+                        •••
+                      </button>
                     </div>
                     <p>{post.text}</p>
                     <img src={post.image} alt={post.imageAlt} />
@@ -223,12 +243,12 @@ export const CommunityFeedPage = () => {
                 corners={fixtures.corners.slice(0, 2).map((corner) => ({
                   id: corner.id,
                   name: corner.name,
-                  meta: `${corner.distance} · ${corner.activity}`,
+                  meta: `${corner.distance} · ${localizeCornerActivity(corner.activity, t)}`,
                 }))}
               />
             </Panel>
             <Panel className={styles.sidePanel}>
-              <SectionHeading title="Sugerencias para vos" />
+              <SectionHeading title={t('community.ui.suggestions')} />
               {fixtures.stats.contributors.slice(0, 3).map((person) => (
                 <article className={styles.suggestion} key={person.name}>
                   <Avatar
@@ -238,9 +258,9 @@ export const CommunityFeedPage = () => {
                   />
                   <div>
                     <strong>{person.name}</strong>
-                    <small>Lecturas en común</small>
+                    <small>{t('community.ui.commonReads')}</small>
                   </div>
-                  <button>Seguir</button>
+                  <button>{t('community.ui.follow')}</button>
                 </article>
               ))}
             </Panel>
@@ -251,35 +271,35 @@ export const CommunityFeedPage = () => {
           <div className={styles.modalBackdrop}>
             <Panel className={styles.modal} as="div">
               <div className={styles.modalHeader}>
-                <h2>Crear una historia</h2>
+                <h2>{t('community.ui.createStory')}</h2>
                 <button
                   onClick={() => setComposerOpen(false)}
-                  aria-label="Cerrar"
+                  aria-label={t('community.ui.close')}
                 >
                   ×
                 </button>
               </div>
               <form onSubmit={submitStory}>
                 <label>
-                  Contanos qué estás leyendo
+                  {t('community.ui.sharePrompt')}
                   <textarea
                     autoFocus
                     value={storyText}
                     onChange={(event) => setStoryText(event.target.value)}
-                    placeholder="Compartí una idea, una recomendación o un encuentro…"
+                    placeholder={t('community.ui.sharePlaceholder')}
                   />
                 </label>
                 <div className={styles.attachments}>
-                  <button type="button">▧ Agregar foto</button>
-                  <button type="button">▤ Linkear libro</button>
-                  <button type="button">↔ Intercambio</button>
+                  <button type="button">▧ {t('community.ui.addPhoto')}</button>
+                  <button type="button">▤ {t('community.ui.linkBook')}</button>
+                  <button type="button">↔ {t('community.ui.trade')}</button>
                 </div>
                 <ActionButton
                   tone="primary"
                   type="submit"
                   disabled={!storyText.trim()}
                 >
-                  Publicar historia
+                  {t('community.ui.publishStory')}
                 </ActionButton>
               </form>
             </Panel>
@@ -308,17 +328,18 @@ const CommunityCornersPanel = ({
   navigate: ReturnType<typeof useNavigate>
 }) => {
   const [selectedCornerId, setSelectedCornerId] = useState<string | null>(null)
+  const { t } = useTranslation()
 
   return (
     <>
       <SectionHeading
-        title="Rincones cerca de vos"
+        title={t('community.ui.nearbyCorners')}
         action={
           <button
             type="button"
             onClick={() => navigate(buildCommunityMapPath(selectedCornerId))}
           >
-            Ver mapa →
+            {t('community.ui.viewMap')} →
           </button>
         }
       />
@@ -453,8 +474,8 @@ const RealCommunityPage = ({
       <PageFrame>
         <header className={styles.header}>
           <div>
-            <h1>Comunidad</h1>
-            <p>Historias, recomendaciones y encuentros cerca tuyo.</p>
+            <h1>{t('community.ui.title')}</h1>
+            <p>{t('community.ui.subtitle')}</p>
           </div>
           <div className={styles.headerActions}>
             <ActionButton onClick={() => setIsPersonSearchOpen(true)}>
@@ -464,7 +485,7 @@ const RealCommunityPage = ({
               tone="primary"
               onClick={() => runIfAuthenticated(() => setComposerOpen(true))}
             >
-              ＋ Publicar
+              ＋ {t('community.ui.publish')}
             </ActionButton>
           </div>
         </header>
@@ -477,11 +498,7 @@ const RealCommunityPage = ({
                 onClick={() => runIfAuthenticated(() => setComposerOpen(true))}
               >
                 <Avatar initials="+" accent="#42d7c7" size="large" />
-                <span>
-                  {t('community.discovery.yourStory', {
-                    defaultValue: 'Tu historia',
-                  })}
-                </span>
+                <span>{t('community.ui.myStory')}</span>
               </button>
               {storyChips.map((story) => (
                 <button
@@ -509,8 +526,10 @@ const RealCommunityPage = ({
             </Panel>
             {selectedStory ? (
               <div className={styles.storyNotice} role="status">
-                Historia de {selectedStory} abierta ·{' '}
-                <button onClick={() => setSelectedStory(null)}>Cerrar</button>
+                {t('community.ui.storyOpen', { name: selectedStory })} ·{' '}
+                <button onClick={() => setSelectedStory(null)}>
+                  {t('community.ui.close')}
+                </button>
               </div>
             ) : null}
             <Panel className={styles.composer}>
@@ -521,7 +540,9 @@ const RealCommunityPage = ({
                     runIfAuthenticated(() => setComposerOpen(true))
                   }
                 >
-                  ¿Qué estás leyendo, Mariano?
+                  {t('community.ui.readingPrompt', {
+                    name: user?.name ?? 'Mariano',
+                  })}
                 </button>
               </div>
               <div className={styles.composerActions}>
@@ -530,28 +551,28 @@ const RealCommunityPage = ({
                     runIfAuthenticated(() => setComposerOpen(true))
                   }
                 >
-                  ▧ Foto/Video
+                  ▧ {t('community.ui.photoVideo')}
                 </button>
                 <button
                   onClick={() =>
                     runIfAuthenticated(() => setComposerOpen(true))
                   }
                 >
-                  ▤ Ofrecer libro
+                  ▤ {t('community.ui.offerBook')}
                 </button>
                 <button
                   onClick={() =>
                     runIfAuthenticated(() => setComposerOpen(true))
                   }
                 >
-                  ↔ Proponer intercambio
+                  ↔ {t('community.ui.proposeTrade')}
                 </button>
                 <button
                   onClick={() =>
                     runIfAuthenticated(() => setComposerOpen(true))
                   }
                 >
-                  ☷ Encuesta
+                  ☷ {t('community.ui.poll')}
                 </button>
                 <ActionButton
                   tone="primary"
@@ -560,7 +581,7 @@ const RealCommunityPage = ({
                     runIfAuthenticated(() => setComposerOpen(true))
                   }
                 >
-                  Publicar
+                  {t('community.ui.publish')}
                 </ActionButton>
               </div>
             </Panel>
@@ -608,22 +629,24 @@ const RealCommunityPage = ({
             ) : null}
             {activity.data?.length ? (
               <div className={styles.storyNotice} role="status">
-                {activity.data.length} movimientos recientes en tu comunidad
+                {t('community.ui.activityCount', {
+                  count: activity.data.length,
+                })}
               </div>
             ) : null}
             <div className={styles.feed}>
               {feed.isLoading ? (
                 <Panel className={styles.post} as="article">
-                  Cargando la actividad de la comunidad...
+                  {t('community.ui.loadingActivity')}
                 </Panel>
               ) : feed.isError ? (
                 <Panel className={styles.post} as="article">
-                  <p>No pudimos cargar la actividad de la comunidad.</p>
+                  <p>{t('community.ui.activityError')}</p>
                   <ActionButton
                     size="small"
                     onClick={() => void feed.refetch()}
                   >
-                    Reintentar
+                    {t('localizedUi.common.retry')}
                   </ActionButton>
                 </Panel>
               ) : feed.data?.length ? (
@@ -632,7 +655,7 @@ const RealCommunityPage = ({
                 ))
               ) : (
                 <Panel className={styles.post} as="article">
-                  No hay actividad para mostrar todavía.
+                  {t('community.ui.emptyActivity')}
                 </Panel>
               )}
             </div>
@@ -644,7 +667,7 @@ const RealCommunityPage = ({
                 corners={realCorners.map((corner) => ({
                   id: corner.id,
                   name: corner.name,
-                  meta: `${corner.distanceKm} km · ${corner.activityLabel ?? 'Sin actividad'}`,
+                  meta: `${corner.distanceKm} km · ${localizeCornerActivity(corner.activityLabel, t)}`,
                 }))}
               />
             </Panel>
@@ -713,10 +736,12 @@ const RealCommunityPage = ({
             </Panel>
             {stats.data ? (
               <Panel className={styles.sidePanel}>
-                <SectionHeading title="Resumen" />
+                <SectionHeading title={t('community.ui.summary')} />
                 <p>
-                  {stats.data.kpis.activeUsers} lectores activos ·{' '}
-                  {stats.data.kpis.booksPublished} libros publicados
+                  {stats.data.kpis.activeUsers}{' '}
+                  {t('community.ui.activeReaders')} ·{' '}
+                  {stats.data.kpis.booksPublished}{' '}
+                  {t('community.ui.publishedBooks')}
                 </p>
               </Panel>
             ) : null}
@@ -746,14 +771,15 @@ const RealCommunityPage = ({
 }
 
 const feedItemLabel = (
-  item: import('@components/feed/FeedItem.types').FeedItem
+  item: import('@components/feed/FeedItem.types').FeedItem,
+  t: ReturnType<typeof useTranslation>['t']
 ) => {
   if ('title' in item) return item.title
   if ('book' in item && typeof item.book === 'string')
-    return `Reseñó ${item.book}`
+    return t('community.ui.reviewed', { book: item.book })
   if ('quote' in item) return item.quote
   if ('name' in item) return item.name
-  return 'Nueva actividad de la comunidad'
+  return t('community.ui.newActivity')
 }
 
 const RealFeedCard = ({ item }: { item: FeedItem }) => {
@@ -775,13 +801,13 @@ const RealFeedCard = ({ item }: { item: FeedItem }) => {
         />
         <div>
           <strong>{item.user}</strong>
-          <small>{item.time}</small>
+          <small>{localizeLegacyRelativeTime(item.time)}</small>
         </div>
-        <button aria-label="Más opciones">•••</button>
+        <button aria-label={t('community.ui.moreOptions')}>•••</button>
       </div>
       {item.corner ? <small>⌖ {item.corner.name}</small> : null}
       {image ? <img src={image} alt="" /> : null}
-      {item.type !== 'story' ? <p>{feedItemLabel(item)}</p> : null}
+      {item.type !== 'story' ? <p>{feedItemLabel(item, t)}</p> : null}
       {item.type === 'story' ? <p>{item.body}</p> : null}
       {item.type === 'book' ? <small>{item.author}</small> : null}
       {item.type === 'sale' ? (
@@ -790,13 +816,13 @@ const RealFeedCard = ({ item }: { item: FeedItem }) => {
         </small>
       ) : null}
       {item.type === 'seeking' ? (
-        <small>{t('community.feed.seekingBook')}</small>
+        <small>{t('community.ui.seekingBook')}</small>
       ) : null}
       {item.type === 'house' ? (
-        <small>{item.distance} km de distancia</small>
+        <small>{t('community.ui.distance', { count: item.distance })}</small>
       ) : null}
       {item.type === 'person' ? (
-        <small>{item.match}% de compatibilidad</small>
+        <small>{t('community.ui.compatibility', { count: item.match })}</small>
       ) : null}
       {item.type === 'review' ? <p>“{item.quote}”</p> : null}
       {item.type === 'event' ? (

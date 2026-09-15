@@ -665,15 +665,17 @@ const MockMessagesPage = () => {
         <section className={styles.messenger}>
           <aside className={styles.conversationRail}>
             <header className={styles.conversationHeader}>
-              <h1>Mensajes</h1>
-              <button aria-label="Redactar mensaje">✎</button>
+              <h1>{t('pages.messages')}</h1>
+              <button aria-label={t('community.messages.newConversation.open')}>
+                ✎
+              </button>
             </header>
             <label className={styles.search}>
               <span>⌕</span>
               <input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Buscar conversaciones"
+                placeholder={t('community.messages.ui.search')}
               />
             </label>
             <div
@@ -742,20 +744,28 @@ const MockMessagesPage = () => {
                 <strong>{activeConversation.name}</strong>
                 <small>
                   {activeConversation.online
-                    ? 'En línea'
-                    : 'Última conexión reciente'}
+                    ? t('community.messages.ui.online')
+                    : t('community.messages.ui.recentlyOnline')}
                 </small>
               </div>
-              <nav aria-label="Acciones del chat">
-                <button aria-label="Buscar en el chat">⌕</button>
-                <button aria-label="Llamar">☎</button>
-                <button aria-label="Videollamada">▣</button>
-                <button aria-label="Información">ⓘ</button>
+              <nav aria-label={t('community.messages.ui.chatActions')}>
+                <button aria-label={t('community.messages.ui.searchChat')}>
+                  ⌕
+                </button>
+                <button aria-label={t('community.messages.ui.call')}>☎</button>
+                <button aria-label={t('community.messages.ui.videoCall')}>
+                  ▣
+                </button>
+                <button aria-label={t('community.messages.ui.information')}>
+                  ⓘ
+                </button>
               </nav>
             </header>
 
             <div className={styles.messages} aria-live="polite">
-              <div className={styles.day}>Hoy</div>
+              <div className={styles.day}>
+                {t('community.messages.ui.today')}
+              </div>
               {chatMessages.map((item) =>
                 item.kind === 'proposal' ? (
                   <article
@@ -763,25 +773,35 @@ const MockMessagesPage = () => {
                     className={`${styles.proposal} ${item.role === 'me' ? styles.mine : ''}`}
                   >
                     <span className={styles.proposalLabel}>
-                      Propuesta de intercambio
+                      {t('community.messages.ui.proposal')}
                     </span>
                     <div>
                       <BookCover compact book={fixtures.books[0]} />
                       <div>
                         <strong>{fixtures.books[0].title}</strong>
                         <small>{fixtures.books[0].author}</small>
-                        <p>Café Literario · mañana, 18:30</p>
+                        <p>
+                          {t('community.messages.ui.proposalMeeting', {
+                            meetingPoint: 'Café Literario',
+                            date: t('community.messages.ui.tomorrow'),
+                            time: '18:30',
+                          })}
+                        </p>
                       </div>
                     </div>
                     <div className={styles.proposalActions}>
                       {item.role === 'me' ? (
-                        <ActionButton size="small">Cancelar</ActionButton>
+                        <ActionButton size="small">
+                          {t('community.messages.ui.cancel')}
+                        </ActionButton>
                       ) : (
                         <>
                           <ActionButton size="small" tone="primary">
-                            Aceptar
+                            {t('community.messages.ui.accept')}
                           </ActionButton>
-                          <ActionButton size="small">Rechazar</ActionButton>
+                          <ActionButton size="small">
+                            {t('community.messages.ui.reject')}
+                          </ActionButton>
                         </>
                       )}
                     </div>
@@ -794,7 +814,7 @@ const MockMessagesPage = () => {
                     <BookCover compact book={fixtures.books[0]} />
                     <div>
                       <strong>{item.text}</strong>
-                      <small>Libro adjunto</small>
+                      <small>{t('community.messages.ui.attachedBook')}</small>
                     </div>
                   </article>
                 ) : (
@@ -836,7 +856,7 @@ const MockMessagesPage = () => {
             <form className={styles.composer} onSubmit={submit}>
               <button
                 type="button"
-                aria-label="Más opciones de mensaje"
+                aria-label={t('community.messages.ui.messageOptions')}
                 aria-expanded={composerMenuOpen}
                 onClick={() => {
                   setEmojiPickerOpen(false)
@@ -869,12 +889,12 @@ const MockMessagesPage = () => {
                 ref={messageInputRef}
                 value={message}
                 onChange={(event) => setMessage(event.target.value)}
-                placeholder="Escribí un mensaje..."
+                placeholder={t('community.messages.ui.messagePlaceholder')}
               />
               <button
                 className={styles.send}
                 type="submit"
-                aria-label="Enviar mensaje"
+                aria-label={t('community.messages.ui.sendMessage')}
               >
                 ➤
               </button>
@@ -889,16 +909,19 @@ const MockMessagesPage = () => {
                 <div>
                   <span>
                     {bookPicker === 'attach'
-                      ? 'ADJUNTAR AL CHAT'
-                      : 'NUEVA PROPUESTA'}
+                      ? t('community.messages.ui.attachToChat')
+                      : t('community.messages.ui.newProposal')}
                   </span>
-                  <h2>Elegí un libro</h2>
+                  <h2>{t('community.messages.ui.chooseBook')}</h2>
                 </div>
-                <button onClick={() => setBookPicker(null)} aria-label="Cerrar">
+                <button
+                  onClick={() => setBookPicker(null)}
+                  aria-label={t('community.messages.ui.close')}
+                >
                   ×
                 </button>
               </header>
-              <p>Todos tus libros disponibles aparecen en esta lista.</p>
+              <p>{t('community.messages.ui.availableBooks')}</p>
               <div>
                 {fixtures.books.map((book) => (
                   <button
@@ -1123,7 +1146,7 @@ const MockMessagesPage = () => {
                     })}
                   </button>
                   <ActionButton type="submit" tone="primary">
-                    Guardar borrador
+                    {t('community.messages.drafts.saveAgreement')}
                   </ActionButton>
                 </div>
               </form>
@@ -1889,9 +1912,9 @@ const RealMessagesPage = () => {
         <section className={styles.messenger}>
           <aside className={styles.conversationRail}>
             <header className={styles.conversationHeader}>
-              <h1>Mensajes</h1>
+              <h1>{t('community.messages.ui.title')}</h1>
               <button
-                aria-label="Redactar mensaje"
+                aria-label={t('community.messages.newConversation.open')}
                 data-new-conversation
                 onClick={() => {
                   setContactSearch('')
@@ -1907,7 +1930,7 @@ const RealMessagesPage = () => {
               <input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Buscar conversaciones"
+                placeholder={t('community.messages.searchAriaLabel')}
               />
             </label>
             <div
@@ -2016,7 +2039,12 @@ const RealMessagesPage = () => {
                       <span className={styles.conversationMeta}>
                         <small>{view.time}</small>
                         {view.unread ? (
-                          <b aria-label={`${view.unread} mensajes sin leer`}>
+                          <b
+                            aria-label={t(
+                              'community.messages.badges.unreadCount',
+                              { count: view.unread }
+                            )}
+                          >
                             {view.unread > 99 ? '99+' : view.unread}
                           </b>
                         ) : null}
@@ -2067,14 +2095,18 @@ const RealMessagesPage = () => {
                     <strong>
                       {toConversationView(activeConversation).name}
                     </strong>
-                    <small>Conversación persistida</small>
+                    <small>
+                      {t('community.messages.ui.persistentConversation')}
+                    </small>
                   </div>
-                  <nav aria-label="Acciones de conversación">
+                  <nav
+                    aria-label={t('community.messages.ui.conversationActions')}
+                  >
                     <button
                       type="button"
                       className={styles.deleteConversationButton}
-                      aria-label="Eliminar conversación solo para vos"
-                      title="Eliminar conversación"
+                      aria-label={t('community.messages.ui.deleteForMe')}
+                      title={t('community.messages.ui.deleteTitle')}
                       onClick={() => {
                         deleteConversationMutation.reset()
                         setDeleteConversationOpen(true)
@@ -2087,7 +2119,9 @@ const RealMessagesPage = () => {
                   </nav>
                 </header>
                 <div className={styles.messages} aria-live="polite">
-                  <div className={styles.day}>Mensajes</div>
+                  <div className={styles.day}>
+                    {t('community.messages.ui.messageHistory')}
+                  </div>
                   {historyQuery.isLoading ? (
                     <div className={styles.messageState} role="status">
                       <span
@@ -2170,7 +2204,8 @@ const RealMessagesPage = () => {
                 !messages.some((item) => item.kind === 'agreement') ? (
                   <Panel className={styles.proposal} as="article">
                     <span className={styles.proposalLabel}>
-                      Propuesta de intercambio · {agreementQuery.data.state}
+                      {t('community.messages.ui.proposal')} ·{' '}
+                      {agreementQuery.data.state}
                     </span>
                     <strong>{agreementQuery.data.details.bookTitle}</strong>
                     <small>
@@ -2192,7 +2227,7 @@ const RealMessagesPage = () => {
                               }
                               disabled={agreementMutation.isPending}
                             >
-                              Aceptar
+                              {t('community.messages.ui.accept')}
                             </ActionButton>
                             <ActionButton
                               size="small"
@@ -2203,7 +2238,7 @@ const RealMessagesPage = () => {
                               }
                               disabled={agreementMutation.isPending}
                             >
-                              Rechazar
+                              {t('community.messages.ui.reject')}
                             </ActionButton>
                           </>
                         ) : agreementQuery.data.proposerId === user.id ? (
@@ -2270,12 +2305,12 @@ const RealMessagesPage = () => {
                     ref={messageInputRef}
                     value={message}
                     onChange={(event) => setMessage(event.target.value)}
-                    placeholder="Escribí un mensaje..."
+                    placeholder={t('community.messages.ui.messagePlaceholder')}
                   />
                   <button
                     className={styles.send}
                     type="submit"
-                    aria-label="Enviar mensaje"
+                    aria-label={t('community.messages.ui.sendMessage')}
                   >
                     ➤
                   </button>
@@ -2310,7 +2345,7 @@ const RealMessagesPage = () => {
               </>
             ) : (
               <Panel className={styles.empty}>
-                Seleccioná una conversación para ver los mensajes.
+                {t('community.messages.ui.selectConversation')}
               </Panel>
             )}
           </section>
@@ -2329,13 +2364,13 @@ const RealMessagesPage = () => {
                   <div>
                     <span>
                       {bookPickerMode === 'swap'
-                        ? 'PROPUESTA DE INTERCAMBIO'
-                        : 'ADJUNTAR AL CHAT'}
+                        ? t('community.messages.ui.swapProposal')
+                        : t('community.messages.ui.attachToChat')}
                     </span>
                     <h2 id="book-picker-title">
                       {bookPickerMode === 'swap'
-                        ? 'Elegí los libros'
-                        : 'Elegí un libro'}
+                        ? t('community.messages.ui.chooseBooks')
+                        : t('community.messages.ui.chooseBook')}
                     </h2>
                   </div>
                   <button
@@ -2343,7 +2378,7 @@ const RealMessagesPage = () => {
                       setAttachError(null)
                       setBookPickerMode(null)
                     }}
-                    aria-label="Cerrar"
+                    aria-label={t('community.messages.ui.close')}
                   >
                     ×
                   </button>
@@ -2398,13 +2433,17 @@ const RealMessagesPage = () => {
                 ) : bookPickerMode === 'swap' ? (
                   <form className={styles.swapForm} onSubmit={proposeSwap}>
                     <label>
-                      <span>Tu libro</span>
+                      <span>{t('community.messages.ui.swapOfferedBook')}</span>
                       <select
-                        aria-label="Tu libro"
+                        aria-label={t('community.messages.ui.swapOfferedBook')}
                         value={offeredId}
                         onChange={(event) => setOfferedId(event.target.value)}
                       >
-                        <option value="">Elegí un libro para ofrecer</option>
+                        <option value="">
+                          {t(
+                            'community.messages.ui.swapOfferedBookPlaceholder'
+                          )}
+                        </option>
                         {(booksQuery.data?.myBooks ?? []).map((book) => (
                           <option key={book.id} value={book.id}>
                             {book.title}
@@ -2413,14 +2452,20 @@ const RealMessagesPage = () => {
                       </select>
                     </label>
                     <label>
-                      <span>Libro que querés recibir</span>
+                      <span>
+                        {t('community.messages.ui.swapRequestedBook')}
+                      </span>
                       <select
-                        aria-label="Libro que querés recibir"
+                        aria-label={t(
+                          'community.messages.ui.swapRequestedBook'
+                        )}
                         value={requestedId}
                         onChange={(event) => setRequestedId(event.target.value)}
                       >
                         <option value="">
-                          Elegí un libro de la otra persona
+                          {t(
+                            'community.messages.ui.swapRequestedBookPlaceholder'
+                          )}
                         </option>
                         {(booksQuery.data?.theirBooks ?? []).map((book) => (
                           <option key={book.id} value={book.id}>
@@ -2430,11 +2475,13 @@ const RealMessagesPage = () => {
                       </select>
                     </label>
                     <label>
-                      <span>Nota opcional</span>
+                      <span>{t('community.messages.ui.swapNote')}</span>
                       <textarea
                         value={swapNote}
                         onChange={(event) => setSwapNote(event.target.value)}
-                        placeholder="Contale algo sobre la propuesta"
+                        placeholder={t(
+                          'community.messages.ui.swapNotePlaceholder'
+                        )}
                         rows={3}
                       />
                     </label>
@@ -2449,7 +2496,7 @@ const RealMessagesPage = () => {
                         className={styles.newConversationCancel}
                         onClick={() => setBookPickerMode(null)}
                       >
-                        Cancelar
+                        {t('community.messages.ui.cancel')}
                       </button>
                       <ActionButton
                         type="submit"
@@ -2461,7 +2508,7 @@ const RealMessagesPage = () => {
                           !booksQuery.data?.theirBooks.length
                         }
                       >
-                        Enviar propuesta
+                        {t('community.messages.drafts.sendProposal')}
                       </ActionButton>
                     </div>
                   </form>
@@ -2804,7 +2851,7 @@ const RealMessagesPage = () => {
                     type="button"
                     className={styles.modalCloseButton}
                     onClick={() => setNewConversationOpen(false)}
-                    aria-label="Cerrar"
+                    aria-label={t('community.messages.ui.close')}
                   >
                     ×
                   </button>
@@ -2996,17 +3043,18 @@ const RealMessagesPage = () => {
                   </span>
                   <div className={styles.deleteConversationCopy}>
                     <h2 id="delete-conversation-title">
-                      ¿Eliminar conversación?
+                      {t('community.messages.deleteConversation.title')}
                     </h2>
                     <p id="delete-conversation-description">
-                      La ocultaremos de tus mensajes. La otra persona conserva
-                      su conversación, sus mensajes y sus acuerdos.
+                      {t('community.messages.deleteConversation.description')}
                     </p>
                   </div>
                   <button
                     type="button"
                     className={styles.deleteConversationCloseButton}
-                    aria-label="Cerrar"
+                    aria-label={t(
+                      'community.messages.deleteConversation.close'
+                    )}
                     onClick={() => setDeleteConversationOpen(false)}
                     disabled={deleteConversationMutation.isPending}
                   >
@@ -3015,7 +3063,7 @@ const RealMessagesPage = () => {
                 </header>
                 {deleteConversationMutation.isError ? (
                   <p className={styles.deleteConversationError} role="alert">
-                    No pudimos eliminar la conversación. Intentá nuevamente.
+                    {t('community.messages.deleteConversation.error')}
                   </p>
                 ) : null}
                 <div className={styles.deleteConversationActions}>
@@ -3025,7 +3073,7 @@ const RealMessagesPage = () => {
                     onClick={() => setDeleteConversationOpen(false)}
                     disabled={deleteConversationMutation.isPending}
                   >
-                    Cancelar
+                    {t('community.messages.deleteConversation.cancel')}
                   </button>
                   <ActionButton
                     type="button"
@@ -3034,8 +3082,8 @@ const RealMessagesPage = () => {
                     disabled={deleteConversationMutation.isPending}
                   >
                     {deleteConversationMutation.isPending
-                      ? 'Eliminando…'
-                      : 'Eliminar para mí'}
+                      ? t('community.messages.deleteConversation.pending')
+                      : t('community.messages.deleteConversation.confirm')}
                   </ActionButton>
                 </div>
               </Panel>

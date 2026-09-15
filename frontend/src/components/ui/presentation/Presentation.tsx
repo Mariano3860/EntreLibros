@@ -200,7 +200,11 @@ export const CatalogBookCard = ({
         ? t('booksPage.intentions.sale')
         : hasTrade
           ? t('booksPage.badge.for_trade')
-          : book.mode
+          : book.mode === 'Venta'
+            ? t('booksPage.intentions.sale')
+            : book.mode === 'Intercambio'
+              ? t('booksPage.badge.for_trade')
+              : t('booksPage.badge.seeking')
   const footerLabel = isSeeking
     ? t('booksPage.badge.seeking')
     : hasSale
@@ -214,7 +218,7 @@ export const CatalogBookCard = ({
       <button
         onClick={onClick}
         className={styles.bookCardButton}
-        aria-label={`Ver ${book.title}`}
+        aria-label={t('localizedUi.common.view', { title: book.title })}
         disabled={decorative}
         tabIndex={decorative ? -1 : undefined}
       >
@@ -295,6 +299,7 @@ export const FixtureState = ({
   region: string
   children: ReactNode
 }) => {
+  const { t } = useTranslation()
   const [fixture, setFixture] = useState(() =>
     typeof window === 'undefined'
       ? null
@@ -309,21 +314,21 @@ export const FixtureState = ({
     return (
       <Panel className={styles.state}>
         <span className={styles.spinner} />
-        Cargando {region}…
+        {t('localizedUi.presentation.fixtureLoading', { region })}
       </Panel>
     )
   if (state === 'empty')
     return (
       <Panel className={styles.state}>
-        <strong>Todavía no hay contenido</strong>
-        <span>Cuando haya novedades aparecerán en esta sección.</span>
+        <strong>{t('localizedUi.presentation.fixtureEmptyTitle')}</strong>
+        <span>{t('localizedUi.presentation.fixtureEmptyText')}</span>
       </Panel>
     )
   if (state === 'error')
     return (
       <div className={`${styles.panel} ${styles.state}`} role="alert">
-        <strong>No pudimos cargar esta sección</strong>
-        <span>El resto de la pantalla sigue disponible.</span>
+        <strong>{t('localizedUi.presentation.fixtureErrorTitle')}</strong>
+        <span>{t('localizedUi.presentation.fixtureErrorText')}</span>
         <ActionButton
           onClick={() => {
             const url = new URL(window.location.href)
@@ -332,7 +337,7 @@ export const FixtureState = ({
             setFixture(null)
           }}
         >
-          Reintentar
+          {t('localizedUi.common.retry')}
         </ActionButton>
       </div>
     )
@@ -340,31 +345,39 @@ export const FixtureState = ({
 }
 
 export const UnavailableState = ({
-  title = 'Esta sección todavía no está disponible',
-  description = 'Estamos conectando esta experiencia con datos reales.',
+  title,
+  description,
 }: {
   title?: string
   description?: string
-}) => (
-  <Panel className={styles.state}>
-    <strong>{title}</strong>
-    <span>{description}</span>
-  </Panel>
-)
+}) => {
+  const { t } = useTranslation()
+  return (
+    <Panel className={styles.state}>
+      <strong>{title ?? t('localizedUi.presentation.unavailableTitle')}</strong>
+      <span>
+        {description ?? t('localizedUi.presentation.unavailableText')}
+      </span>
+    </Panel>
+  )
+}
 
-export const MiniMap = ({ large = false }: { large?: boolean }) => (
-  <div
-    className={`${styles.miniMap} ${large ? styles.miniMapLarge : ''}`}
-    aria-label="Mapa de rincones cercanos"
-    role="img"
-  >
-    <span className={styles.roadA} />
-    <span className={styles.roadB} />
-    <span className={`${styles.mapPin} ${styles.pinA}`}>⌖</span>
-    <span className={`${styles.mapPin} ${styles.pinB}`}>⌖</span>
-    <span className={`${styles.mapPin} ${styles.pinC}`}>⌖</span>
-    <span className={styles.userPin}>
-      <span>●</span>
-    </span>
-  </div>
-)
+export const MiniMap = ({ large = false }: { large?: boolean }) => {
+  const { t } = useTranslation()
+  return (
+    <div
+      className={`${styles.miniMap} ${large ? styles.miniMapLarge : ''}`}
+      aria-label={t('localizedUi.common.mapNearby')}
+      role="img"
+    >
+      <span className={styles.roadA} />
+      <span className={styles.roadB} />
+      <span className={`${styles.mapPin} ${styles.pinA}`}>⌖</span>
+      <span className={`${styles.mapPin} ${styles.pinB}`}>⌖</span>
+      <span className={`${styles.mapPin} ${styles.pinC}`}>⌖</span>
+      <span className={styles.userPin}>
+        <span>●</span>
+      </span>
+    </div>
+  )
+}

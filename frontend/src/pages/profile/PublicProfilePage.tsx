@@ -118,7 +118,7 @@ export const PublicProfilePage = () => {
             <ActionButton
               onClick={() => runIfAuthenticated(() => setReportOpen(true))}
             >
-              {t('reports.report', { defaultValue: 'Reportar' })}
+              {t('reports.report')}
             </ActionButton>
           </div>
         </header>

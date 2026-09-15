@@ -1,4 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react'
+import { useTranslation } from 'react-i18next'
 import { describe, expect, test, vi } from 'vitest'
 
 vi.mock('@src/api/auth/me.service', () => ({
@@ -48,5 +49,20 @@ describe('StatsPage', () => {
 
     fireEvent.change(select, { target: { value: '90' } })
     expect(select).toHaveValue('90')
+  })
+
+  test('localizes statistics labels and accessible chart text', async () => {
+    await useTranslation().i18n.changeLanguage('en')
+    renderWithProviders(<StatsPage />)
+
+    expect(
+      await screen.findByRole('heading', { name: 'Statistics' })
+    ).toBeVisible()
+    expect(await screen.findByText('Exchanges')).toBeVisible()
+    expect(
+      screen.getByRole('img', { name: 'Exchanges by period' })
+    ).toBeVisible()
+    expect(screen.getByText('Top contributors')).toBeVisible()
+    expect(screen.getByText('Popular searches')).toBeVisible()
   })
 })

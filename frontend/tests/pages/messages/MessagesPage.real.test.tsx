@@ -1,4 +1,5 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { useTranslation } from 'react-i18next'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 const { mocks, messageQueryKeys } = vi.hoisted(() => ({
@@ -163,6 +164,55 @@ describe('MessagesPage in real API mode', () => {
     expect(screen.getAllByRole('button', { name: 'Reintentar' })).toHaveLength(
       2
     )
+  })
+
+  test('localizes conversation controls, composer actions, and dialogs', async () => {
+    await useTranslation().i18n.changeLanguage('en')
+    mocks.fetchConversations.mockResolvedValue([conversation])
+    mocks.fetchMessageHistory.mockResolvedValue({ messages: [], nextAfter: 0 })
+    mocks.fetchMessagingContacts.mockResolvedValue([])
+
+    renderWithProviders(<MessagesPage />)
+
+    expect(
+      await screen.findByRole('heading', { name: 'Messages' })
+    ).toBeVisible()
+    expect(await screen.findByText('Lucia')).toBeVisible()
+    expect(screen.getByPlaceholderText('Write a message...')).toBeVisible()
+    expect(
+      screen.getByRole('tablist', { name: 'Conversation filter' })
+    ).toBeVisible()
+    expect(screen.getByRole('tab', { name: 'Unread' })).toBeVisible()
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'More message options' })
+    )
+    expect(screen.getByRole('menuitem', { name: 'Attach book' })).toBeVisible()
+    expect(screen.getByRole('menuitem', { name: 'Propose swap' })).toBeVisible()
+    expect(
+      screen.getByRole('menuitem', { name: 'Prepare agreement' })
+    ).toBeVisible()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Compose message' }))
+    expect(
+      await screen.findByRole('heading', {
+        name: 'Who do you want to talk to?',
+      })
+    ).toBeVisible()
+    expect(
+      screen.getByPlaceholderText('Name, last name or alias')
+    ).toBeVisible()
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'Delete conversation only for you',
+      })
+    )
+    expect(
+      screen.getByRole('heading', { name: 'Delete conversation?' })
+    ).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Delete for me' })).toBeVisible()
   })
 
   test('shows attachment errors in the book picker', async () => {

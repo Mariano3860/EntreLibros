@@ -1,5 +1,6 @@
 import React from 'react'
 import { fireEvent, screen } from '@testing-library/react'
+import { useTranslation } from 'react-i18next'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import type {
@@ -424,7 +425,8 @@ describe('MapCanvas', () => {
     )
   })
 
-  test('provides functional zoom and recenter controls', () => {
+  test('provides localized functional zoom and recenter controls', async () => {
+    await useTranslation().i18n.changeLanguage('en')
     renderWithProviders(
       <MapCanvas
         bbox={bbox}
@@ -441,9 +443,9 @@ describe('MapCanvas', () => {
       />
     )
 
-    fireEvent.click(screen.getByRole('button', { name: 'Acercar' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Alejar' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Centrar mapa' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Zoom in' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Zoom out' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Center map' }))
 
     expect(zoomInMock).toHaveBeenCalledOnce()
     expect(zoomOutMock).toHaveBeenCalledOnce()

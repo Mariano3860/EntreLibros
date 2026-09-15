@@ -1,4 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react'
+import { useTranslation } from 'react-i18next'
 import { describe, expect, test, vi, beforeEach } from 'vitest'
 
 const mockMutate = vi.fn()
@@ -48,6 +49,26 @@ describe('RegisterForm', () => {
     expect(
       await screen.findByText('form.errors.password_mismatch')
     ).toBeVisible()
+  })
+
+  test('renders the registration form and validation copy in English', async () => {
+    await useTranslation().i18n.changeLanguage('en')
+    renderWithProviders(<RegisterForm />)
+
+    expect(
+      screen.getByRole('heading', { name: 'Welcome to EntreLibros' })
+    ).toBeVisible()
+    expect(screen.getByPlaceholderText('Name')).toBeVisible()
+    expect(screen.getByPlaceholderText('Email')).toBeVisible()
+    expect(screen.getByPlaceholderText('Password')).toBeVisible()
+    expect(screen.getByPlaceholderText('Confirm password')).toBeVisible()
+    expect(
+      screen.getByText(
+        'At least 8 characters, with uppercase, lowercase, a number, and a symbol.'
+      )
+    ).toBeVisible()
+    fireEvent.click(screen.getByRole('button', { name: 'Sign up' }))
+    expect(await screen.findAllByText('This field is required')).toHaveLength(4)
   })
 
   test('rejects a password that does not match the backend policy', async () => {

@@ -80,24 +80,30 @@ const parseRequestedRadius = (value: string | null): MapRadiusKm | null => {
   return [1, 5, 30, 50].includes(parsed) ? (parsed as MapRadiusKm) : null
 }
 
-const toDisplayCorner = (corner: MapCornerPin): MapCorner => ({
+const toDisplayCorner = (
+  corner: MapCornerPin,
+  labels: {
+    distanceUnavailable: string
+    recentActivity: string
+    noActivity: string
+  },
+  language: string
+): MapCorner => ({
   id: corner.id,
   name: corner.name,
   category: corner.themes[1] ?? corner.themes[0] ?? corner.barrio,
   distance:
     corner.distanceKm === null
-      ? 'Sin distancia'
-      : `${corner.distanceKm.toLocaleString('es-AR')} km`,
-  activity: corner.lastSignalAt
-    ? 'Actividad reciente'
-    : 'Sin actividad reciente',
+      ? labels.distanceUnavailable
+      : `${corner.distanceKm.toLocaleString(language)} km`,
+  activity: corner.lastSignalAt ? labels.recentActivity : labels.noActivity,
   isOpenNow: corner.isOpenNow,
 })
 
 export const MapPage = () => {
   const { fixtures } = useMockExperience()
   const { theme } = useTheme()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { user, isAuthenticated, isLoading: isAuthLoading } = useAuth()
   const { runIfAuthenticated } = useAuthRequired()
   const mockMode = isApiMockMode()
@@ -554,15 +560,26 @@ export const MapPage = () => {
         } · ${
           corner.distanceKm === null
             ? t('map.selection.distanceUnavailable')
-            : `${corner.distanceKm.toLocaleString('es-AR')} km`
+            : `${corner.distanceKm.toLocaleString(i18n.language)} km`
         }`,
         photo: corner.photos[0],
         icon: 'book',
         isSelected:
           selectedPin?.type === 'corner' && selectedPin.data.id === corner.id,
-        onSelect: () => selectCorner(toDisplayCorner(corner)),
+        onSelect: () =>
+          selectCorner(
+            toDisplayCorner(
+              corner,
+              {
+                distanceUnavailable: t('map.selection.distanceUnavailable'),
+                recentActivity: t('map.selection.recentActivity'),
+                noActivity: t('map.selection.noActivity'),
+              },
+              i18n.language
+            )
+          ),
       })),
-    [mapCorners, selectCorner, selectedPin, t]
+    [i18n.language, mapCorners, selectCorner, selectedPin, t]
   )
 
   return (

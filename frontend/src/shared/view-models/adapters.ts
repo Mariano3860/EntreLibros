@@ -2,6 +2,8 @@ import type { ApiBook } from '@api/books/books.types'
 import type { ApiConversation, ApiMessage } from '@api/messages/messages'
 import type { UserProfile } from '@api/user/profile.types'
 
+import i18n from '@src/assets/i18n/i18n'
+
 import type {
   BookCardView,
   ChatBookView,
@@ -55,7 +57,9 @@ export const toProfileView = (profile: UserProfile): ProfileView => ({
     .filter(Boolean)
     .join(' · '),
   bio: profile.profileDescription ?? '',
-  interests: profile.interests.map(titleCase),
+  // Interest values are product taxonomy keys. Keep them intact so the page
+  // can resolve the current locale at its display boundary.
+  interests: profile.interests,
 })
 
 export const toBookCardView = (
@@ -76,20 +80,24 @@ export const toBookCardView = (
   return {
     id: String(book.id),
     title: book.title,
-    author: book.author || 'Autor desconocido',
-    owner: options.owner ?? book.ownerName ?? 'Miembro de EntreLibros',
+    author: book.author || i18n.t('localizedUi.common.unknownAuthor'),
+    owner:
+      options.owner ?? book.ownerName ?? i18n.t('localizedUi.common.member'),
     ...(book.ownerId ? { ownerId: String(book.ownerId) } : {}),
     ...(options.isExternal ? { isExternal: true } : {}),
-    distance: options.distance ?? 'Ubicación disponible',
+    distance:
+      options.distance ?? i18n.t('localizedUi.common.locationAvailable'),
     mode,
     ...(intentions.length > 0 ? { intentions } : {}),
     ...(book.price !== undefined && book.price !== null
-      ? { price: `$${book.price.toLocaleString('es-AR')}` }
+      ? { price: `$${book.price.toLocaleString(i18n.language)}` }
       : {}),
     ...(book.coverUrl?.trim() ? { coverUrl: book.coverUrl.trim() } : {}),
     ...(book.condition ? { condition: book.condition } : {}),
     accent: accentFor(String(book.id)),
-    genre: book.condition ? titleCase(book.condition) : 'Libro',
+    genre: book.condition
+      ? titleCase(book.condition)
+      : i18n.t('localizedUi.common.book'),
   }
 }
 
@@ -111,16 +119,40 @@ export const formatRelativeTime = (value: string, now = new Date()) => {
     0,
     Math.floor((now.getTime() - date.getTime()) / 60000)
   )
-  if (elapsedMinutes < 1) return 'Ahora'
-  if (elapsedMinutes < 60) return `hace ${elapsedMinutes} min`
+  if (elapsedMinutes < 1)
+    return i18n.t('community.messages.status.lastSeenFallback')
+  if (elapsedMinutes < 60)
+    return i18n.t('localizedUi.common.minutesAgo', { count: elapsedMinutes })
   if (elapsedMinutes < 24 * 60) {
-    return date.toLocaleTimeString('es-AR', {
+    return date.toLocaleTimeString(i18n.language, {
       hour: '2-digit',
       minute: '2-digit',
     })
   }
-  if (elapsedMinutes < 48 * 60) return 'Ayer'
-  return date.toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })
+  if (elapsedMinutes < 48 * 60) return i18n.t('localizedUi.common.yesterday')
+  return date.toLocaleDateString(i18n.language, {
+    day: 'numeric',
+    month: 'short',
+  })
+}
+
+/**
+ * Community endpoints still expose a short Spanish relative-time label for
+ * legacy feed records. Convert only that presentation label here; names,
+ * book titles and other API content remain untouched.
+ */
+export const localizeLegacyRelativeTime = (value: string) => {
+  const match = /^hace (\d+) (min|h|d)$/.exec(value.trim())
+  if (!match) return value
+
+  const [, rawCount, unit] = match
+  const key =
+    unit === 'min'
+      ? 'localizedUi.common.minutesAgo'
+      : unit === 'h'
+        ? 'localizedUi.common.hoursAgo'
+        : 'localizedUi.common.daysAgo'
+  return i18n.t(key, { count: Number(rawCount) })
 }
 
 export const toConversationView = (
@@ -129,12 +161,12 @@ export const toConversationView = (
 ): ConversationView => {
   const name =
     conversation.participantName ??
-    (conversation.isBot ? 'Bot' : 'Conversación')
+    (conversation.isBot ? 'Bot' : i18n.t('localizedUi.common.conversation'))
   return {
     id: String(conversation.id),
     name,
     initials: initials(name),
-    preview: options.preview ?? 'Todavía no hay mensajes',
+    preview: options.preview ?? i18n.t('localizedUi.common.noMessages'),
     time: formatRelativeTime(conversation.updatedAt, options.now),
     ...(options.unread !== undefined ? { unread: options.unread } : {}),
     accent: accentFor(String(conversation.id)),

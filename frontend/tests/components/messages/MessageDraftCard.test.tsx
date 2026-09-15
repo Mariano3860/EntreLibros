@@ -1,4 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react'
+import { useTranslation } from 'react-i18next'
 import { describe, expect, test, vi } from 'vitest'
 
 import type { ApiMessageDraft } from '@src/api/messages/messages'
@@ -116,6 +117,33 @@ describe('MessageDraftCard', () => {
 
     expect(container).toBeEmptyDOMElement()
     expect(handlers.onSend).not.toHaveBeenCalled()
+  })
+
+  test('localizes draft controls without changing the attached book title', async () => {
+    await useTranslation().i18n.changeLanguage('en')
+    const handlers = callbacks()
+    renderWithProviders(
+      <MessageDraftCard
+        draft={{
+          ...baseDraft,
+          attachmentMetadata: {
+            key: 'book:1',
+            contentType: 'application/x-entrelibros-book',
+            size: 1,
+            kind: 'book',
+            bookId: '1',
+            title: 'Ecos del Viento Norte',
+            author: 'Clara Montiel',
+            coverUrl: '/illustrations/book-cover.svg',
+          },
+        }}
+        {...handlers}
+      />
+    )
+
+    expect(screen.getByText('Draft')).toBeVisible()
+    expect(screen.getByText('Ecos del Viento Norte')).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Send' })).toBeVisible()
   })
 
   test('keeps an attachment note out of the structured card', () => {
