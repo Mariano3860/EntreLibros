@@ -1,47 +1,45 @@
 # EntreLibros
 
-EntreLibros es una plataforma colaborativa para publicar, descubrir e
-intercambiar libros, encontrar Rincones y coordinar acuerdos mediante
-mensajería privada.
+Aplicación web para compartir y descubrir libros, explorar rincones y conectar
+lectores.
 
-## Empezar a estudiar
+## Requisitos
 
-- [Tour del proyecto](docs/project-tour.md)
-- [Arquitectura](docs/architecture.md)
-- [Modelo de dominio](docs/domain-model.md)
-- [Mapa de cambios](docs/change-map.md)
+- Node.js `>=22.19.0 <23` y npm.
+- Docker con Docker Compose.
 
-## Stack
+## Iniciar en local
 
-React/Rsbuild, TypeScript, Express, Socket.IO, PostgreSQL/PostGIS, Docker y
-Playwright. La aplicación en ejecución usa siempre la API y Socket.IO reales;
-MSW queda aislado al arnés de tests.
-
-## Ejecutar y verificar
-
-Antes de migrar por primera vez, crea una base PostgreSQL/PostGIS nueva para el
-baseline (por ejemplo, `entrelibros_baseline`) y apunta `backend/.env` a ella.
-No ejecutes el nuevo migrador sobre una base que conserve el historial `001` a
-`037`; consulta [Deployment and Operation](docs/deployment-and-operation.md)
-para el corte y rollback local.
+Desde la raíz del repositorio:
 
 ```bash
 npm install
+cp backend/.env.example backend/.env
+docker compose -f docker-compose.postgis.yml up -d
 npm run migrate
-npm run seed:local
-npm run seed:local:verify
 npm run dev
-npm run test:backend
-npm run test:frontend
-npm run typecheck:backend
-npm run typecheck:frontend
-npm run build:backend
-npm run build:frontend
-npm run verify:e2e
 ```
 
-Para poblar el recorrido local de defensa, usa `npm run seed:local`; para
-retirarlo sin tocar otros datos, usa `npm run seed:local:cleanup`. Consulta
-[Testing](docs/testing.md), [Local dataset](docs/local-dataset.md) y
-[Deployment and Operation](docs/deployment-and-operation.md) para límites y
-prerrequisitos de cada verificación.
+Espera a que PostgreSQL esté listo antes de ejecutar las migraciones. La
+configuración de ejemplo conecta con la base local `entrelibros` que inicia
+Docker Compose. Para otro entorno, ajusta `DATABASE_URL` en `backend/.env`.
+
+La aplicación queda disponible en:
+
+- Web: <http://localhost:3000>
+- API: <http://localhost:4000>
+
+Para detener la aplicación, pulsa `Ctrl+C`. Para detener la base de datos:
+
+```bash
+docker compose -f docker-compose.postgis.yml down
+```
+
+## Comandos útiles
+
+```bash
+npm run test:backend
+npm run test:frontend
+npm run build:backend
+npm run build:frontend
+```
