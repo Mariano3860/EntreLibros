@@ -32,7 +32,7 @@ import styles from './HomePage.module.scss'
 export const HomePage = () => {
   const { isAuthenticated, isLoading, user } = useAuth()
   const { runIfAuthenticated } = useAuthRequired()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { fixtures } = useMockExperience()
   const mockMode = isApiMockMode()
   const navigate = useNavigate()
@@ -85,25 +85,25 @@ export const HomePage = () => {
           {
             icon: '↔',
             value: '134',
-            label: 'intercambios hoy',
+            label: t('localizedUi.home.exchanges'),
             tone: 'teal',
           },
           {
             icon: '⌂',
             value: '52',
-            label: 'rincones activos',
+            label: t('localizedUi.home.activeCorners'),
             tone: 'orange',
           },
           {
             icon: '◉',
             value: '248',
-            label: 'lectores activos',
+            label: t('localizedUi.home.activeReaders'),
             tone: 'purple',
           },
           {
             icon: '✦',
             value: '1.327',
-            label: 'libros publicados',
+            label: t('localizedUi.home.publishedBooks'),
             tone: 'blue',
           },
         ]
@@ -111,26 +111,32 @@ export const HomePage = () => {
       ? [
           {
             icon: '↔',
-            value: statsQuery.data.kpis.exchanges.toLocaleString('es-AR'),
-            label: 'intercambios',
+            value: statsQuery.data.kpis.exchanges.toLocaleString(i18n.language),
+            label: t('localizedUi.home.exchanges'),
             tone: 'teal',
           },
           {
             icon: '⌂',
-            value: statsQuery.data.kpis.activeHouses.toLocaleString('es-AR'),
-            label: 'rincones activos',
+            value: statsQuery.data.kpis.activeHouses.toLocaleString(
+              i18n.language
+            ),
+            label: t('localizedUi.home.activeCorners'),
             tone: 'orange',
           },
           {
             icon: '◉',
-            value: statsQuery.data.kpis.activeUsers.toLocaleString('es-AR'),
-            label: 'lectores activos',
+            value: statsQuery.data.kpis.activeUsers.toLocaleString(
+              i18n.language
+            ),
+            label: t('localizedUi.home.activeReaders'),
             tone: 'purple',
           },
           {
             icon: '✦',
-            value: statsQuery.data.kpis.booksPublished.toLocaleString('es-AR'),
-            label: 'libros publicados',
+            value: statsQuery.data.kpis.booksPublished.toLocaleString(
+              i18n.language
+            ),
+            label: t('localizedUi.home.publishedBooks'),
             tone: 'blue',
           },
         ]
@@ -140,21 +146,26 @@ export const HomePage = () => {
       ? fixtures.activity
       : fixtures.communityPosts.map((post) => ({
           icon: '↔',
-          title: `${post.author} compartió una historia`,
+          title: t('localizedUi.home.sharedStory', { name: post.author }),
           meta: post.meta,
           tone: 'teal',
         }))
     : isAuthenticated
       ? (privateActivityQuery.data ?? []).map((item) => ({
           icon: item.action === 'exchanged' ? '✓' : '↔',
-          title: `${item.action === 'exchanged' ? 'Completaste un intercambio de' : 'Ofreciste'} “${item.bookTitle}”`,
-          meta: new Date(item.timestamp).toLocaleString('es-AR'),
+          title: t(
+            item.action === 'exchanged'
+              ? 'localizedUi.home.completedExchange'
+              : 'localizedUi.home.offered',
+            { title: item.bookTitle }
+          ),
+          meta: new Date(item.timestamp).toLocaleString(i18n.language),
           tone: item.action === 'exchanged' ? 'purple' : 'teal',
         }))
       : (publicActivityQuery.data ?? []).map((item) => ({
           icon: '↔',
-          title: `${item.user} participa en la comunidad`,
-          meta: 'Actividad pública reciente',
+          title: t('localizedUi.home.sharedStory', { name: item.user }),
+          meta: t('localizedUi.home.publicActivity'),
           tone: 'teal',
         }))
 
@@ -175,20 +186,18 @@ export const HomePage = () => {
             {isAuthenticated ? (
               <>
                 <h1>
-                  ¡Bienvenido de nuevo,{' '}
-                  <em>{mockMode ? 'Mariano' : (user?.name ?? 'lector')}!</em>
+                  {t('localizedUi.home.welcome', {
+                    name: mockMode
+                      ? 'Mariano'
+                      : (user?.name ?? t('localizedUi.common.member')),
+                  })}
                 </h1>
-                <p>
-                  Hay nuevas historias, libros y rincones esperando cerca tuyo.
-                </p>
+                <p>{t('localizedUi.home.subtitle')}</p>
               </>
             ) : (
               <>
-                <h1>Encontrá tu próxima historia.</h1>
-                <p>
-                  Descubrí libros cerca tuyo, conectá con otros lectores e
-                  intercambiá los que ya terminaste.
-                </p>
+                <h1>{t('localizedUi.homeStates.guestTitle')}</h1>
+                <p>{t('localizedUi.homeStates.guestSubtitle')}</p>
               </>
             )}
             <ActionButton
@@ -219,17 +228,19 @@ export const HomePage = () => {
             <KpiRegion kpis={kpis} />
           </FixtureState>
         ) : statsQuery.isLoading ? (
-          <Panel className={styles.state}>Cargando resumen…</Panel>
+          <Panel className={styles.state}>
+            {t('localizedUi.homeStates.loadingSummary')}
+          </Panel>
         ) : statsQuery.isError ? (
           <Panel className={styles.state}>
-            El resumen no está disponible ahora.
+            {t('localizedUi.home.summaryUnavailable')}
           </Panel>
         ) : (
           <KpiRegion kpis={kpis} />
         )}
         <section className={styles.booksSection}>
           <SectionHeading
-            title="Libros que podrían gustarte"
+            title={t('localizedUi.home.recommendations')}
             action={
               <ActionButton
                 tone="ghost"
@@ -259,10 +270,12 @@ export const HomePage = () => {
               />
             </FixtureState>
           ) : booksQuery.isLoading ? (
-            <Panel className={styles.state}>Cargando libros…</Panel>
+            <Panel className={styles.state}>
+              {t('localizedUi.homeStates.loadingBooks')}
+            </Panel>
           ) : booksQuery.isError ? (
             <Panel className={styles.state}>
-              No pudimos cargar los libros.
+              {t('localizedUi.homeStates.booksError')}
             </Panel>
           ) : (
             <BookRail
@@ -279,8 +292,12 @@ export const HomePage = () => {
         </section>
         <Panel className={styles.activityPanel}>
           <SectionHeading
-            title="Actividad reciente"
-            action={<span className={styles.live}>● En vivo</span>}
+            title={t('localizedUi.home.recentActivity')}
+            action={
+              <span className={styles.live}>
+                ● {t('localizedUi.homeStates.live')}
+              </span>
+            }
           />
           {mockMode ? (
             <FixtureState region="activity">
@@ -291,13 +308,17 @@ export const HomePage = () => {
                 ? privateActivityQuery.isLoading
                 : publicActivityQuery.isLoading
             ) ? (
-            <div className={styles.state}>Cargando actividad…</div>
+            <div className={styles.state}>
+              {t('localizedUi.homeStates.loadingActivity')}
+            </div>
           ) : (
               isAuthenticated
                 ? privateActivityQuery.isError
                 : publicActivityQuery.isError
             ) ? (
-            <div className={styles.state}>No pudimos cargar la actividad.</div>
+            <div className={styles.state}>
+              {t('localizedUi.homeStates.activityError')}
+            </div>
           ) : (
             <ActivityRegion items={activities} />
           )}
@@ -347,13 +368,19 @@ const KpiRegion = ({
     label: string
     tone: string
   }>
-}) => (
-  <section className={styles.kpiGrid} aria-label="Resumen de hoy">
-    {kpis.map((kpi) => (
-      <KpiCard key={kpi.label} {...kpi} />
-    ))}
-  </section>
-)
+}) => {
+  const { t } = useTranslation()
+  return (
+    <section
+      className={styles.kpiGrid}
+      aria-label={t('localizedUi.home.summary')}
+    >
+      {kpis.map((kpi) => (
+        <KpiCard key={kpi.label} {...kpi} />
+      ))}
+    </section>
+  )
+}
 const BookRail = ({
   books,
   direction,
@@ -373,6 +400,7 @@ const BookRail = ({
   onOpen: (book: BookCardView) => void
   onPrevious: () => void
 }) => {
+  const { t } = useTranslation()
   const previousBooks = useRef(books)
   const [outgoingBooks, setOutgoingBooks] = useState<BookCardView[]>([])
   const [animationKey, setAnimationKey] = useState(0)
@@ -428,13 +456,13 @@ const BookRail = ({
             ))
           ) : (
             <Panel className={styles.state}>
-              No hay libros disponibles todavía.
+              {t('localizedUi.home.noBooks')}
             </Panel>
           )}
         </div>
         {hasPrevious ? (
           <button
-            aria-label="Ver recomendaciones anteriores"
+            aria-label={t('localizedUi.home.previous')}
             className={`${styles.railArrow} ${styles.railArrowPrevious}`}
             disabled={isRefreshing}
             onClick={onPrevious}
@@ -447,7 +475,7 @@ const BookRail = ({
         ) : null}
         {hasNext && visibleBooks.length === 5 ? (
           <button
-            aria-label="Ver más recomendaciones"
+            aria-label={t('localizedUi.home.next')}
             className={`${styles.railArrow} ${styles.railArrowNext}`}
             disabled={isRefreshing}
             onClick={onNext}
@@ -460,7 +488,7 @@ const BookRail = ({
         ) : null}
       </div>
       <span aria-live="polite" className={styles.railStatus}>
-        {isRefreshing ? 'Actualizando recomendaciones' : ''}
+        {isRefreshing ? t('localizedUi.home.refreshing') : ''}
       </span>
     </div>
   )
@@ -474,23 +502,32 @@ const ActivityRegion = ({
     meta: string
     tone: string
   }>
-}) => (
-  <div className={styles.activityList}>
-    {items.length ? (
-      items.map((item) => (
-        <article key={`${item.title}-${item.meta}`}>
-          <span className={`${styles.activityIcon} ${styles[item.tone]}`}>
-            {item.icon}
-          </span>
-          <div>
-            <strong>{item.title}</strong>
-            <small>{item.meta}</small>
-          </div>
-          <button aria-label={`Abrir ${item.title}`}>→</button>
-        </article>
-      ))
-    ) : (
-      <div className={styles.state}>Todavía no hay actividad.</div>
-    )}
-  </div>
-)
+}) => {
+  const { t } = useTranslation()
+  return (
+    <div className={styles.activityList}>
+      {items.length ? (
+        items.map((item) => (
+          <article key={`${item.title}-${item.meta}`}>
+            <span className={`${styles.activityIcon} ${styles[item.tone]}`}>
+              {item.icon}
+            </span>
+            <div>
+              <strong>{item.title}</strong>
+              <small>{item.meta}</small>
+            </div>
+            <button
+              aria-label={t('localizedUi.home.openActivity', {
+                title: item.title,
+              })}
+            >
+              →
+            </button>
+          </article>
+        ))
+      ) : (
+        <div className={styles.state}>{t('localizedUi.home.noActivity')}</div>
+      )}
+    </div>
+  )
+}

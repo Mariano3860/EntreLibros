@@ -24,19 +24,17 @@ describe('BookCard', () => {
 
     expect(screen.getByText('Dune')).toBeInTheDocument()
     expect(screen.getByText('Frank Herbert')).toBeInTheDocument()
-    expect(screen.getByAltText('booksPage.cover_alt')).toBeInTheDocument()
-    expect(screen.getByText('booksPage.status.available')).toBeInTheDocument()
+    expect(screen.getByAltText('Portada de Dune')).toBeInTheDocument()
+    expect(screen.getByText('Disponible')).toBeInTheDocument()
     expect(screen.getByText('nuevo')).toBeInTheDocument()
-    expect(screen.getByText('booksPage.badge.for_sale')).toBeInTheDocument()
+    expect(screen.getByText(/A la venta.*42/)).toBeInTheDocument()
     expect(
-      screen.getByText((content) =>
-        content.startsWith('booksPage.badge.for_trade')
-      )
+      screen.getByText((content) => content.startsWith('Intercambio'))
     ).toBeInTheDocument()
     expect(
       screen.getByText((content) => content.includes('A, B, C +1'))
     ).toBeInTheDocument()
-    expect(screen.getByText('booksPage.badge.seeking')).toBeInTheDocument()
+    expect(screen.getByText('Me interesa')).toBeInTheDocument()
   })
 
   test('renders condition label for known condition values', () => {
@@ -50,9 +48,7 @@ describe('BookCard', () => {
       />
     )
 
-    expect(
-      screen.getByText('publishBook.preview.condition.very_good')
-    ).toBeInTheDocument()
+    expect(screen.getByText('Muy bueno')).toBeInTheDocument()
   })
 
   test('handles onClick with keyboard events', () => {

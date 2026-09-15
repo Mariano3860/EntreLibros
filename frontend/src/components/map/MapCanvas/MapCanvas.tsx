@@ -215,6 +215,7 @@ const MapControls = ({
   userLocation: { latitude: number; longitude: number } | null
 }) => {
   const map = useMap()
+  const { t } = useTranslation()
 
   const centerMap = () => {
     if (userLocation) {
@@ -234,14 +235,26 @@ const MapControls = ({
   }
 
   return (
-    <div className={styles.controls} aria-label="Controles del mapa">
-      <button type="button" aria-label="Acercar" onClick={() => map.zoomIn()}>
+    <div className={styles.controls} aria-label={t('map.controls.label')}>
+      <button
+        type="button"
+        aria-label={t('map.controls.zoomIn')}
+        onClick={() => map.zoomIn()}
+      >
         ＋
       </button>
-      <button type="button" aria-label="Alejar" onClick={() => map.zoomOut()}>
+      <button
+        type="button"
+        aria-label={t('map.controls.zoomOut')}
+        onClick={() => map.zoomOut()}
+      >
         −
       </button>
-      <button type="button" aria-label="Centrar mapa" onClick={centerMap}>
+      <button
+        type="button"
+        aria-label={t('map.controls.center')}
+        onClick={centerMap}
+      >
         ⌖
       </button>
     </div>

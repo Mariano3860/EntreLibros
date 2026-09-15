@@ -6,6 +6,7 @@ import { PublishBookModal } from '@components/publish/PublishBookModal/PublishBo
 import { PublishBookDraftState } from '@components/publish/PublishBookModal/PublishBookModal.types'
 import { ApiBookSearchResult } from '@src/api/books/searchBooks.types'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 
 const { mockUseFocusTrap } = vi.hoisted(() => ({
   mockUseFocusTrap: vi.fn(),
@@ -221,6 +222,41 @@ describe('PublishBookModal', () => {
     fireEvent.change(titleInput, { target: { value: 'Manual entry' } })
 
     expect(titleInput).toHaveValue('Manual entry')
+  })
+
+  test('localizes the publishing flow and requires terms before publishing', async () => {
+    await useTranslation().i18n.changeLanguage('en')
+    renderModal()
+
+    expect(
+      screen.getByRole('heading', { name: 'Publish a book' })
+    ).toBeVisible()
+    expect(screen.getByPlaceholderText('ISBN, title, author...')).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled()
+
+    fireEvent.change(screen.getByPlaceholderText('ISBN, title, author...'), {
+      target: { value: '1984' },
+    })
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Use this book' })
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }))
+
+    fireEvent.click(screen.getByLabelText('Sale'))
+    fireEvent.click(screen.getByLabelText('Good'))
+    fireEvent.change(screen.getByLabelText('Price'), {
+      target: { value: '1700' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }))
+
+    const publish = screen.getByRole('button', { name: 'Publish' })
+    expect(publish).toBeDisabled()
+    fireEvent.click(
+      screen.getByLabelText(
+        "I confirm the information is accurate and I accept EntreLibros' terms"
+      )
+    )
+    expect(publish).toBeEnabled()
   })
 
   test('removes existing images from a resumed draft', async () => {

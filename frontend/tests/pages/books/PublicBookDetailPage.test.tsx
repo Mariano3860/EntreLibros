@@ -83,9 +83,7 @@ describe('PublicBookDetailPage', () => {
       </Routes>,
       { initialEntries: ['/books/1'] }
     )
-    fireEvent.click(
-      await screen.findByRole('button', { name: 'bookDetail.close' })
-    )
+    fireEvent.click(await screen.findByRole('button', { name: 'Cerrar' }))
     expect(await screen.findByText('community-route')).toBeVisible()
   })
 })

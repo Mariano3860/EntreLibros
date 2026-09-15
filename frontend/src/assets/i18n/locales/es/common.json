@@ -533,10 +533,91 @@
     }
   },
   "community": {
+    "ui": {
+      "title": "Comunidad",
+      "subtitle": "Historias, recomendaciones y encuentros cerca tuyo.",
+      "publish": "Publicar",
+      "readingPrompt": "¿Qué estás leyendo, {{name}}?",
+      "photoVideo": "Foto/Video",
+      "offerBook": "Ofrecer libro",
+      "proposeTrade": "Proponer intercambio",
+      "poll": "Encuesta",
+      "moreOptions": "Más opciones",
+      "close": "Cerrar",
+      "storyOpen": "Historia de {{name}} abierta",
+      "activityCount": "{{count}} movimientos recientes en tu comunidad",
+      "loadingActivity": "Cargando la actividad de la comunidad…",
+      "activityError": "No pudimos cargar la actividad de la comunidad.",
+      "emptyActivity": "No hay actividad para mostrar todavía.",
+      "summary": "Resumen",
+      "activeReaders": "lectores activos",
+      "publishedBooks": "libros publicados",
+      "reviewed": "Reseñó {{book}}",
+      "newActivity": "Nueva actividad de la comunidad",
+      "myStory": "Tu historia",
+      "commonReads": "Lecturas en común",
+      "follow": "Seguir",
+      "createStory": "Crear una historia",
+      "sharePrompt": "Contanos qué estás leyendo",
+      "sharePlaceholder": "Compartí una idea, una recomendación o un encuentro…",
+      "addPhoto": "Agregar foto",
+      "linkBook": "Linkear libro",
+      "trade": "Intercambio",
+      "publishStory": "Publicar historia",
+      "nearbyCorners": "Rincones cerca de vos",
+      "viewMap": "Ver mapa",
+      "suggestions": "Sugerencias para vos",
+      "seekingBook": "Le interesa este libro",
+      "distance": "A {{count}} km",
+      "compatibility": "{{count}}% de compatibilidad",
+      "weeklyExchanges": "{{count}} intercambios esta semana",
+      "noActivity": "Sin actividad"
+    },
     "feed": {
       "seekingBook": "Le interesa este libro"
     },
     "messages": {
+      "ui": {
+        "title": "Mensajes",
+        "search": "Buscar conversaciones",
+        "online": "En línea",
+        "recentlyOnline": "Última conexión reciente",
+        "chatActions": "Acciones del chat",
+        "searchChat": "Buscar en el chat",
+        "call": "Llamar",
+        "videoCall": "Videollamada",
+        "information": "Información",
+        "today": "Hoy",
+        "proposal": "Propuesta de intercambio",
+        "proposalMeeting": "{{meetingPoint}} · {{date}}, {{time}}",
+        "tomorrow": "mañana",
+        "attachedBook": "Libro adjunto",
+        "messageOptions": "Más opciones de mensaje",
+        "messagePlaceholder": "Escribí un mensaje...",
+        "sendMessage": "Enviar mensaje",
+        "attachToChat": "ADJUNTAR AL CHAT",
+        "newProposal": "NUEVA PROPUESTA",
+        "chooseBook": "Elegí un libro",
+        "availableBooks": "Todos tus libros disponibles aparecen en esta lista.",
+        "persistentConversation": "Conversación persistida",
+        "conversationActions": "Acciones de conversación",
+        "deleteForMe": "Eliminar conversación solo para vos",
+        "deleteTitle": "Eliminar conversación",
+        "messageHistory": "Mensajes",
+        "selectConversation": "Seleccioná una conversación para ver los mensajes.",
+        "swapProposal": "PROPUESTA DE INTERCAMBIO",
+        "chooseBooks": "Elegí los libros",
+        "swapOfferedBook": "Tu libro",
+        "swapOfferedBookPlaceholder": "Elegí un libro para ofrecer",
+        "swapRequestedBook": "Libro que querés recibir",
+        "swapRequestedBookPlaceholder": "Elegí un libro de la otra persona",
+        "swapNote": "Nota opcional",
+        "swapNotePlaceholder": "Contale algo sobre la propuesta",
+        "close": "Cerrar",
+        "accept": "Aceptar",
+        "reject": "Rechazar",
+        "cancel": "Cancelar"
+      },
       "states": {
         "loadingConversations": "Cargando conversaciones...",
         "conversationsError": "No pudimos cargar tus conversaciones.",
@@ -555,7 +636,17 @@
         "emptyConversations": "Todavía no tenés conversaciones.",
         "retry": "Reintentar"
       },
+      "deleteConversation": {
+        "title": "¿Eliminar conversación?",
+        "description": "La ocultaremos de tus mensajes. La otra persona conserva su conversación, sus mensajes y sus acuerdos.",
+        "close": "Cerrar",
+        "error": "No pudimos eliminar la conversación. Intentá nuevamente.",
+        "cancel": "Cancelar",
+        "pending": "Eliminando…",
+        "confirm": "Eliminar para mí"
+      },
       "newConversation": {
+        "open": "Redactar mensaje",
         "eyebrow": "NUEVA CONVERSACIÓN",
         "title": "¿Con quién querés hablar?",
         "description": "Iniciá una conversación nueva con alguien de la comunidad.",
@@ -597,8 +688,30 @@
       },
       "badges": {
         "unread": "Sin leer",
+        "unreadCount": "{{count}} mensajes sin leer",
         "book": "Libro",
         "swap": "Oferta de intercambio"
+      },
+      "outcome": {
+        "title": "Resultado del encuentro",
+        "description": "Registrá el resultado solo para esta conversación.",
+        "completed": "Se completó",
+        "notCompleted": "No se completó",
+        "notePlaceholder": "Nota opcional",
+        "saved": "Guardar resultado"
+      },
+      "bubbles": {
+        "book": "Libro adjunto",
+        "swap": "Propuesta de intercambio",
+        "offered": "Ofrecido",
+        "requested": "Solicitado",
+        "agreementChange": "Cambio en la propuesta",
+        "agreementConfirmed": "Acuerdo confirmado",
+        "agreementComplete": "Intercambio completado",
+        "agreementCancelled": "Acuerdo cancelado",
+        "agreementProposal": "Propuesta de acuerdo",
+        "accept": "Aceptar",
+        "reject": "Rechazar"
       },
       "agreement": {
         "proposal": {
@@ -864,6 +977,12 @@
     }
   },
   "map": {
+    "controls": {
+      "label": "Controles del mapa",
+      "zoomIn": "Acercar",
+      "zoomOut": "Alejar",
+      "center": "Centrar mapa"
+    },
     "exploration": {
       "eyebrow": "Exploración cercana",
       "title": "Mapa de rincones",
@@ -900,7 +1019,9 @@
       "hideDetails": "Ocultar detalle"
     },
     "location": {
-      "youAreHere": "Tu ubicación aproximada"
+      "youAreHere": "Tu ubicación aproximada",
+      "deniedWithProfile": "No pudimos acceder a tu ubicación. Mostramos tu zona de perfil.",
+      "deniedWithoutProfile": "No pudimos acceder a tu ubicación. Configurá una ubicación de perfil o intentá nuevamente."
     },
     "search": {
       "placeholder": "Buscar por barrio, rincón, título o ISBN",
@@ -1177,6 +1298,7 @@
     "loading": "Cargando tu perfil...",
     "error": "No se pudo cargar tu perfil.",
     "alias": "Alias público",
+    "aliasUnavailable": "Sin alias",
     "about": "Descripción",
     "photo": "Foto de perfil",
     "changePhoto": "Cambiar foto",
@@ -1207,6 +1329,7 @@
       "fantasy": "Fantasía",
       "science-fiction": "Ciencia ficción",
       "history": "Historia",
+      "classics": "Clásicos",
       "romance": "Romance",
       "children": "Literatura infantil",
       "essay": "Ensayo",
@@ -1231,6 +1354,165 @@
     "save": "Guardar cambios",
     "saving": "Guardando...",
     "saved": "Perfil actualizado.",
-    "saveError": "No se pudieron guardar los cambios."
+    "saveError": "No se pudieron guardar los cambios.",
+    "dashboard": {
+      "member": "Miembro de EntreLibros",
+      "readingInterests": "Intereses de lectura",
+      "metricsLabel": "Métricas de perfil",
+      "readingMetricsSoon": "Métricas de lectura próximamente",
+      "preferences": "Preferencias de lectura",
+      "favoriteGenres": "Géneros favoritos",
+      "noInterests": "Todavía no elegiste intereses.",
+      "achievements": "Logros",
+      "unlocked": "{{count}} desbloqueados",
+      "soon": "Próximamente",
+      "achievementsHint": "Los logros se habilitarán con historial lector.",
+      "readingGoal": "Objetivo de lectura",
+      "goalProgress": "de {{count}} libros",
+      "goalSoon": "Objetivo próximamente",
+      "goalMissing": "¡Te faltan {{count}} libros para cumplir tu objetivo!",
+      "goalSourcePending": "Se conectará al existir una fuente persistida.",
+      "streak": "{{count}} días de racha",
+      "streakSoon": "Racha próximamente",
+      "bestStreak": "Tu mejor racha: {{count}} días",
+      "noStreak": "No hay datos de racha persistidos."
+    }
+  },
+  "localizedUi": {
+    "navigation": { "profile": "Perfil", "toggle": "Alternar navegación" },
+    "common": {
+      "view": "Ver {{title}}",
+      "retry": "Reintentar",
+      "loadingSession": "Cargando sesión…",
+      "unknownAuthor": "Autor desconocido",
+      "member": "Miembro de EntreLibros",
+      "book": "Libro",
+      "conversation": "Conversación",
+      "noMessages": "Todavía no hay mensajes.",
+      "locationAvailable": "Ubicación disponible",
+      "mapNearby": "Mapa de rincones cercanos",
+      "minutesAgo": "hace {{count}} min",
+      "hoursAgo": "hace {{count}} h",
+      "daysAgo": "hace {{count}} d",
+      "yesterday": "Ayer",
+      "notFound": "404 — Página no encontrada"
+    },
+    "home": {
+      "welcome": "¡Bienvenido de nuevo, {{name}}!",
+      "subtitle": "Hay nuevas historias, libros y rincones esperando cerca tuyo.",
+      "summary": "Resumen de hoy",
+      "exchanges": "intercambios",
+      "activeCorners": "rincones activos",
+      "activeReaders": "lectores activos",
+      "publishedBooks": "libros publicados",
+      "recommendations": "Libros que podrían gustarte",
+      "recentActivity": "Actividad reciente",
+      "summaryUnavailable": "El resumen no está disponible ahora.",
+      "noBooks": "No hay libros disponibles todavía.",
+      "previous": "Ver recomendaciones anteriores",
+      "next": "Ver más recomendaciones",
+      "refreshing": "Actualizando recomendaciones",
+      "noActivity": "Todavía no hay actividad.",
+      "openActivity": "Abrir {{title}}",
+      "offered": "Ofreciste “{{title}}”",
+      "completedExchange": "Completaste un intercambio de “{{title}}”",
+      "sharedStory": "{{name}} compartió una historia",
+      "publicActivity": "Actividad pública reciente"
+    },
+    "stats": {
+      "title": "Estadísticas",
+      "description": "Mirá cómo crecen las lecturas, intercambios y encuentros de EntreLibros.",
+      "period": "Período",
+      "lastDays": "Últimos {{days}} días",
+      "loading": "Cargando estadísticas…",
+      "error": "No pudimos cargar las estadísticas de la comunidad.",
+      "exchanges": "Intercambios",
+      "activeCorners": "Rincones activos",
+      "activePeople": "Personas activas",
+      "publishedBooks": "Libros publicados",
+      "recentExchanges": "Intercambios recientes",
+      "trendAria": "Intercambios por período",
+      "noTrend": "Sin datos suficientes para mostrar una tendencia.",
+      "persistedMetrics": "Métricas persistidas",
+      "loadingMetrics": "Cargando métricas…",
+      "metricsError": "No pudimos cargar las métricas del período.",
+      "noMetrics": "Sin datos para el período seleccionado.",
+      "activeListings": "Publicaciones activas",
+      "confirmedAgreements": "Acuerdos confirmados",
+      "contactsStarted": "Contactos iniciados",
+      "topContributors": "Contribuyentes destacados",
+      "activityMap": "Mapa de actividad",
+      "popularSearches": "Búsquedas populares",
+      "noSearches": "Sin búsquedas registradas.",
+      "queries": "Consultas"
+    },
+    "contact": {
+      "hero": "¿Cómo podemos ayudarte?",
+      "intro": "Encontrá respuestas rápidas o escribinos. Tu próxima lectura no tiene que esperar.",
+      "search": "Buscar en el centro de ayuda",
+      "categories": "Categorías de ayuda",
+      "faq": "Preguntas frecuentes",
+      "viewAll": "Ver todas",
+      "noResults": "No encontramos resultados. Probá con otras palabras o escribinos.",
+      "moreHelp": "¿Necesitás más ayuda?",
+      "supportHours": "Nuestro equipo responde de lunes a viernes, de 9 a 18 h.",
+      "online": "Estamos en línea",
+      "responseTime": "Respuesta en ~5 min",
+      "startChat": "Iniciar chat",
+      "writeToUs": "Escribinos",
+      "inquiry": "Tu consulta",
+      "inquiryPlaceholder": "Contanos qué pasó…",
+      "sendInquiry": "Enviar consulta",
+      "sending": "Enviando…",
+      "received": "Recibimos tu consulta"
+    },
+    "help": {
+      "account": { "title": "Cuenta", "text": "Perfil, privacidad y acceso" },
+      "listings": {
+        "title": "Publicaciones",
+        "text": "Publicá y administrá libros"
+      },
+      "trades": { "title": "Intercambios", "text": "Propuestas y acuerdos" },
+      "messages": { "title": "Mensajes", "text": "Chats y notificaciones" },
+      "corners": { "title": "Rincones", "text": "Rincones y comunidad" },
+      "safety": { "title": "Seguridad", "text": "Reportes y buenas prácticas" },
+      "faq": {
+        "publish": {
+          "question": "¿Cómo publico un libro?",
+          "answer": "Desde Explorar elegí “Publicar un libro”, completá los datos y seleccioná si querés venderlo o intercambiarlo."
+        },
+        "trade": {
+          "question": "¿Cómo funciona un intercambio?",
+          "answer": "Enviá una propuesta desde un libro o un chat. Ambas personas deben aceptar lugar, fecha y libros antes de confirmarlo."
+        },
+        "corner": {
+          "question": "¿Qué es un rincón?",
+          "answer": "Es un punto de encuentro de la comunidad: cafés, bibliotecas, parques y librerías donde podés leer o intercambiar."
+        },
+        "safety": {
+          "question": "¿Cómo reporto un problema?",
+          "answer": "Usá la opción Reportar en la publicación o escribinos desde el panel de soporte de esta página."
+        }
+      }
+    },
+    "presentation": {
+      "fixtureLoading": "Cargando {{region}}…",
+      "fixtureEmptyTitle": "Todavía no hay contenido",
+      "fixtureEmptyText": "Cuando haya novedades aparecerán en esta sección.",
+      "fixtureErrorTitle": "No pudimos cargar esta sección",
+      "fixtureErrorText": "El resto de la pantalla sigue disponible.",
+      "unavailableTitle": "Esta sección todavía no está disponible",
+      "unavailableText": "Estamos conectando esta experiencia con datos reales."
+    },
+    "homeStates": {
+      "guestTitle": "Encontrá tu próxima historia.",
+      "guestSubtitle": "Descubrí libros cerca tuyo, conectá con otros lectores e intercambiá los que ya terminaste.",
+      "loadingSummary": "Cargando resumen…",
+      "loadingBooks": "Cargando libros…",
+      "booksError": "No pudimos cargar los libros.",
+      "loadingActivity": "Cargando actividad…",
+      "activityError": "No pudimos cargar la actividad.",
+      "live": "En vivo"
+    }
   }
 }

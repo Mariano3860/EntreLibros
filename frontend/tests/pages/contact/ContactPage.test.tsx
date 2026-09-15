@@ -1,4 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react'
+import { useTranslation } from 'react-i18next'
 import { describe, expect, test, vi } from 'vitest'
 
 vi.mock('@src/api/auth/me.service', () => ({
@@ -34,5 +35,19 @@ describe('ContactPage', () => {
     })
     fireEvent.click(screen.getByRole('button', { name: 'Enviar consulta' }))
     expect(screen.getByText('✓ Recibimos tu consulta')).toBeVisible()
+  })
+
+  test('renders shared help content in English', async () => {
+    await useTranslation().i18n.changeLanguage('en')
+    renderWithProviders(<ContactPage />)
+
+    expect(
+      screen.getByRole('heading', { name: 'How can we help?' })
+    ).toBeVisible()
+    expect(screen.getByRole('button', { name: /Account/ })).toBeVisible()
+    expect(screen.getByText('Frequently asked questions')).toBeVisible()
+    expect(
+      screen.getByRole('button', { name: /How do I publish a book/ })
+    ).toBeVisible()
   })
 })

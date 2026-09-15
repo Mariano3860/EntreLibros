@@ -183,11 +183,7 @@ export const ProfilePage = () => {
           resolveApiErrorKey(error, '') === 'profile.photo.too_large'
             ? 'profile.photoInvalid'
             : 'profile.photoReadError'
-        setPhotoError(
-          t(errorKey, {
-            defaultValue: 'No pudimos leer la imagen. Intentá nuevamente.',
-          })
-        )
+        setPhotoError(t(errorKey))
         setSaving(false)
         return
       }
@@ -292,14 +288,9 @@ export const ProfilePage = () => {
   }
 
   if (!mockMode && profileQuery.isLoading)
-    return <ProfileState text="Cargando perfil…" />
+    return <ProfileState text={t('profile.loading')} />
   if (!mockMode && (!realProfile || profileQuery.isError))
-    return (
-      <ProfileState
-        text="No pudimos cargar el perfil. Intentá nuevamente."
-        error
-      />
-    )
+    return <ProfileState text={t('profile.error')} error />
 
   const visible = realProfile ?? {
     name: fixtures.user.name,
@@ -308,10 +299,11 @@ export const ProfilePage = () => {
     city: fixtures.user.city,
     bio: fixtures.user.bio,
     profilePhoto: null,
-    interests: interests.map((interest) =>
-      t(`profile.interestOptions.${interest}`, { defaultValue: interest })
-    ),
+    interests,
   }
+  const visibleInterests = visible.interests.map((interest) =>
+    t(`profile.interestOptions.${interest}`, { defaultValue: interest })
+  )
 
   return (
     <BaseLayout id="profile-page">
@@ -331,7 +323,7 @@ export const ProfilePage = () => {
                 {visible.username}
                 {visible.city ? ` · ${visible.city}` : ''}
               </p>
-              <small>◷ Miembro de EntreLibros</small>
+              <small>◷ {t('profile.dashboard.member')}</small>
             </div>
             <ActionButton onClick={openEditor}>
               {t('profile.edit', { defaultValue: 'Editar perfil' })}
@@ -341,15 +333,18 @@ export const ProfilePage = () => {
           <div className={styles.profileFooter}>
             <div className={styles.interestBlock}>
               <span className={styles.interestsLabel}>
-                Intereses de lectura
+                {t('profile.dashboard.readingInterests')}
               </span>
               <div className={styles.interests}>
-                {visible.interests.map((interest) => (
+                {visibleInterests.map((interest) => (
                   <span key={interest}>{interest}</span>
                 ))}
               </div>
             </div>
-            <section className={styles.metrics} aria-label="Métricas de perfil">
+            <section
+              className={styles.metrics}
+              aria-label={t('profile.dashboard.metricsLabel')}
+            >
               {mockMode ? (
                 fixtures.profileMetrics.map((metric) => (
                   <div key={metric.label}>
@@ -360,14 +355,14 @@ export const ProfilePage = () => {
               ) : (
                 <div className={styles.limitedMetric}>
                   <strong>—</strong>
-                  <span>Métricas de lectura próximamente</span>
+                  <span>{t('profile.dashboard.readingMetricsSoon')}</span>
                 </div>
               )}
             </section>
           </div>
           {saved ? (
             <div className={styles.saved} role="status">
-              Perfil actualizado
+              {t('profile.saved', { defaultValue: 'Perfil actualizado' })}
             </div>
           ) : null}
         </section>
@@ -376,8 +371,10 @@ export const ProfilePage = () => {
           <div className={styles.primaryColumn}>
             <Panel className={styles.preferences}>
               <SectionHeading
-                title="Preferencias de lectura"
-                action={<button onClick={openEditor}>Editar</button>}
+                title={t('profile.dashboard.preferences')}
+                action={
+                  <button onClick={openEditor}>{t('profile.edit')}</button>
+                }
               />
               <div className={styles.preferenceGrid}>
                 {mockMode ? (
@@ -394,10 +391,10 @@ export const ProfilePage = () => {
                   <article>
                     <span>♡</span>
                     <div>
-                      <strong>Géneros favoritos</strong>
+                      <strong>{t('profile.dashboard.favoriteGenres')}</strong>
                       <p>
-                        {visible.interests.join(', ') ||
-                          'Todavía no elegiste intereses.'}
+                        {visibleInterests.join(', ') ||
+                          t('profile.dashboard.noInterests')}
                       </p>
                     </div>
                   </article>
@@ -406,9 +403,13 @@ export const ProfilePage = () => {
             </Panel>
             <Panel className={styles.achievements}>
               <SectionHeading
-                title="Logros"
+                title={t('profile.dashboard.achievements')}
                 action={
-                  <span>{mockMode ? '12 desbloqueados' : 'Próximamente'}</span>
+                  <span>
+                    {mockMode
+                      ? t('profile.dashboard.unlocked', { count: 12 })
+                      : t('profile.dashboard.soon')}
+                  </span>
                 }
               />
               <div>
@@ -423,10 +424,8 @@ export const ProfilePage = () => {
                 ) : (
                   <article>
                     <span>—</span>
-                    <strong>Próximamente</strong>
-                    <small>
-                      Los logros se habilitarán con historial lector.
-                    </small>
+                    <strong>{t('profile.dashboard.soon')}</strong>
+                    <small>{t('profile.dashboard.achievementsHint')}</small>
                   </article>
                 )}
               </div>
@@ -435,7 +434,7 @@ export const ProfilePage = () => {
           <aside className={styles.secondaryColumn}>
             <Panel className={styles.goal}>
               <SectionHeading
-                title="Objetivo de lectura"
+                title={t('profile.dashboard.readingGoal')}
                 action={
                   <span>{mockMode ? fixtures.profile.goal.year : '—'}</span>
                 }
@@ -444,8 +443,10 @@ export const ProfilePage = () => {
                 <strong>{mockMode ? fixtures.profile.goal.read : '—'}</strong>
                 <small>
                   {mockMode
-                    ? `de ${fixtures.profile.goal.target} libros`
-                    : 'Objetivo próximamente'}
+                    ? t('profile.dashboard.goalProgress', {
+                        count: fixtures.profile.goal.target,
+                      })
+                    : t('profile.dashboard.goalSoon')}
                 </small>
               </div>
               <div className={styles.progress}>
@@ -453,8 +454,12 @@ export const ProfilePage = () => {
               </div>
               <p>
                 {mockMode
-                  ? `¡Te faltan ${fixtures.profile.goal.target - fixtures.profile.goal.read} libros para cumplir tu objetivo!`
-                  : 'Se conectará al existir una fuente persistida.'}
+                  ? t('profile.dashboard.goalMissing', {
+                      count:
+                        fixtures.profile.goal.target -
+                        fixtures.profile.goal.read,
+                    })
+                  : t('profile.dashboard.goalSourcePending')}
               </p>
             </Panel>
             <Panel className={styles.streak}>
@@ -462,13 +467,17 @@ export const ProfilePage = () => {
               <div>
                 <strong>
                   {mockMode
-                    ? `${fixtures.profile.streak.current} días de racha`
-                    : 'Racha próximamente'}
+                    ? t('profile.dashboard.streak', {
+                        count: fixtures.profile.streak.current,
+                      })
+                    : t('profile.dashboard.streakSoon')}
                 </strong>
                 <p>
                   {mockMode
-                    ? `Tu mejor racha: ${fixtures.profile.streak.best} días`
-                    : 'No hay datos de racha persistidos.'}
+                    ? t('profile.dashboard.bestStreak', {
+                        count: fixtures.profile.streak.best,
+                      })
+                    : t('profile.dashboard.noStreak')}
                 </p>
               </div>
               <div className={styles.week}>

@@ -1,5 +1,6 @@
 import { BaseLayout } from '@components/layout/BaseLayout/BaseLayout'
 import { FormEvent, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import {
   Panel,
@@ -8,12 +9,14 @@ import {
   SectionHeading,
 } from '@src/components/ui/presentation/Presentation'
 import { useContactForm } from '@src/hooks/api/useContactForm'
-import { faqs, helpCategories } from '@src/shared/content/help'
+import { getHelpContent, type HelpFaq } from '@src/shared/content/help'
 import { isApiMockMode } from '@src/utils/runtimeEnv'
 
 import styles from './ContactPage.module.scss'
 
 export const ContactPage = () => {
+  const { t } = useTranslation()
+  const { faqs, helpCategories } = getHelpContent(t)
   const mockMode = isApiMockMode()
   const [search, setSearch] = useState('')
   const [message, setMessage] = useState('')
@@ -26,7 +29,7 @@ export const ContactPage = () => {
           .toLowerCase()
           .includes(search.toLowerCase())
       ),
-    [search]
+    [faqs, search]
   )
 
   if (!mockMode)
@@ -52,17 +55,14 @@ export const ContactPage = () => {
       <PageFrame>
         <section className={styles.hero}>
           <div>
-            <h1>¿Cómo podemos ayudarte?</h1>
-            <p>
-              Encontrá respuestas rápidas o escribinos. Tu próxima lectura no
-              tiene que esperar.
-            </p>
+            <h1>{t('localizedUi.contact.hero')}</h1>
+            <p>{t('localizedUi.contact.intro')}</p>
             <label>
               <b>⌕</b>
               <input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Buscar en el centro de ayuda"
+                placeholder={t('localizedUi.contact.search')}
               />
               <kbd>⌘ K</kbd>
             </label>
@@ -70,7 +70,10 @@ export const ContactPage = () => {
           <img src="/illustrations/help.svg" alt="" />
         </section>
 
-        <section className={styles.categories} aria-label="Categorías de ayuda">
+        <section
+          className={styles.categories}
+          aria-label={t('localizedUi.contact.categories')}
+        >
           {helpCategories.map((category) => (
             <button
               key={category.title}
@@ -87,8 +90,12 @@ export const ContactPage = () => {
         <div className={styles.content}>
           <Panel className={styles.faq}>
             <SectionHeading
-              title="Preguntas frecuentes"
-              action={<button onClick={() => setSearch('')}>Ver todas</button>}
+              title={t('localizedUi.contact.faq')}
+              action={
+                <button onClick={() => setSearch('')}>
+                  {t('localizedUi.contact.viewAll')}
+                </button>
+              }
             />
             <div className={styles.faqList}>
               {filteredFaqs.length ? (
@@ -108,8 +115,7 @@ export const ContactPage = () => {
                 ))
               ) : (
                 <div className={styles.noResults}>
-                  No encontramos resultados. Probá con otras palabras o
-                  escribinos.
+                  {t('localizedUi.contact.noResults')}
                 </div>
               )}
             </div>
@@ -118,12 +124,12 @@ export const ContactPage = () => {
           <aside className={styles.support}>
             <Panel className={styles.chatCard}>
               <span className={styles.supportIcon}>◯</span>
-              <h2>¿Necesitás más ayuda?</h2>
-              <p>Nuestro equipo responde de lunes a viernes, de 9 a 18 h.</p>
+              <h2>{t('localizedUi.contact.moreHelp')}</h2>
+              <p>{t('localizedUi.contact.supportHours')}</p>
               <div className={styles.online}>
                 <span>●</span>
-                <strong>Estamos en línea</strong>
-                <small>Respuesta en ~5 min</small>
+                <strong>{t('localizedUi.contact.online')}</strong>
+                <small>{t('localizedUi.contact.responseTime')}</small>
               </div>
               <ActionButton
                 tone="primary"
@@ -131,28 +137,28 @@ export const ContactPage = () => {
                   document.getElementById('support-message')?.focus()
                 }
               >
-                Iniciar chat
+                {t('localizedUi.contact.startChat')}
               </ActionButton>
             </Panel>
             <Panel className={styles.contactCard}>
-              <SectionHeading title="Escribinos" />
+              <SectionHeading title={t('localizedUi.contact.writeToUs')} />
               <form onSubmit={submit}>
                 <label>
-                  Tu consulta
+                  {t('localizedUi.contact.inquiry')}
                   <textarea
                     id="support-message"
                     value={message}
                     onChange={(event) => setMessage(event.target.value)}
-                    placeholder="Contanos qué pasó…"
+                    placeholder={t('localizedUi.contact.inquiryPlaceholder')}
                   />
                 </label>
                 <ActionButton type="submit" disabled={!message.trim()}>
-                  Enviar consulta
+                  {t('localizedUi.contact.sendInquiry')}
                 </ActionButton>
               </form>
               {supportSent ? (
                 <p className={styles.sent} role="status">
-                  ✓ Recibimos tu consulta
+                  ✓ {t('localizedUi.contact.received')}
                 </p>
               ) : null}
               <a href="mailto:ayuda@entrelibros.com">
@@ -177,8 +183,10 @@ const RealContactPage = ({
   setOpenFaq: (id: string | null) => void
   search: string
   setSearch: (value: string) => void
-  filteredFaqs: ReadonlyArray<(typeof faqs)[number]>
+  filteredFaqs: ReadonlyArray<HelpFaq>
 }) => {
+  const { t } = useTranslation()
+  const { helpCategories } = getHelpContent(t)
   const [message, setMessage] = useState('')
   const mutation = useContactForm(() => setMessage(''))
   const submit = (event: FormEvent) => {
@@ -195,17 +203,14 @@ const RealContactPage = ({
       <PageFrame>
         <section className={styles.hero}>
           <div>
-            <h1>¿Cómo podemos ayudarte?</h1>
-            <p>
-              Encontrá respuestas rápidas o escribinos. Tu próxima lectura no
-              tiene que esperar.
-            </p>
+            <h1>{t('localizedUi.contact.hero')}</h1>
+            <p>{t('localizedUi.contact.intro')}</p>
             <label>
               <b>⌕</b>
               <input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Buscar en el centro de ayuda"
+                placeholder={t('localizedUi.contact.search')}
               />
               <kbd>⌘ K</kbd>
             </label>
@@ -213,7 +218,10 @@ const RealContactPage = ({
           <img src="/illustrations/help.svg" alt="" />
         </section>
 
-        <section className={styles.categories} aria-label="Categorías de ayuda">
+        <section
+          className={styles.categories}
+          aria-label={t('localizedUi.contact.categories')}
+        >
           {helpCategories.map((category) => (
             <button
               key={category.title}
@@ -230,8 +238,12 @@ const RealContactPage = ({
         <div className={styles.content}>
           <Panel className={styles.faq}>
             <SectionHeading
-              title="Preguntas frecuentes"
-              action={<button onClick={() => setSearch('')}>Ver todas</button>}
+              title={t('localizedUi.contact.faq')}
+              action={
+                <button onClick={() => setSearch('')}>
+                  {t('localizedUi.contact.viewAll')}
+                </button>
+              }
             />
             <div className={styles.faqList}>
               {filteredFaqs.length ? (
@@ -251,8 +263,7 @@ const RealContactPage = ({
                 ))
               ) : (
                 <div className={styles.noResults}>
-                  No encontramos resultados. Probá con otras palabras o
-                  escribinos.
+                  {t('localizedUi.contact.noResults')}
                 </div>
               )}
             </div>
@@ -261,12 +272,12 @@ const RealContactPage = ({
           <aside className={styles.support}>
             <Panel className={styles.chatCard}>
               <span className={styles.supportIcon}>◯</span>
-              <h2>¿Necesitás más ayuda?</h2>
-              <p>Nuestro equipo responde de lunes a viernes, de 9 a 18 h.</p>
+              <h2>{t('localizedUi.contact.moreHelp')}</h2>
+              <p>{t('localizedUi.contact.supportHours')}</p>
               <div className={styles.online}>
                 <span>●</span>
-                <strong>Estamos en línea</strong>
-                <small>Respuesta en ~5 min</small>
+                <strong>{t('localizedUi.contact.online')}</strong>
+                <small>{t('localizedUi.contact.responseTime')}</small>
               </div>
               <ActionButton
                 tone="primary"
@@ -274,31 +285,33 @@ const RealContactPage = ({
                   document.getElementById('support-message')?.focus()
                 }
               >
-                Iniciar chat
+                {t('localizedUi.contact.startChat')}
               </ActionButton>
             </Panel>
             <Panel className={styles.contactCard}>
-              <SectionHeading title="Escribinos" />
+              <SectionHeading title={t('localizedUi.contact.writeToUs')} />
               <form onSubmit={submit}>
                 <label>
-                  Tu consulta
+                  {t('localizedUi.contact.inquiry')}
                   <textarea
                     id="support-message"
                     value={message}
                     onChange={(event) => setMessage(event.target.value)}
-                    placeholder="Contanos qué pasó…"
+                    placeholder={t('localizedUi.contact.inquiryPlaceholder')}
                   />
                 </label>
                 <ActionButton
                   type="submit"
                   disabled={!message.trim() || mutation.isPending}
                 >
-                  {mutation.isPending ? 'Enviando…' : 'Enviar consulta'}
+                  {mutation.isPending
+                    ? t('localizedUi.contact.sending')
+                    : t('localizedUi.contact.sendInquiry')}
                 </ActionButton>
               </form>
               {mutation.isSuccess ? (
                 <p className={styles.sent} role="status">
-                  ✓ Recibimos tu consulta
+                  ✓ {t('localizedUi.contact.received')}
                 </p>
               ) : null}
               <a href="mailto:ayuda@entrelibros.com">

@@ -125,7 +125,7 @@ export const Sidebar = () => {
     {
       path: '/profile',
       icon: Profile,
-      label: t('pages.profile', { defaultValue: 'Perfil' }),
+      label: t('localizedUi.navigation.profile'),
     },
   ]
   const navItems =
@@ -141,7 +141,7 @@ export const Sidebar = () => {
       <button
         className={styles.mobileToggle}
         onClick={toggleMenu}
-        aria-label="Toggle navigation"
+        aria-label={t('localizedUi.navigation.toggle')}
       >
         <span aria-hidden="true"></span>
         <span aria-hidden="true"></span>

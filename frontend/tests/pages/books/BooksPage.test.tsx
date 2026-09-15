@@ -1,4 +1,5 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { useTranslation } from 'react-i18next'
 import { describe, expect, test, vi } from 'vitest'
 import { useLocation } from 'react-router-dom'
 
@@ -184,5 +185,49 @@ describe('BooksPage', () => {
         ).toBeVisible()
       })
     }
+  })
+
+  test('localizes search, filters, tabs, pagination, and the interest form', async () => {
+    await useTranslation().i18n.changeLanguage('en')
+    renderWithProviders(<BooksPage />)
+
+    expect(
+      await screen.findByRole('heading', { name: 'My books' })
+    ).toBeVisible()
+    expect(
+      screen.getByRole('textbox', { name: 'Search books' })
+    ).toHaveAttribute('placeholder', 'Search by title, author, ISBN')
+
+    fireEvent.click(screen.getByRole('button', { name: /Filters/ }))
+    expect(screen.getByText('Topic')).toBeVisible()
+    expect(screen.getByText('Interest')).toBeVisible()
+    expect(screen.getByRole('tablist', { name: 'Book types' })).toBeVisible()
+    expect(screen.getByRole('tab', { name: 'For trade' })).toBeVisible()
+    expect(
+      screen.getByRole('navigation', { name: 'Result pages' })
+    ).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Previous page' })).toBeDisabled()
+
+    fireEvent.click(
+      screen.getAllByRole('button', { name: "I'm interested" })[0]
+    )
+    expect(
+      await screen.findByRole('heading', { name: 'Share an interest' })
+    ).toBeVisible()
+    expect(
+      screen.getByPlaceholderText('ISBN, title, or author...')
+    ).toBeVisible()
+
+    const submit = screen.getByRole('button', { name: 'Share interest' })
+    expect(submit).toBeDisabled()
+    fireEvent.change(screen.getByLabelText('Title'), {
+      target: { value: 'A preserved book title' },
+    })
+    fireEvent.click(
+      screen.getByLabelText(
+        "I confirm the information is accurate and I accept EntreLibros' terms."
+      )
+    )
+    expect(submit).toBeEnabled()
   })
 })

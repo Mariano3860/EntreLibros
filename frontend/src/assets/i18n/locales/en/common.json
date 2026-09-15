@@ -533,10 +533,91 @@
     }
   },
   "community": {
+    "ui": {
+      "title": "Community",
+      "subtitle": "Stories, recommendations and meetups near you.",
+      "publish": "Publish",
+      "readingPrompt": "What are you reading, {{name}}?",
+      "photoVideo": "Photo/video",
+      "offerBook": "Offer book",
+      "proposeTrade": "Propose trade",
+      "poll": "Poll",
+      "moreOptions": "More options",
+      "close": "Close",
+      "storyOpen": "{{name}}’s story is open",
+      "activityCount": "{{count}} recent updates in your community",
+      "loadingActivity": "Loading community activity…",
+      "activityError": "Community activity could not be loaded.",
+      "emptyActivity": "There is no activity to show yet.",
+      "summary": "Summary",
+      "activeReaders": "active readers",
+      "publishedBooks": "published books",
+      "reviewed": "Reviewed {{book}}",
+      "newActivity": "New community activity",
+      "myStory": "Your story",
+      "commonReads": "Shared reads",
+      "follow": "Follow",
+      "createStory": "Create a story",
+      "sharePrompt": "Tell us what you are reading",
+      "sharePlaceholder": "Share an idea, a recommendation or a meetup…",
+      "addPhoto": "Add photo",
+      "linkBook": "Link book",
+      "trade": "Trade",
+      "publishStory": "Publish story",
+      "nearbyCorners": "Corners near you",
+      "viewMap": "View map",
+      "suggestions": "Suggestions for you",
+      "seekingBook": "Interested in this book",
+      "distance": "{{count}} km away",
+      "compatibility": "{{count}}% compatibility",
+      "weeklyExchanges": "{{count}} exchanges this week",
+      "noActivity": "No recent activity"
+    },
     "feed": {
       "seekingBook": "Interested in this book"
     },
     "messages": {
+      "ui": {
+        "title": "Messages",
+        "search": "Search conversations",
+        "online": "Online",
+        "recentlyOnline": "Recently online",
+        "chatActions": "Chat actions",
+        "searchChat": "Search in chat",
+        "call": "Call",
+        "videoCall": "Video call",
+        "information": "Information",
+        "today": "Today",
+        "proposal": "Swap proposal",
+        "proposalMeeting": "{{meetingPoint}} · {{date}}, {{time}}",
+        "tomorrow": "tomorrow",
+        "attachedBook": "Attached book",
+        "messageOptions": "More message options",
+        "messagePlaceholder": "Write a message...",
+        "sendMessage": "Send message",
+        "attachToChat": "ATTACH TO CHAT",
+        "newProposal": "NEW PROPOSAL",
+        "chooseBook": "Choose a book",
+        "availableBooks": "All your available books appear in this list.",
+        "persistentConversation": "Persisted conversation",
+        "conversationActions": "Conversation actions",
+        "deleteForMe": "Delete conversation only for you",
+        "deleteTitle": "Delete conversation",
+        "messageHistory": "Messages",
+        "selectConversation": "Select a conversation to view messages.",
+        "swapProposal": "SWAP PROPOSAL",
+        "chooseBooks": "Choose books",
+        "swapOfferedBook": "Your book",
+        "swapOfferedBookPlaceholder": "Choose a book to offer",
+        "swapRequestedBook": "Book you want to receive",
+        "swapRequestedBookPlaceholder": "Choose the other person's book",
+        "swapNote": "Optional note",
+        "swapNotePlaceholder": "Tell them about the proposal",
+        "close": "Close",
+        "accept": "Accept",
+        "reject": "Reject",
+        "cancel": "Cancel"
+      },
       "states": {
         "loadingConversations": "Loading conversations...",
         "conversationsError": "We couldn't load your conversations.",
@@ -555,7 +636,17 @@
         "emptyConversations": "You don't have any conversations yet.",
         "retry": "Retry"
       },
+      "deleteConversation": {
+        "title": "Delete conversation?",
+        "description": "We will hide it from your messages. The other person keeps their conversation, messages and agreements.",
+        "close": "Close",
+        "error": "The conversation could not be deleted. Try again.",
+        "cancel": "Cancel",
+        "pending": "Deleting…",
+        "confirm": "Delete for me"
+      },
       "newConversation": {
+        "open": "Compose message",
         "eyebrow": "NEW CONVERSATION",
         "title": "Who do you want to talk to?",
         "description": "Start a new conversation with someone from the community.",
@@ -597,8 +688,30 @@
       },
       "badges": {
         "unread": "Unread",
+        "unreadCount": "{{count}} unread messages",
         "book": "Book",
         "swap": "Swap offer"
+      },
+      "outcome": {
+        "title": "Meeting outcome",
+        "description": "Record the result for this conversation only.",
+        "completed": "Completed",
+        "notCompleted": "Not completed",
+        "notePlaceholder": "Optional note",
+        "saved": "Save outcome"
+      },
+      "bubbles": {
+        "book": "Attached book",
+        "swap": "Swap proposal",
+        "offered": "Offered",
+        "requested": "Requested",
+        "agreementChange": "Change proposed",
+        "agreementConfirmed": "Agreement confirmed",
+        "agreementComplete": "Swap completed",
+        "agreementCancelled": "Agreement cancelled",
+        "agreementProposal": "Agreement proposal",
+        "accept": "Accept",
+        "reject": "Reject"
       },
       "agreement": {
         "proposal": {
@@ -864,6 +977,12 @@
     }
   },
   "map": {
+    "controls": {
+      "label": "Map controls",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "center": "Center map"
+    },
     "exploration": {
       "eyebrow": "Nearby exploration",
       "title": "Corners map",
@@ -900,7 +1019,9 @@
       "hideDetails": "Hide details"
     },
     "location": {
-      "youAreHere": "Your approximate location"
+      "youAreHere": "Your approximate location",
+      "deniedWithProfile": "We could not access your location. Showing your profile area instead.",
+      "deniedWithoutProfile": "We could not access your location. Set a profile location or try again."
     },
     "search": {
       "placeholder": "Search by neighborhood, corner, title or ISBN",
@@ -1177,6 +1298,7 @@
     "loading": "Loading your profile...",
     "error": "Your profile could not be loaded.",
     "alias": "Public alias",
+    "aliasUnavailable": "No alias",
     "about": "Description",
     "photo": "Profile photo",
     "changePhoto": "Change photo",
@@ -1207,6 +1329,7 @@
       "fantasy": "Fantasy",
       "science-fiction": "Science fiction",
       "history": "History",
+      "classics": "Classics",
       "romance": "Romance",
       "children": "Children's literature",
       "essay": "Essay",
@@ -1231,6 +1354,162 @@
     "save": "Save changes",
     "saving": "Saving...",
     "saved": "Profile updated.",
-    "saveError": "The changes could not be saved."
+    "saveError": "The changes could not be saved.",
+    "dashboard": {
+      "member": "EntreLibros member",
+      "readingInterests": "Reading interests",
+      "metricsLabel": "Profile metrics",
+      "readingMetricsSoon": "Reading metrics coming soon",
+      "preferences": "Reading preferences",
+      "favoriteGenres": "Favorite genres",
+      "noInterests": "You have not selected any interests yet.",
+      "achievements": "Achievements",
+      "unlocked": "{{count}} unlocked",
+      "soon": "Coming soon",
+      "achievementsHint": "Achievements will be enabled with reading history.",
+      "readingGoal": "Reading goal",
+      "goalProgress": "of {{count}} books",
+      "goalSoon": "Reading goal coming soon",
+      "goalMissing": "You need {{count}} more books to reach your goal!",
+      "goalSourcePending": "It will connect when a persistent source is available.",
+      "streak": "{{count}}-day streak",
+      "streakSoon": "Streak coming soon",
+      "bestStreak": "Your best streak: {{count}} days",
+      "noStreak": "There is no persisted streak data."
+    }
+  },
+  "localizedUi": {
+    "navigation": { "profile": "Profile", "toggle": "Toggle navigation" },
+    "common": {
+      "view": "View {{title}}",
+      "retry": "Retry",
+      "loadingSession": "Loading session…",
+      "unknownAuthor": "Unknown author",
+      "member": "EntreLibros member",
+      "book": "Book",
+      "conversation": "Conversation",
+      "noMessages": "There are no messages yet.",
+      "locationAvailable": "Location available",
+      "mapNearby": "Nearby corners map",
+      "minutesAgo": "{{count}} min ago",
+      "hoursAgo": "{{count}} h ago",
+      "daysAgo": "{{count}} d ago",
+      "yesterday": "Yesterday",
+      "notFound": "404 — Page not found"
+    },
+    "home": {
+      "welcome": "Welcome back, {{name}}!",
+      "subtitle": "New stories, books and corners are waiting near you.",
+      "summary": "Today’s summary",
+      "exchanges": "exchanges",
+      "activeCorners": "active corners",
+      "activeReaders": "active readers",
+      "publishedBooks": "published books",
+      "recommendations": "Books you may like",
+      "recentActivity": "Recent activity",
+      "summaryUnavailable": "The summary is unavailable right now.",
+      "noBooks": "There are no books available yet.",
+      "previous": "View previous recommendations",
+      "next": "View more recommendations",
+      "refreshing": "Refreshing recommendations",
+      "noActivity": "There is no activity yet.",
+      "openActivity": "Open {{title}}",
+      "offered": "You offered “{{title}}”",
+      "completedExchange": "You completed an exchange for “{{title}}”",
+      "sharedStory": "{{name}} shared a story",
+      "publicActivity": "Recent public activity"
+    },
+    "stats": {
+      "title": "Statistics",
+      "description": "See how EntreLibros reading, exchanges and meetups are growing.",
+      "period": "Period",
+      "lastDays": "Last {{days}} days",
+      "loading": "Loading statistics…",
+      "error": "Community statistics could not be loaded.",
+      "exchanges": "Exchanges",
+      "activeCorners": "Active corners",
+      "activePeople": "Active people",
+      "publishedBooks": "Published books",
+      "recentExchanges": "Recent exchanges",
+      "trendAria": "Exchanges by period",
+      "noTrend": "There is not enough data to show a trend.",
+      "persistedMetrics": "Persisted metrics",
+      "loadingMetrics": "Loading metrics…",
+      "metricsError": "Period metrics could not be loaded.",
+      "noMetrics": "There is no data for the selected period.",
+      "activeListings": "Active listings",
+      "confirmedAgreements": "Confirmed agreements",
+      "contactsStarted": "Contacts started",
+      "topContributors": "Top contributors",
+      "activityMap": "Activity map",
+      "popularSearches": "Popular searches",
+      "noSearches": "There are no recorded searches.",
+      "queries": "Searches"
+    },
+    "contact": {
+      "hero": "How can we help?",
+      "intro": "Find quick answers or write to us. Your next read does not have to wait.",
+      "search": "Search the help center",
+      "categories": "Help categories",
+      "faq": "Frequently asked questions",
+      "viewAll": "View all",
+      "noResults": "No results found. Try different words or write to us.",
+      "moreHelp": "Need more help?",
+      "supportHours": "Our team replies Monday through Friday, from 9 AM to 6 PM.",
+      "online": "We’re online",
+      "responseTime": "Reply in about 5 min",
+      "startChat": "Start chat",
+      "writeToUs": "Write to us",
+      "inquiry": "Your inquiry",
+      "inquiryPlaceholder": "Tell us what happened…",
+      "sendInquiry": "Send inquiry",
+      "sending": "Sending…",
+      "received": "We received your inquiry"
+    },
+    "help": {
+      "account": { "title": "Account", "text": "Profile, privacy and access" },
+      "listings": { "title": "Listings", "text": "Publish and manage books" },
+      "trades": { "title": "Trades", "text": "Proposals and agreements" },
+      "messages": { "title": "Messages", "text": "Chats and notifications" },
+      "corners": { "title": "Book corners", "text": "Corners and community" },
+      "safety": { "title": "Safety", "text": "Reports and good practices" },
+      "faq": {
+        "publish": {
+          "question": "How do I publish a book?",
+          "answer": "From Explore, choose “Publish a book”, fill in the details and choose whether you want to sell or trade it."
+        },
+        "trade": {
+          "question": "How does a trade work?",
+          "answer": "Send a proposal from a book or chat. Both people must agree on the place, date and books before confirming it."
+        },
+        "corner": {
+          "question": "What is a book corner?",
+          "answer": "It is a community meeting point: cafés, libraries, parks and bookstores where you can read or trade."
+        },
+        "safety": {
+          "question": "How do I report a problem?",
+          "answer": "Use Report on the listing or write to us from this page’s support panel."
+        }
+      }
+    },
+    "presentation": {
+      "fixtureLoading": "Loading {{region}}…",
+      "fixtureEmptyTitle": "There is no content yet",
+      "fixtureEmptyText": "Updates will appear in this section when available.",
+      "fixtureErrorTitle": "This section could not be loaded",
+      "fixtureErrorText": "The rest of the screen is still available.",
+      "unavailableTitle": "This section is not available yet",
+      "unavailableText": "We are connecting this experience to real data."
+    },
+    "homeStates": {
+      "guestTitle": "Find your next story.",
+      "guestSubtitle": "Discover books near you, connect with other readers and trade the ones you have finished.",
+      "loadingSummary": "Loading summary…",
+      "loadingBooks": "Loading books…",
+      "booksError": "Books could not be loaded.",
+      "loadingActivity": "Loading activity…",
+      "activityError": "Activity could not be loaded.",
+      "live": "Live"
+    }
   }
 }

@@ -1,4 +1,5 @@
 import { fireEvent, screen } from '@testing-library/react'
+import { useTranslation } from 'react-i18next'
 import { describe, expect, test, vi } from 'vitest'
 import { useLocation } from 'react-router-dom'
 
@@ -58,9 +59,21 @@ describe('HomePage', () => {
       await screen.findByRole('button', { name: 'Ver Ecos del Viento Norte' })
     )
 
-    expect(
-      await screen.findByRole('button', { name: 'bookDetail.close' })
-    ).toBeVisible()
+    expect(await screen.findByRole('button', { name: 'Cerrar' })).toBeVisible()
     expect(await screen.findByText('bookDetail.offer.title')).toBeVisible()
+  })
+
+  test('localizes the visitor home while preserving book data', async () => {
+    await useTranslation().i18n.changeLanguage('en')
+    renderWithProviders(<HomePage />)
+
+    expect(
+      await screen.findByRole('heading', { name: 'Find your next story.' })
+    ).toBeVisible()
+    expect(screen.getByText('Books you may like')).toBeVisible()
+    expect(screen.getByText('Recent activity')).toBeVisible()
+    expect(
+      screen.getByRole('button', { name: 'View Ecos del Viento Norte' })
+    ).toBeVisible()
   })
 })

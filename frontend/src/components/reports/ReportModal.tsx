@@ -50,7 +50,11 @@ export const ReportModal = ({
             </span>
             <h2>{t('reports.report')}</h2>
           </div>
-          <button type="button" onClick={onClose} aria-label="Cerrar">
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label={t('bookDetail.close')}
+          >
             ×
           </button>
         </header>
@@ -58,7 +62,7 @@ export const ReportModal = ({
           <div className={styles.success} role="status">
             <p>{t('reports.submitted')}</p>
             <ActionButton tone="primary" onClick={onClose}>
-              {t('bookDetail.close', { defaultValue: 'Cerrar' })}
+              {t('bookDetail.close')}
             </ActionButton>
           </div>
         ) : (
@@ -86,7 +90,7 @@ export const ReportModal = ({
             ) : null}
             <div className={styles.actions}>
               <ActionButton type="button" onClick={onClose}>
-                {t('bookDetail.cancel', { defaultValue: 'Cancelar' })}
+                {t('bookDetail.cancel')}
               </ActionButton>
               <ActionButton
                 type="submit"

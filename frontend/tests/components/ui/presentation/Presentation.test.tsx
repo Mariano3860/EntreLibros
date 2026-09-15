@@ -1,9 +1,11 @@
 import { fireEvent, render, screen } from '@testing-library/react'
+import { useTranslation } from 'react-i18next'
 import { beforeEach, describe, expect, test } from 'vitest'
 
 import {
   Avatar,
   BookCover,
+  CatalogBookCard,
   FixtureState,
 } from '@src/components/ui/presentation/Presentation'
 
@@ -56,6 +58,22 @@ describe('FixtureState', () => {
 
     expect(screen.getByText('Cargando books…')).toBeVisible()
   })
+
+  test('localizes shared fixture states in English', async () => {
+    window.history.replaceState({}, '', '/?fixture=empty')
+    await useTranslation().i18n.changeLanguage('en')
+
+    render(
+      <FixtureState region="books">
+        <div>Books content</div>
+      </FixtureState>
+    )
+
+    expect(screen.getByText('There is no content yet')).toBeVisible()
+    expect(
+      screen.getByText('Updates will appear in this section when available.')
+    ).toBeVisible()
+  })
 })
 
 describe('BookCover', () => {
@@ -91,6 +109,18 @@ describe('BookCover', () => {
 
     expect(container.querySelector('img')).not.toBeInTheDocument()
     expect(screen.getByText('Una novela')).toBeInTheDocument()
+  })
+
+  test('localizes a publication state without changing its book title', async () => {
+    await useTranslation().i18n.changeLanguage('en')
+
+    render(<CatalogBookCard book={book} />)
+
+    expect(screen.getByText('Trade')).toBeVisible()
+    expect(screen.getAllByText('Una novela')).toHaveLength(2)
+    expect(
+      screen.getByRole('button', { name: 'View Una novela' })
+    ).toBeVisible()
   })
 })
 

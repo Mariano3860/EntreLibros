@@ -1,7 +1,9 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 
 const NotFound = () => {
-  return <h1>404 - Page Not Found</h1>
+  const { t } = useTranslation()
+  return <h1>{t('localizedUi.common.notFound')}</h1>
 }
 
 export default NotFound

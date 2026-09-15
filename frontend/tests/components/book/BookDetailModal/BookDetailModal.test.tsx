@@ -298,7 +298,7 @@ describe('BookDetailModal', () => {
 
     fireEvent.click(
       screen.getByRole('button', {
-        name: 'bookDetail.cancel',
+        name: 'Cancelar',
       })
     )
 
@@ -325,10 +325,10 @@ describe('BookDetailModal', () => {
     fireEvent.click(await screen.findByRole('button', { name: /reportar/i }))
 
     expect(
-      await screen.findByRole('heading', { name: 'reports.report' })
+      await screen.findByRole('heading', { name: 'Reportar' })
     ).toBeInTheDocument()
     const reportBackdrop = screen
-      .getByRole('heading', { name: 'reports.report' })
+      .getByRole('heading', { name: 'Reportar' })
       .closest('[role="presentation"]')
     expect(reportBackdrop).not.toBeNull()
   })
