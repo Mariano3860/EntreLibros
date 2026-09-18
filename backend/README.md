@@ -47,11 +47,12 @@ npm run seed:local:verify
 npm run seed:local:cleanup
 ```
 
-`seed:local` crea un recorrido reproducible con 12 perfiles humanos, 30 libros,
-40 publicaciones, 8 Rincones, historias, relaciones sociales, conversaciones,
+`seed:local` crea un recorrido reproducible con 13 perfiles humanos —incluido
+`test@entrelibros.com`—, 30 libros, 39 publicaciones, 8 Rincones, historias,
+relaciones sociales mutuas, una conversación entre cada par de perfiles,
 mensajes, borradores, acuerdos, notificaciones y eventos de analítica. Es
-idempotente: una segunda ejecución actualiza la misma namespace y no duplica
-filas. `seed:local:cleanup` elimina únicamente esa namespace; no ejecuta
+idempotente: una segunda ejecución actualiza las mismas cuentas locales y no duplica
+filas. `seed:local:cleanup` elimina únicamente esas cuentas; no ejecuta
 `TRUNCATE` y conserva los libros bibliográficos compartidos.
 
 Antes del dataset local, su wrapper prepara de forma idempotente la cuenta

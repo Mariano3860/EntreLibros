@@ -1,11 +1,20 @@
--- Remove only the namespace created by seed-local-dataset.sql.
+-- Remove only the local walkthrough accounts created by seed-local-dataset.sql.
 -- Shared bibliographic books are deliberately retained when they have no
 -- reliable provenance marker; deleting a user's book would be unsafe.
 BEGIN;
 
 CREATE TEMP TABLE seed_user_ids (id INTEGER PRIMARY KEY) ON COMMIT DROP;
 INSERT INTO seed_user_ids (id)
-SELECT id FROM users WHERE email LIKE 'seed.%@entrelibros.local';
+SELECT id FROM users
+WHERE email IN (
+  'test@entrelibros.com', 'lucia@entrelibros.com', 'martin@entrelibros.com',
+  'sofia@entrelibros.com', 'clara@entrelibros.com', 'tomas@entrelibros.com',
+  'julieta@entrelibros.com', 'pablo@entrelibros.com', 'valentina@entrelibros.com',
+  'diego@entrelibros.com', 'ana@entrelibros.com', 'nicolas@entrelibros.com',
+  'elena@entrelibros.com'
+)
+-- Legacy demo accounts are included so a reset upgrades an existing local DB.
+OR email LIKE 'seed.%@entrelibros.local';
 
 CREATE TEMP TABLE seed_conversation_ids (id BIGINT PRIMARY KEY) ON COMMIT DROP;
 INSERT INTO seed_conversation_ids (id)
@@ -23,11 +32,13 @@ WHERE agreement.conversation_id IN (SELECT id FROM seed_conversation_ids)
   AND agreement.participant_id IN (SELECT id FROM seed_user_ids);
 
 DELETE FROM analytics_events
-WHERE idempotency_key LIKE 'seed-analytics-%'
+WHERE idempotency_key LIKE 'local-demo-analytics-%'
+   OR idempotency_key LIKE 'seed-analytics-%'
    OR actor_id IN (SELECT id FROM seed_user_ids);
 
 DELETE FROM notifications
-WHERE idempotency_key LIKE 'seed-agreement-%'
+WHERE idempotency_key LIKE 'local-demo-agreement-%'
+   OR idempotency_key LIKE 'seed-agreement-%'
    OR recipient_id IN (SELECT id FROM seed_user_ids);
 
 DELETE FROM exchange_agreements

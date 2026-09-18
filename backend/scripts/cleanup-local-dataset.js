@@ -8,6 +8,21 @@ import pg from 'pg';
 const { Client } = pg;
 const scriptDirectory = path.dirname(fileURLToPath(import.meta.url));
 const cleanupSqlPath = path.join(scriptDirectory, 'cleanup-local-dataset.sql');
+const seededEmails = [
+  'test@entrelibros.com',
+  'lucia@entrelibros.com',
+  'martin@entrelibros.com',
+  'sofia@entrelibros.com',
+  'clara@entrelibros.com',
+  'tomas@entrelibros.com',
+  'julieta@entrelibros.com',
+  'pablo@entrelibros.com',
+  'valentina@entrelibros.com',
+  'diego@entrelibros.com',
+  'ana@entrelibros.com',
+  'nicolas@entrelibros.com',
+  'elena@entrelibros.com',
+];
 
 function assertSafeLocalDatabase(databaseUrl) {
   if (!databaseUrl) {
@@ -55,7 +70,8 @@ async function main() {
       );
     }
     const before = await client.query(
-      "SELECT COUNT(*)::INTEGER AS count FROM users WHERE email LIKE 'seed.%@entrelibros.local'"
+      "SELECT COUNT(*)::INTEGER AS count FROM users WHERE email = ANY($1) OR email LIKE 'seed.%@entrelibros.local'",
+      [seededEmails]
     );
     await client.query(await readFile(cleanupSqlPath, 'utf8'));
     console.log(

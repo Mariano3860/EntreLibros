@@ -10,6 +10,21 @@ import { ensureSystemAccounts } from './seed-system-data.js';
 const { Client } = pg;
 const scriptDirectory = path.dirname(fileURLToPath(import.meta.url));
 const seedSqlPath = path.join(scriptDirectory, 'seed-local-dataset.sql');
+const seededEmails = [
+  'test@entrelibros.com',
+  'lucia@entrelibros.com',
+  'martin@entrelibros.com',
+  'sofia@entrelibros.com',
+  'clara@entrelibros.com',
+  'tomas@entrelibros.com',
+  'julieta@entrelibros.com',
+  'pablo@entrelibros.com',
+  'valentina@entrelibros.com',
+  'diego@entrelibros.com',
+  'ana@entrelibros.com',
+  'nicolas@entrelibros.com',
+  'elena@entrelibros.com',
+];
 
 function assertSafeLocalDatabase(databaseUrl) {
   if (!databaseUrl) {
@@ -64,9 +79,10 @@ async function main() {
     const sql = await readFile(seedSqlPath, 'utf8');
     await client.query(sql);
 
-    const counts = await client.query(`
+    const counts = await client.query(
+      `
       SELECT
-        (SELECT COUNT(*) FROM users WHERE email LIKE 'seed.%@entrelibros.local') AS users,
+        (SELECT COUNT(*) FROM users WHERE email = ANY($1)) AS users,
         (SELECT COUNT(*) FROM books WHERE isbn IN (
           '9788437604794','9788437604947','9788499890944','9788478887194','9788491050299',
           '9788437604944','9788420633111','9788408172179','9788416517271','9788497592208',
@@ -75,11 +91,13 @@ async function main() {
           '9788483468680','9788439722341','9788418015855','9788497595728','9788439724703',
           '9788413621658','9788413140326','9788466347994','9788423360793','9788423354273'
         )) AS books,
-        (SELECT COUNT(*) FROM book_listings listing JOIN users seed_user ON seed_user.id = listing.user_id WHERE seed_user.email LIKE 'seed.%@entrelibros.local') AS listings,
+        (SELECT COUNT(*) FROM book_listings listing JOIN users seed_user ON seed_user.id = listing.user_id WHERE seed_user.email = ANY($1)) AS listings,
         (SELECT COUNT(*) FROM community_corners WHERE id IN ('4a089a74-4dfc-4531-a04c-883d3cd2233a','5a089a74-4dfc-4531-a04c-883d3cd2233a','6a089a74-4dfc-4531-a04c-883d3cd2233a','7a089a74-4dfc-4531-a04c-883d3cd2233a','8a089a74-4dfc-4531-a04c-883d3cd2233a','9a089a74-4dfc-4531-a04c-883d3cd2233a','aa089a74-4dfc-4531-a04c-883d3cd2233a','ba089a74-4dfc-4531-a04c-883d3cd2233a')) AS corners,
-        (SELECT COUNT(DISTINCT message.id) FROM messages message JOIN conversation_participants participant ON participant.conversation_id = message.conversation_id JOIN users seed_user ON seed_user.id = participant.user_id WHERE seed_user.email LIKE 'seed.%@entrelibros.local') AS messages,
-        (SELECT COUNT(*) FROM analytics_events WHERE idempotency_key LIKE 'seed-analytics-%') AS analytics
-    `);
+        (SELECT COUNT(DISTINCT message.id) FROM messages message JOIN conversation_participants participant ON participant.conversation_id = message.conversation_id JOIN users seed_user ON seed_user.id = participant.user_id WHERE seed_user.email = ANY($1)) AS messages,
+        (SELECT COUNT(*) FROM analytics_events WHERE idempotency_key LIKE 'local-demo-analytics-%') AS analytics
+    `,
+      [seededEmails]
+    );
 
     console.log(`Local dataset seeded in ${database}:`, counts.rows[0]);
   } finally {

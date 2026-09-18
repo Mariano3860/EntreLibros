@@ -13,8 +13,8 @@ npm run seed:local:verify
 npm run seed:local:cleanup
 ```
 
-The seed is idempotent and uses the reserved `seed.*@entrelibros.local`
-namespace. It never truncates the database. The cleanup removes seeded users,
+The seed is idempotent and owns the explicit local-demo accounts from
+`test@entrelibros.com` through `elena@entrelibros.com`. It never truncates the database. The cleanup removes seeded users,
 their owned listings, social records, conversations, drafts, agreements,
 notifications, analytics events and fixed seed corners. Shared bibliographic
 rows are retained when their provenance cannot be distinguished safely.
@@ -25,25 +25,26 @@ or an extra demo profile: it is intentionally retained by cleanup so existing
 bot conversations cannot be deleted accidentally.
 
 The scripts refuse test, E2E and production-like database names before opening
-a write connection. The twelve seeded accounts share the local-only password
+a write connection. The thirteen seeded accounts share the local-only password
 `Demo123!`; change or delete them before sharing a development database.
 
 ## What is persisted
 
-- 12 human profiles with aliases, interests, Spanish language, neighborhood
+- 13 human profiles with aliases, interests, Spanish language, neighborhood
   visibility and public profile-photo references.
 - 30 ISBN-keyed bibliographic books with Open Library cover references.
-- 40 public offer, sale and want listings, each with a primary image and, when
+- 39 public offer, sale and want listings, each with an Open Library cover,
+  a contextual image and, when
   applicable, a book-corner relationship.
 - 8 consented, editorially approved corners with approximate PostGIS points,
   rules, schedules, photos and metrics.
-- Follows, one block, stories, likes and comments used by discovery and privacy
+- Mutual follows, stories, likes and comments used by discovery and privacy
   queries.
-- 8 conversations and 24 messages with deterministic client keys, book
-  attachments, read positions and 8 private drafts.
+- A conversation between every pair of demo profiles (78 total), with book
+  attachments, read positions and private drafts.
 - Proposed, confirmed, completed and cancelled agreement journeys, including
   versions, items, acceptances, events, outcomes and notifications.
-- Six analytics events covering publication, contact, agreement and outcome
+- Twelve agreement journeys and six analytics events covering publication, contact, agreement and outcome
   states.
 
 ## Five real-mode walkthroughs
