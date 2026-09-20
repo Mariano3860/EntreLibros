@@ -414,6 +414,117 @@ main.layoutMain {
   text-transform: uppercase;
 }
 
+.outcomePanel {
+  width: min(460px, 78%);
+  align-self: center;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid rgb(255 139 76 / 34%);
+  border-radius: 14px;
+  background: var(--app-proposal-background);
+}
+
+.outcomeHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px 11px;
+  border-bottom: 1px solid rgb(255 139 76 / 18%);
+}
+
+.outcomeHeader p {
+  margin: 5px 0 0;
+  color: var(--app-muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.outcomeSavedMark {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  place-items: center;
+  border: 1px solid rgb(66 215 199 / 35%);
+  border-radius: 50%;
+  background: rgb(66 215 199 / 12%);
+  color: var(--app-teal);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.outcomeForm {
+  display: grid;
+  gap: 10px;
+  padding: 13px 16px 15px;
+}
+
+.outcomeField {
+  display: grid;
+  gap: 5px;
+}
+
+.outcomeField > span {
+  color: var(--app-text);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.outcomeField select,
+.outcomeField textarea {
+  width: 100%;
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  outline: 0;
+  background: var(--app-surface);
+  color: var(--app-input-text);
+  font: inherit;
+  font-size: 11px;
+}
+
+.outcomeField select {
+  height: 34px;
+  padding: 0 9px;
+  cursor: pointer;
+}
+
+.outcomeField textarea {
+  min-height: 56px;
+  padding: 8px 9px;
+  resize: vertical;
+}
+
+.outcomeField select:focus,
+.outcomeField textarea:focus {
+  border-color: var(--app-teal);
+  box-shadow: 0 0 0 3px rgb(66 215 199 / 12%);
+}
+
+.outcomeFooter {
+  display: flex;
+  min-height: 32px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.outcomeFeedback {
+  min-width: 0;
+  flex: 1;
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.outcomeSuccess {
+  color: var(--app-teal);
+}
+
+.outcomeError {
+  color: var(--app-orange);
+}
+
 .proposal > div:nth-child(2) {
   display: grid;
   grid-template-columns: 72px 1fr;

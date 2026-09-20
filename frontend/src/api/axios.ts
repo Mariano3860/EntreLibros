@@ -12,5 +12,8 @@ export const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
     'X-Requested-With': 'XMLHttpRequest',
+    // API responses depend on the authenticated session. Always revalidate
+    // them so a browser cannot reuse another local demo account's data.
+    'Cache-Control': 'no-cache',
   },
 })

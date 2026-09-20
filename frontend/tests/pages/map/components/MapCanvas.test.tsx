@@ -276,7 +276,7 @@ describe('MapCanvas', () => {
     )
   })
 
-  test('shows activity markers, loading overlay and empty state', () => {
+  test('keeps activity in the panel instead of stacking extra map markers', () => {
     const { rerender } = renderWithProviders(
       <MapCanvas
         bbox={bbox}
@@ -293,11 +293,7 @@ describe('MapCanvas', () => {
     )
 
     expect(screen.getByText('map.status.loading')).toBeInTheDocument()
-    expect(screen.getAllByTestId('marker')).toHaveLength(activity.length)
-    expect(screen.getByTestId('marker')).toHaveAttribute(
-      'data-marker-icon',
-      expect.stringContaining('activityPin')
-    )
+    expect(screen.queryByTestId('marker')).not.toBeInTheDocument()
 
     rerender(
       <MapCanvas
@@ -399,6 +395,80 @@ describe('MapCanvas', () => {
     expect(
       screen.getByRole('button', { name: 'Tu ubicación aproximada' })
     ).toBeInTheDocument()
+  })
+
+  test('does not recenter when a refetch recreates the same location', () => {
+    const { rerender } = renderWithProviders(
+      <MapCanvas
+        bbox={bbox}
+        corners={[]}
+        publications={[]}
+        activity={[]}
+        layers={{ corners: true, publications: true, activity: true }}
+        selectedPin={null}
+        onSelectPin={vi.fn()}
+        isLoading={false}
+        isFetching={false}
+        isEmpty={false}
+        userLocation={{ latitude: -34.6, longitude: -58.4 }}
+      />
+    )
+
+    rerender(
+      <MapCanvas
+        bbox={bbox}
+        corners={[]}
+        publications={[]}
+        activity={[]}
+        layers={{ corners: true, publications: true, activity: true }}
+        selectedPin={null}
+        onSelectPin={vi.fn()}
+        isLoading={false}
+        isFetching={false}
+        isEmpty={false}
+        userLocation={{ latitude: -34.6, longitude: -58.4 }}
+      />
+    )
+
+    expect(setViewMock).toHaveBeenCalledTimes(1)
+  })
+
+  test('recenters on an explicit location request even when coordinates match', () => {
+    const { rerender } = renderWithProviders(
+      <MapCanvas
+        bbox={bbox}
+        corners={[]}
+        publications={[]}
+        activity={[]}
+        layers={{ corners: true, publications: true, activity: true }}
+        selectedPin={null}
+        onSelectPin={vi.fn()}
+        isLoading={false}
+        isFetching={false}
+        isEmpty={false}
+        userLocation={{ latitude: -34.6, longitude: -58.4 }}
+        locationFocusRequest={0}
+      />
+    )
+
+    rerender(
+      <MapCanvas
+        bbox={bbox}
+        corners={[]}
+        publications={[]}
+        activity={[]}
+        layers={{ corners: true, publications: true, activity: true }}
+        selectedPin={null}
+        onSelectPin={vi.fn()}
+        isLoading={false}
+        isFetching={false}
+        isEmpty={false}
+        userLocation={{ latitude: -34.6, longitude: -58.4 }}
+        locationFocusRequest={1}
+      />
+    )
+
+    expect(setViewMock).toHaveBeenCalledTimes(2)
   })
 
   test('renders the geographic radius around the approximate location', () => {

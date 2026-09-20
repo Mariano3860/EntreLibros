@@ -695,10 +695,15 @@
       "outcome": {
         "title": "Meeting outcome",
         "description": "Record the result for this conversation only.",
+        "choiceLabel": "Outcome",
         "completed": "Completed",
         "notCompleted": "Not completed",
+        "noteLabel": "Note",
         "notePlaceholder": "Optional note",
-        "saved": "Save outcome"
+        "save": "Save outcome",
+        "saving": "Saving…",
+        "saved": "Your outcome was saved.",
+        "error": "We couldn't save the outcome. Try again."
       },
       "bubbles": {
         "book": "Attached book",

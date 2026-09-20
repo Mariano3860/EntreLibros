@@ -48,6 +48,13 @@ app.use(
     ':method :url :status :res[content-length] - :response-time ms request=:req[x-request-id]'
   )
 );
+app.use('/api', (_req, res, next) => {
+  // Every API response can reflect the active session. Do not let a shared
+  // browser cache return one reader's conversations or profile to another.
+  res.setHeader('Cache-Control', 'private, no-store, max-age=0');
+  res.vary('Cookie');
+  next();
+});
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 

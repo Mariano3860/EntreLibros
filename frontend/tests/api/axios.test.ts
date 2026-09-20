@@ -18,5 +18,6 @@ describe('axios configuration', () => {
     expect(apiClient.defaults.headers['X-Requested-With']).toBe(
       'XMLHttpRequest'
     )
+    expect(apiClient.defaults.headers['Cache-Control']).toBe('no-cache')
   })
 })
