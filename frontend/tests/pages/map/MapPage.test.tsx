@@ -20,6 +20,7 @@ vi.mock('@components/map/MapCanvas/MapCanvas', () => ({
     selectedPin,
     userLocation,
     focusRequest,
+    locationFocusRequest,
     radiusKm,
     onSelectPin,
     bbox,
@@ -29,6 +30,7 @@ vi.mock('@components/map/MapCanvas/MapCanvas', () => ({
     selectedPin: MapPin | null
     userLocation?: { latitude: number; longitude: number } | null
     focusRequest: number
+    locationFocusRequest: number
     radiusKm?: number | null
     onSelectPin: (pin: MapPin) => void
     bbox: MapBoundingBox
@@ -40,6 +42,7 @@ vi.mock('@components/map/MapCanvas/MapCanvas', () => ({
       selectedPin,
       userLocation,
       focusRequest,
+      locationFocusRequest,
       radiusKm,
     })
     return (
@@ -163,7 +166,7 @@ describe('MapPage', () => {
     ).toBeVisible()
   })
 
-  test('keeps the map focus request stable after locating the user', async () => {
+  test('recenters on an explicit location request without changing corner focus', async () => {
     const original = Object.getOwnPropertyDescriptor(navigator, 'geolocation')
     const getCurrentPosition = vi.fn((success) =>
       success({ coords: { latitude: -34.58, longitude: -58.42 } })
@@ -178,12 +181,17 @@ describe('MapPage', () => {
       renderWithProviders(<MapPage />)
       const focusRequestBeforeLocate = mapCanvasRender.mock.calls.at(-1)?.[0]
         .focusRequest as number
+      const locationFocusBeforeLocate = mapCanvasRender.mock.calls.at(-1)?.[0]
+        .locationFocusRequest as number
 
       fireEvent.click(locationButton())
       await waitFor(() => expect(getCurrentPosition).toHaveBeenCalledTimes(1))
 
       expect(mapCanvasRender.mock.calls.at(-1)?.[0].focusRequest).toBe(
         focusRequestBeforeLocate
+      )
+      expect(mapCanvasRender.mock.calls.at(-1)?.[0].locationFocusRequest).toBe(
+        locationFocusBeforeLocate + 1
       )
     } finally {
       if (original) Object.defineProperty(navigator, 'geolocation', original)

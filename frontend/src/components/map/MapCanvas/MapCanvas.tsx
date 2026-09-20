@@ -36,12 +36,11 @@ const userLocationIcon = divIcon({
   </span>`,
 })
 
-type MapPinKind = 'corner' | 'publication' | 'activity'
+type MapPinKind = 'corner' | 'publication'
 
 const pinClassNames: Record<MapPinKind, string> = {
   corner: styles.cornerPin,
   publication: styles.publicationPin,
-  activity: styles.activityPin,
 }
 
 const createMapPinIcon = (kind: MapPinKind, selected = false) => {
@@ -78,6 +77,7 @@ type MapCanvasProps = {
   layers: MapLayerToggles
   selectedPin: MapPin | null
   focusRequest?: number
+  locationFocusRequest?: number
   onSelectPin: (pin: MapPin) => void
   isLoading: boolean
   isFetching: boolean
@@ -160,13 +160,33 @@ const BoundsController = ({
 
 const LocationController = ({
   userLocation,
+  focusRequest,
 }: {
   userLocation: { latitude: number; longitude: number } | null
+  focusRequest: number
 }) => {
   const map = useMap()
+  const lastCenteredLocationRef = useRef<{
+    latitude: number
+    longitude: number
+  } | null>(null)
+  const lastFocusRequestRef = useRef(0)
 
   useEffect(() => {
     if (!userLocation) return
+    const lastCenteredLocation = lastCenteredLocationRef.current
+    const coordinatesChanged =
+      lastCenteredLocation === null ||
+      lastCenteredLocation.latitude !== userLocation.latitude ||
+      lastCenteredLocation.longitude !== userLocation.longitude
+    const hasExplicitFocusRequest = focusRequest > lastFocusRequestRef.current
+
+    // Query refetches can recreate the location object without a new position.
+    // Re-centering in that case would override an in-progress user pan.
+    // An explicit "my location" action must still center the map when the
+    // device position is the same as the saved profile location.
+    if (!coordinatesChanged && !hasExplicitFocusRequest) return
+
     map.setView(
       [userLocation.latitude, userLocation.longitude],
       map.getZoom(),
@@ -174,7 +194,9 @@ const LocationController = ({
         animate: false,
       }
     )
-  }, [map, userLocation])
+    lastCenteredLocationRef.current = userLocation
+    lastFocusRequestRef.current = focusRequest
+  }, [focusRequest, map, userLocation])
 
   return null
 }
@@ -285,10 +307,10 @@ export const MapCanvas = ({
   bbox,
   corners,
   publications,
-  activity,
   layers,
   selectedPin,
   focusRequest = 0,
+  locationFocusRequest = 0,
   onSelectPin,
   isLoading,
   isFetching,
@@ -396,17 +418,6 @@ export const MapCanvas = ({
     t,
   ])
 
-  const activityMarkers = useMemo(() => {
-    if (!layers.activity) return []
-    return activity.map((point) => (
-      <Marker
-        key={point.id}
-        position={[point.lat, point.lon]}
-        icon={createMapPinIcon('activity', point.intensity >= 3)}
-      />
-    ))
-  }, [activity, layers.activity])
-
   return (
     <div
       className={`${styles.canvas} ${className}`}
@@ -422,7 +433,10 @@ export const MapCanvas = ({
         scrollWheelZoom
       >
         <BoundsController bbox={bbox} onViewportChange={onViewportChange} />
-        <LocationController userLocation={userLocation} />
+        <LocationController
+          userLocation={userLocation}
+          focusRequest={locationFocusRequest}
+        />
         <SelectedPinController
           selectedPin={selectedPin}
           focusRequest={focusRequest}
@@ -468,7 +482,6 @@ export const MapCanvas = ({
             </Marker>
           </>
         ) : null}
-        {activityMarkers}
         {cornerPins}
         {publicationPins}
       </MapContainer>

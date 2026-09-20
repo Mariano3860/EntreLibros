@@ -128,6 +128,7 @@ export const MapPage = () => {
   const [cornerDetailsOpen, setCornerDetailsOpen] = useState(false)
   const [cornerReportOpen, setCornerReportOpen] = useState(false)
   const [focusRequest, setFocusRequest] = useState(0)
+  const [locationFocusRequest, setLocationFocusRequest] = useState(0)
   const [createOpen, setCreateOpen] = useState(false)
   const [panelOpen, setPanelOpen] = useState(true)
   const [selectionDismissed, setSelectionDismissed] = useState(false)
@@ -422,6 +423,7 @@ export const MapPage = () => {
           longitude: position.coords.longitude,
         })
         setLocationDenied(false)
+        setLocationFocusRequest((current) => current + 1)
       },
       () => setLocationDenied(true),
       { enableHighAccuracy: false, timeout: 5000, maximumAge: 300000 }
@@ -600,6 +602,7 @@ export const MapPage = () => {
             layers={mapLayers}
             selectedPin={selectedPin}
             focusRequest={focusRequest}
+            locationFocusRequest={locationFocusRequest}
             onSelectPin={handleSelectPin}
             isLoading={!mockMode && mapQuery.isLoading}
             isFetching={!mockMode && mapQuery.isFetching}

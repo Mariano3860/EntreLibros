@@ -227,11 +227,13 @@ const AgreementOutcomePanel = ({
   agreement,
   userId,
   pending,
+  saveState,
   onSave,
 }: {
   agreement: AgreementSnapshot
   userId: number
   pending: boolean
+  saveState: 'idle' | 'success' | 'error'
   onSave: (outcome: AgreementOutcome['outcome'], reason: string) => void
 }) => {
   const { t } = useTranslation()
@@ -241,56 +243,113 @@ const AgreementOutcomePanel = ({
   )
   const [reason, setReason] = useState(ownOutcome?.reason ?? '')
 
+  useEffect(() => {
+    setOutcome(ownOutcome?.outcome ?? 'completed')
+    setReason(ownOutcome?.reason ?? '')
+  }, [ownOutcome?.outcome, ownOutcome?.reason])
+
   return (
-    <Panel className={styles.proposal} as="article">
-      <span className={styles.proposalLabel}>
-        {t('community.messages.outcome.title', {
-          defaultValue: 'Resultado del encuentro',
-        })}
-      </span>
-      <p>
-        {t('community.messages.outcome.description', {
-          defaultValue: 'Registrá el resultado solo para esta conversación.',
-        })}
-      </p>
-      <select
-        value={outcome}
-        onChange={(event) =>
-          setOutcome(event.target.value as AgreementOutcome['outcome'])
-        }
-        aria-label={t('community.messages.outcome.title', {
-          defaultValue: 'Resultado del encuentro',
-        })}
+    <Panel className={styles.outcomePanel} as="article">
+      <header className={styles.outcomeHeader}>
+        <div>
+          <span className={styles.proposalLabel}>
+            {t('community.messages.outcome.title', {
+              defaultValue: 'Resultado del encuentro',
+            })}
+          </span>
+          <p>
+            {t('community.messages.outcome.description', {
+              defaultValue:
+                'Registrá el resultado solo para esta conversación.',
+            })}
+          </p>
+        </div>
+        {ownOutcome ? (
+          <span className={styles.outcomeSavedMark} aria-hidden="true">
+            ✓
+          </span>
+        ) : null}
+      </header>
+      <form
+        className={styles.outcomeForm}
+        onSubmit={(event) => {
+          event.preventDefault()
+          onSave(outcome, reason)
+        }}
       >
-        <option value="completed">
-          {t('community.messages.outcome.completed', {
-            defaultValue: 'Se completó',
-          })}
-        </option>
-        <option value="not_completed">
-          {t('community.messages.outcome.notCompleted', {
-            defaultValue: 'No se completó',
-          })}
-        </option>
-      </select>
-      <textarea
-        value={reason}
-        onChange={(event) => setReason(event.target.value)}
-        placeholder={t('community.messages.outcome.notePlaceholder', {
-          defaultValue: 'Nota opcional',
-        })}
-        rows={2}
-      />
-      <ActionButton
-        size="small"
-        tone="primary"
-        onClick={() => onSave(outcome, reason)}
-        disabled={pending}
-      >
-        {t('community.messages.outcome.saved', {
-          defaultValue: 'Guardar resultado',
-        })}
-      </ActionButton>
+        <label className={styles.outcomeField}>
+          <span>
+            {t('community.messages.outcome.choiceLabel', {
+              defaultValue: 'Resultado',
+            })}
+          </span>
+          <select
+            value={outcome}
+            onChange={(event) =>
+              setOutcome(event.target.value as AgreementOutcome['outcome'])
+            }
+          >
+            <option value="completed">
+              {t('community.messages.outcome.completed', {
+                defaultValue: 'Se completó',
+              })}
+            </option>
+            <option value="not_completed">
+              {t('community.messages.outcome.notCompleted', {
+                defaultValue: 'No se completó',
+              })}
+            </option>
+          </select>
+        </label>
+        <label className={styles.outcomeField}>
+          <span>
+            {t('community.messages.outcome.noteLabel', {
+              defaultValue: 'Nota',
+            })}
+          </span>
+          <textarea
+            value={reason}
+            onChange={(event) => setReason(event.target.value)}
+            placeholder={t('community.messages.outcome.notePlaceholder', {
+              defaultValue: 'Nota opcional',
+            })}
+            rows={2}
+          />
+        </label>
+        <div className={styles.outcomeFooter}>
+          <div aria-live="polite" className={styles.outcomeFeedback}>
+            {saveState === 'success' ? (
+              <span className={styles.outcomeSuccess}>
+                {t('community.messages.outcome.saved', {
+                  defaultValue: 'Tu resultado quedó guardado.',
+                })}
+              </span>
+            ) : null}
+            {saveState === 'error' ? (
+              <span className={styles.outcomeError} role="alert">
+                {t('community.messages.outcome.error', {
+                  defaultValue:
+                    'No pudimos guardar el resultado. Intentá nuevamente.',
+                })}
+              </span>
+            ) : null}
+          </div>
+          <ActionButton
+            size="small"
+            tone="primary"
+            type="submit"
+            disabled={pending}
+          >
+            {pending
+              ? t('community.messages.outcome.saving', {
+                  defaultValue: 'Guardando…',
+                })
+              : t('community.messages.outcome.save', {
+                  defaultValue: 'Guardar resultado',
+                })}
+          </ActionButton>
+        </div>
+      </form>
     </Panel>
   )
 }
@@ -1206,6 +1265,9 @@ const RealMessagesPage = () => {
   )
   const [sendError, setSendError] = useState<string | null>(null)
   const [attachError, setAttachError] = useState<string | null>(null)
+  const [outcomeSaveState, setOutcomeSaveState] = useState<
+    'idle' | 'success' | 'error'
+  >('idle')
   const messageInputRef = useRef<HTMLInputElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const modalRef = useRef<HTMLDivElement>(null)
@@ -1248,6 +1310,9 @@ const RealMessagesPage = () => {
     enabled:
       activeConversation?.agreementId !== null && activeConversation !== null,
   })
+  useEffect(() => {
+    setOutcomeSaveState('idle')
+  }, [activeConversation?.agreementId])
   const activeAgreement = agreementQuery.data
   const isCounterProposal =
     activeAgreement?.state === 'proposed' ||
@@ -1315,6 +1380,7 @@ const RealMessagesPage = () => {
         ...(reason.trim() ? { reason: reason.trim() } : {}),
       }),
     onSuccess: async (agreement) => {
+      setOutcomeSaveState('success')
       queryClient.setQueryData(['agreements', agreement.id], agreement)
       await Promise.all([
         queryClient.invalidateQueries({
@@ -1324,6 +1390,9 @@ const RealMessagesPage = () => {
           queryKey: messageQueryKeys.conversations(),
         }),
       ])
+    },
+    onError: () => {
+      setOutcomeSaveState('error')
     },
   })
   const cancelAgreement = () =>
@@ -2265,13 +2334,15 @@ const RealMessagesPage = () => {
                     agreement={agreementQuery.data}
                     userId={user.id}
                     pending={outcomeMutation.isPending}
-                    onSave={(outcome, reason) =>
+                    saveState={outcomeSaveState}
+                    onSave={(outcome, reason) => {
+                      setOutcomeSaveState('idle')
                       outcomeMutation.mutate({
                         agreementId: agreementQuery.data?.id ?? 0,
                         outcome,
                         reason,
                       })
-                    }
+                    }}
                   />
                 ) : null}
                 <form className={styles.composer} onSubmit={submit}>

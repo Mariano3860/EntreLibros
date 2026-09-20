@@ -19,6 +19,7 @@ const { mocks, messageQueryKeys } = vi.hoisted(() => ({
     counterProposeAgreement: vi.fn(),
     createAgreement: vi.fn(),
     commandAgreement: vi.fn(),
+    recordAgreementOutcome: vi.fn(),
     markMessagesRead: vi.fn(),
     joinConversation: vi.fn(),
   },
@@ -74,12 +75,14 @@ vi.mock('@src/api/agreements/agreements', () => ({
   counterProposeAgreement: mocks.counterProposeAgreement,
   createAgreement: mocks.createAgreement,
   commandAgreement: mocks.commandAgreement,
+  recordAgreementOutcome: mocks.recordAgreementOutcome,
 }))
 vi.mock('@api/agreements/agreements', () => ({
   fetchAgreement: mocks.fetchAgreement,
   counterProposeAgreement: mocks.counterProposeAgreement,
   createAgreement: mocks.createAgreement,
   commandAgreement: mocks.commandAgreement,
+  recordAgreementOutcome: mocks.recordAgreementOutcome,
 }))
 vi.mock('@src/hooks/socket/useChatSocket', () => ({
   useChatSocket: () => ({
@@ -129,6 +132,7 @@ describe('MessagesPage in real API mode', () => {
     mocks.counterProposeAgreement.mockReset()
     mocks.createAgreement.mockReset()
     mocks.commandAgreement.mockReset()
+    mocks.recordAgreementOutcome.mockReset()
     mocks.markMessagesRead.mockReset()
     mocks.joinConversation.mockReset()
     mocks.fetchAgreement.mockResolvedValue(null)
@@ -1099,5 +1103,101 @@ describe('MessagesPage in real API mode', () => {
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     expect(mocks.deleteConversation).not.toHaveBeenCalled()
+  })
+
+  test('saves a meeting outcome and confirms that it was recorded', async () => {
+    const agreement = {
+      id: 37,
+      conversationId: conversation.id,
+      proposerId: 7,
+      participantId: 8,
+      state: 'confirmed' as const,
+      currentVersion: 2,
+      details: {
+        meetingPoint: 'Biblioteca popular',
+        area: 'Centro',
+        date: '2026-09-26',
+        time: '18:30',
+        bookTitle: book.title,
+      },
+      acceptances: [7, 8],
+      listingIds: [1],
+      outcomes: [],
+    }
+    const savedAgreement = {
+      ...agreement,
+      outcomes: [
+        {
+          userId: 7,
+          outcome: 'completed' as const,
+          reason: 'Intercambio realizado en la biblioteca.',
+          recordedAt: '2026-09-26T18:40:00.000Z',
+        },
+      ],
+    }
+    mocks.fetchConversations.mockResolvedValue([
+      { ...conversation, agreementId: agreement.id },
+    ])
+    mocks.fetchMessageHistory.mockResolvedValue({ messages: [], nextAfter: 0 })
+    mocks.fetchAgreement.mockResolvedValue(agreement)
+    mocks.recordAgreementOutcome.mockResolvedValue(savedAgreement)
+
+    renderWithProviders(<MessagesPage />)
+
+    fireEvent.change(await screen.findByLabelText('Resultado'), {
+      target: { value: 'completed' },
+    })
+    fireEvent.change(screen.getByLabelText('Nota'), {
+      target: { value: 'Intercambio realizado en la biblioteca.' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar resultado' }))
+
+    await waitFor(() =>
+      expect(mocks.recordAgreementOutcome).toHaveBeenCalledWith({
+        agreementId: agreement.id,
+        outcome: 'completed',
+        reason: 'Intercambio realizado en la biblioteca.',
+      })
+    )
+    expect(
+      await screen.findByText(/resultado.*guardado|outcome.*saved/i)
+    ).toBeVisible()
+  })
+
+  test('shows a clear error when saving a meeting outcome fails', async () => {
+    const agreement = {
+      id: 38,
+      conversationId: conversation.id,
+      proposerId: 7,
+      participantId: 8,
+      state: 'confirmed' as const,
+      currentVersion: 2,
+      details: {
+        meetingPoint: 'Biblioteca popular',
+        area: 'Centro',
+        date: '2026-09-26',
+        time: '18:30',
+        bookTitle: book.title,
+      },
+      acceptances: [7, 8],
+      listingIds: [1],
+      outcomes: [],
+    }
+    mocks.fetchConversations.mockResolvedValue([
+      { ...conversation, agreementId: agreement.id },
+    ])
+    mocks.fetchMessageHistory.mockResolvedValue({ messages: [], nextAfter: 0 })
+    mocks.fetchAgreement.mockResolvedValue(agreement)
+    mocks.recordAgreementOutcome.mockRejectedValue(new Error('offline'))
+
+    renderWithProviders(<MessagesPage />)
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Guardar resultado' })
+    )
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      /No pudimos guardar el resultado|couldn't save the outcome/i
+    )
   })
 })

@@ -143,8 +143,7 @@
   --pin-color: var(--app-teal);
 }
 
-.publicationPin,
-.activityPin {
+.publicationPin {
   --pin-color: var(--app-orange);
 }
 
@@ -231,6 +230,7 @@
   inset: 0;
   display: grid;
   place-items: center;
+  pointer-events: none;
   background: color-mix(in srgb, var(--background-card) 70%, transparent 30%);
   font-weight: $font-weight-medium;
 }

@@ -695,10 +695,15 @@
       "outcome": {
         "title": "Resultado del encuentro",
         "description": "Registrá el resultado solo para esta conversación.",
+        "choiceLabel": "Resultado",
         "completed": "Se completó",
         "notCompleted": "No se completó",
+        "noteLabel": "Nota",
         "notePlaceholder": "Nota opcional",
-        "saved": "Guardar resultado"
+        "save": "Guardar resultado",
+        "saving": "Guardando…",
+        "saved": "Tu resultado quedó guardado.",
+        "error": "No pudimos guardar el resultado. Intentá nuevamente."
       },
       "bubbles": {
         "book": "Libro adjunto",
