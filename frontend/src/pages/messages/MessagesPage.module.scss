@@ -560,14 +560,14 @@ main.layoutMain {
 
 .proposalBooks {
   display: grid !important;
-  grid-template-columns: 1fr 1fr !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   gap: 8px !important;
   margin-top: 10px;
 }
 
 .proposalBook {
   display: grid;
-  grid-template-columns: 42px 1fr;
+  grid-template-columns: 42px minmax(0, 1fr);
   align-items: center;
   gap: 7px;
   min-width: 0;
@@ -578,20 +578,31 @@ main.layoutMain {
 }
 
 .proposalBook > div {
-  min-height: 58px;
+  height: 64px;
+  min-height: 64px;
+  padding: 0;
+  overflow: hidden;
   border-radius: 5px;
+}
+
+.proposalBook > div > span,
+.proposalBook > div > strong,
+.proposalBook > div > small {
+  display: none;
+}
+
+.proposalBook > span {
+  min-width: 0;
 }
 
 .proposalBook strong,
 .proposalBook small {
   display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .proposalBook strong {
   font-size: 10px;
+  overflow-wrap: anywhere;
 }
 
 .proposalBook small {
