@@ -20,6 +20,10 @@ El runner la rechaza antes de aplicar DDL; conserva esa base y su `DATABASE_URL`
 como rollback, y crea otra base aprobada para el baseline. Después del baseline,
 cualquier cambio vuelve a ser una migración numerada nueva y append-only.
 
+`005_allow_successive_conversation_agreements.sql` sustituye la unicidad global
+de acuerdos por conversación por un índice único parcial para acuerdos activos.
+Conserva los acuerdos cerrados y permite iniciar otro en la misma conversación.
+
 El bot operativo se crea con el bootstrap de system data y el recorrido de
 defensa con `seed:local`; ninguno pertenece a las migraciones. Para comparar un
 build histórico limpio y una base baseline, usa `npm run schema:compare -w

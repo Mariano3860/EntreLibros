@@ -86,6 +86,7 @@ describe('migration baseline target guard', () => {
       '002_defaults_and_constraints.sql',
       '003_indexes.sql',
       '004_foreign_keys.sql',
+      '005_allow_successive_conversation_agreements.sql',
     ]);
   });
 

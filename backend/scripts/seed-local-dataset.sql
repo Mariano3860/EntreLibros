@@ -134,9 +134,16 @@ DECLARE item RECORD; v_agreement_id BIGINT; v_version INTEGER; v_proposer_listin
 BEGIN
   FOR item IN SELECT conversation.id, conversation.user_a, conversation.user_b, conversation.key, ROW_NUMBER() OVER (ORDER BY conversation.key) AS position FROM seed_conversations conversation ORDER BY conversation.key LIMIT 12
   LOOP
-    v_state := CASE MOD(item.position, 5) WHEN 1 THEN 'proposed' WHEN 2 THEN 'partially_confirmed' WHEN 3 THEN 'confirmed' WHEN 4 THEN 'completed' ELSE 'cancelled' END;
     SELECT id INTO v_proposer_listing FROM seed_listings WHERE user_id = item.user_a ORDER BY id LIMIT 1; SELECT id INTO v_participant_listing FROM seed_listings WHERE user_id = item.user_b ORDER BY id LIMIT 1;
-    INSERT INTO exchange_agreements (conversation_id, proposer_id, participant_id, state, current_version) VALUES (item.id, item.user_a, item.user_b, v_state, 1) ON CONFLICT (conversation_id) DO UPDATE SET state = EXCLUDED.state, updated_at = NOW() RETURNING id, current_version INTO v_agreement_id, v_version;
+    -- Keep the latest agreement and its current state on repeated local seeds.
+    SELECT id, current_version, state INTO v_agreement_id, v_version, v_state
+    FROM exchange_agreements WHERE conversation_id = item.id ORDER BY id DESC LIMIT 1;
+    IF NOT FOUND THEN
+      v_state := CASE MOD(item.position, 5) WHEN 1 THEN 'proposed' WHEN 2 THEN 'partially_confirmed' WHEN 3 THEN 'confirmed' WHEN 4 THEN 'completed' ELSE 'cancelled' END;
+      INSERT INTO exchange_agreements (conversation_id, proposer_id, participant_id, state, current_version)
+      VALUES (item.id, item.user_a, item.user_b, v_state, 1)
+      RETURNING id, current_version INTO v_agreement_id, v_version;
+    END IF;
     INSERT INTO exchange_agreement_versions (agreement_id, version, actor_id, state, details) VALUES (v_agreement_id, v_version, item.user_a, v_state, jsonb_build_object('meetingPoint','Rincón de Lectura Chacarita','area','Buenos Aires','date','2026-09-26','time','18:30','note','Encuentro acordado desde la conversación local')) ON CONFLICT (agreement_id, version) DO NOTHING;
     INSERT INTO exchange_agreement_items (agreement_id, version, listing_id, owner_id) VALUES (v_agreement_id, v_version, v_proposer_listing, item.user_a), (v_agreement_id, v_version, v_participant_listing, item.user_b) ON CONFLICT DO NOTHING;
     INSERT INTO exchange_agreement_acceptances (agreement_id, version, user_id) SELECT v_agreement_id, v_version, item.user_a WHERE v_state IN ('partially_confirmed','confirmed','completed') ON CONFLICT DO NOTHING;

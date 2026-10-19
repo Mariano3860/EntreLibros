@@ -24,6 +24,9 @@ Espera a que PostgreSQL esté listo antes de ejecutar las migraciones. La
 configuración de ejemplo conecta con la base local `entrelibros` que inicia
 Docker Compose. Para otro entorno, ajusta `DATABASE_URL` en `backend/.env`.
 
+Si actualizas una instalación existente, ejecuta `npm run migrate` antes de
+reiniciar la aplicación para aplicar las nuevas migraciones.
+
 La aplicación queda disponible en:
 
 - Web: <http://localhost:3000>
