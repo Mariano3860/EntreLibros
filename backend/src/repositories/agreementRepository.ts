@@ -318,9 +318,15 @@ export async function createAgreementWithClient(
   const agreementResult = await client.query<{ id: number }>(
     `INSERT INTO exchange_agreements
      (conversation_id, proposer_id, participant_id)
-     VALUES ($1, $2, $3) RETURNING id`,
+     VALUES ($1, $2, $3)
+     ON CONFLICT (conversation_id)
+       WHERE state IN ('proposed', 'partially_confirmed', 'confirmed')
+     DO NOTHING RETURNING id`,
     [input.conversationId, input.proposerId, input.participantId]
   );
+  if (!agreementResult.rows[0]) {
+    throw new Error('agreements.errors.conflict');
+  }
   const id = agreementResult.rows[0].id;
   await client.query(
     `INSERT INTO exchange_agreement_versions

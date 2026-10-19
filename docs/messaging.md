@@ -18,6 +18,12 @@ exponer ticks en mensajes entrantes, drafts ni texto todavía no enviado.
 Un draft tiene revisión y es privado: no pertenece al historial, no incrementa
 unread ni crea notificaciones hasta enviarse. `clientKey` evita duplicados.
 Los acuerdos son versionados; aceptar una versión antigua no confirma la actual.
+Una conversación puede conservar varios acuerdos cerrados y tener como máximo
+uno activo (`proposed`, `partially_confirmed` o `confirmed`). Tras cancelar,
+rechazar o completar un acuerdo se puede enviar otra propuesta como un acuerdo
+nuevo, conservando los mensajes y versiones anteriores. El resumen de la
+conversación apunta al acuerdo más reciente. Un envío que compite con otro
+acuerdo activo devuelve conflicto y conserva el borrador.
 El bot, si participa, usa la misma operación canónica de persistencia.
 
 Puntos de lectura: `MessagesPage.tsx`, `useMessageDraft.ts`,

@@ -13,6 +13,11 @@
 
 ## Exercises
 
+Seguimiento de acuerdos sucesivos: la migración `005` permite nuevas propuestas
+después de cerrar un acuerdo. El resumen selecciona el más reciente; las pruebas
+de `messageDraftRepository` cubren estados cerrados, conflictos activos,
+conservación del historial y participantes sin duplicar.
+
 - **Password mínima a 10:** empieza en `RegisterForm` y `routes/auth.ts`; revisa
   validación, i18n, auth API y E2E.
 - **Nuevo estado de libro:** empieza en tipos de publicación, modal y books

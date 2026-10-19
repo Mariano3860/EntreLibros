@@ -166,7 +166,11 @@ const CONVERSATION_SELECT = `
   FROM conversations c
   JOIN conversation_participants cp ON cp.conversation_id = c.id
   JOIN users participant_user ON participant_user.id = cp.user_id
-  LEFT JOIN exchange_agreements a ON a.conversation_id = c.id
+  LEFT JOIN LATERAL (
+    SELECT id FROM exchange_agreements
+    WHERE conversation_id = c.id
+    ORDER BY id DESC LIMIT 1
+  ) a ON TRUE
 `;
 
 const BOT_EMAIL = 'bot@entrelibros.local';

@@ -60,6 +60,131 @@ function bookReference(id: number, title: string) {
 }
 
 describe('messageDraftRepository', () => {
+  test.each(['cancelled', 'rejected', 'completed'])(
+    'sends a new agreement after a %s agreement without losing history or duplicating participants',
+    async (state) => {
+      const authorId = await createUser(`successive-author-${state}`);
+      const participantId = await createUser(`successive-participant-${state}`);
+      const conversation = await createConversation([authorId, participantId]);
+      const listingId = await createListing(
+        authorId,
+        'Libro del nuevo acuerdo'
+      );
+      const attachmentMetadata = {
+        key: `agreement-proposal:${listingId}`,
+        contentType: 'application/x-entrelibros-agreement-proposal',
+        size: 1,
+        kind: 'agreementProposal' as const,
+        listingIds: [listingId],
+        details: {
+          meetingPoint: 'Biblioteca',
+          area: 'Centro',
+          date: '2026-10-19',
+          time: '22:32',
+          bookTitle: 'Libro del nuevo acuerdo',
+        },
+      };
+      await upsertMessageDraft({
+        conversationId: conversation.id,
+        authorId,
+        body: '',
+        attachmentMetadata,
+      });
+      const first = await sendMessageDraft({
+        conversationId: conversation.id,
+        authorId,
+        clientKey: 'previous-agreement',
+      });
+      await client.query(
+        'UPDATE exchange_agreements SET state = $2 WHERE id = $1',
+        [first.agreementId, state]
+      );
+      const draft = await upsertMessageDraft({
+        conversationId: conversation.id,
+        authorId,
+        body: 'Hola',
+        attachmentMetadata,
+      });
+      const next = await sendMessageDraft({
+        conversationId: conversation.id,
+        authorId,
+        clientKey: 'next-agreement',
+        revision: draft.revision,
+      });
+      expect(next.agreementId).not.toBe(first.agreementId);
+      expect(next.agreement).toMatchObject({
+        state: 'proposed',
+        currentVersion: 1,
+      });
+      expect(
+        (
+          await client.query(
+            'SELECT state FROM exchange_agreements WHERE id = $1',
+            [first.agreementId]
+          )
+        ).rows[0].state
+      ).toBe(state);
+      expect(await listMessages(conversation.id, participantId)).toEqual([
+        expect.objectContaining({ id: first.message.id }),
+        expect.objectContaining({ id: next.message.id, body: 'Hola' }),
+      ]);
+      expect(await listConversations(authorId)).toContainEqual(
+        expect.objectContaining({
+          id: conversation.id,
+          agreementId: next.agreementId,
+          participantIds: [authorId, participantId].sort((a, b) => a - b),
+        })
+      );
+      expect(await getMessageDraft(conversation.id, authorId)).toBeNull();
+    }
+  );
+
+  test.each(['proposed', 'partially_confirmed', 'confirmed'])(
+    'preserves the draft and returns a conflict when an agreement is already %s',
+    async (state) => {
+      const authorId = await createUser(`active-author-${state}`);
+      const participantId = await createUser(`active-participant-${state}`);
+      const conversation = await createConversation([authorId, participantId]);
+      await client.query(
+        'INSERT INTO exchange_agreements (conversation_id, proposer_id, participant_id, state) VALUES ($1, $2, $3, $4)',
+        [conversation.id, authorId, participantId, state]
+      );
+      const listingId = await createListing(authorId, 'Libro disponible');
+      const draft = await upsertMessageDraft({
+        conversationId: conversation.id,
+        authorId,
+        body: 'Hola',
+        attachmentMetadata: {
+          key: `agreement-proposal:${listingId}`,
+          contentType: 'application/x-entrelibros-agreement-proposal',
+          size: 1,
+          kind: 'agreementProposal',
+          listingIds: [listingId],
+          details: {
+            meetingPoint: 'Biblioteca',
+            area: 'Centro',
+            date: '2026-10-19',
+            time: '22:32',
+            bookTitle: 'Libro disponible',
+          },
+        },
+      });
+      await expect(
+        sendMessageDraft({
+          conversationId: conversation.id,
+          authorId,
+          clientKey: 'conflicting-agreement',
+          revision: draft.revision,
+        })
+      ).rejects.toThrow('agreements.errors.conflict');
+      expect(await getMessageDraft(conversation.id, authorId)).toMatchObject({
+        id: draft.id,
+        revision: draft.revision,
+      });
+      expect(await listMessages(conversation.id, participantId)).toEqual([]);
+    }
+  );
+
   test('creates, updates and rejects stale revisions without touching messages', async () => {
     const authorId = await createUser('author');
     const participantId = await createUser('participant');
